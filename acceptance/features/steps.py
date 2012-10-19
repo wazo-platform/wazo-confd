@@ -17,12 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from lettuce import step
-from xivo_recording.tests.test_config import TestConfig
-from gevent import httplib
 from rest_campaign import RestCampaign
-
-
-testConfig = TestConfig()
 
 @step(u'When I create a campaign named "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, campaign_name):

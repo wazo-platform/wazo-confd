@@ -20,5 +20,11 @@
 class TestConfig(object):
 
 
+    XIVO_RECORD_SERVICE_ADDRESS = "127.0.0.1"
+    XIVO_RECORD_SERVICE_PORT = 5050
+    XIVO_REST_SERVICE_ROOT_PATH = "/rest"
+    XIVO_RECORDING_SERVICE_PATH = "/record"
+    CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
+
     def __init__(self):
-        self.XIVO_RECORD_SERVICE_URL = "127.0.0.1:5050/record/"
+        pass
