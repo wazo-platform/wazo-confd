@@ -33,6 +33,7 @@ class FlaskHttpServer(object):
         app.run(host=TestConfig.XIVO_RECORD_SERVICE_ADDRESS, port=TestConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
 
 
-    @app.route("/")
-    def root(self):
-        return "XiVO REST server"
+
+@app.route("/")
+def root():
+    return "XiVO REST server"

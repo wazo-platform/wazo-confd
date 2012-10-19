@@ -19,6 +19,7 @@
 from flask import Blueprint
 from flask_rest import RESTResource
 from tests.test_config import TestConfig
+from flask import request
 
 api = Blueprint("api", __name__, url_prefix=TestConfig.XIVO_REST_SERVICE_ROOT_PATH)
 
@@ -31,28 +32,27 @@ class RestHttpServer(object):
 
 
     def add(self):
-#        print("rest_id: " + rest_id + " data: " + data)
-        return 201, "nic"
+        print("request: " + request.data)
+        return 201, request.data
 #        return 400, form.errors
 
 
     def get(self, rest_id):
-        print("rest_id: " + rest_id)
-        return 200, ("Rest response, rest_id: " + rest_id)
+        print("rest_id: " + rest_id + "body: " + request.data)
+        return 200, ("Rest response, rest_id: " + rest_id + "body: " + request.data)
 
 
     def delete(self, rest_id):
         print("rest_id: " + rest_id)
         return 200, "DELETED"
 
-
-    def update(self, rest_id, data):
-        print("rest_id: " + rest_id + " data: " + data)
+    def update(self, rest_id):
+        print("rest_id: " + rest_id)
         return 200, "UPDATED"
-#        return 400, form.errors
+
 
     def list(self):
-        return "List to be implemented"
+        return 200, ("Rest response, body: " + request.data)
 
 
 project_resource = RESTResource(
