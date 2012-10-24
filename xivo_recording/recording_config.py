@@ -16,24 +16,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from flask import Flask
-from rest_http_server import api
-from flask import Blueprint
-from tests.test_config import TestConfig
 
-app = Flask(__name__)
-main = Blueprint("main", __name__)
+class RecordingConfig(object):
 
-app.register_blueprint(api)
-app.register_blueprint(main)
+    XIVO_RECORD_SERVICE_ADDRESS = "127.0.0.1"
+    XIVO_RECORD_SERVICE_PORT = 5050
+    XIVO_REST_SERVICE_ROOT_PATH = "/rest"
+    XIVO_RECORDING_SERVICE_PATH = "/record"
+    CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
+    CSV_SEPARATOR = ","
 
-class FlaskHttpServer(object):
+    POSTGRES_ADDRESS = "192.168.51.80"
+    RECORDING_DB_URI = "postgresql://asterisk:proformatique@" + POSTGRES_ADDRESS + "/asterisk"
 
-    def run(self):
-        app.run(host=TestConfig.XIVO_RECORD_SERVICE_ADDRESS, port=TestConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
+    POSTGRES_DEBUG = True
 
-
-#@app.route("/")
-#def root():
-#    return "XiVO REST server"
+    def __init__(self):
+        pass

@@ -16,74 +16,103 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import logging
 from flask import Blueprint
-from flask_rest import RESTResource
 from tests.test_config import TestConfig
 from flask import request
+from xivo_cti_encoding_interface.cti_encoder_provider import CtiEncoderProvider
+from flask_rest import RESTResource
 
 api = Blueprint("api", __name__, url_prefix=TestConfig.XIVO_REST_SERVICE_ROOT_PATH)
+
+logger = logging.getLogger(__name__)
 
 
 class RestHttpServer(object):
 
-
-    def __init__(self):
-        pass
-
-
-    def add(self):
-        print("request: " + request.data)
-        return 201, request.data
+#    @api.route('/', methods=["POST"])
+    def add(self, data):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 201, ("add, body: " + str(body) + " data: " + data + " args: " + str(request.args))
 #        return 400, form.errors
 
-
+#    @api.route('/', methods=["GET"])
     def get(self, rest_id):
-        print("rest_id: " + rest_id + "body: " + request.data)
-        return 200, ("Rest response, rest_id: " + rest_id + "body: " + request.data)
+        return 200, ("get, rest_id: " + rest_id + " args: " + str(request.args))
 
+    def delete(self, rest_id, data):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 200, ("DELETED, rest_id" + rest_id + " body: " + str(body) + " args: " + str(request.args))
 
-    def delete(self, rest_id):
-        print("rest_id: " + rest_id)
-        return 200, "DELETED"
+    def update(self, rest_id, data):
+        logger.debug("PUT body: " + request.data)
+        logger.debug("decode")
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 200, ("update, rest_id: " + rest_id + "body: " + str(body) + " args: " + str(request.args))
 
-    def update(self, rest_id):
-        print("rest_id: " + rest_id)
-        return 200, "UPDATED"
-
-
-    def list(self):
-        return 200, ("Rest response, body: " + request.data)
+    def list(self, data):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 200, ("list, body: " + str(body) + " args: " + str(request.args))
 
 
 project_resource = RESTResource(
     name="rest",
     inject_name="data",
-    route=TestConfig.XIVO_RECORDING_SERVICE_PATH,
+    route=TestConfig.XIVO_RECORDING_SERVICE_PATH + "/<data>",
     app=api,
-    actions=["add", "update", "delete", "get", "list"],
+    actions=["add", "update", "delete", "get"],  #"add", "update", "delete", "get", "list"],
     handler=RestHttpServer())
 
-# name, route, app, handler, authentifier=None, actions=None, inject_name=None):
-#        """
-#        :name:
-#            name of the resource. This is being used when registering
-#            the route, for its name and for the name of the id parameter
-#            that will be passed to the views
-#
-#        :route:
-#           Default route for this resource
-#
-#        :app:
-#            Application to register the routes onto
-#
-#        :actions:
-#            Authorized actions. Optional. None means all.
-#
-#        :handler:
-#            The handler instance which will handle the requests
-#
-#        :authentifier:
-#            callable checking the authentication. If specified, all the
-#            methods will be checked against it.
 
+class RestHttpServerRoot(object):
 
+    def add(self):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 201, ("add, body: " + str(body) + " args: " + str(request.args))
+#        return 400, form.errors
+
+    def get(self, rest_id):
+        return 200, ("get, rest_id: " + rest_id + " args: " + str(request.args))
+
+    def delete(self, rest_id):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 200, ("DELETED, rest_id" + rest_id + " body: " + str(body) + " args: " + str(request.args))
+
+    def update(self, rest_id):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 200, ("update, rest_id: " + rest_id + "body: " + str(body) + " args: " + str(request.args))
+
+    def list(self):
+        try:
+            body = CtiEncoderProvider.encoder.decode(request.data)
+        except ValueError:
+            body = "No data in the request"
+        return 200, ("list, body: " + str(body) + " args: " + str(request.args))
+
+project_resource = RESTResource(
+    name="rest",
+    route=TestConfig.XIVO_RECORDING_SERVICE_PATH + "/",
+    app=api,
+    actions=["add", "update", "delete", "get"],  #"add", "update", "delete", "get", "list"],
+    handler=RestHttpServerRoot())

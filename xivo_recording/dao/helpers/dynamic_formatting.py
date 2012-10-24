@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+#
 # Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
@@ -14,26 +14,14 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
-
-from flask import Flask
-from rest_http_server import api
-from flask import Blueprint
-from tests.test_config import TestConfig
-
-app = Flask(__name__)
-main = Blueprint("main", __name__)
-
-app.register_blueprint(api)
-app.register_blueprint(main)
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+from recording_config import RecordingConfig
 
 
-class FlaskHttpServer(object):
-
-    def run(self):
-        app.run(host=TestConfig.XIVO_RECORD_SERVICE_ADDRESS, port=TestConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
-
-
-#@app.route("/")
-#def root():
-#    return "XiVO REST server"
+def table_to_string(class_instance):
+    members = vars(class_instance)
+    result = ""
+    for n in members:
+        if not n.startswith('_'):
+            result += str(n) + ": " + str(getattr(class_instance, n)) + RecordingConfig.CSV_SEPARATOR
+    return result.rstrip(",")

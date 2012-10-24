@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+#
 # Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
@@ -14,26 +14,18 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Flask
-from rest_http_server import api
-from flask import Blueprint
-from tests.test_config import TestConfig
-
-app = Flask(__name__)
-main = Blueprint("main", __name__)
-
-app.register_blueprint(api)
-app.register_blueprint(main)
+from abc import ABCMeta
+from dao.helpers import dynamic_formatting
 
 
-class FlaskHttpServer(object):
+class GenericDao(object):
 
-    def run(self):
-        app.run(host=TestConfig.XIVO_RECORD_SERVICE_ADDRESS, port=TestConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
+    __metaclass__ = ABCMeta
 
+    def to_string(self):
+        return dynamic_formatting.table_to_string(self)
 
-#@app.route("/")
-#def root():
-#    return "XiVO REST server"
+    def to_dic(self):
+        return vars(self)
