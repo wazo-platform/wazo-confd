@@ -18,64 +18,49 @@
 
 import unittest
 import random
-from dao.record_dao import RecordDao, RecordDbBinder
+from dao.record_campaign_dao import RecordCampaignDao, RecordCampaignDbBinder
 from xivo_dao.alchemy import dbconnection
 from recording_config import RecordingConfig
 from dao.tests.table_utils import contains
 
 
-class TestRecordingDao(unittest.TestCase):
+class TestRecordCampaignDao(unittest.TestCase):
     '''
     Test pre-conditions:
-    - an agent with number 2002.
-    - a table called recording in Asterisk database :
-    
-    CREATE TABLE recording
+    - an queue named "prijem"
+    - a table called record_campaign in Asterisk database :
+
+   CREATE TABLE record_campaign
     (
-      cid character varying(32) NOT NULL,
-      call_direction call_dir_type,
-      start_time timestamp without time zone,
-      end_time timestamp without time zone,
-      caller character varying(32),
-      client_id character varying(1024),
-      calee character varying(32),
-      agent character varying(40),
-      CONSTRAINT recording_pkey PRIMARY KEY (cid ),
-      CONSTRAINT recording_agent_fkey FOREIGN KEY (agent)
-          REFERENCES agentfeatures ("number") MATCH SIMPLE
+      uniqueid character varying(32) NOT NULL,
+      base_filename character varying(64) NOT NULL,
+      queue_name character varying(255) NOT NULL,
+      CONSTRAINT record_campaign_pkey PRIMARY KEY (uniqueid ),
+      CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
+          REFERENCES queuefeatures (name) MATCH SIMPLE
           ON UPDATE NO ACTION ON DELETE NO ACTION
     )
     WITH (
       OIDS=FALSE
     );
-    ALTER TABLE recording
+    ALTER TABLE record_campaign
       OWNER TO asterisk;
-     
+
     '''
 
-    def test_recording_db(self):
+    def test_record_campaign_db(self):
 
-        cid = str(random.randint(10000, 99999999))
-        call_direction = "incoming"
-        start_time = "2004-10-19 10:23:54"
-        end_time = "2004-10-19 10:23:56"
-        caller = "+" + str(random.randint(1000, 9999))
-        client_id = "satisfied client Žluťoučký kůň"
-        callee = str(random.randint(100, 999))
-        agent = "2002"
-        separator = RecordingConfig.CSV_SEPARATOR
+        uniqueid = str(random.randint(10000, 99999999))
+        queue_name = "prijem"
+        base_filename = queue_name + "-" + uniqueid + "-"
 
-        expected_dir = {"cid": cid,
-                        "call_direction": call_direction,
-                        "start_time": start_time,
-                        "end_time": end_time,
-                        "caller": caller,
-                        "client_id": client_id,
-                        "callee": callee,
-                        "agent": agent
-                        }
+        expected_dir = {
+            "uniqueid": uniqueid,
+            "base_filename": base_filename,
+            "queue_name": queue_name
+        }
 
-        expected_object = RecordDao()
+        expected_object = RecordCampaignDao()
         for k, v in expected_dir.items():
             setattr(expected_object, k, v)
 
@@ -83,7 +68,7 @@ class TestRecordingDao(unittest.TestCase):
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
-        record_db = RecordDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
         record_db.insert_into(expected_dir)
         records = record_db.get_records()
 
@@ -95,4 +80,3 @@ class TestRecordingDao(unittest.TestCase):
         print(expected_object.to_string())
 
         self.assert_(contains(records, lambda record: record.to_string() == expected_object.to_string()), "Write/read from database failed")
-

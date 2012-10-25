@@ -15,13 +15,24 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from xivo_dao.alchemy import dbconnection
 from recording_config import RecordingConfig
+from dao.record_campaign_dao import RecordCampaignDao, RecordCampaignDbBinder
 
 
-def table_to_string(class_instance):
-    members = vars(class_instance)
-    result = ""
-    for n in sorted(set(members)):
-        if not n.startswith('_'):
-            result += str(n) + ": " + str(getattr(class_instance, n)) + RecordingConfig.CSV_SEPARATOR
-    return result.rstrip(",")
+class CampagneManagement(object):
+
+    def __init__(self):
+        dbconnection.unregister_db_connection_pool()
+        dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
+        dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
+
+        self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+
+    def create_campagne(self, name, params):
+        data = dict()
+        data["uniqueid"] = name
+        data.update(params)
+        self.record_db.insert_into(params)
+

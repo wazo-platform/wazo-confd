@@ -16,14 +16,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from gevent.wsgi import WSGIServer
+from flask import Flask
+from rest_http_server import api
+from rest_http_root import root
+from recording_config import RecordingConfig
+
+app = Flask(__name__)
+
+app.register_blueprint(api)
+app.register_blueprint(root)
 
 
-class WsgiHttpServer(object):
-
-    def __init__(self, port):
-        pass
+class FlaskHttpServer(object):
 
     def run(self):
-        self.server = WSGIServer(('', self._port_number), self.application)
-        self.server.serve_forever()
+        app.run(host=RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS, port=RecordingConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
+
+
+#@app.route("/")
+#def root():
+#    return "XiVO REST server"

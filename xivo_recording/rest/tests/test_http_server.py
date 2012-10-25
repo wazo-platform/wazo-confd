@@ -19,13 +19,13 @@
 
 import unittest
 from mock import Mock
-from xivo_recording.http_server import HttpServer
+from rest.flask_http_server import FlaskHttpServer
 
 
-class TestHttpServer(unittest.TestCase):
+class TestFlaskHttpServer(unittest.TestCase):
 
     def setUp(self):
-        self.http_server = HttpServer(5999)
+        self.http_server = FlaskHttpServer(5999)
 
     def test_create_named_campaign_monoqueue(self):
         response = Mock()

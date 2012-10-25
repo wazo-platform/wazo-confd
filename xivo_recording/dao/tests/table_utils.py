@@ -15,13 +15,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from recording_config import RecordingConfig
 
 
-def table_to_string(class_instance):
-    members = vars(class_instance)
-    result = ""
-    for n in sorted(set(members)):
-        if not n.startswith('_'):
-            result += str(n) + ": " + str(getattr(class_instance, n)) + RecordingConfig.CSV_SEPARATOR
-    return result.rstrip(",")
+def contains(listing, filter_fct):
+    for x in listing:
+        if filter_fct(x):
+            return True
+    return False

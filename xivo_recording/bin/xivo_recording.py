@@ -21,19 +21,21 @@ import logging
 import sys
 import argparse
 from xivo import daemonize
-from flask_http_server import FlaskHttpServer
-
+from service_manager import ServiceManager
 
 DAEMONNAME = 'xivo-recording'
 DEBUG_MODE = False
 LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
+
 def main():
     parsed_args = _parse_args(sys.argv[1:])
-    httpServer = FlaskHttpServer()
-    httpServer.run()
     _init_logging(parsed_args.debug)
+
+    serviceManager = ServiceManager()
+    serviceManager.run()
+
     if not parsed_args.debug:
         _daemonize()
 
