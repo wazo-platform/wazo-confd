@@ -37,7 +37,7 @@ class RecordDbBinder(object):
     def get_records(self):
         return self.session.query(RecordDao).all()
 
-    def insert_into(self, params):
+    def add(self, params):
         record = RecordDao()
         for k, v in params.items():
             setattr(record, k, v)

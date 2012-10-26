@@ -1,0 +1,77 @@
+Depends :
+---------
+
+
+- gevent
+- flask
+- flask_rest
+- SQLAlchemy
+
+
+Install dependencies :
+----------------------
+
+TODO
+
+Installation :
+--------------
+
+TODO
+
+Configuration :
+---------------
+
+- Following tables need to be created:
+
+    CREATE TABLE recording
+    (
+      cid character varying(32) NOT NULL,
+      call_direction call_dir_type,
+      start_time timestamp without time zone,
+      end_time timestamp without time zone,
+      caller character varying(32),
+      client_id character varying(1024),
+      calee character varying(32),
+      agent character varying(40),
+      CONSTRAINT recording_pkey PRIMARY KEY (cid ),
+      CONSTRAINT recording_agent_fkey FOREIGN KEY (agent)
+          REFERENCES agentfeatures ("number") MATCH SIMPLE
+          ON UPDATE NO ACTION ON DELETE NO ACTION
+    )
+    WITH (
+      OIDS=FALSE
+    );
+    ALTER TABLE recording
+      OWNER TO asterisk;
+
+
+   CREATE TABLE record_campaign
+    (
+      uniqueid character varying(32) NOT NULL,
+      base_filename character varying(64) NOT NULL,
+      queue_name character varying(255) NOT NULL,
+      CONSTRAINT record_campaign_pkey PRIMARY KEY (uniqueid ),
+      CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
+          REFERENCES queuefeatures (name) MATCH SIMPLE
+          ON UPDATE NO ACTION ON DELETE NO ACTION
+    )
+    WITH (
+      OIDS=FALSE
+    );
+    ALTER TABLE record_campaign
+      OWNER TO asterisk;
+
+
+- Other parameters are in the file xivo_recording/recording_config.py 
+
+TODO: Creation of required tables by a script
+
+Starting :
+----------
+
+TODO
+
+Packaging :
+-----------
+Create the tar
+tar -cvf xivo-recording tar xivo-recording/ --exclude xivo-recording/.git --exclude *.log --exclude .project --exclude .pydevproject --exclude tests

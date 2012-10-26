@@ -21,8 +21,8 @@ from flask import Blueprint
 from flask import request
 from flask_rest import RESTResource
 from recording_config import RecordingConfig
-from xivo_cti_protocol import cti_encoder
 from service_manager import campagneManager
+import cti_encoder
 
 api = Blueprint("api", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
 

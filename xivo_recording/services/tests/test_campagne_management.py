@@ -17,21 +17,26 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-from services.campagne_management import CampagneManagement
-from mock import Mock
 import random
+from mock import Mock
+from services.campagne_management import CampagneManagement
 
 
 class TestCampagneManagement(unittest.TestCase):
 
     def setUp(self):
+        '''
+        !!! ************************************************************************* !!!
+        Test KO because of multiple CampagneManagement initialization, refactoring needed
+        !!! ************************************************************************* !!!
+        '''
         self._campagneManager = CampagneManagement()
         self._campagneManager.record_db = Mock()
+        self._campaignName = "test-campagne" + str(random.randint(10, 99))
 
-    def test_campagne_creation(self):
-        campaignName = "test-campagne" + str(random.randint(10, 99))
+    def test_create_campagne(self):
         queue_name = "prijem"
-        base_filename = queue_name + "-" + campaignName + "-"
+        base_filename = queue_name + "-" + self._campaignName + "-"
 
         params = {
             "base_filename": base_filename,
@@ -40,12 +45,15 @@ class TestCampagneManagement(unittest.TestCase):
 
         expected_params = params.copy()
 
-        expected_params["uniqueid"] = campaignName
+        expected_params["uniqueid"] = self._campaignName
 
-        self._campagneManager.record_db.insert_into(expected_params)
+        self._campagneManager.record_db.add(expected_params)
 
-        self._campagneManager.create_campagne(campaignName, params)
-        self._campagneManager.record_db.insert_into.assert_called_with(expected_params)
+        self._campagneManager.create_campagne(self._campaignName, params)
+        self._campagneManager.record_db.add.assert_called_with(expected_params)
+
+    def test_get_campagne(self):
+        pass
 
 
 

@@ -84,7 +84,7 @@ class TestRecordingDao(unittest.TestCase):
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
         record_db = RecordDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-        record_db.insert_into(expected_dir)
+        record_db.add(expected_dir)
         records = record_db.get_records()
 
         print("read from database:")

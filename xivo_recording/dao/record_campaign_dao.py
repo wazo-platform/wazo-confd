@@ -38,7 +38,7 @@ class RecordCampaignDbBinder(object):
     def get_records(self):
         return self.session.query(RecordCampaignDao).all()
 
-    def insert_into(self, params):
+    def add(self, params):
         record = RecordCampaignDao()
         for k, v in params.items():
             setattr(record, k, v)

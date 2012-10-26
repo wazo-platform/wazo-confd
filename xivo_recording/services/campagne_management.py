@@ -18,12 +18,13 @@
 
 from xivo_dao.alchemy import dbconnection
 from recording_config import RecordingConfig
-from dao.record_campaign_dao import RecordCampaignDao, RecordCampaignDbBinder
+from dao.record_campaign_dao import RecordCampaignDbBinder
 
 
 class CampagneManagement(object):
 
     def __init__(self):
+
         dbconnection.unregister_db_connection_pool()
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
@@ -31,8 +32,10 @@ class CampagneManagement(object):
         self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
     def create_campagne(self, name, params):
-        data = dict()
-        data["uniqueid"] = name
-        data.update(params)
-        self.record_db.insert_into(params)
+        params["uniqueid"] = name
+        self.record_db.add(params)
+
+    def get_campagne(self, name):
+        pass
+
 

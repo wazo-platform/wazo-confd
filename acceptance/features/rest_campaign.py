@@ -19,9 +19,9 @@
 from gevent import httplib
 
 from recording_config import RecordingConfig
-from xivo_cti_protocol import cti_encoder
 import random
 import time
+import cti_encoder
 
 
 class RestCampaign(object):
