@@ -21,7 +21,6 @@ from recording_config import RecordingConfig
 from dao.record_campaign_dao import RecordCampaignDbBinder
 from sqlalchemy.exc import OperationalError
 import logging
-from mock import Mock
 
 logger = logging.getLogger(__name__)
 
