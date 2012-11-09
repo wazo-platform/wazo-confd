@@ -67,6 +67,3 @@ class CampagneManagement(object):
                 result = {}
         return result
 
-
-campagne_manager = CampagneManagement()
-

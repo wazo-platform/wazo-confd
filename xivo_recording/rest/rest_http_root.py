@@ -22,7 +22,7 @@ from flask import request
 from flask_rest import RESTResource
 from recording_config import RecordingConfig
 import cti_encoder
-from services import campagne_management
+from services.campagne_management import CampagneManagement
 
 root = Blueprint("root", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class RestHttpServerRoot(object):
 
     def __init__(self):
-        self._campagne_manager = campagne_management.campagne_manager
+        self._campagne_manager = CampagneManagement()
 
     def add(self):
         try:

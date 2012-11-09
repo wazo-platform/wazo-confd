@@ -22,7 +22,7 @@ from flask import request
 from flask_rest import RESTResource
 from recording_config import RecordingConfig
 import cti_encoder
-from services import campagne_management
+from services.campagne_management import CampagneManagement
 
 api = Blueprint("api", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
 
@@ -32,18 +32,20 @@ logger = logging.getLogger(__name__)
 class RestHttpServer(object):
 
     def __init__(self):
-        self._campagne_manager = campagne_management.campagne_manager
+        self._campagne_manager = CampagneManagement()
 
     def add(self, data):
         try:
             body = cti_encoder.decode(request.data)
         except ValueError:
             body = "No parsable data in the request"
+            return 400, body
+
         result = self._campagne_manager.create_campagne(body)
         if (result == True):
             return 201, ("Added: " + str(result))
         else:
-            return 400, str(result)
+            return 500, str(result)
 
     def get(self, rest_id):
         return 501, ("Work in progress, get, rest_id: " + rest_id + " args: " + str(request.args))

@@ -32,7 +32,8 @@ class TestFlaskHttpServer(unittest.TestCase):
     def setUp(self):
         self.app = flask_http_server.app.test_client()
 
-    @patch("services.campagne_management.campagne_manager", mock_campagne_management)
+    # TODO: Refactor to be able to test called_with (and to work without db)
+    @patch("services.campagne_management.__init__", mock_campagne_management)
     def test_get_campaigns(self):
         data = {}
         status = "200 OK"
@@ -47,7 +48,8 @@ class TestFlaskHttpServer(unittest.TestCase):
 
         mock_campagne_management.get_campagnes_as_dict.assert_called_with()
 
-    @patch("services.campagne_management.campagne_manager", mock_campagne_management)
+    # TODO: Refactor to be able to test called_with (and to work without db)
+    @patch("services.campagne_management.__init__", mock_campagne_management)
     def test_add_campaign(self):
         status = "200 OK"
 
@@ -72,4 +74,4 @@ class TestFlaskHttpServer(unittest.TestCase):
 
         self.assertEqual(status, result.status)
 
-        mock_campagne_management.get_campagnes_as_dict.assert_called()
+        mock_campagne_management.get_campagnes_as_dict.assert_called_with()

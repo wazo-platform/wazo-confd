@@ -19,13 +19,13 @@
 import unittest
 import random
 from mock import Mock
-from services.campagne_management import campagneManager
+from services.campagne_management import CampagneManagement
 
 
 class TestCampagneManagement(unittest.TestCase):
 
     def setUp(self):
-        self._campagneManager = campagneManager
+        self._campagneManager = CampagneManagement()
         self._campagneManager.record_db = Mock()
         self._campaignName = "test-campagne" + str(random.randint(10, 99))
 
