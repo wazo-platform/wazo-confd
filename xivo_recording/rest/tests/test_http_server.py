@@ -18,21 +18,58 @@
 
 
 import unittest
-from mock import Mock
-from rest.flask_http_server import FlaskHttpServer
+from mock import Mock, patch
+from rest import flask_http_server
+from recording_config import RecordingConfig
+import random
+from services.campagne_management import CampagneManagement
+
+mock_campagne_management = Mock(CampagneManagement)
 
 
 class TestFlaskHttpServer(unittest.TestCase):
 
     def setUp(self):
-        self.http_server = FlaskHttpServer(5999)
+        self.app = flask_http_server.app.test_client()
 
-    def test_create_named_campaign_monoqueue(self):
-        response = Mock()
+    @patch("services.campagne_management.campagne_manager", mock_campagne_management)
+    def test_get_campaigns(self):
+        data = {}
+        status = "200 OK"
+        mock_campagne_management.get_campagnes_as_dict.return_value = data
 
-        status = '200 OK'
-        headers = [
-            ('Content-Type', 'application/json')
-        ]
+        result = self.app.get(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
+                              "/")
 
-        response.assert_called_with(status, headers)
+        self.assertEqual(status, result.status)
+        print result.data
+
+        mock_campagne_management.get_campagnes_as_dict.assert_called_with()
+
+    @patch("services.campagne_management.campagne_manager", mock_campagne_management)
+    def test_add_campaign(self):
+        status = "200 OK"
+
+        unique_id = str(random.randint(10000, 99999999))
+        campagne_name = "campagne-" + unique_id
+        queue_name = "prijem"
+        base_filename = campagne_name + "-"
+
+        data = {
+            "unique_id": unique_id,
+            "campagne_name": campagne_name,
+            "activated": False,
+            "base_filename": base_filename,
+            "queue_name": queue_name
+        }
+
+        mock_campagne_management.get_campagnes_as_dict.return_value = data
+
+        result = self.app.get(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
+                              "/")
+
+        self.assertEqual(status, result.status)
+
+        mock_campagne_management.get_campagnes_as_dict.assert_called()

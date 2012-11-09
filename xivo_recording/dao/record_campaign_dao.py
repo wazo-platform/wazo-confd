@@ -22,6 +22,9 @@ from sqlalchemy.orm import mapper
 from xivo_dao.alchemy import dbconnection
 from recording_config import RecordingConfig
 from dao.generic_dao import GenericDao
+from sqlalchemy.orm.exc import UnmappedClassError
+from sqlalchemy.orm.util import class_mapper
+from dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 
 class RecordCampaignDao(GenericDao):
@@ -35,6 +38,9 @@ class RecordCampaignDbBinder(object):
     def __init__(self, session):
         self.session = session
 
+    def get_records_as_dict(self):
+        return table_list_to_list_dict(self.session.query(RecordCampaignDao).all())
+
     def get_records(self):
         return self.session.query(RecordCampaignDao).all()
 
@@ -42,15 +48,23 @@ class RecordCampaignDbBinder(object):
         record = RecordCampaignDao()
         for k, v in params.items():
             setattr(record, k, v)
-        self.session.add(record)
-        self.session.commit()
+        try:
+            self.session.add(record)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            return e
+        return True
 
     @classmethod
     def new_from_uri(cls, uri):
-        engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
-        metadata = MetaData(engine)
-        data = Table(cls.__tablename__, metadata, autoload=True)
-        mapper(RecordCampaignDao, data)
+        try:
+            class_mapper(RecordCampaignDao)
+        except UnmappedClassError:
+            engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
+            metadata = MetaData(engine)
+            data = Table(cls.__tablename__, metadata, autoload=True)
+            mapper(RecordCampaignDao, data)
 
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())

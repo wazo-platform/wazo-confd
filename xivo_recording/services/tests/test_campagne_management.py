@@ -19,38 +19,34 @@
 import unittest
 import random
 from mock import Mock
-from services.campagne_management import CampagneManagement
+from services.campagne_management import campagneManager
 
 
 class TestCampagneManagement(unittest.TestCase):
 
     def setUp(self):
-        '''
-        !!! ************************************************************************* !!!
-        Test KO because of multiple CampagneManagement initialization, refactoring needed
-        !!! ************************************************************************* !!!
-        '''
-        self._campagneManager = CampagneManagement()
+        self._campagneManager = campagneManager
         self._campagneManager.record_db = Mock()
         self._campaignName = "test-campagne" + str(random.randint(10, 99))
 
     def test_create_campagne(self):
+        unique_id = str(random.randint(10000, 99999999))
+        campagne_name = "campagne-" + unique_id
         queue_name = "prijem"
-        base_filename = queue_name + "-" + self._campaignName + "-"
+        base_filename = campagne_name + "-"
 
-        params = {
+        data = {
+            "unique_id": unique_id,
+            "campagne_name": campagne_name,
+            "activated": False,
             "base_filename": base_filename,
             "queue_name": queue_name
         }
 
-        expected_params = params.copy()
+        self._campagneManager.record_db.add(data)
 
-        expected_params["uniqueid"] = self._campaignName
-
-        self._campagneManager.record_db.add(expected_params)
-
-        self._campagneManager.create_campagne(self._campaignName, params)
-        self._campagneManager.record_db.add.assert_called_with(expected_params)
+        self._campagneManager.create_campagne(data)
+        self._campagneManager.record_db.add.assert_called_with(data)
 
     def test_get_campagne(self):
         pass

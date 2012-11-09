@@ -19,7 +19,7 @@
 
 class RecordingConfig(object):
 
-    XIVO_RECORD_SERVICE_ADDRESS = "127.0.0.1"
+    XIVO_RECORD_SERVICE_ADDRESS = "192.168.51.100"  #"127.0.0.1"
     XIVO_RECORD_SERVICE_PORT = 5050
     XIVO_REST_SERVICE_ROOT_PATH = "/rest"
     XIVO_RECORDING_SERVICE_PATH = "/record"
@@ -27,7 +27,7 @@ class RecordingConfig(object):
 
     CSV_SEPARATOR = ","
 
-    POSTGRES_ADDRESS = "192.168.51.80"
+    POSTGRES_ADDRESS = "192.168.51.80"  #"127.0.0.1"
     RECORDING_DB_URI = "postgresql://asterisk:proformatique@" + POSTGRES_ADDRESS + "/asterisk"
 
     POSTGRES_DEBUG = True

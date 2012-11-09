@@ -25,3 +25,17 @@ def table_to_string(class_instance):
         if not n.startswith('_'):
             result += str(n) + ": " + str(getattr(class_instance, n)) + RecordingConfig.CSV_SEPARATOR
     return result.rstrip(",")
+
+
+def table_list_to_list_dict(list_instance):
+    list_of_dict = []
+
+    for class_instance in list_instance:
+        dict_instance = {}
+        members = vars(class_instance)
+        for elem in sorted(set(members)):
+            if not elem.startswith('_'):
+                dict_instance[str(elem)] = str(getattr(class_instance, elem))
+        list_of_dict.append(dict_instance)
+
+    return list_of_dict

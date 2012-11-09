@@ -22,6 +22,7 @@ from flask import request
 from flask_rest import RESTResource
 from recording_config import RecordingConfig
 import cti_encoder
+from services import campagne_management
 
 root = Blueprint("root", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
 
@@ -30,41 +31,40 @@ logger = logging.getLogger(__name__)
 
 class RestHttpServerRoot(object):
 
+    def __init__(self):
+        self._campagne_manager = campagne_management.campagne_manager
+
     def add(self):
         try:
             body = cti_encoder.decode(request.data)
         except ValueError:
-            body = "No data in the request"
-        return 201, ("add, body: " + str(body) + " args: " + str(request.args))
-#        return 400, form.errors
+            body = "No parsable data in the request"
+        return 501, ("Work in progress, root add, body: " + str(body) + " args: " + str(request.args))
 
-    def get(self, rest_id):
-        return 200, ("get, rest_id: " + rest_id + " args: " + str(request.args))
+    def get(self):
+        return 501, ("Work in progress, root get, args: " + str(request.args))
 
-    def delete(self, rest_id):
+    def delete(self):
         try:
             body = cti_encoder.decode(request.data)
         except ValueError:
-            body = "No data in the request"
-        return 200, ("DELETED, rest_id" + rest_id + " body: " + str(body) + " args: " + str(request.args))
+            body = "No parsable data in the request"
+        return 501, ("Work in progress, root delete, body: " + str(body) + " args: " + str(request.args))
 
-    def update(self, rest_id):
+    def update(self):
         try:
             body = cti_encoder.decode(request.data)
         except ValueError:
-            body = "No data in the request"
-        return 200, ("update, rest_id: " + rest_id + "body: " + str(body) + " args: " + str(request.args))
+            body = "No parsable data in the request"
+        return 501, ("Work in progress, root update, body: " + str(body) + " args: " + str(request.args))
 
     def list(self):
-        try:
-            body = cti_encoder.decode(request.data)
-        except ValueError:
-            body = "No data in the request"
-        return 200, ("list, body: " + str(body) + " args: " + str(request.args))
+        result = self._campagne_manager.get_campagnes_as_dict()
+        return 200, (cti_encoder.encode(result))
 
 project_resource = RESTResource(
     name="rest",
     route=RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/",
     app=root,
-    actions=["add", "update", "delete", "get"],  #"add", "update", "delete", "get", "list"],
+    actions=["add", "update", "delete", "get", "list"],
     handler=RestHttpServerRoot())

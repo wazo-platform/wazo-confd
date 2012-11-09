@@ -19,23 +19,54 @@
 from xivo_dao.alchemy import dbconnection
 from recording_config import RecordingConfig
 from dao.record_campaign_dao import RecordCampaignDbBinder
+from sqlalchemy.exc import OperationalError
+import logging
+from mock import Mock
+
+logger = logging.getLogger(__name__)
 
 
 class CampagneManagement(object):
 
     def __init__(self):
+        self.__init_db_connection()
 
+    def __init_db_connection(self):
         dbconnection.unregister_db_connection_pool()
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
         self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
-    def create_campagne(self, name, params):
-        params["uniqueid"] = name
-        self.record_db.add(params)
+    def create_campagne(self, params):
+        return self.record_db.add(params)
 
     def get_campagne(self, name):
-        pass
+        try:
+            result = self.record_db.get_records()
+        except OperationalError:
+            # if the database was restarted we need to reconnect
+            try:
+                self.__init_db_connection()
+                result = self.record_db.get_records()
+            except:
+                logger.critical("Database connection failure!")
+                result = {}
+        return result
 
+    def get_campagnes_as_dict(self):
+        try:
+            result = self.record_db.get_records_as_dict()
+        except OperationalError:
+            # if the database was restarted we need to reconnect
+            try:
+                self.__init_db_connection()
+                result = self.record_db.get_records_as_dict()
+            except:
+                logger.critical("Database connection failure!")
+                result = {}
+        return result
+
+
+campagne_manager = CampagneManagement()
 

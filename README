@@ -1,27 +1,41 @@
+!!! Work in progress !!!
+
+TODO:
+-----
+- refactor tests of rest_http_*
+- refactor db integration 
+
+
 Depends :
 ---------
+XiVO:
+- xivo-cti-protocol
+- xivo-dao
+- lib-python
 
-
+External:
 - gevent
 - flask
 - flask_rest
 - SQLAlchemy
 
+HTTP/PHP:
+- HTTPful
+
 
 Install dependencies :
 ----------------------
-
 TODO
+
 
 Installation :
 --------------
-
 TODO
+
 
 Configuration :
 ---------------
-
-- Following tables need to be created:
+- Following tables need to be created in the Asterisk database:
 
     CREATE TABLE recording
     (
@@ -45,32 +59,35 @@ Configuration :
       OWNER TO asterisk;
 
 
-   CREATE TABLE record_campaign
-    (
-      uniqueid character varying(32) NOT NULL,
-      base_filename character varying(64) NOT NULL,
-      queue_name character varying(255) NOT NULL,
-      CONSTRAINT record_campaign_pkey PRIMARY KEY (uniqueid ),
-      CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
-          REFERENCES queuefeatures (name) MATCH SIMPLE
-          ON UPDATE NO ACTION ON DELETE NO ACTION
-    )
-    WITH (
-      OIDS=FALSE
-    );
-    ALTER TABLE record_campaign
-      OWNER TO asterisk;
-
+	CREATE TABLE record_campaign
+	(
+	  unique_id character varying(32) NOT NULL,
+	  campagne_name character varying(128) NOT NULL,
+	  base_filename character varying(64) NOT NULL,
+	  queue_name character varying(255) NOT NULL,
+	  activated boolean NOT NULL,
+	  CONSTRAINT record_campaign_pkey PRIMARY KEY (unique_id ),
+	  CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
+	      REFERENCES queuefeatures (name) MATCH SIMPLE
+	      ON UPDATE NO ACTION ON DELETE NO ACTION
+	)
+	WITH (
+	  OIDS=FALSE
+	);
+	ALTER TABLE record_campaign
+	  OWNER TO asterisk;
 
 - Other parameters are in the file xivo_recording/recording_config.py 
+- TODO: Creation of required tables by a script
 
-TODO: Creation of required tables by a script
 
 Starting :
 ----------
-
-TODO
-
+!!! Not prepared for production !!!
+- The internal Flask http server is used for the moment, but it needs to be refactored and integrated in nginx for production.
+- /bin/xivo_recording is to be run.
+ 
+ 
 Packaging :
 -----------
 Create the tar

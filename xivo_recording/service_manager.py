@@ -17,16 +17,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from rest.flask_http_server import FlaskHttpServer
-from services.campagne_management import CampagneManagement
-
-campagneManager = CampagneManagement()
 
 
 class ServiceManager(object):
 
     def __init__(self):
-        self.httpServer = FlaskHttpServer()
+        self.flaskServer = FlaskHttpServer()
 
     def run(self):
-        self.httpServer.run()
+        self.flaskServer.run()
 

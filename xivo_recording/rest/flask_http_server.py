@@ -30,9 +30,5 @@ app.register_blueprint(root)
 class FlaskHttpServer(object):
 
     def run(self):
-        app.run(host=RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS, port=RecordingConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
-
-
-#@app.route("/")
-#def root():
-#    return "XiVO REST server"
+        app.run(host=RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS,
+                port=RecordingConfig.XIVO_RECORD_SERVICE_PORT, debug=True)

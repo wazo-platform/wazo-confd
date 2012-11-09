@@ -30,12 +30,14 @@ class TestRecordCampaignDao(unittest.TestCase):
     - an queue named "prijem"
     - a table called record_campaign in Asterisk database :
 
-   CREATE TABLE record_campaign
+    CREATE TABLE record_campaign
     (
-      uniqueid character varying(32) NOT NULL,
+      unique_id character varying(32) NOT NULL,
+      campagne_name character varying(128) NOT NULL,
+      activated boolean NOT NULL,
       base_filename character varying(64) NOT NULL,
       queue_name character varying(255) NOT NULL,
-      CONSTRAINT record_campaign_pkey PRIMARY KEY (uniqueid ),
+      CONSTRAINT record_campaign_pkey PRIMARY KEY (unique_id ),
       CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
           REFERENCES queuefeatures (name) MATCH SIMPLE
           ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -45,17 +47,19 @@ class TestRecordCampaignDao(unittest.TestCase):
     );
     ALTER TABLE record_campaign
       OWNER TO asterisk;
-
     '''
 
     def test_record_campaign_db(self):
 
-        uniqueid = str(random.randint(10000, 99999999))
+        unique_id = str(random.randint(10000, 99999999))
+        campagne_name = "campagne-" + unique_id
         queue_name = "prijem"
-        base_filename = queue_name + "-" + uniqueid + "-"
+        base_filename = campagne_name + "-"
 
         expected_dir = {
-            "uniqueid": uniqueid,
+            "unique_id": unique_id,
+            "campagne_name": campagne_name,
+            "activated": False,
             "base_filename": base_filename,
             "queue_name": queue_name
         }
@@ -79,4 +83,6 @@ class TestRecordCampaignDao(unittest.TestCase):
         print("saved:")
         print(expected_object.to_string())
 
-        self.assert_(contains(records, lambda record: record.to_string() == expected_object.to_string()), "Write/read from database failed")
+        self.assert_(contains(records, lambda record:
+                        record.to_string() == expected_object.to_string()),
+                        "Write/read from database failed")
