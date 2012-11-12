@@ -59,8 +59,11 @@ class RestHttpServerRoot(object):
         return 501, ("Work in progress, root update, body: " + str(body) + " args: " + str(request.args))
 
     def list(self):
-        result = self._campagne_manager.get_campagnes_as_dict()
-        return 200, (cti_encoder.encode(result))
+        try:
+            result = self._campagne_manager.get_campagnes_as_dict()
+            return 200, (cti_encoder.encode(result))
+        except Exception as e:
+            return 500, str(e)
 
 project_resource = RESTResource(
     name="rest",

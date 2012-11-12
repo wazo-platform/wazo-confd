@@ -38,7 +38,7 @@ class RestHttpServer(object):
         try:
             body = cti_encoder.decode(request.data)
         except ValueError:
-            body = "No parsable data in the request"
+            body = "No parsable data in the request, data: " + request.data
             return 400, body
 
         result = self._campagne_manager.create_campagne(body)
@@ -79,5 +79,5 @@ project_resource = RESTResource(
     inject_name="data",
     route=RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/<data>",
     app=api,
-    actions=["add", "update", "delete", "get", "list"],  #"add", "update", "delete", "get", "list"],
+    actions=["add", "update", "delete", "get", "list"],
     handler=RestHttpServer())

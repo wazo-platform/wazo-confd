@@ -53,10 +53,8 @@ class RecordDbBinder(object):
             self.session.commit()
         except Exception as e:
             self.session.rollback()
-            return e
+            raise e
         return True
-
-
 
     @classmethod
     def new_from_uri(cls, uri):

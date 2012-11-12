@@ -19,10 +19,11 @@
 
 import unittest
 from mock import Mock, patch
-from rest import flask_http_server
 from recording_config import RecordingConfig
 import random
 from services.campagne_management import CampagneManagement
+from xivo_cti_protocol import cti_encoder
+from dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 mock_campagne_management = Mock(CampagneManagement)
 
@@ -30,49 +31,89 @@ mock_campagne_management = Mock(CampagneManagement)
 class TestFlaskHttpServer(unittest.TestCase):
 
     def setUp(self):
+
+        self.patcher = patch("services.campagne_management.CampagneManagement")
+
+        mock = self.patcher.start()
+        self.instance_campagne_management = mock_campagne_management
+        mock.return_value = self.instance_campagne_management
+
+        from rest import flask_http_server
+        flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 
-    # TODO: Refactor to be able to test called_with (and to work without db)
-    @patch("services.campagne_management.CampagneManagement", mock_campagne_management)
-    def test_get_campaigns(self):
-        data = {}
-        status = "200 OK"
-        mock_campagne_management.get_campagnes_as_dict.return_value = data
+    def tearDown(self):
+        self.patcher.stop()
 
-        result = self.app.get(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
-                              "/")
-
-        self.assertEqual(status, result.status)
-        print result.data
-
-        mock_campagne_management.get_campagnes_as_dict.assert_called_with()
-
-
-    # TODO: Refactor to be able to test called_with  (and to work without db)
-    @patch("services.campagne_management.CampagneManagement", mock_campagne_management)
-    def test_add_campaign(self):
-        status = "200 OK"
+    def test_add_campaign_fail(self):
+        status = "500 INTERNAL SERVER ERROR"
+        body = "error to fail the test"
 
         unique_id = str(random.randint(10000, 99999999))
         campagne_name = "campagne-" + unique_id
-        queue_name = "prijem"
-        base_filename = campagne_name + "-"
 
         data = {
             "unique_id": unique_id,
             "campagne_name": campagne_name,
             "activated": False,
-            "base_filename": base_filename,
-            "queue_name": queue_name
+            "base_filename": campagne_name + "-",
+            "queue_name": "prijem"
         }
 
-        mock_campagne_management.get_campagnes_as_dict.return_value = data
+        self.instance_campagne_management.create_campagne.return_value = body
+
+        result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
+                              '/' + data["unique_id"], data=cti_encoder.encode(data))
+
+        self.instance_campagne_management.create_campagne.assert_called_with(data)
+        self.assertTrue(str(result.status).startswith(status) and body == str(result.data).strip('"'),
+                        "Status comparison failed, received status:" + result.status + ", data: " + result.data)
+
+    def test_add_campaign_success(self):
+        status = "201 CREATED"
+
+        unique_id = str(random.randint(10000, 99999999))
+        campagne_name = "campagne-" + unique_id
+
+        data = {
+            "unique_id": unique_id,
+            "campagne_name": campagne_name,
+            "activated": False,
+            "base_filename": campagne_name + "-",
+            "queue_name": "prijem"
+        }
+
+        self.instance_campagne_management.create_campagne.return_value = True
+
+        result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
+                              '/' + data["unique_id"], data=cti_encoder.encode(data))
+
+        self.instance_campagne_management.create_campagne.assert_called_with(data)
+        self.assertTrue(str(result.status).startswith(status), "Status comparison failed, received status:" + result.status + ", data: " + result.data)
+
+    def test_get_campaigns(self):
+        status = "200 OK"
+
+        unique_id = str(random.randint(10000, 99999999))
+        campagne_name = "campagne-" + unique_id
+
+        data = {
+            "unique_id": unique_id,
+            "campagne_name": campagne_name,
+            "activated": False,
+            "base_filename": campagne_name + "-",
+            "queue_name": "prijem"
+        }
+
+        self.instance_campagne_management.get_campagnes_as_dict.return_value = data
 
         result = self.app.get(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
-                              "/")
+                            RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
+                            '/')
 
         self.assertEqual(status, result.status)
-
-        mock_campagne_management.get_campagnes_as_dict.assert_called()
+        received_data = cti_encoder.decode(result.data.replace("\\", "").strip('"'))
+        self.assertDictEqual(received_data, data)
+        self.instance_campagne_management.get_campagnes_as_dict.assert_called_with()
