@@ -63,7 +63,7 @@ class RestHttpServerRoot(object):
             result = self._campagne_manager.get_campagnes_as_dict()
             return 200, (cti_encoder.encode(result))
         except Exception as e:
-            return 500, str(e)
+            return 500, e.args
 
 project_resource = RESTResource(
     name="rest",

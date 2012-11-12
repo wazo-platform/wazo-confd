@@ -20,6 +20,10 @@ from flask import Flask
 from rest_http_server import api
 from rest_http_root import root
 from recording_config import RecordingConfig
+import logging
+import sys
+
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 

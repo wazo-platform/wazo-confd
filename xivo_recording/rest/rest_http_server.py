@@ -24,9 +24,9 @@ from recording_config import RecordingConfig
 import cti_encoder
 from services.campagne_management import CampagneManagement
 
-api = Blueprint("api", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
-
 logger = logging.getLogger(__name__)
+
+api = Blueprint("api", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
 
 
 class RestHttpServer(object):

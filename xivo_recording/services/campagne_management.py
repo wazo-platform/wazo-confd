@@ -21,6 +21,7 @@ from recording_config import RecordingConfig
 from dao.record_campaign_dao import RecordCampaignDbBinder
 from sqlalchemy.exc import OperationalError
 import logging
+from dao.exceptions import DataRetrieveError
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,6 @@ class CampagneManagement(object):
         dbconnection.unregister_db_connection_pool()
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
-
         self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
     def create_campagne(self, params):
@@ -53,10 +53,9 @@ class CampagneManagement(object):
             try:
                 self.__init_db_connection()
                 result = self.record_db.get_records()
-            except Exception as e:
+            except Exception:
                 logger.critical("Database connection failure!")
-                #TODO custom exceptions
-                raise e
+                raise DataRetrieveError("Database connection failure")
         return result
 
     def get_campagnes_as_dict(self):
@@ -67,9 +66,8 @@ class CampagneManagement(object):
             try:
                 self.__init_db_connection()
                 result = self.record_db.get_records_as_dict()
-            except Exception as e:
+            except Exception:
                 logger.critical("Database connection failure!")
-                #TODO custom exceptions
-                raise e
+                raise DataRetrieveError("Database connection failure")
         return result
 

@@ -23,7 +23,6 @@ from recording_config import RecordingConfig
 import random
 from services.campagne_management import CampagneManagement
 from xivo_cti_protocol import cti_encoder
-from dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 mock_campagne_management = Mock(CampagneManagement)
 

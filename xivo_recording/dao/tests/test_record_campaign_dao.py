@@ -73,6 +73,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
         record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        if record_db == None:
+            self.fail("record_db is None, database connexion error")
         record_db.add(expected_dir)
         records = record_db.get_records()
 

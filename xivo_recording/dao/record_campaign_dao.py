@@ -25,7 +25,10 @@ from dao.generic_dao import GenericDao
 from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
 from dao.helpers.dynamic_formatting import table_list_to_list_dict
+import logging
 
+logger = logging.getLogger(__name__)
+logging.basicConfig()
 
 class RecordCampaignDao(GenericDao):
     pass
@@ -57,14 +60,26 @@ class RecordCampaignDbBinder(object):
         return True
 
     @classmethod
-    def new_from_uri(cls, uri):
-        try:
-            class_mapper(RecordCampaignDao)
-        except UnmappedClassError:
+    def create_class_mapper(cls, uri):
             engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
             metadata = MetaData(engine)
             data = Table(cls.__tablename__, metadata, autoload=True)
             mapper(RecordCampaignDao, data)
 
+    @classmethod
+    def new_from_uri(cls, uri):
+        try:
+            class_mapper(RecordCampaignDao)
+        except UnmappedClassError:
+            try:
+                cls.create_class_mapper(uri)
+            except BaseException as e:
+                logger.error("Database access error: " + str(e.args))
+                return None
+        except BaseException as e:
+            logger.error("Database access error:" + str(e.args))
+            return None
+
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())
+
