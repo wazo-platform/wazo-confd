@@ -19,14 +19,17 @@
 import logging
 from flask import Blueprint
 from flask import request
-from flask_rest import RESTResource
-from recording_config import RecordingConfig
-import cti_encoder
-from services.campagne_management import CampagneManagement
-
-root = Blueprint("root", __name__, url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH)
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.services.campagne_management import CampagneManagement
+from flask.helpers import make_response
+from xivo_client import json
 
 logger = logging.getLogger(__name__)
+
+root = Blueprint("root",
+                 __name__,
+                 url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                            RecordingConfig.XIVO_RECORDING_SERVICE_PATH)
 
 
 class RestHttpServerRoot(object):
@@ -36,38 +39,72 @@ class RestHttpServerRoot(object):
 
     def add(self):
         try:
-            body = cti_encoder.decode(request.data)
+            body = json.decode(request.data)
         except ValueError:
-            body = "No parsable data in the request"
-        return 501, ("Work in progress, root add, body: " + str(body) + " args: " + str(request.args))
+            body = "No parsable data in the request, data: " + request.data
+            return make_response(body, 400)
 
-    def get(self):
-        return 501, ("Work in progress, root get, args: " + str(request.args))
+        result = self._campagne_manager.create_campaign(body)
+        if (result == True):
+            return make_response(("Added: " + str(result)), 201)
+        else:
+            return make_response(str(result), 500)
 
-    def delete(self):
+    def get(self, resource_id):
+        return make_response(("Work in progress, root get, resource_id: " + str(resource_id) +
+                              " args: " + str(request.args)),
+                              501)
+
+    def delete(self, resource_id):
         try:
-            body = cti_encoder.decode(request.data)
+            body = json.decode(request.data)
         except ValueError:
             body = "No parsable data in the request"
-        return 501, ("Work in progress, root delete, body: " + str(body) + " args: " + str(request.args))
+        return make_response(("Work in progress, root delete, resource_id: " + str(resource_id) +
+                              " body: " + str(body) +
+                              " args: " + str(request.args)),
+                             501)
 
-    def update(self):
+    def update(self, resource_id):
         try:
-            body = cti_encoder.decode(request.data)
+            body = json.decode(request.data)
         except ValueError:
             body = "No parsable data in the request"
-        return 501, ("Work in progress, root update, body: " + str(body) + " args: " + str(request.args))
+        return make_response(("Work in progress, root update, resource_id: " + str(resource_id) +
+                              " body: " + str(body) +
+                              " args: " + str(request.args)),
+                             501)
 
     def list(self):
         try:
-            result = self._campagne_manager.get_campagnes_as_dict()
-            return 200, (cti_encoder.encode(result))
+            result = self._campagne_manager.get_campaigns_as_dict()
+            body = json.encode(result)
+            return make_response(body, 200)
         except Exception as e:
-            return 500, e.args
+            return make_response(e.args, 500)
 
-project_resource = RESTResource(
-    name="rest",
-    route=RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/",
-    app=root,
-    actions=["add", "update", "delete", "get", "list"],
-    handler=RestHttpServerRoot())
+
+root.add_url_rule("/",
+                  "list",
+                  getattr(RestHttpServerRoot(), "list"),
+                  methods=["GET"])
+
+root.add_url_rule("/<resource_id>",
+                  "get",
+                  getattr(RestHttpServerRoot(), "get"),
+                  methods=["GET"])
+
+root.add_url_rule('/',
+                  'add',
+                  getattr(RestHttpServerRoot(), "add"),
+                  methods=['POST'])
+
+root.add_url_rule('/<resource_id>',
+                  'update',
+                  getattr(RestHttpServerRoot(), "update"),
+                  methods=['PUT'])
+
+root.add_url_rule('/<resource_id>',
+                  'delete',
+                  getattr(RestHttpServerRoot(), "delete"),
+                  methods=['DELETE'])

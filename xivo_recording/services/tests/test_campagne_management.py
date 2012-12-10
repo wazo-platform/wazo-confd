@@ -19,7 +19,7 @@
 import unittest
 import random
 from mock import Mock
-from services.campagne_management import CampagneManagement
+from xivo_recording.services.campagne_management import CampagneManagement
 
 
 class TestCampagneManagement(unittest.TestCase):
@@ -29,27 +29,37 @@ class TestCampagneManagement(unittest.TestCase):
         self._campagneManager.record_db = Mock()
         self._campaignName = "test-campagne" + str(random.randint(10, 99))
 
-    def test_create_campagne(self):
+    def test_create_campaign(self):
         unique_id = str(random.randint(10000, 99999999))
         campagne_name = "campagne-" + unique_id
         queue_name = "prijem"
         base_filename = campagne_name + "-"
 
         data = {
-            "unique_id": unique_id,
             "campagne_name": campagne_name,
             "activated": False,
             "base_filename": base_filename,
             "queue_name": queue_name
         }
+        self._campagneManager.record_db.add.return_value = True
 
-        self._campagneManager.record_db.add(data)
+        self.assertTrue(self._campagneManager.create_campaign(data))
 
-        self._campagneManager.create_campagne(data)
         self._campagneManager.record_db.add.assert_called_with(data)
 
-    def test_get_campagne(self):
-        pass
+    def test_get_campaigns_as_dict(self):
+        unique_id = str(random.randint(10000, 99999999))
+        campagne_name = "campagne-" + unique_id
+        queue_name = "prijem"
+        base_filename = campagne_name + "-"
 
+        data = {
+            "campagne_name": campagne_name,
+            "activated": False,
+            "base_filename": base_filename,
+            "queue_name": queue_name
+        }
+        self._campagneManager.record_db.get_records_as_dict.return_value = data
 
+        self.assertEqual(self._campagneManager.get_campaigns_as_dict(), data)
 

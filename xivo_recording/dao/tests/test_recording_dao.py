@@ -18,39 +18,43 @@
 
 import unittest
 import random
-from dao.record_dao import RecordDao, RecordDbBinder
+from xivo_recording.dao.record_dao import RecordDao, RecordDbBinder
 from xivo_dao.alchemy import dbconnection
-from recording_config import RecordingConfig
-from dao.tests.table_utils import contains
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.dao.tests.table_utils import contains
 
 
 class TestRecordingDao(unittest.TestCase):
     '''
     Test pre-conditions:
     - an agent with number 2002.
-    - a table called recording in Asterisk database :
-    
+    - a type called call_dir_type and a table called recording in Asterisk database :
+
+    CREATE TYPE call_dir_type AS ENUM
+      ('incoming',
+      'outgoing');
+    ALTER TYPE call_dir_type
+      OWNER TO asterisk;
+
     CREATE TABLE recording
     (
-      cid character varying(32) NOT NULL,
+      cid character varying(32) NOT NULL PRIMARY KEY,
       call_direction call_dir_type,
       start_time timestamp without time zone,
       end_time timestamp without time zone,
       caller character varying(32),
       client_id character varying(1024),
-      calee character varying(32),
-      agent character varying(40),
-      CONSTRAINT recording_pkey PRIMARY KEY (cid ),
-      CONSTRAINT recording_agent_fkey FOREIGN KEY (agent)
-          REFERENCES agentfeatures ("number") MATCH SIMPLE
+      callee character varying(32),
+      agent character varying(40) REFERENCES agentfeatures(number)
           ON UPDATE NO ACTION ON DELETE NO ACTION
     )
     WITH (
       OIDS=FALSE
     );
+
     ALTER TABLE recording
       OWNER TO asterisk;
-     
+
     '''
 
     def test_recording_db(self):

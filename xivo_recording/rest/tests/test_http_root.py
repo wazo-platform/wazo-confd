@@ -19,25 +19,25 @@
 
 import unittest
 from mock import Mock, patch
-from recording_config import RecordingConfig
+from xivo_recording.recording_config import RecordingConfig
 import random
-from services.campagne_management import CampagneManagement
-from xivo_cti_protocol import cti_encoder
+from xivo_recording.services.campagne_management import CampagneManagement
+import cti_encoder
 
 mock_campagne_management = Mock(CampagneManagement)
 
 
-class TestFlaskHttpServer(unittest.TestCase):
+class TestFlaskHttpRoot(unittest.TestCase):
 
     def setUp(self):
 
-        self.patcher = patch("services.campagne_management.CampagneManagement")
+        self.patcher = patch("xivo_recording.services.campagne_management.CampagneManagement")
 
         mock = self.patcher.start()
         self.instance_campagne_management = mock_campagne_management
         mock.return_value = self.instance_campagne_management
 
-        from rest import flask_http_server
+        from xivo_recording.rest import flask_http_server
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 
@@ -52,22 +52,24 @@ class TestFlaskHttpServer(unittest.TestCase):
         campagne_name = "campagne-" + unique_id
 
         data = {
-            "unique_id": unique_id,
-            "campagne_name": campagne_name,
+            "campaign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
-            "queue_name": "prijem"
+            "queue_id": 1
         }
 
-        self.instance_campagne_management.create_campagne.return_value = body
+        self.instance_campagne_management.create_campaign.return_value = body
 
         result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + data["unique_id"], data=cti_encoder.encode(data))
+                              '/', data=cti_encoder.encode(data))
+        print "result add campaign: " + result.data
 
-        self.instance_campagne_management.create_campagne.assert_called_with(data)
-        self.assertTrue(str(result.status).startswith(status) and body == str(result.data).strip('"'),
-                        "Status comparison failed, received status:" + result.status + ", data: " + result.data)
+        self.instance_campagne_management.create_campaign.assert_called_with(data)
+        self.assertTrue(str(result.status).startswith(status)
+                        and body == str(result.data).strip('"'),
+                        "Status comparison failed, received status:" +
+                        result.status + ", data: " + result.data)
 
     def test_add_campaign_success(self):
         status = "201 CREATED"
@@ -76,21 +78,23 @@ class TestFlaskHttpServer(unittest.TestCase):
         campagne_name = "campagne-" + unique_id
 
         data = {
-            "unique_id": unique_id,
-            "campagne_name": campagne_name,
+            "campaign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
-            "queue_name": "prijem"
+            "queue_id": 1
         }
 
-        self.instance_campagne_management.create_campagne.return_value = True
+        self.instance_campagne_management.create_campaign.return_value = True
 
         result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + data["unique_id"], data=cti_encoder.encode(data))
+                              '/',
+                              data=cti_encoder.encode(data))
 
-        self.instance_campagne_management.create_campagne.assert_called_with(data)
-        self.assertTrue(str(result.status).startswith(status), "Status comparison failed, received status:" + result.status + ", data: " + result.data)
+        self.instance_campagne_management.create_campaign.assert_called_with(data)
+        self.assertTrue(str(result.status).startswith(status),
+                        "Status comparison failed, received status:" +
+                        result.status + ", data: " + result.data)
 
     def test_get_campaigns(self):
         status = "200 OK"
@@ -99,14 +103,13 @@ class TestFlaskHttpServer(unittest.TestCase):
         campagne_name = "campagne-" + unique_id
 
         data = {
-            "unique_id": unique_id,
-            "campagne_name": campagne_name,
+            "campign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
-            "queue_name": "prijem"
+            "queue_id": 1
         }
 
-        self.instance_campagne_management.get_campagnes_as_dict.return_value = data
+        self.instance_campagne_management.get_campaigns_as_dict.return_value = data
 
         result = self.app.get(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                             RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
@@ -115,4 +118,4 @@ class TestFlaskHttpServer(unittest.TestCase):
         self.assertEqual(status, result.status)
         received_data = cti_encoder.decode(result.data.replace("\\", "").strip('"'))
         self.assertDictEqual(received_data, data)
-        self.instance_campagne_management.get_campagnes_as_dict.assert_called_with()
+        self.instance_campagne_management.get_campaigns_as_dict.assert_called_with()

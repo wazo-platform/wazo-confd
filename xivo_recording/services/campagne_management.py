@@ -17,11 +17,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao.alchemy import dbconnection
-from recording_config import RecordingConfig
-from dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from sqlalchemy.exc import OperationalError
 import logging
-from dao.exceptions import DataRetrieveError
+from xivo_recording.dao.exceptions import DataRetrieveError
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class CampagneManagement(object):
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
         self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
-    def create_campagne(self, params):
+    def create_campaign(self, params):
         result = None
         try:
             result = self.record_db.add(params)
@@ -45,7 +45,7 @@ class CampagneManagement(object):
             result = "Impossible to add the campagin: " + str(e)
         return result
 
-    def get_campagne(self, name):
+    def get_campaigns(self, name):
         try:
             result = self.record_db.get_records()
         except OperationalError:
@@ -58,7 +58,7 @@ class CampagneManagement(object):
                 raise DataRetrieveError("Database connection failure")
         return result
 
-    def get_campagnes_as_dict(self):
+    def get_campaigns_as_dict(self):
         try:
             result = self.record_db.get_records_as_dict()
         except OperationalError:

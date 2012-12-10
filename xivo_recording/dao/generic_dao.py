@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from abc import ABCMeta
-from dao.helpers import dynamic_formatting
+from xivo_recording.dao.helpers import dynamic_formatting
 
 
 class GenericDao(object):

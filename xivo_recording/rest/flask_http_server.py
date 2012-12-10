@@ -17,22 +17,20 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from flask import Flask
-from rest_http_server import api
-from rest_http_root import root
-from recording_config import RecordingConfig
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.rest.rest_http_root import root
 import logging
-import sys
 
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-app.register_blueprint(api)
 app.register_blueprint(root)
+app.debug = True
 
 
 class FlaskHttpServer(object):
 
     def run(self):
         app.run(host=RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS,
-                port=RecordingConfig.XIVO_RECORD_SERVICE_PORT, debug=True)
+                port=RecordingConfig.XIVO_RECORD_SERVICE_PORT)

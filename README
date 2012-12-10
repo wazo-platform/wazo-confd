@@ -15,8 +15,8 @@ XiVO:
 
 External:
 - gevent
-- flask
-- flask_rest
+- flask (webdevelopment framework)
+- flup (WSGI server)
 - SQLAlchemy
 
 HTTP/PHP:
@@ -25,8 +25,7 @@ HTTP/PHP:
 
 Install dependencies :
 ----------------------
-TODO
-
+sudo pip install requirements.txt ------- ! TODO: requirements.txt
 
 Installation :
 --------------
@@ -91,4 +90,4 @@ Starting :
 Packaging :
 -----------
 Create the tar
-tar -cvf xivo-recording tar xivo-recording/ --exclude xivo-recording/.git --exclude *.log --exclude .project --exclude .pydevproject --exclude tests
+tar -cvf xivo-recording.tar xivo-recording/ --exclude xivo-recording/.git --exclude '*.log' --exclude .project --exclude .pydevproject --exclude tests --exclude '*.pyc' --exclude .settings

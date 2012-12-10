@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+#
 # Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
@@ -14,23 +14,14 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-class RecordingConfig(object):
+class DataRetrieveError(Exception):
 
-    XIVO_RECORD_SERVICE_ADDRESS = "192.168.51.11"  #"127.0.0.1"
-    XIVO_RECORD_SERVICE_PORT = 5050
-    XIVO_REST_SERVICE_ROOT_PATH = "/rest"
-    XIVO_RECORDING_SERVICE_PATH = "/record"
-    CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
+    def __init__(self, value):
+        self.value = value
 
-    CSV_SEPARATOR = ","
+    def __str__(self):
+        return repr(self.value)
 
-    POSTGRES_ADDRESS = "192.168.51.80"  #"127.0.0.1"
-    RECORDING_DB_URI = "postgresql://asterisk:proformatique@" + POSTGRES_ADDRESS + "/asterisk"
-
-    POSTGRES_DEBUG = True
-
-    def __init__(self):
-        pass

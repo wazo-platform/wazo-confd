@@ -20,11 +20,11 @@ from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
 from xivo_dao.alchemy import dbconnection
-from recording_config import RecordingConfig
-from dao.generic_dao import GenericDao
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.dao.generic_dao import GenericDao
 from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.orm.exc import UnmappedClassError
-from dao.helpers.dynamic_formatting import table_list_to_list_dict
+from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 
 class RecordDao(GenericDao):

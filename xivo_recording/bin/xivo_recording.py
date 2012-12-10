@@ -21,7 +21,7 @@ import logging
 import sys
 import argparse
 from xivo import daemonize
-from service_manager import ServiceManager
+from xivo_recording.services.service_manager import ServiceManager
 
 DAEMONNAME = 'xivo-recording'
 DEBUG_MODE = False

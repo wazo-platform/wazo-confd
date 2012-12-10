@@ -18,28 +18,24 @@
 
 import unittest
 import random
-from dao.record_campaign_dao import RecordCampaignDao, RecordCampaignDbBinder
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDao, RecordCampaignDbBinder
 from xivo_dao.alchemy import dbconnection
-from recording_config import RecordingConfig
-from dao.tests.table_utils import contains
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.dao.tests.table_utils import contains
 
 
 class TestRecordCampaignDao(unittest.TestCase):
     '''
     Test pre-conditions:
-    - an queue named "prijem"
+    - a least one queue configured
     - a table called record_campaign in Asterisk database :
 
     CREATE TABLE record_campaign
     (
-      unique_id character varying(32) NOT NULL,
-      campagne_name character varying(128) NOT NULL,
+      campaign_name character varying(128) NOT NULL PRIMARY KEY,
       activated boolean NOT NULL,
       base_filename character varying(64) NOT NULL,
-      queue_name character varying(255) NOT NULL,
-      CONSTRAINT record_campaign_pkey PRIMARY KEY (unique_id ),
-      CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
-          REFERENCES queuefeatures (name) MATCH SIMPLE
+      queue_id integer NOT NULL REFERENCES queuefeatures(id)
           ON UPDATE NO ACTION ON DELETE NO ACTION
     )
     WITH (
@@ -52,16 +48,15 @@ class TestRecordCampaignDao(unittest.TestCase):
     def test_record_campaign_db(self):
 
         unique_id = str(random.randint(10000, 99999999))
-        campagne_name = "campagne-" + unique_id
-        queue_name = "prijem"
-        base_filename = campagne_name + "-"
+        campaign_name = "campaign-" + unique_id
+        queue_id = 1
+        base_filename = campaign_name + "-"
 
         expected_dir = {
-            "unique_id": unique_id,
-            "campagne_name": campagne_name,
+            "campaign_name": campaign_name,
             "activated": False,
             "base_filename": base_filename,
-            "queue_name": queue_name
+            "queue_id": queue_id
         }
 
         expected_object = RecordCampaignDao()

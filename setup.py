@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-#
+
 # Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
@@ -16,14 +17,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from rest.flask_http_server import FlaskHttpServer
 
+from distutils.core import setup
 
-class ServiceManager(object):
-
-    def __init__(self):
-        self.flaskServer = FlaskHttpServer()
-
-    def run(self):
-        self.flaskServer.run()
-
+setup(
+    name='xivo-recording',
+    version='0.1',
+    description='XIVO Recording module',
+    author='Avencall',
+    author_email='xivo-dev@lists.proformatique.com',
+    url='http://wiki.xivo.fr/',
+    license='GPLv3',
+    packages=['xivo_recording',
+              'xivo_recording.dao',
+              'xivo_recording.dao.helpers',
+              'xivo_recording.rest',
+              'xivo_recording.services'],
+    scripts=['bin/xivo_recording.fcgi'],
+    data_files=[],
+)
