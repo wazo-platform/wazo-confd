@@ -33,6 +33,6 @@ setup(
               'xivo_recording.dao.helpers',
               'xivo_recording.rest',
               'xivo_recording.services'],
-    scripts=['bin/xivo_recording.fcgi'],
-    data_files=[],
+    scripts=['bin/xivo-recording'],
+    data_files=[('/etc/init.d', ['etc/init.d/xivo-cti-http'])],
 )

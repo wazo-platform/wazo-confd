@@ -16,7 +16,6 @@ XiVO:
 External:
 - gevent
 - flask (webdevelopment framework)
-- flup (WSGI server)
 - SQLAlchemy
 
 HTTP/PHP:
@@ -82,12 +81,13 @@ Configuration :
 
 Starting :
 ----------
-!!! Not prepared for production !!!
-- The internal Flask http server is used for the moment, but it needs to be refactored and integrated in nginx for production.
-- /bin/xivo_recording is to be run.
+!!! Preparation for production in progress !!!
+- /etc/init.d/xivo_recording is to be run.
  
  
 Packaging :
 -----------
 Create the tar
-tar -cvf xivo-recording.tar xivo-recording/ --exclude xivo-recording/.git --exclude '*.log' --exclude .project --exclude .pydevproject --exclude tests --exclude '*.pyc' --exclude .settings
+tar -cvf xivo-recording.tar xivo-recording/ --exclude '*.log' --exclude '.*' --exclude '*.pyc' --exclude tests --exclude acceptance
+
+ 

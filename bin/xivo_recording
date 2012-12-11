@@ -43,7 +43,7 @@ def main():
         from gevent.wsgi import WSGIServer
         from xivo_recording.rest.flask_http_server import app
 
-        http_server = WSGIServer(('127.0.0.1', 5000), app)
+        http_server = WSGIServer(('127.0.0.1', 50050), app)
         http_server.serve_forever()
 
     if not parsed_args.debug:
