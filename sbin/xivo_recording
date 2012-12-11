@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2012  Avencall
@@ -24,7 +25,7 @@ from xivo import daemonize
 from xivo_recording.services.service_manager import ServiceManager
 
 DAEMONNAME = 'xivo-recording'
-DEBUG_MODE = False
+DEBUG_MODE = True
 LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
@@ -33,8 +34,17 @@ def main():
     parsed_args = _parse_args(sys.argv[1:])
     _init_logging(parsed_args.debug)
 
-    serviceManager = ServiceManager()
-    serviceManager.run()
+    if(DEBUG_MODE):
+        # flask http server
+        serviceManager = ServiceManager()
+        serviceManager.run()
+    else:
+        # nginx connection via gevent
+        from gevent.wsgi import WSGIServer
+        from xivo_recording.rest.flask_http_server import app
+
+        http_server = WSGIServer(('127.0.0.1', 5000), app)
+        http_server.serve_forever()
 
     if not parsed_args.debug:
         _daemonize()

@@ -1,2 +1,2 @@
 #!/bin/sh
-PYTHONPATH=..:../xivo_recording:../../xivo-cti-protocol lettuce features/recording.feature 
+PYTHONPATH=..:../xivo_recording:../../xivo-tools/client-sim/ lettuce features/recording.feature

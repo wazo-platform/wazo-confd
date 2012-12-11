@@ -19,41 +19,22 @@
 from lettuce import step
 from rest_campaign import RestCampaign
 
+
+
 @step(u'When I create a campaign named "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, campaign_name):
     r_campaign = RestCampaign()
-    assert r_campaign.create(campaign_name),"Cannot create a campaign"
-    
+    assert r_campaign.create(campaign_name), "Cannot create a campaign"
 
-    
-
-
-
-
-
+@step(u'Then I can consult this campaign')
+def then_i_can_consult_this_campaign(step):
+    r_campaign = RestCampaign()
+    r_campaign.create('test_consult_campaign')
+    assert r_campaign.list(), "Cannot consult campaign list"
 
 
 
 
-
-
-
-
-
-#
-#@step('I create a campaign called ([^"]+) for the queue (\d+)')
-#def create_a_campaign_for_queue(step, campaign_name, queue_number):
-#    
-#    connection = httplib.HTTPConnection(testConfig.XIVO_RECORD_SERVICE_URL)
-#    requestURI = "/campagnes/recording/"
-#    body = ""
-#    headers = ""
-#    connection.request("POST", requestURI, body, headers)
-#
-#    response = connection.getresponse()
-#    rHeader = response.getHeader()
-#    #assert rHeader == 
-#
 #
 #@step('When I start the campaign')
 #def when_i_start_the_campaign(step):

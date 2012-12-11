@@ -18,39 +18,77 @@
 
 from gevent import httplib
 
-from recording_config import RecordingConfig
+from xivo_recording.recording_config import RecordingConfig
 import random
 import time
-import cti_encoder
+from xivo_client import json
 
 
 class RestCampaign(object):
 
     def __init__(self):
-        uniqueid = "lettuce" + time.ctime() + str(random.randint(10000, 99999999))
-        queue_name = "prijem"
-        base_filename = queue_name + "-" + uniqueid + "-"
+        unique_id = "lettuce" + time.ctime() + str(random.randint(10000, 99999999))
+        queue_id = 1
+        base_filename = unique_id + "-" + str(queue_id) + "-"
 
-        self.campagne = {
-#            "uniqueid": uniqueid,
+        self.campaign = {
+            "campaign_name": unique_id,
             "base_filename": base_filename,
-            "queue_name": queue_name
+            "activated": True,
+            "queue_id": queue_id
         }
 
     def create(self, campaign_name):
-        connection = httplib.HTTPConnection(RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS + ":" + str(RecordingConfig.XIVO_RECORD_SERVICE_PORT))
-        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + campaign_name + "?sd=w&dew=1"
+        connection = httplib.HTTPConnection(
+                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                                ":" +
+                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                            )
 
-#        self.campagne["uniqueid"] = campaign_name
-        body = cti_encoder.encode(self.campagne)
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+
+        body = json.encode(self.campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("POST", requestURI, body, headers)
 
         reply = connection.getresponse()
         print("\nreply: " + reply.read() + '\n')
-        replyHeader = reply.getheaders()
 
-        #assert rHeader ==
+        # TODO : Verify the Content-type
+        # replyHeader = reply.getheaders()
 
-        return False
+        assert reply.status == 201
+
+        return (reply.status == 201)
+
+    def list(self):
+        connection = httplib.HTTPConnection(
+                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                                ":" +
+                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                            )
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("GET", requestURI, "", headers)
+        reply = connection.getresponse()
+
+        body = reply.read()
+
+        campaigns = json.decode(body)
+
+        result = False
+        for campaign in campaigns:
+            for attribute in self.campaign:
+                if (attribute in campaign):
+                    result = True
+                    break
+
+        assert result
+
+        return result
