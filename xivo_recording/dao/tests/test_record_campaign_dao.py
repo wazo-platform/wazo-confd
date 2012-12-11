@@ -16,12 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import unittest
-import random
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDao, RecordCampaignDbBinder
 from xivo_dao.alchemy import dbconnection
-from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDao, \
+    RecordCampaignDbBinder
 from xivo_recording.dao.tests.table_utils import contains
+from xivo_recording.recording_config import RecordingConfig
+import random
+import unittest
 
 
 class TestRecordCampaignDao(unittest.TestCase):

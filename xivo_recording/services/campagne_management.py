@@ -16,12 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.alchemy import dbconnection
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from sqlalchemy.exc import OperationalError
-import logging
+from xivo_dao.alchemy import dbconnection
 from xivo_recording.dao.exceptions import DataRetrieveError
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_recording.recording_config import RecordingConfig
+import logging
 
 logger = logging.getLogger(__name__)
 

@@ -24,8 +24,12 @@ import argparse
 from xivo import daemonize
 from xivo_recording.services.service_manager import ServiceManager
 
-DAEMONNAME = 'xivo-recording'
-DEBUG_MODE = True
+DAEMONNAME = 'xivo_recording'
+
+# Enable debug mode for testing witout gevent WSGi, 
+# setting to True activates the internal web server
+DEBUG_MODE = False
+
 LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
@@ -42,12 +46,11 @@ def main():
         # nginx connection via gevent
         from gevent.wsgi import WSGIServer
         from xivo_recording.rest.flask_http_server import app
-
+        
+        if not parsed_args.debug:
+            _daemonize()
         http_server = WSGIServer(('127.0.0.1', 50050), app)
         http_server.serve_forever()
-
-    if not parsed_args.debug:
-        _daemonize()
 
 
 def _init_logging(debug_mode):

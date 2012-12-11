@@ -16,15 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
-from xivo_dao.alchemy import dbconnection
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.dao.generic_dao import GenericDao
 from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
-from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
+from sqlalchemy.schema import Table, MetaData
+from xivo_dao.alchemy import dbconnection
+from xivo_recording.dao.generic_dao import GenericDao
+from xivo_recording.dao.helpers.dynamic_formatting import \
+    table_list_to_list_dict
+from xivo_recording.recording_config import RecordingConfig
 import logging
 
 logger = logging.getLogger(__name__)

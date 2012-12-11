@@ -16,13 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
-from flask import Blueprint
-from flask import request
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.services.campagne_management import CampagneManagement
+from flask import Blueprint, request
 from flask.helpers import make_response
 from xivo_client import json
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.services.campagne_management import CampagneManagement
+import logging
 
 logger = logging.getLogger(__name__)
 

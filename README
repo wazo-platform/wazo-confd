@@ -14,9 +14,17 @@ XiVO:
 - lib-python
 
 External:
+System:
+- libevent-dev
+- python-pip
+- python-dev
+- build-essential
+
+Python:
 - gevent
 - flask (webdevelopment framework)
 - SQLAlchemy
+- xivo-client-sim
 
 HTTP/PHP:
 - HTTPful
