@@ -18,7 +18,7 @@
 
 from flask import Blueprint, request
 from flask.helpers import make_response
-from xivo_client import json
+import rest_encoder
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.services.campagne_management import CampagneManagement
 import logging
@@ -38,7 +38,7 @@ class RestHttpServerRoot(object):
 
     def add(self):
         try:
-            body = json.decode(request.data)
+            body = rest_encoder.decode(request.data)
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
@@ -56,7 +56,7 @@ class RestHttpServerRoot(object):
 
     def delete(self, resource_id):
         try:
-            body = json.decode(request.data)
+            body = rest_encoder.decode(request.data)
         except ValueError:
             body = "No parsable data in the request"
         return make_response(("Work in progress, root delete, resource_id: " + str(resource_id) +
@@ -66,7 +66,7 @@ class RestHttpServerRoot(object):
 
     def update(self, resource_id):
         try:
-            body = json.decode(request.data)
+            body = rest_encoder.decode(request.data)
         except ValueError:
             body = "No parsable data in the request"
         return make_response(("Work in progress, root update, resource_id: " + str(resource_id) +
@@ -77,7 +77,7 @@ class RestHttpServerRoot(object):
     def list(self):
         try:
             result = self._campagne_manager.get_campaigns_as_dict()
-            body = json.encode(result)
+            body = rest_encoder.encode(result)
             return make_response(body, 200)
         except Exception as e:
             return make_response(e.args, 500)

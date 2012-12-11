@@ -21,7 +21,7 @@ from gevent import httplib
 from xivo_recording.recording_config import RecordingConfig
 import random
 import time
-from xivo_client import json
+from xivo_recording.rest import rest_encoder
 
 
 class RestCampaign(object):
@@ -48,7 +48,7 @@ class RestCampaign(object):
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
 
-        body = json.encode(self.campaign)
+        body = rest_encoder.encode(self.campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("POST", requestURI, body, headers)
@@ -80,7 +80,7 @@ class RestCampaign(object):
 
         body = reply.read()
 
-        campaigns = json.decode(body)
+        campaigns = rest_encoder.decode(body)
 
         result = False
         for campaign in campaigns:
