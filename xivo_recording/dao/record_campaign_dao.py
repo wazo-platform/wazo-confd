@@ -29,6 +29,7 @@ from xivo_recording.recording_config import RecordingConfig
 import logging
 
 logger = logging.getLogger(__name__)
+loggerDB = logging.getLogger('sqlalchemy')
 logging.basicConfig()
 
 class RecordCampaignDao(GenericDao):
@@ -62,10 +63,15 @@ class RecordCampaignDbBinder(object):
 
     @classmethod
     def create_class_mapper(cls, uri):
-            engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
-            metadata = MetaData(engine)
-            data = Table(cls.__tablename__, metadata, autoload=True)
-            mapper(RecordCampaignDao, data)
+        engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
+        if (RecordingConfig.POSTGRES_DEBUG):
+            loggerDB.setLevel(logging.DEBUG)
+            logfilehandler = logging.FileHandler(RecordingConfig.POSTGRES_DEBUG_FILE)
+            loggerDB.addHandler(logfilehandler)
+
+        metadata = MetaData(engine)
+        data = Table(cls.__tablename__, metadata, autoload=True)
+        mapper(RecordCampaignDao, data)
 
     @classmethod
     def new_from_uri(cls, uri):

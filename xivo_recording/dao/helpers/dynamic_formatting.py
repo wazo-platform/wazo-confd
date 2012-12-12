@@ -17,6 +17,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_recording.recording_config import RecordingConfig
+import logging
+
+logger = logging.getLogger()
 
 
 def table_to_string(class_instance):
@@ -29,14 +32,16 @@ def table_to_string(class_instance):
 
 
 def table_list_to_list_dict(list_instance):
+    
     list_of_dict = []
 
     for class_instance in list_instance:
+        logger.info("table_list_to_list_dict - class_instance members:" + class_instance.__dict__)
         dict_instance = {}
         members = vars(class_instance)
         for elem in sorted(set(members)):
             if not elem.startswith('_'):
+                logger.debug("table_list_to_list_dict - elem:" + elem)
                 dict_instance[str(elem)] = str(getattr(class_instance, elem))
         list_of_dict.append(dict_instance)
-
     return list_of_dict
