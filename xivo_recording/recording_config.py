@@ -30,7 +30,7 @@ class RecordingConfig(object):
     POSTGRES_ADDRESS = "127.0.0.1"
     RECORDING_DB_URI = "postgresql://asterisk:proformatique@" + POSTGRES_ADDRESS + "/asterisk"
 
-    POSTGRES_DEBUG = True
+    POSTGRES_DEBUG = False
     POSTGRES_DEBUG_FILE = "/tmp/xivo-recording-postgres.log"
 
     def __init__(self):

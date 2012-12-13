@@ -59,6 +59,7 @@ class CampagneManagement(object):
         return result
 
     def get_campaigns_as_dict(self):
+        logger.debug("get_campaigns_as_dict")
         try:
             result = self.record_db.get_records_as_dict()
         except OperationalError:

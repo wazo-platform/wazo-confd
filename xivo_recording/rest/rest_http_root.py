@@ -75,11 +75,15 @@ class RestHttpServerRoot(object):
                              501)
 
     def list(self):
+        logger.debug("entering list")
         try:
             result = self._campagne_manager.get_campaigns_as_dict()
+            logger.debug("got result")
             body = rest_encoder.encode(result)
+            logger.debug("result encoded")
             return make_response(body, 200)
         except Exception as e:
+            logger.debug("got exception:" + str(e.args))
             return make_response(e.args, 500)
 
 

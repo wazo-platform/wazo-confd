@@ -4,94 +4,36 @@ TODO:
 -----
 - refactor tests of rest_http_*
 - refactor db integration 
-
+- install package for Webi
+- uninstall script
 
 Depends :
 ---------
 XiVO:
-- xivo-cti-protocol
 - xivo-dao
 - lib-python
-
-External:
-System:
-- libevent-dev
-- python-pip
-- python-dev
-- build-essential
-
-Python:
-- gevent
-- flask (webdevelopment framework)
-- SQLAlchemy
-- xivo-client-sim
 
 HTTP/PHP:
 - HTTPful
 
-
-Install dependencies :
-----------------------
-sudo pip install requirements.txt ------- ! TODO: requirements.txt
+Other dependencies will be installed by the install script
 
 Installation :
 --------------
-TODO
+use xivo-recording.tar
 
+tar -xvf xivo-recording.tar
+cd xivo-recording
+./install.sh
 
-Configuration :
----------------
-- Following tables need to be created in the Asterisk database:
-
-    CREATE TABLE recording
-    (
-      cid character varying(32) NOT NULL,
-      call_direction call_dir_type,
-      start_time timestamp without time zone,
-      end_time timestamp without time zone,
-      caller character varying(32),
-      client_id character varying(1024),
-      calee character varying(32),
-      agent character varying(40),
-      CONSTRAINT recording_pkey PRIMARY KEY (cid ),
-      CONSTRAINT recording_agent_fkey FOREIGN KEY (agent)
-          REFERENCES agentfeatures ("number") MATCH SIMPLE
-          ON UPDATE NO ACTION ON DELETE NO ACTION
-    )
-    WITH (
-      OIDS=FALSE
-    );
-    ALTER TABLE recording
-      OWNER TO asterisk;
-
-
-	CREATE TABLE record_campaign
-	(
-	  unique_id character varying(32) NOT NULL,
-	  campagne_name character varying(128) NOT NULL,
-	  base_filename character varying(64) NOT NULL,
-	  queue_name character varying(255) NOT NULL,
-	  activated boolean NOT NULL,
-	  CONSTRAINT record_campaign_pkey PRIMARY KEY (unique_id ),
-	  CONSTRAINT record_campaign_fkey FOREIGN KEY (queue_name)
-	      REFERENCES queuefeatures (name) MATCH SIMPLE
-	      ON UPDATE NO ACTION ON DELETE NO ACTION
-	)
-	WITH (
-	  OIDS=FALSE
-	);
-	ALTER TABLE record_campaign
-	  OWNER TO asterisk;
-
-- Other parameters are in the file xivo_recording/recording_config.py 
-- TODO: Creation of required tables by a script
-
-
-Starting :
+Removing:
 ----------
-!!! Preparation for production in progress !!!
-- /etc/init.d/xivo_recording is to be run.
- 
+use xivo-recording.tar
+
+tar -xvf xivo-recording.tar
+cd xivo-recording
+./uninstall.sh
+
  
 Packaging :
 -----------

@@ -28,7 +28,7 @@ DAEMONNAME = 'xivo_recording'
 
 # Enable debug mode for testing witout gevent WSGi, 
 # setting to True activates the internal web server
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
