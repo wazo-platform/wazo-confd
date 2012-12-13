@@ -26,7 +26,7 @@ from xivo_recording.services.service_manager import ServiceManager
 
 DAEMONNAME = 'xivo_recording'
 
-# Enable debug mode for testing witout gevent WSGi, 
+# Enable debug mode for testing witout gevent WSGi,
 # setting to True activates the internal web server
 DEBUG_MODE = False
 
@@ -46,7 +46,7 @@ def main():
         # nginx connection via gevent
         from gevent.wsgi import WSGIServer
         from xivo_recording.rest.flask_http_server import app
-        
+
         if not parsed_args.debug:
             _daemonize()
         http_server = WSGIServer(('127.0.0.1', 50050), app)
@@ -61,9 +61,9 @@ def _init_logging(debug_mode):
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        logger.setLevel(logging.INFO)
-    else:
         logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
     logfilehandler = logging.FileHandler(LOGFILENAME)
     logfilehandler.setFormatter(formatter)
