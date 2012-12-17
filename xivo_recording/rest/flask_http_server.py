@@ -18,7 +18,7 @@
 
 from flask import Flask
 from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest.rest_http_root import root
+from xivo_recording.rest.routage import root
 import logging
 
 logger = logging.getLogger(__name__)

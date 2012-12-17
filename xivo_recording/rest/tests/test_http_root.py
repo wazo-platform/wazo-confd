@@ -23,6 +23,7 @@ from xivo_recording.recording_config import RecordingConfig
 import random
 from xivo_recording.services.campagne_management import CampagneManagement
 import cti_encoder
+from urlparse import urlparse, parse_qs
 
 mock_campagne_management = Mock(CampagneManagement)
 
@@ -110,12 +111,15 @@ class TestFlaskHttpRoot(unittest.TestCase):
         }
 
         self.instance_campagne_management.get_campaigns_as_dict.return_value = data
+        url = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
+                '/?activated=true&campaign_name=test'
+        result = self.app.get(url)
 
-        result = self.app.get(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                            RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
-                            '/')
-
+        parsed_url = urlparse(url)
+        args = parse_qs(parsed_url.query)
+        print "args: " + str(args)
         self.assertEqual(status, result.status)
         received_data = cti_encoder.decode(result.data.replace("\\", "").strip('"'))
         self.assertDictEqual(received_data, data)
-        self.instance_campagne_management.get_campaigns_as_dict.assert_called_with()
+        self.instance_campagne_management.get_campaigns_as_dict.assert_called_with(args)
