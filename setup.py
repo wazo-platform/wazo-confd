@@ -34,5 +34,6 @@ setup(
               'xivo_recording.rest',
               'xivo_recording.services'],
     scripts=['bin/xivo_recording'],
-    data_files=[('/etc/init.d', ['etc/init.d/xivo-recording'])],
+    data_files=[('/etc/init.d', ['etc/init.d/xivo-recording']),
+                ('/usr/local/sbin', ['bin/xivo_recording_agi.py'])],
 )

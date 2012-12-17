@@ -25,7 +25,7 @@ import sys
 from time import localtime, strftime
 
 DEBUG_MODE = False
-LOGFILE = '/var/log/xivo_recording_agi'
+LOGFILE = '/tmp/xivo_recording_agi.log'
 
 REST_ERROR = 1
 
