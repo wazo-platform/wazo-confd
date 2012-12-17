@@ -35,14 +35,10 @@ def table_list_to_list_dict(list_instance):
     list_of_dict = []
 
     for class_instance in list_instance:
-        logger.debug("class_instance in list_instance: " + str(class_instance))
         dict_instance = {}
         members = vars(class_instance)
         for elem in sorted(set(members)):
             if not elem.startswith('_'):
-                logger.debug("adding elem:" + str(elem) +
-                             "with value: " + str(getattr(class_instance, elem)) + 
-                             " to dict")
                 dict_instance[str(elem)] = str(getattr(class_instance, elem))
         list_of_dict.append(dict_instance)
     return list_of_dict

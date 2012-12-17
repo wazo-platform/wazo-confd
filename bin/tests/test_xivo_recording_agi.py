@@ -33,7 +33,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
     def setUp(self):
         self.xivo_queue_name = 'xivo_name'
         self.base_filename = 'base_filename' + str(random.randint(100, 999))
-        self.rest_response = '[{"base_filename": "' + self.base_filename + '", "queue_id": "1", "activated": "True", "campaign_name": "test"}]'
+        self.rest_response = '[{"base_filename": "' + self.base_filename + '", "queue_name": "queue_1", "activated": "True", "campaign_name": "test"}]'
 
         self.patcher_agi = patch("xivo.agi.AGI")
         mock_patch_agi = self.patcher_agi.start()

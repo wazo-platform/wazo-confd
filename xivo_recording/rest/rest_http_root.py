@@ -36,7 +36,7 @@ class RestHttpServerRoot(object):
     def __init__(self):
         self._campagne_manager = CampagneManagement()
 
-    def add(self):
+    def add_campaign(self):
         try:
             body = rest_encoder.decode(request.data)
         except ValueError:
@@ -49,8 +49,8 @@ class RestHttpServerRoot(object):
         else:
             return make_response(str(result), 500)
 
-    def get(self, resource_id):
-        return make_response(("Work in progress, root get, resource_id: " + str(resource_id) +
+    def get(self, campaign_name):
+        return make_response(("Work in progress, root get, campaign_name: " + str(campaign_name) +
                               " args: " + str(request.args)),
                               501)
 
@@ -74,40 +74,76 @@ class RestHttpServerRoot(object):
                               " args: " + str(request.args)),
                              501)
 
-    def list(self):
-        logger.debug("entering list")
+
+    def list_campaigns(self):
         try:
-            result = self._campagne_manager.get_campaigns_as_dict()
+            logger.debug("List args:" + str(request.args))
+            result = self._campagne_manager.get_campaigns_as_dict(request.args)
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
             return make_response(body, 200)
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(e.args, 500)
+            return make_response(str(e.args), 500)
+
+    def add_recording(self, campaign_name):
+        try:
+            body = rest_encoder.decode(request.data)
+        except ValueError:
+            body = "No parsable data in the request, data: " + request.data
+            return make_response(body, 400)
+
+        result = self._campagne_manager.add_recording(campaign_name, body)
+        if (result == True):
+            return make_response(("Added: " + str(result)), 201)
+        else:
+            return make_response(str(result), 500)
+
+    def list_recordings(self, campaign_name):
+        try:
+            logger.debug("List args:" + str(request.args))
+            result = self._campagne_manager.get_recordings_as_dict(campaign_name, request.args)
+            logger.debug("got result")
+            body = rest_encoder.encode(result)
+            logger.debug("result encoded")
+            return make_response(body, 200)
+        except Exception as e:
+            logger.debug("got exception:" + str(e.args))
+            return make_response(str(e.args), 500)
 
 
 root.add_url_rule("/",
-                  "list",
-                  getattr(RestHttpServerRoot(), "list"),
+                  "list_campaigns",
+                  getattr(RestHttpServerRoot(), "list_campaigns"),
                   methods=["GET"])
 
-root.add_url_rule("/<resource_id>",
+root.add_url_rule("/<campaign_name>",
                   "get",
                   getattr(RestHttpServerRoot(), "get"),
                   methods=["GET"])
 
+root.add_url_rule("/<campaign_name>/",
+                  "list_recordings",
+                  getattr(RestHttpServerRoot(), "list_recordings"),
+                  methods=["GET"])
+
+root.add_url_rule("/<campaign_name>/",
+                  "add_recording",
+                  getattr(RestHttpServerRoot(), "add_recording"),
+                  methods=["POST"])
+
 root.add_url_rule('/',
-                  'add',
-                  getattr(RestHttpServerRoot(), "add"),
+                  'add_campaign',
+                  getattr(RestHttpServerRoot(), "add_campaign"),
                   methods=['POST'])
 
-root.add_url_rule('/<resource_id>',
+root.add_url_rule('/<campaign_name>',
                   'update',
                   getattr(RestHttpServerRoot(), "update"),
                   methods=['PUT'])
 
-root.add_url_rule('/<resource_id>',
+root.add_url_rule('/<campaign_name>',
                   'delete',
                   getattr(RestHttpServerRoot(), "delete"),
                   methods=['DELETE'])

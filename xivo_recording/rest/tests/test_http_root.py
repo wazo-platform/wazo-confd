@@ -55,7 +55,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "campaign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
-            "queue_id": 1
+            "queue_name": "queue_1"
         }
 
         self.instance_campagne_management.create_campaign.return_value = body
@@ -81,7 +81,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "campaign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
-            "queue_id": 1
+            "queue_name": "queue_1"
         }
 
         self.instance_campagne_management.create_campaign.return_value = True
@@ -106,7 +106,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "campign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
-            "queue_id": 1
+            "queue_name": "queue_1"
         }
 
         self.instance_campagne_management.get_campaigns_as_dict.return_value = data

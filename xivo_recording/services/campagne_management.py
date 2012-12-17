@@ -16,12 +16,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
 from sqlalchemy.exc import OperationalError
 from xivo_dao.alchemy import dbconnection
 from xivo_recording.dao.exceptions import DataRetrieveError
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.recording_config import RecordingConfig
-import logging
+from xivo_dao import queue_features_dao
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +37,24 @@ class CampagneManagement(object):
         dbconnection.unregister_db_connection_pool()
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
+        dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI, 'asterisk')
         self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
     def create_campaign(self, params):
+        """
+        Converts data to the final format and calls the DAO
+        """
+        try:
+            params["queue_id"] = queue_features_dao.id_from_name(params["queue_name"])
+            del params["queue_name"]
+        except Exception as e:
+            result = "Impossible to add the campagin: " + str(e)
+            return result
+
+        return self._create_campaign(params)
+
+    def _create_campaign(self, params):
         result = None
         try:
             result = self.record_db.add(params)
@@ -46,29 +63,84 @@ class CampagneManagement(object):
         return result
 
     def get_campaigns(self, name):
+        """
+        Calls the DAO and converts data to the final format
+        """
         try:
             result = self.record_db.get_records()
+
         except OperationalError:
             # if the database was restarted we need to reconnect
             try:
                 self.__init_db_connection()
                 result = self.record_db.get_records()
+
             except Exception:
                 logger.critical("Database connection failure!")
                 raise DataRetrieveError("Database connection failure")
+
+        try:
+            for item in result:
+                item["queue_name"] = queue_features_dao.queue_name(item["queue_id"])
+                del item["queue_id"]
+        except Exception as e:
+            logger.critical("DAO failure(" + str(e) + ")!")
+            raise DataRetrieveError("DAO failure(" + str(e) + ")!")
+
         return result
 
-    def get_campaigns_as_dict(self):
-        logger.debug("get_campaigns_as_dict")
+    def get_campaigns_as_dict(self, search=None):
+        """
+        Calls the DAO and converts data to the final format
+        """
+        result = self._get_campaigns_as_dict(search)
+
         try:
-            result = self.record_db.get_records_as_dict()
+            for item in result:
+                item["queue_name"] = queue_features_dao.queue_name(item["queue_id"])
+                del item["queue_id"]
+        except Exception as e:
+            logger.critical("DAO failure(" + str(e) + ")!")
+            raise DataRetrieveError("DAO failure(" + str(e) + ")!")
+
+        return result
+
+    def _get_campaigns_as_dict(self, search=None):
+        logger.debug("get_campaigns_as_dict")
+
+        try:
+            result = self.record_db.get_records_as_dict(search)
         except OperationalError:
             # if the database was restarted we need to reconnect
             try:
                 self.__init_db_connection()
-                result = self.record_db.get_records_as_dict()
+                result = self.record_db.get_records_as_dict(search)
             except Exception:
                 logger.critical("Database connection failure!")
                 raise DataRetrieveError("Database connection failure")
+
         return result
 
+    def add_recording(self, campaign_name, params):
+        """
+        Converts data to the final format and calls the DAO
+        """
+        params['campaign_name'] = str(campaign_name)
+        result = self.recording_details_db.add_recording(params)
+        return result
+
+    def get_recordings_as_dict(self, campaign_name, search=None):
+        logger.debug("get_recordings_as_dict")
+
+        try:
+            result = self.recording_details_db.get_recordings_as_list(campaign_name, search)
+        except OperationalError:
+            # if the database was restarted we need to reconnect
+            try:
+                self.__init_db_connection()
+                result = self.recording_details_db.get_recordings_as_list(campaign_name, search)
+            except Exception:
+                logger.critical("Database connection failure!")
+                raise DataRetrieveError("Database connection failure")
+
+        return result

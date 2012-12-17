@@ -28,17 +28,19 @@ class RestCampaign(object):
 
     def __init__(self):
         unique_id = "lettuce" + time.ctime() + str(random.randint(10000, 99999999))
-        queue_id = 1
-        base_filename = unique_id + "-" + str(queue_id) + "-"
+        queue_name = "queue_" + str(1)
+        base_filename = unique_id + "-" + str(queue_name) + "-"
 
         self.campaign = {
             "campaign_name": unique_id,
             "base_filename": base_filename,
             "activated": True,
-            "queue_id": queue_id
+            "queue_name": queue_name
         }
 
-    def create(self, campaign_name):
+        self.recording = {}
+
+    def create(self, campaign_name, queue_name='prijem'):
         connection = httplib.HTTPConnection(
                                 RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
                                 ":" +
@@ -48,6 +50,8 @@ class RestCampaign(object):
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
 
+        self.campaign["campaign_name"] = campaign_name
+        self.campaign["queue_name"] = queue_name
         body = rest_encoder.encode(self.campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -90,5 +94,84 @@ class RestCampaign(object):
                     break
 
         assert result
+        return result
 
+    def get_activated_campaigns(self, queue_name):
+        connection = httplib.HTTPConnection(
+                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                                ":" +
+                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                            )
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        "?activated=true&queue_name=" + queue_name
+
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("GET", requestURI, "", headers)
+        reply = connection.getresponse()
+
+        body = reply.read()
+
+        campaigns = rest_encoder.decode(body)
+
+        return campaigns
+
+    def addRecordingDetails(self, campaign_name, callid, caller, callee, time, queue_name):
+        connection = httplib.HTTPConnection(
+                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                                ":" +
+                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                            )
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
+                        "/" + str(campaign_name) + '/'
+
+        self.recording['cid'] = callid
+        self.recording['caller'] = caller
+        self.recording['callee'] = callee
+        self.recording['time'] = time
+        self.recording['queue_name'] = queue_name
+        body = rest_encoder.encode(self.recording)
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("POST", requestURI, body, headers)
+
+        reply = connection.getresponse()
+        print("\nreply: " + reply.read() + '\n')
+
+        # TODO : Verify the Content-type
+        # replyHeader = reply.getheaders()
+
+        assert reply.status == 201
+        return (reply.status == 201)
+
+    def verifyRecordingsDetails(self, campaign_name):
+        connection = httplib.HTTPConnection(
+                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                                ":" +
+                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                            )
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
+                        '/' + str(campaign_name) + "/"
+
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("GET", requestURI, "", headers)
+        reply = connection.getresponse()
+
+        body = reply.read()
+
+        recordings = rest_encoder.decode(body)
+
+        result = False
+        for recording in recordings:
+            if (recording["cid"] == self.recording['cid']):
+                result = True
+
+        assert result
         return result

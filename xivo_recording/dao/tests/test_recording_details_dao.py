@@ -16,18 +16,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.alchemy import dbconnection
-from xivo_recording.dao.record_dao import RecordDao, RecordDbBinder
-from xivo_recording.dao.tests.table_utils import contains
-from xivo_recording.recording_config import RecordingConfig
 import random
 import unittest
+from xivo_dao.alchemy import dbconnection
+from xivo_recording.dao.tests.table_utils import contains
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDao, \
+    RecordingDetailsDbBinder
 
 
 class TestRecordingDao(unittest.TestCase):
     '''
     Test pre-conditions:
-    - an agent with number 2002.
+    - an agent with number 2002
+    - a campaign named prijem
     - a type called call_dir_type and a table called recording in Asterisk database :
 
     CREATE TYPE call_dir_type AS ENUM
@@ -39,6 +41,8 @@ class TestRecordingDao(unittest.TestCase):
     CREATE TABLE recording
     (
       cid character varying(32) NOT NULL PRIMARY KEY,
+      campaign_name character varying(128) REFERENCES record_campaign(campagne_name)
+          ON UPDATE NO ACTION ON DELETE NO ACTION,
       call_direction call_dir_type,
       start_time timestamp without time zone,
       end_time timestamp without time zone,
@@ -70,6 +74,7 @@ class TestRecordingDao(unittest.TestCase):
         separator = RecordingConfig.CSV_SEPARATOR
 
         expected_dir = {"cid": cid,
+                        "campaign_name": 'prijem',
                         "call_direction": call_direction,
                         "start_time": start_time,
                         "end_time": end_time,
@@ -79,7 +84,7 @@ class TestRecordingDao(unittest.TestCase):
                         "agent": agent
                         }
 
-        expected_object = RecordDao()
+        expected_object = RecordingDetailsDao()
         for k, v in expected_dir.items():
             setattr(expected_object, k, v)
 
@@ -87,7 +92,7 @@ class TestRecordingDao(unittest.TestCase):
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
-        record_db = RecordDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        record_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
         record_db.add(expected_dir)
         records = record_db.get_records()
 

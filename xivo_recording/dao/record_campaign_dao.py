@@ -22,6 +22,7 @@ from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.schema import Table, MetaData
 from xivo_dao.alchemy import dbconnection
+from xivo_dao import queue_features_dao
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
@@ -42,15 +43,28 @@ class RecordCampaignDbBinder(object):
     def __init__(self, session):
         self.session = session
 
-    def get_records_as_dict(self):
-        tables = self.session.query(RecordCampaignDao).all()
+    def get_records_as_dict(self, search=None):
+
+        tables = self.get_records(search)
         logger.debug("Tables retrieved:" + str(tables))
         table_dict = table_list_to_list_dict(tables)
         logger.debug("Tables dict:" + str(table_dict))
         return table_dict
 
-    def get_records(self):
-        return self.session.query(RecordCampaignDao).all()
+    def get_records(self, search=None):
+        if (search == None):
+            return self.session.query(RecordCampaignDao).all()
+        else:
+            search_pattern = {}
+            for item in search:
+                if (item == 'queue_name'):
+                    queue_features_dao.id_from_name(search["queue_name"])
+                    search_pattern["queue_id"] = queue_features_dao.id_from_name(search["queue_name"])
+                else:
+                    search_pattern[item] = search[item]
+
+            logger.debug("Search search_pattern: " + str(search_pattern))
+            return self.session.query(RecordCampaignDao).filter_by(**search_pattern)
 
     def add(self, params):
         record = RecordCampaignDao()

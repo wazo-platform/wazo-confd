@@ -25,27 +25,43 @@ from xivo_recording.dao.generic_dao import GenericDao
 from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.orm.exc import UnmappedClassError
 from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig()
 
 
-class RecordDao(GenericDao):
+class RecordingDetailsDao(GenericDao):
     pass
 
 
-class RecordDbBinder(object):
+class RecordingDetailsDbBinder(object):
 
     __tablename__ = "recording"
 
     def __init__(self, session):
         self.session = session
 
-    def get_records_as_list(self):
-        return table_list_to_list_dict(self.session.query(RecordDao).all())
+    def get_recordings_as_list(self, campaign_name, search=None):
+        search_pattern = {}
+        search_pattern['campaign_name'] = campaign_name
+        if search:
+            for item in search:
+                    search_pattern[item] = search[item]
 
-    def get_records(self):
-        return self.session.query(RecordDao).all()
+        logger.debug("Search search_pattern: " + str(search_pattern))
+        return table_list_to_list_dict(self.session.query(RecordingDetailsDao).filter_by(**search_pattern))
 
-    def add(self, params):
-        record = RecordDao()
+    def get_recordings(self, campaign_name, search=None):
+        search_pattern = {}
+        search_pattern['campaign_name'] = campaign_name
+        for item in search:
+                search_pattern[item] = search[item]
+
+        return self.session.query(RecordingDetailsDao).filter_by(**search_pattern)
+
+    def add_recording(self, params):
+        record = RecordingDetailsDao()
         for k, v in params.items():
             setattr(record, k, v)
         try:
@@ -59,12 +75,12 @@ class RecordDbBinder(object):
     @classmethod
     def new_from_uri(cls, uri):
         try:
-            class_mapper(RecordDao)
+            class_mapper(RecordingDetailsDao)
         except UnmappedClassError:
             engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
             metadata = MetaData(engine)
             data = Table(cls.__tablename__, metadata, autoload=True)
-            mapper(RecordDao, data)
+            mapper(RecordingDetailsDao, data)
 
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())

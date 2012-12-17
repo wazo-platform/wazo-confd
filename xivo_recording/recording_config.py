@@ -22,7 +22,7 @@ class RecordingConfig(object):
     XIVO_RECORD_SERVICE_ADDRESS = "127.0.0.1"
     XIVO_RECORD_SERVICE_PORT = 50050
     XIVO_REST_SERVICE_ROOT_PATH = "/rest"
-    XIVO_RECORDING_SERVICE_PATH = "/record"
+    XIVO_RECORDING_SERVICE_PATH = "/IPBX/recording_campaigns"
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
     CSV_SEPARATOR = ","

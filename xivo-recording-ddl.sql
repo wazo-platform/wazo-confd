@@ -23,6 +23,8 @@ ALTER TYPE call_dir_type
 CREATE TABLE recording
 (
   cid character varying(32) NOT NULL PRIMARY KEY,
+  campaign_name character varying(128) REFERENCES record_campaign(campaign_name)
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
   call_direction call_dir_type,
   start_time timestamp without time zone,
   end_time timestamp without time zone,
