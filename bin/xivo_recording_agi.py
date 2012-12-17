@@ -22,6 +22,7 @@ from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
 import logging
 import sys
+from time import localtime, strftime
 
 DEBUG_MODE = False
 LOGFILE = '/var/log/xivo_recording_agi'
@@ -35,12 +36,48 @@ logger = None
 class RestAPIError(Exception):
     pass
 
+class AGIError(Exception):
+    pass
 
 def get_variables():
 
     QUEUE_NAME = agi.get_variable('XIVO_QUEUENAME')
 
     return QUEUE_NAME
+
+
+def add_recording_detail(campaign_details):
+    connection = httplib.HTTPConnection(
+                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                            ":" +
+                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                        )
+
+    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                    str(campaign_details['campaign_name']) + '/'
+
+    global agi
+    if agi == None:
+        raise AGIError()
+
+    body = {}
+    body['cid'] = agi.get_variable('UNIQUEID')
+    body['caller'] = agi.get_variable('XIVO_SRCNUM')
+    body['callee'] = agi.get_variable('XIVO_DSTNUM')
+    body['start_time'] = strftime("%a, %d %b %Y %H:%M:%S", localtime())
+    body['agent'] = agi.get_variable('6004')
+    body_json = rest_encoder.encode(body)
+    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+    connection.request("POST", requestURI, body_json, headers)
+
+    reply = connection.getresponse()
+
+    if (reply.status != "201"):
+        raise RestAPIError()
+
+    return reply.read()
 
 
 def get_campaigns(queue_name):
@@ -68,11 +105,11 @@ def get_campaigns(queue_name):
     return reply.read()
 
 
-def extract_base_filename(campaign_json):
+def extract_campaign_details(campaign_json):
     if (len(campaign_json) == 0):
         return None
     campaign = rest_encoder.decode(campaign_json)
-    return campaign[0]['base_filename']
+    return campaign[0]
 
 
 def _init_logging(debug_mode):
@@ -106,15 +143,17 @@ def main():
         sys.exit(REST_ERROR)
 
     try:
-        base_filename = extract_base_filename(campaigns_json)
+        campaign_details = extract_campaign_details(campaigns_json)
     except Exception:
         logger.error("REST WS: Parse JSON reply error")
         sys.exit(REST_ERROR)
 
-    if (base_filename != None):
+    if (campaign_details['base_filename'] != None):
         agi.set_variable('QR_RECORDQUEUE', '1')
-        agi.set_variable('QR_BASE_FILENAME', base_filename)
+        agi.set_variable('QR_BASE_FILENAME', campaign_details['base_filename'])
         logger.info('Calls to queue: "' + queue_name + '" are recorded')
+        # event if create in the database fails, we record
+        add_recording_detail(campaign_details)
     else:
         agi.set_variable('QR_RECORDQUEUE', '0')
         logger.info('Calls to queue: "' + queue_name + '" are not recorded')
