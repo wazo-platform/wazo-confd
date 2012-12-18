@@ -22,62 +22,36 @@ from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
 import logging
 import sys
-from time import localtime, strftime
+import traceback
 
-DEBUG_MODE = False
-LOGFILE = '/tmp/xivo_recording_agi.log'
+DEBUG_MODE = True
+LOGFILE = '/var/log/asterisk/xivo-recording-agi.log'
 
-REST_ERROR = 1
+GENERIC_ERROR = 1
+REST_ERROR = 2
 
-agi = None
-logger = None
+agi = AGI()
+logger = logging.getLogger()
 
 
 class RestAPIError(Exception):
     pass
 
-class AGIError(Exception):
-    pass
+
+class Syslogger(object):
+
+    def write(self, data):
+        global logger
+        logger.error(data)
+
 
 def get_variables():
-
-    QUEUE_NAME = agi.get_variable('XIVO_QUEUENAME')
-
-    return QUEUE_NAME
-
-
-def add_recording_detail(campaign_details):
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
-
-    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                    str(campaign_details['campaign_name']) + '/'
-
-    global agi
-    if agi == None:
-        raise AGIError()
-
-    body = {}
-    body['cid'] = agi.get_variable('UNIQUEID')
-    body['caller'] = agi.get_variable('XIVO_SRCNUM')
-    body['callee'] = agi.get_variable('XIVO_DSTNUM')
-    body['start_time'] = strftime("%a, %d %b %Y %H:%M:%S", localtime())
-    body['agent'] = agi.get_variable('6004')
-    body_json = rest_encoder.encode(body)
-    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
-
-    connection.request("POST", requestURI, body_json, headers)
-
-    reply = connection.getresponse()
-
-    if (reply.status != "201"):
-        raise RestAPIError()
-
-    return reply.read()
+    xivo_vars = {}
+    xivo_vars['queue_name'] = agi.get_variable('XIVO_QUEUENAME')
+    xivo_vars['xivo-srcnum'] = agi.get_variable('XIVO_SRCNUM')
+    xivo_vars['xivo-destnum'] = agi.get_variable('XIVO_DESTNUM')
+    logger.debug("Queue_name = " + xivo_vars['queue_name'])
+    return xivo_vars
 
 
 def get_campaigns(queue_name):
@@ -89,9 +63,10 @@ def get_campaigns(queue_name):
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-    param_str = "?activated=true&queue_name=%s" % queue_name
+    param_str = "?activated=true&queue_name=%s" % str(queue_name)
 
     requestURI += param_str
+    logger.debug("Getting campaigns from URL: " + requestURI)
 
     headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -99,66 +74,95 @@ def get_campaigns(queue_name):
 
     reply = connection.getresponse()
 
-    if (reply.status != "200"):
+    if (reply.status != 200):
+        logger.warning("Get campaigns failed with code: " + str(reply.status))
         raise RestAPIError()
 
     return reply.read()
 
 
-def extract_campaign_details(campaign_json):
-    if (len(campaign_json) == 0):
+def decodeCampaigns(campaign):
+    if (len(campaign) == 0):
         return None
-    campaign = rest_encoder.decode(campaign_json)
-    return campaign[0]
+    campaigns = rest_encoder.decode(campaign)
+    return campaigns
 
 
-def _init_logging(debug_mode):
-    global logger
-    logger = logging.getLogger()
-    formatter = logging.Formatter('%%(asctime)s [%%(process)d] (%%(levelname)s) (%%(name)s): %%(message)s')
+def init_logging(debug_mode):
     if debug_mode:
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
     else:
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.WARNING)
 
     logfilehandler = logging.FileHandler(LOGFILE)
-    logfilehandler.setFormatter(formatter)
     logger.addHandler(logfilehandler)
 
+    syslogger = Syslogger()
+    sys.stderr = syslogger
 
-def main():
-    _init_logging(DEBUG_MODE)
-    global agi
-    agi = AGI()
 
-    queue_name = get_variables()
-    campaigns_json = None
+def determinateRecord():
+    logger.debug("Going to determinate whether call is to be recorded")
+    xivo_vars = get_variables()
+
+    campaigns = None
     try:
-        campaigns_json = get_campaigns(queue_name)
+        campaigns = decodeCampaigns(get_campaigns(xivo_vars['queue_name']))
     except RestAPIError:
         logger.error("REST WS: GET campaigns error")
         sys.exit(REST_ERROR)
+    except Exception as e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        logger.error(repr(traceback.format_exception(exc_type, exc_value,
+                                          exc_traceback)))
+        sys.exit(GENERIC_ERROR)
 
-    try:
-        campaign_details = extract_campaign_details(campaigns_json)
-    except Exception:
-        logger.error("REST WS: Parse JSON reply error")
-        sys.exit(REST_ERROR)
+    logger.debug("Campaigns: " + str(campaigns))
+    base_filename = campaigns[0]['base_filename']
 
-    if (campaign_details['base_filename'] != None):
+    if len(base_filename) == 0:
+        logger.info("No base_filename")
+        base_filename = campaigns[0]['campaign_name']
+
+    logger.debug("Base filename: " + base_filename)
+    if (campaigns[0]['activated'] == "True"):
         agi.set_variable('QR_RECORDQUEUE', '1')
-        agi.set_variable('QR_BASE_FILENAME', campaign_details['base_filename'])
-        logger.info('Calls to queue: "' + queue_name + '" are recorded')
-        # event if create in the database fails, we record
-        add_recording_detail(campaign_details)
+        agi.set_variable('_QR_CAMPAIGN_NAME', campaigns[0]['campaign_name'])
+        agi.set_variable('_QR_BASE_FILENAME', base_filename)
+        logger.info('Calls to queue: "' +
+                    xivo_vars['queue_name'] +
+                    '" are recorded')
     else:
         agi.set_variable('QR_RECORDQUEUE', '0')
-        logger.info('Calls to queue: "' + queue_name + '" are not recorded')
+        logger.info('Calls to queue: "' +
+                    xivo_vars['queue_name'] +
+                    '" are not recorded')
 
     sys.exit(0)
+
+
+def saveCallDetails():
+    logger.debug("Save recorded call details")
+
+
+def main():
+    init_logging(DEBUG_MODE)
+    try:
+        if len(sys.argv) != 2:
+            logger.error("wrong number of arguments")
+            sys.exit(1)
+        action = sys.argv[1]
+        if (action == 'determinateRecord'):
+            determinateRecord()
+        elif (action == 'saveCallDetails'):
+            saveCallDetails()
+        else:
+            logger.warning("No action given, exit")
+            sys.exit(0)
+    except Exception as e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        logger.error(repr(traceback.format_exception(exc_type, exc_value,
+                                          exc_traceback)))
 
 
 if __name__ == '__main__':

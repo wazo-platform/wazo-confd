@@ -41,7 +41,6 @@ from xivo_dao.alchemy import dbconnection
 from xivo_recording.dao.exceptions import DataRetrieveError
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.recording_config import RecordingConfig
-from xivo_dao import queue_features_dao
 from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
 
 logger = logging.getLogger(__name__)
