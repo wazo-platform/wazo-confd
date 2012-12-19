@@ -1,7 +1,7 @@
 #!/bin/sh
 #installation script for package xivo-recording
 
-PF_XIVO_WEB_DEB_FILE="pf-xivo-web-interface_12.21~20121212.134631.6cf6e1f-3_all.deb"
+PF_XIVO_WEB_DEB_FILE="pf-xivo-web-interface_12.22~20121024.134631.6cf6e1f-3_all.deb"
 
 echo "Starting installation..."
 

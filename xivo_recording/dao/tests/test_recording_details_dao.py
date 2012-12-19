@@ -71,7 +71,6 @@ class TestRecordingDao(unittest.TestCase):
         client_id = "satisfied client Žluťoučký kůň"
         callee = str(random.randint(100, 999))
         agent = "2002"
-        separator = RecordingConfig.CSV_SEPARATOR
 
         expected_dir = {"cid": cid,
                         "campaign_name": 'prijem',

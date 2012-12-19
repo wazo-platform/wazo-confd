@@ -42,20 +42,6 @@ class CampagneManagement(object):
         self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
     def create_campaign(self, params):
-        """
-        Converts data to the final format and calls the DAO
-        """
-        try:
-            params["queue_id"] = queue_features_dao. \
-                                    id_from_name(params["queue_name"])
-            del params["queue_name"]
-        except Exception as e:
-            result = "Impossible to add the campagin: " + str(e)
-            return result
-
-        return self._create_campaign(params)
-
-    def _create_campaign(self, params):
         result = None
         try:
             result = self.record_db.add(params)
@@ -73,7 +59,6 @@ class CampagneManagement(object):
             for item in result:
                 item["queue_name"] = queue_features_dao. \
                                         queue_name(item["queue_id"])
-                del item["queue_id"]
         except Exception as e:
             logger.critical("DAO failure(" + str(e) + ")!")
             raise DataRetrieveError("DAO failure(" + str(e) + ")!")
@@ -95,4 +80,14 @@ class CampagneManagement(object):
                 raise DataRetrieveError("Database connection failure")
 
         return result
-
+    
+    def update_campaign(self, original_campaign_name, params):
+        result = None
+        try:
+            logger.debug('going to update')
+            result = self.record_db.update(original_campaign_name, params)
+        except Exception as e:
+            result = "Impossible to update the campagin: " + str(e)
+        return result
+        
+        

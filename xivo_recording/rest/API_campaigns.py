@@ -34,6 +34,7 @@ class APICampaigns(object):
     def add_campaign(self):
         try:
             body = rest_encoder.decode(request.data)
+            logger.debug(str(body))
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
@@ -45,10 +46,20 @@ class APICampaigns(object):
             return make_response(str(result), 500)
 
     def get(self, campaign_name):
-        return make_response(("Work in progress, root get, campaign_name: " +
-                              str(campaign_name) +
-                              " args: " + str(request.args)),
-                              501)
+        try:
+            logger.debug("Get args:" + str(campaign_name))
+            params = {}
+            params['campaign_name']= campaign_name
+            for item in request.args:
+                params['item'] = request.args[item]
+            result = self._campagne_manager.get_campaigns_as_dict(params)
+            logger.debug("got result")
+            body = rest_encoder.encode(result)
+            logger.debug("result encoded")
+            return make_response(body, 200)
+        except Exception as e:
+            logger.debug("got exception:" + str(e.args))
+            return make_response(str(e.args), 500)
 
     def delete(self, resource_id):
         try:
@@ -61,16 +72,19 @@ class APICampaigns(object):
                               " args: " + str(request.args)),
                              501)
 
-    def update(self, resource_id):
+    def update(self, campaign_name):
         try:
             body = rest_encoder.decode(request.data)
+            logger.debug(str(body))
         except ValueError:
-            body = "No parsable data in the request"
-        return make_response(("Work in progress, root update, resource_id: " +
-                              str(resource_id) +
-                              " body: " + str(body) +
-                              " args: " + str(request.args)),
-                             501)
+            body = "No parsable data in the request, data: " + request.data
+            return make_response(body, 400)
+
+        result = self._campagne_manager.update_campaign(campaign_name, body)
+        if (result):
+            return make_response(("Added: " + str(result)), 201)
+        else:
+            return make_response(str(result), 500)
 
     def list_campaigns(self):
         try:

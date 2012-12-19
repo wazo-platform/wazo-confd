@@ -18,7 +18,7 @@
 
 from flask import Flask
 from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest.routage import root
+from xivo_recording.rest.routage import root, queues_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 app.register_blueprint(root)
+app.register_blueprint(queues_service)
 app.debug = True
 
 

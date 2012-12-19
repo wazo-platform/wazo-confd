@@ -70,11 +70,30 @@ class RecordCampaignDbBinder(object):
         record = RecordCampaignDao()
         for k, v in params.items():
             setattr(record, k, v)
+            logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
         try:
             self.session.add(record)
             self.session.commit()
         except Exception as e:
             self.session.rollback()
+            logger.debug("RecordCampaignDbBinder - add: " + str(e))
+            raise e
+        return True
+    def update(self, original_name, params):
+        try:
+            logger.debug('entering update')
+            campaign = self.get_records({'campaign_name': original_name})[0]
+            logger.debug('got original')
+            for k, v in params.items():
+                setattr(campaign, k, v)
+                logger.debug("RecordCampaignDbBinder - update: " + k + " = " + v)
+            logger.debug('attributes modified')
+            self.session.add(campaign)
+            self.session.commit()
+            logger.debug('commited')
+        except Exception as e:
+            self.session.rollback()
+            logger.debug('Impossible to update the campaign: ' + str(e))
             raise e
         return True
 
