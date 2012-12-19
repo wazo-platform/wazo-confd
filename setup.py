@@ -33,7 +33,7 @@ setup(
               'xivo_recording.dao.helpers',
               'xivo_recording.rest',
               'xivo_recording.services'],
-    scripts=['bin/xivo_recording'],
+    scripts=['bin/xivo_recording_agi.py'],
     data_files=[('/etc/init.d', ['etc/init.d/xivo-recording']),
-                ('/usr/local/sbin', ['bin/xivo_recording_agi.py'])],
+                ('/etc/asterisk/extensions_extra.d/', ['etc/asterisk/extensions_extra.d/xivo-recording.conf'])]
 )

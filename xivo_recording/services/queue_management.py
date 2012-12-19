@@ -35,19 +35,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
-from sqlalchemy.exc import OperationalError
+from xivo_dao import queue_features_dao
 from xivo_dao.alchemy import dbconnection
-from xivo_recording.dao.exceptions import DataRetrieveError
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_recording.dao.helpers.dynamic_formatting import \
+    table_list_to_list_dict
 from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
+import logging
 
 logger = logging.getLogger(__name__)
 
 
-class RecordingManagement(object):
-
+class QueueManagement(object):
+    
     def __init__(self):
         self.__init_db_connection()
 
@@ -56,31 +55,6 @@ class RecordingManagement(object):
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
         dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI, 'asterisk')
-        self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-        self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-
-    def add_recording(self, campaign_name, params):
-        """
-        Converts data to the final format and calls the DAO
-        """
-        params['campaign_name'] = str(campaign_name)
-        result = self.recording_details_db.add_recording(params)
-        return result
-
-    def get_recordings_as_dict(self, campaign_name, search=None):
-        logger.debug("get_recordings_as_dict")
-
-        try:
-            result = self.recording_details_db. \
-                            get_recordings_as_list(campaign_name, search)
-        except OperationalError:
-            # if the database was restarted we need to reconnect
-            try:
-                self.__init_db_connection()
-                result = self.recording_details_db. \
-                                get_recordings_as_list(campaign_name, search)
-            except Exception:
-                logger.critical("Database connection failure!")
-                raise DataRetrieveError("Database connection failure")
-
-        return result
+        
+    def get_all_queues(self):
+        return table_list_to_list_dict(queue_features_dao.all())

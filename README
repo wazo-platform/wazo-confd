@@ -2,7 +2,6 @@
 
 TODO:
 -----
-- refactor tests of rest_http_*
 - refactor db integration 
 - install package for Webi
 - uninstall script
@@ -32,7 +31,7 @@ use xivo-recording.tar
 
 tar -xvf xivo-recording.tar
 cd xivo-recording
-./uninstall.sh
+./uninstall.sh 
 
  
 Packaging :
