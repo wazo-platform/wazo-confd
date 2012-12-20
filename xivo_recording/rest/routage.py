@@ -16,11 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
 from flask import Blueprint
 from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest.API_recordings import APIRecordings
 from xivo_recording.rest.API_campaigns import APICampaigns
+from xivo_recording.rest.API_queues import APIQueues
+from xivo_recording.rest.API_recordings import APIRecordings
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -72,3 +73,20 @@ root.add_url_rule("/<campaign_name>/",
                   "add_recording",
                   getattr(APIRecordings(), "add_recording"),
                   methods=["POST"])
+
+# ****************** #
+#   Queues server    #
+# ****************** #
+queues_service = Blueprint("queues_service",
+                         __name__,
+                         url_prefix=RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                    RecordingConfig.XIVO_QUEUES_SERVICE_PATH)
+
+# ****************** #
+#   API campaigns    #
+# ****************** #
+
+queues_service.add_url_rule("/",
+                  "list_queues",
+                  getattr(APIQueues(), "list_queues"),
+                  methods=["GET"])

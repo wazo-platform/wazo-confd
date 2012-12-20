@@ -16,22 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from flask import Flask
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest.routage import root, queues_service
-import logging
+from acceptance.features.rest_queues import RestQueues
+from lettuce import step
 
-logger = logging.getLogger(__name__)
+restqueues = RestQueues()
 
-app = Flask(__name__)
-
-app.register_blueprint(root)
-app.register_blueprint(queues_service)
-app.debug = True
-
-
-class FlaskHttpServer(object):
-
-    def run(self):
-        app.run(host=RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS,
-                port=RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+@step(u'When I create a queue "([^"]*)"')
+def when_i_create_a_queue(step, group1):
+    global restqueues 
+    assert restqueues.create("test_lettuce")
+    
+@step(u'Then I can consult this queue')
+def then_i_can_consult_this_queue(step):
+    global restqueues 
+    assert restqueues.list("name", "test_lettuce")
+    

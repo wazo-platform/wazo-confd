@@ -36,15 +36,13 @@ queue_name = "test_queue" + str(random.randint(10, 99))
 @step(u'Given there is a campaign named "([^"]*)"')
 def given_there_is_a_campaign_named_campaing_name(step, local_campaign_name):
     global campaign_name
-    campaign_name = local_campaign_name
-    if rest_campaign.list():
-        return True
-    assert rest_campaign.create(campaign_name + str(random.randint(100, 999))), "Cannot create a campaign"
+    campaign_name = local_campaign_name + str(random.randint(100, 999))
+    assert rest_campaign.create(campaign_name), "Cannot create a campaign"
 
 
 @step(u'When I save call details for a call referenced by its "([^"]*)" in campaign "([^"]*)"')
-def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_group2(step, local_callid, campaign_name):
-    global callid
+def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_group2(step, local_callid, local_campaign_name):
+    global callid, campaign_name
     callid = local_callid + str(random.randint(1000, 9999))
     assert callid, "Callid null!"
     assert rest_campaign.addRecordingDetails(campaign_name, callid, caller, callee, time, queue_name), "Cannot add call details"
