@@ -119,7 +119,7 @@ def get_queues():
                         )
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_QUEUE_SERVICE_PATH + "/"
+                    RecordingConfig.XIVO_QUEUES_SERVICE_PATH + "/"
 
     logger.debug("Getting queues from URL: " + requestURI)
 
