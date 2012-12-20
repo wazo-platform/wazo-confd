@@ -50,18 +50,21 @@ def get_general_variables():
     xivo_vars['queue_name'] = agi.get_variable('XIVO_QUEUENAME')
     xivo_vars['xivo_srcnum'] = agi.get_variable('XIVO_SRCNUM')
     xivo_vars['xivo_destnum'] = agi.get_variable('XIVO_DESTNUM')
-    logger.debug("Queue_name = " + xivo_vars['queue_name'])
+    logger.debug(str(xivo_vars))
     return xivo_vars
 
 
 def get_detailed_variables():
-    xivo_vars = get_general_variables()
-    xivo_vars['campaign_name'] = agi.get_variable('_QR_CAMPAIGN_NAME')
-    xivo_vars['base_filename'] = agi.get_variable('_QR_BASE_FILENAME')
+    xivo_vars = {}
+    xivo_vars['campaign_name'] = agi.get_variable('QR_CAMPAIGN_NAME')
+    xivo_vars['base_filename'] = agi.get_variable('QR_BASE_FILENAME')
     xivo_vars['agent'] = agi.get_variable('QR_AGENT_NB')
+    xivo_vars['callee'] = agi.get_variable('QR_CALLEE_NB')
+    xivo_vars['caller'] = agi.get_variable('QR_CALLER_NB')
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
     xivo_vars['queue_name'] = agi.get_variable('QR_QUEUENAME')
+    logger.debug(str(xivo_vars))
     return xivo_vars
 
 
@@ -90,13 +93,6 @@ def get_campaigns(queue_id):
         raise RestAPIError()
 
     return reply.read()
-
-
-def decodeCampaigns(campaign):
-    if (len(campaign) == 0):
-        return None
-    campaigns = rest_encoder.decode(campaign)
-    return campaigns
 
 
 def init_logging(debug_mode):
@@ -138,15 +134,8 @@ def get_queues():
     return reply.read()
 
 
-def decodeQueues(queue):
-    if (len(queue) == 0):
-        return None
-    queues = rest_encoder.decode(queue)
-    return queues
-
-
 def get_queue_id(queue_name):
-    queues = decodeQueues(get_queues())
+    queues = rest_encoder.decode(get_queues())
     for queue in queues:
         if queue['name'] == queue_name:
             return queue['id']
@@ -162,7 +151,7 @@ def determinate_record():
     if queue_id == None:
         logger.error('Queue "' + xivo_vars['queue_name'] + '" not found!')
         sys.exit(1)
-    campaigns = decodeCampaigns(get_campaigns(queue_id))
+    campaigns = rest_encoder.decode(get_campaigns(queue_id))
 
     logger.debug("Campaigns: " + str(campaigns))
     base_filename = campaigns[0]['base_filename']
@@ -174,8 +163,8 @@ def determinate_record():
     logger.debug("Base filename: " + base_filename)
     if (campaigns[0]['activated'] == "True"):
         agi.set_variable('QR_RECORDQUEUE', '1')
-        agi.set_variable('_QR_CAMPAIGN_NAME', campaigns[0]['campaign_name'])
-        agi.set_variable('_QR_BASE_FILENAME', base_filename)
+        agi.set_variable('__QR_CAMPAIGN_NAME', campaigns[0]['campaign_name'])
+        agi.set_variable('__QR_BASE_FILENAME', base_filename)
         logger.info('Calls to queue: "' +
                     xivo_vars['queue_name'] +
                     '" are recorded')
@@ -186,13 +175,6 @@ def determinate_record():
                     '" are not recorded')
 
     sys.exit(0)
-
-
-def encode_recording(recording):
-    if (len(recording) == 0):
-        return None
-    recordings = rest_encoder.encode(recording)
-    return recordings
 
 
 def save_recording(recording):
@@ -209,49 +191,35 @@ def save_recording(recording):
     logger.debug("Post recording to URL: " + requestURI)
 
     headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
-    body = encode_recording(recording)
+    body = rest_encoder.encode(recording)
     logger.debug("Recording post body: " + str(body))
     connection.request("POST", requestURI, body, headers)
 
     reply = connection.getresponse()
 
-    if (reply.status != 201):
+    if (reply.status == 201):
+        return 0
+    else:
         logger.warning("POST recording failed with code: " + str(reply.status))
         raise RestAPIError()
-
-    return reply.read()
 
 
 def save_call_details():
     logger.debug("Save recorded call details")
     xivo_vars = get_detailed_variables()
+    if xivo_vars['base_filename'] == "":
+        xivo_vars['base_filename'] = 'NoBaseFilename'
 
-
-    queue_id = get_queue_id(xivo_vars['queue_name'])
-    if queue_id == None:
-        logger.error('Queue "' + xivo_vars['queue_name'] + '" not found!')
-        sys.exit(1)
-    campaigns = decodeCampaigns(get_campaigns(queue_id))
-
-    logger.debug("Campaigns: " + str(campaigns))
-    base_filename = campaigns[0]['base_filename']
-
-    if len(base_filename) == 0:
-        logger.info("No base_filename")
-        base_filename = campaigns[0]['campaign_name']
-
-
-
-
-    filename = base_filename + xivo_vars['cid'] + '.wav'
+    filename = xivo_vars['base_filename'] + xivo_vars['cid'] + '.wav'
     agi.set_variable('_QR_FILENAME', filename)
     recording = {}
     recording['cid'] = xivo_vars['cid']
     recording['filename'] = filename
-    recording['campaign_name'] = campaigns[0]['campaign_name']
+    recording['campaign_name'] = xivo_vars['campaign_name']
     recording['start_time'] = xivo_vars['start_time']
     recording['agent'] = xivo_vars['agent']
-    recording['callee'] = xivo_vars['xivo_destnum']
+    recording['caller'] = xivo_vars['caller']
+    recording['callee'] = xivo_vars['callee']
     sys.exit(save_recording(recording))
 
 
