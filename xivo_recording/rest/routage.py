@@ -83,7 +83,7 @@ queues_service = Blueprint("queues_service",
                                     RecordingConfig.XIVO_QUEUES_SERVICE_PATH)
 
 # ****************** #
-#   API campaigns    #
+#   API queues       #
 # ****************** #
 
 queues_service.add_url_rule("/",
