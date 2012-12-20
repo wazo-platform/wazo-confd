@@ -103,5 +103,7 @@ class TestRecordingDao(unittest.TestCase):
         print("saved:")
         print(expected_object.to_string())
 
-        self.assert_(contains(records, lambda record: record.to_string() == expected_object.to_string()), "Write/read from database failed")
+        self.assert_(contains(records,
+                              lambda record: record.to_string() == expected_object.to_string()),
+                     "Write/read from database failed")
 

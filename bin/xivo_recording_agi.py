@@ -45,16 +45,25 @@ class Syslogger(object):
         logger.error(data)
 
 
-def get_variables():
+def get_general_variables():
     xivo_vars = {}
     xivo_vars['queue_name'] = agi.get_variable('XIVO_QUEUENAME')
-    xivo_vars['xivo-srcnum'] = agi.get_variable('XIVO_SRCNUM')
-    xivo_vars['xivo-destnum'] = agi.get_variable('XIVO_DESTNUM')
+    xivo_vars['xivo_srcnum'] = agi.get_variable('XIVO_SRCNUM')
+    xivo_vars['xivo_destnum'] = agi.get_variable('XIVO_DESTNUM')
     logger.debug("Queue_name = " + xivo_vars['queue_name'])
     return xivo_vars
 
 
-def get_campaigns(queue_name):
+def get_detailed_variables():
+    xivo_vars = get_general_variables()
+    xivo_vars['campaign_name'] = agi.get_variable('_QR_CAMPAIGN_NAME')
+    xivo_vars['base_filename'] = agi.get_variable('_QR_BASE_FILENAME')
+    xivo_vars['agent'] = agi.get_variable('QR_USER_NB')
+    xivo_vars['start_time'] = agi.get_variable('QR_TIME')
+    xivo_vars['cid'] = agi.get_variable('UNIQUEID')
+
+
+def get_campaigns(queue_id):
     connection = httplib.HTTPConnection(
                             RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
                             ":" +
@@ -63,7 +72,7 @@ def get_campaigns(queue_name):
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-    param_str = "?activated=true&queue_name=%s" % str(queue_name)
+    param_str = "?activated=true&queue_id=%s" % str(queue_id)
 
     requestURI += param_str
     logger.debug("Getting campaigns from URL: " + requestURI)
@@ -101,21 +110,50 @@ def init_logging(debug_mode):
     sys.stderr = syslogger
 
 
-def determinateRecord():
-    logger.debug("Going to determinate whether call is to be recorded")
-    xivo_vars = get_variables()
+# TODO: Refactor in library, used here, in lettuce...!
+def get_queues():
+    connection = httplib.HTTPConnection(
+                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                            ":" +
+                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                        )
 
-    campaigns = None
-    try:
-        campaigns = decodeCampaigns(get_campaigns(xivo_vars['queue_name']))
-    except RestAPIError:
-        logger.error("REST WS: GET campaigns error")
-        sys.exit(REST_ERROR)
-    except Exception as e:
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        logger.error(repr(traceback.format_exception(exc_type, exc_value,
-                                          exc_traceback)))
-        sys.exit(GENERIC_ERROR)
+    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RecordingConfig.XIVO_QUEUE_SERVICE_PATH + "/"
+
+    logger.debug("Getting queues from URL: " + requestURI)
+
+    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+    connection.request("GET", requestURI, None, headers)
+
+    reply = connection.getresponse()
+
+    if (reply.status != 200):
+        logger.warning("Get campaigns failed with code: " + str(reply.status))
+        raise RestAPIError()
+
+    return reply.read()
+
+
+def get_queue_id(queue_name):
+    queues = get_queues()
+    for queue in queues:
+        if queue['queue_name'] == queue_name:
+            return queue['queue_id']
+
+    return None
+
+
+def determinate_record():
+    logger.debug("Going to determinate whether call is to be recorded")
+    xivo_vars = get_general_variables()
+
+    queue_id = get_queue_id(xivo_vars['queue_name'])
+    if queue_id == None:
+        logger.error('Queue "' + xivo_vars['queue_name'] + '" not found!')
+        sys.exit(1)
+    campaigns = get_campaigns(queue_id)
 
     logger.debug("Campaigns: " + str(campaigns))
     base_filename = campaigns[0]['base_filename']
@@ -141,8 +179,52 @@ def determinateRecord():
     sys.exit(0)
 
 
-def saveCallDetails():
+def encode_recording(recording):
+    if (len(recording) == 0):
+        return None
+    recordings = rest_encoder.encode(recording)
+    return recordings
+
+
+def save_recording(recording):
+    connection = httplib.HTTPConnection(
+                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                            ":" +
+                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                        )
+
+    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                    recording['campaign_name'] + "/"
+
+    logger.debug("Post recording to URL: " + requestURI)
+
+    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+    connection.request("POST", requestURI, None, headers)
+
+    reply = connection.getresponse()
+
+    if (reply.status != 200):
+        logger.warning("POST recording failed with code: " + str(reply.status))
+        raise RestAPIError()
+
+    return reply.read()
+
+
+def save_call_details():
     logger.debug("Save recorded call details")
+    xivo_vars = get_detailed_variables()
+    filename = xivo_vars['base_filename'] + xivo_vars['cid'] + '.wav'
+    agi.set_variable('_QR_FILENAME', filename)
+    recording = {}
+    recording['cid'] = xivo_vars['cid']
+    recording['filename'] = filename
+    recording['campaign_name'] = xivo_vars['campaign_name']
+    recording['start_time'] = xivo_vars['start_time']
+    recording['agent'] = xivo_vars['agent']
+    recording['callee'] = xivo_vars['xivo_destnum']
+    sys.exit(save_recording(encode_recording(recording)))
 
 
 def main():
@@ -153,13 +235,13 @@ def main():
             sys.exit(1)
         action = sys.argv[1]
         if (action == 'determinateRecord'):
-            determinateRecord()
+            determinate_record()
         elif (action == 'saveCallDetails'):
-            saveCallDetails()
+            save_call_details()
         else:
             logger.warning("No action given, exit")
             sys.exit(0)
-    except Exception as e:
+    except Exception:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         logger.error(repr(traceback.format_exception(exc_type, exc_value,
                                           exc_traceback)))
