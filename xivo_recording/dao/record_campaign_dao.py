@@ -99,7 +99,7 @@ class RecordCampaignDbBinder(object):
 
     @classmethod
     def create_class_mapper(cls, uri):
-        engine = create_engine(uri, encoding='utf8')
+        engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG, encoding='utf-8')
         if (RecordingConfig.POSTGRES_DEBUG):
             loggerDB = logging.getLogger('sqlalchemy.engine')
             logfilehandler = logging.FileHandler(RecordingConfig.POSTGRES_DEBUG_FILE)

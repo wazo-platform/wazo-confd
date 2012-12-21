@@ -49,7 +49,7 @@ class TestRecordCampaignDao(unittest.TestCase):
     def test_record_campaign_db(self):
 
         unique_id = str(random.randint(10000, 99999999))
-        campaign_name = "campaign-" + unique_id
+        campaign_name = "campaign-àé" + unique_id
         queue_id = 1
         base_filename = campaign_name + "-"
 

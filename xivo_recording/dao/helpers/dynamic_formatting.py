@@ -39,6 +39,10 @@ def table_list_to_list_dict(list_instance):
         members = vars(class_instance)
         for elem in sorted(set(members)):
             if not elem.startswith('_'):
-                dict_instance[str(elem)] = str(getattr(class_instance, elem))
+                value = getattr(class_instance, elem)
+                logger.debug("Value type: " + type(value).__name__)
+                if type(value).__name__ != 'unicode':
+                    value = str(value)
+                dict_instance[elem] = value
         list_of_dict.append(dict_instance)
     return list_of_dict
