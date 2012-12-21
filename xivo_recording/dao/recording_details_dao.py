@@ -77,7 +77,7 @@ class RecordingDetailsDbBinder(object):
         try:
             class_mapper(RecordingDetailsDao)
         except UnmappedClassError:
-            engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG)
+            engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG, encoding='utf-8')
             metadata = MetaData(engine)
             data = Table(cls.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)

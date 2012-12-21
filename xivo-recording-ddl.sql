@@ -31,6 +31,7 @@ CREATE TABLE recording
   caller character varying(32),
   client_id character varying(1024),
   callee character varying(32),
+  filename character varying(1024),
   agent character varying(40) REFERENCES agentfeatures(number)
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
