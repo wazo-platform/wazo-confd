@@ -18,7 +18,6 @@
 
 from gevent import httplib
 from xivo_dao import queue_features_dao
-from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
