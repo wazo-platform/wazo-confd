@@ -35,16 +35,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao import queue_features_dao
-from xivo_recording.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict
-from xivo_recording.services.abstract_manager import AbstractManager
-import logging
+from abc import ABCMeta
+from xivo_dao.alchemy import dbconnection
+from xivo_recording.recording_config import RecordingConfig
 
-logger = logging.getLogger(__name__)
+class AbstractManager(object):
+    __metaclass__ = ABCMeta
+    
+    def __init__(self):
+        self.__init_db_connection()
 
-
-class QueueManagement(AbstractManager):
-           
-    def get_all_queues(self):
-        return table_list_to_list_dict(queue_features_dao.all())
+    def __init_db_connection(self):
+        dbconnection.unregister_db_connection_pool()
+        dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
+        dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
+        dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI, 'asterisk')
