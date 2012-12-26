@@ -43,13 +43,17 @@ def then_i_can_consult_this_campaign(step):
 
 @step(u'Given there is an activated campaign named "([^"]*)" focusing queue "([^"]*)"')
 def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step, campaign_name, queue_id):
+    r_queue = RestQueues()
     r_campaign = RestCampaign()
+    r_queue.create_if_not_exists(queue_id)
     assert r_campaign.create(campaign_name + str(random.randint(100, 999)), int(queue_id)), "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
 
 
 @step(u'Given there is an non activated campaign named "([^"]*)" focusing queue "([^"]*)"')
 def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(step, campaign_name, queue_id):
+    r_queue = RestQueues()
     r_campaign = RestCampaign()
+    r_queue.create_if_not_exists(queue_id)
     assert r_campaign.create(campaign_name + str(random.randint(100, 999)), int(queue_id)), "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
 
 

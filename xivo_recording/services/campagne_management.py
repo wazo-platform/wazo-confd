@@ -19,6 +19,8 @@
 from sqlalchemy.exc import OperationalError
 from xivo_dao import queue_features_dao
 from xivo_recording.dao.exceptions import DataRetrieveError
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.services.abstract_manager import AbstractManager
 import logging
 
@@ -27,6 +29,10 @@ logger = logging.getLogger(__name__)
 
 class CampagneManagement(AbstractManager):
 
+    def __init__(self):
+        self._init_db_connection()
+        self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    
     def create_campaign(self, params):
         result = None
         try:

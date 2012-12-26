@@ -37,6 +37,8 @@
 
 from sqlalchemy.exc import OperationalError
 from xivo_recording.dao.exceptions import DataRetrieveError
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
+from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.services.abstract_manager import AbstractManager
 import logging
 
@@ -44,7 +46,11 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingManagement(AbstractManager):
-
+    
+    def __init__(self):
+        self._init_db_connection()
+        self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        
     def add_recording(self, campaign_name, params):
         """
         Converts data to the final format and calls the DAO

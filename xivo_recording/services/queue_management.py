@@ -46,5 +46,8 @@ logger = logging.getLogger(__name__)
 
 class QueueManagement(AbstractManager):
            
+    def __init__(self):
+        self._init_db_connection()
+        
     def get_all_queues(self):
         return table_list_to_list_dict(queue_features_dao.all())

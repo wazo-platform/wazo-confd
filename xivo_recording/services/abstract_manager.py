@@ -42,10 +42,7 @@ from xivo_recording.recording_config import RecordingConfig
 class AbstractManager(object):
     __metaclass__ = ABCMeta
     
-    def __init__(self):
-        self.__init_db_connection()
-
-    def __init_db_connection(self):
+    def _init_db_connection(self):
         dbconnection.unregister_db_connection_pool()
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)

@@ -22,24 +22,22 @@ from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
+from xivo_recording.services.abstract_manager import AbstractManager
 import random
 
 
 
 
-class RestQueues(object):
+class RestQueues(AbstractManager):
 
     def __init__(self):
         self.queue = QueueFeatures()
-        self.queue.id = str(random.randint(10000, 99999999))
+        self._init_db_connection()
         
     def create(self, queue_name):
-        dbconnection.unregister_db_connection_pool()
-        dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
-        dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
-        dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI, 'asterisk')
-        queue_name += str(random.randint(10000, 99999999))
-        self.queue.name = queue_name
+        alea = random.randint(10000, 99999999)
+        self.queue.id = str(alea)
+        self.queue.name = queue_name + str(alea)
         self.queue.displayname = queue_name
         try:
             queue_features_dao.add_queue(self.queue);
@@ -47,7 +45,23 @@ class RestQueues(object):
             print "got exception: ", e
             raise e
         return True
-
+    
+    def create_if_not_exists(self, queue_id):
+        try:
+            queue_features_dao.get(queue_id)
+        except LookupError:
+            self.queue.id = str(queue_id)
+            self.queue.name = "test_lettuce" + str(queue_id)
+            self.queue.displayname = self.queue.name
+            try:
+                queue_features_dao.add_queue(self.queue);
+            except Exception as e:
+                print "got exception: ", e
+                raise e
+            return True
+        else:
+            return True
+        
     def list(self, columnName, searchItem):
         connection = httplib.HTTPConnection(
                                 RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
