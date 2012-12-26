@@ -58,14 +58,13 @@ class RestCampaign(object):
         connection.request("POST", requestURI, body, headers)
 
         reply = connection.getresponse()
-        print("\nreply: " + reply.read() + '\n')
 
         # TODO : Verify the Content-type
         # replyHeader = reply.getheaders()
 
         assert reply.status == 201
 
-        return (reply.status == 201)
+        return reply.read()
 
     def list(self):
         connection = httplib.HTTPConnection(
@@ -119,7 +118,7 @@ class RestCampaign(object):
 
         return campaigns
 
-    def addRecordingDetails(self, campaign_name, callid, caller, callee, time, queue_name):
+    def addRecordingDetails(self, campaign_id, callid, caller, callee, time, queue_name):
         connection = httplib.HTTPConnection(
                                 RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
                                 ":" +
@@ -128,7 +127,7 @@ class RestCampaign(object):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
-                        "/" + str(campaign_name) + '/'
+                        "/" + str(campaign_id) + '/'
 
         self.recording['cid'] = callid
         self.recording['caller'] = caller
@@ -149,7 +148,7 @@ class RestCampaign(object):
         assert reply.status == 201
         return (reply.status == 201)
 
-    def verifyRecordingsDetails(self, campaign_name):
+    def verifyRecordingsDetails(self, campaign_id):
         connection = httplib.HTTPConnection(
                                 RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
                                 ":" +
@@ -158,7 +157,7 @@ class RestCampaign(object):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
-                        '/' + str(campaign_name) + "/"
+                        '/' + str(campaign_id) + "/"
 
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -166,7 +165,7 @@ class RestCampaign(object):
         reply = connection.getresponse()
 
         body = reply.read()
-
+        assert body != None, "No result" 
         recordings = rest_encoder.decode(body)
 
         result = False
@@ -177,7 +176,7 @@ class RestCampaign(object):
         assert result
         return result
 
-    def update(self, originalCampaignName, params):
+    def update(self, campaign_id, params):
         connection = httplib.HTTPConnection(
                                 RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
                                 ":" +
@@ -186,8 +185,8 @@ class RestCampaign(object):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        originalCampaignName
-
+                        campaign_id
+        print "URI for update: " + requestURI
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         body = rest_encoder.encode(params)
         connection.request("PUT", requestURI, body, headers)

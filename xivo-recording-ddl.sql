@@ -3,22 +3,23 @@ DROP TABLE IF EXISTS record_campaign;
 
 CREATE TABLE record_campaign
 (
-  id serial NOT NULL,
   campaign_name character varying(128) NOT NULL,
   activated boolean NOT NULL,
   base_filename character varying(64) NOT NULL,
   queue_id integer NOT NULL,
+  id serial NOT NULL,
   CONSTRAINT record_campaign_pkey PRIMARY KEY (id ),
   CONSTRAINT record_campaign_queue_id_fkey FOREIGN KEY (queue_id)
       REFERENCES queuefeatures (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT campaign_name_u UNIQUE (campaign_name )
 )
 WITH (
   OIDS=FALSE
 );
 ALTER TABLE record_campaign
   OWNER TO asterisk;
-  
+
 -- DDL for table recording
 CREATE TYPE call_dir_type AS ENUM
   ('incoming',

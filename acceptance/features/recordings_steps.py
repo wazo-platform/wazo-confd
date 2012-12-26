@@ -18,8 +18,10 @@
 
 from lettuce import step
 from rest_campaign import RestCampaign
-import random
 from time import strftime, localtime
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_recording.recording_config import RecordingConfig
+import random
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -45,9 +47,14 @@ def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_gro
     global callid, campaign_name
     callid = local_callid + str(random.randint(1000, 9999))
     assert callid, "Callid null!"
-    assert rest_campaign.addRecordingDetails(campaign_name, callid, caller, callee, time, queue_name), "Cannot add call details"
+    record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    campaign_id = record_db.id_from_name(campaign_name)
+    assert rest_campaign.addRecordingDetails(campaign_id, callid, caller, callee, time, queue_name), "Cannot add call details"
 
 
 @step(u'Then I can consult these details')
 def then_i_can_consult_these_details(step):
-    assert rest_campaign.verifyRecordingsDetails(campaign_name), "Recording not found"
+    global campaign_name
+    record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    campaign_id = record_db.id_from_name(campaign_name)
+    assert rest_campaign.verifyRecordingsDetails(campaign_id), "Recording not found"

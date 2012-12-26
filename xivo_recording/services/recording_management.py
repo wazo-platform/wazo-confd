@@ -51,26 +51,26 @@ class RecordingManagement(AbstractManager):
         self._init_db_connection()
         self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
         
-    def add_recording(self, campaign_name, params):
+    def add_recording(self, campaign_id, params):
         """
         Converts data to the final format and calls the DAO
         """
-        params['campaign_name'] = str(campaign_name)
+        params['campaign_id'] = str(campaign_id)
         result = self.recording_details_db.add_recording(params)
         return result
 
-    def get_recordings_as_dict(self, campaign_name, search=None):
+    def get_recordings_as_dict(self, campaign_id, search=None):
         logger.debug("get_recordings_as_dict")
 
         try:
             result = self.recording_details_db. \
-                            get_recordings_as_list(campaign_name, search)
+                            get_recordings_as_list(campaign_id, search)
         except OperationalError:
             # if the database was restarted we need to reconnect
             try:
-                self.__init_db_connection()
+                self._init_db_connection()
                 result = self.recording_details_db. \
-                                get_recordings_as_list(campaign_name, search)
+                                get_recordings_as_list(campaign_id, search)
             except Exception:
                 logger.critical("Database connection failure!")
                 raise DataRetrieveError("Database connection failure")

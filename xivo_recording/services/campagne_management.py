@@ -73,11 +73,11 @@ class CampagneManagement(AbstractManager):
 
         return result
     
-    def update_campaign(self, original_campaign_name, params):
+    def update_campaign(self, campaign_id, params):
         result = None
         try:
             logger.debug('going to update')
-            result = self.record_db.update(original_campaign_name, params)
+            result = self.record_db.update(campaign_id, params)
         except Exception as e:
             result = "Impossible to update the campagin: " + str(e)
         return result

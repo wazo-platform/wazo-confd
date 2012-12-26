@@ -26,12 +26,15 @@ import random
 #######################################################
 campaign_name = ''
 new_campaign_name = ''
+queue_id = ''
 new_queue_id = ''
+campaign_id = ''
 
 @step(u'When I create a campaign "([^"]*)"')
-def when_i_create_a_campaign_named_campagne_name(step, campaign_name):
+def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
     r_campaign = RestCampaign()
-    assert r_campaign.create(campaign_name + str(random.randint(100, 999))), "Cannot create a campaign"
+    result = r_campaign.create(local_campaign_name + str(random.randint(100, 999)))
+    assert result > 0, "Cannot create a campaign"
 
 
 @step(u'Then I can consult this campaign')
@@ -42,39 +45,45 @@ def then_i_can_consult_this_campaign(step):
 
 
 @step(u'Given there is an activated campaign named "([^"]*)" focusing queue "([^"]*)"')
-def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step, campaign_name, queue_id):
+def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step, local_campaign_name, queue_id):
+    global campaign_name
     r_queue = RestQueues()
     r_campaign = RestCampaign()
     r_queue.create_if_not_exists(queue_id)
-    assert r_campaign.create(campaign_name + str(random.randint(100, 999)), int(queue_id)), "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
+    campaign_name = local_campaign_name + str(random.randint(100, 999))
+    result = r_campaign.create(campaign_name, int(queue_id))
+    assert result>0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
 
 
 @step(u'Given there is an non activated campaign named "([^"]*)" focusing queue "([^"]*)"')
-def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(step, campaign_name, queue_id):
+def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(step, local_campaign_name, queue_id):
     r_queue = RestQueues()
     r_campaign = RestCampaign()
     r_queue.create_if_not_exists(queue_id)
-    assert r_campaign.create(campaign_name + str(random.randint(100, 999)), int(queue_id)), "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
+    result = r_campaign.create(local_campaign_name + str(random.randint(100, 999)), int(queue_id))
+    assert result > 0, "Cannot create campaign: " + local_campaign_name + " for queue: " + queue_id
 
 
 activated_campaigns = None
 @step(u'When I ask for activated campaigns for queue "([^"]*)"')
-def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_id):
+def when_i_ask_for_activated_campaigns_for_queue_group1(step, local_queue_id):
+    global queue_id
+    queue_id = local_queue_id
     r_campaign = RestCampaign()
     global activated_campaigns
-    activated_campaigns = r_campaign.get_activated_campaigns(int(queue_id))
+    activated_campaigns = r_campaign.get_activated_campaigns(int(local_queue_id))
     assert (activated_campaigns != None), "No activated campaign"
 
 
 @step(u'Then I get a list of activated campaigns with campaign "([^"]*)"')
-def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, queue_id):
-    global activated_campaigns
+def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_campaign_name):
+    global activated_campaigns, queue_id, campaign_name
     result = False
     for campaign in activated_campaigns:
-        if ((campaign['queue_id'] == queue_id) and
+        if ((campaign['campaign_name'] == campaign_name) and
             (campaign['activated'] == 'True')):
             result = True
-    assert result, 'Got wrong campaign ("' + \
+    assert result, 'Did not find campaign ' + campaign_name + ' in "' + \
         str(activated_campaigns) + \
         '") when asking for activated campaigns for queue: ' + \
         queue_id
@@ -88,23 +97,25 @@ def given_there_is_a_queue_group1(step, queue_id1, queue_id2):
 @step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)"')
 def given_i_create_a_campaign_group1_pointing_to_queue_group2(step, local_campaign_name, queue_id):
     r_campaign = RestCampaign()
-    global campaign_name
+    global campaign_name, campaign_id
     campaign_name = local_campaign_name + str(random.randint(100, 999))
-    assert r_campaign.create(campaign_name, int(queue_id)), "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
+    campaign_id = r_campaign.create(campaign_name, int(queue_id))
+    print("\nReceived id: " + campaign_id + '\n')
+    assert campaign_id>0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
     
 @step(u'When I change its name to "([^"]*)" and its queue to "([^"]*)"')
 def when_i_change_its_name_to_group1_and_its_queue_to_group2(step, new_campaign_name_local, queue_id):
     r_campaign = RestCampaign()
-    global campaign_name, new_campaign_name, new_queue_id
+    global campaign_id, new_campaign_name, new_queue_id
     new_campaign_name = new_campaign_name_local + str(random.randint(100, 999))
     new_queue_id = queue_id
     params = {'campaign_name' : new_campaign_name,
               'queue_id' : new_queue_id}
-    assert r_campaign.update(campaign_name, params), "Cannot update campaign " + campaign_name
+    assert r_campaign.update(campaign_id, params), "Cannot update campaign " + campaign_id
     
-@step(u'Then I can get it by asking for its new name')
+@step(u'Then its name and queue are actually modified')
 def then_i_can_get_it_by_asking_for_its_new_name(step):
     r_campaign = RestCampaign()
-    global new_campaign_name, new_queue_id
-    campaign = r_campaign.getCampaign(new_campaign_name)
+    global new_campaign_name, new_queue_id, campaign_id
+    campaign = r_campaign.getCampaign(campaign_id)
     assert (campaign[0]['campaign_name'] == new_campaign_name and campaign[0]['queue_id'] == new_queue_id), "No activated campaign"

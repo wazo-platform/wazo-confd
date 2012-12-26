@@ -40,16 +40,16 @@ class APICampaigns(object):
             return make_response(body, 400)
 
         result = self._campagne_manager.create_campaign(body)
-        if (result == True):
-            return make_response(("Added: " + str(result)), 201)
+        if (type(result).__name__ == "int" and result > 0):
+            return make_response(str(result), 201)
         else:
             return make_response(str(result), 500)
 
-    def get(self, campaign_name):
+    def get(self, campaign_id):
         try:
-            logger.debug("Get args:" + str(campaign_name))
+            logger.debug("Get args:" + str(campaign_id))
             params = {}
-            params['campaign_name']= campaign_name
+            params['id']= campaign_id
             for item in request.args:
                 params['item'] = request.args[item]
             result = self._campagne_manager.get_campaigns_as_dict(params)
@@ -72,7 +72,7 @@ class APICampaigns(object):
                               " args: " + str(request.args)),
                              501)
 
-    def update(self, campaign_name):
+    def update(self, campaign_id):
         try:
             body = rest_encoder.decode(request.data)
             logger.debug(str(body))
@@ -80,7 +80,7 @@ class APICampaigns(object):
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
 
-        result = self._campagne_manager.update_campaign(campaign_name, body)
+        result = self._campagne_manager.update_campaign(campaign_id, body)
         if (result):
             return make_response(("Added: " + str(result)), 201)
         else:

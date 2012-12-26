@@ -28,6 +28,7 @@ from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
 from xivo_recording.recording_config import RecordingConfig
 import logging
+from xivo_recording.dao.exceptions import DataRetrieveError
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -64,7 +65,14 @@ class RecordCampaignDbBinder(object):
                     search_pattern[item] = search[item]
 
             logger.debug("Search search_pattern: " + str(search_pattern))
-            return self.session.query(RecordCampaignDao).filter_by(**search_pattern)
+            return self.session.query(RecordCampaignDao).filter_by(**search_pattern).all()
+        
+    def id_from_name(self, name):
+        result = self.session.query(RecordCampaignDao).filter_by(campaign_name = name).first()
+        if result != None:
+            return result.id
+        else:
+            raise DataRetrieveError("No campaign found for name " + name)
 
     def add(self, params):
         record = RecordCampaignDao()
@@ -78,11 +86,11 @@ class RecordCampaignDbBinder(object):
             self.session.rollback()
             logger.debug("RecordCampaignDbBinder - add: " + str(e))
             raise e
-        return True
-    def update(self, original_name, params):
+        return record.id
+    def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
-            campaign = self.get_records({'campaign_name': original_name})[0]
+            campaign = self.get_records({'id': campaign_id})[0]
             logger.debug('got original')
             for k, v in params.items():
                 setattr(campaign, k, v)
