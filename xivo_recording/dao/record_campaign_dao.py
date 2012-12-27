@@ -43,7 +43,7 @@ class RecordCampaignDbBinder(object):
 
     def __init__(self, session):
         self.session = session
-
+        
     def get_records_as_dict(self, search=None):
 
         tables = self.get_records(search)
@@ -87,6 +87,7 @@ class RecordCampaignDbBinder(object):
             logger.debug("RecordCampaignDbBinder - add: " + str(e))
             raise e
         return record.id
+    
     def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
@@ -131,7 +132,6 @@ class RecordCampaignDbBinder(object):
         except BaseException as e:
             logger.error("Database access error:" + str(e.args))
             return None
-
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())
 

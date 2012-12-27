@@ -16,29 +16,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from sqlalchemy.exc import OperationalError
 from xivo_dao import queue_features_dao
 from xivo_recording.dao.exceptions import DataRetrieveError
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.services.abstract_manager import AbstractManager
+from xivo_recording.services.manager_utils import _init_db_connection, \
+    reconnectable
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class CampagneManagement(AbstractManager):
+class CampagneManagement:
 
     def __init__(self):
-        self._init_db_connection()
-        self.record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        self.record_db = _init_db_connection(RecordCampaignDbBinder)
     
+    @reconnectable("record_db")
     def create_campaign(self, params):
-        result = None
-        try:
-            result = self.record_db.add(params)
-        except Exception as e:
-            result = "Impossible to add the campagin: " + str(e)
+        result = self.record_db.add(params)
         return result
 
     def get_campaigns_as_dict(self, search=None):
@@ -56,30 +51,17 @@ class CampagneManagement(AbstractManager):
             raise DataRetrieveError("DAO failure(" + str(e) + ")!")
 
         return result
-
+    
+    @reconnectable("record_db")
     def _get_campaigns_as_dict(self, search=None):
         logger.debug("get_campaigns_as_dict")
-
-        try:
-            result = self.record_db.get_records_as_dict(search)
-        except OperationalError:
-            # if the database was restarted we need to reconnect
-            try:
-                self.__init_db_connection()
-                result = self.record_db.get_records_as_dict(search)
-            except Exception:
-                logger.critical("Database connection failure!")
-                raise DataRetrieveError("Database connection failure")
-
+        result = self.record_db.get_records_as_dict(search)
         return result
     
+    @reconnectable("record_db")
     def update_campaign(self, campaign_id, params):
-        result = None
-        try:
-            logger.debug('going to update')
-            result = self.record_db.update(campaign_id, params)
-        except Exception as e:
-            result = "Impossible to update the campagin: " + str(e)
+        logger.debug('going to update')
+        result = self.record_db.update(campaign_id, params)
         return result
         
         

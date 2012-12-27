@@ -95,5 +95,5 @@ class APICampaigns(object):
             logger.debug("result encoded")
             return make_response(body, 200)
         except Exception as e:
-            logger.debug("got exception:" + str(e.args))
+            logger.debug("API_campaigns.list_campaigns:" + str(e.args))
             return make_response(str(e.args), 500)

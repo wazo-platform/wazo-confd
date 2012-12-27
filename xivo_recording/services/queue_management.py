@@ -35,28 +35,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from sqlalchemy.exc import OperationalError
 from xivo_dao import queue_features_dao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
-from xivo_recording.services.abstract_manager import AbstractManager
+from xivo_recording.services.manager_utils import _init_db_connection,\
+    reconnectable
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class QueueManagement(AbstractManager):
+class QueueManagement:
            
     def __init__(self):
-        self._init_db_connection()
-        
+        _init_db_connection()
+    
+    @reconnectable(None)
     def get_all_queues(self):
-        result = None
-        try:
-            result = queue_features_dao.all()
-        except OperationalError:
-            self._init_db_connection()
-            result = queue_features_dao.all()
+        result = queue_features_dao.all()
         if result != None:
             return table_list_to_list_dict(result)
         return False

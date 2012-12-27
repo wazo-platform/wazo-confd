@@ -81,6 +81,5 @@ class RecordingDetailsDbBinder(object):
             metadata = MetaData(engine)
             data = Table(cls.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)
-
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())

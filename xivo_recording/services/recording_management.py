@@ -35,22 +35,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from sqlalchemy.exc import OperationalError
-from xivo_recording.dao.exceptions import DataRetrieveError
 from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.services.abstract_manager import AbstractManager
+from xivo_recording.services.manager_utils import _init_db_connection, \
+    reconnectable
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class RecordingManagement(AbstractManager):
+class RecordingManagement:
     
     def __init__(self):
-        self._init_db_connection()
-        self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-        
+        self.recording_details_db = _init_db_connection(RecordingDetailsDbBinder)
+        #self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    
+    @reconnectable("recording_details_db")
     def add_recording(self, campaign_id, params):
         """
         Converts data to the final format and calls the DAO
@@ -59,20 +58,11 @@ class RecordingManagement(AbstractManager):
         result = self.recording_details_db.add_recording(params)
         return result
 
+    @reconnectable("recording_details_db")
     def get_recordings_as_dict(self, campaign_id, search=None):
         logger.debug("get_recordings_as_dict")
-
-        try:
-            result = self.recording_details_db. \
+        
+        result = self.recording_details_db. \
                             get_recordings_as_list(campaign_id, search)
-        except OperationalError:
-            # if the database was restarted we need to reconnect
-            try:
-                self._init_db_connection()
-                result = self.recording_details_db. \
-                                get_recordings_as_list(campaign_id, search)
-            except Exception:
-                logger.critical("Database connection failure!")
-                raise DataRetrieveError("Database connection failure")
 
         return result
