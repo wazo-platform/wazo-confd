@@ -36,11 +36,11 @@ class CampagneManagement:
         result = self.record_db.add(params)
         return result
 
-    def get_campaigns_as_dict(self, search=None):
+    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning = False):
         """
         Calls the DAO and converts data to the final format
         """
-        result = self._get_campaigns_as_dict(search)
+        result = self._get_campaigns_as_dict(search, checkCurrentlyRunning)
 
         try:
             for item in result:
@@ -53,9 +53,9 @@ class CampagneManagement:
         return result
     
     @reconnectable("record_db")
-    def _get_campaigns_as_dict(self, search=None):
+    def _get_campaigns_as_dict(self, search=None, checkCurrentlyRunning = False):
         logger.debug("get_campaigns_as_dict")
-        result = self.record_db.get_records_as_dict(search)
+        result = self.record_db.get_records_as_dict(search, checkCurrentlyRunning)
         return result
     
     @reconnectable("record_db")

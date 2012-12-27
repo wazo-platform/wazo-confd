@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from gevent import httplib
 from xivo.agi import AGI
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
@@ -69,11 +68,7 @@ def get_detailed_variables():
 
 
 def get_campaigns(queue_id):
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    connection = RecordingConfig.getWSConnection()
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
@@ -110,11 +105,7 @@ def init_logging(debug_mode):
 
 # TODO: Refactor in library, used here, in lettuce...!
 def get_queues():
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    connection = RecordingConfig.getWSConnection()
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_QUEUES_SERVICE_PATH + "/"
@@ -178,11 +169,7 @@ def determinate_record():
 
 
 def save_recording(recording):
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    connection = RecordingConfig.getWSConnection()
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \

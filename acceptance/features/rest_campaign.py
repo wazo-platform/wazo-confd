@@ -16,8 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from gevent import httplib
-
 from xivo_recording.recording_config import RecordingConfig
 import random
 import time
@@ -40,18 +38,19 @@ class RestCampaign(object):
 
         self.recording = {}
 
-    def create(self, campaign_name, queue_id=1):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+    def create(self, campaign_name, queue_id=1, activated = True, start_date = None, end_date = None):
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
 
         self.campaign["campaign_name"] = campaign_name
         self.campaign["queue_id"] = queue_id
+        self.campaign["activated"] = activated
+        if start_date != None:
+            self.campaign["start_date"] = str(start_date)
+        if end_date != None:
+            self.campaign["end_date"] = str(end_date)
         body = rest_encoder.encode(self.campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -67,11 +66,7 @@ class RestCampaign(object):
         return reply.read()
 
     def list(self):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
@@ -97,11 +92,7 @@ class RestCampaign(object):
         return campaigns
 
     def get_activated_campaigns(self, queue_id):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
@@ -119,11 +110,7 @@ class RestCampaign(object):
         return campaigns
 
     def addRecordingDetails(self, campaign_id, callid, caller, callee, time, queue_name):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
@@ -149,11 +136,7 @@ class RestCampaign(object):
         return (reply.status == 201)
 
     def verifyRecordingsDetails(self, campaign_id):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
@@ -177,11 +160,7 @@ class RestCampaign(object):
         return result
 
     def update(self, campaign_id, params):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
@@ -193,18 +172,23 @@ class RestCampaign(object):
         reply = connection.getresponse()
         return reply.status == 200 or reply.status == 201
     
-    def getCampaign(self, campaign_name):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+    def getCampaign(self, campaign_id):
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        campaign_name
+                        campaign_id
 
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         connection.request("GET", requestURI, '', headers)
+        reply = connection.getresponse()
+        return rest_encoder.decode(reply.read())
+    def getRunningActivatedCampaignsForQueue(self, queue_id):
+        connection = RecordingConfig.getWSConnection()
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+        parameters = "?activated=true&running=true&queue_id=" + queue_id
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("GET", requestURI + parameters, '', headers)
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())

@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from gevent import httplib
 
 class RecordingConfig(object):
 
@@ -36,3 +37,11 @@ class RecordingConfig(object):
 
     def __init__(self):
         pass
+
+    @classmethod
+    def getWSConnection(cls):
+        return httplib.HTTPConnection(
+                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                            ":" +
+                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
+                        )

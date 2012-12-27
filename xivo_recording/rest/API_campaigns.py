@@ -45,14 +45,21 @@ class APICampaigns(object):
         else:
             return make_response(str(result), 500)
 
-    def get(self, campaign_id):
+    def get(self, campaign_id=None):
         try:
             logger.debug("Get args:" + str(campaign_id))
+            checkCurrentlyRunning = False
             params = {}
-            params['id']= campaign_id
+            if campaign_id != None:
+                params['id']= campaign_id
+            logger.debug("entering for")
             for item in request.args:
-                params['item'] = request.args[item]
-            result = self._campagne_manager.get_campaigns_as_dict(params)
+                logger.debug("currently on item: " + item)
+                if item == 'running':
+                    checkCurrentlyRunning = (request.args[item] == 'true')
+                else:
+                    params[item] = request.args[item]
+            result = self._campagne_manager.get_campaigns_as_dict(params, checkCurrentlyRunning)
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
@@ -85,15 +92,3 @@ class APICampaigns(object):
             return make_response(("Added: " + str(result)), 201)
         else:
             return make_response(str(result), 500)
-
-    def list_campaigns(self):
-        try:
-            logger.debug("List args:" + str(request.args))
-            result = self._campagne_manager.get_campaigns_as_dict(request.args)
-            logger.debug("got result")
-            body = rest_encoder.encode(result)
-            logger.debug("result encoded")
-            return make_response(body, 200)
-        except Exception as e:
-            logger.debug("API_campaigns.list_campaigns:" + str(e.args))
-            return make_response(str(e.args), 500)

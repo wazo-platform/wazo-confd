@@ -3,11 +3,13 @@ DROP TABLE IF EXISTS record_campaign;
 
 CREATE TABLE record_campaign
 (
+  id serial NOT NULL,
   campaign_name character varying(128) NOT NULL,
   activated boolean NOT NULL,
   base_filename character varying(64) NOT NULL,
   queue_id integer NOT NULL,
-  id serial NOT NULL,
+  start_date timestamp without time zone,
+  end_date timestamp without time zone,
   CONSTRAINT record_campaign_pkey PRIMARY KEY (id ),
   CONSTRAINT record_campaign_queue_id_fkey FOREIGN KEY (queue_id)
       REFERENCES queuefeatures (id) MATCH SIMPLE

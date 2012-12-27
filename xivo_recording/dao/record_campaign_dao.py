@@ -21,14 +21,16 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.schema import Table, MetaData
-from xivo_dao.alchemy import dbconnection
+from sqlalchemy.sql.expression import and_
 from xivo_dao import queue_features_dao
+from xivo_dao.alchemy import dbconnection
+from xivo_recording.dao.exceptions import DataRetrieveError
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
 from xivo_recording.recording_config import RecordingConfig
+import datetime
 import logging
-from xivo_recording.dao.exceptions import DataRetrieveError
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -44,18 +46,17 @@ class RecordCampaignDbBinder(object):
     def __init__(self, session):
         self.session = session
         
-    def get_records_as_dict(self, search=None):
+    def get_records_as_dict(self, search=None, checkCurrentlyRunning = False):
 
-        tables = self.get_records(search)
+        tables = self.get_records(search, checkCurrentlyRunning)
         logger.debug("Tables retrieved:" + str(tables))
         table_dict = table_list_to_list_dict(tables)
         logger.debug("Tables dict:" + str(table_dict))
         return table_dict
 
-    def get_records(self, search=None):
-        if (search == None):
-            return self.session.query(RecordCampaignDao).all()
-        else:
+    def get_records(self, search=None, checkCurrentlyRunning = False):
+        my_query = self.session.query(RecordCampaignDao)
+        if search != None:
             search_pattern = {}
             for item in search:
                 if (item == 'queue_name'):
@@ -65,7 +66,12 @@ class RecordCampaignDbBinder(object):
                     search_pattern[item] = search[item]
 
             logger.debug("Search search_pattern: " + str(search_pattern))
-            return self.session.query(RecordCampaignDao).filter_by(**search_pattern).all()
+            my_query = my_query.filter_by(**search_pattern)
+        if checkCurrentlyRunning:
+            now = datetime.datetime.now()
+            my_query = my_query.filter(and_(RecordCampaignDao.start_date <= str(now), 
+                                               RecordCampaignDao.end_date >= str(now)))
+        return my_query.all()
         
     def id_from_name(self, name):
         result = self.session.query(RecordCampaignDao).filter_by(campaign_name = name).first()

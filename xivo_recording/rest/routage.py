@@ -35,8 +35,8 @@ root = Blueprint("root",
 # ****************** #
 
 root.add_url_rule("/",
-                  "list_campaigns",
-                  getattr(APICampaigns(), "list_campaigns"),
+                  "get",
+                  getattr(APICampaigns(), "get"),
                   methods=["GET"])
 
 root.add_url_rule("/<campaign_id>",

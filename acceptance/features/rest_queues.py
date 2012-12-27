@@ -21,17 +21,17 @@ from xivo_dao import queue_features_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
-from xivo_recording.services.abstract_manager import AbstractManager
+from xivo_recording.services.manager_utils import _init_db_connection
 import random
 
 
 
 
-class RestQueues(AbstractManager):
+class RestQueues:
 
     def __init__(self):
         self.queue = QueueFeatures()
-        self._init_db_connection()
+        _init_db_connection()
         
     def create(self, queue_name):
         alea = random.randint(10000, 99999999)
@@ -62,11 +62,7 @@ class RestQueues(AbstractManager):
             return True
         
     def list(self, columnName, searchItem):
-        connection = httplib.HTTPConnection(
-                                RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                                ":" +
-                                str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                            )
+        connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_QUEUES_SERVICE_PATH + "/"
