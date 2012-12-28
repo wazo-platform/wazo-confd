@@ -64,7 +64,6 @@ installWebI() {
 
   echo "Creating web directory..."
   mkdir /var/lib/pf-xivo/sounds/campagnes
-  ln -s /var/lib/pf-xivo/sounds/campagnes /usr/share/pf-xivo-web-interface/www/recordings
 }
 
 recordingAutostart() {

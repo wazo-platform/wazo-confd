@@ -28,7 +28,7 @@ DAEMONNAME = 'xivo_recording'
 
 # Enable debug mode for testing witout gevent WSGi,
 # setting to True activates the internal web server
-DEBUG_MODE = True
+#DEBUG_MODE = True
 
 LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
@@ -38,7 +38,7 @@ def main():
     parsed_args = _parse_args(sys.argv[1:])
     _init_logging(parsed_args.debug)
 
-    if(DEBUG_MODE):
+    if(parsed_args.dev_mode):
         # flask http server
         serviceManager = ServiceManager()
         serviceManager.run()
@@ -83,6 +83,7 @@ def _parse_args(args):
 def _new_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('--dev_mode', action='store_true')
     return parser
 
 
