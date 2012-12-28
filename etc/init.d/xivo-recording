@@ -16,6 +16,7 @@ set -e
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
 DAEMONNAME=xivo_recording
 DAEMON=/usr/local/bin/$DAEMONNAME
+DAEMON_ARGS=$2
 PIDFILE=/var/run/$DAEMONNAME.pid
 
 . /lib/lsb/init-functions
@@ -26,7 +27,7 @@ test -x $DAEMON || exit 0
 case "$1" in
   start)
     log_daemon_msg "Starting" "$DAEMONNAME"
-    if start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON;
+    if start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS;
     then
         log_end_msg 0
     else
