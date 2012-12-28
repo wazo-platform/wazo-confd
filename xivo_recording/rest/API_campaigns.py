@@ -18,9 +18,10 @@
 
 from flask import request
 from flask.helpers import make_response
-import rest_encoder
+from sqlalchemy.exc import IntegrityError
 from xivo_recording.services.campagne_management import CampagneManagement
 import logging
+import rest_encoder
 
 
 logger = logging.getLogger(__name__)
@@ -38,8 +39,10 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-
-        result = self._campagne_manager.create_campaign(body)
+        try:
+            result = self._campagne_manager.create_campaign(body)
+        except IntegrityError:
+            return make_response("Duplicated name", 500)
         if (type(result).__name__ == "int" and result > 0):
             return make_response(str(result), 201)
         else:

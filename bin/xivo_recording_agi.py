@@ -55,7 +55,7 @@ def get_general_variables():
 
 def get_detailed_variables():
     xivo_vars = {}
-    xivo_vars['campaign_name'] = agi.get_variable('QR_CAMPAIGN_NAME')
+    xivo_vars['campaign_id'] = agi.get_variable('QR_CAMPAIGN_ID')
     xivo_vars['base_filename'] = agi.get_variable('QR_BASE_FILENAME')
     xivo_vars['agent'] = agi.get_variable('QR_AGENT_NB')
     xivo_vars['callee'] = agi.get_variable('QR_CALLEE_NB')
@@ -72,7 +72,7 @@ def get_campaigns(queue_id):
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-    param_str = "?activated=true&queue_id=%s" % str(queue_id)
+    param_str = "?activated=true&queue_id=%s&running=true" % str(queue_id)
 
     requestURI += param_str
     logger.debug("Getting campaigns from URL: " + requestURI)
@@ -154,7 +154,7 @@ def determinate_record():
     logger.debug("Base filename: " + base_filename)
     if (campaigns[0]['activated'] == "True"):
         agi.set_variable('QR_RECORDQUEUE', '1')
-        agi.set_variable('__QR_CAMPAIGN_NAME', campaigns[0]['campaign_name'])
+        agi.set_variable('__QR_CAMPAIGN_ID', campaigns[0]['id'])
         agi.set_variable('__QR_BASE_FILENAME', base_filename)
         logger.info('Calls to queue: "' +
                     xivo_vars['queue_name'] +
@@ -173,7 +173,7 @@ def save_recording(recording):
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                    recording['campaign_name'] + "/"
+                    recording['id'] + "/"
 
     logger.debug("Post recording to URL: " + requestURI)
 
@@ -202,7 +202,7 @@ def save_call_details():
     recording = {}
     recording['cid'] = xivo_vars['cid']
     recording['filename'] = filename
-    recording['campaign_name'] = xivo_vars['campaign_name']
+    recording['id'] = xivo_vars['campaign_id']
     recording['start_time'] = xivo_vars['start_time']
     recording['agent'] = xivo_vars['agent']
     recording['caller'] = xivo_vars['caller']

@@ -41,6 +41,9 @@ def table_list_to_list_dict(list_instance):
             if not elem.startswith('_'):
                 value = getattr(class_instance, elem)
                 logger.debug("Value type: " + type(value).__name__)
+                #pour éviter d'avoir None au lieu de '' dans le résultat
+                if value == None:
+                    value = ''
                 if type(value).__name__ != 'unicode':
                     value = str(value)
                 dict_instance[elem] = value
