@@ -17,41 +17,31 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_recording.recording_config import RecordingConfig
-import random
-import time
 from xivo_recording.rest import rest_encoder
 
 
 class RestCampaign(object):
 
     def __init__(self):
-        unique_id = "lettuce" + time.ctime() + str(random.randint(10000, 99999999))
-        queue_name = "queue_" + str(1)
-        base_filename = unique_id + "-" + str(queue_name) + "-"
-
-        self.campaign = {
-            "campaign_name": unique_id,
-            "base_filename": base_filename,
-            "activated": True,
-            "queue_name": queue_name
-        }
-
-        self.recording = {}
+        pass
 
     def create(self, campaign_name, queue_id=1, activated = True, start_date = None, end_date = None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+                        
+        campaign = {}
 
-        self.campaign["campaign_name"] = campaign_name
-        self.campaign["queue_id"] = queue_id
-        self.campaign["activated"] = activated
+        campaign["campaign_name"] = campaign_name
+        campaign["base_filename"] = campaign_name + "-file-"
+        campaign["queue_id"] = queue_id
+        campaign["activated"] = activated
         if start_date != None:
-            self.campaign["start_date"] = str(start_date)
+            campaign["start_date"] = str(start_date)
         if end_date != None:
-            self.campaign["end_date"] = str(end_date)
-        body = rest_encoder.encode(self.campaign)
+            campaign["end_date"] = str(end_date)
+        body = rest_encoder.encode(campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("POST", requestURI, body, headers)
@@ -61,9 +51,9 @@ class RestCampaign(object):
         # TODO : Verify the Content-type
         # replyHeader = reply.getheaders()
 
-        assert reply.status == 201
+        #assert reply.status == 201
 
-        return reply.read()
+        return rest_encoder.decode(reply.read())
 
     def list(self):
         connection = RecordingConfig.getWSConnection()
@@ -79,16 +69,6 @@ class RestCampaign(object):
         body = reply.read()
 
         campaigns = rest_encoder.decode(body)
-
-        result = False
-        for campaign in campaigns:
-            for attribute in self.campaign:
-                if (attribute in campaign):
-                    result = True
-                    break
-
-        assert result
-#        return result
         return campaigns
 
     def get_activated_campaigns(self, queue_id):
@@ -115,13 +95,14 @@ class RestCampaign(object):
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
                         "/" + str(campaign_id) + '/'
-
-        self.recording['cid'] = callid
-        self.recording['caller'] = caller
-        self.recording['callee'] = callee
-        self.recording['time'] = time
-        self.recording['queue_name'] = queue_name
-        body = rest_encoder.encode(self.recording)
+        
+        recording = {}
+        recording['cid'] = callid
+        recording['caller'] = caller
+        recording['callee'] = callee
+        recording['time'] = time
+        recording['queue_name'] = queue_name
+        body = rest_encoder.encode(recording)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("POST", requestURI, body, headers)
@@ -135,7 +116,7 @@ class RestCampaign(object):
         assert reply.status == 201
         return (reply.status == 201)
 
-    def verifyRecordingsDetails(self, campaign_id):
+    def verifyRecordingsDetails(self, campaign_id, callid):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -153,7 +134,7 @@ class RestCampaign(object):
 
         result = False
         for recording in recordings:
-            if (recording["cid"] == self.recording['cid']):
+            if (recording["cid"] == callid):
                 result = True
 
         assert result
@@ -164,7 +145,7 @@ class RestCampaign(object):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        campaign_id
+                        str(campaign_id)
         print "URI for update: " + requestURI
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         body = rest_encoder.encode(params)
@@ -177,7 +158,7 @@ class RestCampaign(object):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        campaign_id
+                        str(campaign_id)
 
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         connection.request("GET", requestURI, '', headers)

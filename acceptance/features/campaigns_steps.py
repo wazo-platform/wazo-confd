@@ -36,15 +36,18 @@ list_running_campaigns = []
 @step(u'When I create a campaign "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
     r_campaign = RestCampaign()
-    result = r_campaign.create(local_campaign_name + str(random.randint(100, 999)))
+    global campaign_name
+    campaign_name = local_campaign_name + str(random.randint(100, 999))
+    result = r_campaign.create(campaign_name)
     assert result > 0, "Cannot create a campaign"
 
 
 @step(u'Then I can consult this campaign')
 def then_i_can_consult_this_campaign(step):
     r_campaign = RestCampaign()
-    r_campaign.create('test_consult_campaign' + str(random.randint(100, 999)))
-    assert r_campaign.list(), "Cannot consult campaign list"
+    global campaign_name
+    liste = [item["campaign_name"] for item in r_campaign.list()]
+    assert campaign_name in liste, campaign_name + " not in " + str(liste)
 
 
 @step(u'Given there is an activated campaign named "([^"]*)" focusing queue "([^"]*)"')
@@ -103,7 +106,7 @@ def given_i_create_a_campaign_group1_pointing_to_queue_group2(step, local_campai
     global campaign_name, campaign_id
     campaign_name = local_campaign_name + str(random.randint(100, 999))
     campaign_id = r_campaign.create(campaign_name, int(queue_id))
-    print("\nReceived id: " + campaign_id + '\n')
+    print("\nReceived id: " + str(campaign_id) + '\n')
     assert campaign_id>0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
     
 @step(u'When I change its name to "([^"]*)" and its queue to "([^"]*)"')
@@ -132,7 +135,8 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
     d = datetime.timedelta(days=1)
-    gen_id = r_campaign.create(new_campaign_name, queue_id, True, now - d, now + d)
+    gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now - d).strftime("%Y-%m-%d"),
+                                                                (now + d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     campaign_name + ' not properly inserted'
     
@@ -144,7 +148,8 @@ def given_i_create_a_non_activated_campaign_group1_pointing_to_queue_group2_curr
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
     d = datetime.timedelta(days=1)
-    gen_id = r_campaign.create(new_campaign_name, queue_id, False, now - d, now + d)
+    gen_id = r_campaign.create(new_campaign_name, queue_id, False, (now - d).strftime("%Y-%m-%d"),
+                               (now + d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     campaign_name + ' not properly inserted'
     
@@ -156,7 +161,8 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
     d = datetime.timedelta(days=1)
-    gen_id = r_campaign.create(new_campaign_name, queue_id, True, now + d, now + 2 * d)
+    gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now + d).strftime("%Y-%m-%d"),
+                               (now + 2 * d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     campaign_name + ' not properly inserted'
                                     
@@ -175,3 +181,22 @@ def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, group1, g
     assert running_scenario[group2] not in list_names, group2 + ' was not retrieved.'
     assert running_scenario[group3] not in list_names, group3 + ' was not retrieved.'
     assert running_scenario[group4] not in list_names, group4 + ' was not retrieved.'
+
+@step(u'Then this campaign is created with its start date and end date equal to now')
+def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(step):
+    r_campaign = RestCampaign()
+    global campaign_name
+    liste = r_campaign.list()
+    result = False
+    now = datetime.datetime.now().strftime("%Y-%m-%d")
+    for item in liste:
+        if(item["campaign_name"] == campaign_name and \
+           item["start_date"][:10] == now and item["end_date"][:10] == now):
+            result = True
+    assert result, 'Campaign not created with the current date: '
+    
+@step(u'I cannot a campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+def i_cannot_a_campaign_group1_with_start_date_group2_and_end_date_group3(step, local_campaign_name, start_date, end_date):
+    r_campaign = RestCampaign()
+    result = r_campaign.create(campaign_name + str(random.randint(100, 999)), 1, True, start_date, end_date)
+    assert result[0] == "start_greater_than_end", result

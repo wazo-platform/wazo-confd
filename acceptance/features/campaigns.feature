@@ -3,8 +3,12 @@ Feature: Recording campaign management
 	In order to execute call quality assessment
 	
 	Scenario: Campaign creation and consultation
-	  When I create a campaign "test_campaign_éé"
-	  Then I can consult this campaign  
+	  When I create a campaign "test_campaign"
+	  Then I can consult this campaign
+	  
+	Scenario: Campaign creation and consultation with accents
+	  When I create a campaign "accents_éèà&"
+	  Then I can consult this campaign
 	  
 	Scenario: Get activated campaigns
 	  Given there is an activated campaign named "quality" focusing queue "1"
@@ -33,3 +37,10 @@ Feature: Recording campaign management
 	  Given I create an activated campaign "lettuce4" pointing to queue "1" currently not running
 	  When I ask for running and activated campaigns for queue "1"
 	  Then I get campaign "lettuce1", I do not get "lettuce2", "lettuce3", "lettuce4"
+	  
+	Scenario: Campaign creation and consultation without dates
+	  When I create a campaign "test_dates" without dates
+	  Then this campaign is created with its start date and end date equal to now
+	  
+	Scenario: Campaign creation and consultation with unproprer dates
+	  I cannot a campaign "test_unproper_dates" with start date "2013-02-01" and end date "2013-01-01"

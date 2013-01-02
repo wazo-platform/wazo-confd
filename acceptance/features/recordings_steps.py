@@ -54,7 +54,7 @@ def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_gro
 
 @step(u'Then I can consult these details')
 def then_i_can_consult_these_details(step):
-    global campaign_name
+    global campaign_name, callid
     record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
     campaign_id = record_db.id_from_name(campaign_name)
-    assert rest_campaign.verifyRecordingsDetails(campaign_id), "Recording not found"
+    assert rest_campaign.verifyRecordingsDetails(campaign_id, callid), "Recording not found"

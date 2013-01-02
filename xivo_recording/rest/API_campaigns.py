@@ -40,6 +40,9 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
+        errors = self._campagne_manager.validate_add_input(body)
+        if(len(errors) > 0):
+            return make_response(rest_encoder.encode(errors), 400)
         try:
             result = self._campagne_manager.create_campaign(body)
         except IntegrityError:
@@ -56,9 +59,7 @@ class APICampaigns(object):
             params = {}
             if campaign_id != None:
                 params['id']= campaign_id
-            logger.debug("entering for")
             for item in request.args:
-                logger.debug("currently on item: " + item)
                 if item == 'running':
                     checkCurrentlyRunning = (request.args[item] == 'true')
                 else:
