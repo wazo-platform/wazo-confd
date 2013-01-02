@@ -3,7 +3,7 @@ Feature: Recording campaign management
 	In order to execute call quality assessment
 	
 	Scenario: Campaign creation and consultation
-	  When I create a campaign "test_campaign"
+	  When I create a campaign "test_campaign_éé"
 	  Then I can consult this campaign  
 	  
 	Scenario: Get activated campaigns

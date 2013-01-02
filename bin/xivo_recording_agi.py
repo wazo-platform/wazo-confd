@@ -173,7 +173,7 @@ def save_recording(recording):
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                    recording['id'] + "/"
+                    recording['campaign_id'] + "/"
 
     logger.debug("Post recording to URL: " + requestURI)
 
@@ -202,7 +202,7 @@ def save_call_details():
     recording = {}
     recording['cid'] = xivo_vars['cid']
     recording['filename'] = filename
-    recording['id'] = xivo_vars['campaign_id']
+    recording['campaign_id'] = xivo_vars['campaign_id']
     recording['start_time'] = xivo_vars['start_time']
     recording['agent'] = xivo_vars['agent']
     recording['caller'] = xivo_vars['caller']

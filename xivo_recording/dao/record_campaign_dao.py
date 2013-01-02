@@ -24,7 +24,8 @@ from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.sql.expression import and_
 from xivo_dao import queue_features_dao
 from xivo_dao.alchemy import dbconnection
-from xivo_recording.dao.exceptions import DataRetrieveError
+from xivo_recording.dao.exceptions import DataRetrieveError, \
+    NoSuchElementException
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
@@ -84,7 +85,7 @@ class RecordCampaignDbBinder(object):
         record = RecordCampaignDao()
         for k, v in params.items():
             setattr(record, k, v)
-            logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
+            #logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
         try:
             self.session.add(record)
             self.session.commit()
@@ -97,7 +98,11 @@ class RecordCampaignDbBinder(object):
     def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
-            campaign = self.get_records({'id': campaign_id})[0]
+            campaignsList = self.get_records({'id': campaign_id})
+            logger.debug("Campaigns list for update: " + str(campaignsList))
+            if(len(campaignsList) == 0):
+                raise NoSuchElementException("No campaign found for id " + str(campaign_id))
+            campaign = campaignsList[0]
             logger.debug('got original')
             for k, v in params.items():
                 setattr(campaign, k, v)
@@ -109,7 +114,7 @@ class RecordCampaignDbBinder(object):
         except Exception as e:
             self.session.rollback()
             logger.debug('Impossible to update the campaign: ' + str(e))
-            raise e
+            return False
         return True
 
     @classmethod

@@ -19,6 +19,7 @@
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
+from xivo_recording.dao.exceptions import NoSuchElementException
 from xivo_recording.services.campagne_management import CampagneManagement
 import logging
 import rest_encoder
@@ -82,6 +83,7 @@ class APICampaigns(object):
                               " args: " + str(request.args)),
                              501)
 
+
     def update(self, campaign_id):
         try:
             body = rest_encoder.decode(request.data)
@@ -89,9 +91,11 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-
-        result = self._campagne_manager.update_campaign(campaign_id, body)
+        try:
+            result = self._campagne_manager.update_campaign(campaign_id, body)
+        except NoSuchElementException:
+            return make_response("Campaign not found.", 404)
         if (result):
-            return make_response(("Added: " + str(result)), 201)
+            return make_response(("Updated: " + str(result)), 200)
         else:
             return make_response(str(result), 500)

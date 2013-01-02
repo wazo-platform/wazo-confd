@@ -64,4 +64,3 @@ class CampagneManagement:
         result = self.record_db.update(campaign_id, params)
         return result
         
-        
