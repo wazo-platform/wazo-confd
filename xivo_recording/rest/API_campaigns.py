@@ -19,7 +19,8 @@
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
-from xivo_recording.dao.exceptions import NoSuchElementException
+from xivo_recording.dao.exceptions import NoSuchElementException,\
+    InvalidInputException
 from xivo_recording.services.campagne_management import CampagneManagement
 import logging
 import rest_encoder
@@ -40,13 +41,15 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-        errors = self._campagne_manager.validate_add_input(body)
-        if(len(errors) > 0):
-            return make_response(rest_encoder.encode(errors), 400)
+        body = self._campagne_manager.supplement_add_input(body)
         try:
             result = self._campagne_manager.create_campaign(body)
         except IntegrityError:
-            return make_response("Duplicated name", 500)
+            liste = ["duplicated_name"]
+            return make_response(rest_encoder.encode(liste), 400)
+        except InvalidInputException as e:
+            liste = e.errors_list
+            return make_response(rest_encoder.encode(liste), 400)
         if (type(result).__name__ == "int" and result > 0):
             return make_response(str(result), 201)
         else:
@@ -93,9 +96,17 @@ class APICampaigns(object):
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
         try:
+            body = self._campagne_manager.supplement_edit_input(body)
             result = self._campagne_manager.update_campaign(campaign_id, body)
         except NoSuchElementException:
-            return make_response("Campaign not found.", 404)
+            liste = ["campaign_not_found"]
+            return make_response(rest_encoder.encode(liste), 404)
+        except IntegrityError:
+            liste = ["duplicated_name"]
+            return make_response(rest_encoder.encode(liste), 400)
+        except InvalidInputException as e:
+            liste = e.errors_list
+            return make_response(rest_encoder.encode(liste), 400)
         if (result):
             return make_response(("Updated: " + str(result)), 200)
         else:

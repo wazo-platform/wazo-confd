@@ -23,7 +23,7 @@ fi
 installDep() {
   echo "Installing dependencies..."
   apt-get install -y libevent-dev python-pip python-dev build-essential
-  pip install gevent
+  pip install tornado
   pip install flask
   pip install SQLAlchemy
   pip install xivo-client-sim

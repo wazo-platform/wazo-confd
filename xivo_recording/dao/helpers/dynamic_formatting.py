@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
+from xivo_recording.dao.exceptions import InvalidInputException
 from xivo_recording.recording_config import RecordingConfig
 import logging
 
@@ -48,3 +50,11 @@ def table_list_to_list_dict(list_instance):
                 dict_instance[elem] = value
         list_of_dict.append(dict_instance)
     return list_of_dict
+
+def str_to_datetime(string):
+    if(len(string) == 10):
+        return datetime.strptime(string, "%Y-%m-%d")
+    elif(len(str) == 19):
+        return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+    else:
+        raise InvalidInputException("Invalid data provided", ["invalid_date_format"])

@@ -25,12 +25,12 @@ from sqlalchemy.sql.expression import and_
 from xivo_dao import queue_features_dao
 from xivo_dao.alchemy import dbconnection
 from xivo_recording.dao.exceptions import DataRetrieveError, \
-    NoSuchElementException
+    NoSuchElementException, InvalidInputException
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict
+    table_list_to_list_dict, str_to_datetime
 from xivo_recording.recording_config import RecordingConfig
-import datetime
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ class RecordCampaignDbBinder(object):
             logger.debug("Search search_pattern: " + str(search_pattern))
             my_query = my_query.filter_by(**search_pattern)
         if checkCurrentlyRunning:
-            now = datetime.datetime.now()
+            now = datetime.now()
             my_query = my_query.filter(and_(RecordCampaignDao.start_date <= str(now), 
                                                RecordCampaignDao.end_date >= str(now)))
         return my_query.all()
@@ -84,8 +84,11 @@ class RecordCampaignDbBinder(object):
     def add(self, params):
         record = RecordCampaignDao()
         for k, v in params.items():
+            if((k=="start_date" or k=="end_date") and type(v).__name__=="str"):
+                v = str_to_datetime(v)
             setattr(record, k, v)
             #logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
+        self._validate_campaign(record)
         try:
             self.session.add(record)
             self.session.commit()
@@ -105,16 +108,18 @@ class RecordCampaignDbBinder(object):
             campaign = campaignsList[0]
             logger.debug('got original')
             for k, v in params.items():
+                if(k=="start_date" or k=="end_date"):
+                    v = str_to_datetime(v)
                 setattr(campaign, k, v)
-                logger.debug("RecordCampaignDbBinder - update: " + k + " = " + v)
             logger.debug('attributes modified')
+            self._validate_campaign(campaign)
             self.session.add(campaign)
             self.session.commit()
             logger.debug('commited')
         except Exception as e:
             self.session.rollback()
             logger.debug('Impossible to update the campaign: ' + str(e))
-            return False
+            raise e
         return True
 
     @classmethod
@@ -146,3 +151,14 @@ class RecordCampaignDbBinder(object):
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())
 
+    def _validate_campaign(self, record):
+        '''Check if the campaign is valid, throws InvalidInputException
+        with a list of errors if it is not the case.'''
+        errors_list = []
+        if(record.campaign_name == None):
+            errors_list.append("empty_name")
+        if(record.start_date > record.end_date):
+            errors_list.append("start_greater_than_end")
+        
+        if(len(errors_list) > 0):
+            raise InvalidInputException("Invalid data provided", errors_list)

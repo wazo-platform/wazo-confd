@@ -117,7 +117,7 @@ def when_i_change_its_name_to_group1_and_its_queue_to_group2(step, new_campaign_
     new_queue_id = queue_id
     params = {'campaign_name' : new_campaign_name,
               'queue_id' : new_queue_id}
-    assert r_campaign.update(campaign_id, params), "Cannot update campaign " + campaign_id
+    assert r_campaign.update(campaign_id, params), "Cannot update campaign " + str(campaign_id)
     
 @step(u'Then its name and queue are actually modified')
 def then_i_can_get_it_by_asking_for_its_new_name(step):

@@ -67,23 +67,20 @@ class CampagneManagement:
         result = self.record_db.update(campaign_id, params)
         return result
         
-    def validate_add_input(self, data):
-        '''Validates and, if necessary, supplements the input by side effect.
-        Returns a list of errors (empty list if no error found)'''
-        logger.debug("Validating input for 'add'")
-        errors_list = []
-        #end_date >= start_date?
-        start_date = end_date = None
-        if(("start_date" not in data) or data["start_date"] == None or data["start_date"] == ''):
+    def supplement_add_input(self, data):
+        '''Returns the supplemented input'''
+        logger.debug("Supplementing input for 'add'")
+        for key in data:
+            if(data[key] == ''):
+                data[key] = None
+        if(("start_date" not in data) or data["start_date"] == None):
             data["start_date"] = datetime.now().strftime("%Y-%m-%d")
-        if(("end_date" not in data) or data["end_date"] == None or data["end_date"] == ''):
+        if(("end_date" not in data) or data["end_date"] == None):
             data["end_date"] = datetime.now().strftime("%Y-%m-%d")
-        try:
-            start_date = datetime.strptime(data["start_date"], "%Y-%m-%d")
-            end_date = datetime.strptime(data["end_date"], "%Y-%m-%d")
-        except:
-            errors_list.append("invalid_date_format")
-        if(start_date > end_date):
-            errors_list.append("start_greater_than_end")
-        return errors_list
-        
+        return data
+    
+    def supplement_edit_input(self, data):
+        for key in data:
+            if(data[key] == ''):
+                data[key] = None
+        return data
