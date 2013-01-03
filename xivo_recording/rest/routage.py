@@ -35,11 +35,11 @@ root = Blueprint("root",
 # ****************** #
 
 root.add_url_rule("/",
-                  "list_campaigns",
-                  getattr(APICampaigns(), "list_campaigns"),
+                  "get",
+                  getattr(APICampaigns(), "get"),
                   methods=["GET"])
 
-root.add_url_rule("/<campaign_name>",
+root.add_url_rule("/<campaign_id>",
                   "get",
                   getattr(APICampaigns(), "get"),
                   methods=["GET"])
@@ -49,12 +49,12 @@ root.add_url_rule('/',
                   getattr(APICampaigns(), "add_campaign"),
                   methods=['POST'])
 
-root.add_url_rule('/<campaign_name>',
+root.add_url_rule('/<campaign_id>',
                   'update',
                   getattr(APICampaigns(), "update"),
                   methods=['PUT'])
 
-root.add_url_rule('/<campaign_name>',
+root.add_url_rule('/<campaign_id>',
                   'delete',
                   getattr(APICampaigns(), "delete"),
                   methods=['DELETE'])
@@ -64,12 +64,12 @@ root.add_url_rule('/<campaign_name>',
 #   API recordings   #
 # ****************** #
 
-root.add_url_rule("/<campaign_name>/",
+root.add_url_rule("/<campaign_id>/",
                   "list_recordings",
                   getattr(APIRecordings(), "list_recordings"),
                   methods=["GET"])
 
-root.add_url_rule("/<campaign_name>/",
+root.add_url_rule("/<campaign_id>/",
                   "add_recording",
                   getattr(APIRecordings(), "add_recording"),
                   methods=["POST"])

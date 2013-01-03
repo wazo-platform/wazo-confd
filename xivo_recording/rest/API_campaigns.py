@@ -18,9 +18,12 @@
 
 from flask import request
 from flask.helpers import make_response
-import rest_encoder
+from sqlalchemy.exc import IntegrityError
+from xivo_recording.dao.exceptions import NoSuchElementException,\
+    InvalidInputException
 from xivo_recording.services.campagne_management import CampagneManagement
 import logging
+import rest_encoder
 
 
 logger = logging.getLogger(__name__)
@@ -38,21 +41,33 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-
-        result = self._campagne_manager.create_campaign(body)
-        if (result == True):
-            return make_response(("Added: " + str(result)), 201)
+        body = self._campagne_manager.supplement_add_input(body)
+        try:
+            result = self._campagne_manager.create_campaign(body)
+        except IntegrityError:
+            liste = ["duplicated_name"]
+            return make_response(rest_encoder.encode(liste), 400)
+        except InvalidInputException as e:
+            liste = e.errors_list
+            return make_response(rest_encoder.encode(liste), 400)
+        if (type(result).__name__ == "int" and result > 0):
+            return make_response(str(result), 201)
         else:
             return make_response(str(result), 500)
 
-    def get(self, campaign_name):
+    def get(self, campaign_id=None):
         try:
-            logger.debug("Get args:" + str(campaign_name))
+            logger.debug("Get args:" + str(campaign_id))
+            checkCurrentlyRunning = False
             params = {}
-            params['campaign_name']= campaign_name
+            if campaign_id != None:
+                params['id']= campaign_id
             for item in request.args:
-                params['item'] = request.args[item]
-            result = self._campagne_manager.get_campaigns_as_dict(params)
+                if item == 'running':
+                    checkCurrentlyRunning = (request.args[item] == 'true')
+                else:
+                    params[item] = request.args[item]
+            result = self._campagne_manager.get_campaigns_as_dict(params, checkCurrentlyRunning)
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
@@ -72,28 +87,27 @@ class APICampaigns(object):
                               " args: " + str(request.args)),
                              501)
 
-    def update(self, campaign_name):
+
+    def update(self, campaign_id):
         try:
             body = rest_encoder.decode(request.data)
             logger.debug(str(body))
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-
-        result = self._campagne_manager.update_campaign(campaign_name, body)
+        try:
+            body = self._campagne_manager.supplement_edit_input(body)
+            result = self._campagne_manager.update_campaign(campaign_id, body)
+        except NoSuchElementException:
+            liste = ["campaign_not_found"]
+            return make_response(rest_encoder.encode(liste), 404)
+        except IntegrityError:
+            liste = ["duplicated_name"]
+            return make_response(rest_encoder.encode(liste), 400)
+        except InvalidInputException as e:
+            liste = e.errors_list
+            return make_response(rest_encoder.encode(liste), 400)
         if (result):
-            return make_response(("Added: " + str(result)), 201)
+            return make_response(("Updated: " + str(result)), 200)
         else:
             return make_response(str(result), 500)
-
-    def list_campaigns(self):
-        try:
-            logger.debug("List args:" + str(request.args))
-            result = self._campagne_manager.get_campaigns_as_dict(request.args)
-            logger.debug("got result")
-            body = rest_encoder.encode(result)
-            logger.debug("result encoded")
-            return make_response(body, 200)
-        except Exception as e:
-            logger.debug("got exception:" + str(e.args))
-            return make_response(str(e.args), 500)

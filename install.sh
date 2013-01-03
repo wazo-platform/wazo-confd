@@ -23,7 +23,7 @@ fi
 installDep() {
   echo "Installing dependencies..."
   apt-get install -y libevent-dev python-pip python-dev build-essential
-  pip install gevent
+  pip install tornado
   pip install flask
   pip install SQLAlchemy
   pip install xivo-client-sim
@@ -64,7 +64,6 @@ installWebI() {
 
   echo "Creating web directory..."
   mkdir /var/lib/pf-xivo/sounds/campagnes
-  ln -s /var/lib/pf-xivo/sounds/campagnes /usr/share/pf-xivo-web-interface/www/recordings
 }
 
 recordingAutostart() {

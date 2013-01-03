@@ -21,12 +21,16 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.schema import Table, MetaData
-from xivo_dao.alchemy import dbconnection
+from sqlalchemy.sql.expression import and_
 from xivo_dao import queue_features_dao
+from xivo_dao.alchemy import dbconnection
+from xivo_recording.dao.exceptions import DataRetrieveError, \
+    NoSuchElementException, InvalidInputException
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict
+    table_list_to_list_dict, str_to_datetime
 from xivo_recording.recording_config import RecordingConfig
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -42,19 +46,18 @@ class RecordCampaignDbBinder(object):
 
     def __init__(self, session):
         self.session = session
+        
+    def get_records_as_dict(self, search=None, checkCurrentlyRunning = False):
 
-    def get_records_as_dict(self, search=None):
-
-        tables = self.get_records(search)
+        tables = self.get_records(search, checkCurrentlyRunning)
         logger.debug("Tables retrieved:" + str(tables))
         table_dict = table_list_to_list_dict(tables)
         logger.debug("Tables dict:" + str(table_dict))
         return table_dict
 
-    def get_records(self, search=None):
-        if (search == None):
-            return self.session.query(RecordCampaignDao).all()
-        else:
+    def get_records(self, search=None, checkCurrentlyRunning = False):
+        my_query = self.session.query(RecordCampaignDao)
+        if search != None:
             search_pattern = {}
             for item in search:
                 if (item == 'queue_name'):
@@ -64,13 +67,28 @@ class RecordCampaignDbBinder(object):
                     search_pattern[item] = search[item]
 
             logger.debug("Search search_pattern: " + str(search_pattern))
-            return self.session.query(RecordCampaignDao).filter_by(**search_pattern)
+            my_query = my_query.filter_by(**search_pattern)
+        if checkCurrentlyRunning:
+            now = datetime.now()
+            my_query = my_query.filter(and_(RecordCampaignDao.start_date <= str(now), 
+                                               RecordCampaignDao.end_date >= str(now)))
+        return my_query.all()
+        
+    def id_from_name(self, name):
+        result = self.session.query(RecordCampaignDao).filter_by(campaign_name = name).first()
+        if result != None:
+            return result.id
+        else:
+            raise DataRetrieveError("No campaign found for name " + name)
 
     def add(self, params):
         record = RecordCampaignDao()
         for k, v in params.items():
+            if((k=="start_date" or k=="end_date") and type(v).__name__=="str"):
+                v = str_to_datetime(v)
             setattr(record, k, v)
-            logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
+            #logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
+        self._validate_campaign(record)
         try:
             self.session.add(record)
             self.session.commit()
@@ -78,16 +96,23 @@ class RecordCampaignDbBinder(object):
             self.session.rollback()
             logger.debug("RecordCampaignDbBinder - add: " + str(e))
             raise e
-        return True
-    def update(self, original_name, params):
+        return record.id
+    
+    def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
-            campaign = self.get_records({'campaign_name': original_name})[0]
+            campaignsList = self.get_records({'id': campaign_id})
+            logger.debug("Campaigns list for update: " + str(campaignsList))
+            if(len(campaignsList) == 0):
+                raise NoSuchElementException("No campaign found for id " + str(campaign_id))
+            campaign = campaignsList[0]
             logger.debug('got original')
             for k, v in params.items():
+                if(k=="start_date" or k=="end_date"):
+                    v = str_to_datetime(v)
                 setattr(campaign, k, v)
-                logger.debug("RecordCampaignDbBinder - update: " + k + " = " + v)
             logger.debug('attributes modified')
+            self._validate_campaign(campaign)
             self.session.add(campaign)
             self.session.commit()
             logger.debug('commited')
@@ -123,7 +148,17 @@ class RecordCampaignDbBinder(object):
         except BaseException as e:
             logger.error("Database access error:" + str(e.args))
             return None
-
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())
 
+    def _validate_campaign(self, record):
+        '''Check if the campaign is valid, throws InvalidInputException
+        with a list of errors if it is not the case.'''
+        errors_list = []
+        if(record.campaign_name == None):
+            errors_list.append("empty_name")
+        if(record.start_date > record.end_date):
+            errors_list.append("start_greater_than_end")
+        
+        if(len(errors_list) > 0):
+            raise InvalidInputException("Invalid data provided", errors_list)

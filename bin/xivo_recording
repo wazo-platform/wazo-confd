@@ -28,7 +28,7 @@ DAEMONNAME = 'xivo_recording'
 
 # Enable debug mode for testing witout gevent WSGi,
 # setting to True activates the internal web server
-DEBUG_MODE = True
+#DEBUG_MODE = True
 
 LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
@@ -38,19 +38,26 @@ def main():
     parsed_args = _parse_args(sys.argv[1:])
     _init_logging(parsed_args.debug)
 
-    if(DEBUG_MODE):
+    if(parsed_args.dev_mode):
         # flask http server
         serviceManager = ServiceManager()
         serviceManager.run()
     else:
         # nginx connection via gevent
-        from gevent.wsgi import WSGIServer
+#        from gevent.wsgi import WSGIServer
+#        from xivo_recording.rest.flask_http_server import app
+        from tornado.wsgi import WSGIContainer
+        from tornado.httpserver import HTTPServer
+        from tornado.ioloop import IOLoop
         from xivo_recording.rest.flask_http_server import app
 
         if not parsed_args.debug:
             _daemonize()
-        http_server = WSGIServer(('127.0.0.1', 50050), app)
-        http_server.serve_forever()
+#        http_server = WSGIServer(('127.0.0.1', 50050), app)
+#        http_server.serve_forever()
+        http_server = HTTPServer(WSGIContainer(app))
+        http_server.listen(50050)
+        IOLoop.instance().start()
 
 
 def _init_logging(debug_mode):
@@ -83,6 +90,7 @@ def _parse_args(args):
 def _new_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('--dev_mode', action='store_true')
     return parser
 
 

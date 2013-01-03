@@ -42,9 +42,9 @@ class RecordingDetailsDbBinder(object):
     def __init__(self, session):
         self.session = session
 
-    def get_recordings_as_list(self, campaign_name, search=None):
+    def get_recordings_as_list(self, campaign_id, search=None):
         search_pattern = {}
-        search_pattern['campaign_name'] = campaign_name
+        search_pattern['campaign_id'] = campaign_id
         if search:
             for item in search:
                     search_pattern[item] = search[item]
@@ -81,6 +81,5 @@ class RecordingDetailsDbBinder(object):
             metadata = MetaData(engine)
             data = Table(cls.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)
-
         connection = dbconnection.get_connection(uri)
         return cls(connection.get_session())

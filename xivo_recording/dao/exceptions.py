@@ -25,3 +25,18 @@ class DataRetrieveError(Exception):
     def __str__(self):
         return repr(self.value)
 
+class NoSuchElementException(Exception):
+    
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+    
+class InvalidInputException(Exception):
+    def __init__(self, value, errors_list):
+        self.value = value
+        self.errors_list = errors_list
+        
+    def __str__(self):
+        return self.value + " : " + str(self.errors_list)

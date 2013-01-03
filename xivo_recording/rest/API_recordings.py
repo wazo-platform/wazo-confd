@@ -31,24 +31,24 @@ class APIRecordings(object):
     def __init__(self):
         self._recording_manager = RecordingManagement()
 
-    def add_recording(self, campaign_name):
+    def add_recording(self, campaign_id):
         try:
             body = rest_encoder.decode(request.data)
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
 
-        result = self._recording_manager.add_recording(campaign_name, body)
+        result = self._recording_manager.add_recording(campaign_id, body)
         if (result == True):
             return make_response(("Added: " + str(result)), 201)
         else:
             return make_response(str(result), 500)
 
-    def list_recordings(self, campaign_name):
+    def list_recordings(self, campaign_id):
         try:
             logger.debug("List args:" + str(request.args))
             result = self._recording_manager. \
-                        get_recordings_as_dict(campaign_name, request.args)
+                        get_recordings_as_dict(campaign_id, request.args)
 
             logger.debug("got result")
             body = rest_encoder.encode(result)

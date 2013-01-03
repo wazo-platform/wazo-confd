@@ -4,13 +4,17 @@ Feature: Recording campaign management
 	
 	Scenario: Campaign creation and consultation
 	  When I create a campaign "test_campaign"
-	  Then I can consult this campaign  
+	  Then I can consult this campaign
+	  
+	Scenario: Campaign creation and consultation with accents
+	  When I create a campaign "accents_éèà&"
+	  Then I can consult this campaign
 	  
 	Scenario: Get activated campaigns
 	  Given there is an activated campaign named "quality" focusing queue "1"
 	  Given there is an non activated campaign named "disabled" focusing queue "2"	   
 	  When I ask for activated campaigns for queue "1"
-	  Then I get a list of activated campaigns with campaign "1"
+	  Then I get a list of activated campaigns with campaign "quality"
 
 	Scenario: Campaign configuration and execution
 	  Given there is no campaign "quality",
@@ -23,5 +27,20 @@ Feature: Recording campaign management
 	  Given there is a queue "1" and a queue "2"
 	  Given I create a campaign "lettuce" pointing to queue "1"
 	  When I change its name to "lettuce_updated" and its queue to "2"
-	  Then I can get it by asking for its new name
+	  Then its name and queue are actually modified
+
+	Scenario: Consulting running and activated campaigns for a given queue
+	  Given there is a queue "1" and a queue "2"
+	  Given I create an activated campaign "lettuce1" pointing to queue "1" currently running
+	  Given I create an activated campaign "lettuce2" pointing to queue "2" currently running
+	  Given I create a non activated campaign "lettuce3" pointing to queue "1" currently running
+	  Given I create an activated campaign "lettuce4" pointing to queue "1" currently not running
+	  When I ask for running and activated campaigns for queue "1"
+	  Then I get campaign "lettuce1", I do not get "lettuce2", "lettuce3", "lettuce4"
 	  
+	Scenario: Campaign creation and consultation without dates
+	  When I create a campaign "test_dates" without dates
+	  Then this campaign is created with its start date and end date equal to now
+	  
+	Scenario: Campaign creation and consultation with unproprer dates
+	  I cannot a campaign "test_unproper_dates" with start date "2013-02-01" and end date "2013-01-01"

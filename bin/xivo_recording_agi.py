@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from gevent import httplib
 from xivo.agi import AGI
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
@@ -56,7 +55,7 @@ def get_general_variables():
 
 def get_detailed_variables():
     xivo_vars = {}
-    xivo_vars['campaign_name'] = agi.get_variable('QR_CAMPAIGN_NAME')
+    xivo_vars['campaign_id'] = agi.get_variable('QR_CAMPAIGN_ID')
     xivo_vars['base_filename'] = agi.get_variable('QR_BASE_FILENAME')
     xivo_vars['agent'] = agi.get_variable('QR_AGENT_NB')
     xivo_vars['caller'] = agi.get_variable('QR_CALLER_NB')
@@ -68,15 +67,11 @@ def get_detailed_variables():
 
 
 def get_campaigns(queue_id):
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    connection = RecordingConfig.getWSConnection()
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-    param_str = "?activated=true&queue_id=%s" % str(queue_id)
+    param_str = "?activated=true&queue_id=%s&running=true" % str(queue_id)
 
     requestURI += param_str
     logger.debug("Getting campaigns from URL: " + requestURI)
@@ -109,11 +104,7 @@ def init_logging(debug_mode):
 
 # TODO: Refactor in library, used here, in lettuce...!
 def get_queues():
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    connection = RecordingConfig.getWSConnection()
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_QUEUES_SERVICE_PATH + "/"
@@ -162,7 +153,7 @@ def determinate_record():
     logger.debug("Base filename: " + base_filename)
     if (campaigns[0]['activated'] == "True"):
         agi.set_variable('QR_RECORDQUEUE', '1')
-        agi.set_variable('__QR_CAMPAIGN_NAME', campaigns[0]['campaign_name'])
+        agi.set_variable('__QR_CAMPAIGN_ID', campaigns[0]['id'])
         agi.set_variable('__QR_BASE_FILENAME', base_filename)
         logger.info('Calls to queue: "' +
                     xivo_vars['queue_name'] +
@@ -177,15 +168,11 @@ def determinate_record():
 
 
 def save_recording(recording):
-    connection = httplib.HTTPConnection(
-                            RecordingConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RecordingConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    connection = RecordingConfig.getWSConnection()
 
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                    recording['campaign_name'] + "/"
+                    recording['campaign_id'] + "/"
 
     logger.debug("Post recording to URL: " + requestURI)
 
@@ -214,7 +201,7 @@ def save_call_details():
     recording = {}
     recording['cid'] = xivo_vars['cid']
     recording['filename'] = filename
-    recording['campaign_name'] = xivo_vars['campaign_name']
+    recording['campaign_id'] = xivo_vars['campaign_id']
     recording['start_time'] = xivo_vars['start_time']
     recording['agent'] = xivo_vars['agent']
     recording['caller'] = xivo_vars['caller']
