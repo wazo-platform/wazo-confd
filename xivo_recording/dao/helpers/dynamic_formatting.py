@@ -52,6 +52,8 @@ def table_list_to_list_dict(list_instance):
     return list_of_dict
 
 def str_to_datetime(string):
+    if(type(string) != str and type(string) != unicode):
+        raise InvalidInputException("Invalid data provided", ["invalid_date_format"])
     if(len(string) != 10 and len(string) != 19):
         raise InvalidInputException("Invalid data provided", ["invalid_date_format"])
     try:

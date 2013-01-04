@@ -53,26 +53,26 @@ class TestDynamicFormatting(unittest.TestCase):
         assert resultTime == datetime.strptime(strTime, "%Y-%m-%d %H:%M:%S")
         
         invalidDateStr = "2012-13-13"
-        got_exception=False
-        try:
+        with self.assertRaises(InvalidInputException):
             str_to_datetime(invalidDateStr)
-        except InvalidInputException:
-            got_exception=True
-        assert got_exception
         
         tooShortStr = '2012'
-        got_exception=False
-        try:
+        with self.assertRaises(InvalidInputException):
             str_to_datetime(tooShortStr)
-        except InvalidInputException:
-            got_exception=True
-        assert got_exception
-        
+ 
         invalidTimeStr = '2012-01-01 00:00:99'
-        got_exception=False
-        try:
+        with self.assertRaises(InvalidInputException):
             str_to_datetime(invalidTimeStr)
-        except InvalidInputException:
-            got_exception=True
-        assert got_exception
-        
+
+        invalidTimeStr = None
+        with self.assertRaises(InvalidInputException):
+            str_to_datetime(invalidTimeStr)
+            
+        invalidTimeStr = {}
+        with self.assertRaises(InvalidInputException):
+            str_to_datetime(invalidTimeStr)
+            
+        invalidTimeStr = 2012
+        with self.assertRaises(InvalidInputException):
+            str_to_datetime(invalidTimeStr)
+            

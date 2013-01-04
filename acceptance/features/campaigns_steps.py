@@ -32,6 +32,8 @@ new_queue_id = ''
 campaign_id = ''
 running_scenario = {}
 list_running_campaigns = []
+start_date = ''
+end_date = ''
 
 @step(u'When I create a campaign "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
@@ -93,40 +95,45 @@ def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_ca
         str(activated_campaigns) + \
         '") when asking for activated campaigns for queue: ' + \
         queue_id
+@step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+def edition_step_prerequisite(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
+    r_campaign = RestCampaign()
+    global campaign_id
+    new_campaign_name = local_campaign_name + str(random.randint(100, 999))
+    campaign_id = r_campaign.create(new_campaign_name, local_queue_id, True, local_start_date, local_end_date)
+    assert r_campaign.getCampaign(campaign_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
+                                    local_campaign_name + ' not properly inserted'
+                                    
+@step(u'When I change its name to "([^"]*)", its queue to "([^"]*)", its start date to "([^"]*)" and its end date to "([^"]*)"')
+def edition_step_execution(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
+    r_campaign = RestCampaign()
+    global campaign_id, campaign_name, queue_id, start_date, end_date
+    campaign_name = local_campaign_name + str(random.randint(100, 999))
+    queue_id = local_queue_id
+    start_date = local_start_date
+    end_date = local_end_date
+    params = {'campaign_name' : campaign_name,
+              'queue_id' : queue_id,
+              'start_date' : local_start_date,
+              'end_date' : local_end_date
+              }
+    assert r_campaign.update(campaign_id, params), "Cannot update campaign " + str(campaign_id)
+@step(u'Then the campaign is actually modified')
+def then_the_campaign_is_actually_modified(step):
+    r_campaign = RestCampaign()
+    global campaign_id, campaign_name, queue_id, start_date, end_date
+    campaign = r_campaign.getCampaign(campaign_id)[0]
+    assert campaign['campaign_name'] == campaign_name, "Name not properly modified"
+    assert campaign['queue_id'] == queue_id, "Queue not properly modified"
+    assert campaign['start_date'] == start_date, "Start date not properly modified"
+    assert campaign['end_date'] == end_date, "End date not properly modified"
 
 @step(u'Given there is a queue "([^"]*)" and a queue "([^"]*)"')
 def given_there_is_a_queue_group1(step, queue_id1, queue_id2):
     r_queues = RestQueues()
     assert r_queues.list("id", queue_id1), "The queue of id " + queue_id1 + " does not exist."
     assert r_queues.list("id", queue_id2), "The queue of id " + queue_id2 + " does not exist."
-   
-@step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)"')
-def given_i_create_a_campaign_group1_pointing_to_queue_group2(step, local_campaign_name, queue_id):
-    r_campaign = RestCampaign()
-    global campaign_name, campaign_id
-    campaign_name = local_campaign_name + str(random.randint(100, 999))
-    campaign_id = r_campaign.create(campaign_name, int(queue_id))
-    print("\nReceived id: " + str(campaign_id) + '\n')
-    assert campaign_id>0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
-    
-@step(u'When I change its name to "([^"]*)" and its queue to "([^"]*)"')
-def when_i_change_its_name_to_group1_and_its_queue_to_group2(step, new_campaign_name_local, queue_id):
-    r_campaign = RestCampaign()
-    global campaign_id, new_campaign_name, new_queue_id
-    new_campaign_name = new_campaign_name_local + str(random.randint(100, 999))
-    new_queue_id = queue_id
-    params = {'campaign_name' : new_campaign_name,
-              'queue_id' : new_queue_id}
-    assert r_campaign.update(campaign_id, params), "Cannot update campaign " + str(campaign_id)
-    
-@step(u'Then its name and queue are actually modified')
-def then_i_can_get_it_by_asking_for_its_new_name(step):
-    r_campaign = RestCampaign()
-    global new_campaign_name, new_queue_id, campaign_id
-    campaign = r_campaign.getCampaign(campaign_id)
-    assert (campaign[0]['campaign_name'] == new_campaign_name and campaign[0]['queue_id'] == new_queue_id), "No activated campaign"
-
-    
+       
 @step(u'Given I create an activated campaign "([^"]*)" pointing to queue "([^"]*)" currently running')
 def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_currently_running(step, campaign_name, queue_id):
     r_campaign = RestCampaign()
@@ -195,7 +202,7 @@ def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(
             result = True
     assert result, 'Campaign not created with the current date: '
     
-@step(u'I cannot a campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+@step(u'I cannot create a campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
 def i_cannot_a_campaign_group1_with_start_date_group2_and_end_date_group3(step, local_campaign_name, start_date, end_date):
     r_campaign = RestCampaign()
     result = r_campaign.create(campaign_name + str(random.randint(100, 999)), 1, True, start_date, end_date)
