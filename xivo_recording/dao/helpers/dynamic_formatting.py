@@ -30,7 +30,7 @@ def table_to_string(class_instance):
     for n in sorted(set(members)):
         if not n.startswith('_'):
             result += str(n) + ": " + str(getattr(class_instance, n)) + RecordingConfig.CSV_SEPARATOR
-    return result.rstrip(",")
+    return result.rstrip(RecordingConfig.CSV_SEPARATOR)
 
 
 def table_list_to_list_dict(list_instance):
@@ -52,9 +52,12 @@ def table_list_to_list_dict(list_instance):
     return list_of_dict
 
 def str_to_datetime(string):
-    if(len(string) == 10):
-        return datetime.strptime(string, "%Y-%m-%d")
-    elif(len(str) == 19):
-        return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
-    else:
+    if(len(string) != 10 and len(string) != 19):
+        raise InvalidInputException("Invalid data provided", ["invalid_date_format"])
+    try:
+        if(len(string) == 10):
+            return datetime.strptime(string, "%Y-%m-%d")
+        elif(len(string) == 19):
+            return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+    except Exception:
         raise InvalidInputException("Invalid data provided", ["invalid_date_format"])

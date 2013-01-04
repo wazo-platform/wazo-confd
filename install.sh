@@ -1,7 +1,7 @@
 #!/bin/sh
 #installation script for package xivo-recording
 
-PF_XIVO_WEB_DEB_FILE="./pf-xivo-web-interface_12.22.1.recording.deb"
+PF_XIVO_WEB_DEB_FILE="./pf-xivo-web-interface_12.21~20121024.134631.6cf6e1f-3_all.deb"
 PY_SETUP="setup.py"
 SQL_PATCH="xivo-recording-ddl.sql"
 
@@ -23,6 +23,7 @@ fi
 installDep() {
   echo "Installing dependencies..."
   apt-get install -y libevent-dev python-pip python-dev build-essential
+  pip install gevent
   pip install tornado
   pip install flask
   pip install SQLAlchemy

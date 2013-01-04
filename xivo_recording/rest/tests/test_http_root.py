@@ -17,13 +17,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-import unittest
 from mock import Mock, patch
-from xivo_recording.recording_config import RecordingConfig
-import random
-from xivo_recording.services.campagne_management import CampagneManagement
-import cti_encoder
 from urlparse import urlparse, parse_qs
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.rest import rest_encoder
+from xivo_recording.services.campagne_management import CampagneManagement
+import random
+import unittest
 
 mock_campagne_management = Mock(CampagneManagement)
 
@@ -63,7 +63,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/', data=cti_encoder.encode(data))
+                              '/', data=rest_encoder.encode(data))
         print "result add campaign: " + result.data
 
         self.instance_campagne_management.create_campaign.assert_called_with(data)
@@ -90,7 +90,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/',
-                              data=cti_encoder.encode(data))
+                              data=rest_encoder.encode(data))
 
         self.instance_campagne_management.create_campaign.assert_called_with(data)
         self.assertTrue(str(result.status).startswith(status),
@@ -120,6 +120,6 @@ class TestFlaskHttpRoot(unittest.TestCase):
         args = parse_qs(parsed_url.query)
         print "args: " + str(args)
         self.assertEqual(status, result.status)
-        received_data = cti_encoder.decode(result.data.replace("\\", "").strip('"'))
+        received_data = rest_encoder.decode(result.data.replace("\\", "").strip('"'))
         self.assertDictEqual(received_data, data)
         self.instance_campagne_management.get_campaigns_as_dict.assert_called_with(args)
