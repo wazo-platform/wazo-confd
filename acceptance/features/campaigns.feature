@@ -25,9 +25,9 @@ Feature: Recording campaign management
 	
 	Scenario: Campaign edition
 	  Given there is a queue "1" and a queue "2"
-	  Given I create a campaign "lettuce" pointing to queue "1"
-	  When I change its name to "lettuce_updated" and its queue to "2"
-	  Then its name and queue are actually modified
+	  Given I create a campaign "lettuce" pointing to queue "1" with start date "2012-01-01 00:00:00" and end date "2013-05-05 14:59:14"
+	  When I change its name to "lettuce_updated", its queue to "2", its start date to "2012-02-01 00:11:00" and its end date to "2013-04-05 12:59:14"
+	  Then the campaign is actually modified
 
 	Scenario: Consulting running and activated campaigns for a given queue
 	  Given there is a queue "1" and a queue "2"
@@ -43,4 +43,4 @@ Feature: Recording campaign management
 	  Then this campaign is created with its start date and end date equal to now
 	  
 	Scenario: Campaign creation and consultation with unproprer dates
-	  I cannot a campaign "test_unproper_dates" with start date "2013-02-01" and end date "2013-01-01"
+	  I cannot create a campaign "test_unproper_dates" with start date "2013-02-01" and end date "2013-01-01"

@@ -162,7 +162,6 @@ class RestCampaign(object):
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id)
-        print "URI for update: " + requestURI
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         body = rest_encoder.encode(params)
         connection.request("PUT", requestURI, body, headers)
