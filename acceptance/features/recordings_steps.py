@@ -22,7 +22,6 @@ from time import strftime, localtime
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.recording_config import RecordingConfig
 import random
-from xivo_recording import rest
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -50,7 +49,7 @@ def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_gro
     assert callid, "Callid null!"
     record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
     campaign_id = record_db.id_from_name(campaign_name)
-    assert rest_campaign.addRecordingDetails(campaign_id, callid, caller, callee, time, queue_name), "Cannot add call details"
+    assert rest_campaign.addRecordingDetails(campaign_id, callid, caller, callee, time), "Cannot add call details"
 
 
 @step(u'Then I can consult these details')
@@ -67,9 +66,13 @@ def given_there_is_a_campaign_of_id(step, campaign_id):
 
 @step(u'Given I create a recording for campaign "([^"]*)" with caller "([^"]*)" and agent "([^"]*)"')
 def given_i_create_a_recording_for_campaign_group1_with_caller_group2_and_agent_group3(step, campaign_id, caller, agent):
+    global cidList
+    cidList = []
     rest_campaign = RestCampaign()
-    #rest_campaign.addRecordingDetails(campaign_id, callid, caller, callee, time, queue_name)
-    assert False, 'This step must be implemented'
+    cidList.append(str(random.randint(100, 999)))
+    res = rest_campaign.addRecordingDetails(campaign_id, cidList[0], caller, '', "2012-01-01 00:00:00", agent)
+    assert res, 'Could not create recording'
+    
 @step(u'When I search recordings in the campaign "([^"]*)" with the key "([^"]*)"')
 def when_i_search_recordings_in_the_campaign_group1_with_the_key_group2(step, group1, group2):
     assert False, 'This step must be implemented'

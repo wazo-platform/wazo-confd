@@ -92,7 +92,7 @@ class RestCampaign(object):
 
         return campaigns
 
-    def addRecordingDetails(self, campaign_id, callid, caller, callee, time, queue_name):
+    def addRecordingDetails(self, campaign_id, callid, caller, callee, time, agent = None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -104,7 +104,8 @@ class RestCampaign(object):
         recording['caller'] = caller
         recording['callee'] = callee
         recording['time'] = time
-        recording['queue_name'] = queue_name
+        if agent != None:
+            recording['agent'] = agent
         body = rest_encoder.encode(recording)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -116,7 +117,6 @@ class RestCampaign(object):
         # TODO : Verify the Content-type
         # replyHeader = reply.getheaders()
 
-        assert reply.status == 201
         return (reply.status == 201)
 
     def verifyRecordingsDetails(self, campaign_id, callid):
@@ -184,3 +184,6 @@ class RestCampaign(object):
             result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()))
             return type(result) == int and result > 0
         return True
+    
+    def create_agent_if_not_exists(self, agent_number):
+        pass
