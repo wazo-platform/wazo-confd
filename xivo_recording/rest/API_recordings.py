@@ -58,3 +58,18 @@ class APIRecordings(object):
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
             return make_response(str(e.args), 500)
+
+    def search(self, campaign_id):
+        try:
+            logger.debug("List args:" + str(request.args))
+            result = self._recording_manager. \
+                        search_recordings(campaign_id, request.args)
+
+            logger.debug("got result")
+            body = rest_encoder.encode(result)
+            logger.debug("result encoded")
+            return make_response(body, 200)
+
+        except Exception as e:
+            logger.debug("got exception:" + str(e.args))
+            return make_response(str(e.args), 500)

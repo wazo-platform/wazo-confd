@@ -63,6 +63,10 @@ root.add_url_rule('/<campaign_id>',
 # ****************** #
 #   API recordings   #
 # ****************** #
+root.add_url_rule("/<campaign_id>/search",
+                  "search",
+                  getattr(APIRecordings(), "search"),
+                  methods=["GET"])
 
 root.add_url_rule("/<campaign_id>/",
                   "list_recordings",

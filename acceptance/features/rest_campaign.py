@@ -16,8 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from acceptance.features.rest_queues import RestQueues
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
+import datetime
+import random
 
 
 class RestCampaign(object):
@@ -172,3 +175,12 @@ class RestCampaign(object):
         connection.request("GET", requestURI + parameters, '', headers)
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
+    
+    def create_if_not_exists(self, campaign_id):
+        result = self.getCampaign(campaign_id)
+        if(result == None or len(result) == 0):
+            rest_queues = RestQueues()
+            rest_queues.create_if_not_exists(1)
+            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()))
+            return type(result) == int and result > 0
+        return True

@@ -66,3 +66,11 @@ class RecordingManagement:
                             get_recordings_as_list(campaign_id, search)
 
         return result
+
+    @reconnectable("recording_details_db")
+    def search_recordings(self, campaign_id, search):
+        logger.debug("search_recordings")
+        if(search == None or search == {} or 'key' not in search):
+            return self.get_recordings_as_dict(campaign_id)
+        else:
+            return self.recording_details_db.search_recordings(campaign_id, search['key'])

@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from gevent import httplib
 from xivo_dao import queue_features_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_recording.recording_config import RecordingConfig

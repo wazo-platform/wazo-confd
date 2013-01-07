@@ -22,6 +22,7 @@ from time import strftime, localtime
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.recording_config import RecordingConfig
 import random
+from xivo_recording import rest
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -58,3 +59,21 @@ def then_i_can_consult_these_details(step):
     record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
     campaign_id = record_db.id_from_name(campaign_name)
     assert rest_campaign.verifyRecordingsDetails(campaign_id, callid), "Recording not found"
+
+@step(u'Given there is a campaign of id "([^"]*)"')
+def given_there_is_a_campaign_of_id(step, campaign_id):
+    rest_campaign = RestCampaign()
+    assert rest_campaign.create_if_not_exists(campaign_id), 'The campaign could not be created'
+
+@step(u'Given I create a recording for campaign "([^"]*)" with caller "([^"]*)" and agent "([^"]*)"')
+def given_i_create_a_recording_for_campaign_group1_with_caller_group2_and_agent_group3(step, campaign_id, caller, agent):
+    rest_campaign = RestCampaign()
+    #rest_campaign.addRecordingDetails(campaign_id, callid, caller, callee, time, queue_name)
+    assert False, 'This step must be implemented'
+@step(u'When I search recordings in the campaign "([^"]*)" with the key "([^"]*)"')
+def when_i_search_recordings_in_the_campaign_group1_with_the_key_group2(step, group1, group2):
+    assert False, 'This step must be implemented'
+@step(u'Then I get the first two recordings')
+def then_i_get_the_first_two_recordings(step):
+    assert False, 'This step must be implemented'
+
