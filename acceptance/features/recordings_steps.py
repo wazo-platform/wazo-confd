@@ -34,6 +34,8 @@ time = strftime("%a, %d %b %Y %H:%M:%S", localtime())
 callid = None
 campaign_name = None
 queue_name = "test_queue" + str(random.randint(10, 99))
+result = []
+callid_list = []
 
 
 @step(u'Given there is a campaign named "([^"]*)"')
@@ -73,19 +75,30 @@ def given_there_is_a_campaign_of_id(step, campaign_id):
     rest_campaign = RestCampaign()
     assert rest_campaign.create_if_not_exists(campaign_id), 'The campaign could not be created'
 
+@step(u'Given there is an agent "([^"]*)"')
+def given_there_is_an_agent(step, agent_no):
+    id = rest_campaign.add_agent_if_not_exists(agent_no)
+    assert id > 0, 'Could not create the agent'
+    
 @step(u'Given I create a recording for campaign "([^"]*)" with caller "([^"]*)" and agent "([^"]*)"')
-def given_i_create_a_recording_for_campaign_group1_with_caller_group2_and_agent_group3(step, campaign_id, caller, agent):
-    global cidList
-    cidList = []
+def given_i_create_a_recording_for_campaign_with_caller_and_agent(step, campaign_id, caller_no, agent_no):
     rest_campaign = RestCampaign()
-    cidList.append(str(random.randint(100, 999)))
-    res = rest_campaign.addRecordingDetails(campaign_id, cidList[0], caller, agent, "2012-01-01 00:00:00")
-    assert res, 'Could not create recording'
+    callid = str(random.randint(1000, 9999))
+    callid_list.append(callid)
+    time = "2012-01-01 00:00:00"
+    assert rest_campaign.addRecordingDetails(campaign_id, callid, caller_no, agent_no, time), "Cannot add call details"
     
 @step(u'When I search recordings in the campaign "([^"]*)" with the key "([^"]*)"')
-def when_i_search_recordings_in_the_campaign_group1_with_the_key_group2(step, group1, group2):
-    assert False, 'This step must be implemented'
+def when_i_search_recordings_in_the_campaign_with_the_key(step, campaign_id, key):
+    rest_campaign = RestCampaign()
+    global result
+    result = rest_campaign.search_recordings(campaign_id, key)
+    assert len(result) > 0, 'No recording retrieved'
+    
 @step(u'Then I get the first two recordings')
 def then_i_get_the_first_two_recordings(step):
-    assert False, 'This step must be implemented'
-
+    global result, callid_list
+    liste = [item['cid'] for item in result]
+    assert callid_list[0] in liste, "First call not in the list"
+    assert callid_list[1] in liste, "Second call not in the list"
+    assert callid_list[2] not in liste, "Third call in the list"

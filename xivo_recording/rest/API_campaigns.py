@@ -50,7 +50,7 @@ class APICampaigns(object):
         except InvalidInputException as e:
             liste = e.errors_list
             return make_response(rest_encoder.encode(liste), 400)
-        if (type(result).__name__ == "int" and result > 0):
+        if (type(result) == int and result > 0):
             return make_response(str(result), 201)
         else:
             return make_response(str(result), 500)

@@ -84,18 +84,21 @@ class RecordCampaignDbBinder(object):
     def add(self, params):
         record = RecordCampaignDao()
         for k, v in params.items():
-            if((k=="start_date" or k=="end_date") and type(v).__name__=="str"):
+            if((k=="start_date" or k=="end_date") and type(v)==str):
                 v = str_to_datetime(v)
             setattr(record, k, v)
-            #logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
+            logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
         self._validate_campaign(record)
         try:
+            logger.debug("inserting")
             self.session.add(record)
+            logger.debug("commiting")
             self.session.commit()
         except Exception as e:
             self.session.rollback()
             logger.debug("RecordCampaignDbBinder - add: " + str(e))
             raise e
+        logger.debug("returning")
         return record.id
     
     def update(self, campaign_id, params):
@@ -155,6 +158,7 @@ class RecordCampaignDbBinder(object):
         '''Check if the campaign is valid, throws InvalidInputException
         with a list of errors if it is not the case.'''
         errors_list = []
+        logger.debug("validating")
         if(record.campaign_name == None):
             errors_list.append("empty_name")
         if(record.start_date > record.end_date):

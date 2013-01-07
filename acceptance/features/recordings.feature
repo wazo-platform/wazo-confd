@@ -11,6 +11,9 @@ Feature: Call recordings management
 
 	Scenario: Recording search
 	  Given there is a campaign of id "1"
+	  Given there is an agent "222"
+	  Given there is an agent "111"
+	  Given there is an agent "123"
 	  Given I create a recording for campaign "1" with caller "111" and agent "222"
 	  Given I create a recording for campaign "1" with caller "222" and agent "111"
 	  Given I create a recording for campaign "1" with caller "123" and agent "123"

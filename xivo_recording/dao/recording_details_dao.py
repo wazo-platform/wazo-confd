@@ -20,9 +20,11 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
-from sqlalchemy.schema import Table, MetaData
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.schema import Table, MetaData, Column, ForeignKey
+from sqlalchemy.sql.expression import or_, and_
+from sqlalchemy.types import Integer
 from xivo_dao.alchemy import dbconnection
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
@@ -68,8 +70,9 @@ class RecordingDetailsDbBinder(object):
 
     def search_recordings(self, campaign_id, key):
         query = self.session.query(RecordingDetailsDao)\
-                        .filter_by(**{'campaign_id' : campaign_id})\
-                        .filter(or_(RecordingDetailsDao.caller == key, RecordingDetailsDao.agent == key))
+                        .join(AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id)\
+                        .filter(and_(RecordingDetailsDao.campaign_id == campaign_id, or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
+        logger.debug("generated query: " + str(query))
         return table_list_to_list_dict(query)
     
     @classmethod

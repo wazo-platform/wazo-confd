@@ -42,7 +42,7 @@ class RestCampaign(object):
         session = connection.get_session()
         return session
 
-    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None):
+    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id = None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -58,6 +58,8 @@ class RestCampaign(object):
             campaign["start_date"] = str(start_date)
         if end_date != None:
             campaign["end_date"] = str(end_date)
+        if campaign_id != None:
+            campaign['id'] = campaign_id
         body = rest_encoder.encode(campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -197,7 +199,7 @@ class RestCampaign(object):
         if(result == None or len(result) == 0):
             rest_queues = RestQueues()
             rest_queues.create_if_not_exists(1)
-            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()))
+            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()), campaign_id)
             return type(result) == int and result > 0
         return True
     
@@ -221,3 +223,16 @@ class RestCampaign(object):
 
             self.agentFeatDao.add_agent(agent_features)
             return agent_features.id
+
+    def search_recordings(self, campaign_id, key):
+        connection = RecordingConfig.getWSConnection()
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        str(campaign_id) + "/search"
+        parameters = "?key=" + key
+        requestURI += parameters
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("GET", requestURI, '', headers)
+        reply = connection.getresponse()
+        return rest_encoder.decode(reply.read())
