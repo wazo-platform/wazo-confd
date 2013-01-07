@@ -35,6 +35,7 @@ callid = None
 campaign_name = None
 queue_name = "test_queue" + str(random.randint(10, 99))
 
+
 @step(u'Given there is a campaign named "([^"]*)"')
 def given_there_is_a_campaign_named_campaing_name(step, local_campaign_name):
     global campaign_name
@@ -42,14 +43,21 @@ def given_there_is_a_campaign_named_campaing_name(step, local_campaign_name):
     assert rest_campaign.create(campaign_name), "Cannot create a campaign"
 
 
-@step(u'When I save call details for a call referenced by its "([^"]*)" in campaign "([^"]*)"')
-def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_group2(step, local_callid, local_campaign_name):
+@step(u'Given there is an agent with number "([^"]*)"')
+def given_there_is_an_agent_with_number_group1(step, agent_number):
+    id = rest_campaign.add_agent_if_not_exists(agent_number)
+    print "\n\t Received id: " + str(id) + "\n"
+    assert (id > 0)
+
+
+@step(u'When I save call details for a call referenced by its "([^"]*)" in campaign "([^"]*)" replied by agent with number "([^"]*)"')
+def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_group2_replied_by_agent_with_number_group3(step, local_callid, local_campaign_name, local_agent_no):
     global callid, campaign_name
     callid = local_callid + str(random.randint(1000, 9999))
     assert callid, "Callid null!"
     record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
     campaign_id = record_db.id_from_name(campaign_name)
-    assert rest_campaign.addRecordingDetails(campaign_id, callid, caller, callee, time, queue_name), "Cannot add call details"
+    assert rest_campaign.addRecordingDetails(campaign_id, callid, caller, local_agent_no, time, queue_name), "Cannot add call details"
 
 
 @step(u'Then I can consult these details')

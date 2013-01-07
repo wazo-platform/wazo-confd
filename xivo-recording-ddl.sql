@@ -41,11 +41,11 @@ CREATE TABLE recording
   client_id character varying(1024),
   callee character varying(32),
   filename character varying(1024),
-  agent character varying(40),
   campaign_id integer NOT NULL,
+  agent_id integer,
   CONSTRAINT recording_pkey PRIMARY KEY (cid ),
-  CONSTRAINT recording_agent_fkey FOREIGN KEY (agent)
-      REFERENCES agentfeatures ("number") MATCH SIMPLE
+  CONSTRAINT recording_agent_id_fkey FOREIGN KEY (agent_id)
+      REFERENCES agentfeatures (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT recording_campaign_id_fkey FOREIGN KEY (campaign_id)
       REFERENCES record_campaign (id) MATCH SIMPLE

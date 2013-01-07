@@ -18,19 +18,34 @@
 
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
+from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
+from xivo_dao.alchemy import dbconnection
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
 
 
 class RestCampaign(object):
 
     def __init__(self):
-        pass
+        self.agentFeatDao = AgentFeaturesDAO(self.setUpDBConnection())
 
-    def create(self, campaign_name, queue_id=1, activated = True, start_date = None, end_date = None):
+    def setUpDBConnection(self):
+        db_connection_pool = \
+            dbconnection.DBConnectionPool(dbconnection.DBConnection)
+
+        dbconnection.register_db_connection_pool(db_connection_pool)
+
+        uri = RecordingConfig.RECORDING_DB_URI
+        dbconnection.add_connection_as(uri, 'asterisk')
+        connection = dbconnection.get_connection('asterisk')
+        session = connection.get_session()
+        return session
+
+    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-                        
+
         campaign = {}
 
         campaign["campaign_name"] = campaign_name
@@ -89,17 +104,18 @@ class RestCampaign(object):
 
         return campaigns
 
-    def addRecordingDetails(self, campaign_id, callid, caller, callee, time, queue_name):
+    def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time, queue_name):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
                         "/" + str(campaign_id) + '/'
-        
+
+        agent_id = self.agentFeatDao.agent_id(agent_no)
         recording = {}
         recording['cid'] = callid
         recording['caller'] = caller
-        recording['callee'] = callee
+        recording['agent_id'] = agent_id
         recording['time'] = time
         recording['queue_name'] = queue_name
         body = rest_encoder.encode(recording)
@@ -129,7 +145,7 @@ class RestCampaign(object):
         reply = connection.getresponse()
 
         body = reply.read()
-        assert body != None, "No result" 
+        assert body != None, "No result"
         recordings = rest_encoder.decode(body)
 
         result = False
@@ -152,7 +168,7 @@ class RestCampaign(object):
         connection.request("PUT", requestURI, body, headers)
         reply = connection.getresponse()
         return reply.status == 200 or reply.status == 201
-    
+
     def getCampaign(self, campaign_id):
         connection = RecordingConfig.getWSConnection()
 
@@ -164,6 +180,7 @@ class RestCampaign(object):
         connection.request("GET", requestURI, '', headers)
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
+
     def getRunningActivatedCampaignsForQueue(self, queue_id):
         connection = RecordingConfig.getWSConnection()
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -173,3 +190,23 @@ class RestCampaign(object):
         connection.request("GET", requestURI + parameters, '', headers)
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
+
+    def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName", lastname="LastName", context="default", language="fr_FR"):
+        try:
+            agent_id = self.agentFeatDao.agent_id(agent_no)
+            return agent_id
+        except LookupError:
+            agent_features = AgentFeatures()
+            agent_features.numgroup = numgroup
+            agent_features.firstname = firstname
+            agent_features.lastname = lastname
+            agent_features.number = agent_no
+            agent_features.passwd = agent_no
+            agent_features.context = context
+            agent_features.language = language
+            agent_features.commented = 0
+            agent_features.description = "description"
+
+            self.agentFeatDao.add_agent(agent_features)
+            return agent_features.id
+
