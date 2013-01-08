@@ -29,7 +29,10 @@ def table_to_string(class_instance):
     result = ""
     for n in sorted(set(members)):
         if not n.startswith('_'):
-            result += str(n) + ": " + str(getattr(class_instance, n)) + RecordingConfig.CSV_SEPARATOR
+            result += str(n) + ": " + \
+                        str(getattr(class_instance, n)) + \
+                        RecordingConfig.CSV_SEPARATOR
+
     return result.rstrip(RecordingConfig.CSV_SEPARATOR)
 
 
@@ -50,6 +53,7 @@ def table_list_to_list_dict(list_instance):
                 dict_instance[elem] = value
         list_of_dict.append(dict_instance)
     return list_of_dict
+
 
 def str_to_datetime(string):
     if(type(string) != str and type(string) != unicode):

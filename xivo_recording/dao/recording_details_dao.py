@@ -16,15 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
-from xivo_dao.alchemy import dbconnection
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.dao.generic_dao import GenericDao
-from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.orm.exc import UnmappedClassError
-from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
+from sqlalchemy.orm.util import class_mapper
+from sqlalchemy.schema import Table, MetaData
+from sqlalchemy.sql.expression import or_, and_
+from xivo_dao.alchemy import dbconnection
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
+from xivo_recording.dao.generic_dao import GenericDao
+from xivo_recording.dao.helpers.dynamic_formatting import \
+    table_list_to_list_dict
+from xivo_recording.recording_config import RecordingConfig
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,14 +55,6 @@ class RecordingDetailsDbBinder(object):
         logger.debug("Search search_pattern: " + str(search_pattern))
         return table_list_to_list_dict(self.session.query(RecordingDetailsDao).filter_by(**search_pattern))
 
-    def get_recordings(self, campaign_name, search=None):
-        search_pattern = {}
-        search_pattern['campaign_name'] = campaign_name
-        for item in search:
-                search_pattern[item] = search[item]
-
-        return self.session.query(RecordingDetailsDao).filter_by(**search_pattern)
-
     def add_recording(self, params):
         record = RecordingDetailsDao()
         for k, v in params.items():
@@ -72,6 +67,13 @@ class RecordingDetailsDbBinder(object):
             self.session.rollback()
             raise e
         return True
+
+    def search_recordings(self, campaign_id, key):
+        query = self.session.query(RecordingDetailsDao)\
+                        .join(AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id)\
+                        .filter(and_(RecordingDetailsDao.campaign_id == campaign_id, or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
+        logger.debug("generated query: " + str(query))
+        return table_list_to_list_dict(query)
 
     @classmethod
     def new_from_uri(cls, uri):

@@ -20,6 +20,9 @@ from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
+from acceptance.features.rest_queues import RestQueues
+import datetime
+import random
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 
 
@@ -40,7 +43,7 @@ class RestCampaign(object):
         session = connection.get_session()
         return session
 
-    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None):
+    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -56,6 +59,8 @@ class RestCampaign(object):
             campaign["start_date"] = str(start_date)
         if end_date != None:
             campaign["end_date"] = str(end_date)
+        if campaign_id != None:
+            campaign['id'] = campaign_id
         body = rest_encoder.encode(campaign)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -104,7 +109,7 @@ class RestCampaign(object):
 
         return campaigns
 
-    def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time, queue_name):
+    def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -116,7 +121,7 @@ class RestCampaign(object):
         recording['caller'] = caller
         recording['agent_no'] = agent_no
         recording['time'] = time
-        recording['queue_name'] = queue_name
+
         body = rest_encoder.encode(recording)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -188,6 +193,15 @@ class RestCampaign(object):
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
 
+    def create_if_not_exists(self, campaign_id):
+        result = self.getCampaign(campaign_id)
+        if(result == None or len(result) == 0):
+            rest_queues = RestQueues()
+            rest_queues.create_if_not_exists(1)
+            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()), campaign_id)
+            return type(result) == int and result > 0
+        return True
+
     def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName", lastname="LastName", context="default", language="fr_FR"):
         try:
             agent_id = self.agentFeatDao.agent_id(agent_no)
@@ -215,3 +229,15 @@ class RestCampaign(object):
             return 0
         return -1
 
+    def search_recordings(self, campaign_id, key):
+        connection = RecordingConfig.getWSConnection()
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        str(campaign_id) + "/search"
+        parameters = "?key=" + key
+        requestURI += parameters
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("GET", requestURI, '', headers)
+        reply = connection.getresponse()
+        return rest_encoder.decode(reply.read())
