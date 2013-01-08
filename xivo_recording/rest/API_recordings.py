@@ -86,12 +86,10 @@ class APIRecordings(object):
                         delete(campaign_id, recording_id)
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
-            if result:
-                logger.debug("deleted")
-                return make_response(body, 200)
+            if result == 0:
+                return make_response(rest_encoder.encode("No such recording"), 404)
             else:
-                logger.debug("error when deleting")
-                return make_response(body, 500)
+                return make_response(rest_encoder.encode("Deleted: True"), 200)
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(str(e.args), 500)
+            return make_response(rest_encoder.encode(str(e.args)), 500)

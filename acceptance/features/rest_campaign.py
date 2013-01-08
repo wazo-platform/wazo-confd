@@ -155,8 +155,6 @@ class RestCampaign(object):
         for recording in recordings:
             if (recording["cid"] == callid):
                 result = True
-
-        assert result
         return result
 
     def update(self, campaign_id, params):
@@ -241,3 +239,24 @@ class RestCampaign(object):
         connection.request("GET", requestURI, '', headers)
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
+
+    def deleteRecording(self, campaign_id, callid):
+        connection = RecordingConfig.getWSConnection()
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        str(campaign_id) + "/" + str(callid)
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("DELETE", requestURI, '', headers)
+        reply = connection.getresponse()
+        response = rest_encoder.decode(reply.read())
+        return (reply.status, response)
+
+    def delete_agent(self, agent_no):
+        try:
+            agent_id = self.agentFeatDao.agent_id(agent_no)
+            print "\nAgent id: " + agent_id + "\n"
+            self.agentFeatDao.del_agent(agent_id)
+            return True
+        except Exception as e:
+            print "\nException raised: " + str(e) + "\n"
+            return False

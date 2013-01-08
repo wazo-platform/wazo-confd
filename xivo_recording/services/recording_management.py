@@ -103,5 +103,4 @@ class RecordingManagement:
 
     @reconnectable("recording_details_db")
     def delete(self, campaign_id, recording_id):
-        result = self.recording_details_db.delete(recording_id)
-        return result == 1
+        return self.recording_details_db.delete(campaign_id, recording_id)

@@ -83,10 +83,10 @@ class RecordingDetailsDbBinder(object):
         logger.debug("Search result: " + str(result))
         return result
 
-    def delete(self, recording_id):
+    def delete(self, campaign_id, recording_id):
         logger.debug("Going to delete " + str(recording_id))
         result = self.session.query(RecordingDetailsDao)\
-                    .filter(RecordingDetailsDao.cid == recording_id)\
+                    .filter(and_(RecordingDetailsDao.cid == recording_id, RecordingDetailsDao.campaign_id == campaign_id))\
                     .delete()
         self.session.commit()
         return result

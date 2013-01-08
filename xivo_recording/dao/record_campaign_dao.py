@@ -47,7 +47,7 @@ class RecordCampaignDbBinder(object):
     def __init__(self, session):
         self.session = session
 
-    def get_records_as_dict(self, search=None, checkCurrentlyRunning=False):
+    def get_records(self, search=None, checkCurrentlyRunning=False):
         my_query = self.session.query(RecordCampaignDao)
         if search != None:
             logger.debug("Search search_pattern: " + str(search))
@@ -57,8 +57,10 @@ class RecordCampaignDbBinder(object):
             now = datetime.now()
             my_query = my_query.filter(and_(RecordCampaignDao.start_date <= str(now),
                                                RecordCampaignDao.end_date >= str(now)))
+        return my_query.all()
 
-        return table_list_to_list_dict(my_query.all())
+    def get_records_as_dict(self, search=None, checkCurrentlyRunning=False):
+        return table_list_to_list_dict(self.get_records(search, checkCurrentlyRunning))
 
     def id_from_name(self, name):
         result = self.session.query(RecordCampaignDao).filter_by(campaign_name=name).first()
@@ -73,7 +75,6 @@ class RecordCampaignDbBinder(object):
             if((k == "start_date" or k == "end_date") and type(v) == str):
                 v = str_to_datetime(v)
             setattr(record, k, v)
-            logger.debug("RecordCampaignDbBinder - add: " + str(k) + " = " + str(v))
         self._validate_campaign(record)
         try:
             logger.debug("inserting")
