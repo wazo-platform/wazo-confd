@@ -26,4 +26,3 @@ class ServiceManager(object):
 
     def run(self):
         self.flaskServer.run()
-

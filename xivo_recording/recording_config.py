@@ -18,6 +18,7 @@
 
 from gevent import httplib
 
+
 class RecordingConfig(object):
 
     XIVO_RECORD_SERVICE_ADDRESS = "127.0.0.1"

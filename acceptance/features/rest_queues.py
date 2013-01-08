@@ -24,26 +24,24 @@ from xivo_recording.services.manager_utils import _init_db_connection
 import random
 
 
-
-
 class RestQueues:
 
     def __init__(self):
         self.queue = QueueFeatures()
         _init_db_connection()
-        
+
     def create(self, queue_name):
         alea = random.randint(10000, 99999999)
         self.queue.id = str(alea)
         self.queue.name = queue_name + str(alea)
         self.queue.displayname = queue_name
         try:
-            queue_features_dao.add_queue(self.queue);
+            queue_features_dao.add_queue(self.queue)
         except Exception as e:
             print "got exception: ", e
             raise e
         return True
-    
+
     def create_if_not_exists(self, queue_id):
         try:
             queue_features_dao.get(queue_id)
@@ -52,14 +50,14 @@ class RestQueues:
             self.queue.name = "test_lettuce" + str(queue_id)
             self.queue.displayname = self.queue.name
             try:
-                queue_features_dao.add_queue(self.queue);
+                queue_features_dao.add_queue(self.queue)
             except Exception as e:
                 print "got exception: ", e
                 raise e
             return True
         else:
             return True
-        
+
     def list(self, columnName, searchItem):
         connection = RecordingConfig.getWSConnection()
 
@@ -78,5 +76,5 @@ class RestQueues:
             if queue[columnName].startswith(searchItem):
                 result = True
                 break
-        
+
         return result

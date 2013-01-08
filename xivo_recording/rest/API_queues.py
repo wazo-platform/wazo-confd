@@ -35,7 +35,7 @@ class APIQueues(object):
         try:
             logger.debug("List args:" + str(request.args))
             result = self._queue_management.get_all_queues()
-            result = sorted(result, key = lambda k:k['number'])
+            result = sorted(result, key=lambda k: k['number'])
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")

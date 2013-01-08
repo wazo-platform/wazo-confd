@@ -78,3 +78,20 @@ class APIRecordings(object):
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
             return make_response(str(e.args), 500)
+
+    def delete(self, campaign_id, recording_id):
+        try:
+            logger.debug("Entering delete:", str(campaign_id), ", ", str(recording_id))
+            result = self._recording_manager. \
+                        delete(campaign_id, recording_id)
+            body = rest_encoder.encode(result)
+            logger.debug("result encoded")
+            if result:
+                logger.debug("deleted")
+                return make_response(body, 200)
+            else:
+                logger.debug("error when deleting")
+                return make_response(body, 500)
+        except Exception as e:
+            logger.debug("got exception:" + str(e.args))
+            return make_response(str(e.args), 500)

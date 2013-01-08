@@ -41,8 +41,9 @@ from xivo_recording.recording_config import RecordingConfig
 import logging
 
 logger = logging.getLogger(__name__)
-    
-def _init_db_connection(binderClass = None):
+
+
+def _init_db_connection(binderClass=None):
     '''Initialise la connexion à la base de données, et renvoie, si nécessaire, une instance de la
     classe passée en paramètre. Cette classe doit posséder une méthode statique new_from_uri()'''
     dbconnection.unregister_db_connection_pool()
@@ -51,7 +52,8 @@ def _init_db_connection(binderClass = None):
     dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI, 'asterisk')
     if binderClass != None:
         return binderClass.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-    
+
+
 def reconnectable(attribute_name):
     '''Décorateur permettant de rétablir la connexion à la base de données si elle a été perdue.
     Il est à utiliser sur les méthodes (uniquement les méthodes, pas les fonctions simples)

@@ -40,6 +40,7 @@ from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
 import logging
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
+from acceptance.features.campaigns_steps import campaign_id
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,6 @@ class RecordingManagement:
 
     def __init__(self):
         self.recording_details_db = _init_db_connection(RecordingDetailsDbBinder)
-        #self.recording_details_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
         self.agentFeatDao = AgentFeaturesDAO(self.recording_details_db.session)
 
     @reconnectable("recording_details_db")
@@ -56,7 +56,7 @@ class RecordingManagement:
         """
         Converts data to the final format and calls the DAO
         """
-        logger.debug("Add_recording")
+        logger.debug("Add_recording: " + str(campaign_id) + ", " + str(params))
         recording_details = {}
         for item in params:
             if (item == 'agent_no'):
@@ -73,18 +73,15 @@ class RecordingManagement:
     @reconnectable("recording_details_db")
     def get_recordings_as_dict(self, campaign_id, search=None):
         logger.debug("get_recordings_as_dict")
-
         search_pattern = {}
         for item in search:
             if (item == 'agent_no'):
                 search_pattern["agent_id"] = self.agentFeatDao.agent_id(search['agent_no'])
             else:
                 search_pattern[item] = search[item]
-
         result = self.recording_details_db. \
                             get_recordings_as_list(campaign_id, search_pattern)
-
-        return result
+        return self.insert_agent_no(result)
 
     @reconnectable("recording_details_db")
     def search_recordings(self, campaign_id, search):
@@ -92,4 +89,19 @@ class RecordingManagement:
         if(search == None or search == {} or 'key' not in search):
             return self.get_recordings_as_dict(campaign_id)
         else:
-            return self.recording_details_db.search_recordings(campaign_id, search['key'])
+            result = self.recording_details_db.search_recordings(campaign_id, search['key'])
+            return self.insert_agent_no(result)
+
+    def insert_agent_no(self, liste):
+        for row in liste:
+            agent_no = ''
+            for column in row:
+                if column == 'agent_id':
+                    agent_no = self.agentFeatDao.agent_number(row[column])
+            row['agent_no'] = agent_no
+        return liste
+
+    @reconnectable("recording_details_db")
+    def delete(self, campaign_id, recording_id):
+        result = self.recording_details_db.delete(recording_id)
+        return result == 1

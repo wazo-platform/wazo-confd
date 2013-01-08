@@ -19,7 +19,6 @@
 import random
 import unittest
 from xivo_dao.alchemy import dbconnection
-from xivo_recording.dao.tests.table_utils import contains
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
@@ -74,7 +73,6 @@ class TestRecordingDao(unittest.TestCase):
         end_time = "2004-10-19 10:23:56"
         caller = "+" + str(random.randint(1000, 9999))
         client_id = "satisfied client Žluťoučký kůň"
-        agent_id = 2
         campaign_id = 3
 
         expected_dir = {"cid": cid,
@@ -84,7 +82,7 @@ class TestRecordingDao(unittest.TestCase):
                         "end_time": end_time,
                         "caller": caller,
                         "client_id": client_id,
-                        "agent_id": 1
+                        "agent_id": 2
                         }
 
         expected_object = RecordingDetailsDao()
@@ -96,7 +94,7 @@ class TestRecordingDao(unittest.TestCase):
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
         record_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-        record_db.add(expected_dir)
+        record_db.add_recording(expected_dir)
         records = record_db.get_records()
 
         print("read from database:")
@@ -106,7 +104,5 @@ class TestRecordingDao(unittest.TestCase):
         print("saved:")
         print(expected_object.to_string())
 
-        self.assert_(contains(records,
-                              lambda record: record.to_string() == expected_object.to_string()),
+        self.assert_(expected_object in records,
                      "Write/read from database failed")
-

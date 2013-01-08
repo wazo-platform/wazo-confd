@@ -53,7 +53,8 @@ class RecordingDetailsDbBinder(object):
                     search_pattern[item] = search[item]
 
         logger.debug("Search search_pattern: " + str(search_pattern))
-        return table_list_to_list_dict(self.session.query(RecordingDetailsDao).filter_by(**search_pattern))
+        return table_list_to_list_dict(self.session.query(RecordingDetailsDao)\
+                                       .filter_by(**search_pattern))
 
     def add_recording(self, params):
         record = RecordingDetailsDao()
@@ -69,14 +70,25 @@ class RecordingDetailsDbBinder(object):
         return True
 
     def search_recordings(self, campaign_id, key):
-        logger.debug("campaign id = " + str(campaign_id) + ", key = " + str(key))
-        #jointure interne: RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
+        logger.debug("campaign id = " + str(campaign_id)\
+                      + ", key = " + str(key))
+        #jointure interne:
+        #RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
         query = self.session.query(RecordingDetailsDao)\
                         .join(AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id)\
-                        .filter(and_(RecordingDetailsDao.campaign_id == campaign_id, or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
+                        .filter(and_(RecordingDetailsDao.campaign_id == campaign_id,\
+                                     or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
         logger.debug("generated query: " + str(query))
         result = table_list_to_list_dict(query)
         logger.debug("Search result: " + str(result))
+        return result
+
+    def delete(self, recording_id):
+        logger.debug("Going to delete " + str(recording_id))
+        result = self.session.query(RecordingDetailsDao)\
+                    .filter(RecordingDetailsDao.cid == recording_id)\
+                    .delete()
+        self.session.commit()
         return result
 
     @classmethod

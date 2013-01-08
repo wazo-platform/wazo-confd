@@ -78,6 +78,11 @@ root.add_url_rule("/<campaign_id>/",
                   getattr(APIRecordings(), "add_recording"),
                   methods=["POST"])
 
+root.add_url_rule("/<campaign_id>/<recording_id>",
+                  "delete",
+                  getattr(APIRecordings(), "delete"),
+                  methods=["DELETE"])
+
 # ****************** #
 #   Queues server    #
 # ****************** #

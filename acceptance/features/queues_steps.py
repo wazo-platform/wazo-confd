@@ -21,10 +21,12 @@ from lettuce import step
 
 restqueues = RestQueues()
 
+
 @step(u'When I create a queue "([^"]*)"')
 def when_i_create_a_queue(step, group1):
     global restqueues
     assert restqueues.create("test_lettuce")
+
 
 @step(u'Then I can consult this queue')
 def then_i_can_consult_this_queue(step):

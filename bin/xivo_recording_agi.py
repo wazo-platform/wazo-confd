@@ -57,7 +57,7 @@ def get_detailed_variables():
     xivo_vars = {}
     xivo_vars['campaign_id'] = agi.get_variable('QR_CAMPAIGN_ID')
     xivo_vars['base_filename'] = agi.get_variable('QR_BASE_FILENAME')
-    xivo_vars['agent'] = agi.get_variable('QR_AGENT_NB')
+    xivo_vars['agent_no'] = agi.get_variable('QR_AGENT_NB')
     xivo_vars['caller'] = agi.get_variable('QR_CALLER_NB')
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
@@ -203,7 +203,7 @@ def save_call_details():
     recording['filename'] = filename
     recording['campaign_id'] = xivo_vars['campaign_id']
     recording['start_time'] = xivo_vars['start_time']
-    recording['agent'] = xivo_vars['agent']
+    recording['agent_no'] = xivo_vars['agent_no']
     recording['caller'] = xivo_vars['caller']
     sys.exit(save_recording(recording))
 

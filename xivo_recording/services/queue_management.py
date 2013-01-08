@@ -46,10 +46,10 @@ logger = logging.getLogger(__name__)
 
 
 class QueueManagement:
-           
+
     def __init__(self):
         _init_db_connection()
-    
+
     @reconnectable(None)
     def get_all_queues(self):
         result = queue_features_dao.all()
