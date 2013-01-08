@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /var/lib/pf-xivo/sounds/campagnes
+find -mtime +30 -delete
