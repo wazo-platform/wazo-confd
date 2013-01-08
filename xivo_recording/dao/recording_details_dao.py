@@ -68,6 +68,7 @@ class RecordingDetailsDbBinder(object):
             self.session.add(record)
             self.session.commit()
         except Exception as e:
+            logger.error("SQL exception:" + e.message)
             self.session.rollback()
             raise e
         return True

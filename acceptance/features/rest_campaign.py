@@ -111,11 +111,10 @@ class RestCampaign(object):
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
                         "/" + str(campaign_id) + '/'
 
-        agent_id = self.agentFeatDao.agent_id(agent_no)
         recording = {}
         recording['cid'] = callid
         recording['caller'] = caller
-        recording['agent_id'] = agent_id
+        recording['agent_no'] = agent_no
         recording['time'] = time
         recording['queue_name'] = queue_name
         body = rest_encoder.encode(recording)
@@ -124,13 +123,12 @@ class RestCampaign(object):
         connection.request("POST", requestURI, body, headers)
 
         reply = connection.getresponse()
-        print("\nreply: " + reply.read() + '\n')
+        response = reply.read()
 
         # TODO : Verify the Content-type
         # replyHeader = reply.getheaders()
 
-        assert reply.status == 201
-        return (reply.status == 201)
+        return (reply.status, response)
 
     def verifyRecordingsDetails(self, campaign_id, callid):
         connection = RecordingConfig.getWSConnection()
@@ -208,4 +206,12 @@ class RestCampaign(object):
 
             self.agentFeatDao.add_agent(agent_features)
             return agent_features.id
+
+    def agent_exists(self, agent_no):
+        try:
+            agent_id = self.agentFeatDao.agent_id(agent_no)
+            return agent_id
+        except LookupError:
+            return 0
+        return -1
 
