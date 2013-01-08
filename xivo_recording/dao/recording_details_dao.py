@@ -20,9 +20,8 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
-from sqlalchemy.schema import Table, MetaData, Column, ForeignKey
+from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.sql.expression import or_, and_
-from sqlalchemy.types import Integer
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_recording.dao.generic_dao import GenericDao
@@ -49,7 +48,7 @@ class RecordingDetailsDbBinder(object):
     def get_recordings_as_list(self, campaign_id, search=None):
         search_pattern = {}
         search_pattern['campaign_id'] = campaign_id
-        if search:
+        if search != None:
             for item in search:
                     search_pattern[item] = search[item]
 
@@ -69,11 +68,15 @@ class RecordingDetailsDbBinder(object):
         return True
 
     def search_recordings(self, campaign_id, key):
+        logger.debug("campaign id = " + str(campaign_id) + ", key = " + str(key))
+        #jointure interne: RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
         query = self.session.query(RecordingDetailsDao)\
                         .join(AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id)\
                         .filter(and_(RecordingDetailsDao.campaign_id == campaign_id, or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
         logger.debug("generated query: " + str(query))
-        return table_list_to_list_dict(query)
+        result = table_list_to_list_dict(query)
+        logger.debug("Search result: " + str(result))
+        return result
     
     @classmethod
     def new_from_uri(cls, uri):

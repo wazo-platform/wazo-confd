@@ -75,6 +75,7 @@ def given_there_is_a_campaign_of_id(step, campaign_id):
     rest_campaign = RestCampaign()
     assert rest_campaign.create_if_not_exists(campaign_id), 'The campaign could not be created'
 
+
 @step(u'Given there is an agent "([^"]*)"')
 def given_there_is_an_agent(step, agent_no):
     id = rest_campaign.add_agent_if_not_exists(agent_no)
