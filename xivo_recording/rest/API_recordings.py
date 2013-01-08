@@ -38,7 +38,12 @@ class APIRecordings(object):
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
 
-        result = self._recording_manager.add_recording(campaign_id, body)
+        try:
+            result = self._recording_manager.add_recording(campaign_id, body)
+        except Exception as e:
+            body = "SQL Error: " + str(e.message)
+            return make_response(body, 400)
+
         if (result == True):
             return make_response(("Added: " + str(result)), 201)
         else:

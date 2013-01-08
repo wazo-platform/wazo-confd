@@ -63,6 +63,7 @@ class RecordingDetailsDbBinder(object):
             self.session.add(record)
             self.session.commit()
         except Exception as e:
+            logger.error("SQL exception:" + e.message)
             self.session.rollback()
             raise e
         return True
@@ -77,7 +78,7 @@ class RecordingDetailsDbBinder(object):
         result = table_list_to_list_dict(query)
         logger.debug("Search result: " + str(result))
         return result
-    
+
     @classmethod
     def new_from_uri(cls, uri):
         try:

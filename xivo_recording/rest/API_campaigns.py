@@ -19,7 +19,7 @@
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
-from xivo_recording.dao.exceptions import NoSuchElementException,\
+from xivo_recording.dao.exceptions import NoSuchElementException, \
     InvalidInputException
 from xivo_recording.services.campagne_management import CampagneManagement
 import logging
@@ -61,7 +61,7 @@ class APICampaigns(object):
             checkCurrentlyRunning = False
             params = {}
             if campaign_id != None:
-                params['id']= campaign_id
+                params['id'] = campaign_id
             for item in request.args:
                 if item == 'running':
                     checkCurrentlyRunning = (request.args[item] == 'true')
@@ -86,7 +86,6 @@ class APICampaigns(object):
                               " body: " + str(body) +
                               " args: " + str(request.args)),
                              501)
-
 
     def update(self, campaign_id):
         try:

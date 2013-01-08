@@ -19,7 +19,6 @@
 from xivo_dao.alchemy import dbconnection
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDao, \
     RecordCampaignDbBinder
-from xivo_recording.dao.tests.table_utils import contains
 from xivo_recording.recording_config import RecordingConfig
 import random
 import unittest
@@ -50,18 +49,20 @@ class TestRecordCampaignDao(unittest.TestCase):
 
         unique_id = str(random.randint(10000, 99999999))
         campaign_name = "campaign-àé" + unique_id
-        queue_id = 1
+        queue_id = "1"
         base_filename = campaign_name + "-"
 
-        expected_dir = {
-            "campaign_name": campaign_name,
-            "activated": False,
-            "base_filename": base_filename,
-            "queue_id": queue_id
+        expected_dict = {
+            u"campaign_name": campaign_name,
+            u"activated": "False",
+            u"base_filename": base_filename,
+            u"queue_id": queue_id,
+            u"start_date": '2012-01-01 12:12:12',
+            u"end_date": '2012-12-12 12:12:12',
         }
 
         expected_object = RecordCampaignDao()
-        for k, v in expected_dir.items():
+        for k, v in expected_dict.items():
             setattr(expected_object, k, v)
 
         dbconnection.unregister_db_connection_pool()
@@ -71,16 +72,16 @@ class TestRecordCampaignDao(unittest.TestCase):
         record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
         if record_db == None:
             self.fail("record_db is None, database connexion error")
-        record_db.add(expected_dir)
-        records = record_db.get_records()
+
+        expected_dict[u"id"] = str(record_db.add(expected_dict))
+
+        records = record_db.get_records_as_dict()
 
         print("read from database:")
         for record in records:
-            print(record.to_string())
+            print(str(record))
 
         print("saved:")
-        print(expected_object.to_string())
+        print(str(expected_dict))
 
-        self.assert_(contains(records, lambda record:
-                        record.to_string() == expected_object.to_string()),
-                        "Write/read from database failed")
+        self.assert_(expected_dict in records)

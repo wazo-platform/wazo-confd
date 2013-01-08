@@ -31,17 +31,25 @@ class CampagneManagement:
 
     def __init__(self):
         self.record_db = _init_db_connection(RecordCampaignDbBinder)
-    
+
     @reconnectable("record_db")
     def create_campaign(self, params):
         result = self.record_db.add(params)
         return result
 
-    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning = False):
+    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False):
         """
         Calls the DAO and converts data to the final format
         """
-        result = self._get_campaigns_as_dict(search, checkCurrentlyRunning)
+
+        search_pattern = {}
+        for item in search:
+            if (item == 'queue_name'):
+                search_pattern["queue_id"] = queue_features_dao.id_from_name(search["queue_name"])
+            else:
+                search_pattern[item] = search[item]
+
+        result = self._get_campaigns_as_dict(search_pattern, checkCurrentlyRunning)
 
         try:
             for item in result:
@@ -54,19 +62,20 @@ class CampagneManagement:
             raise DataRetrieveError("DAO failure(" + str(e) + ")!")
 
         return result
-    
+
     @reconnectable("record_db")
-    def _get_campaigns_as_dict(self, search=None, checkCurrentlyRunning = False):
+    def _get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False):
         logger.debug("get_campaigns_as_dict")
+
         result = self.record_db.get_records_as_dict(search, checkCurrentlyRunning)
         return result
-    
+
     @reconnectable("record_db")
     def update_campaign(self, campaign_id, params):
         logger.debug('going to update')
         result = self.record_db.update(campaign_id, params)
         return result
-        
+
     def supplement_add_input(self, data):
         '''Returns the supplemented input'''
         logger.debug("Supplementing input for 'add'")
@@ -78,7 +87,7 @@ class CampagneManagement:
         if(("end_date" not in data) or data["end_date"] == None):
             data["end_date"] = datetime.now().strftime("%Y-%m-%d")
         return data
-    
+
     def supplement_edit_input(self, data):
         for key in data:
             if(data[key] == ''):

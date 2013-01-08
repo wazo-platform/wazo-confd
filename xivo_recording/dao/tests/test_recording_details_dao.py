@@ -28,8 +28,8 @@ from xivo_recording.dao.recording_details_dao import RecordingDetailsDao, \
 class TestRecordingDao(unittest.TestCase):
     '''
     Test pre-conditions:
-    - an agent with number 2002
-    - a campaign named prijem
+    - an agent with id 2
+    - a campaign with id 3
     - a type called call_dir_type and a table called recording in Asterisk database :
 
     CREATE TYPE call_dir_type AS ENUM
@@ -40,22 +40,27 @@ class TestRecordingDao(unittest.TestCase):
 
     CREATE TABLE recording
     (
-      cid character varying(32) NOT NULL PRIMARY KEY,
-      campaign_name character varying(128) REFERENCES record_campaign(campagne_name)
-          ON UPDATE NO ACTION ON DELETE NO ACTION,
+      cid character varying(32) NOT NULL,
       call_direction call_dir_type,
       start_time timestamp without time zone,
       end_time timestamp without time zone,
       caller character varying(32),
       client_id character varying(1024),
       callee character varying(32),
-      agent character varying(40) REFERENCES agentfeatures(number)
+      filename character varying(1024),
+      campaign_id integer NOT NULL,
+      agent_id integer NOT NULL,
+      CONSTRAINT recording_pkey PRIMARY KEY (cid ),
+      CONSTRAINT recording_agent_id_fkey FOREIGN KEY (agent_id)
+          REFERENCES agentfeatures (id) MATCH SIMPLE
+          ON UPDATE NO ACTION ON DELETE NO ACTION,
+      CONSTRAINT recording_campaign_id_fkey FOREIGN KEY (campaign_id)
+          REFERENCES record_campaign (id) MATCH SIMPLE
           ON UPDATE NO ACTION ON DELETE NO ACTION
     )
     WITH (
       OIDS=FALSE
     );
-
     ALTER TABLE recording
       OWNER TO asterisk;
 
@@ -69,18 +74,17 @@ class TestRecordingDao(unittest.TestCase):
         end_time = "2004-10-19 10:23:56"
         caller = "+" + str(random.randint(1000, 9999))
         client_id = "satisfied client Žluťoučký kůň"
-        callee = str(random.randint(100, 999))
-        agent = "2002"
+        agent_id = 2
+        campaign_id = 3
 
         expected_dir = {"cid": cid,
-                        "campaign_name": 'prijem',
+                        "campaign_id": campaign_id,
                         "call_direction": call_direction,
                         "start_time": start_time,
                         "end_time": end_time,
                         "caller": caller,
                         "client_id": client_id,
-                        "callee": callee,
-                        "agent": agent
+                        "agent_id": 1
                         }
 
         expected_object = RecordingDetailsDao()

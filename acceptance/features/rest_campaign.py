@@ -16,14 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from acceptance.features.rest_queues import RestQueues
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
-import datetime
-import random
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
+from acceptance.features.rest_queues import RestQueues
+import datetime
+import random
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
+
 
 class RestCampaign(object):
 
@@ -42,7 +43,7 @@ class RestCampaign(object):
         session = connection.get_session()
         return session
 
-    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id = None):
+    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -115,25 +116,24 @@ class RestCampaign(object):
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
                         "/" + str(campaign_id) + '/'
 
-        agent_id = self.agentFeatDao.agent_id(agent_no)
         recording = {}
         recording['cid'] = callid
         recording['caller'] = caller
-        recording['agent_id'] = agent_id
+        recording['agent_no'] = agent_no
         recording['time'] = time
-        
+
         body = rest_encoder.encode(recording)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("POST", requestURI, body, headers)
 
         reply = connection.getresponse()
-        print("\nreply: " + reply.read() + '\n')
+        response = reply.read()
 
         # TODO : Verify the Content-type
         # replyHeader = reply.getheaders()
 
-        return (reply.status == 201)
+        return (reply.status, response)
 
     def verifyRecordingsDetails(self, campaign_id, callid):
         connection = RecordingConfig.getWSConnection()
@@ -193,7 +193,6 @@ class RestCampaign(object):
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
 
-    
     def create_if_not_exists(self, campaign_id):
         result = self.getCampaign(campaign_id)
         if(result == None or len(result) == 0):
@@ -202,8 +201,6 @@ class RestCampaign(object):
             result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()), campaign_id)
             return type(result) == int and result > 0
         return True
-    
-
 
     def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName", lastname="LastName", context="default", language="fr_FR"):
         try:
@@ -223,6 +220,14 @@ class RestCampaign(object):
 
             self.agentFeatDao.add_agent(agent_features)
             return agent_features.id
+
+    def agent_exists(self, agent_no):
+        try:
+            agent_id = self.agentFeatDao.agent_id(agent_no)
+            return agent_id
+        except LookupError:
+            return 0
+        return -1
 
     def search_recordings(self, campaign_id, key):
         connection = RecordingConfig.getWSConnection()
