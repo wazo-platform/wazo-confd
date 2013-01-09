@@ -94,6 +94,7 @@ installCron() {
   cp cron_job/log_and_delete /usr/local/bin/log_and_delete
   chmod u+x /usr/local/bin/log_and_delete
   cp cron_job/xivo-recording.conf /etc/rsyslog.d/xivo-recording.conf
+  touch /var/log/asterisk/xivo-recording.log
   /etc/init.d/rsyslog restart
   TMP_CRONTAB=/tmp/crontab
   crontab -l > $TMP_CRONTAB.txt

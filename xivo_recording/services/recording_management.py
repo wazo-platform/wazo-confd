@@ -41,6 +41,7 @@ from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
 import logging
 import os
+from commands import getoutput
 
 logger = logging.getLogger(__name__)
 
@@ -107,5 +108,7 @@ class RecordingManagement:
         if(filename == None):
             return False
         else:
+            logphrase = "File " + filename + " is being deleted."
+            getoutput('logger -t xivo-recording "' + logphrase + '"')
             os.remove("/var/lib/pf-xivo/sounds/campagnes/" + filename)
             return True

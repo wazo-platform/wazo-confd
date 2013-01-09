@@ -1,3 +1,4 @@
 #!/bin/sh
+BASEDIR=$(dirname $0)
 cd /var/lib/pf-xivo/sounds/campagnes
-find -mtime +30 -exec ./log_and_delete {} +
+find -mtime +30 -exec $BASEDIR/log_and_delete {} +
