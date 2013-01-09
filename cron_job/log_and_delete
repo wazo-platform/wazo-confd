@@ -1,0 +1,7 @@
+#!/bin/sh
+for file in $@;
+do
+	message="Automatic deletion: ""$file"
+	logger -t xivo-recording "$message"
+done;
+rm $@

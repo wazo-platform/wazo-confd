@@ -88,12 +88,29 @@ startRecording() {
   fi
 }
 
+installCron() {
+  cp cron_job/delete_old_items /usr/local/bin/delete_old_items
+  chmod u+x /usr/local/bin/delete_old_items
+  cp cron_job/log_and_delete /usr/local/bin/log_and_delete
+  chmod u+x /usr/local/bin/log_and_delete
+  cp cron_job/xivo-recording.conf /etc/rsyslog.d/xivo-recording.conf
+  /etc/init.d/rsyslog restart
+  TMP_CRONTAB=/tmp/crontab
+  crontab -l > $TMP_CRONTAB.txt
+  echo "0 0 * * *  /usr/local/bin/delete_old_items" >> $TMP_CRONTAB.txt
+  crontab $TMP_CRONTAB.txt
+  RES=$?
+  rm ${TMP_CRONTAB}.txt
+  return $RES
+}
+
 install() {
   installDep
   installPy
   reloadAsterisk
   installDB
   installWebI
+  installCron
   recordingAutostart
   startRecording
 }
