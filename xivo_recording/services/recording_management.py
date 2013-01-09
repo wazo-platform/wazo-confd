@@ -35,12 +35,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
 from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
 import logging
-from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
-from acceptance.features.campaigns_steps import campaign_id
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -103,4 +103,9 @@ class RecordingManagement:
 
     @reconnectable("recording_details_db")
     def delete(self, campaign_id, recording_id):
-        return self.recording_details_db.delete(campaign_id, recording_id)
+        filename = self.recording_details_db.delete(campaign_id, recording_id)
+        if(filename == None):
+            return False
+        else:
+            os.remove("/var/lib/pf-xivo/sounds/campagnes/" + filename)
+            return True

@@ -81,12 +81,12 @@ class APIRecordings(object):
 
     def delete(self, campaign_id, recording_id):
         try:
-            logger.debug("Entering delete:", str(campaign_id), ", ", str(recording_id))
+            logger.debug("Entering delete:" + str(campaign_id) + ", " + str(recording_id))
             result = self._recording_manager. \
                         delete(campaign_id, recording_id)
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
-            if result == 0:
+            if not result:
                 return make_response(rest_encoder.encode("No such recording"), 404)
             else:
                 return make_response(rest_encoder.encode("Deleted: True"), 200)

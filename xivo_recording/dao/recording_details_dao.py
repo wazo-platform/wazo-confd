@@ -85,11 +85,16 @@ class RecordingDetailsDbBinder(object):
 
     def delete(self, campaign_id, recording_id):
         logger.debug("Going to delete " + str(recording_id))
-        result = self.session.query(RecordingDetailsDao)\
+        recording = self.session.query(RecordingDetailsDao)\
                     .filter(and_(RecordingDetailsDao.cid == recording_id, RecordingDetailsDao.campaign_id == campaign_id))\
-                    .delete()
-        self.session.commit()
-        return result
+                    .first()
+        if(recording == None):
+            return None
+        else:
+            filename = recording.filename
+            self.session.delete(recording)
+            self.session.commit()
+            return filename
 
     @classmethod
     def new_from_uri(cls, uri):
