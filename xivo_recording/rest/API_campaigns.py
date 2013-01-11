@@ -45,11 +45,14 @@ class APICampaigns(object):
         try:
             result = self._campagne_manager.create_campaign(body)
         except IntegrityError:
-            liste = ["duplicated_name"]
-            return make_response(rest_encoder.encode(liste), 400)
+            body = ["duplicated_name"]
+            return make_response(rest_encoder.encode(body), 400)
         except InvalidInputException as e:
-            liste = e.errors_list
-            return make_response(rest_encoder.encode(liste), 400)
+            body = e.errors_list
+            return make_response(rest_encoder.encode(body), 400)
+        except Exception as e:
+            body = [str(e)]
+            return make_response(rest_encoder.encode(body), 500)
         if (type(result) == int and result > 0):
             return make_response(str(result), 201)
         else:
@@ -74,7 +77,8 @@ class APICampaigns(object):
             return make_response(body, 200)
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(str(e.args), 500)
+            body = [str(e.args)]
+            return make_response(rest_encoder.encode(body), 500)
 
     def delete(self, resource_id):
         try:

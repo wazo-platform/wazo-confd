@@ -39,6 +39,7 @@ from sqlalchemy.exc import OperationalError
 from xivo_dao.alchemy import dbconnection
 from xivo_recording.recording_config import RecordingConfig
 import logging
+from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,4 @@
-Feature: Automatic deletion
+Feature: Automatic deletion - must be launched as super user
 
 	In order to avoid hard disk overlaoding
 	

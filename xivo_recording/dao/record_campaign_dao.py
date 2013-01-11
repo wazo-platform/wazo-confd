@@ -31,6 +31,8 @@ from xivo_recording.dao.helpers.dynamic_formatting import \
 from xivo_recording.recording_config import RecordingConfig
 from datetime import datetime
 import logging
+from xivo_recording.dao.helpers.query_utils import get_all_data,\
+    get_paginated_data
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -47,7 +49,7 @@ class RecordCampaignDbBinder(object):
     def __init__(self, session):
         self.session = session
 
-    def get_records(self, search=None, checkCurrentlyRunning=False):
+    def get_records(self, search=None, checkCurrentlyRunning=False, pagination=None):
         my_query = self.session.query(RecordCampaignDao)
         if search != None:
             logger.debug("Search search_pattern: " + str(search))
@@ -57,10 +59,14 @@ class RecordCampaignDbBinder(object):
             now = datetime.now()
             my_query = my_query.filter(and_(RecordCampaignDao.start_date <= str(now),
                                                RecordCampaignDao.end_date >= str(now)))
-        return my_query.all()
+
+        if (pagination == None):
+            return get_all_data(self.session, my_query)
+        else:
+            return get_paginated_data(self.session, my_query, pagination)
 
     def get_records_as_dict(self, search=None, checkCurrentlyRunning=False):
-        return table_list_to_list_dict(self.get_records(search, checkCurrentlyRunning))
+        return table_list_to_list_dict(self.get_records(search, checkCurrentlyRunning).all())
 
     def id_from_name(self, name):
         result = self.session.query(RecordCampaignDao).filter_by(campaign_name=name).first()
@@ -86,7 +92,7 @@ class RecordCampaignDbBinder(object):
                 self.session.rollback()
             except e:
                 logger.error("Rollback failed with exception " + str(e))
-            logger.debug("RecordCampaignDbBinder - add: " + str(e))
+            logger.error("RecordCampaignDbBinder - add: " + str(e))
             raise e
         logger.debug("returning")
         return record.id
@@ -94,7 +100,7 @@ class RecordCampaignDbBinder(object):
     def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
-            campaignsList = self.get_records({'id': campaign_id})
+            campaignsList = self.get_records({'id': campaign_id}).all()
             logger.debug("Campaigns list for update: " + str(campaignsList))
             if(len(campaignsList) == 0):
                 raise NoSuchElementException("No campaign found for id " + str(campaign_id))

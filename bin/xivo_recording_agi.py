@@ -141,7 +141,7 @@ def determinate_record():
     if queue_id == None:
         logger.error('Queue "' + xivo_vars['queue_name'] + '" not found!')
         sys.exit(1)
-    campaigns = rest_encoder.decode(get_campaigns(queue_id))
+    campaigns = rest_encoder.decode(get_campaigns(queue_id))['data']
 
     logger.debug("Campaigns: " + str(campaigns))
     base_filename = campaigns[0]['base_filename']

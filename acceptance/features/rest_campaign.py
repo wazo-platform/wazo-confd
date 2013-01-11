@@ -16,14 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest import rest_encoder
+from acceptance.features import cron_steps
+from acceptance.features.rest_queues import RestQueues
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
-from acceptance.features.rest_queues import RestQueues
-import datetime
-import random
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
+from xivo_recording.recording_config import RecordingConfig
+from xivo_recording.rest import rest_encoder
+import datetime
+import os
+import random
 
 
 class RestCampaign(object):
@@ -121,11 +123,20 @@ class RestCampaign(object):
         recording['caller'] = caller
         recording['agent_no'] = agent_no
         recording['time'] = time
+        recording['filename'] = callid + ".wav"
 
         body = rest_encoder.encode(recording)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("POST", requestURI, body, headers)
+
+        #we create the file
+        dirname = '/var/lib/pf-xivo/sounds/campagnes'
+        if(not os.path.exists(dirname)):
+            cron_steps.create_dir(dirname)
+        myfile = open(dirname + "/" + recording['filename'], 'w')
+        myfile.write('')
+        myfile.close()
 
         reply = connection.getresponse()
         response = reply.read()
@@ -179,7 +190,11 @@ class RestCampaign(object):
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         connection.request("GET", requestURI, '', headers)
         reply = connection.getresponse()
-        return rest_encoder.decode(reply.read())
+        result = rest_encoder.decode(reply.read())['data']
+        if(len(result) > 0):
+            return result[0]
+        else:
+            return None
 
     def getRunningActivatedCampaignsForQueue(self, queue_id):
         connection = RecordingConfig.getWSConnection()

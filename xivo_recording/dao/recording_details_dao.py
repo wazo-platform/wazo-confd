@@ -75,7 +75,7 @@ class RecordingDetailsDbBinder(object):
         #jointure interne:
         #RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
         query = self.session.query(RecordingDetailsDao)\
-                        .join(AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id)\
+                        .join((AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id))\
                         .filter(and_(RecordingDetailsDao.campaign_id == campaign_id,\
                                      or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
         logger.debug("generated query: " + str(query))

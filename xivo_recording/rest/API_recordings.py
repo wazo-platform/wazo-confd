@@ -37,7 +37,7 @@ class APIRecordings(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-
+        self._recording_manager.supplement_add_input(body)
         try:
             result = self._recording_manager.add_recording(campaign_id, body)
         except Exception as e:
@@ -84,7 +84,6 @@ class APIRecordings(object):
             logger.debug("Entering delete:" + str(campaign_id) + ", " + str(recording_id))
             result = self._recording_manager. \
                         delete(campaign_id, recording_id)
-            body = rest_encoder.encode(result)
             logger.debug("result encoded")
             if not result:
                 return make_response(rest_encoder.encode("No such recording"), 404)

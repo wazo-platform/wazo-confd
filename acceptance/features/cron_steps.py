@@ -7,11 +7,8 @@ import os
 directory = None
 
 
-@step(u'Given there is a directory "([^"]*)"')
-def given_there_is_a_directory_group1(step, dirname):
-    global directory
-    directory = dirname
-    exists = os.path.exists(dirname)
+def create_dir(dirname):
+    exists = False
     list_dirs = []
     head = dirname
     while not exists:
@@ -22,6 +19,12 @@ def given_there_is_a_directory_group1(step, dirname):
     for folder in list_dirs:
         head += "/" + folder
         os.mkdir(head)
+
+
+@step(u'Given there is a directory "([^"]*)"')
+def given_there_is_a_directory_group1(step, dirname):
+    global directory
+    create_dir(dirname)
     assert os.path.exists(dirname), "Could not create the directory"
 
 

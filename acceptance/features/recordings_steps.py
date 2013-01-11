@@ -97,7 +97,8 @@ def then_i_delete_this_recording_and_the_agent_group1(step, agent_no):
     global campaign_name, callid
     record_db = RecordCampaignDbBinder.new_from_uri('asterisk')
     campaign_id = record_db.id_from_name(campaign_name)
-    assert rest_campaign.deleteRecording(campaign_id, callid)[0] == 200, "Could not delete the recording"
+    res_rec = rest_campaign.deleteRecording(campaign_id, callid)
+    assert res_rec[0] == 200, "Could not delete the recording: " + str(res_rec)
     assert rest_campaign.delete_agent(agent_no), "Could not delete the agent"
 
 

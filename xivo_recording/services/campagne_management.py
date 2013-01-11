@@ -16,12 +16,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
 from xivo_dao import queue_features_dao
 from xivo_recording.dao.exceptions import DataRetrieveError
+from xivo_recording.dao.helpers.query_utils import get_paginated_data,\
+    get_all_data
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
-from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,11 +39,11 @@ class CampagneManagement:
         result = self.record_db.add(params)
         return result
 
-    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False):
+    @reconnectable("record_db")
+    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False, paginator=None):
         """
         Calls the DAO and converts data to the final format
         """
-
         search_pattern = {}
         for item in search:
             if (item == 'queue_name'):
@@ -49,10 +51,10 @@ class CampagneManagement:
             else:
                 search_pattern[item] = search[item]
 
-        result = self._get_campaigns_as_dict(search_pattern, checkCurrentlyRunning)
+        result = self.record_db.get_records(search, checkCurrentlyRunning)
 
         try:
-            for item in result:
+            for item in result['data']:
                 item["queue_name"] = queue_features_dao. \
                                         queue_name(item["queue_id"])
                 item["queue_display_name"], item["queue_number"] = queue_features_dao.\
@@ -61,13 +63,6 @@ class CampagneManagement:
             logger.critical("DAO failure(" + str(e) + ")!")
             raise DataRetrieveError("DAO failure(" + str(e) + ")!")
 
-        return result
-
-    @reconnectable("record_db")
-    def _get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False):
-        logger.debug("get_campaigns_as_dict")
-
-        result = self.record_db.get_records_as_dict(search, checkCurrentlyRunning)
         return result
 
     @reconnectable("record_db")

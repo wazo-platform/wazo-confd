@@ -1,4 +1,3 @@
-
 Feature: Call recordings management
 
 	In order to create, consult and delete call recordings
@@ -9,7 +8,6 @@ Feature: Call recordings management
 	  When I save call details for a call referenced by its "callid" in campaign "test_campaign" replied by agent with number "1111"
 	  Then I get a response with error code '400' and message 'SQL Error: No such agent'
 
-
 	Scenario: Recording creation and consultation
 	  Given there is a campaign named "test_campaign"
 	  Given there is an agent with number "1111"
@@ -17,7 +15,6 @@ Feature: Call recordings management
 	  Then I can consult these details
 	  Then I delete this recording and the agent "1111"
 
-  
 	Scenario: Recording consultation and removing
 	  Given there is a campaign named "test_campaing"
 	  Given there is an agent of number "222"
@@ -43,3 +40,4 @@ Feature: Call recordings management
 	  Given I create a recording for campaign "1" with caller "123" and agent "123"
 	  When I search recordings in the campaign "1" with the key "111"
 	  Then I get the first two recordings
+	  

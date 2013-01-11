@@ -42,3 +42,11 @@ class InvalidInputException(Exception):
 
     def __str__(self):
         return self.value + " : " + str(self.errors_list)
+
+
+class InvalidPaginatorException(Exception):
+    pass
+
+
+class EmptyPageException(Exception):
+    pass

@@ -73,7 +73,7 @@ class TestRecordingDao(unittest.TestCase):
         end_time = "2004-10-19 10:23:56"
         caller = "+" + str(random.randint(1000, 9999))
         client_id = "satisfied client Žluťoučký kůň"
-        campaign_id = 3
+        campaign_id = 1
 
         expected_dir = {"cid": cid,
                         "campaign_id": campaign_id,
@@ -82,24 +82,25 @@ class TestRecordingDao(unittest.TestCase):
                         "end_time": end_time,
                         "caller": caller,
                         "client_id": client_id,
-                        "agent_id": 2
+                        "agent_id": 50
                         }
 
         expected_object = RecordingDetailsDao()
         for k, v in expected_dir.items():
             setattr(expected_object, k, v)
 
+        RecordingConfig.RECORDING_DB_URI = "postgresql://asterisk:proformatique@127.0.0.1:5433/asterisk"
         dbconnection.unregister_db_connection_pool()
         dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
 
         record_db = RecordingDetailsDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
         record_db.add_recording(expected_dir)
-        records = record_db.get_records()
+        records = record_db.get_recordings_as_list(campaign_id)
 
         print("read from database:")
         for record in records:
-            print(record.to_string())
+            print(str(record))
 
         print("saved:")
         print(expected_object.to_string())

@@ -49,7 +49,7 @@ def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
 def then_i_can_consult_this_campaign(step):
     r_campaign = RestCampaign()
     global campaign_name
-    liste = [item["campaign_name"] for item in r_campaign.list()]
+    liste = [item["campaign_name"] for item in r_campaign.list()['data']]
     assert campaign_name in liste, campaign_name + " not in " + str(liste)
 
 
@@ -80,7 +80,7 @@ def when_i_ask_for_activated_campaigns_for_queue_group1(step, local_queue_id):
     queue_id = local_queue_id
     r_campaign = RestCampaign()
     global activated_campaigns
-    activated_campaigns = r_campaign.get_activated_campaigns(int(local_queue_id))
+    activated_campaigns = r_campaign.get_activated_campaigns(int(local_queue_id))['data']
     assert (activated_campaigns != None), "No activated campaign"
 
 
@@ -98,14 +98,15 @@ def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_ca
         queue_id
 
 
-@step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
-def edition_step_prerequisite(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
-    r_campaign = RestCampaign()
-    global campaign_id
-    new_campaign_name = local_campaign_name + str(random.randint(100, 999))
-    campaign_id = r_campaign.create(new_campaign_name, local_queue_id, True, local_start_date, local_end_date)
-    assert r_campaign.getCampaign(campaign_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
-                                    local_campaign_name + ' not properly inserted'
+#@step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+#def edition_step_prerequisite(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
+#    r_campaign = RestCampaign()
+#    global campaign_id
+#    new_campaign_name = local_campaign_name + str(random.randint(100, 999))
+#    campaign_id = r_campaign.create(new_campaign_name, local_queue_id, True, local_start_date, local_end_date)
+#    campaign = r_campaign.getCampaign(campaign_id)
+#    assert campaign["campaign_name"] == new_campaign_name, 'Campaign ' + \
+#                                    local_campaign_name + ' not properly inserted'
 
 
 @step(u'When I change its name to "([^"]*)", its queue to "([^"]*)", its start date to "([^"]*)" and its end date to "([^"]*)"')
@@ -128,7 +129,7 @@ def edition_step_execution(step, local_campaign_name, local_queue_id, local_star
 def then_the_campaign_is_actually_modified(step):
     r_campaign = RestCampaign()
     global campaign_id, campaign_name, queue_id, start_date, end_date
-    campaign = r_campaign.getCampaign(campaign_id)[0]
+    campaign = r_campaign.getCampaign(campaign_id)
     assert campaign['campaign_name'] == campaign_name, "Name not properly modified"
     assert campaign['queue_id'] == queue_id, "Queue not properly modified"
     assert campaign['start_date'] == start_date, "Start date not properly modified"
@@ -152,7 +153,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     d = datetime.timedelta(days=1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now - d).strftime("%Y-%m-%d"),
                                                                 (now + d).strftime("%Y-%m-%d"))
-    assert r_campaign.getCampaign(gen_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
+    assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     campaign_name + ' not properly inserted'
 
 
@@ -166,7 +167,7 @@ def given_i_create_a_non_activated_campaign_group1_pointing_to_queue_group2_curr
     d = datetime.timedelta(days=1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, False, (now - d).strftime("%Y-%m-%d"),
                                (now + d).strftime("%Y-%m-%d"))
-    assert r_campaign.getCampaign(gen_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
+    assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     campaign_name + ' not properly inserted'
 
 
@@ -180,7 +181,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     d = datetime.timedelta(days=1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now + d).strftime("%Y-%m-%d"),
                                (now + 2 * d).strftime("%Y-%m-%d"))
-    assert r_campaign.getCampaign(gen_id)[0]["campaign_name"] == new_campaign_name, 'Campaign ' + \
+    assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     campaign_name + ' not properly inserted'
 
 
@@ -188,7 +189,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
 def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_id):
     r_campaign = RestCampaign()
     global list_running_campaigns
-    list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(queue_id)
+    list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(queue_id)['data']
     assert len(list_running_campaigns) > 0, 'No campaign retrieved'
 
 
@@ -206,7 +207,7 @@ def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, group1, g
 def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(step):
     r_campaign = RestCampaign()
     global campaign_name
-    liste = r_campaign.list()
+    liste = r_campaign.list()['data']
     result = False
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     for item in liste:
@@ -216,8 +217,17 @@ def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(
     assert result, 'Campaign not created with the current date: '
 
 
-@step(u'I cannot create a campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
-def i_cannot_a_campaign_group1_with_start_date_group2_and_end_date_group3(step, local_campaign_name, start_date, end_date):
+@step(u'When I ask for all the campaigns')
+def when_i_ask_for_all_the_campaigns(step):
     r_campaign = RestCampaign()
-    result = r_campaign.create(local_campaign_name + str(random.randint(100, 999)), 1, True, start_date, end_date)
-    assert result[0] == "start_greater_than_end", result
+    assert False, 'This step must be implemented'
+
+
+@step(u'Then the displayed total is equal to the actual number of campaigns')
+def then_the_displayed_total_is_equal_to_the_actual_number_of_campaigns(step):
+    assert False, 'This step must be implemented'
+    
+
+@step(u'Then I get an error code \'([^\']*)\' with message \'([^\']*)\'')
+def then_i_get_an_error_code_group1_with_message_group2(step, group1, group2):
+    assert False, 'This step must be implemented'

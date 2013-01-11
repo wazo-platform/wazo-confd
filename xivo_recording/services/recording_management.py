@@ -112,3 +112,11 @@ class RecordingManagement:
             getoutput('logger -t xivo-recording "' + logphrase + '"')
             os.remove("/var/lib/pf-xivo/sounds/campagnes/" + filename)
             return True
+
+    def supplement_add_input(self, data):
+        '''Returns the supplemented input'''
+        logger.debug("Supplementing input for 'add_recording'")
+        for key in data:
+            if(data[key] == ''):
+                data[key] = None
+        return data
