@@ -21,6 +21,7 @@ from flask.helpers import make_response
 import rest_encoder
 from xivo_recording.services.recording_management import RecordingManagement
 import logging
+from pip import req
 
 
 logger = logging.getLogger(__name__)
@@ -52,8 +53,15 @@ class APIRecordings(object):
     def list_recordings(self, campaign_id):
         try:
             logger.debug("List args:" + str(request.args))
+            technical_params = {}
+            params = {}
+            for item in request.args:
+                if(item[0] == "_"):
+                    technical_params[item] = request.args[item]
+                else:
+                    params[item] = request.args[item]
             result = self._recording_manager. \
-                        get_recordings_as_dict(campaign_id, request.args)
+                        get_recordings_as_dict(campaign_id, params, technical_params)
 
             logger.debug("got result")
             body = rest_encoder.encode(result)
@@ -67,17 +75,23 @@ class APIRecordings(object):
     def search(self, campaign_id):
         try:
             logger.debug("List args:" + str(request.args))
+            technical_params = {}
+            params = {}
+            for item in request.args:
+                if(item[0] == "_"):
+                    technical_params[item] = request.args[item]
+                else:
+                    params[item] = request.args[item]
             result = self._recording_manager. \
-                        search_recordings(campaign_id, request.args)
+                        search_recordings(campaign_id, params, technical_params)
 
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
             return make_response(body, 200)
-
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(str(e.args), 500)
+            return make_response(rest_encoder.encode(str(e.args)), 500)
 
     def delete(self, campaign_id, recording_id):
         try:

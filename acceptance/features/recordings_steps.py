@@ -38,6 +38,8 @@ add_result = None
 result = []
 callid_list = []
 del_result = None
+single_result = None
+result_list = []
 
 
 @step(u'Given there is no agent with number "([^"]*)"')
@@ -159,7 +161,7 @@ def given_i_create_a_recording_for_campaign_with_caller_and_agent(step, campaign
 @step(u'When I search recordings in the campaign "([^"]*)" with the key "([^"]*)"')
 def when_i_search_recordings_in_the_campaign_with_the_key(step, campaign_id, key):
     global result
-    result = rest_campaign.search_recordings(campaign_id, key)
+    result = rest_campaign.search_recordings(campaign_id, key)['data']
     assert len(result) > 0, 'No recording retrieved'
 
 
@@ -185,3 +187,58 @@ def given_there_is_no_recording_referenced_by_a_group1_in_campaign_group2(step, 
 def then_i_get_a_response_with_error_code_group1_with_message_group2(step, code, message):
     global del_result
     assert del_result == (int(code), message), "Got wrong response: " + str(del_result) + ", expected " + str((code, message))
+
+
+@step(u'Given there are at least "([^"]*)" recordings for "([^"]*)" and agent "([^"]*)"')
+def given_there_are_at_least_group1_recordings_for_group2_and_agent_group3(step, num_rec, campaign, agent):
+    res = rest_campaign.search_recordings(campaign, agent)
+    if(res['total'] < int(num_rec)):
+        i = res['total']
+        while(i < int(num_rec)):
+            rest_campaign.addRecordingDetails(campaign, str(random.randint(1000,9999)), "222", agent, time)
+            i += 1
+        res = rest_campaign.search_recordings(campaign, agent)
+    assert res['total'] >= int(num_rec), 'Not enough recordings: ' + str(res)
+
+
+@step(u'When I ask for the recordings of "([^"]*)"')
+def when_i_ask_for_the_recordings_of_group1(step, campaign):
+    global single_result
+    single_result = rest_campaign.search_recordings(campaign)
+
+
+@step(u'Then the displayed total is equal to the actual number of recordings')
+def then_the_displayed_total_is_equal_to_the_actual_number_of_recordings(step):
+    global single_result
+    assert single_result['total'] == len(single_result['data']), 'Inconsistent number'
+
+
+@step(u'When I ask for a list of recordings for "([^"]*)" with page "([^"]*)" and page size "([^"]*)"')
+def when_i_ask_for_a_list_of_recordings_for_group1_with_page_group1_and_page_size_group3(step, campaign, page, pagesize):
+    global single_result
+    single_result = rest_campaign.paginated_recordings_list(campaign, page, pagesize)
+
+
+@step(u'Then I get exactly "([^"]*)" recordings')
+def then_i_get_exactly_group1_recordings(step, number):
+    global single_result
+    assert len(single_result['data']) == int(number), 'Inconsistent number retrieved: ' + str(single_result)
+
+
+@step(u'Given I ask for a list of recordings for "([^"]*)" with page "([^"]*)" and page size "([^"]*)"')
+def given_i_ask_for_a_list_of_recordings_for_group1_with_page_group1_and_page_size_group3(step, campaign, page, pagesize):
+    global result_list
+    result_list.append(rest_campaign.paginated_recordings_list(campaign, page, pagesize))
+
+
+@step(u'Then the two lists of recording do not overlap')
+def then_the_two_lists_of_recording_do_not_overlap(step):
+    global result_list
+    intersection = [item for item in result_list[0]['data'] if item in result_list[1]['data']]
+    assert intersection == [], 'The results overlap: ' + str(intersection)
+
+
+@step(u'When we search recordings in the campaign "([^"]*)" with the key "([^"]*)", page "([^"]*)" and page size "([^"]*)"')
+def when_we_search_recordings_in_the_campaign_with_the_key_page_and_page_size(step, campaign, key, page, pagesize):
+    global single_result
+    single_result = rest_campaign.search_paginated_recordings(campaign, key, page, pagesize)

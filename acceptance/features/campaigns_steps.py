@@ -21,6 +21,8 @@ from lettuce import step
 from rest_campaign import RestCampaign
 import datetime
 import random
+from xivo_recording import rest
+from jinja2.testsuite import res
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -36,6 +38,7 @@ start_date = ''
 end_date = ''
 return_tuple = None
 result = None
+result_list = []
 
 
 @step(u'When I create a campaign "([^"]*)"')
@@ -246,31 +249,40 @@ def then_the_displayed_total_is_equal_to_the_actual_number_of_campaigns(step):
         " but real number was " + str(len(result['data']))
 
 
-@step(u'Given there are at least 10 campaigns')
-def given_there_are_at_least_10_campaigns(step):
-    assert False, 'This step must be implemented'
+@step(u'Given there are at least "([^"]*)" campaigns')
+def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
+    r_campaign = RestCampaign()
+    res = r_campaign.list()
+    if(res['total'] < int(num_of_campaigns)):
+        global queue_id
+        i = res['total']
+        while(i<int(num_of_campaigns)):
+            r_campaign.create(str(random.randint(1000,9999)), queue_id, True)
+            i += 1
+        res = r_campaign.list()
+    assert res['total'] >= int(num_of_campaigns), 'Not enough campaigns: ' + str(res)
 
 
-@step(u'When I ask for a list of campaigns with page 1 and page size 5')
-def when_i_ask_for_a_list_of_campaigns_with_page_1_and_page_size_5(step):
-    assert False, 'This step must be implemented'
+@step(u'When I ask for a list of campaigns with page "([^"]*)" and page size "([^"]*)"')
+def when_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(step, page_number, page_size):
+    r_campaign = RestCampaign()
+    global result
+    result = r_campaign.paginated_list(int(page_number), int(page_size))
+
+@step(u'Then I get exactly "([^"]*)" campaigns')
+def then_i_get_exactly_group1_campaigns(step, num_of_campaigns):
+    global result
+    assert len(result['data']) == int(num_of_campaigns), "Got wrong number of campaigns: " + str(result)
 
 
-@step(u'Then I get exactly 5 campaigns')
-def then_i_get_exactly_5_campaigns(step):
-    assert False, 'This step must be implemented'
-
-
-@step(u'Given I ask for a list of campaigns with page 1 and page size 5')
-def given_i_ask_for_a_list_of_campaigns_with_page_1_and_page_size_5(step):
-    assert False, 'This step must be implemented'
-
-
-@step(u'Given I ask for a list of campaigns with page 2 and page size 5')
-def given_i_ask_for_a_list_of_campaigns_with_page_2_and_page_size_5(step):
-    assert False, 'This step must be implemented'
-
+@step(u'Given I ask for a list of campaigns with page "([^"]*)" and page size "([^"]*)"')
+def given_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(step, page_number, page_size):
+    r_campaign = RestCampaign()
+    global result_list
+    result_list.append(r_campaign.paginated_list(int(page_number), int(page_size)))
 
 @step(u'Then the two results do not overlap')
 def then_the_two_results_do_not_overlap(step):
-    assert False, 'This step must be implemented'
+    global result_list
+    intersection = [item for item in result_list[0]['data'] if item in result_list[1]['data']]
+    assert intersection == [], 'The results overlap: ' + str(intersection)

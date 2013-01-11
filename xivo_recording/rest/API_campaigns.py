@@ -63,14 +63,17 @@ class APICampaigns(object):
             logger.debug("Get args:" + str(campaign_id))
             checkCurrentlyRunning = False
             params = {}
+            technical_params = {}
             if campaign_id != None:
                 params['id'] = campaign_id
             for item in request.args:
-                if item == 'running':
+                if(item[0] == '_'):
+                    technical_params[item] = request.args[item]
+                elif item == 'running':
                     checkCurrentlyRunning = (request.args[item] == 'true')
                 else:
                     params[item] = request.args[item]
-            result = self._campagne_manager.get_campaigns_as_dict(params, checkCurrentlyRunning)
+            result = self._campagne_manager.get_campaigns_as_dict(params, checkCurrentlyRunning, technical_params)
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")

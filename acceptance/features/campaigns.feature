@@ -51,12 +51,12 @@ Feature: Recording campaign management
 	  Then the displayed total is equal to the actual number of campaigns
 	  
 	Scenario: Campaign pagination
-	  Given there are at least 10 campaigns
-	  When I ask for a list of campaigns with page 1 and page size 5
-	  Then I get exactly 5 campaigns
+	  Given there are at least "10" campaigns
+	  When I ask for a list of campaigns with page "1" and page size "5"
+	  Then I get exactly "5" campaigns
 	  
 	Scenario: No overlapping when paginating campaigns
-	  Given there are at least 10 campaigns
-	  Given I ask for a list of campaigns with page 1 and page size 5
-	  Given I ask for a list of campaigns with page 2 and page size 5
+	  Given there are at least "10" campaigns
+	  Given I ask for a list of campaigns with page "1" and page size "5"
+	  Given I ask for a list of campaigns with page "2" and page size "5"
 	  Then the two results do not overlap

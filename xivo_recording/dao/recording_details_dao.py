@@ -27,6 +27,8 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
+from xivo_recording.dao.helpers.query_utils import get_all_data, \
+    get_paginated_data
 from xivo_recording.recording_config import RecordingConfig
 import logging
 
@@ -45,7 +47,7 @@ class RecordingDetailsDbBinder(object):
     def __init__(self, session):
         self.session = session
 
-    def get_recordings_as_list(self, campaign_id, search=None):
+    def get_recordings_as_list(self, campaign_id, search=None, pagination=None):
         search_pattern = {}
         search_pattern['campaign_id'] = campaign_id
         if search != None:
@@ -53,8 +55,12 @@ class RecordingDetailsDbBinder(object):
                     search_pattern[item] = search[item]
 
         logger.debug("Search search_pattern: " + str(search_pattern))
-        return table_list_to_list_dict(self.session.query(RecordingDetailsDao)\
-                                       .filter_by(**search_pattern))
+        my_query = self.session.query(RecordingDetailsDao)\
+                                       .filter_by(**search_pattern)
+        if (pagination == None):
+            return get_all_data(self.session, my_query)
+        else:
+            return get_paginated_data(self.session, my_query, pagination)
 
     def add_recording(self, params):
         record = RecordingDetailsDao()
@@ -69,19 +75,19 @@ class RecordingDetailsDbBinder(object):
             raise e
         return True
 
-    def search_recordings(self, campaign_id, key):
+    def search_recordings(self, campaign_id, key, pagination=None):
         logger.debug("campaign id = " + str(campaign_id)\
                       + ", key = " + str(key))
         #jointure interne:
         #RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
-        query = self.session.query(RecordingDetailsDao)\
+        my_query = self.session.query(RecordingDetailsDao)\
                         .join((AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id))\
                         .filter(and_(RecordingDetailsDao.campaign_id == campaign_id,\
                                      or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
-        logger.debug("generated query: " + str(query))
-        result = table_list_to_list_dict(query)
-        logger.debug("Search result: " + str(result))
-        return result
+        if (pagination == None):
+            return get_all_data(self.session, my_query)
+        else:
+            return get_paginated_data(self.session, my_query, pagination)
 
     def delete(self, campaign_id, recording_id):
         logger.debug("Going to delete " + str(recording_id))

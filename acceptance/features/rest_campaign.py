@@ -160,7 +160,7 @@ class RestCampaign(object):
 
         body = reply.read()
         assert body != None, "No result"
-        recordings = rest_encoder.decode(body)
+        recordings = rest_encoder.decode(body)['data']
 
         result = False
         for recording in recordings:
@@ -242,14 +242,15 @@ class RestCampaign(object):
             return 0
         return -1
 
-    def search_recordings(self, campaign_id, key):
+    def search_recordings(self, campaign_id, key=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/search"
-        parameters = "?key=" + key
-        requestURI += parameters
+        if(key != None):
+            parameters = "?key=" + key
+            requestURI += parameters
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         connection.request("GET", requestURI, '', headers)
         reply = connection.getresponse()
@@ -302,3 +303,49 @@ class RestCampaign(object):
         reply = connection.getresponse()
 
         return (reply.status, rest_encoder.decode(reply.read()))
+
+    def paginated_list(self, page_number, page_size):
+        connection = RecordingConfig.getWSConnection()
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+        params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("GET", requestURI + params, "", headers)
+        reply = connection.getresponse()
+
+        body = reply.read()
+
+        campaigns = rest_encoder.decode(body)
+        return campaigns
+
+    def paginated_recordings_list(self, campaign_id, page_number, page_size):
+        connection = RecordingConfig.getWSConnection()
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + campaign_id + "/"
+        params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("GET", requestURI + params, "", headers)
+        reply = connection.getresponse()
+
+        body = reply.read()
+
+        campaigns = rest_encoder.decode(body)
+        return campaigns
+    
+    def search_paginated_recordings(self, campaign_id, key, page, pagesize):
+        connection = RecordingConfig.getWSConnection()
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        str(campaign_id) + "/search"
+
+        parameters = "?key=" + key + "&_page=" + page + "&_pagesize=" + pagesize
+        requestURI += parameters
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("GET", requestURI, '', headers)
+        reply = connection.getresponse()
+        return rest_encoder.decode(reply.read())

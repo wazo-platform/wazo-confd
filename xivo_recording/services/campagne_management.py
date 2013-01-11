@@ -19,8 +19,6 @@
 from datetime import datetime
 from xivo_dao import queue_features_dao
 from xivo_recording.dao.exceptions import DataRetrieveError
-from xivo_recording.dao.helpers.query_utils import get_paginated_data,\
-    get_all_data
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
@@ -40,7 +38,7 @@ class CampagneManagement:
         return result
 
     @reconnectable("record_db")
-    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False, paginator=None):
+    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False, technical_params=None):
         """
         Calls the DAO and converts data to the final format
         """
@@ -50,8 +48,12 @@ class CampagneManagement:
                 search_pattern["queue_id"] = queue_features_dao.id_from_name(search["queue_name"])
             else:
                 search_pattern[item] = search[item]
-
-        result = self.record_db.get_records(search, checkCurrentlyRunning)
+        result = None
+        if(technical_params != None and '_page' in technical_params and '_pagesize' in technical_params):
+            paginator = (int(technical_params['_page']), int(technical_params['_pagesize']))
+            result = self.record_db.get_records(search, checkCurrentlyRunning, paginator)
+        else:
+            result = self.record_db.get_records(search, checkCurrentlyRunning)
 
         try:
             for item in result['data']:

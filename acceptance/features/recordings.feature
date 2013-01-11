@@ -41,3 +41,31 @@ Feature: Call recordings management
 	  When I search recordings in the campaign "1" with the key "111"
 	  Then I get the first two recordings
 	  
+	Scenario: Consistent number of recordings
+	  Given there is a campaign of id "1"
+	  Given there is an agent "222"
+	  Given there are at least "10" recordings for "1" and agent "222"
+	  When I ask for the recordings of "1"
+	  Then the displayed total is equal to the actual number of recordings
+	  
+	Scenario: Recording pagination
+	  Given there is a campaign of id "1"
+	  Given there is an agent "222"
+	  Given there are at least "10" recordings for "1" and agent "222"
+	  When I ask for a list of recordings for "1" with page "1" and page size "5"
+	  Then I get exactly "5" recordings
+	  
+	Scenario: No overlapping when paginating recordings
+	  Given there is a campaign of id "1"
+	  Given there is an agent "222"
+	  Given there are at least "10" recordings for "1" and agent "222"
+	  Given I ask for a list of recordings for "1" with page "1" and page size "5"
+	  Given I ask for a list of recordings for "1" with page "2" and page size "5"
+	  Then the two lists of recording do not overlap
+	
+	Scenario: Pagination of search result
+	  Given there is a campaign of id "1"
+	  Given there is an agent "222"
+	  Given there are at least "10" recordings for "1" and agent "222"
+	  When we search recordings in the campaign "1" with the key "222", page "2" and page size "5"
+	  Then I get exactly "5" recordings

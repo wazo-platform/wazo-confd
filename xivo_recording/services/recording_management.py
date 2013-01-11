@@ -72,26 +72,31 @@ class RecordingManagement:
         return result
 
     @reconnectable("recording_details_db")
-    def get_recordings_as_dict(self, campaign_id, search=None):
+    def get_recordings_as_dict(self, campaign_id, search=None, technical_params=None):
         logger.debug("get_recordings_as_dict")
         search_pattern = {}
-        for item in search:
-            if (item == 'agent_no'):
-                search_pattern["agent_id"] = self.agentFeatDao.agent_id(search['agent_no'])
-            else:
-                search_pattern[item] = search[item]
+        if(search != None):
+            for item in search:
+                if (item == 'agent_no'):
+                    search_pattern["agent_id"] = self.agentFeatDao.agent_id(search['agent_no'])
+                else:
+                    search_pattern[item] = search[item]
+        paginator = self._get_paginator(technical_params)
         result = self.recording_details_db. \
-                            get_recordings_as_list(campaign_id, search_pattern)
-        return self.insert_agent_no(result)
+                            get_recordings_as_list(campaign_id, search_pattern, paginator)
+        self.insert_agent_no(result['data'])
+        return result
 
     @reconnectable("recording_details_db")
-    def search_recordings(self, campaign_id, search):
+    def search_recordings(self, campaign_id, search, technical_params):
         logger.debug("search_recordings")
         if(search == None or search == {} or 'key' not in search):
-            return self.get_recordings_as_dict(campaign_id)
+            return self.get_recordings_as_dict(campaign_id, {}, technical_params)
         else:
-            result = self.recording_details_db.search_recordings(campaign_id, search['key'])
-            return self.insert_agent_no(result)
+            paginator = self._get_paginator(technical_params)
+            result = self.recording_details_db.search_recordings(campaign_id, search['key'], paginator)
+            self.insert_agent_no(result['data'])
+            return result
 
     def insert_agent_no(self, liste):
         for row in liste:
@@ -120,3 +125,10 @@ class RecordingManagement:
             if(data[key] == ''):
                 data[key] = None
         return data
+
+    def _get_paginator(self, technical_params):
+        paginator = None
+        if(technical_params != None and '_page' in technical_params and '_pagesize' in technical_params):
+            paginator = (int(technical_params['_page']), int(technical_params['_pagesize']))
+        logger.debug("Created paginator: " + str(paginator))
+        return paginator
