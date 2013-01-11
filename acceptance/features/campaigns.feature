@@ -43,9 +43,20 @@ Feature: Recording campaign management
 	  Then this campaign is created with its start date and end date equal to now
 	  
 	Scenario: Campaign creation and consultation with unproprer dates
-	  When I create a campaign "test_unproper_dates" with start date "2013-02-01" and end date "2013-01-01"
+	  When I create the campaign "test_unproper_dates" with start date "2013-02-01" and end date "2013-01-01"
 	  Then I get an error code '400' with message 'start_greater_than_end'
 	  
 	Scenario: Consistent number of campaigns
 	  When I ask for all the campaigns
 	  Then the displayed total is equal to the actual number of campaigns
+	  
+	Scenario: Campaign pagination
+	  Given there are at least 10 campaigns
+	  When I ask for a list of campaigns with page 1 and page size 5
+	  Then I get exactly 5 campaigns
+	  
+	Scenario: No overlapping when paginating campaigns
+	  Given there are at least 10 campaigns
+	  Given I ask for a list of campaigns with page 1 and page size 5
+	  Given I ask for a list of campaigns with page 2 and page size 5
+	  Then the two results do not overlap

@@ -65,9 +65,6 @@ class RecordCampaignDbBinder(object):
         else:
             return get_paginated_data(self.session, my_query, pagination)
 
-    def get_records_as_dict(self, search=None, checkCurrentlyRunning=False):
-        return table_list_to_list_dict(self.get_records(search, checkCurrentlyRunning).all())
-
     def id_from_name(self, name):
         result = self.session.query(RecordCampaignDao).filter_by(campaign_name=name).first()
         if result != None:
@@ -100,7 +97,8 @@ class RecordCampaignDbBinder(object):
     def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
-            campaignsList = self.get_records({'id': campaign_id}).all()
+            campaignsList = self.session.query(RecordCampaignDao)\
+                        .filter(RecordCampaignDao.id == campaign_id).all()
             logger.debug("Campaigns list for update: " + str(campaignsList))
             if(len(campaignsList) == 0):
                 raise NoSuchElementException("No campaign found for id " + str(campaign_id))

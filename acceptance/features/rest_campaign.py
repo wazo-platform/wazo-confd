@@ -275,3 +275,30 @@ class RestCampaign(object):
         except Exception as e:
             print "\nException raised: " + str(e) + "\n"
             return False
+        
+    def create_with_errors(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id=None):
+        connection = RecordingConfig.getWSConnection()
+
+        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+
+        campaign = {}
+
+        campaign["campaign_name"] = campaign_name
+        campaign["base_filename"] = campaign_name + "-file-"
+        campaign["queue_id"] = queue_id
+        campaign["activated"] = activated
+        if start_date != None:
+            campaign["start_date"] = str(start_date)
+        if end_date != None:
+            campaign["end_date"] = str(end_date)
+        if campaign_id != None:
+            campaign['id'] = campaign_id
+        body = rest_encoder.encode(campaign)
+        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+        connection.request("POST", requestURI, body, headers)
+
+        reply = connection.getresponse()
+
+        return (reply.status, rest_encoder.decode(reply.read()))

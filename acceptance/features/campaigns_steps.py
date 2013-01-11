@@ -34,6 +34,8 @@ running_scenario = {}
 list_running_campaigns = []
 start_date = ''
 end_date = ''
+return_tuple = None
+result = None
 
 
 @step(u'When I create a campaign "([^"]*)"')
@@ -98,15 +100,15 @@ def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_ca
         queue_id
 
 
-#@step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
-#def edition_step_prerequisite(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
-#    r_campaign = RestCampaign()
-#    global campaign_id
-#    new_campaign_name = local_campaign_name + str(random.randint(100, 999))
-#    campaign_id = r_campaign.create(new_campaign_name, local_queue_id, True, local_start_date, local_end_date)
-#    campaign = r_campaign.getCampaign(campaign_id)
-#    assert campaign["campaign_name"] == new_campaign_name, 'Campaign ' + \
-#                                    local_campaign_name + ' not properly inserted'
+@step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+def edition_step_prerequisite(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
+    r_campaign = RestCampaign()
+    global campaign_id
+    new_campaign_name = local_campaign_name + str(random.randint(100, 999))
+    campaign_id = r_campaign.create(new_campaign_name, local_queue_id, True, local_start_date, local_end_date)
+    campaign = r_campaign.getCampaign(campaign_id)
+    assert campaign["campaign_name"] == new_campaign_name, 'Campaign ' + \
+                                    local_campaign_name + ' not properly inserted'
 
 
 @step(u'When I change its name to "([^"]*)", its queue to "([^"]*)", its start date to "([^"]*)" and its end date to "([^"]*)"')
@@ -216,18 +218,59 @@ def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(
             result = True
     assert result, 'Campaign not created with the current date: '
 
+@step(u'When I create the campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+def step_unproper_dates(step, campaign, sdate, edate):
+    r_campaign = RestCampaign()
+    global queue_id, return_tuple
+    return_tuple = r_campaign.create_with_errors(campaign, queue_id, True, sdate,
+                               edate)
+
+
+@step(u'Then I get an error code \'([^\']*)\' with message \'([^\']*)\'')
+def then_i_get_an_error_code_group1_with_message_group2(step, error_code, message):
+    global return_tuple
+    assert str(return_tuple[0]) == error_code, "Got wrong error code: " + str(return_tuple[0])
+    assert return_tuple[1] == [message], "Got wrong message: " +  str(return_tuple[1])
 
 @step(u'When I ask for all the campaigns')
 def when_i_ask_for_all_the_campaigns(step):
     r_campaign = RestCampaign()
-    assert False, 'This step must be implemented'
+    global result
+    result = r_campaign.list()
 
 
 @step(u'Then the displayed total is equal to the actual number of campaigns')
 def then_the_displayed_total_is_equal_to_the_actual_number_of_campaigns(step):
-    assert False, 'This step must be implemented'
-    
+    global result
+    assert result['total'] == len(result['data']), 'Got total ' + str(result['total']) +\
+        " but real number was " + str(len(result['data']))
 
-@step(u'Then I get an error code \'([^\']*)\' with message \'([^\']*)\'')
-def then_i_get_an_error_code_group1_with_message_group2(step, group1, group2):
+
+@step(u'Given there are at least 10 campaigns')
+def given_there_are_at_least_10_campaigns(step):
+    assert False, 'This step must be implemented'
+
+
+@step(u'When I ask for a list of campaigns with page 1 and page size 5')
+def when_i_ask_for_a_list_of_campaigns_with_page_1_and_page_size_5(step):
+    assert False, 'This step must be implemented'
+
+
+@step(u'Then I get exactly 5 campaigns')
+def then_i_get_exactly_5_campaigns(step):
+    assert False, 'This step must be implemented'
+
+
+@step(u'Given I ask for a list of campaigns with page 1 and page size 5')
+def given_i_ask_for_a_list_of_campaigns_with_page_1_and_page_size_5(step):
+    assert False, 'This step must be implemented'
+
+
+@step(u'Given I ask for a list of campaigns with page 2 and page size 5')
+def given_i_ask_for_a_list_of_campaigns_with_page_2_and_page_size_5(step):
+    assert False, 'This step must be implemented'
+
+
+@step(u'Then the two results do not overlap')
+def then_the_two_results_do_not_overlap(step):
     assert False, 'This step must be implemented'
