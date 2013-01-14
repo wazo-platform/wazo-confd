@@ -139,11 +139,18 @@ def determinate_record():
 
     queue_id = get_queue_id(xivo_vars['queue_name'])
     if queue_id == None:
+        agi.set_variable('QR_RECORDQUEUE', '0')
         logger.error('Queue "' + xivo_vars['queue_name'] + '" not found!')
         sys.exit(1)
+
     campaigns = rest_encoder.decode(get_campaigns(queue_id))['data']
 
     logger.debug("Campaigns: " + str(campaigns))
+    if(campaigns == []):
+        agi.set_variable('QR_RECORDQUEUE', '0')
+        logger.info('No activated campaign for queue: ' + xivo_vars['queue_name'])
+        sys.exit(0)
+
     base_filename = campaigns[0]['base_filename']
 
     if len(base_filename) == 0:
@@ -163,8 +170,6 @@ def determinate_record():
         logger.info('Calls to queue: "' +
                     xivo_vars['queue_name'] +
                     '" are not recorded')
-
-    sys.exit(0)
 
 
 def save_recording(recording):
@@ -226,7 +231,9 @@ def main():
         exc_type, exc_value, exc_traceback = sys.exc_info()
         logger.error(repr(traceback.format_exception(exc_type, exc_value,
                                           exc_traceback)))
+        sys.exit(1)
 
+    sys.exit(0)
 
 if __name__ == '__main__':
     main()
