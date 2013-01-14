@@ -196,7 +196,7 @@ def save_call_details():
     if xivo_vars['base_filename'] == "":
         xivo_vars['base_filename'] = 'NoBaseFilename'
 
-    filename = xivo_vars['base_filename'] + xivo_vars['cid'] + '.wav'
+    filename = xivo_vars['cid'] + '.wav'
     agi.set_variable('_QR_FILENAME', filename)
     recording = {}
     recording['cid'] = xivo_vars['cid']
