@@ -70,7 +70,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
     def test_xivo_recording_agi_get_campaigns(self):
         response = Mock()
         response.read.return_value = self.rest_response
-        response.status = "200"
+        response.status = 200
 
         self.instance_http_connection.getresponse.return_value = response
 

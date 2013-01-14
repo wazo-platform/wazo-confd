@@ -82,7 +82,7 @@ def get_campaigns(queue_id):
 
     reply = connection.getresponse()
 
-    if (reply.status != "200"):
+    if (reply.status != 200):
         logger.warning("Get campaigns failed with code: " + str(reply.status))
         raise RestAPIError()
 
