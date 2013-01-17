@@ -19,12 +19,10 @@
 import unittest
 from mock import Mock, patch, call
 from xivo.agi import AGI
-from gevent.httplib import HTTPConnection, HTTPResponse
+from gevent.httplib import HTTPConnection
 import random
-from gevent import http
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
-
 mock_agi = Mock(AGI)
 mock_http_connection = Mock(HTTPConnection)
 
@@ -57,6 +55,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
     def test_xivo_recording_agi_get_general_variables(self):
         self.instance_agi.get_variable.return_value = self.xivo_queue_name
+
         from bin import xivo_recording_agi
         xivo_recording_agi.get_general_variables()
         self.instance_agi.get_variable.assert_called_with("XIVO_DESTNUM")
@@ -65,7 +64,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.instance_agi.get_variable.return_value = self.xivo_queue_name
         from bin import xivo_recording_agi
         xivo_recording_agi.get_detailed_variables()
-        self.instance_agi.get_variable.assert_called_with("QR_QUEUENAME")
+        self.instance_agi.get_variable.assert_called_with(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)
 
     def test_xivo_recording_agi_get_campaigns(self):
         response = Mock()
@@ -105,7 +104,19 @@ class TestXivoRecordingAgi(unittest.TestCase):
         else:
             raise Exception
 
+    def test_xivo_recording_set_user_field(self):
+        expected_user_data = 'test'
+        self.instance_agi.get_variable.return_value = expected_user_data
+
+        from bin import xivo_recording_agi
+        xivo_recording_agi.set_user_field()
+
+        self.instance_agi.get_variable.assert_called_with(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD)
+        self.instance_agi.set_variable.assert_called_with(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_user_data)
+
     def test_xivo_recording_determinate_record(self):
+
+        expected_data = 'test'
 
         from bin import xivo_recording_agi
         xivo_recording_agi.get_queue_id = self.mock_get_queue_id
@@ -113,9 +124,13 @@ class TestXivoRecordingAgi(unittest.TestCase):
         xivo_recording_agi.get_campaigns = self.mock_get_campaigns
 
         self.instance_agi.set_variable = Mock()
+        self.instance_agi.get_variable = Mock()
+        self.instance_agi.get_variable.return_value = expected_data
         xivo_recording_agi.determinate_record()
 
-        expected = [call('QR_RECORDQUEUE', '1'), call('__QR_CAMPAIGN_ID', self.xivo_campaign_id), call('__QR_BASE_FILENAME', self.base_filename)]
-
-        print self.instance_agi.set_variable.mock_calls
+        expected = [call('QR_RECORDQUEUE', '1'),
+                    call('__QR_CAMPAIGN_ID', self.xivo_campaign_id),
+                    call('__QR_BASE_FILENAME', self.base_filename),
+                    call(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_data)]
+        print(self.instance_agi.set_variable.mock_calls)
         self.assertTrue(self.instance_agi.set_variable.mock_calls == expected)

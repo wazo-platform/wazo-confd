@@ -62,7 +62,7 @@ def get_detailed_variables():
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
     xivo_vars['queue_name'] = agi.get_variable('QR_QUEUENAME')
-    xivo_vars['client_id'] = agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTID)
+    xivo_vars['client_id'] = agi.get_variable(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)
     logger.debug(str(xivo_vars))
     return xivo_vars
 
@@ -134,6 +134,11 @@ def get_queue_id(queue_name):
     return None
 
 
+def set_user_field():
+    agi.set_variable(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
+                     agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD))
+
+
 def determinate_record():
     logger.debug("Going to determinate whether call is to be recorded")
     xivo_vars = get_general_variables()
@@ -163,6 +168,7 @@ def determinate_record():
         agi.set_variable('QR_RECORDQUEUE', '1')
         agi.set_variable('__QR_CAMPAIGN_ID', campaigns[0]['id'])
         agi.set_variable('__QR_BASE_FILENAME', base_filename)
+        set_user_field()
         logger.info('Calls to queue: "' +
                     xivo_vars['queue_name'] +
                     '" are recorded')
