@@ -60,12 +60,13 @@ class TestFlaskHttpRoot(unittest.TestCase):
         }
 
         self.instance_campagne_management.create_campaign.return_value = body
-
+        self.instance_campagne_management.supplement_add_input.return_value = data
+        
         result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/', data=rest_encoder.encode(data))
         print "result add campaign: " + result.data
-
+        self.instance_campagne_management.supplement_add_input.assert_called_with(data)
         self.instance_campagne_management.create_campaign.assert_called_with(data)
         self.assertTrue(str(result.status).startswith(status)
                         and body == str(result.data).strip('"'),
@@ -85,13 +86,14 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "queue_name": "queue_1"
         }
 
-        self.instance_campagne_management.create_campaign.return_value = True
+        self.instance_campagne_management.create_campaign.return_value = 1
+        self.instance_campagne_management.supplement_add_input.return_value = data
 
         result = self.app.post(RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RecordingConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/',
                               data=rest_encoder.encode(data))
-
+        self.instance_campagne_management.supplement_add_input.assert_called_with(data)
         self.instance_campagne_management.create_campaign.assert_called_with(data)
         self.assertTrue(str(result.status).startswith(status),
                         "Status comparison failed, received status:" +
@@ -116,10 +118,34 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/?activated=true&campaign_name=test'
         result = self.app.get(url)
 
-        parsed_url = urlparse(url)
-        args = parse_qs(parsed_url.query)
+        args = {'campaign_name' : 'test',
+                'activated' : 'true'}
         print "args: " + str(args)
         self.assertEqual(status, result.status)
         received_data = rest_encoder.decode(result.data.replace("\\", "").strip('"'))
         self.assertDictEqual(received_data, data)
-        self.instance_campagne_management.get_campaigns_as_dict.assert_called_with(args)
+        self.instance_campagne_management.get_campaigns_as_dict.assert_called_with(args, False, {})
+
+    def test_edit_campaign(self):
+        status = "200 OK"
+
+        campaign_id = random.randint(10000, 99999999)
+        campagne_name = "campagne-" + str(campaign_id)
+
+        data = {
+            "campaign_name": campagne_name,
+            "activated": False,
+            "base_filename": campagne_name + "-",
+            "queue_name": "queue_1"
+        }
+
+        self.instance_campagne_management.update_campaign.return_value = True
+        self.instance_campagne_management.supplement_edit_input.return_value = data
+        url = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
+                '/' + str(campaign_id)
+        result = self.app.put(url, data=rest_encoder.encode(data))
+        self.assertEqual(status, result.status)
+        self.assertEqual(result.data, "Updated: True")
+        self.instance_campagne_management.supplement_edit_input.assert_called_with(data)
+        self.instance_campagne_management.update_campaign.assert_called_with(str(campaign_id), data)

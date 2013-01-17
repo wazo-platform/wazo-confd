@@ -1,5 +1,9 @@
--- DDL for table record_campaign
+DROP TABLE IF EXISTS recording;
 DROP TABLE IF EXISTS record_campaign;
+DROP TYPE IF EXISTS call_dir_type;
+
+-- DDL for table record_campaign
+
 
 CREATE TABLE record_campaign
 (
@@ -28,8 +32,6 @@ CREATE TYPE call_dir_type AS ENUM
   'outgoing');
 ALTER TYPE call_dir_type
   OWNER TO asterisk;
-
-DROP TABLE IF EXISTS recording;
 
 CREATE TABLE recording
 (
