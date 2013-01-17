@@ -21,11 +21,16 @@ from acceptance.features.rest_queues import RestQueues
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder,\
+    RecordCampaignDao
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
+from xivo_recording.services.manager_utils import _init_db_connection
 import datetime
 import os
 import random
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder,\
+    RecordingDetailsDao
 
 
 class RestCampaign(object):
@@ -211,7 +216,8 @@ class RestCampaign(object):
         if(result == None or len(result) == 0):
             rest_queues = RestQueues()
             rest_queues.create_if_not_exists(1)
-            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, str(datetime.datetime.now()), str(datetime.datetime.now()), campaign_id)
+            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, datetime.datetime.now().strftime("%Y-%m-%d"), datetime.datetime.now().strftime("%Y-%m-%d"), campaign_id)
+            print "\n========================" + str(result) + "\n"
             return type(result) == int and result > 0
         return True
 
@@ -335,7 +341,7 @@ class RestCampaign(object):
 
         campaigns = rest_encoder.decode(body)
         return campaigns
-    
+
     def search_paginated_recordings(self, campaign_id, key, page, pagesize):
         connection = RecordingConfig.getWSConnection()
 
@@ -349,3 +355,11 @@ class RestCampaign(object):
         connection.request("GET", requestURI, '', headers)
         reply = connection.getresponse()
         return rest_encoder.decode(reply.read())
+
+    def delete_all_campaigns(self):
+        campaign_db = _init_db_connection(RecordCampaignDbBinder)
+        recording_db = _init_db_connection(RecordingDetailsDbBinder)
+        recording_db.session.query(RecordingDetailsDao).delete()
+        recording_db.session.commit()
+        campaign_db.session.query(RecordCampaignDao).delete()
+        campaign_db.session.commit()

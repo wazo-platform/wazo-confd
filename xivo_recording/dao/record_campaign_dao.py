@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm.exc import UnmappedClassError
@@ -28,11 +29,11 @@ from xivo_recording.dao.exceptions import DataRetrieveError, \
 from xivo_recording.dao.generic_dao import GenericDao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict, str_to_datetime
-from xivo_recording.recording_config import RecordingConfig
-from datetime import datetime
-import logging
-from xivo_recording.dao.helpers.query_utils import get_all_data,\
+from xivo_recording.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
+from xivo_recording.dao.helpers.time_interval import TimeInterval
+from xivo_recording.recording_config import RecordingConfig
+import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -75,7 +76,7 @@ class RecordCampaignDbBinder(object):
     def add(self, params):
         record = RecordCampaignDao()
         for k, v in params.items():
-            if((k == "start_date" or k == "end_date") and type(v) == str):
+            if((k == "start_date" or k == "end_date") and type(v) != datetime):
                 v = str_to_datetime(v)
             setattr(record, k, v)
         self._validate_campaign(record)
@@ -105,7 +106,7 @@ class RecordCampaignDbBinder(object):
             campaign = campaignsList[0]
             logger.debug('got original')
             for k, v in params.items():
-                if(k == "start_date" or k == "end_date"):
+                if(k == "start_date" or k == "end_date" and type(v) != datetime):
                     v = str_to_datetime(v)
                 setattr(campaign, k, v)
             logger.debug('attributes modified')
@@ -155,8 +156,23 @@ class RecordCampaignDbBinder(object):
         logger.debug("validating")
         if(record.campaign_name == None):
             errors_list.append("empty_name")
+
         if(record.start_date > record.end_date):
             errors_list.append("start_greater_than_end")
+        else:
+            #check if another campaign exists on the same queue, with a concurrent time interval:
+            campaigns_list = self.session.query(RecordCampaignDao)\
+                .filter(RecordCampaignDao.queue_id == record.queue_id)\
+                .filter(RecordCampaignDao.id != record.id).all()
+            record_interval = TimeInterval(record.start_date, record.end_date)
+            intersects = False
+            for campaign in campaigns_list:
+                campaign_interval = TimeInterval(campaign.start_date, campaign.end_date)
+                if(record_interval.intersect(campaign_interval) != None):
+                    intersects = True
+                    break
+            if(intersects):
+                errors_list.append("concurrent_campaigns")
 
         if(len(errors_list) > 0):
             raise InvalidInputException("Invalid data provided", errors_list)
