@@ -62,6 +62,7 @@ def get_detailed_variables():
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
     xivo_vars['queue_name'] = agi.get_variable('QR_QUEUENAME')
+    xivo_vars['client_id'] = agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTID)
     logger.debug(str(xivo_vars))
     return xivo_vars
 
@@ -210,6 +211,7 @@ def save_call_details():
     recording['start_time'] = xivo_vars['start_time']
     recording['agent_no'] = xivo_vars['agent_no']
     recording['caller'] = xivo_vars['caller']
+    recording['client_id'] = xivo_vars['client_id']
     sys.exit(save_recording(recording))
 
 

@@ -26,6 +26,8 @@ class RecordingConfig(object):
     XIVO_REST_SERVICE_ROOT_PATH = "/rest"
     XIVO_RECORDING_SERVICE_PATH = "/IPBX/recording_campaigns"
     XIVO_QUEUES_SERVICE_PATH = "/CallCenter/queues"
+
+    XIVO_DIALPLAN_CLIENTID = 'LDLC_IDTICKET'
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
     CSV_SEPARATOR = ","
