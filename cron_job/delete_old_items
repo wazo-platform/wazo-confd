@@ -1,4 +1,5 @@
 #!/bin/sh
 BASEDIR=$(dirname $0)
 cd /var/lib/pf-xivo/sounds/campagnes
-find -mtime +30 -name '*.wav' -exec $BASEDIR/log_and_delete {} +
+find -mtime +31 -name '*.wav' -exec $BASEDIR/log_and_delete {} +
+su - -c "psql asterisk postgres -c \"delete from recording where end_time <= (current_timestamp - interval '31 days');\"" postgres

@@ -8,7 +8,7 @@ directory = None
 
 
 def create_dir(dirname):
-    exists = False
+    exists = os.path.exists(dirname)
     list_dirs = []
     head = dirname
     while not exists:
@@ -24,6 +24,7 @@ def create_dir(dirname):
 @step(u'Given there is a directory "([^"]*)"')
 def given_there_is_a_directory_group1(step, dirname):
     global directory
+    directory = dirname
     create_dir(dirname)
     assert os.path.exists(dirname), "Could not create the directory"
 
