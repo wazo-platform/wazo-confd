@@ -1,7 +1,7 @@
 #!/bin/sh
 #installation script for package xivo-recording
 
-PF_XIVO_WEB_DEB_FILE="./pf-xivo-web-interface_12.21~20121024.134631.6cf6e1f-3_all.deb"
+PF_XIVO_WEB_DEB_FILE="./pf-xivo-web-interface_12.22~20121115.144123.f26d569-2_all.deb"
 PY_SETUP="setup.py"
 SQL_PATCH="xivo-recording-ddl.sql"
 
@@ -90,9 +90,7 @@ startRecording() {
 
 installCron() {
   cp cron_job/delete_old_items /usr/local/bin/delete_old_items
-  chmod u+x /usr/local/bin/delete_old_items
   cp cron_job/log_and_delete /usr/local/bin/log_and_delete
-  chmod u+x /usr/local/bin/log_and_delete
   cp cron_job/xivo-recording.conf /etc/rsyslog.d/xivo-recording.conf
   touch /var/log/asterisk/xivo-recording.log
   /etc/init.d/rsyslog restart
