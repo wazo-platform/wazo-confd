@@ -194,7 +194,7 @@ def given_there_are_at_least_group1_recordings_for_group2_and_agent_group3(step,
     res = rest_campaign.search_recordings(campaign, agent)
     if(res['total'] < int(num_rec)):
         i = res['total']
-        while(i < int(num_rec)):
+        while(i <= int(num_rec)):
             rest_campaign.addRecordingDetails(campaign, str(random.randint(1000,9999)), "222", agent, time)
             i += 1
         res = rest_campaign.search_recordings(campaign, agent)

@@ -3,12 +3,14 @@ Feature: Call recordings management
 	In order to create, consult and delete call recordings
 
 	Scenario: Recording creation exception
+	  Given there is no campaign
 	  Given there is a campaign named "test_campaign"
 	  Given there is no agent with number "1111"
 	  When I save call details for a call referenced by its "callid" in campaign "test_campaign" replied by agent with number "1111"
 	  Then I get a response with error code '400' and message 'SQL Error: No such agent'
 
 	Scenario: Recording creation and consultation
+	  Given there is no campaign
 	  Given there is a campaign named "test_campaign"
 	  Given there is an agent with number "1111"
 	  When I save call details for a call referenced by its "callid" in campaign "test_campaign" replied by agent with number "1111"
@@ -16,6 +18,7 @@ Feature: Call recordings management
 	  Then I delete this recording and the agent "1111"
 
 	Scenario: Recording consultation and removing
+	  Given there is no campaign
 	  Given there is a campaign named "test_campaing"
 	  Given there is an agent of number "222"
 	  Given there is a recording referenced by a "callid" with agent "222"
@@ -24,6 +27,7 @@ Feature: Call recordings management
 
 
 	Scenario: Deleting of unexisting recording
+	  Given there is no campaign
 	  Given there is a campaign named "test_campaign"
 	  Given there is no recording referenced by a "callid" in campaign "test_campaign"
 	  When I delete a recording referenced by this "callid"
@@ -31,6 +35,7 @@ Feature: Call recordings management
 	  
 
 	Scenario: Recording search
+	  Given there is no campaign
 	  Given there is a campaign of id "1"
 	  Given there is an agent "222"
 	  Given there is an agent "111"
@@ -42,6 +47,7 @@ Feature: Call recordings management
 	  Then I get the first two recordings
 	  
 	Scenario: Consistent number of recordings
+	  Given there is no campaign
 	  Given there is a campaign of id "1"
 	  Given there is an agent "222"
 	  Given there are at least "10" recordings for "1" and agent "222"
@@ -49,6 +55,7 @@ Feature: Call recordings management
 	  Then the displayed total is equal to the actual number of recordings
 	  
 	Scenario: Recording pagination
+	  Given there is no campaign
 	  Given there is a campaign of id "1"
 	  Given there is an agent "222"
 	  Given there are at least "10" recordings for "1" and agent "222"
@@ -56,6 +63,7 @@ Feature: Call recordings management
 	  Then I get exactly "5" recordings
 	  
 	Scenario: No overlapping when paginating recordings
+	  Given there is no campaign
 	  Given there is a campaign of id "1"
 	  Given there is an agent "222"
 	  Given there are at least "10" recordings for "1" and agent "222"
@@ -64,6 +72,7 @@ Feature: Call recordings management
 	  Then the two lists of recording do not overlap
 	
 	Scenario: Pagination of search result
+	  Given there is no campaign
 	  Given there is a campaign of id "1"
 	  Given there is an agent "222"
 	  Given there are at least "10" recordings for "1" and agent "222"

@@ -41,6 +41,12 @@ result = None
 result_list = []
 
 
+@step(u'Given there is no campaign')
+def given_there_is_no_campaign(step):
+    r_campaign = RestCampaign()
+    r_campaign.delete_all_campaigns()
+
+
 @step(u'When I create a campaign "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
     r_campaign = RestCampaign()
@@ -198,14 +204,13 @@ def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_
     assert len(list_running_campaigns) > 0, 'No campaign retrieved'
 
 
-@step(u'Then I get campaign "([^"]*)", I do not get "([^"]*)", "([^"]*)", "([^"]*)"')
-def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, group1, group2, group3, group4):
+@step(u'Then I get campaign "([^"]*)", I do not get "([^"]*)", "([^"]*)"')
+def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, group1, group2, group3):
     global list_running_campaigns, running_scenario
     list_names = [item['campaign_name'] for item in list_running_campaigns]
     assert running_scenario[group1] in list_names, group1 + ' was not retrieved.'
     assert running_scenario[group2] not in list_names, group2 + ' was not retrieved.'
     assert running_scenario[group3] not in list_names, group3 + ' was not retrieved.'
-    assert running_scenario[group4] not in list_names, group4 + ' was not retrieved.'
 
 
 @step(u'Then this campaign is created with its start date and end date equal to now')
@@ -256,8 +261,12 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
     if(res['total'] < int(num_of_campaigns)):
         global queue_id
         i = res['total']
-        while(i<int(num_of_campaigns)):
-            r_campaign.create(str(random.randint(1000,9999)), queue_id, True)
+        now = datetime.datetime.now()
+        while(i < int(num_of_campaigns)):
+            d = datetime.timedelta(days=(i+1))
+            oned = datetime.timedelta(days=1)
+            r_campaign.create(str(random.randint(1000,9999)), queue_id, True,
+                              (now + d).strftime("%Y-%m-%d"), (now + d + oned).strftime("%Y-%m-%d"))
             i += 1
         res = r_campaign.list()
     assert res['total'] >= int(num_of_campaigns), 'Not enough campaigns: ' + str(res)
@@ -268,6 +277,7 @@ def when_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(ste
     r_campaign = RestCampaign()
     global result
     result = r_campaign.paginated_list(int(page_number), int(page_size))
+
 
 @step(u'Then I get exactly "([^"]*)" campaigns')
 def then_i_get_exactly_group1_campaigns(step, num_of_campaigns):
@@ -281,8 +291,16 @@ def given_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(st
     global result_list
     result_list.append(r_campaign.paginated_list(int(page_number), int(page_size)))
 
+
 @step(u'Then the two results do not overlap')
 def then_the_two_results_do_not_overlap(step):
     global result_list
     intersection = [item for item in result_list[0]['data'] if item in result_list[1]['data']]
     assert intersection == [], 'The results overlap: ' + str(intersection)
+
+
+@step(u'When I try to create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
+def when_i_try_to_create_a_campaign_group1_pointing_to_queue_group2_with_start_date_group3_and_end_date_group4(step, name, queue, start, end):
+    r_campaign = RestCampaign()
+    global return_tuple
+    return_tuple = r_campaign.create_with_errors(name, queue, True, start, end)
