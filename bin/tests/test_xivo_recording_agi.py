@@ -100,7 +100,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
     def mock_get_campaigns(self, queue_id):
         if(queue_id == self.xivo_queue_id):
-            return rest_encoder.encode({'data':[{'id': self.xivo_campaign_id, 'activated': "True", 'base_filename': self.base_filename}]})
+            return rest_encoder.encode({'data':[{'id': self.xivo_campaign_id, 'activated': "True"}]})
         else:
             raise Exception
 
@@ -112,7 +112,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
         xivo_recording_agi.set_user_field()
 
         self.instance_agi.get_variable.assert_called_with(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD)
-        self.instance_agi.set_variable.assert_called_with(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_user_data)
+        self.instance_agi.set_variable.assert_called_with('__' + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_user_data)
 
     def test_xivo_recording_determinate_record(self):
 
@@ -130,7 +130,6 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         expected = [call('QR_RECORDQUEUE', '1'),
                     call('__QR_CAMPAIGN_ID', self.xivo_campaign_id),
-                    call('__QR_BASE_FILENAME', self.base_filename),
                     call('__' + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_data)]
         print(self.instance_agi.set_variable.mock_calls)
         self.assertTrue(self.instance_agi.set_variable.mock_calls == expected)

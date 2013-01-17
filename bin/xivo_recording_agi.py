@@ -56,7 +56,6 @@ def get_general_variables():
 def get_detailed_variables():
     xivo_vars = {}
     xivo_vars['campaign_id'] = agi.get_variable('QR_CAMPAIGN_ID')
-    xivo_vars['base_filename'] = agi.get_variable('QR_BASE_FILENAME')
     xivo_vars['agent_no'] = agi.get_variable('QR_AGENT_NB')
     xivo_vars['caller'] = agi.get_variable('QR_CALLER_NB')
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
@@ -157,17 +156,9 @@ def determinate_record():
         logger.info('No activated campaign for queue: ' + xivo_vars['queue_name'])
         sys.exit(0)
 
-    base_filename = campaigns[0]['base_filename']
-
-    if len(base_filename) == 0:
-        logger.info("No base_filename")
-        base_filename = campaigns[0]['campaign_name']
-
-    logger.debug("Base filename: " + base_filename)
     if (campaigns[0]['activated'] == "True"):
         agi.set_variable('QR_RECORDQUEUE', '1')
         agi.set_variable('__QR_CAMPAIGN_ID', campaigns[0]['id'])
-        agi.set_variable('__QR_BASE_FILENAME', base_filename)
         set_user_field()
         logger.info('Calls to queue: "' +
                     xivo_vars['queue_name'] +
@@ -205,8 +196,6 @@ def save_recording(recording):
 def save_call_details():
     logger.debug("Save recorded call details")
     xivo_vars = get_detailed_variables()
-    if xivo_vars['base_filename'] == "":
-        xivo_vars['base_filename'] = 'NoBaseFilename'
 
     filename = xivo_vars['cid'] + '.wav'
     agi.set_variable('_QR_FILENAME', filename)
