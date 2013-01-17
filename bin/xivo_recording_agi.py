@@ -135,7 +135,7 @@ def get_queue_id(queue_name):
 
 
 def set_user_field():
-    agi.set_variable(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
+    agi.set_variable("__" + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
                      agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD))
 
 

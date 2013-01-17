@@ -1,21 +1,25 @@
-!!! Work in progress !!!
-
 TODO:
 -----
-- refactor db integration 
-- install package for Webi
-- uninstall script
+- refactor db integration
+- this composant will be integrated into XiVO soon 
 
 Depends :
 ---------
 XiVO:
 - xivo-dao
 - lib-python
+- xivo-client-sim-1.0
 
 HTTP/PHP:
 - HTTPful
 
-Other dependencies will be installed by the install script
+Other dependencies will be installed by the install script:
+- for independent web server (temporary):
+--- gevent-0.13.8, greenlet-0.4.0, tornado-2.4.1, Flask-0.9, Werkzeug-0.8.3, 
+--- tornado
+- for pip support (temporary)
+--- binutils build-essential cpp cpp-4.4 dpkg-dev g++ g++-4.4 gcc gcc-4.4 libc-dev-bin libc6-dev libdpkg-perl libevent-1.4-2 libevent-core-1.4-2 libevent-dev libevent-extra-1.4-2 libmpfr4 libssl-dev libstdc++6-4.4-dev libtimedate-perl linux-libc-dev make python-dev python-pip python-setuptools python2.6-dev zlib1g-dev 
+
 
 Installation :
 --------------
@@ -23,15 +27,18 @@ use xivo-recording.tar
 
 tar -xvf xivo-recording.tar
 cd xivo-recording
+
+Be sure to have a corresponding web interface package in the xivo-recording directory (with the support of the recording)! 
 ./install.sh
+
+Patch dao (git repo xivo-dao branch recording):
+xivo-dao/xivo_dao/agentfeaturesdao.py
+xivo-dao/xivo_dao/queue_features_dao.py
+
 
 Removing:
 ----------
-use xivo-recording.tar
-
-tar -xvf xivo-recording.tar
-cd xivo-recording
-./uninstall.sh 
+manual
 
  
 Packaging :

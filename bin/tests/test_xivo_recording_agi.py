@@ -131,6 +131,6 @@ class TestXivoRecordingAgi(unittest.TestCase):
         expected = [call('QR_RECORDQUEUE', '1'),
                     call('__QR_CAMPAIGN_ID', self.xivo_campaign_id),
                     call('__QR_BASE_FILENAME', self.base_filename),
-                    call(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_data)]
+                    call('__' + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_data)]
         print(self.instance_agi.set_variable.mock_calls)
         self.assertTrue(self.instance_agi.set_variable.mock_calls == expected)
