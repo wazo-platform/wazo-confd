@@ -42,12 +42,12 @@ class RestQueues:
             raise e
         return True
 
-    def create_if_not_exists(self, queue_id):
+    def create_if_not_exists(self, queue_id, queue_name):
         try:
             queue_features_dao.get(queue_id)
         except LookupError:
             self.queue.id = str(queue_id)
-            self.queue.name = "test_lettuce" + str(queue_id)
+            self.queue.name = queue_name
             self.queue.displayname = self.queue.name
             try:
                 queue_features_dao.add_queue(self.queue)

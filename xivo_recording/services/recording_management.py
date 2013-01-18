@@ -121,7 +121,7 @@ class RecordingManagement:
 
             logphrase = "File " + filename + " is being deleted."
             getoutput('logger -t xivo-recording "' + logphrase + '"')
-            os.remove(RecordingConfig.RECORDING_FILE_ROOT_PATH + filename)
+            os.remove(RecordingConfig.RECORDING_FILE_ROOT_PATH + "/" + filename)
             return True
 
     def supplement_add_input(self, data):
