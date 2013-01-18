@@ -42,6 +42,7 @@ from xivo_recording.services.manager_utils import _init_db_connection, \
 import logging
 import os
 from commands import getoutput
+from xivo_recording.recording_config import RecordingConfig
 
 logger = logging.getLogger(__name__)
 
@@ -111,11 +112,16 @@ class RecordingManagement:
     def delete(self, campaign_id, recording_id):
         filename = self.recording_details_db.delete(campaign_id, recording_id)
         if(filename == None):
+            logger.error("Recording file remove error - no filename!")
             return False
         else:
+            logger.debug("Deleting file: " + \
+                         RecordingConfig.RECORDING_FILE_ROOT_PATH + \
+                         filename)
+
             logphrase = "File " + filename + " is being deleted."
             getoutput('logger -t xivo-recording "' + logphrase + '"')
-            os.remove("/var/lib/pf-xivo/sounds/campagnes/" + filename)
+            os.remove(RecordingConfig.RECORDING_FILE_ROOT_PATH + filename)
             return True
 
     def supplement_add_input(self, data):

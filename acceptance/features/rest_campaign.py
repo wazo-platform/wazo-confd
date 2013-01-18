@@ -140,7 +140,7 @@ class RestCampaign(object):
         connection.request("POST", requestURI, body, headers)
 
         #we create the file
-        dirname = '/var/lib/pf-xivo/sounds/campagnes'
+        dirname = RecordingConfig.RECORDING_FILE_ROOT_PATH
         if(not os.path.exists(dirname)):
             cron_utils.create_dir(dirname)
         myfile = open(dirname + "/" + recording['filename'], 'w')
