@@ -1,24 +1,28 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
+
+# Copyright (C) 2012  Avencall
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+from acceptance.features.cron_utils import create_dir
+from acceptance.features.rest_campaign import RestCampaign
 from commands import getoutput
 from datetime import timedelta, datetime
 from lettuce import step
 import os
 
 directory = None
-
-
-def create_dir(dirname):
-    exists = os.path.exists(dirname)
-    list_dirs = []
-    head = dirname
-    while not exists:
-        (head, tail) = os.path.split(head)
-        list_dirs.append(tail)
-        exists = os.path.exists(head)
-    list_dirs.reverse()
-    for folder in list_dirs:
-        head += "/" + folder
-        os.mkdir(head)
 
 
 @step(u'Given there is a directory "([^"]*)"')
@@ -72,3 +76,21 @@ def then_group1_and_group2_are_not_deleted(step, group1, group2):
     global directory
     assert os.path.exists(directory + "/" + group1), group1 + " does not exist."
     assert os.path.exists(directory + "/" + group2), group2 + " does not exist."
+
+
+@step(u'Given there is a recording with id "([^"]*)" created "([^"]*)" days ago with campaign "([^"]*)" and agent "([^"]*)"')
+def given_there_is_a_recording_with_id_group1_created_group2_days_ago_with_campaign_group3(step, rec_id, numdays, camp_id, agent_no):
+    rest_campaign = RestCampaign()
+    time = datetime.now()
+    tdelta = timedelta(days=int(numdays))
+    time = time - tdelta
+    assert rest_campaign.addRecordingDetails(camp_id, rec_id,
+                                             '2002', agent_no, time.strftime("%Y-%m-%d %H:%M:%S")), "Could not create the recording"
+
+
+@step(u'Then items "([^"]*)" and "([^"]*)" are deleted')
+def then_items_group1_and_group2_are_deleted(step, group1, group2):
+    assert False, 'This step must be implemented'
+@step(u'Then items "([^"]*)" and "([^"]*)" are not deleted')
+def then_items_group1_and_group2_are_not_deleted(step, group1, group2):
+    assert False, 'This step must be implemented'

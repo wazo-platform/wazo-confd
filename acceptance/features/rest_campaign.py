@@ -16,21 +16,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from acceptance.features import cron_steps
+from acceptance.features import cron_utils
 from acceptance.features.rest_queues import RestQueues
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder,\
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder, \
     RecordCampaignDao
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder, \
+    RecordingDetailsDao
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
 from xivo_recording.services.manager_utils import _init_db_connection
 import datetime
 import os
 import random
-from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder,\
-    RecordingDetailsDao
 
 
 class RestCampaign(object):
@@ -138,7 +138,7 @@ class RestCampaign(object):
         #we create the file
         dirname = '/var/lib/pf-xivo/sounds/campagnes'
         if(not os.path.exists(dirname)):
-            cron_steps.create_dir(dirname)
+            cron_utils.create_dir(dirname)
         myfile = open(dirname + "/" + recording['filename'], 'w')
         myfile.write('')
         myfile.close()
