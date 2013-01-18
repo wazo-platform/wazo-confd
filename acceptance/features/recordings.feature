@@ -84,9 +84,11 @@ Feature: Call recordings management
 	  Then I get exactly "5" recordings
 	  
 	Scenario: Add recording end time
-	  Given there is a campaign of id "1"
+	  Given there is no campaign
+	  Given there is a queue named "test_queue"
+	  Given there is a campaign named "test_campaign" for a queue "test_queue"
 	  Given there is an agent "222"
-	  Given there is a recording referenced by a "callid" with agent "222"
+	  Given there is a recording in campaign "test_campaign" referenced by a "callid" answered by agent "222"
 	  Given I update the recording referenced by a "callid" with end time "2099-01-13 10:25:55"
 	  When I consult the recording referenced by a "callid"
 	  Then I get a recording with end time "2099-01-13 10:25:55"

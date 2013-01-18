@@ -27,6 +27,7 @@ def create_dir(dirname):
         list_dirs.append(tail)
         exists = os.path.exists(head)
     if len(list_dirs) > 0:
+        print('\n' + str(os.path.exists(dirname)) + ': ' + str(list_dirs) + '\n')
         list_dirs.reverse()
         for folder in list_dirs:
             head += "/" + folder

@@ -3,7 +3,7 @@ Feature: Automatic deletion - must be launched as super user
 	In order to avoid hard disk overloading
 	
 	Scenario: WAV files deletion
-	  Given there is a directory "/var/lib/pf-xivo/sounds/campagnes"
+	  Given there is a directory "/var/lib/pf-xivo/sounds/campagnes/"
 	  Given there is a file "test1.wav" created "40" days ago
 	  Given there is a file "test2.wav" created "32" days ago
 	  Given there is a file "test3.wav" created "31" days ago

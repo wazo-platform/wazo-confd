@@ -19,9 +19,11 @@
 from lettuce import step
 from rest_campaign import RestCampaign
 from time import strftime, localtime
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder, \
+    RecordCampaignDao
 from xivo_recording.recording_config import RecordingConfig
 import random
+from xivo_recording.services.manager_utils import _init_db_connection
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -247,3 +249,46 @@ def then_the_two_lists_of_recording_do_not_overlap(step):
 def when_we_search_recordings_in_the_campaign_with_the_key_page_and_page_size(step, campaign, key, page, pagesize):
     global single_result
     single_result = rest_campaign.search_paginated_recordings(campaign, key, page, pagesize)
+
+
+@step(u'Given there is a recording in campaign "([^"]*)" referenced by a "([^"]*)" answered by agent "([^"]*)"')
+def given_there_is_a_recording_in_campaign_group1_referenced_by_a_group2_answered_by_agent_group3(step, local_campaign_name, callid, agent_no):
+    record_db = _init_db_connection(RecordCampaignDbBinder)
+    global campaign_name
+    campaign_id = record_db.id_from_name(campaign_name)
+    time = "2012-01-01 00:00:00"
+    assert rest_campaign.addRecordingDetails(campaign_id, callid, "caller",
+                                             agent_no, time), "Impossible to create recording"
+
+
+@step(u'Given I update the recording referenced by a "([^"]*)" with end time "([^"]*)"')
+def given_i_update_the_recording_referenced_by_a_group1_with_end_time_group2(step, group1, group2):
+    assert False, 'This step must be implemented'
+
+
+@step(u'When I consult the recording referenced by a "([^"]*)"')
+def when_i_consult_the_recording_referenced_by_a_group1(step, group1):
+    assert False, 'This step must be implemented'
+
+
+@step(u'Then I get a recording with end time "([^"]*)"')
+def then_i_get_a_recording_with_end_time_group1(step, group1):
+    assert False, 'This step must be implemented'
+
+
+#@step(u'Given I update the recording referenced by a "([^"]*)" with end time "([^"]*)"')
+#def given_i_update_the_recording_referenced_by_a_group1_with_end_time_group2(step, callid, end_time):
+#    assert rest_campaign.addRecordingDetails(campaign_id, callid,
+#                                             caller_no, agent_no, time), "Impossible to update "
+#    assert False, 'This step must be implemented'
+#
+#
+#@step(u'When I consult the recording referenced by a "([^"]*)"')
+#def when_i_consult_the_recording_referenced_by_a_group1(step, group1):
+#    assert False, 'This step must be implemented'
+#
+#
+#@step(u'Then I get a recording with end time "([^"]*)"')
+#def then_i_get_a_recording_with_end_time_group1(step, group1):
+#    assert False, 'This step must be implemented'
+
