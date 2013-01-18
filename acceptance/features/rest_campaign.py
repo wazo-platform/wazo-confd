@@ -16,21 +16,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from acceptance.features import cron_steps
+from acceptance.features import cron_utils
 from acceptance.features.rest_queues import RestQueues
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder, \
     RecordCampaignDao
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder, \
+    RecordingDetailsDao
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
 from xivo_recording.services.manager_utils import _init_db_connection
 import datetime
 import os
 import random
-from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder, \
-    RecordingDetailsDao
 from xivo_dao import queue_features_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 
@@ -52,7 +52,9 @@ class RestCampaign(object):
         session = connection.get_session()
         return session
 
-    def create(self, campaign_name, queue_name='test', activated=True, start_date=None, end_date=None, campaign_id=None):
+    def create(self, campaign_name, queue_name='test', activated=True,
+               start_date=None, end_date=None, campaign_id=None):
+
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -140,7 +142,7 @@ class RestCampaign(object):
         #we create the file
         dirname = '/var/lib/pf-xivo/sounds/campagnes'
         if(not os.path.exists(dirname)):
-            cron_steps.create_dir(dirname)
+            cron_utils.create_dir(dirname)
         myfile = open(dirname + "/" + recording['filename'], 'w')
         myfile.write('')
         myfile.close()
@@ -218,7 +220,14 @@ class RestCampaign(object):
         if(result == None or len(result) == 0):
             rest_queues = RestQueues()
             rest_queues.create_if_not_exists(1)
-            result = self.create("lettuce" + str(random.randint(100, 999)), 1, True, datetime.datetime.now().strftime("%Y-%m-%d"), datetime.datetime.now().strftime("%Y-%m-%d"), campaign_id)
+            result = self.create("lettuce" +
+                                 str(random.randint(100, 999)),
+                                 1,
+                                 True,
+                                 datetime.datetime.now().strftime("%Y-%m-%d"),
+                                 datetime.datetime.now().strftime("%Y-%m-%d"),
+                                 campaign_id)
+
             print "\n========================" + str(result) + "\n"
             return type(result) == int and result > 0
         return True
@@ -234,7 +243,8 @@ class RestCampaign(object):
         else:
             return True
 
-    def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName", lastname="LastName", context="default", language="fr_FR"):
+    def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName",
+                                lastname="LastName", context="default", language="fr_FR"):
         try:
             agent_id = self.agentFeatDao.agent_id(agent_no)
             return agent_id
@@ -296,7 +306,8 @@ class RestCampaign(object):
             print "\nException raised: " + str(e) + "\n"
             return False
 
-    def create_with_errors(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id=None):
+    def create_with_errors(self, campaign_name, queue_id=1, activated=True,
+                           start_date=None, end_date=None, campaign_id=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -343,7 +354,9 @@ class RestCampaign(object):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + campaign_id + "/"
+                        RecordingConfig.XIVO_RECORDING_SERVICE_PATH + \
+                        "/" + campaign_id + "/"
+
         params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
