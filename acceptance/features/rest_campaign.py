@@ -59,7 +59,7 @@ class RestCampaign(object):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-
+        self.queue_create_if_not_exists(queue_name)
         campaign = {}
 
         campaign["campaign_name"] = campaign_name
@@ -141,7 +141,9 @@ class RestCampaign(object):
 
         #we create the file
         dirname = RecordingConfig.RECORDING_FILE_ROOT_PATH
+        print "\nexists? " + str(os.path.exists(dirname)) + "\n"
         if(not os.path.exists(dirname)):
+            print "\ngoing to create the dir\n"
             cron_utils.create_dir(dirname)
         myfile = open(dirname + "/" + recording['filename'], 'w')
         myfile.write('')
@@ -219,10 +221,10 @@ class RestCampaign(object):
         result = self.getCampaign(campaign_id)
         if(result == None or len(result) == 0):
             rest_queues = RestQueues()
-            rest_queues.create_if_not_exists(1)
+            rest_queues.create_if_not_exists(1, 'test')
             result = self.create("lettuce" +
                                  str(random.randint(100, 999)),
-                                 1,
+                                 'test',
                                  True,
                                  datetime.datetime.now().strftime("%Y-%m-%d"),
                                  datetime.datetime.now().strftime("%Y-%m-%d"),

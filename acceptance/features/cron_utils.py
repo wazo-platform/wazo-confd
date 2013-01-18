@@ -19,6 +19,7 @@ import os
 
 
 def create_dir(dirname):
+    dirname = dirname.rstrip("/")
     exists = os.path.exists(dirname)
     list_dirs = []
     head = dirname
