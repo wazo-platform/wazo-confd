@@ -48,7 +48,7 @@ def get_general_variables():
     xivo_vars = {}
     xivo_vars['queue_name'] = agi.get_variable('XIVO_QUEUENAME')
     xivo_vars['xivo_srcnum'] = agi.get_variable('XIVO_SRCNUM')
-    xivo_vars['xivo_destnum'] = agi.get_variable('XIVO_DESTNUM')
+    xivo_vars['xivo_dstnum'] = agi.get_variable('XIVO_DSTNUM')
     logger.debug(str(xivo_vars))
     return xivo_vars
 
@@ -208,6 +208,29 @@ def save_call_details():
     recording['caller'] = xivo_vars['caller']
     recording['client_id'] = xivo_vars['client_id']
     sys.exit(save_recording(recording))
+
+
+def process_call_hangup():
+    cid = agi.get_variable('UNIQUEID')
+    campaign_id = agi.get_variable('QR_CAMPAIGN_ID')
+    end_time = agi.get_variable('QR_TIME')
+    connection = RecordingConfig.getWSConnection()
+
+    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                    campaign_id + "/" + cid
+    body = {"end_time": end_time}
+    logger.debug("Update recording to URL: " + requestURI)
+    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+    connection.request("PUT", requestURI, rest_encoder.encode(body), headers)
+
+    reply = connection.getresponse()
+
+    if (reply.status == 200):
+        sys.exit(0)
+    else:
+        logger.warning("PUT recording failed with code: " + str(reply.status))
+        raise RestAPIError()
 
 
 def main():
