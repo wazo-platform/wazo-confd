@@ -50,6 +50,11 @@ def given_there_is_no_agent_with_number_group1(step, agent_no):
         assert True, "The agent does not exist"
 
 
+@step(u'Given there is a queue named "([^"]*)"')
+def given_there_is_a_queue_named_group1(step, queue_name):
+    assert rest_campaign.queue_create_if_not_exists(queue_name), "Can't add queue"
+
+
 @step(u'Then I get a response with error code \'([^\']*)\' and message \'([^\']*)\'')
 def then_i_get_a_error_code_group1_with_message_group2(step, error_code, error_message):
     global add_result
@@ -59,11 +64,11 @@ def then_i_get_a_error_code_group1_with_message_group2(step, error_code, error_m
     assert (str(add_result[1]).strip() == error_message), 'Got wrong error message'
 
 
-@step(u'Given there is a campaign named "([^"]*)"')
-def given_there_is_a_campaign_named_campaing_name(step, local_campaign_name):
+@step(u'Given there is a campaign named "([^"]*)" for a queue "([^"]*)"')
+def given_there_is_a_campaign_named_group1_for_a_queue_group2(step, local_campaign_name, local_queue_name):
     global campaign_name
     campaign_name = local_campaign_name + str(random.randint(100, 999))
-    assert rest_campaign.create(campaign_name), "Cannot create a campaign"
+    assert rest_campaign.create(campaign_name, local_queue_name), "Cannot create a campaign"
 
 
 @step(u'Given there is an agent with number "([^"]*)"')
@@ -138,7 +143,7 @@ def then_the_recording_is_deleted_and_i_get_a_response_with_code_group1(step, re
 
 @step(u'Given there is a campaign of id "([^"]*)"')
 def given_there_is_a_campaign_of_id(step, campaign_id):
-    assert rest_campaign.create_if_not_exists(campaign_id),\
+    assert rest_campaign.create_if_not_exists(campaign_id), \
             'The campaign could not be created'
 
 
@@ -154,7 +159,7 @@ def given_i_create_a_recording_for_campaign_with_caller_and_agent(step, campaign
     callid_list.append(callid)
     time = "2012-01-01 00:00:00"
     assert rest_campaign.addRecordingDetails(campaign_id, callid,
-                                             caller_no, agent_no, time),\
+                                             caller_no, agent_no, time), \
             "Cannot add call details"
 
 
@@ -195,7 +200,7 @@ def given_there_are_at_least_group1_recordings_for_group2_and_agent_group3(step,
     if(res['total'] < int(num_rec)):
         i = res['total']
         while(i <= int(num_rec)):
-            rest_campaign.addRecordingDetails(campaign, str(random.randint(1000,9999)), "222", agent, time)
+            rest_campaign.addRecordingDetails(campaign, str(random.randint(1000, 9999)), "222", agent, time)
             i += 1
         res = rest_campaign.search_recordings(campaign, agent)
     assert res['total'] >= int(num_rec), 'Not enough recordings: ' + str(res)

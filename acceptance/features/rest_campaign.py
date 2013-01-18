@@ -21,7 +21,7 @@ from acceptance.features.rest_queues import RestQueues
 from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder,\
+from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder, \
     RecordCampaignDao
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
@@ -29,8 +29,10 @@ from xivo_recording.services.manager_utils import _init_db_connection
 import datetime
 import os
 import random
-from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder,\
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder, \
     RecordingDetailsDao
+from xivo_dao import queue_features_dao
+from xivo_dao.alchemy.queuefeatures import QueueFeatures
 
 
 class RestCampaign(object):
@@ -50,7 +52,7 @@ class RestCampaign(object):
         session = connection.get_session()
         return session
 
-    def create(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id=None):
+    def create(self, campaign_name, queue_name='test', activated=True, start_date=None, end_date=None, campaign_id=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -60,7 +62,7 @@ class RestCampaign(object):
 
         campaign["campaign_name"] = campaign_name
         campaign["base_filename"] = campaign_name + "-file-"
-        campaign["queue_id"] = queue_id
+        campaign["queue_id"] = queue_features_dao.id_from_name(queue_name)
         campaign["activated"] = activated
         if start_date != None:
             campaign["start_date"] = str(start_date)
@@ -221,6 +223,17 @@ class RestCampaign(object):
             return type(result) == int and result > 0
         return True
 
+    def queue_create_if_not_exists(self, queue_name):
+        if not queue_features_dao.is_a_queue(queue_name):
+            queue = QueueFeatures()
+            queue.name = queue_name
+            queue.displayname = queue_name
+
+            queue_features_dao.add_queue(queue)
+            return queue_features_dao.is_a_queue(queue_name)
+        else:
+            return True
+
     def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName", lastname="LastName", context="default", language="fr_FR"):
         try:
             agent_id = self.agentFeatDao.agent_id(agent_no)
@@ -282,7 +295,7 @@ class RestCampaign(object):
         except Exception as e:
             print "\nException raised: " + str(e) + "\n"
             return False
-        
+
     def create_with_errors(self, campaign_name, queue_id=1, activated=True, start_date=None, end_date=None, campaign_id=None):
         connection = RecordingConfig.getWSConnection()
 
