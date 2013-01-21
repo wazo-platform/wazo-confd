@@ -193,16 +193,6 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.assertTrue(self.instance_agi.set_variable.mock_calls == expected)
 
     def test_process_call_hangup(self):
-        def get_variable_side_effect(name):
-            if name == 'QR_TIME':
-                return '2012-01-01 00:00:00'
-            elif name == 'QR_CAMPAIGN_ID':
-                return '1'
-            elif name == 'UNIQUEID':
-                return '001'
-
-        self.instance_agi.get_variable.side_effect = self.mock_agi_get_variable
-        self.instance_agi.get_variable.call_args_list = []
 
         response = Mock()
         response.read.return_value = 'Updated: True'
@@ -211,12 +201,8 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         from bin import xivo_recording_agi
 
-        self.assertRaises(SystemExit, xivo_recording_agi.process_call_hangup)
-
-        expected = [call('UNIQUEID'), call('QR_CAMPAIGN_ID'), call('QR_TIME')]
-        self.assertListEqual(expected, self.instance_agi.get_variable.call_args_list,
-                             "Actual calls: " + str(self.instance_agi.get_variable.call_args_list) + \
-                             ", expected were: " + str(expected))
+        with self.assertRaises(SystemExit):
+            xivo_recording_agi.process_call_hangup(self.unique_id, str(self.xivo_campaign_id), self.xivo_date)
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/1/001"

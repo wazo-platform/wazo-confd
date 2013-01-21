@@ -141,13 +141,12 @@ class RestCampaign(object):
 
         #we create the file
         dirname = RecordingConfig.RECORDING_FILE_ROOT_PATH
-        print "\nexists? " + str(os.path.exists(dirname)) + "\n"
         if(not os.path.exists(dirname)):
-            print "\ngoing to create the dir\n"
             cron_utils.create_dir(dirname)
         myfile = open(dirname + "/" + recording['filename'], 'w')
         myfile.write('')
         myfile.close()
+        # TODO : permettre au WebService de supprimer les fichiers
 
         reply = connection.getresponse()
         response = reply.read()

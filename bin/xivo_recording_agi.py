@@ -210,12 +210,8 @@ def save_call_details():
     sys.exit(save_recording(recording))
 
 
-def process_call_hangup():
-    cid = agi.get_variable('UNIQUEID')
-    campaign_id = agi.get_variable('QR_CAMPAIGN_ID')
-    end_time = agi.get_variable('QR_TIME')
+def process_call_hangup(cid, campaign_id, end_time):
     connection = RecordingConfig.getWSConnection()
-
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                     campaign_id + "/" + cid
@@ -244,6 +240,8 @@ def main():
             determinate_record()
         elif (action == 'saveCallDetails'):
             save_call_details()
+        elif action == 'processCallHangup':
+            process_call_hangup() #passer en paramètre les variables de la ligne de commande
         else:
             logger.warning("No action given, exit")
             sys.exit(0)
