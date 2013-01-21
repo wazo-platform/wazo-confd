@@ -72,7 +72,7 @@ def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step
     r_queue.create_if_not_exists(queue_id)
     campaign_name = local_campaign_name + str(random.randint(100, 999))
     result = r_campaign.create(campaign_name, int(queue_id))
-    assert result>0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
+    assert result > 0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
 
 
 @step(u'Given there is an non activated campaign named "([^"]*)" focusing queue "([^"]*)"')
@@ -133,7 +133,7 @@ def edition_step_execution(step, local_campaign_name, local_queue_id, local_star
               'start_date' : local_start_date,
               'end_date' : local_end_date
               }
-    assert r_campaign.update(campaign_id, params), "Cannot update campaign " + str(campaign_id)
+    assert r_campaign.updateCampaign(campaign_id, params), "Cannot update campaign " + str(campaign_id)
 
 
 @step(u'Then the campaign is actually modified')
@@ -238,7 +238,7 @@ def step_unproper_dates(step, campaign, sdate, edate):
 def then_i_get_an_error_code_group1_with_message_group2(step, error_code, message):
     global return_tuple
     assert str(return_tuple[0]) == error_code, "Got wrong error code: " + str(return_tuple[0])
-    assert return_tuple[1] == [message], "Got wrong message: " +  str(return_tuple[1])
+    assert return_tuple[1] == [message], "Got wrong message: " + str(return_tuple[1])
 
 @step(u'When I ask for all the campaigns')
 def when_i_ask_for_all_the_campaigns(step):
@@ -250,7 +250,7 @@ def when_i_ask_for_all_the_campaigns(step):
 @step(u'Then the displayed total is equal to the actual number of campaigns')
 def then_the_displayed_total_is_equal_to_the_actual_number_of_campaigns(step):
     global result
-    assert result['total'] == len(result['data']), 'Got total ' + str(result['total']) +\
+    assert result['total'] == len(result['data']), 'Got total ' + str(result['total']) + \
         " but real number was " + str(len(result['data']))
 
 
@@ -263,9 +263,9 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
         i = res['total']
         now = datetime.datetime.now()
         while(i < int(num_of_campaigns)):
-            d = datetime.timedelta(days=(i+1))
+            d = datetime.timedelta(days=(i + 1))
             oned = datetime.timedelta(days=1)
-            r_campaign.create(str(random.randint(1000,9999)), queue_id, True,
+            r_campaign.create(str(random.randint(1000, 9999)), queue_id, True,
                               (now + d).strftime("%Y-%m-%d"), (now + d + oned).strftime("%Y-%m-%d"))
             i += 1
         res = r_campaign.list()

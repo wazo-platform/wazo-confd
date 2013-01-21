@@ -178,7 +178,7 @@ class RestCampaign(object):
                 result = True
         return result
 
-    def update(self, campaign_id, params):
+    def updateCampaign(self, campaign_id, params):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
