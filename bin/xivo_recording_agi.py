@@ -19,6 +19,8 @@
 from xivo.agi import AGI
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
+import argparse
+from datetime import datetime
 import logging
 import sys
 import traceback
@@ -61,7 +63,8 @@ def get_detailed_variables():
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
     xivo_vars['queue_name'] = agi.get_variable('QR_QUEUENAME')
-    xivo_vars['client_id'] = agi.get_variable(RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)
+    xivo_vars['client_id'] = agi.get_variable(
+                    RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)
     logger.debug(str(xivo_vars))
     return xivo_vars
 
@@ -134,8 +137,10 @@ def get_queue_id(queue_name):
 
 
 def set_user_field():
-    agi.set_variable("__" + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
-                     agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD))
+    agi.set_variable(
+                 "__" +\
+                 RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
+                 agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD))
 
 
 def determinate_record():
@@ -153,7 +158,8 @@ def determinate_record():
     logger.debug("Campaigns: " + str(campaigns))
     if(campaigns == []):
         agi.set_variable('QR_RECORDQUEUE', '0')
-        logger.info('No activated campaign for queue: ' + xivo_vars['queue_name'])
+        logger.info('No activated campaign for queue: ' +\
+                     xivo_vars['queue_name'])
         sys.exit(0)
 
     if (campaigns[0]['activated'] == "True"):
@@ -210,12 +216,13 @@ def save_call_details():
     sys.exit(save_recording(recording))
 
 
-def process_call_hangup(cid, campaign_id, end_time):
+def process_call_hangup(cid, campaign_id):
     connection = RecordingConfig.getWSConnection()
     requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                     campaign_id + "/" + cid
-    body = {"end_time": end_time}
+    body = {"end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    print str(body)
     logger.debug("Update recording to URL: " + requestURI)
     headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request("PUT", requestURI, rest_encoder.encode(body), headers)
@@ -229,22 +236,37 @@ def process_call_hangup(cid, campaign_id, end_time):
         raise RestAPIError()
 
 
+def process_call_hangup_args():
+    parser = _new_parser()
+    if(len(sys.argv) < 6):
+        logger.error('processCallHangup must be called with parameters ' +\
+                     'time, cid and campaign')
+        sys.exit(1)
+    parsing_res = parser.parse_args(sys.argv[2:])
+    process_call_hangup(parsing_res.cid, parsing_res.campaign)
+
+
+def _new_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cid')
+    parser.add_argument('--campaign')
+    return parser
+
+
 def main():
     init_logging(DEBUG_MODE)
     try:
-        if len(sys.argv) != 2:
+        if len(sys.argv) < 2:
             logger.error("wrong number of arguments")
             sys.exit(1)
-        action = sys.argv[1]
-        if (action == 'determinateRecord'):
-            determinate_record()
-        elif (action == 'saveCallDetails'):
-            save_call_details()
-        elif action == 'processCallHangup':
-            process_call_hangup() #passer en paramètre les variables de la ligne de commande
-        else:
-            logger.warning("No action given, exit")
-            sys.exit(0)
+        option_dict = {
+                       'determinateRecord': determinate_record,
+                       'saveCallDetails': save_call_details,
+                       'processCallHangup': process_call_hangup_args}
+        if(sys.argv[1] not in option_dict):
+            logger.error("Invalid argument provided: " + sys.argv[1])
+            sys.exit(1)
+        option_dict[sys.argv[1]]()
     except Exception:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         logger.error(repr(traceback.format_exception(exc_type, exc_value,
