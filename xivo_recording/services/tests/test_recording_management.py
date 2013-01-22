@@ -18,10 +18,12 @@
 
 from datetime import datetime
 from mock import Mock, patch
+from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.services import manager_utils
+import commands
 import copy
+import os
 import unittest
-from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
 
 
 class FakeDate(datetime):
@@ -49,6 +51,11 @@ class TestCampagneManagement(unittest.TestCase):
         mock_patch_datetime = self.patcher_datetime.start()
         self.instance_datetime = FakeDate
         mock_patch_datetime.return_value = self.instance_datetime
+
+#        self.patcher_os = patch("os.remove")
+#        patch_os = self.patcher_os.start()
+#        self.os_remove_function = Mock(os.remove)
+#        patch_os.return_value = self.os_remove_function
 
         from xivo_recording.services.recording_management import RecordingManagement
         self._recordingManager = RecordingManagement()
@@ -99,3 +106,103 @@ class TestCampagneManagement(unittest.TestCase):
         self.assertDictEqual(result, expected_result)
         self._recordingManager.recording_details_db.get_recordings_as_list\
                     .assert_called_with(campaign_id, search, None)
+
+    def test_get_recordings_as_dict_paginated(self):
+        campaign_id = 1
+        search = {'cid': '111',
+                  'caller': '2002',
+                  'agent_no': '1000'}
+        technical_params = {'_page': '1',
+                            '_pagesize': '20',
+                            '_foo': 'bar'}
+        dao_result = {'total': 1,
+                      'data': [{'cid': '111',
+                                'caller': '2002',
+                                'agent_id': '1'}]}
+        expected_result = copy.deepcopy(dao_result)
+        expected_result['data'][0]['agent_no'] = '1000'
+        self._recordingManager.recording_details_db.get_recordings_as_list\
+                       .return_value = dao_result
+        self._recordingManager.agentFeatDao.agent_number.return_value = '1000'
+        self._recordingManager.agentFeatDao.agent_id.return_value = '1'
+
+        result = self._recordingManager.get_recordings_as_dict(campaign_id,
+                                                               search,
+                                                               technical_params)
+        del search['agent_no']
+        search['agent_id'] = '1'
+        self.assertDictEqual(result, expected_result)
+        self._recordingManager.recording_details_db.get_recordings_as_list\
+                    .assert_called_with(campaign_id, search, (1, 20))
+
+    def test_search_recordings_paginated(self):
+        campaign_id = 1
+        search = {'key': '2002',
+                  'foo': 'bar'}
+        technical_params = {'_page': '1',
+                            '_pagesize': '20',
+                            '_foo': 'bar'}
+        dao_result = {'total': 1,
+                      'data': [{'cid': '111',
+                                'caller': '2002',
+                                'agent_id': '1'}]}
+        expected_result = copy.deepcopy(dao_result)
+        expected_result['data'][0]['agent_no'] = '1000'
+        self._recordingManager.recording_details_db.search_recordings\
+                       .return_value = dao_result
+        self._recordingManager.agentFeatDao.agent_number.return_value = '1000'
+
+        result = self._recordingManager.search_recordings(campaign_id,
+                                                          search,
+                                                          technical_params)
+        self.assertDictEqual(result, expected_result)
+        self._recordingManager.recording_details_db.search_recordings\
+                    .assert_called_with(campaign_id, '2002', (1, 20))
+
+    def test_search_recordings(self):
+        campaign_id = 1
+        search = {'key': '2002',
+                  'foo': 'bar'}
+        dao_result = {'total': 1,
+                      'data': [{'cid': '111',
+                                'caller': '2002',
+                                'agent_id': '1'}]}
+        expected_result = copy.deepcopy(dao_result)
+        expected_result['data'][0]['agent_no'] = '1000'
+        self._recordingManager.recording_details_db.search_recordings\
+                       .return_value = dao_result
+        self._recordingManager.agentFeatDao.agent_number.return_value = '1000'
+
+        result = self._recordingManager.search_recordings(campaign_id,
+                                                               search, None)
+        self.assertDictEqual(result, expected_result)
+        self._recordingManager.recording_details_db.search_recordings\
+                    .assert_called_with(campaign_id, '2002', None)
+
+    def test_delete(self):
+        campaign_id = 1
+        cid = '001'
+        filename = 'filename.wav'
+        self._recordingManager.recording_details_db.delete\
+                       .return_value = filename
+        os.remove = Mock()
+        self.assertTrue(self._recordingManager.delete(campaign_id, cid))
+        self._recordingManager.recording_details_db.delete\
+                    .assert_called_with(campaign_id, cid)
+        os.remove.assert_called_with(RecordingConfig.RECORDING_FILE_ROOT_PATH +\
+                         '/' + filename)
+
+    def test_supplement_add_input(self):
+        data = {'champ1': '',
+                'champ2': ''}
+        expected_result = {'champ1': None,
+                           'champ2': None}
+        result = self._recordingManager.supplement_add_input(data)
+        self.assertDictEqual(expected_result, result)
+
+    def test_get_paginator(self):
+        params = {'_page': '1',
+                  '_pagesize': '20',
+                  '_foo': 'bar'}
+        result = self._recordingManager._get_paginator(params)
+        self.assertTupleEqual(result, (1, 20))
