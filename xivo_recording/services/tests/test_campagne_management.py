@@ -62,4 +62,3 @@ class TestCampagneManagement(unittest.TestCase):
         self._campagneManager.record_db.get_records_as_dict.return_value = data
 
         self.assertEqual(self._campagneManager._get_campaigns_as_dict(), data)
-

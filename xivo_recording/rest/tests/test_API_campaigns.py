@@ -205,7 +205,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "queue_name": "queue_1"
         }
 
-        def mock_update(instance, campaign_id):
+        def mock_update(campaign_id, body):
             raise NoSuchElementException(str(campaign_id))
 
         self.instance_campagne_management.update_campaign\
@@ -237,7 +237,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "queue_name": "queue_1"
         }
 
-        def mock_update(instance, campaign_id):
+        def mock_update(campaign_id, body):
             raise IntegrityError(None, None, None)
 
         self.instance_campagne_management.update_campaign\
@@ -271,7 +271,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 "queue_name": "queue_1"
             }
 
-            def mock_update(instance, campaign_id):
+            def mock_update(campaign_id, body):
                 raise InvalidInputException('', liste)
 
             self.instance_campagne_management.update_campaign\

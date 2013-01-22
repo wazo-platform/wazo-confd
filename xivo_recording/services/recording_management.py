@@ -134,7 +134,10 @@ class RecordingManagement:
 
     def _get_paginator(self, technical_params):
         paginator = None
-        if(technical_params != None and '_page' in technical_params and '_pagesize' in technical_params):
-            paginator = (int(technical_params['_page']), int(technical_params['_pagesize']))
+        if(technical_params != None\
+           and '_page' in technical_params\
+           and '_pagesize' in technical_params):
+            paginator = (int(technical_params['_page']),
+                         int(technical_params['_pagesize']))
         logger.debug("Created paginator: " + str(paginator))
         return paginator

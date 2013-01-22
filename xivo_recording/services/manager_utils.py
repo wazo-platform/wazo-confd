@@ -39,30 +39,33 @@ from sqlalchemy.exc import OperationalError
 from xivo_dao.alchemy import dbconnection
 from xivo_recording.recording_config import RecordingConfig
 import logging
-from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 logger = logging.getLogger(__name__)
 
 
 def _init_db_connection(binderClass=None):
-    '''Initialise la connexion à la base de données, et renvoie, si nécessaire, une instance de la
-    classe passée en paramètre. Cette classe doit posséder une méthode statique new_from_uri()'''
+    '''Initialise la connexion à la base de données, et renvoie, si nécessaire,
+    une instance de la classe passée en paramètre. Cette classe doit posséder
+    une méthode statique new_from_uri()'''
     dbconnection.unregister_db_connection_pool()
-    dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
+    dbconnection.register_db_connection_pool(
+                     dbconnection.DBConnectionPool(dbconnection.DBConnection))
     dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
-    dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI, 'asterisk')
+    dbconnection.add_connection_as(RecordingConfig.RECORDING_DB_URI,
+                                   'asterisk')
     if binderClass != None:
         return binderClass.new_from_uri(RecordingConfig.RECORDING_DB_URI)
 
 
 def reconnectable(attribute_name):
-    '''Décorateur permettant de rétablir la connexion à la base de données si elle a été perdue.
-    Il est à utiliser sur les méthodes (uniquement les méthodes, pas les fonctions simples)
-    faisant appel aux DAO.
-    Il prend en paramètre le nom de l'attribut responsable de la connexion à la base de données
-    (xxxDbBinder)
-    Si un tel attribut n'existe pas, "None" doit être passé en paramètre
-    Une méthode utilisant ce décorateur doit "laisser passer" les exceptions de type OperationalError'''
+    '''Décorateur permettant de rétablir la connexion à la base de données si
+    elle a été perdue. Il est à utiliser sur les méthodes (uniquement les
+    méthodes, pas les fonctions simples) faisant appel aux DAO.
+    Il prend en paramètre le nom de l'attribut responsable de la connexion à
+    la base de données (xxxDbBinder).
+    Si un tel attribut n'existe pas, "None" doit être passé en paramètre.
+    Une méthode utilisant ce décorateur doit "laisser passer" les exceptions
+    de type OperationalError'''
     def reconnector(func):
         def reconnected_func(self, *args, **kwargs):
             global logger
@@ -74,7 +77,9 @@ def reconnectable(attribute_name):
                 if(attribute_name == None):
                     _init_db_connection()
                 else:
-                    setattr(self, attribute_name, _init_db_connection(getattr(self, attribute_name).__class__))
+                    attr_value = _init_db_connection(
+                                    getattr(self, attribute_name).__class__)
+                    setattr(self, attribute_name, attr_value)
                 result = func(self, *args, **kwargs)
             return result
         return reconnected_func
