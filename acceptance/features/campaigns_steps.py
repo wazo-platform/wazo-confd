@@ -256,13 +256,12 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
     r_campaign = RestCampaign()
     res = r_campaign.list()
     if(res['total'] < int(num_of_campaigns)):
-        global queue_id
         i = res['total']
         now = datetime.datetime.now()
         while(i < int(num_of_campaigns)):
             d = datetime.timedelta(days=(i + 1))
             oned = datetime.timedelta(days=1)
-            r_campaign.create(str(random.randint(1000, 9999)), queue_id, True,
+            r_campaign.create(str(random.randint(1000, 9999)), 'test', True,
                               (now + d).strftime("%Y-%m-%d"), (now + d + oned).strftime("%Y-%m-%d"))
             i += 1
         res = r_campaign.list()
