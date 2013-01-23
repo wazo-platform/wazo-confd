@@ -20,7 +20,6 @@ from datetime import datetime
 from mock import Mock, patch
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.services import manager_utils
-import commands
 import copy
 import os
 import unittest

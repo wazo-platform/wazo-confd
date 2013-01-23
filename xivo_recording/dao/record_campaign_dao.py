@@ -27,8 +27,7 @@ from xivo_dao.alchemy import dbconnection
 from xivo_recording.dao.exceptions import DataRetrieveError, \
     NoSuchElementException, InvalidInputException
 from xivo_recording.dao.generic_dao import GenericDao
-from xivo_recording.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict, str_to_datetime
+from xivo_recording.dao.helpers.dynamic_formatting import str_to_datetime
 from xivo_recording.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
 from xivo_recording.dao.helpers.time_interval import TimeInterval
@@ -58,8 +57,9 @@ class RecordCampaignDbBinder(object):
 
         if checkCurrentlyRunning:
             now = datetime.now()
-            my_query = my_query.filter(and_(RecordCampaignDao.start_date <= str(now),
-                                               RecordCampaignDao.end_date >= str(now)))
+            my_query = my_query.filter(
+                               and_(RecordCampaignDao.start_date <= str(now),
+                                    RecordCampaignDao.end_date >= str(now)))
 
         if (pagination == None):
             return get_all_data(self.session, my_query)
@@ -67,7 +67,9 @@ class RecordCampaignDbBinder(object):
             return get_paginated_data(self.session, my_query, pagination)
 
     def id_from_name(self, name):
-        result = self.session.query(RecordCampaignDao).filter_by(campaign_name=name).first()
+        result = self.session.query(RecordCampaignDao)\
+                    .filter_by(campaign_name=name)\
+                    .first()
         if result != None:
             return result.id
         else:
@@ -102,11 +104,13 @@ class RecordCampaignDbBinder(object):
                         .filter(RecordCampaignDao.id == campaign_id).all()
             logger.debug("Campaigns list for update: " + str(campaignsList))
             if(len(campaignsList) == 0):
-                raise NoSuchElementException("No campaign found for id " + str(campaign_id))
+                raise NoSuchElementException("No campaign found for id " +\
+                                             str(campaign_id))
             campaign = campaignsList[0]
             logger.debug('got original')
             for k, v in params.items():
-                if(k == "start_date" or k == "end_date" and type(v) != datetime):
+                if((k == "start_date" or k == "end_date")
+                                        and type(v) != datetime):
                     v = str_to_datetime(v)
                 setattr(campaign, k, v)
             logger.debug('attributes modified')
@@ -122,10 +126,13 @@ class RecordCampaignDbBinder(object):
 
     @classmethod
     def create_class_mapper(cls, uri):
-        engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG, encoding='utf-8')
+        engine = create_engine(uri,
+                               echo=RecordingConfig.POSTGRES_DEBUG,
+                               encoding='utf-8')
         if (RecordingConfig.POSTGRES_DEBUG):
             loggerDB = logging.getLogger('sqlalchemy.engine')
-            logfilehandler = logging.FileHandler(RecordingConfig.POSTGRES_DEBUG_FILE)
+            logfilehandler = logging.FileHandler(RecordingConfig\
+                                                 .POSTGRES_DEBUG_FILE)
             loggerDB.addHandler(logfilehandler)
             loggerDB.setLevel(logging.DEBUG)
 
@@ -160,14 +167,16 @@ class RecordCampaignDbBinder(object):
         if(record.start_date > record.end_date):
             errors_list.append("start_greater_than_end")
         else:
-            #check if another campaign exists on the same queue, with a concurrent time interval:
+            #check if another campaign exists on the same queue,
+            #with a concurrent time interval:
             campaigns_list = self.session.query(RecordCampaignDao)\
                 .filter(RecordCampaignDao.queue_id == record.queue_id)\
                 .filter(RecordCampaignDao.id != record.id).all()
             record_interval = TimeInterval(record.start_date, record.end_date)
             intersects = False
             for campaign in campaigns_list:
-                campaign_interval = TimeInterval(campaign.start_date, campaign.end_date)
+                campaign_interval = TimeInterval(campaign.start_date,
+                                                 campaign.end_date)
                 if(record_interval.intersect(campaign_interval) != None):
                     intersects = True
                     break
