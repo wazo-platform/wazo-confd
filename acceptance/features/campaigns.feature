@@ -29,9 +29,9 @@ Feature: Recording campaign management
 	
 	Scenario: Campaign edition
 	  Given there is no campaign
-	  Given there is a queue "1" and a queue "2"
-	  Given I create a campaign "lettuce" pointing to queue "1" with start date "2012-01-01 00:00:00" and end date "2013-05-05 14:59:14"
-	  When I change its name to "lettuce_updated", its queue to "2", its start date to "2012-02-01 00:11:00" and its end date to "2013-04-05 12:59:14"
+	  Given there is a queue "test1" and a queue "test2"
+	  Given I create a campaign "lettuce" pointing to queue "test1" with start date "2012-01-01 00:00:00" and end date "2013-05-05 14:59:14"
+	  When I change its name to "lettuce_updated", its queue to "test2", its start date to "2012-02-01 00:11:00" and its end date to "2013-04-05 12:59:14"
 	  Then the campaign is actually modified
 
 	Scenario: Consulting running and activated campaigns for a given queue

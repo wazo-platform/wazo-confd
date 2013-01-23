@@ -106,26 +106,26 @@ def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_ca
 
 
 @step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
-def edition_step_prerequisite(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
+def edition_step_prerequisite(step, local_campaign_name, queue_name, local_start_date, local_end_date):
     r_campaign = RestCampaign()
     global campaign_id
     new_campaign_name = local_campaign_name + str(random.randint(100, 999))
-    campaign_id = r_campaign.create(new_campaign_name, local_queue_id, True, local_start_date, local_end_date)
+    campaign_id = r_campaign.create(new_campaign_name, queue_name, True, local_start_date, local_end_date)
     campaign = r_campaign.getCampaign(campaign_id)
     assert campaign["campaign_name"] == new_campaign_name, 'Campaign ' + \
                                     local_campaign_name + ' not properly inserted'
 
 
 @step(u'When I change its name to "([^"]*)", its queue to "([^"]*)", its start date to "([^"]*)" and its end date to "([^"]*)"')
-def edition_step_execution(step, local_campaign_name, local_queue_id, local_start_date, local_end_date):
+def edition_step_execution(step, local_campaign_name, queue_name, local_start_date, local_end_date):
     r_campaign = RestCampaign()
     global campaign_id, campaign_name, queue_id, start_date, end_date
     campaign_name = local_campaign_name + str(random.randint(100, 999))
-    queue_id = local_queue_id
+    queue_id = str(queue_features_dao.id_from_name(queue_name))
     start_date = local_start_date
     end_date = local_end_date
-    params = {'campaign_name' : campaign_name,
-              'queue_id' : queue_id,
+    params = {'campaign_name': campaign_name,
+              'queue_id': queue_id,
               'start_date' : local_start_date,
               'end_date' : local_end_date
               }
@@ -144,10 +144,10 @@ def then_the_campaign_is_actually_modified(step):
 
 
 @step(u'Given there is a queue "([^"]*)" and a queue "([^"]*)"')
-def given_there_is_a_queue_group1(step, queue_id1, queue_id2):
-    r_queues = RestQueues()
-    assert r_queues.list("id", queue_id1), "The queue of id " + queue_id1 + " does not exist."
-    assert r_queues.list("id", queue_id2), "The queue of id " + queue_id2 + " does not exist."
+def given_there_is_a_queue_group1(step, queue1, queue2):
+    r_campaign = RestCampaign()
+    r_campaign.queue_create_if_not_exists(queue1)
+    r_campaign.queue_create_if_not_exists(queue2)
 
 
 @step(u'Given I create an activated campaign "([^"]*)" pointing to queue "([^"]*)" currently running')
@@ -226,8 +226,8 @@ def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(
 @step(u'When I create the campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
 def step_unproper_dates(step, campaign, sdate, edate):
     r_campaign = RestCampaign()
-    global queue_id, return_tuple
-    return_tuple = r_campaign.create_with_errors(campaign, queue_id, True, sdate,
+    global return_tuple
+    return_tuple = r_campaign.create_with_errors(campaign, 'test', True, sdate,
                                edate)
 
 
