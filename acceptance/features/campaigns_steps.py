@@ -21,8 +21,7 @@ from lettuce import step
 from rest_campaign import RestCampaign
 import datetime
 import random
-from xivo_recording import rest
-from jinja2.testsuite import res
+from xivo_dao import queue_features_dao
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -65,33 +64,30 @@ def then_i_can_consult_this_campaign(step):
 
 
 @step(u'Given there is an activated campaign named "([^"]*)" focusing queue "([^"]*)"')
-def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step, local_campaign_name, queue_id):
+def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step, local_campaign_name, queue_name):
     global campaign_name
-    r_queue = RestQueues()
     r_campaign = RestCampaign()
-    r_queue.create_if_not_exists(queue_id)
     campaign_name = local_campaign_name + str(random.randint(100, 999))
-    result = r_campaign.create(campaign_name, int(queue_id))
-    assert result > 0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_id
+    result = r_campaign.create(campaign_name, queue_name)
+    assert result > 0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_name
 
 
 @step(u'Given there is an non activated campaign named "([^"]*)" focusing queue "([^"]*)"')
-def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(step, local_campaign_name, queue_id):
-    r_queue = RestQueues()
+def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(step, local_campaign_name, queue_name):
     r_campaign = RestCampaign()
-    r_queue.create_if_not_exists(queue_id)
-    result = r_campaign.create(local_campaign_name + str(random.randint(100, 999)), int(queue_id))
-    assert result > 0, "Cannot create campaign: " + local_campaign_name + " for queue: " + queue_id
+    r_campaign.queue_create_if_not_exists(queue_name)
+    result = r_campaign.create(local_campaign_name + str(random.randint(100, 999)), queue_name)
+    assert result > 0, "Cannot create campaign: " + local_campaign_name + " for queue: " + queue_name
 
 
 activated_campaigns = None
 @step(u'When I ask for activated campaigns for queue "([^"]*)"')
-def when_i_ask_for_activated_campaigns_for_queue_group1(step, local_queue_id):
+def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
     global queue_id
-    queue_id = local_queue_id
+    queue_id = queue_features_dao.id_from_name(queue_name)
     r_campaign = RestCampaign()
     global activated_campaigns
-    activated_campaigns = r_campaign.get_activated_campaigns(int(local_queue_id))['data']
+    activated_campaigns = r_campaign.get_activated_campaigns(queue_id)['data']
     assert (activated_campaigns != None), "No activated campaign"
 
 
@@ -197,10 +193,11 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
 
 
 @step(u'When I ask for running and activated campaigns for queue "([^"]*)"')
-def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_id):
+def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_name):
     r_campaign = RestCampaign()
     global list_running_campaigns
-    list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(queue_id)['data']
+    queue_id = queue_features_dao.id_from_name(queue_name)
+    list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(str(queue_id))['data']
     assert len(list_running_campaigns) > 0, 'No campaign retrieved'
 
 

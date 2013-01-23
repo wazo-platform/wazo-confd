@@ -21,6 +21,6 @@ Feature: Automatic deletion - must be launched as super user
 	  Given there is a recording with id "test3" created "15" days ago with campaign "1" and agent "222"
 	  Given there is a recording with id "test4" created "0" days ago with campaign "1" and agent "222"
 	  When I run the script "../cron_job/delete_old_items"
-	  Then items "test1" and "test2" are deleted
-	  Then items "test3" and "test4" are not deleted
+	  Then items "test1" and "test2" are deleted from the database
+	  Then items "test3" and "test4" are not deleted from the database
 	  

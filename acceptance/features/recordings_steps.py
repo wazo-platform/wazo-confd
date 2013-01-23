@@ -122,10 +122,9 @@ def given_there_is_an_agent_of_number(step, agent_number):
 def given_there_is_a_recording_referenced_by_a_callid(step, local_callid, agent_no):
     #record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
     record_db = RecordCampaignDbBinder.new_from_uri('asterisk')
-    global campaign_name, callid
+    global campaign_name
     campaign_id = record_db.id_from_name(campaign_name)
-    callid = local_callid + str(random.randint(1000, 9999))
-    add_result = rest_campaign.addRecordingDetails(campaign_id, callid, "caller", agent_no, time)
+    add_result = rest_campaign.addRecordingDetails(campaign_id, local_callid, "caller", agent_no, time)
     assert (add_result == (201, "Added: True")), 'Cannot add call details: ' + str(add_result)
 
 
@@ -134,7 +133,7 @@ def when_i_delete_a_recording_referenced_by_this_callid(step, local_callid):
     global callid, campaign_name, del_result
     record_db = RecordCampaignDbBinder.new_from_uri('asterisk')
     campaign_id = record_db.id_from_name(campaign_name)
-    del_result = rest_campaign.deleteRecording(campaign_id, callid)
+    del_result = rest_campaign.deleteRecording(campaign_id, local_callid)
 
 
 @step(u'Then the recording is deleted and I get a response with code "([^"]*)"')
@@ -261,19 +260,19 @@ def given_there_is_a_recording_in_campaign_group1_referenced_by_a_group2_answere
                                              agent_no, time), "Impossible to create recording"
 
 
-@step(u'Given I update the recording referenced by a "([^"]*)" with end time "([^"]*)"')
-def given_i_update_the_recording_referenced_by_a_group1_with_end_time_group2(step, group1, group2):
-    assert False, 'This step must be implemented'
-
-
-@step(u'When I consult the recording referenced by a "([^"]*)"')
-def when_i_consult_the_recording_referenced_by_a_group1(step, group1):
-    assert False, 'This step must be implemented'
-
-
-@step(u'Then I get a recording with end time "([^"]*)"')
-def then_i_get_a_recording_with_end_time_group1(step, group1):
-    assert False, 'This step must be implemented'
+#@step(u'Given I update the recording referenced by a "([^"]*)" with end time "([^"]*)"')
+#def given_i_update_the_recording_referenced_by_a_group1_with_end_time_group2(step, group1, group2):
+#    assert False, 'This step must be implemented'
+#
+#
+#@step(u'When I consult the recording referenced by a "([^"]*)"')
+#def when_i_consult_the_recording_referenced_by_a_group1(step, group1):
+#    assert False, 'This step must be implemented'
+#
+#
+#@step(u'Then I get a recording with end time "([^"]*)"')
+#def then_i_get_a_recording_with_end_time_group1(step, group1):
+#    assert False, 'This step must be implemented'
 
 
 #@step(u'Given I update the recording referenced by a "([^"]*)" with end time "([^"]*)"')

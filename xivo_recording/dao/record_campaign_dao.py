@@ -160,7 +160,7 @@ class RecordCampaignDbBinder(object):
         '''Check if the campaign is valid, throws InvalidInputException
         with a list of errors if it is not the case.'''
         errors_list = []
-        logger.debug("validating")
+        logger.debug("validating campaign")
         if(record.campaign_name == None):
             errors_list.append("empty_name")
 

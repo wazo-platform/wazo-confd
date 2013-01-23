@@ -31,7 +31,6 @@ class RecordingConfig(object):
     XIVO_DIALPLAN_CLIENTFIELD = 'LDLC_IDTICKET'
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
-
     CSV_SEPARATOR = ","
 
     POSTGRES_ADDRESS = "127.0.0.1"
