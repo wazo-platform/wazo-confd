@@ -190,11 +190,14 @@ class TestRecordingDao(unittest.TestCase):
             setattr(my_recording1, k, v)
         self.recording_details_db.session.add(my_recording1)
         self.recording_details_db.session.commit()
-        data = self.recording_details_db.session.query(RecordingDetailsDao).all()
+        data = self.recording_details_db.session.query(RecordingDetailsDao)\
+                                                                    .all()
         self.assertTrue(len(data) == 1)
         data = table_list_to_list_dict(data)
         self.assertDictContainsSubset(dict_data1, data[0])
-        result = self.recording_details_db.delete(self.campaign.id, my_recording1.cid)
-        data = self.recording_details_db.session.query(RecordingDetailsDao).all()
+        result = self.recording_details_db.delete(self.campaign.id,
+                                                  my_recording1.cid)
+        data = self.recording_details_db.session.query(RecordingDetailsDao)\
+                                                                    .all()
         self.assertTrue(len(data) == 0)
         self.assertTrue(result == my_recording1.filename)
