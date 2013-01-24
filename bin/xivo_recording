@@ -30,7 +30,7 @@ DAEMONNAME = 'xivo_recording'
 # setting to True activates the internal web server
 #DEBUG_MODE = True
 
-LOGFILENAME = '/tmp/%s.log' % DAEMONNAME
+LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
 
@@ -60,7 +60,7 @@ def _init_logging(debug_mode):
         logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
     else:
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.WARNING)
 
     logfilehandler = logging.FileHandler(LOGFILENAME)
     logfilehandler.setFormatter(formatter)

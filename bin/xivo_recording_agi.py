@@ -25,8 +25,8 @@ import logging
 import sys
 import traceback
 
-DEBUG_MODE = True
-LOGFILE = '/var/log/asterisk/xivo-recording-agi.log'
+DEBUG_MODE = False
+LOGFILE = '/var/log/xivo-recording-agi.log'
 
 GENERIC_ERROR = 1
 REST_ERROR = 2
