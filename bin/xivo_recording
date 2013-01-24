@@ -43,21 +43,11 @@ def main():
         serviceManager = ServiceManager()
         serviceManager.run()
     else:
-        # nginx connection via gevent
-#        from gevent.wsgi import WSGIServer
-#        from xivo_recording.rest.flask_http_server import app
-        from tornado.wsgi import WSGIContainer
-        from tornado.httpserver import HTTPServer
-        from tornado.ioloop import IOLoop
         from xivo_recording.rest.flask_http_server import app
-
+        from flup.server.fcgi import WSGIServer
         if not parsed_args.debug:
             _daemonize()
-#        http_server = WSGIServer(('127.0.0.1', 50050), app)
-#        http_server.serve_forever()
-        http_server = HTTPServer(WSGIContainer(app))
-        http_server.listen(50050)
-        IOLoop.instance().start()
+        WSGIServer(app, bindAddress='/var/www/restws-fcgi.sock').run()
 
 
 def _init_logging(debug_mode):
