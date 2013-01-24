@@ -88,9 +88,19 @@ def given_there_is_a_recording_with_id_group1_created_group2_days_ago_with_campa
                                              '2002', agent_no, time.strftime("%Y-%m-%d %H:%M:%S")), "Could not create the recording"
 
 
-@step(u'Then items "([^"]*)" and "([^"]*)" are deleted')
+@step(u'Then items "([^"]*)" and "([^"]*)" are deleted from the database')
 def then_items_group1_and_group2_are_deleted(step, group1, group2):
-    assert False, 'This step must be implemented'
-@step(u'Then items "([^"]*)" and "([^"]*)" are not deleted')
+    r_campaign = RestCampaign()
+    results = r_campaign.list_all_recordings()
+    results_id = [item['cid'] for item in results]
+    assert(group1 not in results_id)
+    assert(group2 not in results_id)
+
+
+@step(u'Then items "([^"]*)" and "([^"]*)" are not deleted from the database')
 def then_items_group1_and_group2_are_not_deleted(step, group1, group2):
-    assert False, 'This step must be implemented'
+    r_campaign = RestCampaign()
+    results = r_campaign.list_all_recordings()
+    results_id = [item['cid'] for item in results]
+    assert(group1 in results_id)
+    assert(group2 in results_id)

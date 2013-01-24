@@ -24,9 +24,19 @@ from xivo_recording.rest import rest_encoder
 import random
 import sys
 import unittest
+from datetime import datetime
 mock_agi = Mock(AGI)
 mock_http_connection = Mock(HTTPConnection)
-mock_sys = Mock(sys)
+
+
+class FakeDate(datetime):
+        "A manipulable date replacement"
+        def __init__(self):
+            pass
+
+        @classmethod
+        def now(cls):
+            return datetime(year=2012, month=1, day=1)
 
 
 class TestXivoRecordingAgi(unittest.TestCase):
@@ -58,6 +68,11 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.instance_http_connection = mock_http_connection
         mock_patch_http_connection.return_value = self.instance_http_connection
 
+        self.patcher_datetime = patch("datetime.datetime", FakeDate)
+        mock_patch_datetime = self.patcher_datetime.start()
+        self.instance_datetime = FakeDate
+        mock_patch_datetime.return_value = self.instance_datetime
+
     def tearDown(self):
         self.patcher_agi.stop()
         self.patcher_http_connection.stop()
@@ -68,13 +83,19 @@ class TestXivoRecordingAgi(unittest.TestCase):
         xivo_vars = {'queue_name': self.xivo_queue_name,
                      'xivo_srcnum': self.xivo_srcnum,
                      'xivo_dstnum': self.xivo_destnum}
-        expected = [call('XIVO_QUEUENAME'), call('XIVO_SRCNUM'), call('XIVO_DSTNUM')]
+        expected = [call('XIVO_QUEUENAME'),
+                    call('XIVO_SRCNUM'),
+                    call('XIVO_DSTNUM')]
+
         from bin import xivo_recording_agi
         res = xivo_recording_agi.get_general_variables()
         self.assertDictEqual(res, xivo_vars)
-        self.assertListEqual(expected, self.instance_agi.get_variable.call_args_list,
-                             "Actual calls: " + str(self.instance_agi.get_variable.call_args_list) + \
-                             ", expected were: " + str(expected))
+        self.assertListEqual(expected,
+                             self.instance_agi.get_variable.call_args_list,
+                             "Actual calls: " + \
+                             str(self.instance_agi.get_variable.call_args_list) + \
+                             ", expected were: " + \
+                             str(expected))
 
     def test_xivo_recording_agi_get_detailed_variables(self):
         self.instance_agi.get_variable.side_effect = self.mock_agi_get_variable
@@ -93,7 +114,8 @@ class TestXivoRecordingAgi(unittest.TestCase):
                      'queue_name': self.xivo_queue_name,
                      'client_id': self.xivo_client_id}
         self.assertDictEqual(res, xivo_vars)
-        self.assertListEqual(expected_calls, self.instance_agi.get_variable.call_args_list)
+        self.assertListEqual(expected_calls,
+                             self.instance_agi.get_variable.call_args_list)
 
     def test_xivo_recording_agi_get_campaigns(self):
         response = Mock()
@@ -108,7 +130,8 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH +\
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH +\
-                        '/?activated=true&queue_id=' + str(self.xivo_queue_id) +\
+                        '/?activated=true&queue_id=' + \
+                        str(self.xivo_queue_id) + \
                         '&running=true'
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
@@ -168,9 +191,12 @@ class TestXivoRecordingAgi(unittest.TestCase):
         from bin import xivo_recording_agi
         xivo_recording_agi.set_user_field()
 
-        self.instance_agi.get_variable.assert_called_with(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD)
-        self.instance_agi.set_variable.assert_called_with('__' + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
-                                                          expected_user_data)
+        self.instance_agi.get_variable.assert_called_with(
+                                    RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD)
+        self.instance_agi.set_variable.assert_called_with(
+                                    '__' + \
+                                    RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
+                                    expected_user_data)
 
     def test_xivo_recording_determinate_record(self):
 
@@ -188,21 +214,17 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         expected = [call('QR_RECORDQUEUE', '1'),
                     call('__QR_CAMPAIGN_ID', self.xivo_campaign_id),
-                    call('__' + RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME, expected_data)]
+                    call('__' + \
+                         RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
+                         expected_data)]
+
         print(self.instance_agi.set_variable.mock_calls)
         self.assertTrue(self.instance_agi.set_variable.mock_calls == expected)
 
+    def now(self):
+        return "test"
+    
     def test_process_call_hangup(self):
-        def get_variable_side_effect(name):
-            if name == 'QR_TIME':
-                return '2012-01-01 00:00:00'
-            elif name == 'QR_CAMPAIGN_ID':
-                return '1'
-            elif name == 'UNIQUEID':
-                return '001'
-
-        self.instance_agi.get_variable.side_effect = self.mock_agi_get_variable
-        self.instance_agi.get_variable.call_args_list = []
 
         response = Mock()
         response.read.return_value = 'Updated: True'
@@ -210,19 +232,24 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.instance_http_connection.getresponse.return_value = response
 
         from bin import xivo_recording_agi
-
-        self.assertRaises(SystemExit, xivo_recording_agi.process_call_hangup)
-
-        expected = [call('UNIQUEID'), call('QR_CAMPAIGN_ID'), call('QR_TIME')]
-        self.assertListEqual(expected, self.instance_agi.get_variable.call_args_list,
-                             "Actual calls: " + str(self.instance_agi.get_variable.call_args_list) + \
-                             ", expected were: " + str(expected))
+        with self.assertRaises(SystemExit):
+            xivo_recording_agi.process_call_hangup(self.unique_id,
+                                                   str(self.xivo_campaign_id))
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/1/001"
-        body = {"end_time": '2012-01-01 00:00:00'}
+                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" +\
+                    str(self.xivo_campaign_id) + "/" + self.unique_id
+        body = {"end_time": self.xivo_date}
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         self.instance_http_connection.request\
                 .assert_called_with("PUT", requestURI,
                                     rest_encoder.encode(body), headers)
 
+    def test_process_call_hangup_args(self):
+        sys.argv = ['', 'processCallHangup', '--cid',
+                    '001', '--campaign', '1']
+        from bin import xivo_recording_agi
+        self.proces_call_hangup = Mock(return_value=None)
+        xivo_recording_agi.process_call_hangup = self.proces_call_hangup
+        xivo_recording_agi.process_call_hangup_args()
+        self.proces_call_hangup.assert_called_with('001', '1')

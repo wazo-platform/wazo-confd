@@ -50,20 +50,25 @@ def table_list_to_list_dict(list_instance):
                     value = ''
                 if type(value).__name__ != 'unicode':
                     value = str(value)
-                dict_instance[elem] = value
+                else:
+                    value = value.encode('utf-8', 'ignore')
+                dict_instance[str(elem)] = value
         list_of_dict.append(dict_instance)
     return list_of_dict
 
 
 def str_to_datetime(string):
     if(type(string) != str and type(string) != unicode):
-        raise InvalidInputException("Invalid data provided", ["invalid_date_format"])
+        raise InvalidInputException("Invalid data provided",
+                                    ["invalid_date_format"])
     if(len(string) != 10 and len(string) != 19):
-        raise InvalidInputException("Invalid data provided", ["invalid_date_format"])
+        raise InvalidInputException("Invalid data provided",
+                                    ["invalid_date_format"])
     try:
         if(len(string) == 10):
             return datetime.strptime(string, "%Y-%m-%d")
         elif(len(string) == 19):
             return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
     except Exception:
-        raise InvalidInputException("Invalid data provided", ["invalid_date_format"])
+        raise InvalidInputException("Invalid data provided",
+                                    ["invalid_date_format"])

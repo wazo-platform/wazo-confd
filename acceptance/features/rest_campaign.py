@@ -33,6 +33,7 @@ import os
 import random
 from xivo_dao import queue_features_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
+from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 
 class RestCampaign(object):
@@ -131,7 +132,8 @@ class RestCampaign(object):
         recording['cid'] = callid
         recording['caller'] = caller
         recording['agent_no'] = agent_no
-        recording['time'] = time
+        recording['start_time'] = time
+        recording['end_time'] = time
         recording['filename'] = callid + ".wav"
 
         body = rest_encoder.encode(recording)
@@ -142,11 +144,11 @@ class RestCampaign(object):
         #we create the file
         dirname = RecordingConfig.RECORDING_FILE_ROOT_PATH
         if(not os.path.exists(dirname)):
-            print "\ngoing to create the dir\n"
             cron_utils.create_dir(dirname)
         myfile = open(dirname + "/" + recording['filename'], 'w')
         myfile.write('')
         myfile.close()
+        # TODO : permettre au WebService de supprimer les fichiers
 
         reply = connection.getresponse()
         response = reply.read()
@@ -287,6 +289,7 @@ class RestCampaign(object):
         return rest_encoder.decode(reply.read())
 
     def deleteRecording(self, campaign_id, callid):
+        os.chmod(RecordingConfig.RECORDING_FILE_ROOT_PATH, 0777)
         connection = RecordingConfig.getWSConnection()
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
@@ -307,18 +310,19 @@ class RestCampaign(object):
             print "\nException raised: " + str(e) + "\n"
             return False
 
-    def create_with_errors(self, campaign_name, queue_id=1, activated=True,
-                           start_date=None, end_date=None, campaign_id=None):
+    def create_with_errors(self, campaign_name, queue_name='test',
+                           activated=True, start_date=None,
+                           end_date=None, campaign_id=None):
         connection = RecordingConfig.getWSConnection()
 
         requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-
+        self.queue_create_if_not_exists(queue_name)
         campaign = {}
 
         campaign["campaign_name"] = campaign_name
         campaign["base_filename"] = campaign_name + "-file-"
-        campaign["queue_id"] = queue_id
+        campaign["queue_id"] = queue_features_dao.id_from_name(queue_name)
         campaign["activated"] = activated
         if start_date != None:
             campaign["start_date"] = str(start_date)
@@ -376,7 +380,8 @@ class RestCampaign(object):
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/search"
 
-        parameters = "?key=" + key + "&_page=" + page + "&_pagesize=" + pagesize
+        parameters = "?key=" + key + "&_page=" + page + "&_pagesize=" +\
+                                             pagesize
         requestURI += parameters
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         connection.request("GET", requestURI, '', headers)
@@ -390,3 +395,8 @@ class RestCampaign(object):
         recording_db.session.commit()
         campaign_db.session.query(RecordCampaignDao).delete()
         campaign_db.session.commit()
+
+    def list_all_recordings(self):
+        recording_db = _init_db_connection(RecordingDetailsDbBinder)
+        result = recording_db.session.query(RecordingDetailsDao).all()
+        return table_list_to_list_dict(result)

@@ -17,6 +17,7 @@
 
 from datetime import datetime
 
+
 class TimeInterval(object):
     '''
     Represents a time interval: start_date ==> end_date
@@ -35,8 +36,8 @@ class TimeInterval(object):
 
     def intersect(self, other_interval):
         '''
-        Return a TimeInterval object representing the intersection between two time intervals,
-        None if they do not intersect
+        Return a TimeInterval object representing the intersection between
+        two time intervals, None if they do not intersect
         '''
         if(type(other_interval) != TimeInterval):
             raise Exception('A TimeInterval object must be provided.')

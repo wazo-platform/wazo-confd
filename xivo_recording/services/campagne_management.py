@@ -38,7 +38,7 @@ class CampagneManagement:
         return result
 
     @reconnectable("record_db")
-    def get_campaigns_as_dict(self, search=None, checkCurrentlyRunning=False, technical_params=None):
+    def get_campaigns_as_dict(self, search={}, checkCurrentlyRunning=False, technical_params=None):
         """
         Calls the DAO and converts data to the final format
         """
@@ -74,7 +74,7 @@ class CampagneManagement:
         return result
 
     def supplement_add_input(self, data):
-        '''Returns the supplemented input'''
+        '''Returns the supplemented input for add'''
         logger.debug("Supplementing input for 'add'")
         for key in data:
             if(data[key] == ''):
@@ -86,6 +86,7 @@ class CampagneManagement:
         return data
 
     def supplement_edit_input(self, data):
+        '''Returns the supplemented input for edit'''
         for key in data:
             if(data[key] == ''):
                 data[key] = None

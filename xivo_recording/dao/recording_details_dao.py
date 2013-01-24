@@ -25,8 +25,6 @@ from sqlalchemy.sql.expression import or_, and_
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_recording.dao.generic_dao import GenericDao
-from xivo_recording.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict
 from xivo_recording.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
 from xivo_recording.recording_config import RecordingConfig
@@ -83,7 +81,8 @@ class RecordingDetailsDbBinder(object):
         my_query = self.session.query(RecordingDetailsDao)\
                         .join((AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id))\
                         .filter(and_(RecordingDetailsDao.campaign_id == campaign_id,\
-                                     or_(RecordingDetailsDao.caller == key, AgentFeatures.number == key)))
+                                     or_(RecordingDetailsDao.caller == key,
+                                         AgentFeatures.number == key)))
         if (pagination == None):
             return get_all_data(self.session, my_query)
         else:
@@ -92,8 +91,10 @@ class RecordingDetailsDbBinder(object):
     def delete(self, campaign_id, recording_id):
         logger.debug("Going to delete " + str(recording_id))
         recording = self.session.query(RecordingDetailsDao)\
-                    .filter(and_(RecordingDetailsDao.cid == recording_id, RecordingDetailsDao.campaign_id == campaign_id))\
+                    .filter(and_(RecordingDetailsDao.cid == recording_id,
+                                 RecordingDetailsDao.campaign_id == campaign_id))\
                     .first()
+
         if(recording == None):
             return None
         else:
@@ -107,7 +108,9 @@ class RecordingDetailsDbBinder(object):
         try:
             class_mapper(RecordingDetailsDao)
         except UnmappedClassError:
-            engine = create_engine(uri, echo=RecordingConfig.POSTGRES_DEBUG, encoding='utf-8')
+            engine = create_engine(uri,
+                                   echo=RecordingConfig.POSTGRES_DEBUG,
+                                   encoding='utf-8')
             metadata = MetaData(engine)
             data = Table(cls.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)

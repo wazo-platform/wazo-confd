@@ -14,9 +14,9 @@ Feature: Recording campaign management
 	  
 	Scenario: Get activated campaigns
 	  Given there is no campaign
-	  Given there is an activated campaign named "quality" focusing queue "1"
-	  Given there is an non activated campaign named "disabled" focusing queue "2"	   
-	  When I ask for activated campaigns for queue "1"
+	  Given there is an activated campaign named "quality" focusing queue "test1"
+	  Given there is an non activated campaign named "disabled" focusing queue "test2"	   
+	  When I ask for activated campaigns for queue "test1"
 	  Then I get a list of activated campaigns with campaign "quality"
 
 	Scenario: Campaign configuration and execution
@@ -29,18 +29,18 @@ Feature: Recording campaign management
 	
 	Scenario: Campaign edition
 	  Given there is no campaign
-	  Given there is a queue "1" and a queue "2"
-	  Given I create a campaign "lettuce" pointing to queue "1" with start date "2012-01-01 00:00:00" and end date "2013-05-05 14:59:14"
-	  When I change its name to "lettuce_updated", its queue to "2", its start date to "2012-02-01 00:11:00" and its end date to "2013-04-05 12:59:14"
+	  Given there is a queue "test1" and a queue "test2"
+	  Given I create a campaign "lettuce" pointing to queue "test1" with start date "2012-01-01 00:00:00" and end date "2013-05-05 14:59:14"
+	  When I change its name to "lettuce_updated", its queue to "test2", its start date to "2012-02-01 00:11:00" and its end date to "2013-04-05 12:59:14"
 	  Then the campaign is actually modified
 
 	Scenario: Consulting running and activated campaigns for a given queue
 	  Given there is no campaign
 	  Given there is a queue "1" and a queue "2"
-	  Given I create an activated campaign "lettuce1" pointing to queue "1" currently running
-	  Given I create an activated campaign "lettuce2" pointing to queue "2" currently running
-	  Given I create an activated campaign "lettuce3" pointing to queue "1" currently not running
-	  When I ask for running and activated campaigns for queue "1"
+	  Given I create an activated campaign "lettuce1" pointing to queue "test1" currently running
+	  Given I create an activated campaign "lettuce2" pointing to queue "test2" currently running
+	  Given I create an activated campaign "lettuce3" pointing to queue "test1" currently not running
+	  When I ask for running and activated campaigns for queue "test1"
 	  Then I get campaign "lettuce1", I do not get "lettuce2", "lettuce3"
 	  
 	Scenario: Campaign creation and consultation without dates
@@ -73,6 +73,6 @@ Feature: Recording campaign management
 	  
 	Scenario: Campaign dates overlapping
 	  Given there is no campaign
-	  Given I create a campaign "test1" pointing to queue "1" with start date "2013-01-01" and end date "2013-02-01"
-	  When I try to create a campaign "test2" pointing to queue "1" with start date "2013-01-15" and end date "2013-02-15"
+	  Given I create a campaign "test1" pointing to queue "test" with start date "2013-01-01" and end date "2013-02-01"
+	  When I try to create a campaign "test2" pointing to queue "test" with start date "2013-01-15" and end date "2013-02-15"
 	  Then I get an error code '400' with message 'concurrent_campaigns'

@@ -16,11 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
 from xivo_dao.alchemy import dbconnection
+from xivo_recording.dao.exceptions import DataRetrieveError, \
+    InvalidInputException
+from xivo_recording.dao.helpers.dynamic_formatting import \
+    table_list_to_list_dict
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDao, \
     RecordCampaignDbBinder
+from xivo_recording.dao.recording_details_dao import RecordingDetailsDao, \
+    RecordingDetailsDbBinder
 from xivo_recording.recording_config import RecordingConfig
-import random
+import copy
 import unittest
 
 
@@ -45,43 +52,170 @@ class TestRecordCampaignDao(unittest.TestCase):
       OWNER TO asterisk;
     '''
 
-    def test_record_campaign_db(self):
+    def setUp(self):
+        dbconnection.unregister_db_connection_pool()
+        dbconnection.register_db_connection_pool(dbconnection\
+                                .DBConnectionPool(dbconnection.DBConnection))
+        dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
+        self.record_db = RecordCampaignDbBinder\
+                                .new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        if self.record_db == None:
+            self.fail("record_db is None, database connection error")
+        self.recording_details_db = RecordingDetailsDbBinder\
+                                .new_from_uri(RecordingConfig.RECORDING_DB_URI)
+        if self.recording_details_db == None:
+            self.fail("record_db is None, database connection error")
+        self.recording_details_db.session.query(RecordingDetailsDao).delete()
+        self.recording_details_db.session.commit()
+        self.record_db.session.query(RecordCampaignDao).delete()
+        self.record_db.session.commit()
+        unittest.TestCase.setUp(self)
 
-        unique_id = str(random.randint(10000, 99999999))
-        campaign_name = "campaign-àé" + unique_id
+    def test_get_records(self):
+        campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
 
         expected_dict = {
-            u"campaign_name": campaign_name,
-            u"activated": "False",
-            u"base_filename": base_filename,
-            u"queue_id": queue_id,
-            u"start_date": '2012-01-01 12:12:12',
-            u"end_date": '2012-12-12 12:12:12',
+            "campaign_name": campaign_name,
+            "activated": "False",
+            "base_filename": base_filename,
+            "queue_id": queue_id,
+            "start_date": '2012-01-01 12:12:12',
+            "end_date": '2012-12-12 12:12:12',
         }
 
-        expected_object = RecordCampaignDao()
+        obj = RecordCampaignDao()
         for k, v in expected_dict.items():
-            setattr(expected_object, k, v)
+            setattr(obj, k, v)
 
-        dbconnection.unregister_db_connection_pool()
-        dbconnection.register_db_connection_pool(dbconnection.DBConnectionPool(dbconnection.DBConnection))
-        dbconnection.add_connection(RecordingConfig.RECORDING_DB_URI)
+        self.record_db.session.add(obj)
+        self.record_db.session.commit()
+        expected_dict['id'] = str(obj.id)
+        records = self.record_db.get_records()['data']
+        self.assertDictEqual(expected_dict, records[0])
 
-        record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
-        if record_db == None:
-            self.fail("record_db is None, database connexion error")
+    def test_id_from_name(self):
+        campaign_name = "campaign-àé"
+        queue_id = "1"
+        base_filename = campaign_name + "-"
 
-        expected_dict[u"id"] = str(record_db.add(expected_dict))
+        expected_dict = {
+            "campaign_name": campaign_name,
+            "activated": "False",
+            "base_filename": base_filename,
+            "queue_id": queue_id,
+            "start_date": '2012-01-01 12:12:12',
+            "end_date": '2012-12-12 12:12:12',
+        }
 
-        records = record_db.get_records_as_dict()
+        obj = RecordCampaignDao()
+        for k, v in expected_dict.items():
+            setattr(obj, k, v)
 
-        print("read from database:")
-        for record in records:
-            print(str(record))
+        self.record_db.session.add(obj)
+        self.record_db.session.commit()
+        retrieved_id = self.record_db\
+                .id_from_name(expected_dict['campaign_name'])
+        self.assertTrue(retrieved_id == obj.id)
 
-        print("saved:")
-        print(str(expected_dict))
+        with self.assertRaises(DataRetrieveError):
+            self.record_db.id_from_name('test')
 
-        self.assert_(expected_dict in records)
+    def test_add(self):
+        campaign_name = "campaign-àé"
+        queue_id = "1"
+        base_filename = campaign_name + "-"
+
+        expected_dict = {
+            "campaign_name": campaign_name,
+            "activated": "False",
+            "base_filename": base_filename,
+            "queue_id": queue_id,
+            "start_date": '2012-01-01 12:12:12',
+            "end_date": '2012-12-12 12:12:12',
+        }
+        gen_id = self.record_db.add(expected_dict)
+        expected_dict['id'] = str(gen_id)
+        result = self.record_db.session.query(RecordCampaignDao).all()
+        self.assertTrue(len(result) == 1)
+        result = table_list_to_list_dict(result)
+        self.assertTrue(result[0] == expected_dict)
+
+    def test_update(self):
+        campaign_name = "campaign-àé"
+        queue_id = "1"
+        base_filename = campaign_name + "-"
+
+        inserted_dict = {
+            "campaign_name": campaign_name,
+            "activated": "False",
+            "base_filename": base_filename,
+            "queue_id": queue_id,
+            "start_date": '2012-01-01 12:12:12',
+            "end_date": '2012-12-12 12:12:12',
+        }
+
+        obj = RecordCampaignDao()
+        for k, v in inserted_dict.items():
+            setattr(obj, k, v)
+
+        self.record_db.session.add(obj)
+        self.record_db.session.commit()
+        queue_id2 = '2'
+
+        updated_dict = {
+            "campaign_name": campaign_name + str(1),
+            "activated": "True",
+            "base_filename": base_filename + str(1),
+            "queue_id": queue_id2,
+            "start_date": '2012-01-01 12:12:13',
+            "end_date": '2012-12-12 12:12:13',
+        }
+        self.record_db.update(obj.id, updated_dict)
+        updated_dict['id'] = str(obj.id)
+        result = self.record_db.session.query(RecordCampaignDao).all()
+        self.assertTrue(len(result) == 1)
+        result = table_list_to_list_dict(result)
+        self.assertDictEqual(result[0], updated_dict)
+
+    def test_validate_campaign(self):
+        campaign = RecordCampaignDao()
+        campaign.campaign_name = None
+        campaign.start_date = datetime.strptime('2012-12-31',
+                                                "%Y-%m-%d")
+        campaign.end_date = datetime.strptime('2012-01-31',
+                                              "%Y-%m-%d")
+        gotException = False
+        try:
+            self.record_db._validate_campaign(campaign)
+        except InvalidInputException as e:
+            self.assertIn('empty_name', e.errors_list)
+            self.assertIn('start_greater_than_end', e.errors_list)
+            gotException = True
+        self.assertTrue(gotException)
+
+        #we check that overlapping campaigns are rejected
+        campaign1 = RecordCampaignDao()
+        campaign1.campaign_name = 'name1'
+        campaign1.start_date = datetime.strptime('2012-01-31',
+                                              "%Y-%m-%d")
+        campaign1.end_date = datetime.strptime('2012-12-31',
+                                                "%Y-%m-%d")
+        campaign1.base_filename = 'file-'
+        campaign1.activated = True
+        campaign1.queue_id = 1
+        campaign2 = copy.deepcopy(campaign1)
+        self.record_db.session.add(campaign1)
+        self.record_db.session.commit()
+        campaign2.start_date = datetime.strptime('2012-02-28',
+                                              "%Y-%m-%d")
+        campaign2.end_date = datetime.strptime('2013-01-31',
+                                                "%Y-%m-%d")
+        gotException = False
+        try:
+            self.record_db._validate_campaign(campaign2)
+        except InvalidInputException as e:
+            self.assertIn('concurrent_campaigns', e.errors_list)
+            gotException = True
+        self.assertTrue(gotException)

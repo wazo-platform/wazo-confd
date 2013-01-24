@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from gevent import httplib
+import httplib
 
 
 class RecordingConfig(object):
@@ -30,7 +30,6 @@ class RecordingConfig(object):
     XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME = 'RECORDING_USERFIELD'
     XIVO_DIALPLAN_CLIENTFIELD = 'LDLC_IDTICKET'
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
-
 
     CSV_SEPARATOR = ","
 

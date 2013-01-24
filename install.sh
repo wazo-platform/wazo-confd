@@ -103,6 +103,11 @@ installCron() {
   return $RES
 }
 
+installAgi() {
+  touch /var/log/xivo-recording-agi.log
+  chmod o+x /var/log/xivo-recording-agi.log
+}
+
 install() {
   installDep
   installPy
@@ -110,6 +115,7 @@ install() {
   installDB
   installWebI
   installCron
+  installAgi
   recordingAutostart
   startRecording
 }
