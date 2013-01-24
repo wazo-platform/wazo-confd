@@ -24,7 +24,7 @@ import argparse
 from xivo import daemonize
 from xivo_recording.services.service_manager import ServiceManager
 
-DAEMONNAME = 'xivo_recording'
+DAEMONNAME = 'xivo-recording'
 
 # Enable debug mode for testing witout gevent WSGi,
 # setting to True activates the internal web server
