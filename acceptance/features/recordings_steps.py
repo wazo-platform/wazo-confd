@@ -19,11 +19,11 @@
 from lettuce import step
 from rest_campaign import RestCampaign
 from time import strftime, localtime
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder, \
+from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
     RecordCampaignDao
-from xivo_recording.recording_config import RecordingConfig
+from xivo_restapi.restapi_config import RestAPIConfig
 import random
-from xivo_recording.services.manager_utils import _init_db_connection
+from xivo_restapi.services.manager_utils import _init_db_connection
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -85,7 +85,7 @@ def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_gro
     global callid, campaign_name
     callid = local_callid + str(random.randint(1000, 9999))
     assert callid, "Callid null!"
-    record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    record_db = RecordCampaignDbBinder.new_from_uri(RestAPIConfig.RECORDING_DB_URI)
     campaign_id = record_db.id_from_name(campaign_name)
     global add_result
     add_result = rest_campaign.addRecordingDetails(campaign_id, callid, caller, local_agent_no, time)
@@ -120,7 +120,7 @@ def given_there_is_an_agent_of_number(step, agent_number):
 
 @step(u'Given there is a recording referenced by a "([^"]*)" with agent "([^"]*)"')
 def given_there_is_a_recording_referenced_by_a_callid(step, local_callid, agent_no):
-    #record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    #record_db = RecordCampaignDbBinder.new_from_uri(RestAPIConfig.RECORDING_DB_URI)
     record_db = RecordCampaignDbBinder.new_from_uri('asterisk')
     global campaign_name
     campaign_id = record_db.id_from_name(campaign_name)

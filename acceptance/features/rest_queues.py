@@ -18,9 +18,9 @@
 
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest import rest_encoder
-from xivo_recording.services.manager_utils import _init_db_connection
+from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.rest import rest_encoder
+from xivo_restapi.services.manager_utils import _init_db_connection
 import random
 
 
@@ -59,12 +59,12 @@ class RestQueues:
             return True
 
     def list(self, columnName, searchItem):
-        connection = RecordingConfig.getWSConnection()
+        connection = RestAPIConfig.getWSConnection()
 
-        requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                        RecordingConfig.XIVO_QUEUES_SERVICE_PATH + "/"
+        requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + "/"
 
-        headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
         connection.request("GET", requestURI, "", headers)
         reply = connection.getresponse()

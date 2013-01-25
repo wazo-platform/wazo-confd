@@ -21,20 +21,20 @@
 from distutils.core import setup
 
 setup(
-    name='xivo-recording',
+    name='xivo-restapid',
     version='0.1',
-    description='XIVO Recording module',
+    description='XIVO REST API daemon',
     author='Avencall',
     author_email='xivo-dev@lists.proformatique.com',
     url='http://wiki.xivo.fr/',
     license='GPLv3',
-    packages=['xivo_recording',
-              'xivo_recording.dao',
-              'xivo_recording.dao.helpers',
-              'xivo_recording.rest',
-              'xivo_recording.services'],
-    scripts=['bin/xivo_recording_agi.py', 'bin/xivo-recording'],
-    data_files=[('/etc/init.d', ['etc/init.d/xivo-recording']),
+    packages=['xivo_restapi',
+              'xivo_restapi.dao',
+              'xivo_restapi.dao.helpers',
+              'xivo_restapi.rest',
+              'xivo_restapi.services'],
+    scripts=['bin/xivo_recording_agi.py', 'bin/xivo-restapid'],
+    data_files=[('/etc/init.d', ['etc/init.d/xivo-restapid']),
                 ('/etc/asterisk/extensions_extra.d/', ['etc/asterisk/extensions_extra.d/xivo-recording.conf']),
-                ('/etc/nginx/sites-enabled', ['etc/nginx/sites-enabled/restws'])]
+                ('/etc/nginx/sites-enabled', ['etc/nginx/sites-enabled/restapi'])]
 )

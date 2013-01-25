@@ -17,8 +17,8 @@
 
 from acceptance.features.rest_campaign import RestCampaign
 from lettuce import step
-from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
-from xivo_recording.recording_config import RecordingConfig
+from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_restapi.restapi_config import RestAPIConfig
 import os
 status = None
 recordings_list = None
@@ -26,8 +26,8 @@ recordings_list = None
 
 @step(u'When I send a "([^"]*)" request to "([^"]*)"')
 def when_i_send_a_group1_request_to_group2(step, method, url):
-    connection = RecordingConfig.getWSConnection()
-    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+    connection = RestAPIConfig.getWSConnection()
+    headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request(method, url, None, headers)
     global status
     status = connection.getresponse().status
@@ -49,7 +49,7 @@ def when_there_was_a_call_from_group1_to_the_queue_group2_answered_by_agent_grou
 @step(u'When I read the list of recordings for the campaign "([^"]*)" from the database')
 def when_i_read_the_list_of_recordings_for_the_campaign_group1_from_the_database(step, campaign_name):
     r_campaign = RestCampaign()
-    record_db = RecordCampaignDbBinder.new_from_uri(RecordingConfig.RECORDING_DB_URI)
+    record_db = RecordCampaignDbBinder.new_from_uri(RestAPIConfig.RECORDING_DB_URI)
     campaign_id = record_db.id_from_name(campaign_name)
     result = r_campaign.paginated_recordings_list(campaign_id, 1, 10)
     global recordings_list
@@ -64,5 +64,5 @@ def then_i_get_one_and_only_one_item_with_caller_group1_agent_group2_and_i_can_r
     item = recordings_list[0]
     assert item['agent_no'] == agent, "Got wrong agent: " + item['agent_no'] + " instead of " + agent
     assert item['caller'] == caller, "Got wrong agent: " + item['caller'] + " instead of " + caller
-    assert os.path.exists(RecordingConfig.RECORDING_FILE_ROOT_PATH + "/" + item['filename']),\
+    assert os.path.exists(RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + item['filename']), \
            "The file " + item['filename'] + " does not exist."

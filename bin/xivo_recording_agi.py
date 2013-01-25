@@ -17,8 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo.agi import AGI
-from xivo_recording.recording_config import RecordingConfig
-from xivo_recording.rest import rest_encoder
+from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.rest import rest_encoder
 import argparse
 from datetime import datetime
 import logging
@@ -64,22 +64,22 @@ def get_detailed_variables():
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
     xivo_vars['queue_name'] = agi.get_variable('QR_QUEUENAME')
     xivo_vars['client_id'] = agi.get_variable(
-                    RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)
+                    RestAPIConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)
     logger.debug(str(xivo_vars))
     return xivo_vars
 
 
 def get_campaigns(queue_id):
-    connection = RecordingConfig.getWSConnection()
+    connection = RestAPIConfig.getWSConnection()
 
-    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/"
+    requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/"
     param_str = "?activated=true&queue_id=%s&running=true" % str(queue_id)
 
     requestURI += param_str
     logger.debug("Getting campaigns from URL: " + requestURI)
 
-    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+    headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
     connection.request("GET", requestURI, None, headers)
 
@@ -107,14 +107,14 @@ def init_logging(debug_mode):
 
 # TODO: Refactor in library, used here, in lettuce...!
 def get_queues():
-    connection = RecordingConfig.getWSConnection()
+    connection = RestAPIConfig.getWSConnection()
 
-    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_QUEUES_SERVICE_PATH + "/"
+    requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + "/"
 
     logger.debug("Getting queues from URL: " + requestURI)
 
-    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+    headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
 
     connection.request("GET", requestURI, None, headers)
 
@@ -139,8 +139,8 @@ def get_queue_id(queue_name):
 def set_user_field():
     agi.set_variable(
                  "__" +\
-                 RecordingConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
-                 agi.get_variable(RecordingConfig.XIVO_DIALPLAN_CLIENTFIELD))
+                 RestAPIConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
+                 agi.get_variable(RestAPIConfig.XIVO_DIALPLAN_CLIENTFIELD))
 
 
 def determinate_record():
@@ -177,15 +177,15 @@ def determinate_record():
 
 
 def save_recording(recording):
-    connection = RecordingConfig.getWSConnection()
+    connection = RestAPIConfig.getWSConnection()
 
-    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+    requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                     recording['campaign_id'] + "/"
 
     logger.debug("Post recording to URL: " + requestURI)
 
-    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+    headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     body = rest_encoder.encode(recording)
     logger.debug("Recording post body: " + str(body))
     connection.request("POST", requestURI, body, headers)
@@ -217,14 +217,14 @@ def save_call_details():
 
 
 def process_call_hangup(cid, campaign_id):
-    connection = RecordingConfig.getWSConnection()
-    requestURI = RecordingConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                    RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+    connection = RestAPIConfig.getWSConnection()
+    requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                     campaign_id + "/" + cid
     body = {"end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
     print str(body)
     logger.debug("Update recording to URL: " + requestURI)
-    headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+    headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request("PUT", requestURI, rest_encoder.encode(body), headers)
 
     reply = connection.getresponse()
