@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+# -*- mode: makefile; coding: utf-8 -*-
+
+DEB_PKG="xivo-restapi"
+DEB_TB_DEPS=""
+
+default:
