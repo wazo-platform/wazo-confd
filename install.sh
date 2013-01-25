@@ -23,8 +23,6 @@ fi
 installDep() {
   echo "Installing dependencies..."
   apt-get install -y libevent-dev python-pip python-dev build-essential
-  pip install gevent
-  pip install tornado
   pip install flask
   pip install SQLAlchemy
   pip install xivo-client-sim
@@ -33,6 +31,7 @@ installDep() {
 installPy() {
   echo "Running python installer..."
   python $PY_SETUP install
+  /etc/init.d/nginx restart
 }
 
 reloadAsterisk() {
