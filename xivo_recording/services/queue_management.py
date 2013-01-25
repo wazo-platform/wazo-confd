@@ -16,10 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao import queue_features_dao
+from xivo_dao import queue_dao
 from xivo_recording.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
-from xivo_recording.services.manager_utils import _init_db_connection,\
+from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
 import logging
 
@@ -33,7 +33,7 @@ class QueueManagement:
 
     @reconnectable(None)
     def get_all_queues(self):
-        result = queue_features_dao.all()
+        result = queue_dao.all_queues()
         if result != None:
             return table_list_to_list_dict(result)
         return False

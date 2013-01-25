@@ -1,7 +1,13 @@
+Testing:
+--------
+
+/!\ Important
+You must execute "xivo-acceptance/utils/prerequisite.py" before testing !
+
+
 TODO:
 -----
 - refactor db integration
-- this composant will be integrated into XiVO soon 
 
 Depends :
 ---------
@@ -22,16 +28,7 @@ cd xivo-recording
 Be sure to have a corresponding web interface package in the xivo-recording directory (with the support of the recording)! 
 ./install.sh
 
-Patch dao (git repo xivo-dao branch recording):
-xivo-dao/xivo_dao/agentfeaturesdao.py
-xivo-dao/xivo_dao/queue_features_dao.py
 
-
-Removing:
-----------
-manual
-
- 
 Packaging :
 -----------
 Create the tar

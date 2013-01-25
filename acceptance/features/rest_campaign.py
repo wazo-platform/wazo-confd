@@ -18,7 +18,7 @@
 
 from acceptance.features import cron_utils
 from acceptance.features.rest_queues import RestQueues
-from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
+from xivo_dao import agent_dao
 from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder, \
@@ -31,15 +31,12 @@ from xivo_recording.services.manager_utils import _init_db_connection
 import datetime
 import os
 import random
-from xivo_dao import queue_features_dao
+from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_recording.dao.helpers.dynamic_formatting import table_list_to_list_dict
 
 
 class RestCampaign(object):
-
-    def __init__(self):
-        self.agentFeatDao = AgentFeaturesDAO(self.setUpDBConnection())
 
     def setUpDBConnection(self):
         db_connection_pool = \
@@ -65,7 +62,7 @@ class RestCampaign(object):
 
         campaign["campaign_name"] = campaign_name
         campaign["base_filename"] = campaign_name + "-file-"
-        campaign["queue_id"] = queue_features_dao.id_from_name(queue_name)
+        campaign["queue_id"] = queue_dao.id_from_name(queue_name)
         campaign["activated"] = activated
         if start_date != None:
             campaign["start_date"] = str(start_date)
@@ -236,20 +233,20 @@ class RestCampaign(object):
         return True
 
     def queue_create_if_not_exists(self, queue_name):
-        if not queue_features_dao.is_a_queue(queue_name):
+        if not queue_dao.is_a_queue(queue_name):
             queue = QueueFeatures()
             queue.name = queue_name
             queue.displayname = queue_name
 
-            queue_features_dao.add_queue(queue)
-            return queue_features_dao.is_a_queue(queue_name)
+            queue_dao.add_queue(queue)
+            return queue_dao.is_a_queue(queue_name)
         else:
             return True
 
     def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName",
                                 lastname="LastName", context="default", language="fr_FR"):
         try:
-            agent_id = self.agentFeatDao.agent_id(agent_no)
+            agent_id = agent_dao.agent_id(agent_no)
             return agent_id
         except LookupError:
             agent_features = AgentFeatures()
@@ -263,12 +260,12 @@ class RestCampaign(object):
             agent_features.commented = 0
             agent_features.description = "description"
 
-            self.agentFeatDao.add_agent(agent_features)
+            agent_dao.add_agent(agent_features)
             return agent_features.id
 
     def agent_exists(self, agent_no):
         try:
-            agent_id = self.agentFeatDao.agent_id(agent_no)
+            agent_id = agent_dao.agent_id(agent_no)
             return agent_id
         except LookupError:
             return 0
@@ -302,9 +299,9 @@ class RestCampaign(object):
 
     def delete_agent(self, agent_no):
         try:
-            agent_id = self.agentFeatDao.agent_id(agent_no)
+            agent_id = agent_dao.agent_id(agent_no)
             print "\nAgent id: " + agent_id + "\n"
-            self.agentFeatDao.del_agent(agent_id)
+            agent_dao.del_agent(agent_id)
             return True
         except Exception as e:
             print "\nException raised: " + str(e) + "\n"
@@ -322,7 +319,7 @@ class RestCampaign(object):
 
         campaign["campaign_name"] = campaign_name
         campaign["base_filename"] = campaign_name + "-file-"
-        campaign["queue_id"] = queue_features_dao.id_from_name(queue_name)
+        campaign["queue_id"] = queue_dao.id_from_name(queue_name)
         campaign["activated"] = activated
         if start_date != None:
             campaign["start_date"] = str(start_date)
@@ -380,7 +377,7 @@ class RestCampaign(object):
                         RecordingConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/search"
 
-        parameters = "?key=" + key + "&_page=" + page + "&_pagesize=" +\
+        parameters = "?key=" + key + "&_page=" + page + "&_pagesize=" + \
                                              pagesize
         requestURI += parameters
         headers = RecordingConfig.CTI_REST_DEFAULT_CONTENT_TYPE

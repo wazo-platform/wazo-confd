@@ -21,7 +21,7 @@ from lettuce import step
 from rest_campaign import RestCampaign
 import datetime
 import random
-from xivo_dao import queue_features_dao
+from xivo_dao import queue_dao
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -84,7 +84,7 @@ activated_campaigns = None
 @step(u'When I ask for activated campaigns for queue "([^"]*)"')
 def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
     global queue_id
-    queue_id = queue_features_dao.id_from_name(queue_name)
+    queue_id = queue_dao.id_from_name(queue_name)
     r_campaign = RestCampaign()
     global activated_campaigns
     activated_campaigns = r_campaign.get_activated_campaigns(queue_id)['data']
@@ -121,7 +121,7 @@ def edition_step_execution(step, local_campaign_name, queue_name, local_start_da
     r_campaign = RestCampaign()
     global campaign_id, campaign_name, queue_id, start_date, end_date
     campaign_name = local_campaign_name + str(random.randint(100, 999))
-    queue_id = str(queue_features_dao.id_from_name(queue_name))
+    queue_id = str(queue_dao.id_from_name(queue_name))
     start_date = local_start_date
     end_date = local_end_date
     params = {'campaign_name': campaign_name,
@@ -196,7 +196,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
 def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_name):
     r_campaign = RestCampaign()
     global list_running_campaigns
-    queue_id = queue_features_dao.id_from_name(queue_name)
+    queue_id = queue_dao.id_from_name(queue_name)
     list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(str(queue_id))['data']
     assert len(list_running_campaigns) > 0, 'No campaign retrieved'
 

@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.agentfeaturesdao import AgentFeaturesDAO
+from xivo_dao import agent_dao
 from xivo_recording.dao.recording_details_dao import RecordingDetailsDbBinder
 from xivo_recording.services.manager_utils import _init_db_connection, \
     reconnectable
@@ -32,7 +32,6 @@ class RecordingManagement:
 
     def __init__(self):
         self.recording_details_db = _init_db_connection(RecordingDetailsDbBinder)
-        self.agentFeatDao = AgentFeaturesDAO(self.recording_details_db.session)
 
     @reconnectable("recording_details_db")
     def add_recording(self, campaign_id, params):
@@ -43,8 +42,8 @@ class RecordingManagement:
         recording_details = {}
         for item in params:
             if (item == 'agent_no'):
-                agent_id = self.agentFeatDao.agent_id(params['agent_no'])
-                logger.debug("Replacing agent number: " + params['agent_no'] +\
+                agent_id = agent_dao.agent_id(params['agent_no'])
+                logger.debug("Replacing agent number: " + params['agent_no'] + \
                              " by agent id: " + agent_id)
                 recording_details["agent_id"] = agent_id
             else:
@@ -61,7 +60,7 @@ class RecordingManagement:
         if(search != None):
             for item in search:
                 if (item == 'agent_no'):
-                    search_pattern["agent_id"] = self.agentFeatDao\
+                    search_pattern["agent_id"] = agent_dao\
                                             .agent_id(search['agent_no'])
                 else:
                     search_pattern[item] = search[item]
@@ -93,7 +92,7 @@ class RecordingManagement:
             agent_no = ''
             for column in row:
                 if column == 'agent_id':
-                    agent_no = self.agentFeatDao.agent_number(row[column])
+                    agent_no = agent_dao.agent_number(row[column])
             row['agent_no'] = agent_no
         return liste
 
@@ -110,7 +109,7 @@ class RecordingManagement:
 
             logphrase = "File " + filename + " is being deleted."
             getoutput('logger -t xivo-recording "' + logphrase + '"')
-            os.remove(RecordingConfig.RECORDING_FILE_ROOT_PATH + "/" +\
+            os.remove(RecordingConfig.RECORDING_FILE_ROOT_PATH + "/" + \
                        filename)
             return True
 

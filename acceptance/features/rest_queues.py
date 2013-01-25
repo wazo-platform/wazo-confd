@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao import queue_features_dao
+from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_recording.recording_config import RecordingConfig
 from xivo_recording.rest import rest_encoder
@@ -36,26 +36,26 @@ class RestQueues:
         self.queue.name = queue_name + str(alea)
         self.queue.displayname = queue_name
         try:
-            queue_features_dao.add_queue(self.queue)
+            queue_dao.add_queue(self.queue)
         except Exception as e:
             print "got exception: ", e
             raise e
         return True
 
     def create_if_not_exists(self, queue_id, queue_name):
+
         try:
-            queue_features_dao.get(queue_id)
-        except LookupError:
+            queue_dao._get(queue_id)
+            return True
+        except IndexError:
             self.queue.id = str(queue_id)
             self.queue.name = queue_name
             self.queue.displayname = self.queue.name
             try:
-                queue_features_dao.add_queue(self.queue)
+                queue_dao.add_queue(self.queue)
             except Exception as e:
                 print "got exception: ", e
                 raise e
-            return True
-        else:
             return True
 
     def list(self, columnName, searchItem):

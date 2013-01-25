@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from datetime import datetime
-from xivo_dao import queue_features_dao
+from xivo_dao import queue_dao
 from xivo_recording.dao.exceptions import DataRetrieveError
 from xivo_recording.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_recording.services.manager_utils import _init_db_connection, \
@@ -45,7 +45,7 @@ class CampagneManagement:
         search_pattern = {}
         for item in search:
             if (item == 'queue_name'):
-                search_pattern["queue_id"] = queue_features_dao.id_from_name(search["queue_name"])
+                search_pattern["queue_id"] = queue_dao.id_from_name(search["queue_name"])
             else:
                 search_pattern[item] = search[item]
         result = None
@@ -57,9 +57,9 @@ class CampagneManagement:
 
         try:
             for item in result['data']:
-                item["queue_name"] = queue_features_dao. \
+                item["queue_name"] = queue_dao. \
                                         queue_name(item["queue_id"])
-                item["queue_display_name"], item["queue_number"] = queue_features_dao.\
+                item["queue_display_name"], item["queue_number"] = queue_dao.\
                                                                     get_display_name_number(item["queue_id"])
         except Exception as e:
             logger.critical("DAO failure(" + str(e) + ")!")
