@@ -15,7 +15,7 @@ set -e
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
 DAEMONNAME=xivo-restapid
-DAEMON=/usr/local/bin/$DAEMONNAME
+DAEMON=/usr/bin/$DAEMONNAME
 DAEMON_ARGS=$2
 PIDFILE=/var/run/$DAEMONNAME.pid
 
