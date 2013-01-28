@@ -397,3 +397,6 @@ class RestCampaign(object):
         recording_db = _init_db_connection(RecordingDetailsDbBinder)
         result = recording_db.session.query(RecordingDetailsDao).all()
         return table_list_to_list_dict(result)
+
+    def delete_queue(self):
+        

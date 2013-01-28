@@ -77,6 +77,13 @@ Feature: Recording campaign management
 	  When I try to create a campaign "test2" pointing to queue "test" with start date "2013-01-15" and end date "2013-02-15"
 	  Then I get an error code '400' with message 'concurrent_campaigns'
 	  
+	Scenario: Queue deletion
+	  Given there is no campaign
+	  Given I create a campaign "test1" pointing to queue "test" with start date "2013-01-01" and end date "2013-02-01"
+	  When I delete the queue "test"
+	  Then the queue "test" is actually deleted
+	  Then I can get the campaign "test" has an empty queue_id
+	  
 	Scenario: Campaign remove fails because there are still some recordings
 	  Given there is a campaign named "test_remove"
 	  Given there's at least one recording for the campaign "test_remove"

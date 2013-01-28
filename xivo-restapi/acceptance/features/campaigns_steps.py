@@ -300,3 +300,16 @@ def when_i_try_to_create_a_campaign_group1_pointing_to_queue_group2_with_start_d
     r_campaign = RestCampaign()
     global return_tuple
     return_tuple = r_campaign.create_with_errors(name, queue, True, start, end)
+
+
+@step(u'When I delete the queue "([^"]*)"')
+def when_i_delete_the_queue_group1(step, group1):
+    r_campaign = RestCampaign()
+    
+    assert False, 'This step must be implemented'
+@step(u'Then the queue "([^"]*)" is actually deleted')
+def then_the_queue_group1_is_actually_deleted(step, group1):
+    assert False, 'This step must be implemented'
+@step(u'Then I can get the campaign "([^"]*)" has an empty queue_id')
+def then_i_can_get_the_campaign_group1_has_an_empty_queue_id(step, group1):
+    assert False, 'This step must be implemented'
