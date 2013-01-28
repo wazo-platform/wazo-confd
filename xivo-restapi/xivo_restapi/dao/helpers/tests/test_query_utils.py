@@ -38,12 +38,10 @@ class TestQueryUtils(unittest.TestCase):
         dbconnection.register_db_connection_pool(dbconnection\
                                 .DBConnectionPool(dbconnection.DBConnection))
         dbconnection.add_connection(RestAPIConfig.RECORDING_DB_URI)
-        self.record_db = RecordCampaignDbBinder\
-                                .new_from_uri(RestAPIConfig.RECORDING_DB_URI)
+        self.record_db = RecordCampaignDbBinder()
         if self.record_db == None:
             self.fail("record_db is None, database connection error")
-        self.recording_details_db = RecordingDetailsDbBinder\
-                                .new_from_uri(RestAPIConfig.RECORDING_DB_URI)
+        self.recording_details_db = RecordingDetailsDbBinder()
         if self.recording_details_db == None:
             self.fail("record_db is None, database connection error")
         self.recording_details_db.session.query(RecordingDetailsDao).delete()
@@ -108,7 +106,7 @@ class TestQueryUtils(unittest.TestCase):
                                           .query(RecordingDetailsDao))['data']\
                                           .sort()
 
-        self.assertTrue(expected_list == result, "Expected: " +\
+        self.assertTrue(expected_list == result, "Expected: " + \
                              str(expected_list) + ", actual: " + str(result))
 
     def test_get_paginated_data(self):

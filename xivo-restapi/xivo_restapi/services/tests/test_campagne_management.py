@@ -19,7 +19,6 @@
 from datetime import datetime
 from mock import Mock, patch
 from xivo_dao import queue_dao
-from xivo_restapi.services import manager_utils
 import copy
 import random
 import unittest
@@ -46,8 +45,6 @@ class TestCampagneManagement(unittest.TestCase):
         self.queue_name = 'queuename'
         self.queue_display_name = "queuedisplayname"
         self.queue_number = '1000'
-
-        manager_utils.reconnectable = self.mock_reconnectable
 
         self.patcher_datetime = patch("datetime.datetime", FakeDate)
         mock_patch_datetime = self.patcher_datetime.start()

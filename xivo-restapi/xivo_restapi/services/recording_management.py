@@ -18,8 +18,6 @@
 
 from xivo_dao import agent_dao
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDbBinder
-from xivo_restapi.services.manager_utils import _init_db_connection, \
-    reconnectable
 import logging
 import os
 from commands import getoutput
@@ -31,9 +29,8 @@ logger = logging.getLogger(__name__)
 class RecordingManagement:
 
     def __init__(self):
-        self.recording_details_db = _init_db_connection(RecordingDetailsDbBinder)
+        self.recording_details_db = RecordingDetailsDbBinder()
 
-    @reconnectable("recording_details_db")
     def add_recording(self, campaign_id, params):
         """
         Converts data to the final format and calls the DAO
@@ -42,6 +39,7 @@ class RecordingManagement:
         recording_details = {}
         for item in params:
             if (item == 'agent_no'):
+                logger.debug("Search agent id for agent no:" + params['agent_no'])
                 agent_id = agent_dao.agent_id(params['agent_no'])
                 logger.debug("Replacing agent number: " + params['agent_no'] + \
                              " by agent id: " + agent_id)
@@ -53,7 +51,6 @@ class RecordingManagement:
         result = self.recording_details_db.add_recording(recording_details)
         return result
 
-    @reconnectable("recording_details_db")
     def get_recordings_as_dict(self, campaign_id, search=None, technical_params=None):
         logger.debug("get_recordings_as_dict")
         search_pattern = {}
@@ -72,7 +69,6 @@ class RecordingManagement:
         self.insert_agent_no(result['data'])
         return result
 
-    @reconnectable("recording_details_db")
     def search_recordings(self, campaign_id, search, technical_params):
         logger.debug("search_recordings")
         if(search == None or search == {} or 'key' not in search):
@@ -96,7 +92,6 @@ class RecordingManagement:
             row['agent_no'] = agent_no
         return liste
 
-    @reconnectable("recording_details_db")
     def delete(self, campaign_id, recording_id):
         filename = self.recording_details_db.delete(campaign_id, recording_id)
         if(filename == None):

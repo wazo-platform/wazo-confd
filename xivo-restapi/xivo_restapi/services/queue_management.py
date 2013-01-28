@@ -19,8 +19,6 @@
 from xivo_dao import queue_dao
 from xivo_restapi.dao.helpers.dynamic_formatting import \
     table_list_to_list_dict
-from xivo_restapi.services.manager_utils import _init_db_connection, \
-    reconnectable
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,10 +26,6 @@ logger = logging.getLogger(__name__)
 
 class QueueManagement:
 
-    def __init__(self):
-        _init_db_connection()
-
-    @reconnectable(None)
     def get_all_queues(self):
         result = queue_dao.all_queues()
         if result != None:

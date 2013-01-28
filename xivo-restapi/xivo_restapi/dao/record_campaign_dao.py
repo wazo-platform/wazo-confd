@@ -20,10 +20,8 @@ from datetime import datetime
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm.exc import UnmappedClassError
-from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.sql.expression import and_
-from xivo_dao.alchemy import dbconnection
 from xivo_restapi.dao.exceptions import DataRetrieveError, \
     NoSuchElementException, InvalidInputException
 from xivo_restapi.dao.generic_dao import GenericDao
@@ -32,7 +30,10 @@ from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
 from xivo_restapi.dao.helpers.time_interval import TimeInterval
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_dao.helpers.db_manager import DbSession
+from xivo_dao.helpers import config
 import logging
+from sqlalchemy.orm.util import class_mapper
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -46,11 +47,11 @@ class RecordCampaignDbBinder(object):
 
     __tablename__ = "record_campaign"
 
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
+        self._new_from_uri(config.DB_URI)
 
     def get_records(self, search=None, checkCurrentlyRunning=False, pagination=None):
-        my_query = self.session.query(RecordCampaignDao)
+        my_query = DbSession().query(RecordCampaignDao)
         if search != None:
             logger.debug("Search search_pattern: " + str(search))
             my_query = my_query.filter_by(**search)
@@ -62,12 +63,12 @@ class RecordCampaignDbBinder(object):
                                     RecordCampaignDao.end_date >= str(now)))
 
         if (pagination == None):
-            return get_all_data(self.session, my_query)
+            return get_all_data(DbSession(), my_query)
         else:
-            return get_paginated_data(self.session, my_query, pagination)
+            return get_paginated_data(DbSession(), my_query, pagination)
 
     def id_from_name(self, name):
-        result = self.session.query(RecordCampaignDao)\
+        result = DbSession().query(RecordCampaignDao)\
                     .filter_by(campaign_name=name)\
                     .first()
         if result != None:
@@ -83,13 +84,11 @@ class RecordCampaignDbBinder(object):
             setattr(record, k, v)
         self._validate_campaign(record)
         try:
-            logger.debug("inserting")
-            self.session.add(record)
-            logger.debug("commiting")
-            self.session.commit()
+            DbSession().add(record)
+            DbSession().commit()
         except Exception as e:
             try:
-                self.session.rollback()
+                DbSession().rollback()
             except e:
                 logger.error("Rollback failed with exception " + str(e))
             logger.error("RecordCampaignDbBinder - add: " + str(e))
@@ -100,11 +99,11 @@ class RecordCampaignDbBinder(object):
     def update(self, campaign_id, params):
         try:
             logger.debug('entering update')
-            campaignsList = self.session.query(RecordCampaignDao)\
+            campaignsList = DbSession().query(RecordCampaignDao)\
                         .filter(RecordCampaignDao.id == campaign_id).all()
             logger.debug("Campaigns list for update: " + str(campaignsList))
             if(len(campaignsList) == 0):
-                raise NoSuchElementException("No campaign found for id " +\
+                raise NoSuchElementException("No campaign found for id " + \
                                              str(campaign_id))
             campaign = campaignsList[0]
             logger.debug('got original')
@@ -115,46 +114,25 @@ class RecordCampaignDbBinder(object):
                 setattr(campaign, k, v)
             logger.debug('attributes modified')
             self._validate_campaign(campaign)
-            self.session.add(campaign)
-            self.session.commit()
+            DbSession().add(campaign)
+            DbSession().commit()
             logger.debug('commited')
         except Exception as e:
-            self.session.rollback()
+            DbSession().rollback()
             logger.debug('Impossible to update the campaign: ' + str(e))
             raise e
         return True
 
-    @classmethod
-    def create_class_mapper(cls, uri):
-        engine = create_engine(uri,
-                               echo=RestAPIConfig.POSTGRES_DEBUG,
-                               encoding='utf-8')
-        if (RestAPIConfig.POSTGRES_DEBUG):
-            loggerDB = logging.getLogger('sqlalchemy.engine')
-            logfilehandler = logging.FileHandler(RestAPIConfig\
-                                                 .POSTGRES_DEBUG_FILE)
-            loggerDB.addHandler(logfilehandler)
-            loggerDB.setLevel(logging.DEBUG)
-
-        metadata = MetaData(engine)
-        data = Table(cls.__tablename__, metadata, autoload=True)
-        mapper(RecordCampaignDao, data)
-
-    @classmethod
-    def new_from_uri(cls, uri):
+    def _new_from_uri(self, uri):
         try:
             class_mapper(RecordCampaignDao)
         except UnmappedClassError:
-            try:
-                cls.create_class_mapper(uri)
-            except BaseException as e:
-                logger.error("Database access error: " + str(e.args))
-                return None
-        except BaseException as e:
-            logger.error("Database access error:" + str(e.args))
-            return None
-        connection = dbconnection.get_connection(uri)
-        return cls(connection.get_session())
+            engine = create_engine(uri,
+                                   echo=RestAPIConfig.POSTGRES_DEBUG,
+                                   encoding='utf-8')
+            metadata = MetaData(engine)
+            data = Table(self.__tablename__, metadata, autoload=True)
+            mapper(RecordCampaignDao, data)
 
     def _validate_campaign(self, record):
         '''Check if the campaign is valid, throws InvalidInputException
@@ -169,7 +147,7 @@ class RecordCampaignDbBinder(object):
         else:
             #check if another campaign exists on the same queue,
             #with a concurrent time interval:
-            campaigns_list = self.session.query(RecordCampaignDao)\
+            campaigns_list = DbSession().query(RecordCampaignDao)\
                 .filter(RecordCampaignDao.queue_id == record.queue_id)\
                 .filter(RecordCampaignDao.id != record.id).all()
             record_interval = TimeInterval(record.start_date, record.end_date)

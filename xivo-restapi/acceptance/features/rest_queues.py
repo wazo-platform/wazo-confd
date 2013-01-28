@@ -20,7 +20,6 @@ from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.services.manager_utils import _init_db_connection
 import random
 
 
@@ -28,7 +27,6 @@ class RestQueues:
 
     def __init__(self):
         self.queue = QueueFeatures()
-        _init_db_connection()
 
     def create(self, queue_name):
         alea = random.randint(10000, 99999999)

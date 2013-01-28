@@ -20,8 +20,6 @@ from datetime import datetime
 from xivo_dao import queue_dao
 from xivo_restapi.dao.exceptions import DataRetrieveError
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
-from xivo_restapi.services.manager_utils import _init_db_connection, \
-    reconnectable
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,14 +28,12 @@ logger = logging.getLogger(__name__)
 class CampagneManagement:
 
     def __init__(self):
-        self.record_db = _init_db_connection(RecordCampaignDbBinder)
+        self.record_db = RecordCampaignDbBinder()
 
-    @reconnectable("record_db")
     def create_campaign(self, params):
         result = self.record_db.add(params)
         return result
 
-    @reconnectable("record_db")
     def get_campaigns_as_dict(self, search={}, checkCurrentlyRunning=False, technical_params=None):
         """
         Calls the DAO and converts data to the final format
@@ -67,7 +63,6 @@ class CampagneManagement:
 
         return result
 
-    @reconnectable("record_db")
     def update_campaign(self, campaign_id, params):
         logger.debug('going to update')
         result = self.record_db.update(campaign_id, params)

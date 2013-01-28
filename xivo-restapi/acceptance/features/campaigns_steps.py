@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from acceptance.features.rest_queues import RestQueues
 from lettuce import step
 from rest_campaign import RestCampaign
 import datetime

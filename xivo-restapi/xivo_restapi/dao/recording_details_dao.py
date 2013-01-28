@@ -22,12 +22,13 @@ from sqlalchemy.orm.exc import UnmappedClassError
 from sqlalchemy.orm.util import class_mapper
 from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.sql.expression import or_, and_
-from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.dao.generic_dao import GenericDao
 from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_dao.helpers.db_manager import DbSession
+from xivo_dao.helpers import config
 import logging
 
 logger = logging.getLogger(__name__)
@@ -42,8 +43,8 @@ class RecordingDetailsDbBinder(object):
 
     __tablename__ = "recording"
 
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
+        self._new_from_uri(config.DB_URI)
 
     def get_recordings_as_list(self, campaign_id, search=None, pagination=None):
         search_pattern = {}
@@ -53,23 +54,23 @@ class RecordingDetailsDbBinder(object):
                     search_pattern[item] = search[item]
 
         logger.debug("Search search_pattern: " + str(search_pattern))
-        my_query = self.session.query(RecordingDetailsDao)\
+        my_query = DbSession().query(RecordingDetailsDao)\
                                        .filter_by(**search_pattern)
         if (pagination == None):
-            return get_all_data(self.session, my_query)
+            return get_all_data(DbSession(), my_query)
         else:
-            return get_paginated_data(self.session, my_query, pagination)
+            return get_paginated_data(DbSession(), my_query, pagination)
 
     def add_recording(self, params):
         record = RecordingDetailsDao()
         for k, v in params.items():
             setattr(record, k, v)
         try:
-            self.session.add(record)
-            self.session.commit()
+            DbSession().add(record)
+            DbSession().commit()
         except Exception as e:
             logger.error("SQL exception:" + e.message)
-            self.session.rollback()
+            DbSession().rollback()
             raise e
         return True
 
@@ -78,19 +79,19 @@ class RecordingDetailsDbBinder(object):
                       + ", key = " + str(key))
         #jointure interne:
         #RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
-        my_query = self.session.query(RecordingDetailsDao)\
+        my_query = DbSession().query(RecordingDetailsDao)\
                         .join((AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id))\
-                        .filter(and_(RecordingDetailsDao.campaign_id == campaign_id,\
+                        .filter(and_(RecordingDetailsDao.campaign_id == campaign_id, \
                                      or_(RecordingDetailsDao.caller == key,
                                          AgentFeatures.number == key)))
         if (pagination == None):
-            return get_all_data(self.session, my_query)
+            return get_all_data(DbSession(), my_query)
         else:
-            return get_paginated_data(self.session, my_query, pagination)
+            return get_paginated_data(DbSession(), my_query, pagination)
 
     def delete(self, campaign_id, recording_id):
         logger.debug("Going to delete " + str(recording_id))
-        recording = self.session.query(RecordingDetailsDao)\
+        recording = DbSession().query(RecordingDetailsDao)\
                     .filter(and_(RecordingDetailsDao.cid == recording_id,
                                  RecordingDetailsDao.campaign_id == campaign_id))\
                     .first()
@@ -99,12 +100,11 @@ class RecordingDetailsDbBinder(object):
             return None
         else:
             filename = recording.filename
-            self.session.delete(recording)
-            self.session.commit()
+            DbSession().delete(recording)
+            DbSession().commit()
             return filename
 
-    @classmethod
-    def new_from_uri(cls, uri):
+    def _new_from_uri(self, uri):
         try:
             class_mapper(RecordingDetailsDao)
         except UnmappedClassError:
@@ -112,7 +112,5 @@ class RecordingDetailsDbBinder(object):
                                    echo=RestAPIConfig.POSTGRES_DEBUG,
                                    encoding='utf-8')
             metadata = MetaData(engine)
-            data = Table(cls.__tablename__, metadata, autoload=True)
+            data = Table(self.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)
-        connection = dbconnection.get_connection(uri)
-        return cls(connection.get_session())
