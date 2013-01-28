@@ -53,10 +53,11 @@ class CampagneManagement:
 
         try:
             for item in result['data']:
-                item["queue_name"] = queue_dao. \
-                                        queue_name(item["queue_id"])
-                item["queue_display_name"], item["queue_number"] = queue_dao.\
-                                                                    get_display_name_number(item["queue_id"])
+                if(item['queue_id'] != ''):
+                    item["queue_name"] = queue_dao. \
+                                            queue_name(item["queue_id"])
+                    item["queue_display_name"], item["queue_number"] = queue_dao.\
+                                                                        get_display_name_number(item["queue_id"])
         except Exception as e:
             logger.critical("DAO failure(" + str(e) + ")!")
             raise DataRetrieveError("DAO failure(" + str(e) + ")!")

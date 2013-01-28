@@ -33,8 +33,9 @@ setup(
               'xivo_restapi.dao.helpers',
               'xivo_restapi.rest',
               'xivo_restapi.services'],
-    scripts=['bin/xivo_recording_agi.py', 'bin/xivo-restapid'],
-    data_files=[('/etc/init.d', ['etc/init.d/xivo-restapid']),
+    scripts=['bin/xivo_recording_agi.py'],
+    data_files=[('/usr/bin', ['bin/xivo-restapid']),
+                ('/etc/init.d', ['etc/init.d/xivo-restapid']),
                 ('/etc/asterisk/extensions_extra.d/', ['etc/asterisk/extensions_extra.d/xivo-recording.conf']),
                 ('/etc/nginx/sites-enabled', ['etc/nginx/sites-enabled/restapi'])]
 )
