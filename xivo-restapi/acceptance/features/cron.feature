@@ -8,7 +8,7 @@ Feature: Automatic deletion - must be launched as super user
 	  Given there is a file "test2.wav" created "32" days ago
 	  Given there is a file "test3.wav" created "31" days ago
 	  Given there is a file "test4.wav" created today
-	  When I run the script "../cron_job/delete_old_items"
+	  When I run the script "../bin/xivo-recording-del-old-items"
 	  Then "test1.wav" and "test2.wav" are deleted
 	  Then "test3.wav" and "test4.wav" are not deleted
 	  
@@ -20,7 +20,7 @@ Feature: Automatic deletion - must be launched as super user
 	  Given there is a recording with id "test2" created "31" days ago with campaign "1" and agent "222"
 	  Given there is a recording with id "test3" created "15" days ago with campaign "1" and agent "222"
 	  Given there is a recording with id "test4" created "0" days ago with campaign "1" and agent "222"
-	  When I run the script "../cron_job/delete_old_items"
+	  When I run the script "../bin/xivo-recording-del-old-items"
 	  Then items "test1" and "test2" are deleted from the database
 	  Then items "test3" and "test4" are not deleted from the database
 	  

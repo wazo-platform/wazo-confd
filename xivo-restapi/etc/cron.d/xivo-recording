@@ -1,0 +1,6 @@
+#
+# cron jobs for xivo-recording
+# performs automatic remove of old recordings
+#
+
+0 0 * * *  root /usr/local/bin/delete_old_items
