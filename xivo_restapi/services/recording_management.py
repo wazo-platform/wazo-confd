@@ -91,7 +91,7 @@ class RecordingManagement:
         for row in liste:
             agent_no = ''
             for column in row:
-                if column == 'agent_id':
+                if column == 'agent_id' and row[column] != '':
                     agent_no = agent_dao.agent_number(row[column])
             row['agent_no'] = agent_no
         return liste
