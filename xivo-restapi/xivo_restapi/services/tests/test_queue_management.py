@@ -18,7 +18,6 @@
 
 from mock import Mock
 from xivo_dao import queue_dao
-from xivo_restapi.services import manager_utils
 import unittest
 
 
@@ -34,9 +33,6 @@ class TestCampagneManagement(unittest.TestCase):
         return reconnector
 
     def setUp(self):
-
-        manager_utils.reconnectable = self.mock_reconnectable
-
         from xivo_restapi.services.queue_management import QueueManagement
         self._queueManager = QueueManagement()
 

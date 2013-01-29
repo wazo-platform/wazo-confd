@@ -16,12 +16,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from acceptance.features.rest_queues import RestQueues
 from lettuce import step
 from rest_campaign import RestCampaign
+from time import strftime, localtime
+from xivo_dao import queue_dao
+from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_restapi.rest import rest_encoder
 import datetime
 import random
-from xivo_dao import queue_dao
 
 #######################################################
 # !!!!!!!!!!!!!!!!!!! TODO: delete random.randint!!!! #
@@ -109,10 +111,9 @@ def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_ca
 def edition_step_prerequisite(step, local_campaign_name, queue_name, local_start_date, local_end_date):
     r_campaign = RestCampaign()
     global campaign_id
-    new_campaign_name = local_campaign_name + str(random.randint(100, 999))
-    campaign_id = r_campaign.create(new_campaign_name, queue_name, True, local_start_date, local_end_date)
+    campaign_id = r_campaign.create(local_campaign_name, queue_name, True, local_start_date, local_end_date)
     campaign = r_campaign.getCampaign(campaign_id)
-    assert campaign["campaign_name"] == new_campaign_name, 'Campaign ' + \
+    assert campaign["campaign_name"] == local_campaign_name, 'Campaign ' + \
                                     local_campaign_name + ' not properly inserted'
 
 
@@ -237,6 +238,7 @@ def then_i_get_an_error_code_group1_with_message_group2(step, error_code, messag
     assert str(return_tuple[0]) == error_code, "Got wrong error code: " + str(return_tuple[0])
     assert return_tuple[1] == [message], "Got wrong message: " + str(return_tuple[1])
 
+
 @step(u'When I ask for all the campaigns')
 def when_i_ask_for_all_the_campaigns(step):
     r_campaign = RestCampaign()
@@ -303,13 +305,54 @@ def when_i_try_to_create_a_campaign_group1_pointing_to_queue_group2_with_start_d
 
 
 @step(u'When I delete the queue "([^"]*)"')
-def when_i_delete_the_queue_group1(step, group1):
+def when_i_delete_the_queue_group1(step, queue_name):
     r_campaign = RestCampaign()
-    
-    assert False, 'This step must be implemented'
+    r_campaign.delete_queue(queue_name)
+
+
 @step(u'Then the queue "([^"]*)" is actually deleted')
-def then_the_queue_group1_is_actually_deleted(step, group1):
-    assert False, 'This step must be implemented'
-@step(u'Then I can get the campaign "([^"]*)" has an empty queue_id')
-def then_i_can_get_the_campaign_group1_has_an_empty_queue_id(step, group1):
-    assert False, 'This step must be implemented'
+def then_the_queue_group1_is_actually_deleted(step, queue_name):
+    r_campaign = RestCampaign()
+    result = r_campaign.get_queue(queue_name)
+    assert result == None
+
+
+@step(u'Then I can get the campaign "([^"]*)" with an empty queue_id')
+def then_i_can_get_the_campaign_group1_has_an_empty_queue_id(step, campaign_name):
+    r_campaign = RestCampaign()
+    global campaign_id
+    result = r_campaign.getCampaign(campaign_id)
+    assert result != None, "No campaign retrieved"
+    assert result['queue_id'] == '', "queue_id not null"
+
+
+@step(u'Given there is at least one recording for the campaign "([^"]*)"')
+def given_there_s_at_least_one_recording_for_the_campaign_group1(step, group1):
+    global campaign_id
+    r_campaign = RestCampaign()
+    agent_no = '4000'
+    r_campaign.add_agent_if_not_exists(agent_no)
+    callid = str(random.randint(1000, 9999))
+    time = strftime("%a, %d %b %Y %H:%M:%S", localtime())
+    r_campaign.addRecordingDetails(campaign_id, callid, '2002', agent_no, time)
+
+
+@step(u'When I ask to delete the campaign "([^"]*)"')
+def when_i_ask_to_delete_the_campaign_group1(step, group1):
+    global campaign_id, return_tuple
+    r_campaign = RestCampaign()
+    result = r_campaign.delete_campaign(campaign_id)
+    return_tuple = (result.status, rest_encoder.decode(result.read()))
+
+
+@step(u'Given there is not any recording for the campaign "([^"]*)"')
+def given_there_isn_t_any_recording_for_the_campaign_group1(step, campaign_name):
+    r_campaign = RestCampaign()
+    r_campaign.delete_recordings(campaign_name)
+
+
+@step(u'Then I get a response with code \'([^\']*)\' and the campaign is deleted')
+def then_i_get_a_response_with_code_group1_and_the_campaign_is_deleted(step, code):
+    global return_tuple, campaign_id
+    assert str(return_tuple[0]) == code
+    assert RecordCampaignDbBinder().get(campaign_id) == None

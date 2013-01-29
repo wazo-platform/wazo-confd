@@ -45,17 +45,17 @@ root.add_url_rule("/<campaign_id>",
                   methods=["GET"])
 
 root.add_url_rule('/',
-                  'add_campaign',
+                  "add_campaign",
                   getattr(APICampaigns(), "add_campaign"),
                   methods=['POST'])
 
 root.add_url_rule('/<campaign_id>',
-                  'update',
+                  "update",
                   getattr(APICampaigns(), "update"),
                   methods=['PUT'])
 
-root.add_url_rule('/<campaign_id>',
-                  'delete',
+root.add_url_rule("/<campaign_id>",
+                  "delete_campaign",
                   getattr(APICampaigns(), "delete"),
                   methods=['DELETE'])
 
@@ -64,7 +64,7 @@ root.add_url_rule('/<campaign_id>',
 #   API recordings   #
 # ****************** #
 root.add_url_rule("/<campaign_id>/search",
-                  "search",
+                  "search_recording",
                   getattr(APIRecordings(), "search"),
                   methods=["GET"])
 
@@ -82,6 +82,7 @@ root.add_url_rule("/<campaign_id>/<recording_id>",
                   "delete",
                   getattr(APIRecordings(), "delete"),
                   methods=["DELETE"])
+
 
 # ****************** #
 #   Queues server    #

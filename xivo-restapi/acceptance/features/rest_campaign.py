@@ -16,10 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import datetime
+import os
+import random
 from acceptance.features import cron_utils
 from acceptance.features.rest_queues import RestQueues
 from xivo_dao import agent_dao
-from xivo_dao.alchemy import dbconnection
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
     RecordCampaignDao
@@ -27,28 +29,18 @@ from xivo_restapi.dao.recording_details_dao import RecordingDetailsDbBinder, \
     RecordingDetailsDao
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.services.manager_utils import _init_db_connection
-import datetime
-import os
-import random
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.dao.helpers.dynamic_formatting import table_list_to_list_dict
+from xivo_dao.helpers.db_manager import DbSession
 
 
 class RestCampaign(object):
 
-    def setUpDBConnection(self):
-        db_connection_pool = \
-            dbconnection.DBConnectionPool(dbconnection.DBConnection)
 
-        dbconnection.register_db_connection_pool(db_connection_pool)
-
-        uri = RestAPIConfig.RECORDING_DB_URI
-        dbconnection.add_connection_as(uri, 'asterisk')
-        connection = dbconnection.get_connection('asterisk')
-        session = connection.get_session()
-        return session
+    def __init__(self):
+        self.record_db = RecordCampaignDbBinder()
+        self.recordings = RecordingDetailsDbBinder()
 
     def create(self, campaign_name, queue_name='test', activated=True,
                start_date=None, end_date=None, campaign_id=None):
@@ -386,17 +378,34 @@ class RestCampaign(object):
         return rest_encoder.decode(reply.read())
 
     def delete_all_campaigns(self):
-        campaign_db = _init_db_connection(RecordCampaignDbBinder)
-        recording_db = _init_db_connection(RecordingDetailsDbBinder)
-        recording_db.session.query(RecordingDetailsDao).delete()
-        recording_db.session.commit()
-        campaign_db.session.query(RecordCampaignDao).delete()
-        campaign_db.session.commit()
+        DbSession().query(RecordingDetailsDao).delete()
+        DbSession().commit()
+        DbSession().query(RecordCampaignDao).delete()
+        DbSession().commit()
 
     def list_all_recordings(self):
-        recording_db = _init_db_connection(RecordingDetailsDbBinder)
-        result = recording_db.session.query(RecordingDetailsDao).all()
+        result = DbSession().query(RecordingDetailsDao).all()
         return table_list_to_list_dict(result)
 
-    def delete_queue(self):
-        
+    def delete_queue(self, queue_name):
+        DbSession().query(QueueFeatures).filter(QueueFeatures.name == queue_name).delete()
+        DbSession().commit()
+
+    def get_queue(self, queue_name):
+        return DbSession().query(QueueFeatures)\
+            .filter(QueueFeatures.name == queue_name).first()
+
+    def delete_campaign(self, campaign_id):
+        connection = RestAPIConfig.getWSConnection()
+        requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        str(campaign_id)
+        headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("DELETE", requestURI, '', headers)
+        return connection.getresponse()
+
+    def delete_recordings(self, campaign_name):
+        campaign_id = RecordCampaignDbBinder().id_from_name(campaign_name)
+        DbSession().query(RecordingDetailsDao)\
+            .filter_by(campaign_id=int(campaign_id)).delete()
+        DbSession().commit()

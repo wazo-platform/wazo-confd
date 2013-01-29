@@ -49,7 +49,7 @@ def when_there_was_a_call_from_group1_to_the_queue_group2_answered_by_agent_grou
 @step(u'When I read the list of recordings for the campaign "([^"]*)" from the database')
 def when_i_read_the_list_of_recordings_for_the_campaign_group1_from_the_database(step, campaign_name):
     r_campaign = RestCampaign()
-    record_db = RecordCampaignDbBinder.new_from_uri(RestAPIConfig.RECORDING_DB_URI)
+    record_db = RecordCampaignDbBinder()
     campaign_id = record_db.id_from_name(campaign_name)
     result = r_campaign.paginated_recordings_list(campaign_id, 1, 10)
     global recordings_list
