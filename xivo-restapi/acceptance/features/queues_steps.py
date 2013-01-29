@@ -31,4 +31,4 @@ def when_i_create_a_queue(step, group1):
 @step(u'Then I can consult this queue')
 def then_i_can_consult_this_queue(step):
     global restqueues
-    assert restqueues.list("name", "test_lettuce")
+    assert restqueues.find("name", "test_lettuce")

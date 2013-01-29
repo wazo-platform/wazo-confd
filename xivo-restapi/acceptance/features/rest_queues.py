@@ -54,7 +54,7 @@ class RestQueues:
             print "Test precondition failed, got exception: ", e
             raise e
 
-    def list(self, columnName, searchItem):
+    def find(self, columnName, searchItem):
         queues_result = self.ws_utils.rest_get(RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + '/')
 
         queues = queues_result.data
