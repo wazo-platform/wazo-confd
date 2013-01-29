@@ -36,6 +36,7 @@ class APICampaigns(object):
 
     def add_campaign(self):
         try:
+            logger.debug("Got an ADD request for campaigns")
             body = rest_encoder.decode(request.data)
             logger.debug(str(body))
         except ValueError:
@@ -60,7 +61,10 @@ class APICampaigns(object):
 
     def get(self, campaign_id=None):
         try:
-            logger.debug("Get args:" + str(campaign_id))
+            logger.debug("Got an GET request for campaign id: " + \
+                         str(campaign_id) + \
+                         "with args: " + \
+                         str(campaign_id))
             checkCurrentlyRunning = False
             params = {}
             technical_params = {}
@@ -86,19 +90,23 @@ class APICampaigns(object):
             body = [str(e.args)]
             return make_response(rest_encoder.encode(body), 500)
 
-    def delete(self, resource_id):
+    def delete(self, campaign_id):
         try:
-            body = rest_encoder.decode(request.data)
-        except ValueError:
-            body = "No parsable data in the request"
-        return make_response(("Work in progress, root delete, resource_id: " +
-                              str(resource_id) +
-                              " body: " + str(body) +
-                              " args: " + str(request.args)),
-                             501)
+            logger.debug("Got an DELETE request for campaign id: " + campaign_id)
+            self._campagne_manager.delete(campaign_id)
+        except NoSuchElementException:
+            liste = ["campaign_not_found"]
+            return make_response(rest_encoder.encode(liste), 404)
+        except IntegrityError:
+            liste = ["campaign_not_empty"]
+            return make_response(rest_encoder.encode(liste), 412)
+        except Exception as e:
+            return make_response(rest_encoder.encode(str(e)), 500)
+        return make_response(rest_encoder.encode("Deleted: True"), 200)
 
     def update(self, campaign_id):
         try:
+            logger.debug("Got an UPDATE request for campaign id: " + campaign_id)
             body = rest_encoder.decode(request.data)
             logger.debug(str(body))
         except ValueError:

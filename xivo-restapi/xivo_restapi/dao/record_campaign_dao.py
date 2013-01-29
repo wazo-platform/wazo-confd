@@ -163,3 +163,15 @@ class RecordCampaignDbBinder(object):
 
         if(len(errors_list) > 0):
             raise InvalidInputException("Invalid data provided", errors_list)
+
+    def get(self, campaign_id):
+        return DbSession().query(RecordCampaignDao)\
+            .filter(RecordCampaignDao.id == campaign_id).first()
+
+    def delete(self, campaign):
+        try:
+            DbSession().delete(campaign)
+            DbSession().commit()
+        except Exception as e:
+            DbSession().rollback()
+            raise e

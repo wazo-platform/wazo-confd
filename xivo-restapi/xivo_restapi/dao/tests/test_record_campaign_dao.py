@@ -17,17 +17,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from datetime import datetime
-from xivo_restapi.dao.exceptions import DataRetrieveError, \
-    InvalidInputException
-from xivo_restapi.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict
+from sqlalchemy.exc import IntegrityError
+from xivo_dao.helpers.db_manager import DbSession
+from xivo_restapi.dao.exceptions import DataRetrieveError, InvalidInputException
+from xivo_restapi.dao.helpers.dynamic_formatting import table_list_to_list_dict
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDao, \
     RecordCampaignDbBinder
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
 import copy
 import unittest
-from xivo_dao.helpers.db_manager import DbSession
 
 
 class TestRecordCampaignDao(unittest.TestCase):
@@ -214,3 +213,69 @@ class TestRecordCampaignDao(unittest.TestCase):
             self.assertIn('concurrent_campaigns', e.errors_list)
             gotException = True
         self.assertTrue(gotException)
+
+    def test_get(self):
+        campaign_name = "campaign-àé"
+        queue_id = "1"
+        base_filename = campaign_name + "-"
+
+        obj = RecordCampaignDao()
+
+        obj.campaign_name = campaign_name
+        obj.activated = False
+        obj.base_filename = base_filename,
+        obj.queue_id = queue_id,
+        obj.start_date = '2012-01-01 12:12:12',
+        obj.end_date = '2012-12-12 12:12:12',
+
+        DbSession().add(obj)
+        DbSession().commit()
+        returned_obj = self.record_db.get(obj.id)
+        self.assertEqual(returned_obj, obj)
+
+    def test_delete(self):
+        campaign_name = "campaign-àé"
+        queue_id = "1"
+        base_filename = campaign_name + "-"
+
+        obj = RecordCampaignDao()
+
+        obj.campaign_name = campaign_name
+        obj.activated = False
+        obj.base_filename = base_filename
+        obj.queue_id = queue_id
+        obj.start_date = '2012-01-01 12:12:12'
+        obj.end_date = '2012-12-12 12:12:12'
+
+        DbSession().add(obj)
+        DbSession().commit()
+        self.record_db.delete(obj)
+        self.assertEqual(None, self.record_db.get(obj.id))
+
+    def test_delete_integrity_error(self):
+        campaign_name = "campaign-àé"
+        queue_id = "1"
+        base_filename = campaign_name + "-"
+
+        campaign = RecordCampaignDao()
+
+        campaign.campaign_name = campaign_name
+        campaign.activated = False
+        campaign.base_filename = base_filename
+        campaign.queue_id = queue_id
+        campaign.start_date = '2012-01-01 12:12:12'
+        campaign.end_date = '2012-12-12 12:12:12'
+        DbSession().add(campaign)
+        DbSession().commit()
+
+        recording = RecordingDetailsDao()
+        recording.campaign_id = campaign.id
+        recording.filename = 'file'
+        recording.cid = '123'
+        recording.agent_id = 1
+        recording.caller = '2002'
+        DbSession().add(recording)
+        DbSession().commit()
+
+        with self.assertRaises(IntegrityError):
+            self.record_db.delete(campaign)

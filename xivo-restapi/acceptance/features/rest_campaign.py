@@ -272,3 +272,26 @@ class RestCampaign(object):
     def list_all_recordings(self):
         result = DbSession().query(RecordingDetailsDao).all()
         return table_list_to_list_dict(result)
+
+    def delete_queue(self, queue_name):
+        DbSession().query(QueueFeatures).filter(QueueFeatures.name == queue_name).delete()
+        DbSession().commit()
+
+    def get_queue(self, queue_name):
+        return DbSession().query(QueueFeatures)\
+            .filter(QueueFeatures.name == queue_name).first()
+
+    def delete_campaign(self, campaign_id):
+        connection = RestAPIConfig.getWSConnection()
+        requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                        RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+                        str(campaign_id)
+        headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+        connection.request("DELETE", requestURI, '', headers)
+        return connection.getresponse()
+
+    def delete_recordings(self, campaign_name):
+        campaign_id = RecordCampaignDbBinder().id_from_name(campaign_name)
+        DbSession().query(RecordingDetailsDao)\
+            .filter_by(campaign_id=int(campaign_id)).delete()
+        DbSession().commit()

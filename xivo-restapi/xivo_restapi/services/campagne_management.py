@@ -18,8 +18,10 @@
 
 from datetime import datetime
 from xivo_dao import queue_dao
-from xivo_restapi.dao.exceptions import DataRetrieveError
+from xivo_restapi.dao.exceptions import DataRetrieveError, InvalidInputException, \
+    NoSuchElementException
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_restapi.dao.recording_details_dao import RecordingDetailsDbBinder
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,6 +31,7 @@ class CampagneManagement:
 
     def __init__(self):
         self.record_db = RecordCampaignDbBinder()
+        self.recording_details_db = RecordingDetailsDbBinder()
 
     def create_campaign(self, params):
         result = self.record_db.add(params)
@@ -87,3 +90,10 @@ class CampagneManagement:
             if(data[key] == ''):
                 data[key] = None
         return data
+
+    def delete(self, campaign_id):
+        campaign = self.record_db.get(int(campaign_id))
+        if(campaign == None):
+            raise NoSuchElementException("No such campaign")
+        else:
+            self.record_db.delete(campaign)

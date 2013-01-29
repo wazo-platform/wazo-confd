@@ -18,10 +18,13 @@
 
 from datetime import datetime
 from mock import Mock, patch
+from sqlalchemy.exc import IntegrityError
 from xivo_dao import queue_dao
+from xivo_restapi.dao.exceptions import NoSuchElementException
 import copy
 import random
 import unittest
+from xivo_restapi.dao.record_campaign_dao import RecordCampaignDao
 
 
 class FakeDate(datetime):
@@ -139,3 +142,23 @@ class TestCampagneManagement(unittest.TestCase):
         result = self._campagneManager.supplement_edit_input(data)
         old_data["champ3"] = None
         self.assertDictEqual(old_data, result)
+
+    def test_delete_no_such_element(self):
+        self._campagneManager.record_db.get.return_value = None
+        with self.assertRaises(NoSuchElementException):
+            self._campagneManager.delete('1')
+
+    def test_delete_integrity_error(self):
+        def mock_delete(campaign):
+            raise IntegrityError(None, None, None)
+        self._campagneManager.record_db.delete.side_effect = mock_delete
+        self._campagneManager.record_db.get.return_value = RecordCampaignDao()
+        with self.assertRaises(IntegrityError):
+            self._campagneManager.delete('1')
+
+    def test_delete_success(self):
+        obj = RecordCampaignDao()
+        self._campagneManager.record_db.get.return_value = obj
+        self._campagneManager.record_db.delete.return_value = None
+        self._campagneManager.delete('1')
+        self._campagneManager.record_db.delete.assert_called_with(obj)

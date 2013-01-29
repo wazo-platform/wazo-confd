@@ -114,3 +114,7 @@ class RecordingDetailsDbBinder(object):
             metadata = MetaData(engine)
             data = Table(self.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)
+
+    def count_recordings(self, campaign_id):
+        return DbSession().query(RecordingDetailsDao)\
+            .filter(RecordingDetailsDao.campaign_id == campaign_id).count()
