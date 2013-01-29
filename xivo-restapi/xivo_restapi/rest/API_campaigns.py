@@ -125,6 +125,6 @@ class APICampaigns(object):
             liste = e.errors_list
             return make_response(rest_encoder.encode(liste), 400)
         if (result):
-            return make_response(("Updated: " + str(result)), 200)
+            return make_response(rest_encoder.encode(("Updated: " + str(result))), 200)
         else:
-            return make_response(str(result), 500)
+            return make_response(rest_encoder.encode(str(result)), 500)

@@ -19,14 +19,6 @@ Feature: Recording campaign management
 	  When I ask for activated campaigns for queue "test1"
 	  Then I get a list of activated campaigns with campaign "quality"
 
-	Scenario: Campaign configuration and execution
-	  Given there is no campaign
-	  Given there is no campaign "quality",
-	  Given I create a campaign named "quality",
-	  Given I add queue "5001" for this campaign, 
-	  When I start this campaign
-	  Then calls placed in this queue are recorded 
-	
 	Scenario: Campaign edition
 	  Given there is no campaign
 	  Given there is a queue "test1" and a queue "test2"
@@ -97,4 +89,12 @@ Feature: Recording campaign management
 	  Given there is not any recording for the campaign "test_remove"
 	  When I ask to delete the campaign "test_remove"
 	  Then I get a response with code '200' and the campaign is deleted
+
+	Scenario: Campaign configuration and execution
+	  Given there is no campaign
+	  Given there is no campaign "quality",
+	  Given I create a campaign named "quality",
+	  Given I add queue "5001" for this campaign, 
+	  When I start this campaign
+	  Then calls placed in this queue are recorded 
 	  
