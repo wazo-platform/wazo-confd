@@ -19,7 +19,7 @@
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.rest import rest_encoder
+from acceptance.features.ws_utils import WsUtils
 import random
 
 
@@ -27,48 +27,39 @@ class RestQueues:
 
     def __init__(self):
         self.queue = QueueFeatures()
+        self.ws_utils = WsUtils()
 
-    def create(self, queue_name):
+    def create(self, queue_name, queue_id=None):
         alea = random.randint(10000, 99999999)
-        self.queue.id = str(alea)
+
+        if queue_id == None:
+            self.queue.id = str(alea)
+
         self.queue.name = queue_name + str(alea)
         self.queue.displayname = queue_name
         try:
             queue_dao.add_queue(self.queue)
         except Exception as e:
-            print "got exception: ", e
+            print "Test precondition failed, got exception: ", e
             raise e
         return True
 
-    def create_if_not_exists(self, queue_id, queue_name):
-
+    def create_if_not_exists(self, queue_name, queue_id):
         try:
             queue_dao._get(queue_id)
             return True
         except IndexError:
-            self.queue.id = str(queue_id)
-            self.queue.name = queue_name
-            self.queue.displayname = self.queue.name
-            try:
-                queue_dao.add_queue(self.queue)
-            except Exception as e:
-                print "got exception: ", e
-                raise e
-            return True
+            return self.create(queue_name, queue_id)
+        except Exception as e:
+            print "Test precondition failed, got exception: ", e
+            raise e
 
     def list(self, columnName, searchItem):
-        connection = RestAPIConfig.getWSConnection()
+        queues_result = self.ws_utils.rest_get(RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + '/')
 
-        requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                        RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + "/"
-
-        headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
-
-        connection.request("GET", requestURI, "", headers)
-        reply = connection.getresponse()
-        body = reply.read()
-        queues = rest_encoder.decode(body)
+        queues = queues_result.data
         assert len(queues) > 0
+
         result = False
         for queue in queues:
             if queue[columnName].startswith(searchItem):
