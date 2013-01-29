@@ -59,8 +59,8 @@ def then_i_get_a_error_code_group1_with_message_group2(step, error_code, error_m
     global add_result
     print "\nReceived code, message: " + str(add_result) + "\n"
     print "\nAwaited code, message: " + error_code + ", " + error_message + "\n"
-    assert (str(add_result[0]) == error_code), 'Got wrong error code'
-    assert (str(add_result[1]).strip() == error_message), 'Got wrong error message'
+    assert (str(add_result.status) == error_code), 'Got wrong error code'
+    assert (str(add_result.data).strip() == error_message), 'Got wrong error message'
 
 
 @step(u'Given there is a campaign named "([^"]*)" for a queue "([^"]*)"')
@@ -85,13 +85,18 @@ def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_gro
     record_db = RecordCampaignDbBinder()
     campaign_id = record_db.id_from_name(campaign_name)
     global add_result
-    add_result = rest_campaign.addRecordingDetails(campaign_id, callid, caller, local_agent_no, time)
+    add_result = rest_campaign.addRecordingDetails(campaign_id,
+                                                   callid,
+                                                   caller,
+                                                   local_agent_no,
+                                                   time)
 
 
 @step(u'Then I can consult these details')
 def then_i_can_consult_these_details(step):
     global add_result
-    assert (add_result == (201, "Added: True")), 'Cannot add call details'
+    assert (add_result.status == 201), 'Cannot add call details'
+    assert (add_result.data == "Added: True"), 'Cannot add call details'
     global campaign_name, callid
     record_db = RecordCampaignDbBinder()
     campaign_id = record_db.id_from_name(campaign_name)
@@ -122,7 +127,8 @@ def given_there_is_a_recording_referenced_by_a_callid(step, local_callid, agent_
     global campaign_name
     campaign_id = record_db.id_from_name(campaign_name)
     add_result = rest_campaign.addRecordingDetails(campaign_id, local_callid, "caller", agent_no, time)
-    assert (add_result == (201, "Added: True")), 'Cannot add call details: ' + str(add_result)
+    assert (add_result.status == 201), 'Cannot add call details: ' + add_result.status
+    assert (add_result.data == "Added: True"), 'Cannot add call details: ' + add_result.data
 
 
 @step(u'When I delete a recording referenced by this "([^"]*)"')

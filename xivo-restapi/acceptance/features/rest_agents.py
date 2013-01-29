@@ -59,7 +59,7 @@ class RestAgents:
             raise e
 
     def list(self, agent_id=""):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + \
+        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + \
                                        "/" + agent_id)
         return reply.data
 

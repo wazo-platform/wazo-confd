@@ -80,7 +80,7 @@ class RestCampaign(object):
         recording['end_time'] = time
         recording['filename'] = callid + ".wav"
 
-        reply = self.ws_client.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
+        reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                         "/" + str(campaign_id) + '/', recording)
 
         #we create the file
@@ -95,7 +95,7 @@ class RestCampaign(object):
         return reply
 
     def verifyRecordingsDetails(self, campaign_id, callid):
-        reply = self.ws_utils.post_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
+        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                         '/' + str(campaign_id) + "/")
 
         assert reply.data != None, "No result"
@@ -282,13 +282,10 @@ class RestCampaign(object):
             .filter(QueueFeatures.name == queue_name).first()
 
     def delete_campaign(self, campaign_id):
-        connection = RestAPIConfig.getWSConnection()
-        requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
-                        RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+        serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id)
-        headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
-        connection.request("DELETE", requestURI, '', headers)
-        return connection.getresponse()
+        reply = self.ws_utils.rest_delete(serviceURI)
+        return reply
 
     def delete_recordings(self, campaign_name):
         campaign_id = RecordCampaignDbBinder().id_from_name(campaign_name)

@@ -36,18 +36,19 @@ class APIRecordings(object):
             body = rest_encoder.decode(request.data)
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
-            return make_response(body, 400)
+            return make_response(rest_encoder.encode(body), 400)
         self._recording_manager.supplement_add_input(body)
         try:
             result = self._recording_manager.add_recording(campaign_id, body)
         except Exception as e:
             body = "SQL Error: " + str(e.message)
-            return make_response(body, 400)
+            return make_response(rest_encoder.encode(body), 400)
 
         if (result == True):
-            return make_response(("Added: " + str(result)), 201)
+            return make_response(rest_encoder.encode("Added: " + \
+                                                     str(result)), 201)
         else:
-            return make_response(str(result), 500)
+            return make_response(rest_encoder.encode(str(result)), 500)
 
     def list_recordings(self, campaign_id):
         try:
@@ -97,7 +98,7 @@ class APIRecordings(object):
 
     def delete(self, campaign_id, recording_id):
         try:
-            logger.debug("Entering delete:" + str(campaign_id) + ", " +\
+            logger.debug("Entering delete:" + str(campaign_id) + ", " + \
                          str(recording_id))
             result = self._recording_manager. \
                         delete(campaign_id, recording_id)

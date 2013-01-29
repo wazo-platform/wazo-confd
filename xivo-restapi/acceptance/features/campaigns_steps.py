@@ -342,7 +342,7 @@ def when_i_ask_to_delete_the_campaign_group1(step, group1):
     global campaign_id, return_tuple
     r_campaign = RestCampaign()
     result = r_campaign.delete_campaign(campaign_id)
-    return_tuple = (result.status, rest_encoder.decode(result.read()))
+    return_tuple = (result.status, result.data)
 
 
 @step(u'Given there is not any recording for the campaign "([^"]*)"')
