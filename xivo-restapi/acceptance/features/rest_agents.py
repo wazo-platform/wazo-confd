@@ -58,15 +58,10 @@ class RestAgents:
             print "Test precondition failed, got exception: ", e
             raise e
 
-    def list(self, agent_id=""):
+    def list_agents(self, agent_id=""):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + \
                                        "/" + agent_id)
         return reply.data
 
-    def get_by_number(self, agent_number):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + \
-                                       "?agent_number=" + str(agent_number))
-        return reply.data
-
     def check_agent_in_list(self, agents_list):
-        assert "this method must be implemented" == True  #return in agents_list
+        return (self.agent.todict() in agents_list)

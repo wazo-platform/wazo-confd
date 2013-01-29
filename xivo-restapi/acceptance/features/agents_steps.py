@@ -23,6 +23,7 @@ rest_agents = RestAgents()
 agents_dict = {}
 agent_with_number = None
 
+
 @step(u'Given there is an agent named "([^"]*)" with number "([^"]*)"')
 def given_there_is_an_agent_named_group1_with_number_group2(step, agent_first_name, agent_number):
     rest_agents.create_if_not_exists(agent_first_name, agent_number)
@@ -31,23 +32,11 @@ def given_there_is_an_agent_named_group1_with_number_group2(step, agent_first_na
 @step(u'When I ask for all agents')
 def when_i_ask_for_all_agents(step):
     global agents_dict
-    agents_dict = rest_agents.list()
-    assert (agents_dict['total'] > 0)
+    agents_dict = rest_agents.list_agents()
+    assert (agents_dict != {})
 
 
 @step(u'Then there is an agent named "([^"]*)" with number "([^"]*)" in the response')
 def then_there_is_an_agent_named_group1_with_number_group2_in_the_response(step, group1, group2):
     global agents_dict
     rest_agents.check_agent_in_list(agents_dict)
-
-
-@step(u'When I ask for agent with number "([^"]*)"')
-def when_i_ask_for_agent_with_number_group1(step, number):
-    global agent_with_number
-    agent_with_number = rest_agents.get_by_number(number)
-
-
-@step(u'Then I get agent named "([^"]*)"')
-def then_i_get_agent_named_group1(step, name):
-    global agent_with_number
-    agent_with_number.name = name

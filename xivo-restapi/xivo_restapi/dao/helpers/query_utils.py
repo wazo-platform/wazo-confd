@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_restapi.dao.helpers.dynamic_formatting import table_list_to_list_dict
-from xivo_restapi.dao.exceptions import EmptyPageException,\
+from xivo_restapi.dao.exceptions import EmptyPageException, \
     InvalidPaginatorException
 
 
@@ -49,9 +49,7 @@ def _get_data(session, query, fct):
         total = query.count()
     except Exception as e:
         session.rollback()
-        #traitement de l'exception
         raise e
 
     return {'total': total,
             'data': data}
-

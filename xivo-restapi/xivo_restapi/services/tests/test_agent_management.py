@@ -1,3 +1,5 @@
+
+
 # -*- coding: UTF-8 -*-
 #
 # Copyright (C) 2012  Avencall
@@ -17,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from mock import Mock
-from xivo_dao import queue_dao
+from xivo_dao import agent_dao
 import unittest
 
 
@@ -25,19 +27,14 @@ class SampleClass:
     pass
 
 
-class TestQueueManagement(unittest.TestCase):
-
-    def mock_reconnectable(self, attribute_name):
-        def reconnector(func):
-            return func
-        return reconnector
+class TestAgentManagement(unittest.TestCase):
 
     def setUp(self):
-        from xivo_restapi.services.queue_management import QueueManagement
-        self._queueManager = QueueManagement()
+        from xivo_restapi.services.agent_management import AgentManagement
+        self._agentManager = AgentManagement()
 
     def test_get_all_queues(self):
-        queue_dao.all_queues = Mock()
+        agent_dao.all = Mock()
         data = []
         expected_result = []
         i = 0
@@ -54,6 +51,6 @@ class TestQueueManagement(unittest.TestCase):
             expected_result.append(item)
             i += 1
 
-        queue_dao.all_queues.return_value = data
-        result = self._queueManager.get_all_queues()
+        agent_dao.all.return_value = data
+        result = self._agentManager.get_all_agents()
         self.assertListEqual(result, expected_result)

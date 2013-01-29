@@ -22,6 +22,7 @@ from xivo_restapi.rest.API_campaigns import APICampaigns
 from xivo_restapi.rest.API_queues import APIQueues
 from xivo_restapi.rest.API_recordings import APIRecordings
 import logging
+from xivo_restapi.rest.API_agents import APIAgents
 
 logger = logging.getLogger(__name__)
 
@@ -99,4 +100,22 @@ queues_service = Blueprint("queues_service",
 queues_service.add_url_rule("/",
                   "list_queues",
                   getattr(APIQueues(), "list_queues"),
+                  methods=["GET"])
+
+
+# ****************** #
+#   Agents server    #
+# ****************** #
+agents_service = Blueprint("agents_service",
+                         __name__,
+                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                    RestAPIConfig.XIVO_AGENTS_SERVICE_PATH)
+
+# ****************** #
+#   API queues       #
+# ****************** #
+
+agents_service.add_url_rule("/",
+                  "list_agents",
+                  getattr(APIAgents(), "list_agents"),
                   methods=["GET"])

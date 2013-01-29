@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+#
 # Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
@@ -14,25 +14,20 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Flask
-from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.rest.routage import root, queues_service, agents_service
+from xivo_dao import agent_dao
+from xivo_restapi.dao.helpers.dynamic_formatting import \
+    table_list_to_list_dict
 import logging
 
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
 
-app.register_blueprint(root)
-app.register_blueprint(queues_service)
-app.register_blueprint(agents_service)
-app.debug = True
+class AgentManagement:
 
-
-class FlaskHttpServer(object):
-
-    def run(self):
-        app.run(host=RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
-                port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+    def get_all_agents(self):
+        result = agent_dao.all()
+        if result != None:
+            return table_list_to_list_dict(result)
+        return False
