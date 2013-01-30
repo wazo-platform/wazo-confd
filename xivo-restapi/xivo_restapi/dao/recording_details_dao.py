@@ -26,9 +26,9 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.dao.generic_dao import GenericDao
 from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
-from xivo_dao.helpers import config
-import logging
 from xivo_dao.helpers.db_manager import daosession_class
+from xivo_dao.helpers import db_manager
+import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -43,7 +43,7 @@ class RecordingDetailsDbBinder(object):
     __tablename__ = "recording"
 
     def __init__(self):
-        self._new_from_uri(config.DB_URI)
+        self._new_from_uri(db_manager._DB_URI)
 
     @daosession_class
     def get_recordings_as_list(self, session, campaign_id, search=None, pagination=None):

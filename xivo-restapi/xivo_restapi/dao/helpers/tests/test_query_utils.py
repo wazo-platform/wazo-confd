@@ -24,24 +24,27 @@ from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
     RecordCampaignDao
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
-from xivo_dao.helpers.db_manager import daosession_class
 from datetime import datetime
+from xivo_dao.tests.test_dao import DAOTestCase
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
+from xivo_dao.alchemy.queuefeatures import QueueFeatures
 import random
 import unittest
 
 
-class TestQueryUtils(unittest.TestCase):
+class TestQueryUtils(DAOTestCase):
 
-    @daosession_class
-    def setUp(self, session):
+    tables = [AgentFeatures, QueueFeatures]
+
+    def setUp(self):
         self.record_db = RecordCampaignDbBinder()
         if self.record_db == None:
             self.fail("record_db is None, database connection error")
         self.recording_details_db = RecordingDetailsDbBinder()
         if self.recording_details_db == None:
             self.fail("recording_details_db is None, database connection error")
-        session.query(RecordingDetailsDao).delete()
-        session.commit()
+        self.session.query(RecordingDetailsDao).delete()
+        self.session.commit()
         self.campaign = RecordCampaignDao()
         self.campaign.campaign_name = 'name'
         self.campaign.base_filename = 'file-'
@@ -51,12 +54,11 @@ class TestQueryUtils(unittest.TestCase):
         self.campaign.end_date = datetime.strptime('2012-01-31',
                                               "%Y-%m-%d")
         self.campaign.activated = True
-        session.query(RecordCampaignDao).delete()
-        session.add(self.campaign)
-        session.commit()
+        self.session.query(RecordCampaignDao).delete()
+        self.session.add(self.campaign)
+        self.session.commit()
         unittest.TestCase.setUp(self)
 
-    @daosession_class
     def test_get_all_data(self, session):
 
         cid1 = '001'
@@ -93,21 +95,20 @@ class TestQueryUtils(unittest.TestCase):
         for k, v in expected_dir2.items():
             setattr(expected_object2, k, v)
 
-        session.add(expected_object1)
-        session.add(expected_object2)
-        session.commit()
+        self.session.add(expected_object1)
+        self.session.add(expected_object2)
+        self.session.commit()
 
         expected_list = [expected_object1, expected_object2].sort()
-        result = query_utils.get_all_data(session,
-                                          session\
+        result = query_utils.get_all_data(self.session,
+                                          self.session\
                                           .query(RecordingDetailsDao))['data']\
                                           .sort()
 
         self.assertTrue(expected_list == result, "Expected: " + \
                              str(expected_list) + ", actual: " + str(result))
 
-    @daosession_class
-    def test_get_paginated_data(self, session):
+    def test_get_paginated_data(self):
         cid1 = "001"
         cid2 = "002"
         call_direction = "incoming"
@@ -148,9 +149,9 @@ class TestQueryUtils(unittest.TestCase):
         for k, v in expected_dir2.items():
             setattr(expected_object2, k, v)
 
-        session.add(expected_object1)
-        session.add(expected_object2)
-        session.commit()
+        self.session.add(expected_object1)
+        self.session.add(expected_object2)
+        self.session.commit()
 
         list_paginators = [(1, 1), (2, 1), (1, 0), (0, 0), (999, 999), ('')]
         list_expected_results = [[expected_dir1], [expected_dir2]]
@@ -166,36 +167,36 @@ class TestQueryUtils(unittest.TestCase):
             if(i == 3):
                 with self.assertRaises(InvalidPaginatorException):
                     result = query_utils.get_paginated_data(
-                                        session,
-                                        session\
+                                        self.session,
+                                        self.session\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
             elif(i == 4):
                 with self.assertRaises(EmptyPageException):
                     result = query_utils.get_paginated_data(
-                                        session,
-                                        session\
+                                        self.session,
+                                        self.session\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
             elif(i == 5):
                 with self.assertRaises(InvalidPaginatorException):
                     result = query_utils.get_paginated_data(
-                                        session,
-                                        session\
+                                        self.session,
+                                        self.session\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
             else:
                 result = query_utils.get_paginated_data(
-                                        session,
-                                        session\
+                                        self.session,
+                                        self.session\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
                 self.assertTrue(expected_list == result)
             i += 1
 
-        session.query(RecordingDetailsDao).delete()
-        session.commit()
+        self.session.query(RecordingDetailsDao).delete()
+        self.session.commit()
