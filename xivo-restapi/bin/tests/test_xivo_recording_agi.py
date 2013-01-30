@@ -54,12 +54,12 @@ class TestXivoRecordingAgi(unittest.TestCase):
               ' "campaign_name": "test"}]'
         self.get_agents_response = \
             '''[{"group": "", "autologoff": "", "firstname": "j ohn",
-                 "passwd": "2005", "lastname": "JOHN", "number": "2005",
+                 "passwd": "2005", "lastname": "JOHN*.-/;:@`~@!)(*&^%$_+}{\'", "number": "2005",
                  "id": "23", "language": "en_US", "context": "default",
                  "numgroup": "123", "preprocess_subroutine": "", "commented": "0",
                  "description": ""},
                 {"group": "", "autologoff": "", "firstname": "tom\u00e1 \u0161",
-                 "passwd": "2006", "lastname": "TOM\u00c1 \u0160",
+                 "passwd": "2006", "lastname": "èçàâŷûîôê",
                  "number": "2006", "id": "22", "language": "en_US",
                  "context": "default", "numgroup": "123",
                  "preprocess_subroutine": "", "commented": "0",
@@ -282,7 +282,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         from bin import xivo_recording_agi
         filename = xivo_recording_agi.get_filename('2006', 'test_call_id')
-        self.assertEqual(filename, 'TOM_tom_test_call_id.wav')
+        self.assertEqual(filename, 'ecaayuioe_tomas_test_call_id.wav')
 
         filename = xivo_recording_agi.get_filename('2005', 'test_call_id')
         self.assertEqual(filename, 'JOHN_john_test_call_id.wav')
@@ -309,3 +309,10 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.assertEqual(filename,
                          RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
                          '99_test_call_id.wav')
+
+    def test_validate_filename_string(self):
+        from bin import xivo_recording_agi
+        result = xivo_recording_agi.validate_filename_string('''
+                        /*-+.;:!§%*µ$£+°&-(_)~#{[|`\^@]}èçàéâêŷûîôÂËŸÜÏÖ''')
+
+        self.assertEqual(result, "ecaeaeyuioAEYUIO")

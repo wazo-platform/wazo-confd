@@ -23,6 +23,7 @@ from datetime import datetime
 import logging
 import sys
 import traceback
+import unicodedata
 
 DEBUG_MODE = False
 LOGFILE = '/var/log/xivo-recording-agi.log'
@@ -43,6 +44,12 @@ class Syslogger(object):
     def write(self, data):
         global logger
         logger.error(data)
+
+
+def validate_filename_string(data):
+    s_ascii = unicodedata.normalize('NFKD', unicode(data)).encode('ASCII', 'ignore')
+    s_clean = ''.join(c for c in s_ascii if c.isalnum())
+    return s_clean.replace(' ', '')
 
 
 def get_general_variables():
@@ -166,11 +173,9 @@ def get_agent_full_name(agent_number):
 
     for agent in agents:
         if agent['number'] == agent_number:
-            return (agent['lastname'].encode('ascii', 'ignore')
-                    .replace(' ', '') + \
+            return validate_filename_string(agent['lastname']) + \
                     '_' + \
-                    agent['firstname'].encode('ascii', 'ignore')
-                    .replace(' ', ''))
+                    validate_filename_string(agent['firstname'])
 
     return RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
                                                     str(agent_number)
