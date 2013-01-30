@@ -132,7 +132,7 @@ class TestCampagneManagement(unittest.TestCase):
         old_data["champ3"] = None
         old_data["end_date"] = FakeDate.now().strftime("%Y-%m-%d")
         old_data["start_date"] = FakeDate.now().strftime("%Y-%m-%d")
-        self.assertDictEqual(old_data, result)
+        self.assertTrue(old_data == result)
 
     def test_supplement_edit_input(self):
         data = {"champ1": "valeur1",
@@ -141,7 +141,7 @@ class TestCampagneManagement(unittest.TestCase):
         old_data = copy.deepcopy(data)
         result = self._campagneManager.supplement_edit_input(data)
         old_data["champ3"] = None
-        self.assertDictEqual(old_data, result)
+        self.assertTrue(old_data == result)
 
     def test_delete_no_such_element(self):
         self._campagneManager.record_db.get.return_value = None

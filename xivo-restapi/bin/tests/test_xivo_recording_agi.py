@@ -110,13 +110,12 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         from bin import xivo_recording_agi
         res = xivo_recording_agi.get_general_variables()
-        self.assertDictEqual(res, xivo_vars)
-        self.assertListEqual(expected,
-                             self.instance_agi.get_variable.call_args_list,
-                             "Actual calls: " + \
-                             str(self.instance_agi.get_variable.call_args_list) + \
-                             ", expected were: " + \
-                             str(expected))
+        self.assertTrue(res == xivo_vars, "Got wrong values")
+        self.assertTrue(expected == self.instance_agi.get_variable.call_args_list,
+                         "Actual calls: " + \
+                         str(self.instance_agi.get_variable.call_args_list) + \
+                         ", expected were: " + \
+                         str(expected))
 
     def test_xivo_recording_agi_get_detailed_variables(self):
         self.instance_agi.get_variable.side_effect = self.mock_agi_get_variable
@@ -134,9 +133,8 @@ class TestXivoRecordingAgi(unittest.TestCase):
                      'cid': self.unique_id,
                      'queue_name': self.xivo_queue_name,
                      'client_id': self.xivo_client_id}
-        self.assertDictEqual(res, xivo_vars)
-        self.assertListEqual(expected_calls,
-                             self.instance_agi.get_variable.call_args_list)
+        self.assertTrue(res == xivo_vars)
+        self.assertTrue(expected_calls == self.instance_agi.get_variable.call_args_list)
 
     def test_xivo_recording_agi_get_campaigns(self):
         response = Mock()

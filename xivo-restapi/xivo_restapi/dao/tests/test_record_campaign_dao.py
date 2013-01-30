@@ -86,7 +86,7 @@ class TestRecordCampaignDao(unittest.TestCase):
         session.commit()
         expected_dict['id'] = str(obj.id)
         records = self.record_db.get_records()['data']
-        self.assertDictEqual(expected_dict, records[0])
+        self.assertTrue(expected_dict == records[0])
 
     @daosession_class
     def test_id_from_name(self, session):
@@ -175,7 +175,7 @@ class TestRecordCampaignDao(unittest.TestCase):
         result = session.query(RecordCampaignDao).all()
         self.assertTrue(len(result) == 1)
         result = table_list_to_list_dict(result)
-        self.assertDictEqual(result[0], updated_dict)
+        self.assertTrue(result[0] == updated_dict)
 
     @daosession_class
     def test_validate_campaign(self, session):

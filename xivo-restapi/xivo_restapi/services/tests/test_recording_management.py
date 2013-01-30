@@ -96,7 +96,7 @@ class TestCampagneManagement(unittest.TestCase):
                                                                search, None)
         del search['agent_no']
         search['agent_id'] = '1'
-        self.assertDictEqual(result, expected_result)
+        self.assertTrue(result == expected_result)
         self._recordingManager.recording_details_db.get_recordings_as_list\
                     .assert_called_with(campaign_id, search, None)
 
@@ -126,7 +126,7 @@ class TestCampagneManagement(unittest.TestCase):
                                                                technical_params)
         del search['agent_no']
         search['agent_id'] = '1'
-        self.assertDictEqual(result, expected_result)
+        self.assertTrue(result == expected_result)
         self._recordingManager.recording_details_db.get_recordings_as_list\
                     .assert_called_with(campaign_id, search, (1, 20))
 
@@ -151,7 +151,7 @@ class TestCampagneManagement(unittest.TestCase):
         result = self._recordingManager.search_recordings(campaign_id,
                                                           search,
                                                           technical_params)
-        self.assertDictEqual(result, expected_result)
+        self.assertTrue(result == expected_result)
         self._recordingManager.recording_details_db.search_recordings\
                     .assert_called_with(campaign_id, '2002', (1, 20))
 
@@ -172,7 +172,7 @@ class TestCampagneManagement(unittest.TestCase):
 
         result = self._recordingManager.search_recordings(campaign_id,
                                                                search, None)
-        self.assertDictEqual(result, expected_result)
+        self.assertTrue(result == expected_result)
         self._recordingManager.recording_details_db.search_recordings\
                     .assert_called_with(campaign_id, '2002', None)
 
@@ -195,11 +195,11 @@ class TestCampagneManagement(unittest.TestCase):
         expected_result = {'champ1': None,
                            'champ2': None}
         result = self._recordingManager.supplement_add_input(data)
-        self.assertDictEqual(expected_result, result)
+        self.assertTrue(expected_result == result)
 
     def test_get_paginator(self):
         params = {'_page': '1',
                   '_pagesize': '20',
                   '_foo': 'bar'}
         result = self._recordingManager._get_paginator(params)
-        self.assertTupleEqual(result, (1, 20))
+        self.assertTrue(result == (1, 20))

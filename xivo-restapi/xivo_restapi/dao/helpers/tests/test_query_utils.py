@@ -194,7 +194,7 @@ class TestQueryUtils(unittest.TestCase):
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
-                self.assertListEqual(expected_list, result)
+                self.assertTrue(expected_list == result)
             i += 1
 
         session.query(RecordingDetailsDao).delete()

@@ -56,4 +56,4 @@ class TestQueueManagement(unittest.TestCase):
 
         queue_dao.all_queues.return_value = data
         result = self._queueManager.get_all_queues()
-        self.assertListEqual(result, expected_result)
+        self.assertTrue(result == expected_result)

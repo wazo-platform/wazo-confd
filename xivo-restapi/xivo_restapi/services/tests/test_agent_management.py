@@ -53,4 +53,4 @@ class TestAgentManagement(unittest.TestCase):
 
         agent_dao.all.return_value = data
         result = self._agentManager.get_all_agents()
-        self.assertListEqual(result, expected_result)
+        self.assertTrue(result == expected_result)
