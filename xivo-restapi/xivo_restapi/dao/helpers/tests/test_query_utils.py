@@ -56,7 +56,8 @@ class TestQueryUtils(unittest.TestCase):
         session.commit()
         unittest.TestCase.setUp(self)
 
-    def test_get_all_data(self):
+    @daosession_class
+    def test_get_all_data(self, session):
 
         cid1 = '001'
         cid2 = '002'
@@ -105,7 +106,8 @@ class TestQueryUtils(unittest.TestCase):
         self.assertTrue(expected_list == result, "Expected: " + \
                              str(expected_list) + ", actual: " + str(result))
 
-    def test_get_paginated_data(self):
+    @daosession_class
+    def test_get_paginated_data(self, session):
         cid1 = "001"
         cid2 = "002"
         call_direction = "incoming"
