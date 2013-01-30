@@ -52,9 +52,30 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.rest_response = '[{"base_filename": "' + self.base_filename + \
              '", "queue_name": "queue_1", "activated": "True",' + \
               ' "campaign_name": "test"}]'
+        self.get_agents_response = \
+            '''[{"group": "", "autologoff": "", "firstname": "j ohn",
+                 "passwd": "2005", "lastname": "JOHN", "number": "2005",
+                 "id": "23", "language": "en_US", "context": "default",
+                 "numgroup": "123", "preprocess_subroutine": "", "commented": "0",
+                 "description": ""},
+                {"group": "", "autologoff": "", "firstname": "tom\u00e1 \u0161",
+                 "passwd": "2006", "lastname": "TOM\u00c1 \u0160",
+                 "number": "2006", "id": "22", "language": "en_US",
+                 "context": "default", "numgroup": "123",
+                 "preprocess_subroutine": "", "commented": "0",
+                 "description": ""},
+                {"group": "", "autologoff": "", "firstname": "autre",
+                 "passwd": "2007", "lastname": "AUTRE", "number": "2007",
+                 "id": "21", "language": "en_US", "context": "default",
+                 "numgroup": "123", "preprocess_subroutine": "",
+                 "commented": "0", "description": ""}
+               ]'''
+
         self.xivo_date = '2012-01-01 00:00:00'
         self.unique_id = '001'
         self.agent_no = '1111'
+        self.agent_firstname = "prenom"
+        self.agent_lastname = "famille"
         self.caller_no = '2222'
         self.xivo_client_id = 'abc'
 
@@ -218,7 +239,6 @@ class TestXivoRecordingAgi(unittest.TestCase):
                          RestAPIConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
                          expected_data)]
 
-        print(self.instance_agi.set_variable.mock_calls)
         self.assertTrue(self.instance_agi.set_variable.mock_calls == expected)
 
     def now(self):
@@ -253,3 +273,39 @@ class TestXivoRecordingAgi(unittest.TestCase):
         xivo_recording_agi.process_call_hangup = self.proces_call_hangup
         xivo_recording_agi.process_call_hangup_args()
         self.proces_call_hangup.assert_called_with('001', '1')
+
+    def test_get_filename(self):
+        response = Mock()
+        response.read.return_value = self.get_agents_response
+        response.status = 200
+        self.instance_http_connection.getresponse.return_value = response
+
+        from bin import xivo_recording_agi
+        filename = xivo_recording_agi.get_filename('2006', 'test_call_id')
+        self.assertEqual(filename, 'TOM_tom_test_call_id.wav')
+
+        filename = xivo_recording_agi.get_filename('2005', 'test_call_id')
+        self.assertEqual(filename, 'JOHN_john_test_call_id.wav')
+
+        filename = xivo_recording_agi.get_filename('99', 'test_call_id')
+        self.assertEqual(filename,
+                         RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
+                         '99_test_call_id.wav')
+
+        response.read.return_value = '[]'
+        response.status = 200
+        self.instance_http_connection.getresponse.return_value = response
+
+        filename = xivo_recording_agi.get_filename('99', 'test_call_id')
+        self.assertEqual(filename,
+                         RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
+                         '99_test_call_id.wav')
+
+        response.read.return_value = '[]'
+        response.status = 400
+        self.instance_http_connection.getresponse.return_value = response
+
+        filename = xivo_recording_agi.get_filename('99', 'test_call_id')
+        self.assertEqual(filename,
+                         RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
+                         '99_test_call_id.wav')

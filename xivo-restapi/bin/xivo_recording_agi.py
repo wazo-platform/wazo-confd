@@ -14,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo.agi import AGI
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -121,7 +120,7 @@ def get_queues():
     reply = connection.getresponse()
 
     if (reply.status != 200):
-        logger.warning("Get campaigns failed with code: " + str(reply.status))
+        logger.warning("Get queues failed with code: " + str(reply.status))
         raise RestAPIError()
 
     return reply.read()
@@ -136,9 +135,50 @@ def get_queue_id(queue_name):
     return None
 
 
+def get_agents():
+    connection = RestAPIConfig.getWSConnection()
+
+    requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
+                    RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + "/"
+
+    logger.debug("Getting agents from URL: " + requestURI)
+
+    headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
+
+    connection.request("GET", requestURI, None, headers)
+
+    reply = connection.getresponse()
+
+    if (reply.status != 200):
+        logger.warning("Get agents failed with code: " + str(reply.status))
+        raise RestAPIError()
+
+    return reply.read()
+
+
+def get_agent_full_name(agent_number):
+    try:
+        agents = rest_encoder.decode(get_agents())
+    except RestAPIError:
+        logger.error('Unable to get campaigns via REST WS, using default filename.')
+        return RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
+                                                    str(agent_number)
+
+    for agent in agents:
+        if agent['number'] == agent_number:
+            return (agent['lastname'].encode('ascii', 'ignore')
+                    .replace(' ', '') + \
+                    '_' + \
+                    agent['firstname'].encode('ascii', 'ignore')
+                    .replace(' ', ''))
+
+    return RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
+                                                    str(agent_number)
+
+
 def set_user_field():
     agi.set_variable(
-                 "__" +\
+                 "__" + \
                  RestAPIConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME,
                  agi.get_variable(RestAPIConfig.XIVO_DIALPLAN_CLIENTFIELD))
 
@@ -147,18 +187,27 @@ def determinate_record():
     logger.debug("Going to determinate whether call is to be recorded")
     xivo_vars = get_general_variables()
 
-    queue_id = get_queue_id(xivo_vars['queue_name'])
+    try:
+        queue_id = get_queue_id(xivo_vars['queue_name'])
+    except RestAPIError:
+        logger.error('Unable to get queues via REST WS, exiting.')
+        sys.exit(1)
+
     if queue_id == None:
         agi.set_variable('QR_RECORDQUEUE', '0')
         logger.error('Queue "' + xivo_vars['queue_name'] + '" not found!')
         sys.exit(1)
 
-    campaigns = rest_encoder.decode(get_campaigns(queue_id))['data']
+    try:
+        campaigns = rest_encoder.decode(get_campaigns(queue_id))['data']
+    except RestAPIError:
+        logger.error('Unable to get campaigns via REST WS, exiting.')
+        sys.exit(1)
 
     logger.debug("Campaigns: " + str(campaigns))
     if(campaigns == []):
         agi.set_variable('QR_RECORDQUEUE', '0')
-        logger.info('No activated campaign for queue: ' +\
+        logger.info('No activated campaign for queue: ' + \
                      xivo_vars['queue_name'])
         sys.exit(0)
 
@@ -203,7 +252,8 @@ def save_call_details():
     logger.debug("Save recorded call details")
     xivo_vars = get_detailed_variables()
 
-    filename = xivo_vars['cid'] + '.wav'
+    filename = get_filename(xivo_vars['agent_no'],
+                            xivo_vars['cid'])
     agi.set_variable('_QR_FILENAME', filename)
     recording = {}
     recording['cid'] = xivo_vars['cid']
@@ -216,13 +266,19 @@ def save_call_details():
     sys.exit(save_recording(recording))
 
 
+def get_filename(agent_number, call_id):
+    return get_agent_full_name(agent_number) + \
+                '_' + \
+                str(call_id) + \
+                '.wav'
+
+
 def process_call_hangup(cid, campaign_id):
     connection = RestAPIConfig.getWSConnection()
     requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                     campaign_id + "/" + cid
     body = {"end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-    print str(body)
     logger.debug("Update recording to URL: " + requestURI)
     headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request("PUT", requestURI, rest_encoder.encode(body), headers)
@@ -239,7 +295,7 @@ def process_call_hangup(cid, campaign_id):
 def process_call_hangup_args():
     parser = _new_parser()
     if(len(sys.argv) < 6):
-        logger.error('processCallHangup must be called with parameters ' +\
+        logger.error('processCallHangup must be called with parameters ' + \
                      'time, cid and campaign')
         sys.exit(1)
     parsing_res = parser.parse_args(sys.argv[2:])
