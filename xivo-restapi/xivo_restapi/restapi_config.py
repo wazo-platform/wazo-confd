@@ -30,6 +30,7 @@ class RestAPIConfig(object):
     XIVO_DIALPLAN_CLIENTFIELD = 'LDLC_IDTICKET'
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
+    CSV_SEPARATOR = ","
+
     RECORDING_FILE_ROOT_PATH = "/var/lib/pf-xivo/sounds/campagnes"
     RECORDING_FILENAME_WHEN_NO_AGENTNAME = 'NoNameForAgentWithNumber'
-

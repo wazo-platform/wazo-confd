@@ -21,6 +21,7 @@ from xivo_restapi.dao.exceptions import InvalidInputException
 from xivo_restapi.dao.helpers.dynamic_formatting import table_to_string, \
     table_list_to_list_dict, str_to_datetime
 from xivo_restapi.restapi_config import RestAPIConfig
+import sys
 import unittest
 
 
@@ -40,10 +41,10 @@ class TestDynamicFormatting(unittest.TestCase):
 
     def test_table_to_string(self):
         instance = SampleClass("un", None, "trois", 4, None)
-        expected_result = "bar: 4" + RestAPIConfig.CSV_SEPARATOR +\
+        expected_result = "bar: 4" + RestAPIConfig.CSV_SEPARATOR + \
                  "foo: trois" + RestAPIConfig.CSV_SEPARATOR + "other: None"
         actual_result = table_to_string(instance)
-        assert expected_result == actual_result,\
+        assert expected_result == actual_result, \
                 "Instance not properly formatted: " + actual_result + \
                     ", expected: " + expected_result
 
@@ -54,8 +55,8 @@ class TestDynamicFormatting(unittest.TestCase):
                               {"bar":"5", "foo":"", "other":""}]
 
         actual_result = table_list_to_list_dict(table_list)
-        assert expected_list_dict == actual_result, "Incorrect dictionary: " +\
-                     str(actual_result) + ", expected: " +\
+        assert expected_list_dict == actual_result, "Incorrect dictionary: " + \
+                     str(actual_result) + ", expected: " + \
                      str(expected_list_dict)
 
     def test_str_to_datetime(self):

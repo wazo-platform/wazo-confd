@@ -29,7 +29,6 @@ from xivo_restapi.dao.helpers.dynamic_formatting import str_to_datetime
 from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
 from xivo_restapi.dao.helpers.time_interval import TimeInterval
-from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_dao.helpers.db_manager import DbSession
 from xivo_dao.helpers import config
 import logging
@@ -128,7 +127,6 @@ class RecordCampaignDbBinder(object):
             class_mapper(RecordCampaignDao)
         except UnmappedClassError:
             engine = create_engine(uri,
-                                   echo=RestAPIConfig.POSTGRES_DEBUG,
                                    encoding='utf-8')
             metadata = MetaData(engine)
             data = Table(self.__tablename__, metadata, autoload=True)

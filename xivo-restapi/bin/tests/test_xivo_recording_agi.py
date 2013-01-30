@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright (C) 2012  Avencall
 #
@@ -312,7 +312,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
     def test_validate_filename_string(self):
         from bin import xivo_recording_agi
-        result = xivo_recording_agi.validate_filename_string('''
-                        /*-+.;:!§%*µ$£+°&-(_)~#{[|`\^@]}èçàéâêŷûîôÂËŸÜÏÖ''')
+        result = xivo_recording_agi.validate_filename_string(\
+                        u'/*-+.;:!§%*µ$£+°&-(_)~#{[|`\^@]}<>èçàéâêŷûîôÂËŸÜÏÖ')
 
         self.assertEqual(result, "ecaeaeyuioAEYUIO")

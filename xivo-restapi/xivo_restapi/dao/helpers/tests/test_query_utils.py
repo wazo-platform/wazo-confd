@@ -16,10 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from datetime import datetime
 from sqlalchemy.sql.expression import asc
-from xivo_dao.alchemy import dbconnection
-from xivo_dao.helpers.db_manager import DbSession
 from xivo_restapi.dao.exceptions import EmptyPageException, \
     InvalidPaginatorException
 from xivo_restapi.dao.helpers import query_utils
@@ -28,7 +25,6 @@ from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
 from xivo_dao.helpers.db_manager import DbSession
-from xivo_restapi.restapi_config import RestAPIConfig
 from datetime import datetime
 import random
 import unittest

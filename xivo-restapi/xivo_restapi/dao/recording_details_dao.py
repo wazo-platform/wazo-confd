@@ -26,7 +26,6 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.dao.generic_dao import GenericDao
 from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
-from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_dao.helpers.db_manager import DbSession
 from xivo_dao.helpers import config
 import logging
@@ -93,7 +92,7 @@ class RecordingDetailsDbBinder(object):
         logger.debug("Going to delete " + str(recording_id))
         recording = DbSession().query(RecordingDetailsDao)\
                     .filter(and_(RecordingDetailsDao.cid == recording_id,
-                                 RecordingDetailsDao.campaign_id == campaign_id))\
+                                 RecordingDetailsDao.campaign_id == campaign_id)) \
                     .first()
 
         if(recording == None):
@@ -109,7 +108,6 @@ class RecordingDetailsDbBinder(object):
             class_mapper(RecordingDetailsDao)
         except UnmappedClassError:
             engine = create_engine(uri,
-                                   echo=RestAPIConfig.POSTGRES_DEBUG,
                                    encoding='utf-8')
             metadata = MetaData(engine)
             data = Table(self.__tablename__, metadata, autoload=True)
