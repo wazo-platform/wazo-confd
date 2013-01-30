@@ -18,8 +18,8 @@
 
 from datetime import datetime
 from xivo_dao import queue_dao
-from xivo_restapi.dao.exceptions import DataRetrieveError, InvalidInputException, \
-    NoSuchElementException
+from xivo_restapi.dao.exceptions import DataRetrieveError, \
+                                        NoSuchElementException
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDbBinder
 import logging

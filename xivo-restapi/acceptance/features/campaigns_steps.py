@@ -21,7 +21,6 @@ from rest_campaign import RestCampaign
 from time import strftime, localtime
 from xivo_dao import queue_dao
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
-from xivo_restapi.rest import rest_encoder
 import datetime
 import random
 
@@ -83,6 +82,8 @@ def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(
 
 
 activated_campaigns = None
+
+
 @step(u'When I ask for activated campaigns for queue "([^"]*)"')
 def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
     global queue_id
@@ -127,8 +128,8 @@ def edition_step_execution(step, local_campaign_name, queue_name, local_start_da
     end_date = local_end_date
     params = {'campaign_name': campaign_name,
               'queue_id': queue_id,
-              'start_date' : local_start_date,
-              'end_date' : local_end_date
+              'start_date': local_start_date,
+              'end_date': local_end_date
               }
     assert r_campaign.updateCampaign(campaign_id, params), "Cannot update campaign " + str(campaign_id)
 
@@ -223,6 +224,7 @@ def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(
            item["start_date"][:10] == now and item["end_date"][:10] == now):
             result = True
     assert result, 'Campaign not created with the current date: '
+
 
 @step(u'When I create the campaign "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
 def step_unproper_dates(step, campaign, sdate, edate):
