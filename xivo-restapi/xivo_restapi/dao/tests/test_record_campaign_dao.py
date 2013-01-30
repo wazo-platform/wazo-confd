@@ -18,7 +18,6 @@
 
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-from xivo_dao.helpers.db_manager import DbSession
 from xivo_restapi.dao.exceptions import DataRetrieveError, InvalidInputException
 from xivo_restapi.dao.helpers.dynamic_formatting import table_list_to_list_dict
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDao, \
@@ -27,6 +26,7 @@ from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
 import copy
 import unittest
+from xivo_dao.helpers.db_manager import daosession_class
 
 
 class TestRecordCampaignDao(unittest.TestCase):
@@ -49,21 +49,22 @@ class TestRecordCampaignDao(unittest.TestCase):
     ALTER TABLE record_campaign
       OWNER TO asterisk;
     '''
-
-    def setUp(self):
+    @daosession_class
+    def setUp(self, session):
         self.record_db = RecordCampaignDbBinder()
         if self.record_db == None:
             self.fail("record_db is None, database connection error")
         self.recording_details_db = RecordingDetailsDbBinder()
         if self.recording_details_db == None:
             self.fail("record_db is None, database connection error")
-        DbSession().query(RecordingDetailsDao).delete()
-        DbSession().commit()
-        DbSession().query(RecordCampaignDao).delete()
-        DbSession().commit()
+        session.query(RecordingDetailsDao).delete()
+        session.commit()
+        session.query(RecordCampaignDao).delete()
+        session.commit()
         unittest.TestCase.setUp(self)
 
-    def test_get_records(self):
+    @daosession_class
+    def test_get_records(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -81,13 +82,14 @@ class TestRecordCampaignDao(unittest.TestCase):
         for k, v in expected_dict.items():
             setattr(obj, k, v)
 
-        DbSession().add(obj)
-        DbSession().commit()
+        session.add(obj)
+        session.commit()
         expected_dict['id'] = str(obj.id)
         records = self.record_db.get_records()['data']
         self.assertDictEqual(expected_dict, records[0])
 
-    def test_id_from_name(self):
+    @daosession_class
+    def test_id_from_name(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -105,8 +107,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         for k, v in expected_dict.items():
             setattr(obj, k, v)
 
-        DbSession().add(obj)
-        DbSession().commit()
+        session.add(obj)
+        session.commit()
         retrieved_id = self.record_db\
                 .id_from_name(expected_dict['campaign_name'])
         self.assertTrue(retrieved_id == obj.id)
@@ -114,7 +116,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         with self.assertRaises(DataRetrieveError):
             self.record_db.id_from_name('test')
 
-    def test_add(self):
+    @daosession_class
+    def test_add(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -131,12 +134,13 @@ class TestRecordCampaignDao(unittest.TestCase):
         gen_id = self.record_db.add(expected_dict)
 
         expected_dict['id'] = str(gen_id)
-        result = DbSession().query(RecordCampaignDao).all()
+        result = session.query(RecordCampaignDao).all()
         self.assertTrue(len(result) == 1)
         result = table_list_to_list_dict(result)
         self.assertTrue(result[0] == expected_dict)
 
-    def test_update(self):
+    @daosession_class
+    def test_update(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -154,8 +158,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         for k, v in inserted_dict.items():
             setattr(obj, k, v)
 
-        DbSession().add(obj)
-        DbSession().commit()
+        session.add(obj)
+        session.commit()
         queue_id2 = '2'
 
         updated_dict = {
@@ -168,12 +172,13 @@ class TestRecordCampaignDao(unittest.TestCase):
         }
         self.record_db.update(obj.id, updated_dict)
         updated_dict['id'] = str(obj.id)
-        result = DbSession().query(RecordCampaignDao).all()
+        result = session.query(RecordCampaignDao).all()
         self.assertTrue(len(result) == 1)
         result = table_list_to_list_dict(result)
         self.assertDictEqual(result[0], updated_dict)
 
-    def test_validate_campaign(self):
+    @daosession_class
+    def test_validate_campaign(self, session):
         campaign = RecordCampaignDao()
         campaign.campaign_name = None
         campaign.start_date = datetime.strptime('2012-12-31',
@@ -200,8 +205,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         campaign1.activated = True
         campaign1.queue_id = 1
         campaign2 = copy.deepcopy(campaign1)
-        DbSession().add(campaign1)
-        DbSession().commit()
+        session.add(campaign1)
+        session.commit()
         campaign2.start_date = datetime.strptime('2012-02-28',
                                               "%Y-%m-%d")
         campaign2.end_date = datetime.strptime('2013-01-31',
@@ -214,7 +219,8 @@ class TestRecordCampaignDao(unittest.TestCase):
             gotException = True
         self.assertTrue(gotException)
 
-    def test_get(self):
+    @daosession_class
+    def test_get(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -228,12 +234,13 @@ class TestRecordCampaignDao(unittest.TestCase):
         obj.start_date = '2012-01-01 12:12:12',
         obj.end_date = '2012-12-12 12:12:12',
 
-        DbSession().add(obj)
-        DbSession().commit()
+        session.add(obj)
+        session.commit()
         returned_obj = self.record_db.get(obj.id)
         self.assertEqual(returned_obj, obj)
 
-    def test_delete(self):
+    @daosession_class
+    def test_delete(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -247,12 +254,13 @@ class TestRecordCampaignDao(unittest.TestCase):
         obj.start_date = '2012-01-01 12:12:12'
         obj.end_date = '2012-12-12 12:12:12'
 
-        DbSession().add(obj)
-        DbSession().commit()
+        session.add(obj)
+        session.commit()
         self.record_db.delete(obj)
         self.assertEqual(None, self.record_db.get(obj.id))
 
-    def test_delete_integrity_error(self):
+    @daosession_class
+    def test_delete_integrity_error(self, session):
         campaign_name = "campaign-àé"
         queue_id = "1"
         base_filename = campaign_name + "-"
@@ -265,8 +273,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         campaign.queue_id = queue_id
         campaign.start_date = '2012-01-01 12:12:12'
         campaign.end_date = '2012-12-12 12:12:12'
-        DbSession().add(campaign)
-        DbSession().commit()
+        session.add(campaign)
+        session.commit()
 
         recording = RecordingDetailsDao()
         recording.campaign_id = campaign.id
@@ -274,8 +282,8 @@ class TestRecordCampaignDao(unittest.TestCase):
         recording.cid = '123'
         recording.agent_id = 1
         recording.caller = '2002'
-        DbSession().add(recording)
-        DbSession().commit()
+        session.add(recording)
+        session.commit()
 
         with self.assertRaises(IntegrityError):
             self.record_db.delete(campaign)

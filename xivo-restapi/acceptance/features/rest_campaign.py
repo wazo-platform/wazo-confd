@@ -31,8 +31,8 @@ from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.dao.helpers.dynamic_formatting import table_list_to_list_dict
-from xivo_dao.helpers.db_manager import DbSession
 from acceptance.features.ws_utils import WsUtils
+from xivo_dao.helpers.db_manager import daosession_class
 
 
 class RestCampaign(object):
@@ -263,22 +263,26 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_get(serviceURI + params)
         return reply.data
 
-    def delete_all_campaigns(self):
-        DbSession().query(RecordingDetailsDao).delete()
-        DbSession().commit()
-        DbSession().query(RecordCampaignDao).delete()
-        DbSession().commit()
+    @daosession_class
+    def delete_all_campaigns(self, session):
+        session.query(RecordingDetailsDao).delete()
+        session.commit()
+        session.query(RecordCampaignDao).delete()
+        session.commit()
 
-    def list_all_recordings(self):
-        result = DbSession().query(RecordingDetailsDao).all()
+    @daosession_class
+    def list_all_recordings(self, session):
+        result = session.query(RecordingDetailsDao).all()
         return table_list_to_list_dict(result)
 
-    def delete_queue(self, queue_name):
-        DbSession().query(QueueFeatures).filter(QueueFeatures.name == queue_name).delete()
-        DbSession().commit()
+    @daosession_class
+    def delete_queue(self, session, queue_name):
+        session.query(QueueFeatures).filter(QueueFeatures.name == queue_name).delete()
+        session.commit()
 
-    def get_queue(self, queue_name):
-        return DbSession().query(QueueFeatures)\
+    @daosession_class
+    def get_queue(self, session, queue_name):
+        return session.query(QueueFeatures)\
             .filter(QueueFeatures.name == queue_name).first()
 
     def delete_campaign(self, campaign_id):
@@ -287,8 +291,9 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_delete(serviceURI)
         return reply
 
-    def delete_recordings(self, campaign_name):
+    @daosession_class
+    def delete_recordings(self, session, campaign_name):
         campaign_id = RecordCampaignDbBinder().id_from_name(campaign_name)
-        DbSession().query(RecordingDetailsDao)\
+        session.query(RecordingDetailsDao)\
             .filter_by(campaign_id=int(campaign_id)).delete()
-        DbSession().commit()
+        session.commit()

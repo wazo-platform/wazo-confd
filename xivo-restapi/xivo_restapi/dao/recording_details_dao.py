@@ -26,9 +26,9 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.dao.generic_dao import GenericDao
 from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
-from xivo_dao.helpers.db_manager import DbSession
 from xivo_dao.helpers import config
 import logging
+from xivo_dao.helpers.db_manager import daosession_class
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -45,7 +45,8 @@ class RecordingDetailsDbBinder(object):
     def __init__(self):
         self._new_from_uri(config.DB_URI)
 
-    def get_recordings_as_list(self, campaign_id, search=None, pagination=None):
+    @daosession_class
+    def get_recordings_as_list(self, session, campaign_id, search=None, pagination=None):
         search_pattern = {}
         search_pattern['campaign_id'] = campaign_id
         if search != None:
@@ -53,44 +54,47 @@ class RecordingDetailsDbBinder(object):
                     search_pattern[item] = search[item]
 
         logger.debug("Search search_pattern: " + str(search_pattern))
-        my_query = DbSession().query(RecordingDetailsDao)\
+        my_query = session.query(RecordingDetailsDao)\
                                        .filter_by(**search_pattern)
         if (pagination == None):
-            return get_all_data(DbSession(), my_query)
+            return get_all_data(session, my_query)
         else:
-            return get_paginated_data(DbSession(), my_query, pagination)
+            return get_paginated_data(session, my_query, pagination)
 
-    def add_recording(self, params):
+    @daosession_class
+    def add_recording(self, session, params):
         record = RecordingDetailsDao()
         for k, v in params.items():
             setattr(record, k, v)
         try:
-            DbSession().add(record)
-            DbSession().commit()
+            session.add(record)
+            session.commit()
         except Exception as e:
             logger.error("SQL exception:" + e.message)
-            DbSession().rollback()
+            session.rollback()
             raise e
         return True
 
-    def search_recordings(self, campaign_id, key, pagination=None):
+    @daosession_class
+    def search_recordings(self, session, campaign_id, key, pagination=None):
         logger.debug("campaign id = " + str(campaign_id)\
                       + ", key = " + str(key))
         #jointure interne:
         #RecordingDetailsDao r inner join AgentFeatures a on r.agent_id = a.id
-        my_query = DbSession().query(RecordingDetailsDao)\
+        my_query = session.query(RecordingDetailsDao)\
                         .join((AgentFeatures, RecordingDetailsDao.agent_id == AgentFeatures.id))\
                         .filter(and_(RecordingDetailsDao.campaign_id == campaign_id, \
                                      or_(RecordingDetailsDao.caller == key,
                                          AgentFeatures.number == key)))
         if (pagination == None):
-            return get_all_data(DbSession(), my_query)
+            return get_all_data(session, my_query)
         else:
-            return get_paginated_data(DbSession(), my_query, pagination)
+            return get_paginated_data(session, my_query, pagination)
 
-    def delete(self, campaign_id, recording_id):
+    @daosession_class
+    def delete(self, session, campaign_id, recording_id):
         logger.debug("Going to delete " + str(recording_id))
-        recording = DbSession().query(RecordingDetailsDao)\
+        recording = session.query(RecordingDetailsDao)\
                     .filter(and_(RecordingDetailsDao.cid == recording_id,
                                  RecordingDetailsDao.campaign_id == campaign_id)) \
                     .first()
@@ -99,9 +103,14 @@ class RecordingDetailsDbBinder(object):
             return None
         else:
             filename = recording.filename
-            DbSession().delete(recording)
-            DbSession().commit()
+            session.delete(recording)
+            session.commit()
             return filename
+
+    @daosession_class
+    def count_recordings(self, session, campaign_id):
+        return session.query(RecordingDetailsDao)\
+            .filter(RecordingDetailsDao.campaign_id == campaign_id).count()
 
     def _new_from_uri(self, uri):
         try:
@@ -112,7 +121,3 @@ class RecordingDetailsDbBinder(object):
             metadata = MetaData(engine)
             data = Table(self.__tablename__, metadata, autoload=True)
             mapper(RecordingDetailsDao, data)
-
-    def count_recordings(self, campaign_id):
-        return DbSession().query(RecordingDetailsDao)\
-            .filter(RecordingDetailsDao.campaign_id == campaign_id).count()

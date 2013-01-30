@@ -46,9 +46,9 @@ class RestQueues:
 
     def create_if_not_exists(self, queue_name, queue_id):
         try:
-            queue_dao._get(queue_id)
+            queue_dao.get(queue_id)
             return True
-        except IndexError:
+        except LookupError:
             return self.create(queue_name, queue_id)
         except Exception as e:
             print "Test precondition failed, got exception: ", e

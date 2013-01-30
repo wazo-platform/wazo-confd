@@ -25,7 +25,7 @@ import copy
 import unittest
 from xivo_restapi.dao.helpers.dynamic_formatting import\
                     table_list_to_list_dict
-from xivo_dao.helpers.db_manager import DbSession
+from xivo_dao.helpers.db_manager import daosession_class
 
 
 class TestRecordingDao(unittest.TestCase):
@@ -67,15 +67,16 @@ class TestRecordingDao(unittest.TestCase):
       OWNER TO asterisk;
 
     '''
-    def setUp(self):
+    @daosession_class
+    def setUp(self, session):
         self.record_db = RecordCampaignDbBinder()
         if self.record_db == None:
             self.fail("record_db is None, database connection error")
         self.recording_details_db = RecordingDetailsDbBinder()
         if self.recording_details_db == None:
             self.fail("record_db is None, database connection error")
-        DbSession().query(RecordingDetailsDao).delete()
-        DbSession().commit()
+        session.query(RecordingDetailsDao).delete()
+        session.commit()
         self.campaign = RecordCampaignDao()
         self.campaign.campaign_name = 'name'
         self.campaign.base_filename = 'file-'
@@ -85,12 +86,13 @@ class TestRecordingDao(unittest.TestCase):
         self.campaign.end_date = datetime.strptime('2012-01-31',
                                               "%Y-%m-%d")
         self.campaign.activated = True
-        DbSession().query(RecordCampaignDao).delete()
-        DbSession().add(self.campaign)
-        DbSession().commit()
+        session.query(RecordCampaignDao).delete()
+        session.add(self.campaign)
+        session.commit()
         unittest.TestCase.setUp(self)
 
-    def test_get_recordings_as_list(self):
+    @daosession_class
+    def test_get_recordings_as_list(self, session):
         dict_data1 = {'cid': '001',
                      'caller': '2002',
                      'agent_id': '1',
@@ -107,9 +109,9 @@ class TestRecordingDao(unittest.TestCase):
             setattr(my_recording1, k, v)
         for k, v in dict_data2.items():
             setattr(my_recording2, k, v)
-        DbSession().add(my_recording1)
-        DbSession().add(my_recording2)
-        DbSession().commit()
+        session.add(my_recording1)
+        session.add(my_recording2)
+        session.commit()
 
         search = {'caller': '2002'}
         result = self.recording_details_db\
@@ -117,7 +119,8 @@ class TestRecordingDao(unittest.TestCase):
         self.assertTrue(result['total'] == 1)
         self.assertDictContainsSubset(dict_data1, result['data'][0])
 
-    def test_add_recording(self):
+    @daosession_class
+    def test_add_recording(self, session):
         dict_data1 = {'cid': '001',
                      'caller': '2002',
                      'agent_id': '1',
@@ -126,12 +129,13 @@ class TestRecordingDao(unittest.TestCase):
                      'end_time': '2012-01-01 00:10:00',
                      'campaign_id': str(self.campaign.id)}
         self.recording_details_db.add_recording(dict_data1)
-        result = DbSession().query(RecordingDetailsDao).all()
+        result = session.query(RecordingDetailsDao).all()
         result = table_list_to_list_dict(result)
         self.assertTrue(len(result) == 1)
         self.assertDictContainsSubset(dict_data1, result[0])
 
-    def test_search_recordings(self):
+    @daosession_class
+    def test_search_recordings(self, session):
         dict_data1 = {'cid': '001',
                      'caller': '2002',
                      'agent_id': '1',
@@ -148,9 +152,9 @@ class TestRecordingDao(unittest.TestCase):
             setattr(my_recording1, k, v)
         for k, v in dict_data2.items():
             setattr(my_recording2, k, v)
-        DbSession().add(my_recording1)
-        DbSession().add(my_recording2)
-        DbSession().commit()
+        session.add(my_recording1)
+        session.add(my_recording2)
+        session.commit()
 
         key = '3003'
         result = self.recording_details_db\
@@ -165,7 +169,8 @@ class TestRecordingDao(unittest.TestCase):
         self.assertDictContainsSubset(dict_data1, result['data'][0])
         self.assertDictContainsSubset(dict_data2, result['data'][1])
 
-    def test_delete(self):
+    @daosession_class
+    def test_delete(self, session):
         result = self.recording_details_db.delete(1, '001')
         assert result == None
         dict_data1 = {'cid': '001',
@@ -178,15 +183,15 @@ class TestRecordingDao(unittest.TestCase):
         my_recording1 = RecordingDetailsDao()
         for k, v in dict_data1.items():
             setattr(my_recording1, k, v)
-        DbSession().add(my_recording1)
-        DbSession().commit()
-        data = DbSession().query(RecordingDetailsDao).all()
+        session.add(my_recording1)
+        session.commit()
+        data = session.query(RecordingDetailsDao).all()
         self.assertTrue(len(data) == 1)
         data = table_list_to_list_dict(data)
         self.assertDictContainsSubset(dict_data1, data[0])
         result = self.recording_details_db.delete(self.campaign.id,
                                                   my_recording1.cid)
-        data = DbSession().query(RecordingDetailsDao)\
+        data = session.query(RecordingDetailsDao)\
                                                                     .all()
         self.assertTrue(len(data) == 0)
         self.assertTrue(result == my_recording1.filename)
