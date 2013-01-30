@@ -158,7 +158,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.assertEqual(result.data, "Updated: True")
+        self.assertEqual(rest_encoder.decode(result.data), "Updated: True")
         self.instance_campagne_management.supplement_edit_input\
                     .assert_called_with(data)
         self.instance_campagne_management.update_campaign\
@@ -185,7 +185,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.assertEqual(result.data, "False")
+        self.assertEqual(rest_encoder.decode(result.data), "False")
         self.instance_campagne_management.supplement_edit_input\
                     .assert_called_with(data)
         self.instance_campagne_management.update_campaign\

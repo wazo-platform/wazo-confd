@@ -16,8 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import httplib
-
 
 class RestAPIConfig(object):
 
@@ -35,13 +33,3 @@ class RestAPIConfig(object):
     RECORDING_FILE_ROOT_PATH = "/var/lib/pf-xivo/sounds/campagnes"
     RECORDING_FILENAME_WHEN_NO_AGENTNAME = 'NoNameForAgentWithNumber'
 
-    def __init__(self):
-        pass
-
-    @classmethod
-    def getWSConnection(cls):
-        return httplib.HTTPConnection(
-                            RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
-                        )

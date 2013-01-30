@@ -16,7 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
 from sqlalchemy.sql.expression import asc
+from xivo_dao.alchemy import dbconnection
+from xivo_dao.helpers.db_manager import DbSession
 from xivo_restapi.dao.exceptions import EmptyPageException, \
     InvalidPaginatorException
 from xivo_restapi.dao.helpers import query_utils
@@ -25,6 +28,7 @@ from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
 from xivo_dao.helpers.db_manager import DbSession
+from xivo_restapi.restapi_config import RestAPIConfig
 from datetime import datetime
 import random
 import unittest
@@ -38,7 +42,7 @@ class TestQueryUtils(unittest.TestCase):
             self.fail("record_db is None, database connection error")
         self.recording_details_db = RecordingDetailsDbBinder()
         if self.recording_details_db == None:
-            self.fail("record_db is None, database connection error")
+            self.fail("recording_details_db is None, database connection error")
         DbSession().query(RecordingDetailsDao).delete()
         DbSession().commit()
         self.campaign = RecordCampaignDao()
@@ -111,7 +115,7 @@ class TestQueryUtils(unittest.TestCase):
         start_time = "2004-10-19 10:23:54"
         end_time = "2004-10-19 10:23:56"
         caller = "2002"
-        agent_id = "50"
+        agent_id = '1'
 
         expected_dir1 = {"cid": cid1,
                         "campaign_id": str(self.campaign.id),
