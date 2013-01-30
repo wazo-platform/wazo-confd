@@ -16,8 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import httplib
-
 
 class RestAPIConfig(object):
 
@@ -33,7 +31,8 @@ class RestAPIConfig(object):
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
     POSTGRES_ADDRESS = "127.0.0.1"
-    RECORDING_DB_URI = "postgresql://asterisk:proformatique@" + POSTGRES_ADDRESS + "/asterisk"
+    RECORDING_DB_URI = "postgresql://asterisk:proformatique@" +\
+                                        POSTGRES_ADDRESS + "/asterisk"
 
     RECORDING_FILE_ROOT_PATH = "/var/lib/pf-xivo/sounds/campagnes"
     RECORDING_FILENAME_WHEN_NO_AGENTNAME = 'NoNameForAgentWithNumber'
@@ -43,11 +42,3 @@ class RestAPIConfig(object):
 
     def __init__(self):
         pass
-
-    @classmethod
-    def getWSConnection(cls):
-        return httplib.HTTPConnection(
-                            RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
-                        )

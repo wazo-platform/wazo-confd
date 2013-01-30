@@ -16,8 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
 from sqlalchemy.sql.expression import asc
 from xivo_dao.alchemy import dbconnection
+from xivo_dao.helpers.db_manager import DbSession
 from xivo_restapi.dao.exceptions import EmptyPageException, \
     InvalidPaginatorException
 from xivo_restapi.dao.helpers import query_utils
@@ -26,7 +28,6 @@ from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
 from xivo_restapi.restapi_config import RestAPIConfig
-from datetime import datetime
 import random
 import unittest
 
@@ -43,9 +44,9 @@ class TestQueryUtils(unittest.TestCase):
             self.fail("record_db is None, database connection error")
         self.recording_details_db = RecordingDetailsDbBinder()
         if self.recording_details_db == None:
-            self.fail("record_db is None, database connection error")
-        self.recording_details_db.session.query(RecordingDetailsDao).delete()
-        self.recording_details_db.session.commit()
+            self.fail("recording_details_db is None, database connection error")
+        DbSession().query(RecordingDetailsDao).delete()
+        DbSession().commit()
         self.campaign = RecordCampaignDao()
         self.campaign.campaign_name = 'name'
         self.campaign.base_filename = 'file-'
@@ -55,9 +56,9 @@ class TestQueryUtils(unittest.TestCase):
         self.campaign.end_date = datetime.strptime('2012-01-31',
                                               "%Y-%m-%d")
         self.campaign.activated = True
-        self.record_db.session.query(RecordCampaignDao).delete()
-        self.record_db.session.add(self.campaign)
-        self.record_db.session.commit()
+        DbSession().query(RecordCampaignDao).delete()
+        DbSession().add(self.campaign)
+        DbSession().commit()
         unittest.TestCase.setUp(self)
 
     def test_get_all_data(self):
@@ -96,13 +97,13 @@ class TestQueryUtils(unittest.TestCase):
         for k, v in expected_dir2.items():
             setattr(expected_object2, k, v)
 
-        self.record_db.session.add(expected_object1)
-        self.record_db.session.add(expected_object2)
-        self.record_db.session.commit()
+        DbSession().add(expected_object1)
+        DbSession().add(expected_object2)
+        DbSession().commit()
 
         expected_list = [expected_object1, expected_object2].sort()
-        result = query_utils.get_all_data(self.record_db.session,
-                                          self.record_db.session\
+        result = query_utils.get_all_data(DbSession(),
+                                          DbSession()\
                                           .query(RecordingDetailsDao))['data']\
                                           .sort()
 
@@ -116,7 +117,7 @@ class TestQueryUtils(unittest.TestCase):
         start_time = "2004-10-19 10:23:54"
         end_time = "2004-10-19 10:23:56"
         caller = "2002"
-        agent_id = "50"
+        agent_id = '1'
 
         expected_dir1 = {"cid": cid1,
                         "campaign_id": str(self.campaign.id),
@@ -150,9 +151,9 @@ class TestQueryUtils(unittest.TestCase):
         for k, v in expected_dir2.items():
             setattr(expected_object2, k, v)
 
-        self.record_db.session.add(expected_object1)
-        self.record_db.session.add(expected_object2)
-        self.record_db.session.commit()
+        DbSession().add(expected_object1)
+        DbSession().add(expected_object2)
+        DbSession().commit()
 
         list_paginators = [(1, 1), (2, 1), (1, 0), (0, 0), (999, 999), ('')]
         list_expected_results = [[expected_dir1], [expected_dir2]]
@@ -168,36 +169,36 @@ class TestQueryUtils(unittest.TestCase):
             if(i == 3):
                 with self.assertRaises(InvalidPaginatorException):
                     result = query_utils.get_paginated_data(
-                                        self.record_db.session,
-                                        self.record_db.session\
+                                        DbSession(),
+                                        DbSession()\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
             elif(i == 4):
                 with self.assertRaises(EmptyPageException):
                     result = query_utils.get_paginated_data(
-                                        self.record_db.session,
-                                        self.record_db.session\
+                                        DbSession(),
+                                        DbSession()\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
             elif(i == 5):
                 with self.assertRaises(InvalidPaginatorException):
                     result = query_utils.get_paginated_data(
-                                        self.record_db.session,
-                                        self.record_db.session\
+                                        DbSession(),
+                                        DbSession()\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
             else:
                 result = query_utils.get_paginated_data(
-                                        self.record_db.session,
-                                        self.record_db.session\
+                                        DbSession(),
+                                        DbSession()\
                                           .query(RecordingDetailsDao)\
                                           .order_by(asc("cid")),
                                         paginator)['data']
                 self.assertListEqual(expected_list, result)
             i += 1
 
-        self.record_db.session.query(RecordingDetailsDao).delete()
-        self.record_db.session.commit()
+        DbSession().query(RecordingDetailsDao).delete()
+        DbSession().commit()

@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 
-from xivo.agi import AGI
-from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.rest import rest_encoder
-import argparse
 from datetime import datetime
+from xivo.agi import AGI
+from xivo_restapi.rest import rest_encoder
+from xivo_restapi.restapi_config import RestAPIConfig
+import argparse
+import httplib
 import logging
 import sys
 import traceback
@@ -44,6 +45,14 @@ class Syslogger(object):
     def write(self, data):
         global logger
         logger.error(data)
+
+
+def getWSConnection():
+    return httplib.HTTPConnection(
+                        RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                        ":" +
+                        str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+                    )
 
 
 def validate_filename_string(data):
@@ -76,7 +85,7 @@ def get_detailed_variables():
 
 
 def get_campaigns(queue_id):
-    connection = RestAPIConfig.getWSConnection()
+    connection = getWSConnection()
 
     requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/"
@@ -113,7 +122,7 @@ def init_logging(debug_mode):
 
 # TODO: Refactor in library, used here, in lettuce...!
 def get_queues():
-    connection = RestAPIConfig.getWSConnection()
+    connection = getWSConnection()
 
     requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + "/"
@@ -143,7 +152,7 @@ def get_queue_id(queue_name):
 
 
 def get_agents():
-    connection = RestAPIConfig.getWSConnection()
+    connection = getWSConnection()
 
     requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + "/"
@@ -231,7 +240,7 @@ def determinate_record():
 
 
 def save_recording(recording):
-    connection = RestAPIConfig.getWSConnection()
+    connection = getWSConnection()
 
     requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
@@ -279,7 +288,7 @@ def get_filename(agent_number, call_id):
 
 
 def process_call_hangup(cid, campaign_id):
-    connection = RestAPIConfig.getWSConnection()
+    connection = getWSConnection()
     requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                     campaign_id + "/" + cid

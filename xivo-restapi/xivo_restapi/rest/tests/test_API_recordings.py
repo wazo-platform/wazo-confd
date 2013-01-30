@@ -54,7 +54,6 @@ class TestFlaskHttpRoot(unittest.TestCase):
             'campaign_id': campaign_id,
             "agent_id": agent_id
         }
-
         self.instance_recording_management.add_recording.return_value = False
         self.instance_recording_management.supplement_add_input\
                     .return_value = data

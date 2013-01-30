@@ -19,6 +19,7 @@ from acceptance.features.rest_campaign import RestCampaign
 from lettuce import step
 from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
 from xivo_restapi.restapi_config import RestAPIConfig
+import httplib
 import os
 status = None
 recordings_list = None
@@ -26,7 +27,11 @@ recordings_list = None
 
 @step(u'When I send a "([^"]*)" request to "([^"]*)"')
 def when_i_send_a_group1_request_to_group2(step, method, url):
-    connection = RestAPIConfig.getWSConnection()
+    connection = httplib.HTTPConnection(
+                            RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                            ":" +
+                            str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+                        )
     headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request(method, url, None, headers)
     global status

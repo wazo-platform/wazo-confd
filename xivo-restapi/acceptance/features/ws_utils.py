@@ -16,8 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.rest import rest_encoder
+from xivo_restapi.restapi_config import RestAPIConfig
+import httplib
 
 
 class WsUtils(object):
@@ -28,7 +29,11 @@ class WsUtils(object):
     '''
 
     def __init__(self):
-        self.connection = RestAPIConfig.getWSConnection()
+        self.connection = httplib.HTTPConnection(
+                            RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
+                            ":" +
+                            str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+                        )
         self.requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH
 
     def rest_get(self, serviceURI):
