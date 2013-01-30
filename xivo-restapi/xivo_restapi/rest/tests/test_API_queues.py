@@ -87,8 +87,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                         "Status comparison failed, received status:" +
                         result.status)
         liste = sorted(liste, key=lambda k: k['number'])
-        self.assertListEqual(liste,
-                             rest_encoder.decode(result.data),
+        self.assertTrue(liste == rest_encoder.decode(result.data),
                              "Result is not the expected one: "\
                                 + str(result.data))
 

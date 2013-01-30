@@ -159,7 +159,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         self.assertEqual(status, result.status)
         received_data = rest_encoder.decode(result.data\
                                             .replace("\\", "").strip('"'))
-        self.assertDictEqual(received_data, data)
+        self.assertTrue(received_data == data)
         self.instance_campagne_management.get_campaigns_as_dict\
                             .assert_called_with(args, False, {})
 
@@ -274,8 +274,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.assertListEqual(['duplicated_name'],
-                             rest_encoder.decode(result.data))
+        self.assertTrue(['duplicated_name'] == rest_encoder.decode(result.data))
         self.instance_campagne_management.supplement_edit_input\
                     .assert_called_with(data)
         self.instance_campagne_management.update_campaign\
@@ -308,8 +307,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.assertListEqual(liste,
-                             rest_encoder.decode(result.data))
+        self.assertTrue(liste == rest_encoder.decode(result.data))
         self.instance_campagne_management.supplement_edit_input\
                     .assert_called_with(data)
         self.instance_campagne_management.update_campaign\
