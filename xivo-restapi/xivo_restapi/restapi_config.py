@@ -32,14 +32,8 @@ class RestAPIConfig(object):
     XIVO_DIALPLAN_CLIENTFIELD = 'LDLC_IDTICKET'
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
 
-    POSTGRES_ADDRESS = "127.0.0.1"
-    RECORDING_DB_URI = "postgresql://asterisk:proformatique@" + POSTGRES_ADDRESS + "/asterisk"
-
     RECORDING_FILE_ROOT_PATH = "/var/lib/pf-xivo/sounds/campagnes"
     RECORDING_FILENAME_WHEN_NO_AGENTNAME = 'NoNameForAgentWithNumber'
-
-    POSTGRES_DEBUG = False
-    POSTGRES_DEBUG_FILE = "/tmp/xivo-recording-postgres.log"
 
     def __init__(self):
         pass
