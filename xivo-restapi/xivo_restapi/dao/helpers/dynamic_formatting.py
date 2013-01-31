@@ -22,6 +22,7 @@ from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 import sys
 import traceback
+#from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao
 
 logger = logging.getLogger(__name__)
 
@@ -42,12 +43,20 @@ def table_list_to_list_dict(list_instance):
     list_of_dict = []
 
     for class_instance in list_instance:
+        if type(class_instance).__name__ != "RecordingDetailsDao":
+            my_var = class_instance.id
+        else:
+            my_var = class_instance.cid
         dict_instance = {}
+        logger.debug("In table_list: " + str(class_instance))
         members = vars(class_instance)
+        logger.debug("members = " + str(members))
         for elem in sorted(set(members)):
+            logger.debug("Entering for: " + str(elem))
             if not elem.startswith('_'):
                 value = getattr(class_instance, elem)
                 #pour éviter d'avoir None au lieu de '' dans le résultat
+                logger.debug("The value is: " + str(value))
                 if value == None:
                     value = ''
                 if type(value).__name__ != 'unicode':

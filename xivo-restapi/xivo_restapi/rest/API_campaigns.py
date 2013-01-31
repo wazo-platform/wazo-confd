@@ -43,8 +43,10 @@ class APICampaigns(object):
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
         body = self._campagne_manager.supplement_add_input(body)
+        logger.debug("Just supplemented: " + str(body))
         try:
             result = self._campagne_manager.create_campaign(body)
+            logger.debug("Just created")
         except IntegrityError:
             body = ["duplicated_name"]
             return make_response(rest_encoder.encode(body), 400)

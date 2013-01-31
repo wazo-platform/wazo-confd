@@ -28,6 +28,7 @@ class QueueManagement:
 
     def get_all_queues(self):
         result = queue_dao.all_queues()
+        logger.debug("Got queues: " + str(result))
         if result != None:
             return table_list_to_list_dict(result)
         return False
