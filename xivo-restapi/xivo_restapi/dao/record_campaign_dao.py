@@ -29,9 +29,9 @@ from xivo_restapi.dao.helpers.dynamic_formatting import str_to_datetime
 from xivo_restapi.dao.helpers.query_utils import get_all_data, \
     get_paginated_data
 from xivo_restapi.dao.helpers.time_interval import TimeInterval
-from xivo_dao.helpers import db_manager
 from sqlalchemy.orm.util import class_mapper
 from xivo_dao.helpers.db_manager import daosession_class
+from xivo_dao.helpers import config
 import logging
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ class RecordCampaignDbBinder(object):
     __tablename__ = "record_campaign"
 
     def __init__(self):
-        self._new_from_uri(db_manager._DB_URI)
+        self._new_from_uri(config.DB_URI)
 
     @daosession_class
     def get_records(self, session, search=None, checkCurrentlyRunning=False, pagination=None):

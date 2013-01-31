@@ -25,18 +25,16 @@ from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
 from xivo_restapi.dao.recording_details_dao import RecordingDetailsDao, \
     RecordingDetailsDbBinder
 from datetime import datetime
-from xivo_dao.tests.test_dao import DAOTestCase
-from xivo_dao.alchemy.agentfeatures import AgentFeatures
-from xivo_dao.alchemy.queuefeatures import QueueFeatures
 import random
 import unittest
+from xivo_dao.helpers.db_manager import daosession_class
 
 
-class TestQueryUtils(DAOTestCase):
+class TestQueryUtils(unittest.TestCase):
 
-    tables = [AgentFeatures, QueueFeatures]
-
-    def setUp(self):
+    @daosession_class
+    def setUp(self, session):
+        self.session = session
         self.record_db = RecordCampaignDbBinder()
         if self.record_db == None:
             self.fail("record_db is None, database connection error")
@@ -59,7 +57,7 @@ class TestQueryUtils(DAOTestCase):
         self.session.commit()
         unittest.TestCase.setUp(self)
 
-    def test_get_all_data(self, session):
+    def test_get_all_data(self):
 
         cid1 = '001'
         cid2 = '002'
