@@ -32,6 +32,6 @@ Be sure to have a corresponding web interface package in the xivo-recording dire
 Packaging :
 -----------
 Create the tar
-tar -cvf xivo-recording.tar xivo-recording/ --exclude '*.log' --exclude '.*' --exclude '*.pyc' --exclude tests --exclude acceptance
+tar -cvf xivo-restapi.tar xivo-restapi/ --exclude '*.log' --exclude '.*' --exclude '*.pyc' --exclude tests --exclude acceptance
 
  
