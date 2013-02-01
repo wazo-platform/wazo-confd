@@ -48,7 +48,6 @@ def table_list_to_list_dict(list_instance):
         else:
             my_var = class_instance.cid
         dict_instance = {}
-        logger.debug("In table_list: " + str(class_instance))
         members = vars(class_instance)
         logger.debug("members = " + str(members))
         for elem in sorted(set(members)):
@@ -56,7 +55,6 @@ def table_list_to_list_dict(list_instance):
             if not elem.startswith('_'):
                 value = getattr(class_instance, elem)
                 #pour éviter d'avoir None au lieu de '' dans le résultat
-                logger.debug("The value is: " + str(value))
                 if value == None:
                     value = ''
                 if type(value).__name__ != 'unicode':
