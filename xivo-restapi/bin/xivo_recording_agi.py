@@ -73,7 +73,7 @@ def get_general_variables():
 def get_detailed_variables():
     xivo_vars = {}
     xivo_vars['campaign_id'] = agi.get_variable('QR_CAMPAIGN_ID')
-    xivo_vars['agent_no'] = agi.get_variable('QR_AGENT_NB')
+    xivo_vars['agent_id'] = agi.get_variable('QR_AGENT_ID')
     xivo_vars['caller'] = agi.get_variable('QR_CALLER_NB')
     xivo_vars['start_time'] = agi.get_variable('QR_TIME')
     xivo_vars['cid'] = agi.get_variable('UNIQUEID')
@@ -172,22 +172,22 @@ def get_agents():
     return reply.read()
 
 
-def get_agent_full_name(agent_number):
+def get_agent_full_name(agent_id):
     try:
         agents = rest_encoder.decode(get_agents())
     except RestAPIError:
         logger.error('Unable to get campaigns via REST WS, using default filename.')
         return RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
-                                                    str(agent_number)
+                                                    str(agent_id)
 
     for agent in agents:
-        if agent['number'] == agent_number:
+        if agent['id'] == agent_id:
             return validate_filename_string(agent['lastname']) + \
                     '_' + \
                     validate_filename_string(agent['firstname'])
 
     return RestAPIConfig.RECORDING_FILENAME_WHEN_NO_AGENTNAME + \
-                                                    str(agent_number)
+                                                    str(agent_id)
 
 
 def set_user_field():
@@ -266,7 +266,7 @@ def save_call_details():
     logger.debug("Save recorded call details")
     xivo_vars = get_detailed_variables()
 
-    filename = get_filename(xivo_vars['agent_no'],
+    filename = get_filename(xivo_vars['agent_id'],
                             xivo_vars['cid'])
     agi.set_variable('_QR_FILENAME', filename)
     recording = {}
@@ -274,7 +274,7 @@ def save_call_details():
     recording['filename'] = filename
     recording['campaign_id'] = xivo_vars['campaign_id']
     recording['start_time'] = xivo_vars['start_time']
-    recording['agent_no'] = xivo_vars['agent_no']
+    recording['agent_id'] = xivo_vars['agent_id']
     recording['caller'] = xivo_vars['caller']
     recording['client_id'] = xivo_vars['client_id']
     sys.exit(save_recording(recording))
