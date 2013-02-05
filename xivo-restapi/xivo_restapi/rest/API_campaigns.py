@@ -21,11 +21,13 @@ from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
 from xivo_restapi.dao.exceptions import NoSuchElementException, \
     InvalidInputException
+from xivo_restapi.services import service_utils
 from xivo_restapi.services.campagne_management import CampagneManagement
 import logging
 import rest_encoder
 
 
+authDB = service_utils.authDB
 logger = logging.getLogger(__name__)
 
 
@@ -61,9 +63,10 @@ class APICampaigns(object):
         else:
             return make_response(str(result), 500)
 
+    @authDB.requires_auth
     def get(self, campaign_id=None):
         try:
-            logger.debug("Got an GET request for campaign id: " + \
+            logger.debug("Got a GET request for campaign id: " + \
                          str(campaign_id) + \
                          "with args: " + \
                          str(campaign_id))

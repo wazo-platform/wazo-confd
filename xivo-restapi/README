@@ -34,4 +34,12 @@ Packaging :
 Create the tar
 tar -cvf xivo-restapi.tar xivo-restapi/ --exclude '*.log' --exclude '.*' --exclude '*.pyc' --exclude tests --exclude acceptance
 
+
+Nouvelles dépendances:
+----------------------
+pyopenssl
+fichier en + (authdigest.py)
+
+
+curl --digest --user admin:test https://127.0.0.1:50050/rest/IPBX/recording_campaigns/ --insecure -c cookie.txt -b cookie.txt
  

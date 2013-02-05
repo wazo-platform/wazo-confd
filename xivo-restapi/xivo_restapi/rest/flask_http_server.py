@@ -16,9 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from OpenSSL import SSL
 from flask import Flask
-from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.rest.routage import root, queues_service, agents_service
+from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,5 +35,10 @@ app.debug = True
 class FlaskHttpServer(object):
 
     def run(self):
-        app.run(host=RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
-                port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+        ctx = SSL.Context(SSL.SSLv23_METHOD)
+        ctx.use_privatekey_file('ssl/server.key')
+        ctx.use_certificate_file('ssl/server.crt')
+        app.run(host='0.0.0.0',
+                #host=RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
+                port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT,
+                ssl_context=ctx)
