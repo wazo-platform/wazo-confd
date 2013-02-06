@@ -32,6 +32,7 @@ setup(
               'xivo_restapi.dao',
               'xivo_restapi.dao.helpers',
               'xivo_restapi.rest',
+              'xivo_restapi.rest.authentication',
               'xivo_restapi.services'],
     scripts=['bin/xivo_recording_agi.py',
              'bin/xivo-restapid',

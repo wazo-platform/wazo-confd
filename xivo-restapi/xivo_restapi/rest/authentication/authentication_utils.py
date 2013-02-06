@@ -16,6 +16,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 from flask import session
 from functools import wraps
+from xivo_restapi.dao.accesswebservice_dao import get_allowed_hosts
 import authdigest
 import flask
 import logging
@@ -28,20 +29,18 @@ class FlaskRealmDigestDB(authdigest.RealmDigestDB):
         @wraps(f)
         def decorated(*args, **kwargs):
             request = flask.request
-            #if request.remote_addr != '127.0.0.1':
-            if 'logged' not in session and not self.isAuthenticated(request):
-                logger.debug("Challenging")
-                return self.challenge()
-                #return make_response('', 401)
-            else:
-                if 'logged' in session and session['logged']:
-                    logger.debug("Session déjà enregistrée!!!!!!")
-                else:
-                    session['logged'] = True
-                    logger.debug("Nouvelle session créée!!!!!")
+            if 'logged' in session and session['logged']:
+                logger.debug("Session déjà enregistrée!!!!!!")
                 return f(*args, **kwargs)
-            #return f(*args, **kwargs)
+            if request.remote_addr == '127.0.0.1' or request.remote_addr in get_allowed_hosts():
+                return f(*args, **kwargs)
+            if self.isAuthenticated(request):
+                session.permanent = True
+                session['logged'] = True
+                logger.debug("Nouvelle session créée!!!!!")
+                return f(*args, **kwargs)
+            logger.debug("Challenging")
+            return self.challenge()
         return decorated
 
 authDB = FlaskRealmDigestDB('XivoRestRealm')
-#authDB.add_user('admin', 'test')

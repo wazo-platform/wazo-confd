@@ -32,6 +32,7 @@ return get_protected_response(request)
 #~ Imports
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from xivo_restapi.dao.accesswebservice_dao import get_password
 import hashlib
 import os
 import weakref
@@ -71,31 +72,21 @@ default is 'md5'
         kw.setdefault('indent', 2)
         return json.dumps(self.toDict(), **kw)
 
-    def add_user(self, user, password):
-        r = self.alg.hashPassword(user, self.realm, password)
-        self.db[user] = r
-        return r
     def del_user(self, user):
         del self.db[user]
 
     def __contains__(self, user):
         return user in self.db
-    def get(self, user, default=None):
-        return self.db.get(user, default)
+
     def __getitem__(self, user):
         passwd = self.db.get(user)
         return self.alg.hashPassword(user, self.realm, passwd)
-        ################################
-        #return self.db.get(user)
-    def __setitem__(self, user, password):
-        return self.add_user(user, password)
-    def __delitem__(self, user):
-        return self.db.pop(user, None)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def newDB(self):
         return SampleAccessClass()
+
     def newAlgorithm(self, algorithm):
         return DigestAuthentication(algorithm)
 
@@ -248,16 +239,11 @@ http://en.wikipedia.org/wiki/Digest_access_authentication
 DigestAuthentication.addDigestHashAlg('md5', hashlib.md5)
 DigestAuthentication.addDigestHashAlg('sha', hashlib.sha1)
 
+
 class SampleAccessClass():
 
     def __init__(self):
-        self.db = dict()
-        self.db['admin'] = 'test'
-        self.db['foo'] = 'bar'
+        pass
 
     def get(self, user):
-        if user in self.db:
-            return self.db[user]
-        else:
-            return None
-
+        return get_password(user)
