@@ -38,9 +38,5 @@ app.permanent_session_lifetime = timedelta(minutes=1)
 class FlaskHttpServer(object):
 
     def run(self):
-        ctx = SSL.Context(SSL.SSLv23_METHOD)
-        ctx.use_privatekey_file('/etc/nginx/ssl/server.key')
-        ctx.use_certificate_file('/etc/nginx/ssl/server.crt')
         app.run(host=RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
-                port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT,
-                ssl_context=ctx)
+                port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
