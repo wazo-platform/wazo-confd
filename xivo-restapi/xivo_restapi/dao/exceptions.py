@@ -35,9 +35,3 @@ class NoSuchElementException(Exception):
         return repr(self.value)
 
 
-class InvalidPaginatorException(Exception):
-    pass
-
-
-class EmptyPageException(Exception):
-    pass
