@@ -36,7 +36,7 @@ class FakeDate(datetime):
 
         @classmethod
         def now(cls):
-            return datetime(year=2012, month=1, day=1)
+            return datetime(year = 2012, month = 1, day = 1)
 
 
 class TestXivoRecordingAgi(unittest.TestCase):
@@ -73,7 +73,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
 
         self.xivo_date = '2012-01-01 00:00:00'
         self.unique_id = '001'
-        self.agent_no = '1111'
+        self.agent_id = '1'
         self.agent_firstname = "prenom"
         self.agent_lastname = "famille"
         self.caller_no = '2222'
@@ -122,12 +122,12 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.instance_agi.get_variable.call_args_list = []
         from bin import xivo_recording_agi
         res = xivo_recording_agi.get_detailed_variables()
-        expected_calls = [call('QR_CAMPAIGN_ID'), call('QR_AGENT_NB'),
+        expected_calls = [call('QR_CAMPAIGN_ID'), call('QR_AGENT_ID'),
                           call('QR_CALLER_NB'), call('QR_TIME'),
                           call('UNIQUEID'), call('QR_QUEUENAME'),
                           call(RestAPIConfig.XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME)]
         xivo_vars = {'campaign_id': str(self.xivo_campaign_id),
-                     'agent_no': self.agent_no,
+                     'agent_id': self.agent_id,
                      'caller': self.caller_no,
                      'start_time': self.xivo_date,
                      'cid': self.unique_id,
@@ -194,8 +194,8 @@ class TestXivoRecordingAgi(unittest.TestCase):
             return self.xivo_queue_name
         elif name == 'XIVO_SRCNUM':
             return self.xivo_srcnum
-        elif name == 'QR_AGENT_NB':
-            return self.agent_no
+        elif name == 'QR_AGENT_ID':
+            return self.agent_id
         elif name == 'QR_CALLER_NB':
             return self.caller_no
         elif name == 'QR_QUEUENAME':
@@ -250,9 +250,8 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.instance_http_connection.getresponse.return_value = response
 
         from bin import xivo_recording_agi
-        with self.assertRaises(SystemExit):
-            xivo_recording_agi.process_call_hangup(self.unique_id,
-                                                   str(self.xivo_campaign_id))
+        self.assertRaises(SystemExit, xivo_recording_agi.process_call_hangup,
+                          self.unique_id, str(self.xivo_campaign_id))
 
         requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                     RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
@@ -267,7 +266,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
         sys.argv = ['', 'processCallHangup', '--cid',
                     '001', '--campaign', '1']
         from bin import xivo_recording_agi
-        self.proces_call_hangup = Mock(return_value=None)
+        self.proces_call_hangup = Mock(return_value = None)
         xivo_recording_agi.process_call_hangup = self.proces_call_hangup
         xivo_recording_agi.process_call_hangup_args()
         self.proces_call_hangup.assert_called_with('001', '1')
@@ -279,10 +278,10 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.instance_http_connection.getresponse.return_value = response
 
         from bin import xivo_recording_agi
-        filename = xivo_recording_agi.get_filename('2006', 'test_call_id')
+        filename = xivo_recording_agi.get_filename('22', 'test_call_id')
         self.assertEqual(filename, 'ecaayuioe_tomas_test_call_id.wav')
 
-        filename = xivo_recording_agi.get_filename('2005', 'test_call_id')
+        filename = xivo_recording_agi.get_filename('23', 'test_call_id')
         self.assertEqual(filename, 'JOHN_john_test_call_id.wav')
 
         filename = xivo_recording_agi.get_filename('99', 'test_call_id')

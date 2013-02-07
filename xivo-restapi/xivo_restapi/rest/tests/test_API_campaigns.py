@@ -19,8 +19,8 @@
 
 from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
-from xivo_restapi.dao.exceptions import NoSuchElementException, \
-    InvalidInputException
+from xivo_dao.helpers.cel_exception import InvalidInputException
+from xivo_restapi.dao.exceptions import NoSuchElementException
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.agent_management import AgentManagement
@@ -95,7 +95,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/', data=rest_encoder.encode(data))
+                              '/', data = rest_encoder.encode(data))
         self.instance_campagne_management.supplement_add_input\
                     .assert_called_with(data)
         self.instance_campagne_management.create_campaign\
@@ -125,7 +125,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/',
-                              data=rest_encoder.encode(data))
+                              data = rest_encoder.encode(data))
         self.instance_campagne_management.supplement_add_input\
                     .assert_called_with(data)
         self.instance_campagne_management.create_campaign\
@@ -182,7 +182,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data=rest_encoder.encode(data))
+        result = self.app.put(url, data = rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertEqual(rest_encoder.decode(result.data), "Updated: True")
         self.instance_campagne_management.supplement_edit_input\
@@ -209,7 +209,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data=rest_encoder.encode(data))
+        result = self.app.put(url, data = rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertEqual(rest_encoder.decode(result.data), "False")
         self.instance_campagne_management.supplement_edit_input\
@@ -240,7 +240,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data=rest_encoder.encode(data))
+        result = self.app.put(url, data = rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.instance_campagne_management.supplement_edit_input\
                     .assert_called_with(data)
@@ -272,7 +272,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data=rest_encoder.encode(data))
+        result = self.app.put(url, data = rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertTrue(['duplicated_name'] == rest_encoder.decode(result.data))
         self.instance_campagne_management.supplement_edit_input\
@@ -305,7 +305,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data=rest_encoder.encode(data))
+        result = self.app.put(url, data = rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertTrue(liste == rest_encoder.decode(result.data))
         self.instance_campagne_management.supplement_edit_input\

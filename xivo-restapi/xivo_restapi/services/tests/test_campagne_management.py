@@ -19,12 +19,12 @@
 from datetime import datetime
 from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
-from xivo_dao import queue_dao
+from xivo_dao import queue_dao, record_campaigns_dao
+from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.dao.exceptions import NoSuchElementException
 import copy
 import random
 import unittest
-from xivo_restapi.dao.record_campaign_dao import RecordCampaignDao
 
 
 class FakeDate(datetime):
@@ -34,7 +34,7 @@ class FakeDate(datetime):
 
         @classmethod
         def now(cls):
-            return datetime(year=2012, month=1, day=1)
+            return datetime(year = 2012, month = 1, day = 1)
 
 
 class TestCampagneManagement(unittest.TestCase):
@@ -56,11 +56,10 @@ class TestCampagneManagement(unittest.TestCase):
 
         from xivo_restapi.services.campagne_management import CampagneManagement
         self._campagneManager = CampagneManagement()
-        self._campagneManager.record_db = Mock()
-        queue_dao.id_from_name = Mock(return_value='1')
-        queue_dao.queue_name = Mock(return_value=self.queue_name)
+        queue_dao.id_from_name = Mock(return_value = '1')
+        queue_dao.queue_name = Mock(return_value = self.queue_name)
         queue_dao.get_display_name_number = Mock(
-                                  return_value=(self.queue_display_name,
+                                  return_value = (self.queue_display_name,
                                                 self.queue_number))
         self._campaignName = "test-campagne" + str(random.randint(10, 99))
 
@@ -75,12 +74,13 @@ class TestCampagneManagement(unittest.TestCase):
             "base_filename": base_filename,
             "queue_id": queue_id
         }
-        self._campagneManager.record_db.add.return_value = 1
+        record_campaigns_dao.add = Mock()
+        record_campaigns_dao.add.return_value = 1
 
         result = self._campagneManager.create_campaign(data)
         self.assertTrue(result == 1)
 
-        self._campagneManager.record_db.add.assert_called_with(data)
+        record_campaigns_dao.add.assert_called_with(data)
 
     def test_get_campaigns_as_dict(self):
         campagne_name = "campagne"
@@ -100,10 +100,11 @@ class TestCampagneManagement(unittest.TestCase):
         old_data['data'][0]['queue_display_name'] = self.queue_display_name
         old_data['data'][0]['queue_number'] = self.queue_number
 
-        self._campagneManager.record_db.get_records.return_value = data
+        record_campaigns_dao.get_records = Mock()
+        record_campaigns_dao.get_records.return_value = data
         self.assertEqual(self._campagneManager.get_campaigns_as_dict(),
                          old_data)
-        self._campagneManager.record_db.get_records.assert_called_with({},
+        record_campaigns_dao.get_records.assert_called_with({},
                                                                        False)
 
     def test_update_campaign(self):
@@ -117,10 +118,11 @@ class TestCampagneManagement(unittest.TestCase):
                 "base_filename": base_filename,
                 "queue_id": queue_id
                 }
-        self._campagneManager.record_db.update.return_value = True
+        record_campaigns_dao.update = Mock()
+        record_campaigns_dao.update.return_value = True
         self.assertTrue(self._campagneManager.update_campaign(campaign_id,
                                                               data))
-        self._campagneManager.record_db.update.assert_called_with(campaign_id,
+        record_campaigns_dao.update.assert_called_with(campaign_id,
                                                                   data)
 
     def test_supplement_add_input(self):
@@ -144,21 +146,24 @@ class TestCampagneManagement(unittest.TestCase):
         self.assertTrue(old_data == result)
 
     def test_delete_no_such_element(self):
-        self._campagneManager.record_db.get.return_value = None
-        with self.assertRaises(NoSuchElementException):
-            self._campagneManager.delete('1')
+        record_campaigns_dao.get = Mock()
+        record_campaigns_dao.get.return_value = None
+        self.assertRaises(NoSuchElementException, self._campagneManager.delete, '1')
 
     def test_delete_integrity_error(self):
         def mock_delete(campaign):
             raise IntegrityError(None, None, None)
-        self._campagneManager.record_db.delete.side_effect = mock_delete
-        self._campagneManager.record_db.get.return_value = RecordCampaignDao()
-        with self.assertRaises(IntegrityError):
-            self._campagneManager.delete('1')
+        record_campaigns_dao.delete = Mock()
+        record_campaigns_dao.delete.side_effect = mock_delete
+        record_campaigns_dao.get = Mock()
+        record_campaigns_dao.get.return_value = RecordCampaigns()
+        self.assertRaises(IntegrityError, self._campagneManager.delete, '1')
 
     def test_delete_success(self):
-        obj = RecordCampaignDao()
-        self._campagneManager.record_db.get.return_value = obj
-        self._campagneManager.record_db.delete.return_value = None
+        obj = RecordCampaigns()
+        record_campaigns_dao.get = Mock()
+        record_campaigns_dao.get.return_value = obj
+        record_campaigns_dao.delete = Mock()
+        record_campaigns_dao.delete.return_value = None
         self._campagneManager.delete('1')
-        self._campagneManager.record_db.delete.assert_called_with(obj)
+        record_campaigns_dao.delete.assert_called_with(obj)

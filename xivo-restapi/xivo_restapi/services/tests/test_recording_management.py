@@ -18,7 +18,7 @@
 
 from datetime import datetime
 from mock import Mock, patch
-from xivo_dao import agent_dao
+from xivo_dao import agent_dao, recordings_dao
 from xivo_restapi.restapi_config import RestAPIConfig
 import copy
 import os
@@ -32,7 +32,7 @@ class FakeDate(datetime):
 
         @classmethod
         def now(cls):
-            return datetime(year=2012, month=1, day=1)
+            return datetime(year = 2012, month = 1, day = 1)
 
 
 class TestCampagneManagement(unittest.TestCase):
@@ -50,7 +50,6 @@ class TestCampagneManagement(unittest.TestCase):
 
         from xivo_restapi.services.recording_management import RecordingManagement
         self._recordingManager = RecordingManagement()
-        self._recordingManager.recording_details_db = Mock()
 
     def test_add_recording(self):
         campaign_id = 1
@@ -62,8 +61,8 @@ class TestCampagneManagement(unittest.TestCase):
         agent_dao.agent_id = Mock()
         agent_dao.agent_id.return_value = '1'
 
-        self._recordingManager.recording_details_db.add_recording\
-                    .return_value = True
+        recordings_dao.add_recording = Mock()
+        recordings_dao.add_recording.return_value = True
         result = self._recordingManager.add_recording(campaign_id, data)
 
         del data["agent_no"]
@@ -71,8 +70,7 @@ class TestCampagneManagement(unittest.TestCase):
         data['campaign_id'] = str(campaign_id)
 
         self.assertTrue(result)
-        self._recordingManager.recording_details_db.add_recording\
-                    .assert_called_with(data)
+        recordings_dao.add_recording.assert_called_with(data)
 
     def test_get_recordings_as_dict(self):
         campaign_id = 1
@@ -85,8 +83,8 @@ class TestCampagneManagement(unittest.TestCase):
                                 'agent_id': '1'}]}
         expected_result = copy.deepcopy(dao_result)
         expected_result['data'][0]['agent_no'] = '1000'
-        self._recordingManager.recording_details_db.get_recordings_as_list\
-                       .return_value = dao_result
+        recordings_dao.get_recordings_as_list = Mock()
+        recordings_dao.get_recordings_as_list.return_value = dao_result
         agent_dao.agent_number = Mock()
         agent_dao.agent_number.return_value = '1000'
         agent_dao.agent_id = Mock()
@@ -97,8 +95,7 @@ class TestCampagneManagement(unittest.TestCase):
         del search['agent_no']
         search['agent_id'] = '1'
         self.assertTrue(result == expected_result)
-        self._recordingManager.recording_details_db.get_recordings_as_list\
-                    .assert_called_with(campaign_id, search, None)
+        recordings_dao.get_recordings_as_list.assert_called_with(campaign_id, search, None)
 
     def test_get_recordings_as_dict_paginated(self):
         campaign_id = 1
@@ -114,8 +111,8 @@ class TestCampagneManagement(unittest.TestCase):
                                 'agent_id': '1'}]}
         expected_result = copy.deepcopy(dao_result)
         expected_result['data'][0]['agent_no'] = '1000'
-        self._recordingManager.recording_details_db.get_recordings_as_list\
-                       .return_value = dao_result
+        recordings_dao.get_recordings_as_list = Mock()
+        recordings_dao.get_recordings_as_list.return_value = dao_result
         agent_dao.agent_number = Mock()
         agent_dao.agent_number.return_value = '1000'
         agent_dao.agent_id = Mock()
@@ -127,8 +124,7 @@ class TestCampagneManagement(unittest.TestCase):
         del search['agent_no']
         search['agent_id'] = '1'
         self.assertTrue(result == expected_result)
-        self._recordingManager.recording_details_db.get_recordings_as_list\
-                    .assert_called_with(campaign_id, search, (1, 20))
+        recordings_dao.get_recordings_as_list.assert_called_with(campaign_id, search, (1, 20))
 
     def test_search_recordings_paginated(self):
         campaign_id = 1
@@ -143,8 +139,8 @@ class TestCampagneManagement(unittest.TestCase):
                                 'agent_id': '1'}]}
         expected_result = copy.deepcopy(dao_result)
         expected_result['data'][0]['agent_no'] = '1000'
-        self._recordingManager.recording_details_db.search_recordings\
-                       .return_value = dao_result
+        recordings_dao.search_recordings = Mock()
+        recordings_dao.search_recordings.return_value = dao_result
         agent_dao.agent_number = Mock()
         agent_dao.agent_number.return_value = '1000'
 
@@ -152,8 +148,7 @@ class TestCampagneManagement(unittest.TestCase):
                                                           search,
                                                           technical_params)
         self.assertTrue(result == expected_result)
-        self._recordingManager.recording_details_db.search_recordings\
-                    .assert_called_with(campaign_id, '2002', (1, 20))
+        recordings_dao.search_recordings.assert_called_with(campaign_id, '2002', (1, 20))
 
     def test_search_recordings(self):
         campaign_id = 1
@@ -165,27 +160,25 @@ class TestCampagneManagement(unittest.TestCase):
                                 'agent_id': '1'}]}
         expected_result = copy.deepcopy(dao_result)
         expected_result['data'][0]['agent_no'] = '1000'
-        self._recordingManager.recording_details_db.search_recordings\
-                       .return_value = dao_result
+        recordings_dao.search_recordings = Mock()
+        recordings_dao.search_recordings.return_value = dao_result
         agent_dao.agent_number = Mock()
         agent_dao.agent_number.return_value = '1000'
 
         result = self._recordingManager.search_recordings(campaign_id,
                                                                search, None)
         self.assertTrue(result == expected_result)
-        self._recordingManager.recording_details_db.search_recordings\
-                    .assert_called_with(campaign_id, '2002', None)
+        recordings_dao.search_recordings.assert_called_with(campaign_id, '2002', None)
 
     def test_delete(self):
         campaign_id = 1
         cid = '001'
         filename = 'filename.wav'
-        self._recordingManager.recording_details_db.delete\
-                       .return_value = filename
+        recordings_dao.delete = Mock()
+        recordings_dao.delete.return_value = filename
         os.remove = Mock()
         self.assertTrue(self._recordingManager.delete(campaign_id, cid))
-        self._recordingManager.recording_details_db.delete\
-                    .assert_called_with(campaign_id, cid)
+        recordings_dao.delete.assert_called_with(campaign_id, cid)
         os.remove.assert_called_with(RestAPIConfig.RECORDING_FILE_ROOT_PATH + \
                          '/' + filename)
 

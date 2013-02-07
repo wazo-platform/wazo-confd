@@ -22,15 +22,12 @@ import unittest
 
 
 class SampleClass:
-    pass
+
+    def __init__(self):
+        self.id = 1
 
 
 class TestQueueManagement(unittest.TestCase):
-
-    def mock_reconnectable(self, attribute_name):
-        def reconnector(func):
-            return func
-        return reconnector
 
     def setUp(self):
         from xivo_restapi.services.queue_management import QueueManagement
@@ -50,10 +47,11 @@ class TestQueueManagement(unittest.TestCase):
             item['att1'] = 'val1-' + str(i)
             item['att2'] = 'val2-' + str(i)
             item['att3'] = 'val3-' + str(i)
+            item['id'] = '1'
             data.append(obj)
             expected_result.append(item)
             i += 1
 
         queue_dao.all_queues.return_value = data
         result = self._queueManager.get_all_queues()
-        self.assertTrue(result == expected_result)
+        self.assertEquals(result, expected_result)

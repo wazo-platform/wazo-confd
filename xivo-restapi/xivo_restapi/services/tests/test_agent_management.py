@@ -24,7 +24,9 @@ import unittest
 
 
 class SampleClass:
-    pass
+
+    def __init__(self):
+        self.id = 1
 
 
 class TestAgentManagement(unittest.TestCase):
@@ -47,10 +49,11 @@ class TestAgentManagement(unittest.TestCase):
             item['att1'] = 'val1-' + str(i)
             item['att2'] = 'val2-' + str(i)
             item['att3'] = 'val3-' + str(i)
+            item['id'] = '1'
             data.append(obj)
             expected_result.append(item)
             i += 1
 
         agent_dao.all.return_value = data
         result = self._agentManager.get_all_agents()
-        self.assertTrue(result == expected_result)
+        self.assertEquals(result, expected_result)

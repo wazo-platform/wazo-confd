@@ -18,7 +18,7 @@
 from flask import session
 from flask.app import Flask
 from mock import Mock
-from xivo_restapi.dao import accesswebservice_dao
+from xivo_dao import accesswebservice_dao
 from xivo_restapi.rest.authentication.xivo_realm_digest import XivoRealmDigest
 import flask
 import unittest
