@@ -26,6 +26,11 @@ return get_protected_response(request)
 
 :copyright: (c) 2010 by the Werkzeug Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This code was modified by the Avencall company.
+Modification:
+- access to a custom database to retrieve passwords
 """
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,10 +67,11 @@ default is 'md5'
         return self.alg.algorithm
 
     def toDict(self):
-        r = {'cfg':{ 'algorithm': self.alg.algorithm,
+        r = {'cfg': {'algorithm': self.alg.algorithm,
                 'realm': self.realm},
             'db': self.db, }
         return r
+
     def toJson(self, **kw):
         import json
         kw.setdefault('sort_keys', True)
@@ -108,6 +114,7 @@ default is 'md5'
             return authResult.approve('success')
 
     challenge_class = werkzeug.Response
+
     def challenge(self, response = None, status = 401):
         try:
             authReq = response.www_authenticate
