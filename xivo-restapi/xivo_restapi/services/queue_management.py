@@ -17,8 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao import queue_dao
-from xivo_restapi.dao.helpers.dynamic_formatting import \
-    table_list_to_list_dict
+from xivo_dao.helpers.dynamic_formatting import table_list_to_list_dict
 import logging
 
 logger = logging.getLogger(__name__)

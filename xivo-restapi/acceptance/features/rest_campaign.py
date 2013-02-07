@@ -16,34 +16,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from acceptance.features import cron_utils
+from acceptance.features.rest_queues import RestQueues
+from acceptance.features.ws_utils import WsUtils
+from xivo_dao import agent_dao, queue_dao, record_campaigns_dao
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
+from xivo_dao.alchemy.queuefeatures import QueueFeatures
+from xivo_dao.alchemy.record_campaigns import RecordCampaigns
+from xivo_dao.alchemy.recordings import Recordings
+from xivo_dao.helpers.db_manager import daosession_class
+from xivo_dao.helpers.dynamic_formatting import table_list_to_list_dict
+from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
 import os
 import random
-from acceptance.features import cron_utils
-from acceptance.features.rest_queues import RestQueues
-from xivo_dao import agent_dao
-from xivo_dao.alchemy.agentfeatures import AgentFeatures
-from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder, \
-    RecordCampaignDao
-from xivo_restapi.dao.recording_details_dao import RecordingDetailsDbBinder, \
-    RecordingDetailsDao
-from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_dao import queue_dao
-from xivo_dao.alchemy.queuefeatures import QueueFeatures
-from xivo_restapi.dao.helpers.dynamic_formatting import table_list_to_list_dict
-from acceptance.features.ws_utils import WsUtils
-from xivo_dao.helpers.db_manager import daosession_class
 
 
 class RestCampaign(object):
 
     def __init__(self):
-        self.record_db = RecordCampaignDbBinder()
-        self.recordings = RecordingDetailsDbBinder()
         self.ws_utils = WsUtils()
 
-    def create(self, campaign_name, queue_name='test', activated=True,
-               start_date=None, end_date=None, campaign_id=None):
+    def create(self, campaign_name, queue_name = 'test', activated = True,
+               start_date = None, end_date = None, campaign_id = None):
 
         self.queue_create_if_not_exists(queue_name)
         campaign = {}
@@ -159,8 +154,8 @@ class RestCampaign(object):
         else:
             return True
 
-    def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName",
-                                lastname="LastName", context="default", language="fr_FR"):
+    def add_agent_if_not_exists(self, agent_no, numgroup = 1, firstname = "FirstName",
+                                lastname = "LastName", context = "default", language = "fr_FR"):
         try:
             agent_id = agent_dao.agent_id(agent_no)
             return agent_id
@@ -187,7 +182,7 @@ class RestCampaign(object):
             return 0
         return -1
 
-    def search_recordings(self, campaign_id, key=None):
+    def search_recordings(self, campaign_id, key = None):
         serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/search"
         if(key != None):
@@ -213,9 +208,9 @@ class RestCampaign(object):
             print "\nException raised: " + str(e) + "\n"
             return False
 
-    def create_with_errors(self, campaign_name, queue_name='test',
-                           activated=True, start_date=None,
-                           end_date=None, campaign_id=None):
+    def create_with_errors(self, campaign_name, queue_name = 'test',
+                           activated = True, start_date = None,
+                           end_date = None, campaign_id = None):
 
         self.queue_create_if_not_exists(queue_name)
         campaign = {}
@@ -265,14 +260,14 @@ class RestCampaign(object):
 
     @daosession_class
     def delete_all_campaigns(self, session):
-        session.query(RecordingDetailsDao).delete()
+        session.query(Recordings).delete()
         session.commit()
-        session.query(RecordCampaignDao).delete()
+        session.query(RecordCampaigns).delete()
         session.commit()
 
     @daosession_class
     def list_all_recordings(self, session):
-        result = session.query(RecordingDetailsDao).all()
+        result = session.query(Recordings).all()
         return table_list_to_list_dict(result)
 
     @daosession_class
@@ -293,7 +288,7 @@ class RestCampaign(object):
 
     @daosession_class
     def delete_recordings(self, session, campaign_name):
-        campaign_id = RecordCampaignDbBinder().id_from_name(campaign_name)
-        session.query(RecordingDetailsDao)\
-            .filter_by(campaign_id=int(campaign_id)).delete()
+        campaign_id = record_campaigns_dao.id_from_name(campaign_name)
+        session.query(Recordings)\
+            .filter_by(campaign_id = int(campaign_id)).delete()
         session.commit()

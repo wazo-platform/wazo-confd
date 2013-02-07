@@ -16,12 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao import agent_dao
-from xivo_restapi.dao.recording_details_dao import RecordingDetailsDbBinder
+from commands import getoutput
+from xivo_dao import agent_dao, recordings_dao
+from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 import os
-from commands import getoutput
-from xivo_restapi.restapi_config import RestAPIConfig
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ logger = logging.getLogger(__name__)
 class RecordingManagement:
 
     def __init__(self):
-        self.recording_details_db = RecordingDetailsDbBinder()
+        pass
 
     def add_recording(self, campaign_id, params):
         """
@@ -48,10 +47,10 @@ class RecordingManagement:
                 recording_details[item] = params[item]
 
         recording_details['campaign_id'] = str(campaign_id)
-        result = self.recording_details_db.add_recording(recording_details)
+        result = recordings_dao.add_recording(recording_details)
         return result
 
-    def get_recordings_as_dict(self, campaign_id, search=None, technical_params=None):
+    def get_recordings_as_dict(self, campaign_id, search = None, technical_params = None):
         logger.debug("get_recordings_as_dict")
         search_pattern = {}
         if(search != None):
@@ -62,7 +61,7 @@ class RecordingManagement:
                 else:
                     search_pattern[item] = search[item]
         paginator = self._get_paginator(technical_params)
-        result = self.recording_details_db. \
+        result = recordings_dao. \
                             get_recordings_as_list(campaign_id,
                                                    search_pattern,
                                                    paginator)
@@ -77,7 +76,7 @@ class RecordingManagement:
                                                technical_params)
         else:
             paginator = self._get_paginator(technical_params)
-            result = self.recording_details_db.search_recordings(campaign_id,
+            result = recordings_dao.search_recordings(campaign_id,
                                                                  search['key'],
                                                                  paginator)
             self.insert_agent_no(result['data'])
@@ -93,7 +92,7 @@ class RecordingManagement:
         return liste
 
     def delete(self, campaign_id, recording_id):
-        filename = self.recording_details_db.delete(campaign_id, recording_id)
+        filename = recordings_dao.delete(campaign_id, recording_id)
         if(filename == None):
             logger.error("Recording file remove error - no filename!")
             return False

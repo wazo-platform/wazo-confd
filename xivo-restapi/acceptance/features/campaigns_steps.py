@@ -19,8 +19,7 @@
 from lettuce import step
 from rest_campaign import RestCampaign
 from time import strftime, localtime
-from xivo_dao import queue_dao
-from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_dao import queue_dao, record_campaigns_dao
 import datetime
 import random
 
@@ -159,7 +158,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     now = datetime.datetime.now()
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
-    d = datetime.timedelta(days=1)
+    d = datetime.timedelta(days = 1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now - d).strftime("%Y-%m-%d"),
                                                                 (now + d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
@@ -173,7 +172,7 @@ def given_i_create_a_non_activated_campaign_group1_pointing_to_queue_group2_curr
     now = datetime.datetime.now()
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
-    d = datetime.timedelta(days=1)
+    d = datetime.timedelta(days = 1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, False, (now - d).strftime("%Y-%m-%d"),
                                (now + d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
@@ -187,7 +186,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     now = datetime.datetime.now()
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
-    d = datetime.timedelta(days=1)
+    d = datetime.timedelta(days = 1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now + d).strftime("%Y-%m-%d"),
                                (now + 2 * d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
@@ -263,8 +262,8 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
         i = res['total']
         now = datetime.datetime.now()
         while(i < int(num_of_campaigns)):
-            d = datetime.timedelta(days=(i + 1))
-            oned = datetime.timedelta(days=1)
+            d = datetime.timedelta(days = (i + 1))
+            oned = datetime.timedelta(days = 1)
             r_campaign.create(str(random.randint(1000, 9999)), 'test', True,
                               (now + d).strftime("%Y-%m-%d"), (now + d + oned).strftime("%Y-%m-%d"))
             i += 1
@@ -357,4 +356,4 @@ def given_there_isn_t_any_recording_for_the_campaign_group1(step, campaign_name)
 def then_i_get_a_response_with_code_group1_and_the_campaign_is_deleted(step, code):
     global return_tuple, campaign_id
     assert str(return_tuple[0]) == code
-    assert RecordCampaignDbBinder().get(campaign_id) == None
+    assert record_campaigns_dao.get(campaign_id) == None

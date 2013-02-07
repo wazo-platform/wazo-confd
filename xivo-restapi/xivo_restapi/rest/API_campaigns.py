@@ -19,8 +19,8 @@
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
-from xivo_restapi.dao.exceptions import NoSuchElementException, \
-    InvalidInputException
+from xivo_dao.helpers.cel_exception import InvalidInputException
+from xivo_restapi.dao.exceptions import NoSuchElementException
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.services.campagne_management import CampagneManagement
 import logging

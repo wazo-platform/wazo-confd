@@ -19,7 +19,7 @@
 from lettuce import step
 from rest_campaign import RestCampaign
 from time import strftime, localtime
-from xivo_restapi.dao.record_campaign_dao import RecordCampaignDbBinder
+from xivo_dao import record_campaigns_dao
 import random
 
 #######################################################
@@ -82,8 +82,7 @@ def when_i_save_call_details_for_a_call_referenced_by_its_group1_in_campaign_gro
     global callid, campaign_name
     callid = local_callid + str(random.randint(1000, 9999))
     assert callid, "Callid null!"
-    record_db = RecordCampaignDbBinder()
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     global add_result
     add_result = rest_campaign.addRecordingDetails(campaign_id,
                                                    callid,
@@ -98,16 +97,14 @@ def then_i_can_consult_these_details(step):
     assert (add_result.status == 201), 'Cannot add call details'
     assert (add_result.data == "Added: True"), 'Cannot add call details'
     global campaign_name, callid
-    record_db = RecordCampaignDbBinder()
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     assert rest_campaign.verifyRecordingsDetails(campaign_id, callid), "Recording not found"
 
 
 @step(u'Then I delete this recording and the agent "([^"]*)"')
 def then_i_delete_this_recording_and_the_agent_group1(step, agent_no):
     global campaign_name, callid
-    record_db = RecordCampaignDbBinder()
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     res_rec = rest_campaign.deleteRecording(campaign_id, callid)
     assert res_rec[0] == 200, "Could not delete the recording: " + str(res_rec)
     assert rest_campaign.delete_agent(agent_no), "Could not delete the agent"
@@ -122,10 +119,8 @@ def given_there_is_an_agent_of_number(step, agent_number):
 
 @step(u'Given there is a recording referenced by a "([^"]*)" with agent "([^"]*)"')
 def given_there_is_a_recording_referenced_by_a_callid(step, local_callid, agent_no):
-    #record_db = RecordCampaignDbBinder.new_from_uri(RestAPIConfig.RECORDING_DB_URI)
-    record_db = RecordCampaignDbBinder()
     global campaign_name
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     add_result = rest_campaign.addRecordingDetails(campaign_id, local_callid, "caller", agent_no, time)
     assert (add_result.status == 201), 'Cannot add call details: ' + add_result.status
     assert (add_result.data == "Added: True"), 'Cannot add call details: ' + add_result.data
@@ -134,8 +129,7 @@ def given_there_is_a_recording_referenced_by_a_callid(step, local_callid, agent_
 @step(u'When I delete a recording referenced by this "([^"]*)"')
 def when_i_delete_a_recording_referenced_by_this_callid(step, local_callid):
     global callid, campaign_name, del_result
-    record_db = RecordCampaignDbBinder()
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     del_result = rest_campaign.deleteRecording(campaign_id, local_callid)
 
 
@@ -186,8 +180,7 @@ def then_i_get_the_first_two_recordings(step):
 @step(u'Given there is no recording referenced by a "([^"]*)" in campaign "([^"]*)"')
 def given_there_is_no_recording_referenced_by_a_group1_in_campaign_group2(step, callid, local_campaign_name):
     global campaign_name
-    record_db = RecordCampaignDbBinder()
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     result = rest_campaign.verifyRecordingsDetails(campaign_id, callid)
     assert not result, 'The recording already exists'
 
@@ -255,9 +248,8 @@ def when_we_search_recordings_in_the_campaign_with_the_key_page_and_page_size(st
 
 @step(u'Given there is a recording in campaign "([^"]*)" referenced by a "([^"]*)" answered by agent "([^"]*)"')
 def given_there_is_a_recording_in_campaign_group1_referenced_by_a_group2_answered_by_agent_group3(step, local_campaign_name, callid, agent_no):
-    record_db = RecordCampaignDbBinder()
     global campaign_name
-    campaign_id = record_db.id_from_name(campaign_name)
+    campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     time = "2012-01-01 00:00:00"
     assert rest_campaign.addRecordingDetails(campaign_id, callid, "caller",
                                              agent_no, time), "Impossible to create recording"

@@ -54,7 +54,7 @@ class WsUtils(object):
         method = "DELETE"
         return self._http_request(serviceURI, method)
 
-    def _http_request(self, serviceURI, method, body=""):
+    def _http_request(self, serviceURI, method, body = ""):
         headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         uri = self.requestURI + serviceURI
         self.connection.request(method, uri, body, headers)
@@ -84,7 +84,7 @@ class RestWsInvalidDataException(Exception):
     code = 0
     body = ""
 
-    def __init__(self, e, code, body):
+    def __init__(self, code, body):
         self.code = code
         self.body = body
 
