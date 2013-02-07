@@ -101,7 +101,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         self.instance_campagne_management.create_campaign\
                     .assert_called_with(data)
         self.assertTrue(str(result.status).startswith(status)
-                        and body == str(result.data).strip('"'),
+                        and body == str(rest_encoder.decode(result.data)[0]),
                         "Status comparison failed, received status:" +
                         result.status + ", data: " + result.data)
 
@@ -211,7 +211,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data = rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.assertEqual(rest_encoder.decode(result.data), "False")
+        self.assertEqual(rest_encoder.decode(result.data)[0], "False")
         self.instance_campagne_management.supplement_edit_input\
                     .assert_called_with(data)
         self.instance_campagne_management.update_campaign\

@@ -58,9 +58,9 @@ class APICampaigns(object):
             body = [str(e)]
             return make_response(rest_encoder.encode(body), 500)
         if (type(result) == int and result > 0):
-            return make_response(str(result), 201)
+            return make_response(rest_encoder.encode(result), 201)
         else:
-            return make_response(str(result), 500)
+            return make_response(rest_encoder.encode([str(result)]), 500)
 
     @realmDigest.requires_auth
     def get(self, campaign_id = None):
@@ -105,7 +105,8 @@ class APICampaigns(object):
             liste = ["campaign_not_empty"]
             return make_response(rest_encoder.encode(liste), 412)
         except Exception as e:
-            return make_response(rest_encoder.encode(str(e)), 500)
+            body = rest_encoder.encode([str(e)])
+            return make_response(body, 500)
         return make_response(rest_encoder.encode("Deleted: True"), 200)
 
     def update(self, campaign_id):
@@ -129,6 +130,8 @@ class APICampaigns(object):
             liste = e.errors_list
             return make_response(rest_encoder.encode(liste), 400)
         if (result):
-            return make_response(rest_encoder.encode(("Updated: " + str(result))), 200)
+            body = rest_encoder.encode(("Updated: " + str(result)))
+            return make_response(body, 200)
         else:
-            return make_response(rest_encoder.encode(str(result)), 500)
+            body = rest_encoder.encode([str(result)])
+            return make_response(body, 500)

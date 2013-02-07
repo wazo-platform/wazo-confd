@@ -35,7 +35,7 @@ class APIAgents(object):
         try:
             logger.debug("List args:" + str(request.args))
             result = self._agent_management.get_all_agents()
-            result = sorted(result, key=lambda k: k['number'])
+            result = sorted(result, key = lambda k: k['number'])
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
@@ -43,4 +43,5 @@ class APIAgents(object):
 
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(str(e.args), 500)
+            body = rest_encoder.encode([str(e.args)])
+            return make_response(body, 500)

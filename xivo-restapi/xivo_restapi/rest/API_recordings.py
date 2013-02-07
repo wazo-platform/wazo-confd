@@ -48,7 +48,8 @@ class APIRecordings(object):
             return make_response(rest_encoder.encode("Added: " + \
                                                      str(result)), 201)
         else:
-            return make_response(rest_encoder.encode(str(result)), 500)
+            body = rest_encoder.encode([str(result)])
+            return make_response(body, 500)
 
     def list_recordings(self, campaign_id):
         try:
@@ -72,7 +73,8 @@ class APIRecordings(object):
 
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(str(e.args), 500)
+            body = rest_encoder.encode([str(e.args)])
+            return make_response(body, 500)
 
     def search(self, campaign_id):
         try:
@@ -94,7 +96,8 @@ class APIRecordings(object):
             return make_response(body, 200)
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(rest_encoder.encode(str(e.args)), 500)
+            body = rest_encoder.encode([str(e.args)])
+            return make_response(body, 500)
 
     def delete(self, campaign_id, recording_id):
         try:
@@ -110,4 +113,5 @@ class APIRecordings(object):
                 return make_response(rest_encoder.encode("Deleted: True"), 200)
         except Exception as e:
             logger.debug("got exception:" + str(e.args))
-            return make_response(rest_encoder.encode(str(e.args)), 500)
+            body = rest_encoder.encode([str(e.args)])
+            return make_response(body, 500)
