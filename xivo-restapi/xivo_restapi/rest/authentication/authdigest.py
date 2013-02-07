@@ -14,13 +14,13 @@ Usage
 
 from werkzeug.contrib.authdigest import RealmDigestDB
 
-authDB = RealmDigestDB('test-realm')
-authDB.add_user('admin', 'test')
+realmDigest = RealmDigestDB('test-realm')
+realmDigest.add_user('admin', 'test')
 
 def protectedResource(environ, start_reponse):
 request = Request(environ)
-if not authDB.isAuthenticated(request):
-return authDB.challenge()
+if not realmDigest.isAuthenticated(request):
+return realmDigest.challenge()
 
 return get_protected_response(request)
 
@@ -32,7 +32,7 @@ return get_protected_response(request)
 #~ Imports
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from xivo_restapi.dao.accesswebservice_dao import get_password
+from xivo_dao.accesswebservice_dao import get_password
 import hashlib
 import os
 import weakref
@@ -52,7 +52,7 @@ digest algorithm.
 default is 'md5'
 """
 
-    def __init__(self, realm, algorithm='md5'):
+    def __init__(self, realm, algorithm = 'md5'):
         self.realm = realm
         self.alg = self.newAlgorithm(algorithm)
         self.db = self.newDB()
@@ -85,7 +85,7 @@ default is 'md5'
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def newDB(self):
-        return SampleAccessClass()
+        return DbAccessClass()
 
     def newAlgorithm(self, algorithm):
         return DigestAuthentication(algorithm)
@@ -108,7 +108,7 @@ default is 'md5'
             return authResult.approve('success')
 
     challenge_class = werkzeug.Response
-    def challenge(self, response=None, status=401):
+    def challenge(self, response = None, status = 401):
         try:
             authReq = response.www_authenticate
         except AttributeError:
@@ -138,7 +138,7 @@ and storage of authentication information."""
     status = 500
 
     def __init__(self, authDB):
-        self.authDB = weakref.ref(authDB)
+        self.realmDigest = weakref.ref(authDB)
 
     def __repr__(self):
         return '<authenticated: %r reason: %r>' % (
@@ -146,7 +146,7 @@ and storage of authentication information."""
     def __nonzero__(self):
         return bool(self.authenticated)
 
-    def deny(self, reason, authenticated=False):
+    def deny(self, reason, authenticated = False):
         if bool(authenticated):
             raise ValueError("Denied authenticated parameter must evaluate as False")
         self.authenticated = authenticated
@@ -154,7 +154,7 @@ and storage of authentication information."""
         self.status = 401
         return self
 
-    def approve(self, reason, authenticated=True):
+    def approve(self, reason, authenticated = True):
         if not bool(authenticated):
             raise ValueError("Approved authenticated parameter must evaluate as True")
         self.authenticated = authenticated
@@ -162,9 +162,9 @@ and storage of authentication information."""
         self.status = 200
         return self
 
-    def challenge(self, response=None, force=False):
+    def challenge(self, response = None, force = False):
         if force or not self:
-            return self.authDB().challenge(response, self.status)
+            return self.realmDigest().challenge(response, self.status)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,16 +182,16 @@ http://tools.ietf.org/html/rfc2617
 http://en.wikipedia.org/wiki/Digest_access_authentication
 """
 
-    def __init__(self, algorithm='md5'):
+    def __init__(self, algorithm = 'md5'):
         self.algorithm = algorithm.lower()
         self.H = self.hashAlgorithms[self.algorithm]
 
-    def verify(self, authorization, hashPass=None, method='GET', **kw):
+    def verify(self, authorization, hashPass = None, method = 'GET', **kw):
         reqResponse = self.digest(authorization, hashPass, method, **kw)
         if reqResponse:
             return (authorization.response.lower() == reqResponse.lower())
 
-    def digest(self, authorization, hashPass=None, method='GET', **kw):
+    def digest(self, authorization, hashPass = None, method = 'GET', **kw):
         if authorization is None:
             return None
 
@@ -212,9 +212,9 @@ http://en.wikipedia.org/wiki/Digest_access_authentication
     def hashPassword(self, username, realm, password):
         return self.H(username, realm, password)
 
-    def _compute_hA1(self, auth, password=None):
+    def _compute_hA1(self, auth, password = None):
         return self.hashPassword(auth.username, auth.realm, password or auth.password)
-    def _compute_hA2(self, auth, method='GET'):
+    def _compute_hA2(self, auth, method = 'GET'):
         return self.H(method, auth.uri)
     def _compute_qop_auth(self, auth, hA1, hA2):
         return self.H(hA1, auth.nonce, auth.nc, auth.cnonce, auth.qop, hA2)
@@ -232,7 +232,7 @@ http://en.wikipedia.org/wiki/Digest_access_authentication
             x = ':'.join(map(str, args))
             return hashObj(x).hexdigest()
 
-        H.__name__ = "H_"+key
+        H.__name__ = "H_" + key
         klass.hashAlgorithms[key] = H
         return H
 
@@ -240,7 +240,7 @@ DigestAuthentication.addDigestHashAlg('md5', hashlib.md5)
 DigestAuthentication.addDigestHashAlg('sha', hashlib.sha1)
 
 
-class SampleAccessClass():
+class DbAccessClass():
 
     def __init__(self):
         pass

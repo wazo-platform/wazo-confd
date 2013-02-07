@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+
 # Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
@@ -13,34 +14,38 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+
 from flask import session
 from functools import wraps
-from xivo_restapi.dao.accesswebservice_dao import get_allowed_hosts
-import authdigest
+from xivo_dao import accesswebservice_dao
+from xivo_restapi.rest.authentication import authdigest
 import flask
-import logging
-
-logger = logging.getLogger(__name__)
 
 
-class FlaskRealmDigestDB(authdigest.RealmDigestDB):
+class XivoRealmDigest(authdigest.RealmDigestDB):
     def requires_auth(self, f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            request = flask.request
-            if 'logged' in session and session['logged']:
-                logger.debug("Session déjà enregistrée!!!!!!")
+            remote_address = flask.request.remote_addr
+            if self.isRemoteAddressAllowed(remote_address):
                 return f(*args, **kwargs)
-            if request.remote_addr == '127.0.0.1' or request.remote_addr in get_allowed_hosts():
+            if self.isSessionLogged(session):
                 return f(*args, **kwargs)
-            if self.isAuthenticated(request):
+            if self.isAuthenticated(flask.request):
                 session.permanent = True
                 session['logged'] = True
-                logger.debug("Nouvelle session créée!!!!!")
                 return f(*args, **kwargs)
-            logger.debug("Challenging")
             return self.challenge()
         return decorated
 
-authDB = FlaskRealmDigestDB('XivoRestRealm')
+    def isRemoteAddressAllowed(self, address):
+        if  address == '127.0.0.1' or (address in accesswebservice_dao.get_allowed_hosts()):
+            return True
+        else:
+            return False
+
+    def isSessionLogged(self, session):
+        return 'logged' in session and session['logged']
+
+realmDigest = XivoRealmDigest('XivoRealm')
