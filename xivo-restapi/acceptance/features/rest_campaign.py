@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from acceptance.features import cron_utils
+from acceptance.features.db_utils import daosession_class
 from acceptance.features.rest_queues import RestQueues
 from acceptance.features.ws_utils import WsUtils
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao
@@ -24,7 +25,6 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_dao.alchemy.recordings import Recordings
-from xivo_dao.helpers.db_manager import daosession_class
 from xivo_dao.helpers.dynamic_formatting import table_list_to_list_dict
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
