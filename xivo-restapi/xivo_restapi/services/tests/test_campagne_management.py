@@ -34,15 +34,10 @@ class FakeDate(datetime):
 
         @classmethod
         def now(cls):
-            return datetime(year = 2012, month = 1, day = 1)
+            return datetime(year=2012, month=1, day=1)
 
 
 class TestCampagneManagement(unittest.TestCase):
-
-    def mock_reconnectable(self, attribute_name):
-        def reconnector(func):
-            return func
-        return reconnector
 
     def setUp(self):
         self.queue_name = 'queuename'
@@ -56,10 +51,10 @@ class TestCampagneManagement(unittest.TestCase):
 
         from xivo_restapi.services.campagne_management import CampagneManagement
         self._campagneManager = CampagneManagement()
-        queue_dao.id_from_name = Mock(return_value = '1')
-        queue_dao.queue_name = Mock(return_value = self.queue_name)
+        queue_dao.id_from_name = Mock(return_value='1')
+        queue_dao.queue_name = Mock(return_value=self.queue_name)
         queue_dao.get_display_name_number = Mock(
-                                  return_value = (self.queue_display_name,
+                                  return_value=(self.queue_display_name,
                                                 self.queue_number))
         self._campaignName = "test-campagne" + str(random.randint(10, 99))
 
