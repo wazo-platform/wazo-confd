@@ -36,7 +36,7 @@ class FakeDate(datetime):
 
         @classmethod
         def now(cls):
-            return datetime(year = 2012, month = 1, day = 1)
+            return datetime(year=2012, month=1, day=1)
 
 
 class TestXivoRecordingAgi(unittest.TestCase):
@@ -55,18 +55,18 @@ class TestXivoRecordingAgi(unittest.TestCase):
         self.get_agents_response = \
             '''[{"group": "", "autologoff": "", "firstname": "j ohn",
                  "passwd": "2005", "lastname": "JOHN*.-/;:@`~@!)(*&^%$_+}{\'", "number": "2005",
-                 "id": "23", "language": "en_US", "context": "default",
+                 "id": 23, "language": "en_US", "context": "default",
                  "numgroup": "123", "preprocess_subroutine": "", "commented": "0",
                  "description": ""},
                 {"group": "", "autologoff": "", "firstname": "tom\u00e1 \u0161",
                  "passwd": "2006", "lastname": "èçàâŷûîôê",
-                 "number": "2006", "id": "22", "language": "en_US",
+                 "number": "2006", "id": 22, "language": "en_US",
                  "context": "default", "numgroup": "123",
                  "preprocess_subroutine": "", "commented": "0",
                  "description": ""},
                 {"group": "", "autologoff": "", "firstname": "autre",
                  "passwd": "2007", "lastname": "AUTRE", "number": "2007",
-                 "id": "21", "language": "en_US", "context": "default",
+                 "id": 21, "language": "en_US", "context": "default",
                  "numgroup": "123", "preprocess_subroutine": "",
                  "commented": "0", "description": ""}
                ]'''
@@ -266,7 +266,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
         sys.argv = ['', 'processCallHangup', '--cid',
                     '001', '--campaign', '1']
         from bin import xivo_recording_agi
-        self.proces_call_hangup = Mock(return_value = None)
+        self.proces_call_hangup = Mock(return_value=None)
         xivo_recording_agi.process_call_hangup = self.proces_call_hangup
         xivo_recording_agi.process_call_hangup_args()
         self.proces_call_hangup.assert_called_with('001', '1')
