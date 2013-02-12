@@ -21,7 +21,6 @@ from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest.helpers import global_helper
 import copy
 import unittest
-from xivo_dao.helpers import dynamic_formatting
 
 
 class FakeDate(datetime):
@@ -74,7 +73,7 @@ class TestCampaignsHelper(unittest.TestCase):
         mock_return_value.start_date = '2012-12-12'
         mock_return_value.end_date = '2012-12-13'
         global_helper.create_class_instance.return_value = mock_return_value
-        dynamic_formatting.str_to_datetime = Mock()
+        global_helper.str_to_datetime = Mock()
         from xivo_restapi.rest.helpers import campaigns_helper
         result = campaigns_helper.create_instance(data)
         global_helper.create_class_instance.assert_called_with(RecordCampaigns, data)

@@ -171,6 +171,7 @@ class TestCampagneManagement(unittest.TestCase):
         campaign1.base_filename = 'file-'
         campaign1.activated = True
         campaign1.queue_id = 1
+        campaign1.id = 1
         record_campaigns_dao.get_records = Mock()
         record_campaigns_dao.get_records.return_value = (1, [campaign1])
         campaign2 = copy.deepcopy(campaign1)
@@ -178,6 +179,7 @@ class TestCampagneManagement(unittest.TestCase):
                                               "%Y-%m-%d")
         campaign2.end_date = datetime.strptime('2013-01-31',
                                                 "%Y-%m-%d")
+        campaign2.id = 2
         gotException = False
         try:
             self._campagneManager._validate_campaign(campaign2)

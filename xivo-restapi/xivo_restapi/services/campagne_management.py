@@ -20,10 +20,10 @@ from datetime import datetime
 from xivo_dao import queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_dao.helpers.cel_exception import InvalidInputException
-from xivo_dao.helpers.dynamic_formatting import str_to_datetime
 from xivo_dao.helpers.time_interval import TimeInterval
 from xivo_restapi.dao.exceptions import DataRetrieveError, \
     NoSuchElementException
+from xivo_restapi.rest.helpers.global_helper import str_to_datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -69,6 +69,8 @@ class CampagneManagement:
     def update_campaign(self, campaign_id, params):
         logger.debug("Retrieving original campaign")
         campaign = record_campaigns_dao.get(campaign_id)
+        if(campaign is None):
+            raise NoSuchElementException('No such campaign')
         logger.debug('Going to update')
         campaign = self._update_campaign_with_params(campaign, params)
         self._validate_campaign(campaign)

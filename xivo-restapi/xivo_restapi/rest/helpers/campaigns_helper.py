@@ -17,8 +17,8 @@
 from datetime import datetime
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest.helpers import global_helper
+from xivo_restapi.rest.helpers.global_helper import str_to_datetime
 import logging
-from xivo_dao.helpers.dynamic_formatting import str_to_datetime
 
 
 logger = logging.getLogger()

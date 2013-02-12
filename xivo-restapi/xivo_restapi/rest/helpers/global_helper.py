@@ -14,6 +14,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+from datetime import datetime
+from xivo_dao.helpers.cel_exception import InvalidInputException
+import logging
+import sys
+import traceback
+
+logger = logging.getLogger(__name__)
 
 
 def create_class_instance(class_type, data):
@@ -31,3 +38,24 @@ def create_paginator(data):
         page = int(data['_page'])
         pagesize = int(data['_pagesize'])
         return (page, pagesize)
+
+
+def str_to_datetime(string):
+    if(type(string) != str and type(string) != unicode):
+        raise InvalidInputException("Invalid data provided",
+                                    ["invalid_date_format"])
+    if (len(string) != 10 and len(string) != 19):
+        raise InvalidInputException("Invalid data provided",
+                                    ["invalid_date_format"])
+    try:
+        if(len(string) == 10):
+            result = datetime.strptime(string, "%Y-%m-%d")
+            return result
+        elif(len(string) == 19):
+            return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+    except Exception:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        logger.error(repr(traceback.format_exception(exc_type, exc_value,
+                                          exc_traceback)))
+        raise InvalidInputException("Invalid data provided",
+                                    ["invalid_date_format"])
