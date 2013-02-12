@@ -28,7 +28,6 @@ Feature: Call recordings management
 	  When I delete a recording referenced by this "callid"
 	  Then the recording is deleted and I get a response with code "200"
 
-
 	Scenario: Deleting of unexisting recording
 	  Given there is no campaign
 	  Given there is a queue named "test_queue"
@@ -92,4 +91,3 @@ Feature: Call recordings management
 	  Given I update the recording referenced by a "callid" with end time "2099-01-13 10:25:55"
 	  When I consult the recording referenced by a "callid"
 	  Then I get a recording with end time "2099-01-13 10:25:55"
-	  

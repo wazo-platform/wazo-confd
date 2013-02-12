@@ -59,7 +59,7 @@ def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
 def then_i_can_consult_this_campaign(step):
     r_campaign = RestCampaign()
     global campaign_name
-    liste = [item["campaign_name"] for item in r_campaign.list()]
+    liste = [item["campaign_name"] for item in r_campaign.list()['data']]
     assert campaign_name in liste, campaign_name + " not in " + str(liste)
 
 
@@ -98,13 +98,13 @@ def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, local_ca
     global activated_campaigns, queue_id, campaign_name
     result = False
     for campaign in activated_campaigns:
-        if ((campaign['campaign_name'] == campaign_name) and
-            (campaign['activated'] == 'True')):
+        if ((campaign['campaign_name'] == campaign_name) and campaign['activated']):
             result = True
+            break
     assert result, 'Did not find campaign ' + campaign_name + ' in "' + \
         str(activated_campaigns) + \
         '") when asking for activated campaigns for queue: ' + \
-        queue_id
+        str(queue_id)
 
 
 @step(u'Given I create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
@@ -139,7 +139,7 @@ def then_the_campaign_is_actually_modified(step):
     global campaign_id, campaign_name, queue_id, start_date, end_date
     campaign = r_campaign.getCampaign(campaign_id)
     assert campaign['campaign_name'] == campaign_name, "Name not properly modified"
-    assert campaign['queue_id'] == queue_id, "Queue not properly modified"
+    assert campaign['queue_id'] == int(queue_id), "Queue not properly modified"
     assert campaign['start_date'] == start_date, "Start date not properly modified"
     assert campaign['end_date'] == end_date, "End date not properly modified"
 
@@ -324,7 +324,7 @@ def then_i_can_get_the_campaign_group1_has_an_empty_queue_id(step, campaign_name
     global campaign_id
     result = r_campaign.getCampaign(campaign_id)
     assert result != None, "No campaign retrieved"
-    assert result['queue_id'] == '', "queue_id not null"
+    assert result['queue_id'] is None, "queue_id not null"
 
 
 @step(u'Given there is at least one recording for the campaign "([^"]*)"')

@@ -194,6 +194,7 @@ def then_i_get_a_response_with_error_code_group1_with_message_group2(step, code,
 @step(u'Given there are at least "([^"]*)" recordings for "([^"]*)" and agent "([^"]*)"')
 def given_there_are_at_least_group1_recordings_for_group2_and_agent_group3(step, num_rec, campaign, agent):
     res = rest_campaign.search_recordings(campaign, agent)
+    print "\n==============res: ", res, "\n"
     if(res['total'] < int(num_rec)):
         i = res['total']
         while(i <= int(num_rec)):

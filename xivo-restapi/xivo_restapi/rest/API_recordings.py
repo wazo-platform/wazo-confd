@@ -48,7 +48,7 @@ class APIRecordings(object):
             body = "SQL Error: " + str(e.message)
             return make_response(rest_encoder.encode(body), 400)
 
-        if (result == True):
+        if (result):
             return make_response(rest_encoder.encode("Added: " + \
                                                      str(result)), 201)
         else:

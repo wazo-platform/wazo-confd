@@ -26,7 +26,7 @@ def create_class_instance(class_type, data):
 
 def create_paginator(data):
     if('_page' not in data or '_pagesize' not in data):
-        return None
+        return (0, 0)
     else:
         page = int(data['_page'])
         pagesize = int(data['_pagesize'])

@@ -55,9 +55,10 @@ class CampagneManagement:
                                                   paginator)
         try:
             for item in items:
-                item.queue_name = queue_dao.queue_name(item.queue_id)
-                item.queue_display_name, item.queue_number = queue_dao\
-                                                    .get_display_name_number(item.queue_id)
+                if(item.queue_id != None):
+                    item.queue_name = queue_dao.queue_name(item.queue_id)
+                    item.queue_display_name, item.queue_number = queue_dao\
+                                                        .get_display_name_number(item.queue_id)
 
         except Exception as e:
             logger.critical("DAO failure(" + str(e) + ")!")
@@ -96,6 +97,7 @@ class CampagneManagement:
             (total, campaigns_list) = record_campaigns_dao.get_records(criteria,
                                                                        False,
                                                                        paginator)
+            campaigns_list = [item for item in campaigns_list if item.id != campaign.id]
             intersects = self._check_for_interval_overlap(campaign, campaigns_list)
             if(intersects):
                 errors_list.append("concurrent_campaigns")

@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from mock import Mock, patch
-from xivo_restapi.rest import rest_encoder
-import unittest
 from xivo_dao.alchemy.recordings import Recordings
+from xivo_restapi.rest import rest_encoder
+from datetime import datetime
+import unittest
 
 
 class SampleClass:
@@ -70,3 +70,13 @@ class TestRestEncoder(unittest.TestCase):
                                       u'callee': None,
                                       u'agent_id': None}]}
         self.assertEqual(rest_encoder.decode(result), expected_result)
+
+    def test_serialize_base(self):
+        obj = Recordings()
+        result = rest_encoder._serialize(obj)
+        self.assertEqual(result, obj.todict())
+
+    def test_serialize_datetime(self):
+        obj = datetime.now()
+        result = rest_encoder._serialize(obj)
+        self.assertEqual(result, str(obj))
