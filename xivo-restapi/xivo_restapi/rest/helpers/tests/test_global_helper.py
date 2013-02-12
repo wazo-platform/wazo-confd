@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.cel_exception import InvalidInputException
+from datetime import datetime
 from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.helpers.global_helper import str_to_datetime
-from datetime import datetime
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 import unittest
 
 
@@ -45,7 +45,7 @@ class TestGlobalHelper(unittest.TestCase):
         data = {'param1': 1,
                 'param2': 'valeur'}
         result = global_helper.create_paginator(data)
-        self.assertEqual(result, None)
+        self.assertEqual(result, (0, 0))
 
     def test_create_paginator_success(self):
         data = {'param1': '1',

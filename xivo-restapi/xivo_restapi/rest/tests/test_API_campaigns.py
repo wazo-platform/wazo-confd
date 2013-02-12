@@ -20,8 +20,6 @@
 from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
-from xivo_dao.helpers.cel_exception import InvalidInputException
-from xivo_restapi.dao.exceptions import NoSuchElementException
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.helpers import campaigns_helper
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -29,6 +27,8 @@ from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    InvalidInputException
 import random
 import unittest
 
@@ -154,7 +154,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         status = "200 OK"
         data = {'total': 1,
-                'data': [campaign.todict()]}
+                'data': [rest_encoder._serialize(campaign)]}
 
         self.instance_campagne_management.get_campaigns.return_value = (1, [campaign])
 
@@ -168,7 +168,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         self.assertEqual(status, result.status)
         self.assertEquals(result.data, rest_encoder.encode(data))
         self.instance_campagne_management.get_campaigns\
-                            .assert_called_with(args, False, None)
+                            .assert_called_with(args, False, (0, 0))
 
     def test_edit_campaign_success(self):
         status = "200 OK"

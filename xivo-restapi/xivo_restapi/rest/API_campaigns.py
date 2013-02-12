@@ -19,11 +19,10 @@
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
-from xivo_dao.helpers.cel_exception import InvalidInputException
-from xivo_restapi.dao.exceptions import NoSuchElementException
-from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import campaigns_helper, global_helper
 from xivo_restapi.services.campagne_management import CampagneManagement
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    InvalidInputException
 import logging
 import rest_encoder
 
@@ -64,7 +63,6 @@ class APICampaigns(object):
         else:
             return make_response(rest_encoder.encode([str(result)]), 500)
 
-    #@realmDigest.requires_auth
     def get(self, campaign_id=None):
         try:
             logger.debug("Got a GET request for campaign id: " + \

@@ -66,13 +66,13 @@ class TestCampaignsHelper(unittest.TestCase):
         old_data["champ3"] = None
         self.assertTrue(old_data == result)
 
-    def test_create_instance(self):
+    @patch('xivo_restapi.rest.helpers.global_helper.create_class_instance')
+    def test_create_instance(self, patch_create_class_instance):
         data = {'campaign_name': 'name'}
-        global_helper.create_class_instance = Mock()
         mock_return_value = Mock()
         mock_return_value.start_date = '2012-12-12'
         mock_return_value.end_date = '2012-12-13'
-        global_helper.create_class_instance.return_value = mock_return_value
+        patch_create_class_instance.return_value = mock_return_value
         global_helper.str_to_datetime = Mock()
         from xivo_restapi.rest.helpers import campaigns_helper
         result = campaigns_helper.create_instance(data)

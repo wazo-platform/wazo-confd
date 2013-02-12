@@ -19,11 +19,10 @@
 from datetime import datetime
 from xivo_dao import queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
-from xivo_dao.helpers.cel_exception import InvalidInputException
-from xivo_dao.helpers.time_interval import TimeInterval
-from xivo_restapi.dao.exceptions import DataRetrieveError, \
-    NoSuchElementException
 from xivo_restapi.rest.helpers.global_helper import str_to_datetime
+from xivo_restapi.services.utils.exceptions import DataRetrieveError, \
+    NoSuchElementException, InvalidInputException
+from xivo_restapi.services.utils.time_interval import TimeInterval
 import logging
 
 logger = logging.getLogger(__name__)

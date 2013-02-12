@@ -21,8 +21,8 @@ from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
 from xivo_dao import queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
-from xivo_dao.helpers.cel_exception import InvalidInputException
-from xivo_restapi.dao.exceptions import NoSuchElementException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    InvalidInputException
 import copy
 import unittest
 

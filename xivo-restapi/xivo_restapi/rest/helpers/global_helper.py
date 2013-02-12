@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from datetime import datetime
-from xivo_dao.helpers.cel_exception import InvalidInputException
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 import logging
 import sys
 import traceback
