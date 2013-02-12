@@ -92,7 +92,7 @@ def given_there_is_a_recording_with_id_group1_created_group2_days_ago_with_campa
 def then_items_group1_and_group2_are_deleted(step, group1, group2):
     r_campaign = RestCampaign()
     results = r_campaign.list_all_recordings()
-    results_id = [item['cid'] for item in results]
+    results_id = [item.cid for item in results]
     assert(group1 not in results_id)
     assert(group2 not in results_id)
 
@@ -101,6 +101,6 @@ def then_items_group1_and_group2_are_deleted(step, group1, group2):
 def then_items_group1_and_group2_are_not_deleted(step, group1, group2):
     r_campaign = RestCampaign()
     results = r_campaign.list_all_recordings()
-    results_id = [item['cid'] for item in results]
+    results_id = [item.cid for item in results]
     assert(group1 in results_id)
     assert(group2 in results_id)

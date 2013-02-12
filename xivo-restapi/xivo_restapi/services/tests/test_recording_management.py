@@ -19,6 +19,7 @@
 from datetime import datetime
 from mock import Mock, patch
 from xivo_dao import agent_dao, recordings_dao
+from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.restapi_config import RestAPIConfig
 import copy
 import os
@@ -32,7 +33,7 @@ class FakeDate(datetime):
 
         @classmethod
         def now(cls):
-            return datetime(year = 2012, month = 1, day = 1)
+            return datetime(year=2012, month=1, day=1)
 
 
 class TestCampagneManagement(unittest.TestCase):
@@ -53,92 +54,65 @@ class TestCampagneManagement(unittest.TestCase):
 
     def test_add_recording(self):
         campaign_id = 1
-        data = {
-            "cid": '001',
-            "caller": '2002',
-            "agent_no": '1000'
-        }
+        recording = Recordings()
         agent_dao.agent_id = Mock()
         agent_dao.agent_id.return_value = '1'
 
         recordings_dao.add_recording = Mock()
         recordings_dao.add_recording.return_value = True
-        result = self._recordingManager.add_recording(campaign_id, data)
-
-        del data["agent_no"]
-        data["agent_id"] = '1'
-        data['campaign_id'] = str(campaign_id)
+        result = self._recordingManager.add_recording(campaign_id, recording)
 
         self.assertTrue(result)
-        recordings_dao.add_recording.assert_called_with(data)
+        recordings_dao.add_recording.assert_called_with(recording)
 
-    def test_get_recordings_as_dict(self):
+    def test_get_recordings(self):
         campaign_id = 1
         search = {'cid': '111',
                   'caller': '2002',
                   'agent_no': '1000'}
-        dao_result = {'total': 1,
-                      'data': [{'cid': '111',
-                                'caller': '2002',
-                                'agent_id': '1'}]}
-        expected_result = copy.deepcopy(dao_result)
-        expected_result['data'][0]['agent_no'] = '1000'
-        recordings_dao.get_recordings_as_list = Mock()
-        recordings_dao.get_recordings_as_list.return_value = dao_result
+        dao_result = (1, [Recordings()])
+        recordings_dao.get_recordings = Mock()
+        recordings_dao.get_recordings.return_value = dao_result
         agent_dao.agent_number = Mock()
         agent_dao.agent_number.return_value = '1000'
         agent_dao.agent_id = Mock()
         agent_dao.agent_id.return_value = '1'
 
-        result = self._recordingManager.get_recordings_as_dict(campaign_id,
+        result = self._recordingManager.get_recordings(campaign_id,
                                                                search, None)
         del search['agent_no']
         search['agent_id'] = '1'
-        self.assertTrue(result == expected_result)
-        recordings_dao.get_recordings_as_list.assert_called_with(campaign_id, search, None)
+        self.assertEquals(result, dao_result)
+        self.assertEqual(result[1][0].agent_no, '1000')
+        recordings_dao.get_recordings.assert_called_with(campaign_id, search, None)
 
-    def test_get_recordings_as_dict_paginated(self):
+    def test_get_recordings_paginated(self):
         campaign_id = 1
         search = {'cid': '111',
                   'caller': '2002',
                   'agent_no': '1000'}
-        technical_params = {'_page': '1',
-                            '_pagesize': '20',
-                            '_foo': 'bar'}
-        dao_result = {'total': 1,
-                      'data': [{'cid': '111',
-                                'caller': '2002',
-                                'agent_id': '1'}]}
-        expected_result = copy.deepcopy(dao_result)
-        expected_result['data'][0]['agent_no'] = '1000'
-        recordings_dao.get_recordings_as_list = Mock()
-        recordings_dao.get_recordings_as_list.return_value = dao_result
+        dao_result = (1, [Recordings()])
+        recordings_dao.get_recordings = Mock()
+        recordings_dao.get_recordings.return_value = dao_result
         agent_dao.agent_number = Mock()
         agent_dao.agent_number.return_value = '1000'
         agent_dao.agent_id = Mock()
         agent_dao.agent_id.return_value = '1'
 
-        result = self._recordingManager.get_recordings_as_dict(campaign_id,
-                                                               search,
-                                                               technical_params)
+        result = self._recordingManager.get_recordings(campaign_id,
+                                                       search,
+                                                       (1, 20))
         del search['agent_no']
         search['agent_id'] = '1'
-        self.assertTrue(result == expected_result)
-        recordings_dao.get_recordings_as_list.assert_called_with(campaign_id, search, (1, 20))
+        self.assertEqual(result, dao_result)
+        self.assertEqual(result[1][0].agent_no, '1000')
+        recordings_dao.get_recordings.assert_called_with(campaign_id, search, (1, 20))
 
     def test_search_recordings_paginated(self):
         campaign_id = 1
         search = {'key': '2002',
                   'foo': 'bar'}
-        technical_params = {'_page': '1',
-                            '_pagesize': '20',
-                            '_foo': 'bar'}
-        dao_result = {'total': 1,
-                      'data': [{'cid': '111',
-                                'caller': '2002',
-                                'agent_id': '1'}]}
-        expected_result = copy.deepcopy(dao_result)
-        expected_result['data'][0]['agent_no'] = '1000'
+        dao_result = (1, [Recordings()])
         recordings_dao.search_recordings = Mock()
         recordings_dao.search_recordings.return_value = dao_result
         agent_dao.agent_number = Mock()
@@ -146,20 +120,16 @@ class TestCampagneManagement(unittest.TestCase):
 
         result = self._recordingManager.search_recordings(campaign_id,
                                                           search,
-                                                          technical_params)
-        self.assertTrue(result == expected_result)
+                                                          (1, 20))
+        self.assertEqual(result, dao_result)
+        self.assertEqual(result[1][0].agent_no, '1000')
         recordings_dao.search_recordings.assert_called_with(campaign_id, '2002', (1, 20))
 
     def test_search_recordings(self):
         campaign_id = 1
         search = {'key': '2002',
                   'foo': 'bar'}
-        dao_result = {'total': 1,
-                      'data': [{'cid': '111',
-                                'caller': '2002',
-                                'agent_id': '1'}]}
-        expected_result = copy.deepcopy(dao_result)
-        expected_result['data'][0]['agent_no'] = '1000'
+        dao_result = (1, [Recordings()])
         recordings_dao.search_recordings = Mock()
         recordings_dao.search_recordings.return_value = dao_result
         agent_dao.agent_number = Mock()
@@ -167,7 +137,8 @@ class TestCampagneManagement(unittest.TestCase):
 
         result = self._recordingManager.search_recordings(campaign_id,
                                                                search, None)
-        self.assertTrue(result == expected_result)
+        self.assertEqual(result, dao_result)
+        self.assertEqual(result[1][0].agent_no, '1000')
         recordings_dao.search_recordings.assert_called_with(campaign_id, '2002', None)
 
     def test_delete(self):
@@ -181,18 +152,3 @@ class TestCampagneManagement(unittest.TestCase):
         recordings_dao.delete.assert_called_with(campaign_id, cid)
         os.remove.assert_called_with(RestAPIConfig.RECORDING_FILE_ROOT_PATH + \
                          '/' + filename)
-
-    def test_supplement_add_input(self):
-        data = {'champ1': '',
-                'champ2': ''}
-        expected_result = {'champ1': None,
-                           'champ2': None}
-        result = self._recordingManager.supplement_add_input(data)
-        self.assertTrue(expected_result == result)
-
-    def test_get_paginator(self):
-        params = {'_page': '1',
-                  '_pagesize': '20',
-                  '_foo': 'bar'}
-        result = self._recordingManager._get_paginator(params)
-        self.assertTrue(result == (1, 20))

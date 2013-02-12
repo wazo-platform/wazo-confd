@@ -18,9 +18,10 @@
 
 from flask import request
 from flask.helpers import make_response
-import rest_encoder
+from xivo_restapi.rest.helpers import recordings_helper, global_helper
 from xivo_restapi.services.recording_management import RecordingManagement
 import logging
+import rest_encoder
 
 
 logger = logging.getLogger(__name__)
@@ -37,9 +38,12 @@ class APIRecordings(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(rest_encoder.encode(body), 400)
-        self._recording_manager.supplement_add_input(body)
+        body = recordings_helper.supplement_add_input(body)
+        recording = recordings_helper.create_instance(body)
+        if('agent_no' in body):
+            recording.agent_no = body['agent_no']
         try:
-            result = self._recording_manager.add_recording(campaign_id, body)
+            result = self._recording_manager.add_recording(campaign_id, recording)
         except Exception as e:
             body = "SQL Error: " + str(e.message)
             return make_response(rest_encoder.encode(body), 400)
@@ -54,17 +58,14 @@ class APIRecordings(object):
     def list_recordings(self, campaign_id):
         try:
             logger.debug("List args:" + str(request.args))
-            technical_params = {}
             params = {}
             for item in request.args:
-                if(item[0] == "_"):
-                    technical_params[item] = request.args[item]
-                else:
+                if(not item.startswith('_')):
                     params[item] = request.args[item]
-            result = self._recording_manager. \
-                        get_recordings_as_dict(campaign_id,
-                                               params,
-                                               technical_params)
+            paginator = global_helper.create_paginator(request.args)
+            result = self._recording_manager.get_recordings(campaign_id,
+                                                            params,
+                                                            paginator)
 
             logger.debug("got result")
             body = rest_encoder.encode(result)
@@ -79,16 +80,14 @@ class APIRecordings(object):
     def search(self, campaign_id):
         try:
             logger.debug("List args:" + str(request.args))
-            technical_params = {}
             params = {}
             for item in request.args:
-                if(item[0] == "_"):
-                    technical_params[item] = request.args[item]
-                else:
+                if(not item.startswith('_')):
                     params[item] = request.args[item]
+            paginator = global_helper.create_paginator(request.args)
             result = self._recording_manager. \
                         search_recordings(campaign_id, params,
-                                          technical_params)
+                                          paginator)
 
             logger.debug("got result")
             body = rest_encoder.encode(result)

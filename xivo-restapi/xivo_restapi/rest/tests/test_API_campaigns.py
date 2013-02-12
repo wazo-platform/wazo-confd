@@ -19,9 +19,11 @@
 
 from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
+from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_dao.helpers.cel_exception import InvalidInputException
 from xivo_restapi.dao.exceptions import NoSuchElementException
 from xivo_restapi.rest import rest_encoder
+from xivo_restapi.rest.helpers import campaigns_helper
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
@@ -82,28 +84,30 @@ class TestFlaskHttpRoot(unittest.TestCase):
         unique_id = str(random.randint(10000, 99999999))
         campagne_name = "campagne-" + unique_id
 
-        data = {
+        data_dict = {
             "campaign_name": campagne_name,
             "activated": False,
             "base_filename": campagne_name + "-",
             "queue_name": "queue_1"
         }
+        campaigns_helper.create_instance = Mock()
+        campaign = RecordCampaigns()
+        campaigns_helper.create_instance.return_value = campaign
 
+        self.instance_campagne_management.create_campaign = Mock()
         self.instance_campagne_management.create_campaign.return_value = body
-        self.instance_campagne_management.supplement_add_input\
-                    .return_value = data
+        campaigns_helper.supplement_add_input = Mock()
+        campaigns_helper.supplement_add_input.return_value = data_dict
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/', data = rest_encoder.encode(data))
-        self.instance_campagne_management.supplement_add_input\
-                    .assert_called_with(data)
+                              '/', data=rest_encoder.encode(data_dict))
+        campaigns_helper.supplement_add_input.assert_called_with(data_dict)
+        campaigns_helper.create_instance.assert_called_with(data_dict)
         self.instance_campagne_management.create_campaign\
-                    .assert_called_with(data)
-        self.assertTrue(str(result.status).startswith(status)
-                        and body == str(rest_encoder.decode(result.data)[0]),
-                        "Status comparison failed, received status:" +
-                        result.status + ", data: " + result.data)
+                    .assert_called_with(campaign)
+        self.assertTrue(str(result.status).startswith(status))
+        self.assertEqual(body, str(rest_encoder.decode(result.data)[0]))
 
     def test_add_campaign_success(self):
         status = "201 CREATED"
@@ -119,36 +123,41 @@ class TestFlaskHttpRoot(unittest.TestCase):
         }
 
         self.instance_campagne_management.create_campaign.return_value = 1
-        self.instance_campagne_management.supplement_add_input\
+        campaigns_helper.supplement_add_input = Mock()
+        campaigns_helper.supplement_add_input\
                     .return_value = data
+        campaigns_helper.create_instance = Mock()
+        campaign = RecordCampaigns()
+        campaigns_helper.create_instance.return_value = campaign
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/',
-                              data = rest_encoder.encode(data))
-        self.instance_campagne_management.supplement_add_input\
-                    .assert_called_with(data)
+                              data=rest_encoder.encode(data))
+        campaigns_helper.supplement_add_input.assert_called_with(data)
         self.instance_campagne_management.create_campaign\
-                    .assert_called_with(data)
+                    .assert_called_with(campaign)
         self.assertTrue(str(result.status).startswith(status),
                         "Status comparison failed, received status:" +
                         result.status + ", data: " + result.data)
 
     def test_get_campaigns(self):
+#        from xivo_restapi.rest.authentication import xivo_realm_digest
+#        xivo_realm_digest.realmDigest = Mock()
+#        xivo_realm_digest.realmDigest.requires_auth = Mock()
+#        xivo_realm_digest.realmDigest.requires_auth.return_value = APICampaigns.get
+        campaign = RecordCampaigns()
+        campaign.campaign_name = 'campagne'
+        campaign.activated = False
+        campaign.base_filename = "file-"
+        campaign.queue_name = 'queue_1'
+
         status = "200 OK"
+        data = {'total': 1,
+                'data': [campaign.todict()]}
 
-        unique_id = str(random.randint(10000, 99999999))
-        campagne_name = "campagne-" + unique_id
+        self.instance_campagne_management.get_campaigns.return_value = (1, [campaign])
 
-        data = {
-            "campign_name": campagne_name,
-            "activated": False,
-            "base_filename": campagne_name + "-",
-            "queue_name": "queue_1"
-        }
-
-        self.instance_campagne_management.get_campaigns_as_dict\
-                    .return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/?activated=true&campaign_name=test'
@@ -157,11 +166,9 @@ class TestFlaskHttpRoot(unittest.TestCase):
         args = {'campaign_name': 'test',
                 'activated': 'true'}
         self.assertEqual(status, result.status)
-        received_data = rest_encoder.decode(result.data\
-                                            .replace("\\", "").strip('"'))
-        self.assertTrue(received_data == data)
-        self.instance_campagne_management.get_campaigns_as_dict\
-                            .assert_called_with(args, False, {})
+        self.assertEquals(result.data, rest_encoder.encode(data))
+        self.instance_campagne_management.get_campaigns\
+                            .assert_called_with(args, False, None)
 
     def test_edit_campaign_success(self):
         status = "200 OK"
@@ -177,16 +184,16 @@ class TestFlaskHttpRoot(unittest.TestCase):
         }
 
         self.instance_campagne_management.update_campaign.return_value = True
-        self.instance_campagne_management.supplement_edit_input\
+        campaigns_helper.supplement_edit_input = Mock()
+        campaigns_helper.supplement_edit_input\
                     .return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data = rest_encoder.encode(data))
+        result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertEqual(rest_encoder.decode(result.data), "Updated: True")
-        self.instance_campagne_management.supplement_edit_input\
-                    .assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)
         self.instance_campagne_management.update_campaign\
                     .assert_called_with(str(campaign_id), data)
 
@@ -204,15 +211,15 @@ class TestFlaskHttpRoot(unittest.TestCase):
         }
 
         self.instance_campagne_management.update_campaign.return_value = False
-        self.instance_campagne_management.supplement_edit_input\
-                    .return_value = data
+        campaigns_helper.supplement_edit_input = Mock()
+        campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data = rest_encoder.encode(data))
+        result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertEqual(rest_encoder.decode(result.data)[0], "False")
-        self.instance_campagne_management.supplement_edit_input\
+        campaigns_helper.supplement_edit_input\
                     .assert_called_with(data)
         self.instance_campagne_management.update_campaign\
                     .assert_called_with(str(campaign_id), data)
@@ -235,15 +242,14 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         self.instance_campagne_management.update_campaign\
                     .side_effect = mock_update
-        self.instance_campagne_management.supplement_edit_input\
-                    .return_value = data
+        campaigns_helper.supplement_edit_input = Mock()
+        campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data = rest_encoder.encode(data))
+        result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.instance_campagne_management.supplement_edit_input\
-                    .assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
         self.instance_campagne_management.update_campaign\
@@ -267,16 +273,15 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         self.instance_campagne_management.update_campaign\
                     .side_effect = mock_update
-        self.instance_campagne_management.supplement_edit_input\
-                    .return_value = data
+        campaigns_helper.supplement_edit_input = Mock()
+        campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data = rest_encoder.encode(data))
+        result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertTrue(['duplicated_name'] == rest_encoder.decode(result.data))
-        self.instance_campagne_management.supplement_edit_input\
-                    .assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
         self.instance_campagne_management.update_campaign\
@@ -300,16 +305,15 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         self.instance_campagne_management.update_campaign\
                     .side_effect = mock_update
-        self.instance_campagne_management.supplement_edit_input\
-                    .return_value = data
+        campaigns_helper.supplement_edit_input = Mock()
+        campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + str(campaign_id)
-        result = self.app.put(url, data = rest_encoder.encode(data))
+        result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertTrue(liste == rest_encoder.decode(result.data))
-        self.instance_campagne_management.supplement_edit_input\
-                    .assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
         self.instance_campagne_management.update_campaign\

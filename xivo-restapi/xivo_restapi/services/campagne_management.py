@@ -18,6 +18,10 @@
 
 from datetime import datetime
 from xivo_dao import queue_dao, record_campaigns_dao
+from xivo_dao.alchemy.record_campaigns import RecordCampaigns
+from xivo_dao.helpers.cel_exception import InvalidInputException
+from xivo_dao.helpers.dynamic_formatting import str_to_datetime
+from xivo_dao.helpers.time_interval import TimeInterval
 from xivo_restapi.dao.exceptions import DataRetrieveError, \
     NoSuchElementException
 import logging
@@ -30,11 +34,11 @@ class CampagneManagement:
     def __init__(self):
         pass
 
-    def create_campaign(self, params):
-        result = record_campaigns_dao.add(params)
-        return result
+    def create_campaign(self, campaign):
+        self._validate_campaign(campaign)
+        return record_campaigns_dao.add_or_update(campaign)
 
-    def get_campaigns_as_dict(self, search = {}, checkCurrentlyRunning = False, technical_params = None):
+    def get_campaigns(self, search={}, checkCurrentlyRunning=False, paginator=None):
         """
         Calls the DAO and converts data to the final format
         """
@@ -44,49 +48,31 @@ class CampagneManagement:
                 search_pattern["queue_id"] = queue_dao.id_from_name(search["queue_name"])
             else:
                 search_pattern[item] = search[item]
-        result = None
-        if(technical_params != None and '_page' in technical_params and '_pagesize' in technical_params):
-            paginator = (int(technical_params['_page']), int(technical_params['_pagesize']))
-            result = record_campaigns_dao.get_records(search, checkCurrentlyRunning, paginator)
-        else:
-            result = record_campaigns_dao.get_records(search, checkCurrentlyRunning)
-
+        if(paginator is None):
+            paginator = (0, 0)
+        (total, items) = record_campaigns_dao.get_records(search,
+                                                  checkCurrentlyRunning,
+                                                  paginator)
         try:
-            for item in result['data']:
-                if(item['queue_id'] != ''):
-                    item["queue_name"] = queue_dao. \
-                                            queue_name(item["queue_id"])
-                    item["queue_display_name"], item["queue_number"] = queue_dao.\
-                                                                        get_display_name_number(item["queue_id"])
+            for item in items:
+                item.queue_name = queue_dao.queue_name(item.queue_id)
+                item.queue_display_name, item.queue_number = queue_dao\
+                                                    .get_display_name_number(item.queue_id)
+
         except Exception as e:
             logger.critical("DAO failure(" + str(e) + ")!")
             raise DataRetrieveError("DAO failure(" + str(e) + ")!")
 
-        return result
+        return (total, items)
 
     def update_campaign(self, campaign_id, params):
-        logger.debug('going to update')
-        result = record_campaigns_dao.update(campaign_id, params)
+        logger.debug("Retrieving original campaign")
+        campaign = record_campaigns_dao.get(campaign_id)
+        logger.debug('Going to update')
+        campaign = self._update_campaign_with_params(campaign, params)
+        self._validate_campaign(campaign)
+        result = record_campaigns_dao.add_or_update(campaign)
         return result
-
-    def supplement_add_input(self, data):
-        '''Returns the supplemented input for add'''
-        logger.debug("Supplementing input for 'add'")
-        for key in data:
-            if(data[key] == ''):
-                data[key] = None
-        if(("start_date" not in data) or data["start_date"] == None):
-            data["start_date"] = datetime.now().strftime("%Y-%m-%d")
-        if(("end_date" not in data) or data["end_date"] == None):
-            data["end_date"] = datetime.now().strftime("%Y-%m-%d")
-        return data
-
-    def supplement_edit_input(self, data):
-        '''Returns the supplemented input for edit'''
-        for key in data:
-            if(data[key] == ''):
-                data[key] = None
-        return data
 
     def delete(self, campaign_id):
         campaign = record_campaigns_dao.get(int(campaign_id))
@@ -94,3 +80,46 @@ class CampagneManagement:
             raise NoSuchElementException("No such campaign")
         else:
             record_campaigns_dao.delete(campaign)
+
+    def _validate_campaign(self, campaign):
+        '''Check if the campaign is valid, throws
+        with a list of errors if it is not the case.'''
+        errors_list = []
+        logger.debug("validating campaign")
+        if(campaign.campaign_name == None):
+            errors_list.append("empty_name")
+        if(campaign.start_date > campaign.end_date):
+            errors_list.append("start_greater_than_end")
+        else:
+            criteria = {'queue_id': campaign.queue_id}
+            paginator = (0, 0)
+            (total, campaigns_list) = record_campaigns_dao.get_records(criteria,
+                                                                       False,
+                                                                       paginator)
+            intersects = self._check_for_interval_overlap(campaign, campaigns_list)
+            if(intersects):
+                errors_list.append("concurrent_campaigns")
+        if(len(errors_list) > 0):
+            raise InvalidInputException("Invalid data provided", errors_list)
+        return campaign.id
+
+    def _update_campaign_with_params(self, campaign, params):
+        for k, v in params.items():
+            if((k == 'start_date' or k == 'end_date') and not isinstance(v, datetime)):
+                v = str_to_datetime(v)
+            if k in dir(RecordCampaigns):
+                setattr(campaign, k, v)
+        return campaign
+
+    def _check_for_interval_overlap(self, campaign, campaigns_list):
+        #check if another campaign exists on the same queue,
+        #with a concurrent time interval:
+        campaign_interval = TimeInterval(campaign.start_date, campaign.end_date)
+        intersects = False
+        for item in campaigns_list:
+            item_interval = TimeInterval(item.start_date,
+                                             item.end_date)
+            if(campaign_interval.intersect(item_interval) != None):
+                intersects = True
+                break
+        return intersects

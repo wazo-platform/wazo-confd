@@ -54,14 +54,18 @@ class WsUtils(object):
         method = "DELETE"
         return self._http_request(serviceURI, method)
 
-    def _http_request(self, serviceURI, method, body = ""):
+    def _http_request(self, serviceURI, method, body=""):
         headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
         uri = self.requestURI + serviceURI
         self.connection.request(method, uri, body, headers)
         reply = self.connection.getresponse()
         status = reply.status
         body = reply.read()
-        data = rest_encoder.decode(body)
+        try:
+            data = rest_encoder.decode(body)
+        except:
+            print "==============================="
+            print body
 
         if (status > 299 and status < 200):
             raise RestWsRequestFailedException(status, data)

@@ -30,28 +30,19 @@ class RecordingManagement:
     def __init__(self):
         pass
 
-    def add_recording(self, campaign_id, params):
+    def add_recording(self, campaign_id, recording):
         """
         Converts data to the final format and calls the DAO
         """
-        logger.debug("Add_recording: " + str(campaign_id) + ", " + str(params))
-        recording_details = {}
-        for item in params:
-            if (item == 'agent_no'):
-                logger.debug("Search agent id for agent no:" + params['agent_no'])
-                agent_id = agent_dao.agent_id(params['agent_no'])
-                logger.debug("Replacing agent number: " + params['agent_no'] + \
-                             " by agent id: " + agent_id)
-                recording_details["agent_id"] = agent_id
-            else:
-                recording_details[item] = params[item]
-
-        recording_details['campaign_id'] = str(campaign_id)
-        result = recordings_dao.add_recording(recording_details)
+        logger.debug("Add_recording: " + str(campaign_id) + ", " + str(recording))
+        if('agent_no' in vars(recording)):
+            recording.agent_id = agent_dao.agent_id(recording.agent_no)
+        recording.campaign_id = campaign_id
+        result = recordings_dao.add_recording(recording)
         return result
 
-    def get_recordings_as_dict(self, campaign_id, search = None, technical_params = None):
-        logger.debug("get_recordings_as_dict")
+    def get_recordings(self, campaign_id, search=None, paginator=None):
+        logger.debug("get_recordings")
         search_pattern = {}
         if(search != None):
             for item in search:
@@ -60,36 +51,29 @@ class RecordingManagement:
                                             .agent_id(search['agent_no'])
                 else:
                     search_pattern[item] = search[item]
-        paginator = self._get_paginator(technical_params)
-        result = recordings_dao. \
-                            get_recordings_as_list(campaign_id,
-                                                   search_pattern,
-                                                   paginator)
-        self.insert_agent_no(result['data'])
-        return result
+        (total, items) = recordings_dao.get_recordings(campaign_id,
+                                                       search_pattern,
+                                                       paginator)
+        self._insert_agent_no(items)
+        return (total, items)
 
-    def search_recordings(self, campaign_id, search, technical_params):
+    def search_recordings(self, campaign_id, search, paginator=None):
         logger.debug("search_recordings")
         if(search == None or search == {} or 'key' not in search):
-            return self.get_recordings_as_dict(campaign_id,
+            return self.get_recordings(campaign_id,
                                                {},
-                                               technical_params)
+                                               paginator)
         else:
-            paginator = self._get_paginator(technical_params)
-            result = recordings_dao.search_recordings(campaign_id,
-                                                                 search['key'],
-                                                                 paginator)
-            self.insert_agent_no(result['data'])
-            return result
+            (total, items) = recordings_dao.search_recordings(campaign_id,
+                                                      search['key'],
+                                                      paginator)
+            self._insert_agent_no(items)
+            return (total, items)
 
-    def insert_agent_no(self, liste):
-        for row in liste:
-            agent_no = ''
-            for column in row:
-                if column == 'agent_id' and row[column] != '':
-                    agent_no = agent_dao.agent_number(row[column])
-            row['agent_no'] = agent_no
-        return liste
+    def _insert_agent_no(self, items):
+        for recording in items:
+            recording.agent_no = agent_dao.agent_number(recording.agent_id)
+        return items
 
     def delete(self, campaign_id, recording_id):
         filename = recordings_dao.delete(campaign_id, recording_id)
@@ -106,21 +90,3 @@ class RecordingManagement:
             os.remove(RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + \
                        filename)
             return True
-
-    def supplement_add_input(self, data):
-        '''Returns the supplemented input'''
-        logger.debug("Supplementing input for 'add_recording'")
-        for key in data:
-            if(data[key] == ''):
-                data[key] = None
-        return data
-
-    def _get_paginator(self, technical_params):
-        paginator = None
-        if(technical_params != None\
-           and '_page' in technical_params\
-           and '_pagesize' in technical_params):
-            paginator = (int(technical_params['_page']),
-                         int(technical_params['_pagesize']))
-        logger.debug("Created paginator: " + str(paginator))
-        return paginator

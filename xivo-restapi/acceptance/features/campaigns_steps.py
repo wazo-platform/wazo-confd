@@ -59,7 +59,7 @@ def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
 def then_i_can_consult_this_campaign(step):
     r_campaign = RestCampaign()
     global campaign_name
-    liste = [item["campaign_name"] for item in r_campaign.list()['data']]
+    liste = [item["campaign_name"] for item in r_campaign.list()]
     assert campaign_name in liste, campaign_name + " not in " + str(liste)
 
 
@@ -158,7 +158,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     now = datetime.datetime.now()
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
-    d = datetime.timedelta(days = 1)
+    d = datetime.timedelta(days=1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now - d).strftime("%Y-%m-%d"),
                                                                 (now + d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
@@ -172,7 +172,7 @@ def given_i_create_a_non_activated_campaign_group1_pointing_to_queue_group2_curr
     now = datetime.datetime.now()
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
-    d = datetime.timedelta(days = 1)
+    d = datetime.timedelta(days=1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, False, (now - d).strftime("%Y-%m-%d"),
                                (now + d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
@@ -186,7 +186,7 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
     now = datetime.datetime.now()
     new_campaign_name = campaign_name + str(random.randint(100, 999))
     running_scenario[campaign_name] = new_campaign_name
-    d = datetime.timedelta(days = 1)
+    d = datetime.timedelta(days=1)
     gen_id = r_campaign.create(new_campaign_name, queue_id, True, (now + d).strftime("%Y-%m-%d"),
                                (now + 2 * d).strftime("%Y-%m-%d"))
     assert r_campaign.getCampaign(gen_id)["campaign_name"] == new_campaign_name, 'Campaign ' + \
@@ -262,8 +262,8 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
         i = res['total']
         now = datetime.datetime.now()
         while(i < int(num_of_campaigns)):
-            d = datetime.timedelta(days = (i + 1))
-            oned = datetime.timedelta(days = 1)
+            d = datetime.timedelta(days=(i + 1))
+            oned = datetime.timedelta(days=1)
             r_campaign.create(str(random.randint(1000, 9999)), 'test', True,
                               (now + d).strftime("%Y-%m-%d"), (now + d + oned).strftime("%Y-%m-%d"))
             i += 1

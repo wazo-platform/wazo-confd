@@ -18,6 +18,7 @@
 
 
 from mock import Mock, patch
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.agent_management import AgentManagement
@@ -72,9 +73,11 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
     def test_list_agents(self):
         status = "200 OK"
-        liste = [{"number": "1"},
-                 {"number": "3"},
-                 {"number": "2"}]
+        agent1 = AgentFeatures()
+        agent1.number = '1'
+        agent2 = AgentFeatures()
+        agent2.number = '2'
+        liste = [agent1, agent2]
         self.instance_agent_management.get_all_agents\
                     .return_value = liste
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
@@ -83,13 +86,9 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         self.instance_agent_management.get_all_agents\
                     .assert_any_call()
-        self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
-        liste = sorted(liste, key=lambda k: k['number'])
-        self.assertTrue(liste == rest_encoder.decode(result.data),
-                             "Result is not the expected one: "\
-                                + str(result.data))
+        self.assertEquals(result.status, status)
+        liste = sorted(liste, key=lambda k: k.number)
+        self.assertEquals(rest_encoder.encode(liste), result.data)
 
     def test_list_agents_error(self):
         status = "500 INTERNAL SERVER ERROR"

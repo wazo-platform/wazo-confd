@@ -17,6 +17,32 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json
+import logging
+from xivo_dao.alchemy.base import Base
 
-encode = json.dumps
+logger = logging.getLogger()
+
+
 decode = json.loads
+
+
+def encode(data):
+    result = data
+    if(isinstance(data, tuple)):
+        result = _process_paginated_data(data)
+    return_value = json.dumps(result, default=_serialize)
+    return return_value
+
+
+def _process_paginated_data(data):
+    (total, items) = data
+    result = {'total': total,
+              'data': items}
+    return result
+
+
+def _serialize(obj):
+    if(isinstance(obj, Base)):
+        return obj.todict()
+    else:
+        return str(obj)

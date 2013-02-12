@@ -18,7 +18,9 @@
 
 
 from mock import Mock, patch
+from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.rest import rest_encoder
+from xivo_restapi.rest.helpers import recordings_helper
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
@@ -81,17 +83,20 @@ class TestFlaskHttpRoot(unittest.TestCase):
             "agent_id": agent_id
         }
         self.instance_recording_management.add_recording.return_value = False
-        self.instance_recording_management.supplement_add_input\
-                    .return_value = data
+        recordings_helper.supplement_add_input = Mock()
+        recordings_helper.supplement_add_input.return_value = data
+        recordings_helper.create_instance = Mock()
+        recording = Recordings()
+        recordings_helper.create_instance.return_value = recording
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        self.instance_recording_management.supplement_add_input\
-                    .assert_called_with(data)
+        recordings_helper.supplement_add_input.assert_called_with(data)
+        recordings_helper.create_instance.assert_called_with(data)
         self.instance_recording_management.add_recording\
-                    .assert_called_with(campaign_id, data)
+                    .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
@@ -108,17 +113,19 @@ class TestFlaskHttpRoot(unittest.TestCase):
         }
 
         self.instance_recording_management.add_recording.return_value = True
-        self.instance_recording_management.supplement_add_input\
-                    .return_value = data
+        recordings_helper.supplement_add_input.return_value = data
+        recordings_helper.create_instance = Mock()
+        recording = Recordings()
+        recordings_helper.create_instance.return_value = recording
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        self.instance_recording_management.supplement_add_input\
-                    .assert_called_with(data)
+        recordings_helper.supplement_add_input.assert_called_with(data)
+        recordings_helper.create_instance.assert_called_with(data)
         self.instance_recording_management.add_recording\
-                    .assert_called_with(campaign_id, data)
+                    .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
@@ -139,17 +146,20 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         self.instance_recording_management.add_recording\
                 .side_effect = mock_add_recording
-        self.instance_recording_management.supplement_add_input\
-                    .return_value = data
+        recordings_helper.supplement_add_input = Mock()
+        recordings_helper.supplement_add_input.return_value = data
+        recordings_helper.create_instance = Mock()
+        recording = Recordings()
+        recordings_helper.create_instance.return_value = recording
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        self.instance_recording_management.supplement_add_input\
-                    .assert_called_with(data)
+        recordings_helper.supplement_add_input.assert_called_with(data)
+        recordings_helper.create_instance.assert_called_with(data)
         self.instance_recording_management.add_recording\
-                    .assert_called_with(campaign_id, data)
+                    .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
@@ -158,46 +168,42 @@ class TestFlaskHttpRoot(unittest.TestCase):
     def test_list_recording_success(self):
         status = "200 OK"
         campaign_id = '1'
-
-        self.instance_recording_management.get_recordings_as_dict\
-            .return_value = True
+        obj = Recordings()
+        data = (1, [obj])
+        self.instance_recording_management.get_recordings.return_value = data
         params = "?_page=1&_pagesize=20&foo=bar"
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/' + params,
                               '')
-        self.instance_recording_management.get_recordings_as_dict\
+        self.instance_recording_management.get_recordings\
                     .assert_called_with(campaign_id,
                                         {"foo": "bar"},
-                                        {"_page": "1",
-                                         "_pagesize": "20"})
-        self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                                        (1, 20))
+        self.assertEquals(result.status, status)
+        expected_result = rest_encoder.encode({'total': 1,
+                          'data': [obj.todict()]})
+        self.assertEqual(expected_result, result.data)
 
     def test_list_recording_fail(self):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
 
-        def mock_get_recordings_as_dict(campaign, params, technical_params):
+        def mock_get_recordings(campaign, params, technical_params):
             raise Exception
 
-        self.instance_recording_management.get_recordings_as_dict\
-            .side_effect = mock_get_recordings_as_dict
+        self.instance_recording_management.get_recordings.side_effect = mock_get_recordings
         params = "?_page=1&_pagesize=20&foo=bar"
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/' + params,
                               '')
-        self.instance_recording_management.get_recordings_as_dict\
+        self.instance_recording_management.get_recordings\
                     .assert_called_with(campaign_id,
                                         {"foo": "bar"},
-                                        {"_page": "1",
-                                         "_pagesize": "20"})
-        self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
-        self.instance_recording_management.get_recordings_as_dict\
+                                        (1, 20))
+        self.assertEquals(result.status, status)
+        self.instance_recording_management.get_recordings\
             .side_effect = None
 
     def test_search(self):
@@ -214,8 +220,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         self.instance_recording_management.search_recordings\
                     .assert_called_with(campaign_id,
                                         {"foo": "bar"},
-                                        {"_page": "1",
-                                         "_pagesize": "20"})
+                                        (1, 20))
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
@@ -237,8 +242,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         self.instance_recording_management.search_recordings\
                     .assert_called_with(campaign_id,
                                         {"foo": "bar"},
-                                        {"_page": "1",
-                                         "_pagesize": "20"})
+                                        (1, 20))
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)

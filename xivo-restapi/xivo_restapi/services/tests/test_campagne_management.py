@@ -21,20 +21,10 @@ from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
 from xivo_dao import queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
+from xivo_dao.helpers.cel_exception import InvalidInputException
 from xivo_restapi.dao.exceptions import NoSuchElementException
 import copy
-import random
 import unittest
-
-
-class FakeDate(datetime):
-        "A manipulable date replacement"
-        def __init__(self):
-            pass
-
-        @classmethod
-        def now(cls):
-            return datetime(year=2012, month=1, day=1)
 
 
 class TestCampagneManagement(unittest.TestCase):
@@ -44,11 +34,6 @@ class TestCampagneManagement(unittest.TestCase):
         self.queue_display_name = "queuedisplayname"
         self.queue_number = '1000'
 
-        self.patcher_datetime = patch("datetime.datetime", FakeDate)
-        mock_patch_datetime = self.patcher_datetime.start()
-        self.instance_datetime = FakeDate
-        mock_patch_datetime.return_value = self.instance_datetime
-
         from xivo_restapi.services.campagne_management import CampagneManagement
         self._campagneManager = CampagneManagement()
         queue_dao.id_from_name = Mock(return_value='1')
@@ -56,89 +41,75 @@ class TestCampagneManagement(unittest.TestCase):
         queue_dao.get_display_name_number = Mock(
                                   return_value=(self.queue_display_name,
                                                 self.queue_number))
-        self._campaignName = "test-campagne" + str(random.randint(10, 99))
+        self._create_sample_campaign()
 
     def test_create_campaign(self):
-        campagne_name = "campagne"
-        queue_id = "1"
-        base_filename = campagne_name + "-"
+        campaign = copy.deepcopy(self.sample_campaign)
+        record_campaigns_dao.add_or_update = Mock()
+        record_campaigns_dao.add_or_update.return_value = 1
+        self._campagneManager._validate_campaign = Mock()
+        self._campagneManager._validate_campaign.return_value = campaign
 
-        data = {
-            "campagne_name": campagne_name,
-            "activated": False,
-            "base_filename": base_filename,
-            "queue_id": queue_id
-        }
-        record_campaigns_dao.add = Mock()
-        record_campaigns_dao.add.return_value = 1
+        result = self._campagneManager.create_campaign(campaign)
+        self.assertEquals(result, 1)
+        record_campaigns_dao.add_or_update.assert_called_with(campaign)
+        self._campagneManager._validate_campaign.assert_called_with(campaign)
 
-        result = self._campagneManager.create_campaign(data)
-        self.assertTrue(result == 1)
-
-        record_campaigns_dao.add.assert_called_with(data)
-
-    def test_get_campaigns_as_dict(self):
-        campagne_name = "campagne"
-        queue_id = "1"
-        base_filename = campagne_name + "-"
-
-        data = {'total': 1,
-                'data': [{"campagne_name": campagne_name,
-                        "activated": False,
-                        "base_filename": base_filename,
-                        "queue_id": queue_id
-                        }]
-                }
-        #on recopie data dans old_data, car data sera modifié par effet de bord
-        old_data = copy.deepcopy(data)
-        old_data['data'][0]['queue_name'] = self.queue_name
-        old_data['data'][0]['queue_display_name'] = self.queue_display_name
-        old_data['data'][0]['queue_number'] = self.queue_number
-
+    def test_get_campaigns_no_pagination(self):
+        campaign = copy.deepcopy(self.sample_campaign)
+        data = (1, [campaign])
         record_campaigns_dao.get_records = Mock()
         record_campaigns_dao.get_records.return_value = data
-        self.assertEqual(self._campagneManager.get_campaigns_as_dict(),
-                         old_data)
-        record_campaigns_dao.get_records.assert_called_with({},
-                                                                       False)
 
-    def test_update_campaign(self):
+        (total, items) = self._campagneManager.get_campaigns()
+        result = items[0]
+        self.assertEqual(result.queue_name, self.queue_name)
+        self.assertEqual(result.queue_display_name, self.queue_display_name)
+        self.assertEqual(result.queue_number, self.queue_number)
+        record_campaigns_dao.get_records.assert_called_with({}, False, (0, 0))
+
+    def test_get_campaigns_paginated(self):
+        campaign = copy.deepcopy(self.sample_campaign)
+        data = (1, [campaign])
+        record_campaigns_dao.get_records = Mock()
+        record_campaigns_dao.get_records.return_value = data
+
+        (total, items) = self._campagneManager.get_campaigns({"campaign_name": campaign.campaign_name},
+                                                             True,
+                                                             (1, 1))
+        result = items[0]
+        self.assertEqual(result.queue_name, self.queue_name)
+        self.assertEqual(result.queue_display_name, self.queue_display_name)
+        self.assertEqual(result.queue_number, self.queue_number)
+        record_campaigns_dao.get_records.assert_called_with({"campaign_name": campaign.campaign_name},
+                                                             True,
+                                                             (1, 1))
+    @patch('xivo_restapi.services.campagne_management.CampagneManagement._validate_campaign')
+    def test_update_campaign(self, mock_validate):
         campaign_id = 1
-        campagne_name = "campagne"
+        campaign_name = "campagne"
         queue_id = "1"
-        base_filename = campagne_name + "-"
-
-        data = {"campagne_name": campagne_name,
+        base_filename = campaign_name + "-"
+        campaign = copy.deepcopy(self.sample_campaign)
+        data = {"campaign_name": campaign_name,
                 "activated": False,
                 "base_filename": base_filename,
                 "queue_id": queue_id
                 }
-        record_campaigns_dao.update = Mock()
-        record_campaigns_dao.update.return_value = True
-        self.assertTrue(self._campagneManager.update_campaign(campaign_id,
-                                                              data))
-        record_campaigns_dao.update.assert_called_with(campaign_id,
-                                                                  data)
+        record_campaigns_dao.get = Mock()
+        record_campaigns_dao.get.return_value = campaign
+        record_campaigns_dao.add_or_update = Mock()
+        record_campaigns_dao.add_or_update.return_value = True
 
-    def test_supplement_add_input(self):
-        data = {"champ1": "valeur1",
-                "champ2": "valeur2",
-                "champ3": ""}
-        old_data = copy.deepcopy(data)
-        result = self._campagneManager.supplement_add_input(data)
-        old_data["champ3"] = None
-        old_data["end_date"] = FakeDate.now().strftime("%Y-%m-%d")
-        old_data["start_date"] = FakeDate.now().strftime("%Y-%m-%d")
-        self.assertTrue(old_data == result)
-
-    def test_supplement_edit_input(self):
-        data = {"champ1": "valeur1",
-                "champ2": "valeur2",
-                "champ3": ""}
-        old_data = copy.deepcopy(data)
-        result = self._campagneManager.supplement_edit_input(data)
-        old_data["champ3"] = None
-        self.assertTrue(old_data == result)
+        result = self._campagneManager.update_campaign(campaign_id,
+                                                              data)
+        self.assertTrue(result)
+        record_campaigns_dao.get.assert_called_once_with(campaign_id)
+        record_campaigns_dao.add_or_update.assert_called_once_with(campaign)
+        self.assertEqual(campaign.campaign_name, data['campaign_name'])
+        self.assertEqual(campaign.activated, data['activated'])
+        self.assertEqual(campaign.base_filename, data['base_filename'])
+        self.assertEqual(campaign.queue_id, data['queue_id'])
 
     def test_delete_no_such_element(self):
         record_campaigns_dao.get = Mock()
@@ -162,3 +133,55 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.delete.return_value = None
         self._campagneManager.delete('1')
         record_campaigns_dao.delete.assert_called_with(obj)
+
+    def _create_sample_campaign(self):
+        self.sample_campaign = RecordCampaigns()
+        self.sample_campaign.activated = True
+        self.sample_campaign.campaign_name = "campaign-àé"
+        self.sample_campaign.queue_id = 1
+        self.sample_campaign.base_filename = self.sample_campaign.campaign_name + "-"
+        self.sample_campaign.start_date = datetime.strptime('2012-01-01 12:12:12',
+                                                            "%Y-%m-%d %H:%M:%S")
+        self.sample_campaign.end_date = datetime.strptime('2012-12-12 12:12:12',
+                                                            "%Y-%m-%d %H:%M:%S")
+
+    def test_validate_campaign(self):
+        campaign = RecordCampaigns()
+        campaign.campaign_name = None
+        campaign.start_date = datetime.strptime('2012-12-31',
+                                                "%Y-%m-%d")
+        campaign.end_date = datetime.strptime('2012-01-31',
+                                              "%Y-%m-%d")
+        gotException = False
+        try:
+            self._campagneManager._validate_campaign(campaign)
+        except InvalidInputException as e:
+            self.assertTrue('empty_name' in e.errors_list)
+            self.assertTrue('start_greater_than_end' in e.errors_list)
+            gotException = True
+        self.assertTrue(gotException)
+
+        #we check that overlapping campaigns are rejected
+        campaign1 = RecordCampaigns()
+        campaign1.campaign_name = 'name1'
+        campaign1.start_date = datetime.strptime('2012-01-31',
+                                              "%Y-%m-%d")
+        campaign1.end_date = datetime.strptime('2012-12-31',
+                                                "%Y-%m-%d")
+        campaign1.base_filename = 'file-'
+        campaign1.activated = True
+        campaign1.queue_id = 1
+        record_campaigns_dao.get_records = Mock()
+        record_campaigns_dao.get_records.return_value = (1, [campaign1])
+        campaign2 = copy.deepcopy(campaign1)
+        campaign2.start_date = datetime.strptime('2012-02-28',
+                                              "%Y-%m-%d")
+        campaign2.end_date = datetime.strptime('2013-01-31',
+                                                "%Y-%m-%d")
+        gotException = False
+        try:
+            self._campagneManager._validate_campaign(campaign2)
+        except InvalidInputException as e:
+            self.assertTrue('concurrent_campaigns' in e.errors_list)
+            gotException = True
+        self.assertTrue(gotException)

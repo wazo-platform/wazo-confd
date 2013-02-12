@@ -21,6 +21,7 @@
 from mock import Mock
 from xivo_dao import agent_dao
 import unittest
+from xivo_dao.alchemy.agentfeatures import AgentFeatures
 
 
 class SampleClass:
@@ -35,25 +36,9 @@ class TestAgentManagement(unittest.TestCase):
         from xivo_restapi.services.agent_management import AgentManagement
         self._agentManager = AgentManagement()
 
-    def test_get_all_queues(self):
+    def test_get_all_agents(self):
         agent_dao.all = Mock()
-        data = []
-        expected_result = []
-        i = 0
-        while(i < 3):
-            obj = SampleClass()
-            obj.att1 = 'val1-' + str(i)
-            obj.att2 = 'val2-' + str(i)
-            obj.att3 = 'val3-' + str(i)
-            item = {}
-            item['att1'] = 'val1-' + str(i)
-            item['att2'] = 'val2-' + str(i)
-            item['att3'] = 'val3-' + str(i)
-            item['id'] = '1'
-            data.append(obj)
-            expected_result.append(item)
-            i += 1
-
+        data = [AgentFeatures()]
         agent_dao.all.return_value = data
         result = self._agentManager.get_all_agents()
-        self.assertEquals(result, expected_result)
+        self.assertEquals(result, data)

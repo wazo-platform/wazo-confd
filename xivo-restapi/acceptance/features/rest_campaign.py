@@ -25,7 +25,6 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_dao.alchemy.recordings import Recordings
-from xivo_dao.helpers.dynamic_formatting import table_list_to_list_dict
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
 import os
@@ -37,8 +36,8 @@ class RestCampaign(object):
     def __init__(self):
         self.ws_utils = WsUtils()
 
-    def create(self, campaign_name, queue_name = 'test', activated = True,
-               start_date = None, end_date = None, campaign_id = None):
+    def create(self, campaign_name, queue_name='test', activated=True,
+               start_date=None, end_date=None, campaign_id=None):
 
         self.queue_create_if_not_exists(queue_name)
         campaign = {}
@@ -154,8 +153,8 @@ class RestCampaign(object):
         else:
             return True
 
-    def add_agent_if_not_exists(self, agent_no, numgroup = 1, firstname = "FirstName",
-                                lastname = "LastName", context = "default", language = "fr_FR"):
+    def add_agent_if_not_exists(self, agent_no, numgroup=1, firstname="FirstName",
+                                lastname="LastName", context="default", language="fr_FR"):
         try:
             agent_id = agent_dao.agent_id(agent_no)
             return agent_id
@@ -182,7 +181,7 @@ class RestCampaign(object):
             return 0
         return -1
 
-    def search_recordings(self, campaign_id, key = None):
+    def search_recordings(self, campaign_id, key=None):
         serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/search"
         if(key != None):
@@ -208,9 +207,9 @@ class RestCampaign(object):
             print "\nException raised: " + str(e) + "\n"
             return False
 
-    def create_with_errors(self, campaign_name, queue_name = 'test',
-                           activated = True, start_date = None,
-                           end_date = None, campaign_id = None):
+    def create_with_errors(self, campaign_name, queue_name='test',
+                           activated=True, start_date=None,
+                           end_date=None, campaign_id=None):
 
         self.queue_create_if_not_exists(queue_name)
         campaign = {}
@@ -267,8 +266,7 @@ class RestCampaign(object):
 
     @daosession_class
     def list_all_recordings(self, session):
-        result = session.query(Recordings).all()
-        return table_list_to_list_dict(result)
+        return session.query(Recordings).all()
 
     @daosession_class
     def delete_queue(self, session, queue_name):
@@ -290,5 +288,5 @@ class RestCampaign(object):
     def delete_recordings(self, session, campaign_name):
         campaign_id = record_campaigns_dao.id_from_name(campaign_name)
         session.query(Recordings)\
-            .filter_by(campaign_id = int(campaign_id)).delete()
+            .filter_by(campaign_id=int(campaign_id)).delete()
         session.commit()

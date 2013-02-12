@@ -18,6 +18,7 @@
 
 from mock import Mock
 from xivo_dao import queue_dao
+from xivo_dao.alchemy.queuefeatures import QueueFeatures
 import unittest
 
 
@@ -35,23 +36,7 @@ class TestQueueManagement(unittest.TestCase):
 
     def test_get_all_queues(self):
         queue_dao.all_queues = Mock()
-        data = []
-        expected_result = []
-        i = 0
-        while(i < 3):
-            obj = SampleClass()
-            obj.att1 = 'val1-' + str(i)
-            obj.att2 = 'val2-' + str(i)
-            obj.att3 = 'val3-' + str(i)
-            item = {}
-            item['att1'] = 'val1-' + str(i)
-            item['att2'] = 'val2-' + str(i)
-            item['att3'] = 'val3-' + str(i)
-            item['id'] = '1'
-            data.append(obj)
-            expected_result.append(item)
-            i += 1
-
+        data = [QueueFeatures()]
         queue_dao.all_queues.return_value = data
         result = self._queueManager.get_all_queues()
-        self.assertEquals(result, expected_result)
+        self.assertEquals(result, data)

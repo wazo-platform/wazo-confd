@@ -22,6 +22,7 @@ from sqlalchemy.exc import IntegrityError
 from xivo_dao.helpers.cel_exception import InvalidInputException
 from xivo_restapi.dao.exceptions import NoSuchElementException
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.rest.helpers import campaigns_helper, global_helper
 from xivo_restapi.services.campagne_management import CampagneManagement
 import logging
 import rest_encoder
@@ -43,10 +44,11 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-        body = self._campagne_manager.supplement_add_input(body)
+        body = campaigns_helper.supplement_add_input(body)
+        campaign = campaigns_helper.create_instance(body)
         logger.debug("Just supplemented: " + str(body))
         try:
-            result = self._campagne_manager.create_campaign(body)
+            result = self._campagne_manager.create_campaign(campaign)
             logger.debug("Just created")
         except IntegrityError:
             body = ["duplicated_name"]
@@ -62,8 +64,8 @@ class APICampaigns(object):
         else:
             return make_response(rest_encoder.encode([str(result)]), 500)
 
-    @realmDigest.requires_auth
-    def get(self, campaign_id = None):
+    #@realmDigest.requires_auth
+    def get(self, campaign_id=None):
         try:
             logger.debug("Got a GET request for campaign id: " + \
                          str(campaign_id) + \
@@ -71,20 +73,17 @@ class APICampaigns(object):
                          str(campaign_id))
             checkCurrentlyRunning = False
             params = {}
-            technical_params = {}
             if campaign_id != None:
                 params['id'] = campaign_id
             for item in request.args:
-                if(item[0] == '_'):
-                    technical_params[item] = request.args[item]
-                elif item == 'running':
+                if(item == 'running'):
                     checkCurrentlyRunning = (request.args[item] == 'true')
-                else:
+                elif(not item.startswith('_')):
                     params[item] = request.args[item]
-            result = self._campagne_manager\
-                            .get_campaigns_as_dict(params,
-                                                   checkCurrentlyRunning,
-                                                   technical_params)
+            paginator = global_helper.create_paginator(request.args)
+            result = self._campagne_manager.get_campaigns(params,
+                                                          checkCurrentlyRunning,
+                                                          paginator)
             logger.debug("got result")
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
@@ -118,7 +117,7 @@ class APICampaigns(object):
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
         try:
-            body = self._campagne_manager.supplement_edit_input(body)
+            body = campaigns_helper.supplement_edit_input(body)
             result = self._campagne_manager.update_campaign(campaign_id, body)
         except NoSuchElementException:
             liste = ["campaign_not_found"]
@@ -135,3 +134,4 @@ class APICampaigns(object):
         else:
             body = rest_encoder.encode([str(result)])
             return make_response(body, 500)
+

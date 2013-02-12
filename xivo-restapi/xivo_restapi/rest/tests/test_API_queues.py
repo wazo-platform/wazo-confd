@@ -25,6 +25,7 @@ from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
 import unittest
+from xivo_dao.alchemy.queuefeatures import QueueFeatures
 
 mock_agent_management = Mock(AgentManagement)
 mock_campaign_management = Mock(CampagneManagement)
@@ -72,9 +73,11 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
     def test_list_queues(self):
         status = "200 OK"
-        liste = [{"number": "1"},
-                 {"number": "3"},
-                 {"number": "2"}]
+        queue1 = QueueFeatures()
+        queue1.number = '1'
+        queue2 = QueueFeatures()
+        queue2.number = '2'
+        liste = [queue1, queue2]
         self.instance_queue_management.get_all_queues\
                     .return_value = liste
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
@@ -83,13 +86,9 @@ class TestFlaskHttpRoot(unittest.TestCase):
 
         self.instance_queue_management.get_all_queues\
                     .assert_any_call()
-        self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
-        liste = sorted(liste, key=lambda k: k['number'])
-        self.assertTrue(liste == rest_encoder.decode(result.data),
-                             "Result is not the expected one: "\
-                                + str(result.data))
+        self.assertEquals(result.status, status)
+        liste = sorted(liste, key=lambda k: k.number)
+        self.assertEquals(rest_encoder.encode(liste), result.data)
 
     def test_list_queues_error(self):
         status = "500 INTERNAL SERVER ERROR"
