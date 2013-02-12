@@ -23,26 +23,7 @@ import copy
 import unittest
 
 
-class FakeDate(datetime):
-    "A manipulable date replacement"
-    def __init__(self):
-        pass
-
-    @classmethod
-    def now(cls):
-        return datetime(year=2012, month=1, day=1)
-
-
 class TestCampaignsHelper(unittest.TestCase):
-
-    def setUp(self):
-        self.patcher_datetime = patch("datetime.datetime", FakeDate)
-        mock_patch_datetime = self.patcher_datetime.start()
-        self.instance_datetime = FakeDate
-        mock_patch_datetime.return_value = self.instance_datetime
-
-    def tearDown(self):
-        self.patcher_datetime.stop()
 
     def test_supplement_add_input(self):
         data = {"champ1": "valeur1",
@@ -52,8 +33,8 @@ class TestCampaignsHelper(unittest.TestCase):
         from xivo_restapi.rest.helpers import campaigns_helper
         result = campaigns_helper.supplement_add_input(data)
         old_data["champ3"] = None
-        old_data["end_date"] = FakeDate.now().strftime("%Y-%m-%d")
-        old_data["start_date"] = FakeDate.now().strftime("%Y-%m-%d")
+        old_data["end_date"] = datetime.now().strftime("%Y-%m-%d")
+        old_data["start_date"] = datetime.now().strftime("%Y-%m-%d")
         self.assertEquals(old_data, result)
 
     def test_supplement_edit_input(self):

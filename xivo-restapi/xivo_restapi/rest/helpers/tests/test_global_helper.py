@@ -57,11 +57,11 @@ class TestGlobalHelper(unittest.TestCase):
     def test_str_to_datetime(self):
         strDate = "2012-01-01"
         resultDate = str_to_datetime(strDate)
-        assert resultDate == datetime.strptime(strDate, "%Y-%m-%d")
+        self.assertEqual(resultDate, datetime.strptime(strDate, "%Y-%m-%d"))
 
         strTime = "2012-01-01 00:00:00"
         resultTime = str_to_datetime(strTime)
-        assert resultTime == datetime.strptime(strTime, "%Y-%m-%d %H:%M:%S")
+        self.assertEqual(resultTime, datetime.strptime(strTime, "%Y-%m-%d %H:%M:%S"))
 
         invalidDateStr = "2012-13-13"
         self.assertRaises(InvalidInputException, str_to_datetime, invalidDateStr)

@@ -97,6 +97,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
     def tearDown(self):
         self.patcher_agi.stop()
         self.patcher_http_connection.stop()
+        self.patcher_datetime.stop()
 
     def test_xivo_recording_agi_get_general_variables(self):
         self.instance_agi.get_variable.side_effect = self.mock_agi_get_variable
