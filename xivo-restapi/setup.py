@@ -29,7 +29,6 @@ setup(
     url='http://git.xivo.fr/',
     license='GPLv3',
     packages=['xivo_restapi',
-              'xivo_restapi.dao',
               'xivo_restapi.rest',
               'xivo_restapi.rest.authentication',
               'xivo_restapi.services'],
