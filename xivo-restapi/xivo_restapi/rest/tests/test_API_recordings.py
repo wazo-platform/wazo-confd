@@ -34,7 +34,7 @@ mock_recording_management = Mock(RecordingManagement)
 mock_queue_management = Mock(QueueManagement)
 
 
-class TestFlaskHttpRoot(unittest.TestCase):
+class TestAPIRecordings(unittest.TestCase):
 
     def setUp(self):
 
@@ -93,8 +93,8 @@ class TestFlaskHttpRoot(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        recordings_helper.supplement_add_input.assert_called_with(data)
-        recordings_helper.create_instance.assert_called_with(data)
+        recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
+        recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
                     .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
@@ -122,8 +122,8 @@ class TestFlaskHttpRoot(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        recordings_helper.supplement_add_input.assert_called_with(data)
-        recordings_helper.create_instance.assert_called_with(data)
+        recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
+        recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
                     .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
@@ -156,8 +156,8 @@ class TestFlaskHttpRoot(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        recordings_helper.supplement_add_input.assert_called_with(data)
-        recordings_helper.create_instance.assert_called_with(data)
+        recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
+        recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
                     .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,

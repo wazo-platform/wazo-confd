@@ -33,7 +33,7 @@ mock_recording_management = Mock(RecordingManagement)
 mock_queue_management = Mock(QueueManagement)
 
 
-class TestFlaskHttpRoot(unittest.TestCase):
+class TestAPIAgents(unittest.TestCase):
 
     def setUp(self):
 

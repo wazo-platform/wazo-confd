@@ -39,7 +39,7 @@ mock_recording_management = Mock(RecordingManagement)
 mock_queue_management = Mock(QueueManagement)
 
 
-class TestFlaskHttpRoot(unittest.TestCase):
+class TestAPICampaigns(unittest.TestCase):
 
     def setUp(self):
 
@@ -102,8 +102,9 @@ class TestFlaskHttpRoot(unittest.TestCase):
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/', data=rest_encoder.encode(data_dict))
-        campaigns_helper.supplement_add_input.assert_called_with(data_dict)
-        campaigns_helper.create_instance.assert_called_with(data_dict)
+
+        campaigns_helper.supplement_add_input.assert_called_with(data_dict)  #@UndefinedVariable
+        campaigns_helper.create_instance.assert_called_with(data_dict)  #@UndefinedVariable
         self.instance_campagne_management.create_campaign\
                     .assert_called_with(campaign)
         self.assertTrue(str(result.status).startswith(status))
@@ -134,7 +135,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/',
                               data=rest_encoder.encode(data))
-        campaigns_helper.supplement_add_input.assert_called_with(data)
+        campaigns_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.create_campaign\
                     .assert_called_with(campaign)
         self.assertTrue(str(result.status).startswith(status),
@@ -193,7 +194,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertEqual(rest_encoder.decode(result.data), "Updated: True")
-        campaigns_helper.supplement_edit_input.assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.update_campaign\
                     .assert_called_with(str(campaign_id), data)
 
@@ -220,7 +221,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         self.assertEqual(status, result.status)
         self.assertEqual(rest_encoder.decode(result.data)[0], "False")
         campaigns_helper.supplement_edit_input\
-                    .assert_called_with(data)
+                    .assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.update_campaign\
                     .assert_called_with(str(campaign_id), data)
 
@@ -249,7 +250,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        campaigns_helper.supplement_edit_input.assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
         self.instance_campagne_management.update_campaign\
@@ -281,7 +282,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertTrue(['duplicated_name'] == rest_encoder.decode(result.data))
-        campaigns_helper.supplement_edit_input.assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
         self.instance_campagne_management.update_campaign\
@@ -313,7 +314,7 @@ class TestFlaskHttpRoot(unittest.TestCase):
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.assertTrue(liste == rest_encoder.decode(result.data))
-        campaigns_helper.supplement_edit_input.assert_called_with(data)
+        campaigns_helper.supplement_edit_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
         self.instance_campagne_management.update_campaign\
