@@ -73,8 +73,11 @@ class TestRestEncoder(unittest.TestCase):
 
     def test_serialize_base(self):
         obj = Recordings()
+        obj.test = 1
         result = rest_encoder._serialize(obj)
-        self.assertEqual(result, obj.todict())
+        expected_result = obj.todict()
+        expected_result['test'] = 1
+        self.assertEqual(result, expected_result)
 
     def test_serialize_datetime(self):
         obj = datetime.now()

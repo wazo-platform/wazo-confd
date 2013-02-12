@@ -181,7 +181,7 @@ def get_agent_full_name(agent_id):
                                                     str(agent_id)
 
     for agent in agents:
-        if agent['id'] == agent_id:
+        if agent['id'] == int(agent_id):
             return validate_filename_string(agent['lastname']) + \
                     '_' + \
                     validate_filename_string(agent['firstname'])
@@ -225,7 +225,7 @@ def determinate_record():
                      xivo_vars['queue_name'])
         sys.exit(0)
 
-    if (campaigns[0]['activated'] == "True"):
+    if (campaigns[0]['activated']):
         agi.set_variable('QR_RECORDQUEUE', '1')
         agi.set_variable('__QR_CAMPAIGN_ID', campaigns[0]['id'])
         set_user_field()
@@ -280,8 +280,8 @@ def save_call_details():
     sys.exit(save_recording(recording))
 
 
-def get_filename(agent_number, call_id):
-    return get_agent_full_name(agent_number) + \
+def get_filename(agent_id, call_id):
+    return get_agent_full_name(agent_id) + \
                 '_' + \
                 str(call_id) + \
                 '.wav'

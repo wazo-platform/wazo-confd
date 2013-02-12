@@ -84,7 +84,7 @@ class APICampaigns(object):
             result = self._campagne_manager.get_campaigns(params,
                                                           checkCurrentlyRunning,
                                                           paginator)
-            logger.debug("got result")
+            logger.debug("got result: " + str(result))
             body = rest_encoder.encode(result)
             logger.debug("result encoded")
             return make_response(body, 200)

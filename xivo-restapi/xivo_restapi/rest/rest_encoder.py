@@ -43,6 +43,10 @@ def _process_paginated_data(data):
 
 def _serialize(obj):
     if(isinstance(obj, Base)):
-        return obj.todict()
+        result = obj.todict()
+        missing_attributes = [item for item in obj.__dict__.keys() if item not in obj.__table__.columns and not item.startswith('_')]
+        for attribute in missing_attributes:
+            result[attribute] = getattr(obj, attribute)
+        return result
     else:
         return str(obj)
