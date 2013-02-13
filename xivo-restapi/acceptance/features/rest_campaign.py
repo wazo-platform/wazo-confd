@@ -29,6 +29,7 @@ from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
 import os
 import random
+from commands import getoutput
 
 
 class RestCampaign(object):
@@ -52,7 +53,6 @@ class RestCampaign(object):
             campaign["end_date"] = str(end_date)
         if campaign_id != None:
             campaign['id'] = campaign_id
-
         reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + '/', campaign)
         return reply.data
 
@@ -79,13 +79,13 @@ class RestCampaign(object):
 
         #we create the file
         dirname = RestAPIConfig.RECORDING_FILE_ROOT_PATH
-        if(not os.path.exists(dirname)):
-            cron_utils.create_dir(dirname)
-        myfile = open(dirname + "/" + recording['filename'], 'w')
-        myfile.write('')
-        myfile.close()
-        # TODO : permettre au WebService de supprimer les fichiers
-
+        config_file = open("config.ini", "r")
+        remote_host = config_file.read()
+        config_file.close()
+        file_path = dirname + "/" + recording['filename']
+        remote_command = "'touch %s'" % file_path
+        ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
+        getoutput(ssh_command)
         return reply
 
     def verifyRecordingsDetails(self, campaign_id, callid):
@@ -137,8 +137,6 @@ class RestCampaign(object):
                                  datetime.datetime.now().strftime("%Y-%m-%d"),
                                  datetime.datetime.now().strftime("%Y-%m-%d"),
                                  campaign_id)
-
-            print "\n========================" + str(result) + "\n"
             return type(result) == int and result > 0
         return True
 
@@ -192,7 +190,7 @@ class RestCampaign(object):
         return reply.data
 
     def deleteRecording(self, campaign_id, callid):
-        os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
+        #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
         reply = self.ws_utils.rest_delete(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/" + str(callid))
         return (reply.status, reply.data)
