@@ -25,7 +25,7 @@ import unittest
 from xivo_restapi.rest.tests import instance_agent_management
 
 
-class TestFlaskHttpRoot(unittest.TestCase):
+class TestAPIAgents(unittest.TestCase):
 
     def setUp(self):
         self.instance_agent_management = instance_agent_management

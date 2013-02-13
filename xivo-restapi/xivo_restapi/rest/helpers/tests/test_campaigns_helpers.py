@@ -57,5 +57,5 @@ class TestCampaignsHelper(unittest.TestCase):
         global_helper.str_to_datetime = Mock()
         from xivo_restapi.rest.helpers import campaigns_helper
         result = campaigns_helper.create_instance(data)
-        global_helper.create_class_instance.assert_called_with(RecordCampaigns, data)
+        global_helper.create_class_instance.assert_called_with(RecordCampaigns, data)  #@UndefinedVariable
         self.assertEqual(result, mock_return_value)

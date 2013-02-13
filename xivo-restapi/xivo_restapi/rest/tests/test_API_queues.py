@@ -24,7 +24,7 @@ from xivo_restapi.restapi_config import RestAPIConfig
 import unittest
 
 
-class TestFlaskHttpRoot(unittest.TestCase):
+class TestAPIQueues(unittest.TestCase):
 
     def setUp(self):
         self.instance_queue_management = instance_queue_management
