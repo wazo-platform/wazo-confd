@@ -9,7 +9,7 @@ Feature: Recording campaign management
 	  
 	Scenario: Campaign creation and consultation with accents
 	  Given there is no campaign
-	  When I create a campaign "accents_éèà&"
+	  When I create a campaign "accents_"
 	  Then I can consult this campaign
 	  
 	Scenario: Get activated campaigns
