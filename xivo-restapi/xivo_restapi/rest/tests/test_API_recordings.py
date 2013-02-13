@@ -17,16 +17,12 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-from mock import Mock, patch
+from mock import Mock
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.helpers import recordings_helper
 from xivo_restapi.rest.tests import instance_recording_management
 from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.services.agent_management import AgentManagement
-from xivo_restapi.services.campagne_management import CampagneManagement
-from xivo_restapi.services.queue_management import QueueManagement
-from xivo_restapi.services.recording_management import RecordingManagement
 import unittest
 
 
