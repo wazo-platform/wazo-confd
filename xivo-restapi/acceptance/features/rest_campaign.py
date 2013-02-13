@@ -16,20 +16,25 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from acceptance.features import cron_utils
 from acceptance.features.db_utils import daosession_class
 from acceptance.features.rest_queues import RestQueues
 from acceptance.features.ws_utils import WsUtils
+from commands import getoutput
+from lettuce.terrain import before
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_dao.alchemy.recordings import Recordings
+from xivo_dao.helpers import config
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
-import os
 import random
-from commands import getoutput
+
+
+@before.all
+def modify_db_uri():
+    config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
 
 
 class RestCampaign(object):
