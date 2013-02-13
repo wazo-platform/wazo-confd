@@ -9,7 +9,7 @@ Feature: Recording campaign management
 	  
 	Scenario: Campaign creation and consultation with accents
 	  Given there is no campaign
-	  When I create a campaign "accents_"
+	  When I create a campaign "accents_éèà&"
 	  Then I can consult this campaign
 	  
 	Scenario: Get activated campaigns
@@ -89,12 +89,3 @@ Feature: Recording campaign management
 	  Given there is not any recording for the campaign "test_remove"
 	  When I ask to delete the campaign "test_remove"
 	  Then I get a response with code '200' and the campaign is deleted
-
-	Scenario: Campaign configuration and execution
-	  Given there is no campaign
-	  Given there is no campaign "quality",
-	  Given I create a campaign named "quality",
-	  Given I add queue "5001" for this campaign, 
-	  When I start this campaign
-	  Then calls placed in this queue are recorded 
-	  
