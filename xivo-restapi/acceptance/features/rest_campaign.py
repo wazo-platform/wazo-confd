@@ -67,7 +67,8 @@ class RestCampaign(object):
 
     def get_activated_campaigns(self, queue_id):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
-                                     "/" + "?activated=true&queue_id=" + str(queue_id))
+                                     "/" + "?activated=true&queue_id=" + \
+                                      str(queue_id))
         return reply.data
 
     def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time):
@@ -89,7 +90,7 @@ class RestCampaign(object):
         config_file.close()
         file_path = dirname + "/" + recording['filename']
         remote_command = "'touch %s'" % file_path
-        ssh_command = "ssh -t root@%s %s" % (remote_host, remote_command)
+        ssh_command = "ssh -t -t root@%s %s" % (remote_host, remote_command)
         print(getoutput(ssh_command))
         print(getstatusoutput(ssh_command))
         return reply
