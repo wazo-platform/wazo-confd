@@ -92,9 +92,7 @@ class RestCampaign(object):
         file_path = dirname + "/" + recording['filename']
         remote_command = "'touch %s'" % file_path
         ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
-        print '\n====== ssh command: ', ssh_command, "\n"
-        print "\n getoutput: ", getoutput(ssh_command), "\n"
-        print "\n", getstatusoutput(ssh_command), "\n"
+        getoutput(ssh_command)
         return reply
 
     def verifyRecordingsDetails(self, campaign_id, callid):
