@@ -19,7 +19,7 @@
 from lettuce import step
 from rest_campaign import RestCampaign
 from time import strftime, localtime
-from xivo_dao import queue_dao, record_campaigns_dao
+from xivo_dao import queue_dao, record_campaigns_dao, recordings_dao
 import datetime
 import random
 
@@ -348,8 +348,7 @@ def when_i_ask_to_delete_the_campaign_group1(step, group1):
 
 @step(u'Given there is not any recording for the campaign "([^"]*)"')
 def given_there_isn_t_any_recording_for_the_campaign_group1(step, campaign_name):
-    r_campaign = RestCampaign()
-    r_campaign.delete_recordings(campaign_name)
+    recordings_dao.delete_by_campaign_name(campaign_name)
 
 
 @step(u'Then I get a response with code \'([^\']*)\' and the campaign is deleted')

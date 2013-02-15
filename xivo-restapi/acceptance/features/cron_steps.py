@@ -20,6 +20,7 @@ from acceptance.features.rest_campaign import RestCampaign
 from commands import getoutput
 from datetime import timedelta, datetime
 from lettuce import step
+from xivo_dao import recordings_dao
 import os
 
 directory = None
@@ -90,8 +91,7 @@ def given_there_is_a_recording_with_id_group1_created_group2_days_ago_with_campa
 
 @step(u'Then items "([^"]*)" and "([^"]*)" are deleted from the database')
 def then_items_group1_and_group2_are_deleted(step, group1, group2):
-    r_campaign = RestCampaign()
-    results = r_campaign.list_all_recordings()
+    results = recordings_dao.get_all()
     results_id = [item.cid for item in results]
     assert(group1 not in results_id)
     assert(group2 not in results_id)
@@ -99,8 +99,7 @@ def then_items_group1_and_group2_are_deleted(step, group1, group2):
 
 @step(u'Then items "([^"]*)" and "([^"]*)" are not deleted from the database')
 def then_items_group1_and_group2_are_not_deleted(step, group1, group2):
-    r_campaign = RestCampaign()
-    results = r_campaign.list_all_recordings()
+    results = recordings_dao.get_all()
     results_id = [item.cid for item in results]
     assert(group1 in results_id)
     assert(group2 in results_id)

@@ -19,13 +19,11 @@
 from acceptance.features.db_utils import daosession_class
 from acceptance.features.rest_queues import RestQueues
 from acceptance.features.ws_utils import WsUtils
-from commands import getoutput, getstatusoutput
+from commands import getoutput
 from lettuce.terrain import before
-from xivo_dao import agent_dao, queue_dao, record_campaigns_dao
+from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
-from xivo_dao.alchemy.record_campaigns import RecordCampaigns
-from xivo_dao.alchemy.recordings import Recordings
 from xivo_dao.helpers import config
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
@@ -262,16 +260,9 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_get(serviceURI + params)
         return reply.data
 
-    @daosession_class
-    def delete_all_campaigns(self, session):
-        session.query(Recordings).delete()
-        session.commit()
-        session.query(RecordCampaigns).delete()
-        session.commit()
-
-    @daosession_class
-    def list_all_recordings(self, session):
-        return session.query(Recordings).all()
+    def delete_all_campaigns(self):
+        recordings_dao.delete_all()
+        record_campaigns_dao.delete_all()
 
     @daosession_class
     def delete_queue(self, session, queue_name):
@@ -289,9 +280,3 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_delete(serviceURI)
         return reply
 
-    @daosession_class
-    def delete_recordings(self, session, campaign_name):
-        campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-        session.query(Recordings)\
-            .filter_by(campaign_id=int(campaign_id)).delete()
-        session.commit()
