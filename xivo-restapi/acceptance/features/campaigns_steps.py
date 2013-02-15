@@ -261,7 +261,7 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
     if(res['total'] < int(num_of_campaigns)):
         i = res['total']
         now = datetime.datetime.now()
-        while(i < int(num_of_campaigns)):
+        while(i <= int(num_of_campaigns)):
             d = datetime.timedelta(days=(i + 1))
             oned = datetime.timedelta(days=1)
             r_campaign.create(str(random.randint(1000, 9999)), 'test', True,
