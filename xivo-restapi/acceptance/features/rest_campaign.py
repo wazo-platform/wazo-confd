@@ -19,7 +19,7 @@
 from acceptance.features.db_utils import daosession_class
 from acceptance.features.rest_queues import RestQueues
 from acceptance.features.ws_utils import WsUtils
-from commands import getoutput
+from commands import getoutput, getstatusoutput
 from lettuce.terrain import before
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
@@ -90,7 +90,8 @@ class RestCampaign(object):
         file_path = dirname + "/" + recording['filename']
         remote_command = "'touch %s'" % file_path
         ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
-        getoutput(ssh_command)
+        print(getoutput(ssh_command))
+        print(getstatusoutput(ssh_command))
         return reply
 
     def verifyRecordingsDetails(self, campaign_id, callid):
