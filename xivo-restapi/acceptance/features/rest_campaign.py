@@ -88,6 +88,7 @@ class RestCampaign(object):
         config_file = open("config.ini", "r")
         remote_host = config_file.read()
         config_file.close()
+        remote_host = remote_host.rstrip()
         file_path = dirname + "/" + recording['filename']
         remote_command = "'touch %s'" % file_path
         ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
