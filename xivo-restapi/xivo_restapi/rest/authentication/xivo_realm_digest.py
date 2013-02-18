@@ -19,7 +19,7 @@
 from flask import session
 from functools import wraps
 from xivo_dao import accesswebservice_dao
-from xivo_restapi.rest.authentication import authdigest
+from xivo_restapi.rest.authentication.werkzeug import authdigest
 import flask
 
 

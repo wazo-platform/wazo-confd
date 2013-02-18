@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-from mock import Mock
+from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest import rest_encoder
@@ -105,10 +105,6 @@ class TestAPICampaigns(unittest.TestCase):
                         result.status + ", data: " + result.data)
 
     def test_get_campaigns(self):
-#        from xivo_restapi.rest.authentication import xivo_realm_digest
-#        xivo_realm_digest.realmDigest = Mock()
-#        xivo_realm_digest.realmDigest.requires_auth = Mock()
-#        xivo_realm_digest.realmDigest.requires_auth.return_value = APICampaigns.get
         campaign = RecordCampaigns()
         campaign.campaign_name = 'campagne'
         campaign.activated = False

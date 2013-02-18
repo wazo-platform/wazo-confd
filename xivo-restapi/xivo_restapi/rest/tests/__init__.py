@@ -1,8 +1,16 @@
 from mock import patch, Mock
+from xivo_restapi.rest.authentication import xivo_realm_digest
 from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
+
+def mock_requires_auth(func):
+    return func
+
+xivo_realm_digest.realmDigest = Mock()
+xivo_realm_digest.realmDigest.requires_auth.side_effect = mock_requires_auth
+
 
 patcher_queue = patch("xivo_restapi.rest." + \
                              "API_queues.QueueManagement")

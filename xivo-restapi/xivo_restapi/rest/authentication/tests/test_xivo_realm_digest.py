@@ -14,7 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 from flask import session
 from flask.app import Flask
 from mock import Mock
@@ -35,7 +36,7 @@ class TestXivoRealmDigest(unittest.TestCase):
 #        self.app = flask_http_server.app.test_client()
 
     def test_authentication_needed(self):
-        ctx = self.app.test_request_context('/users/', environ_base = {'REMOTE_ADDR': '132.52.61.4'})
+        ctx = self.app.test_request_context('/users/', environ_base={'REMOTE_ADDR': '132.52.61.4'})
         ctx.push()
 
         self.realmDigest.challenge = Mock()
@@ -53,7 +54,7 @@ class TestXivoRealmDigest(unittest.TestCase):
         self.realmDigest.challenge.assert_called_once_with()
 
     def test_not_needed_for_this_ip(self):
-        ctx = self.app.test_request_context('/users/', base_url = 'http://127.0.0.1/', environ_base = {'REMOTE_ADDR': '127.0.0.1'})
+        ctx = self.app.test_request_context('/users/', base_url='http://127.0.0.1/', environ_base={'REMOTE_ADDR': '127.0.0.1'})
         ctx.push()
         service_function = Mock()
         service_function.__name__ = 'get all campaigns'
@@ -69,7 +70,7 @@ class TestXivoRealmDigest(unittest.TestCase):
 
 
     def test_client_authenticates(self):
-        ctx = self.app.test_request_context('/users/', base_url = 'http://127.0.0.1/', environ_base = {'REMOTE_ADDR': 'njnjj'})
+        ctx = self.app.test_request_context('/users/', base_url='http://127.0.0.1/', environ_base={'REMOTE_ADDR': 'njnjj'})
         ctx.push()
         service_function = Mock()
         service_function.__name__ = 'get all campaigns'
@@ -126,3 +127,4 @@ class TestXivoRealmDigest(unittest.TestCase):
         accesswebservice_dao.get_allowed_hosts = Mock()
         accesswebservice_dao.get_allowed_hosts.return_value = ['12.13.14.15']
         self.assertTrue(self.realmDigest.isRemoteAddressAllowed('12.13.14.15'))
+        self.assertFalse(self.realmDigest.isRemoteAddressAllowed('12.13.14.12'))

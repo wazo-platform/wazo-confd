@@ -21,6 +21,7 @@ from flask import Flask
 from xivo_restapi.rest.routage import root, queues_service, agents_service
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +31,12 @@ app.register_blueprint(root)
 app.register_blueprint(queues_service)
 app.register_blueprint(agents_service)
 app.debug = True
-#TODO: créer une vraie clé secrète
-app.secret_key = 'the amazing secret key!!'
-app.permanent_session_lifetime = timedelta(minutes = 1)
+app.secret_key = os.urandom(24)
+app.permanent_session_lifetime = timedelta(minutes=1)
 
 
 class FlaskHttpServer(object):
 
     def run(self):
-        app.run(host = RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
-                port = RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+        app.run(host=RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
+                port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT)

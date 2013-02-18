@@ -19,6 +19,7 @@
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
+from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import campaigns_helper, global_helper
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
@@ -35,6 +36,7 @@ class APICampaigns(object):
     def __init__(self):
         self._campagne_manager = CampagneManagement()
 
+    @realmDigest.requires_auth
     def add_campaign(self):
         try:
             logger.debug("Got an ADD request for campaigns")
@@ -63,6 +65,7 @@ class APICampaigns(object):
         else:
             return make_response(rest_encoder.encode([str(result)]), 500)
 
+    @realmDigest.requires_auth
     def get(self, campaign_id=None):
         try:
             logger.debug("Got a GET request for campaign id: " + \
@@ -91,6 +94,7 @@ class APICampaigns(object):
             body = [str(e.args)]
             return make_response(rest_encoder.encode(body), 500)
 
+    @realmDigest.requires_auth
     def delete(self, campaign_id):
         try:
             logger.debug("Got an DELETE request for campaign id: " + campaign_id)
@@ -106,6 +110,7 @@ class APICampaigns(object):
             return make_response(body, 500)
         return make_response(rest_encoder.encode("Deleted: True"), 200)
 
+    @realmDigest.requires_auth
     def update(self, campaign_id):
         try:
             logger.debug("Got an UPDATE request for campaign id: " + campaign_id)
