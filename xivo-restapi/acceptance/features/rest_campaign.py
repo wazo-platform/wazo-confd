@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from acceptance.features.db_utils import daosession_class
 from acceptance.features.rest_queues import RestQueues
 from acceptance.features.ws_utils import WsUtils
 from commands import getoutput
@@ -264,19 +263,12 @@ class RestCampaign(object):
         recordings_dao.delete_all()
         record_campaigns_dao.delete_all()
 
-    @daosession_class
-    def delete_queue(self, session, queue_name):
-        session.query(QueueFeatures).filter(QueueFeatures.name == queue_name).delete()
-        session.commit()
-
-    @daosession_class
-    def get_queue(self, session, queue_name):
-        return session.query(QueueFeatures)\
-            .filter(QueueFeatures.name == queue_name).first()
+    def get_queue(self, queue_name):
+        queue_id = queue_dao.id_from_name(queue_name)
+        return queue_dao.get(queue_id)
 
     def delete_campaign(self, campaign_id):
         serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id)
         reply = self.ws_utils.rest_delete(serviceURI)
         return reply
-

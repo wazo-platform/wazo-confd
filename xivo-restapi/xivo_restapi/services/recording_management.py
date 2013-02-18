@@ -82,7 +82,7 @@ class RecordingManagement:
             return False
         else:
             logger.debug("Deleting file: " + \
-                         RestAPIConfig.RECORDING_FILE_ROOT_PATH + \
+                         RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + \
                          filename)
 
             logphrase = "File " + filename + " is being deleted."

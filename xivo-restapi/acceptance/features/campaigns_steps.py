@@ -307,15 +307,18 @@ def when_i_try_to_create_a_campaign_group1_pointing_to_queue_group2_with_start_d
 
 @step(u'When I delete the queue "([^"]*)"')
 def when_i_delete_the_queue_group1(step, queue_name):
-    r_campaign = RestCampaign()
-    r_campaign.delete_queue(queue_name)
+    queue_dao.delete_by_name(queue_name)
 
 
 @step(u'Then the queue "([^"]*)" is actually deleted')
 def then_the_queue_group1_is_actually_deleted(step, queue_name):
     r_campaign = RestCampaign()
-    result = r_campaign.get_queue(queue_name)
-    assert result == None
+    gotException = False
+    try:
+        r_campaign.get_queue(queue_name)
+    except LookupError:
+        gotException = True
+    assert gotException
 
 
 @step(u'Then I can get the campaign "([^"]*)" with an empty queue_id')
