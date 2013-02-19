@@ -18,6 +18,7 @@
 
 from flask import request
 from flask.helpers import make_response
+from flask_negotiate import produces
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.services.agent_management import AgentManagement
 import logging
@@ -32,6 +33,7 @@ class APIAgents(object):
     def __init__(self):
         self._agent_management = AgentManagement()
 
+    @produces('application/json')
     @realmDigest.requires_auth
     def list_agents(self):
         try:

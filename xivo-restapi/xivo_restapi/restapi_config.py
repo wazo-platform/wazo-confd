@@ -28,7 +28,8 @@ class RestAPIConfig(object):
 
     XIVO_DIALPLAN_RECORDING_USERDATA_VAR_NAME = 'RECORDING_USERFIELD'
     XIVO_DIALPLAN_CLIENTFIELD = 'LDLC_IDTICKET'
-    CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type:": "application/json"}
+    CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type": "application/json",
+                                     "Accept": "application/json"}
 
     CSV_SEPARATOR = ","
 

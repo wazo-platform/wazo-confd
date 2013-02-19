@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-from mock import Mock, patch
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.restapi_config import RestAPIConfig

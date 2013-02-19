@@ -16,9 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.alchemy.base import Base
 import json
 import logging
-from xivo_dao.alchemy.base import Base
 
 logger = logging.getLogger()
 
@@ -44,7 +44,7 @@ def _process_paginated_data(data):
 def _serialize(obj):
     if(isinstance(obj, Base)):
         result = obj.todict()
-        missing_attributes = [item for item in obj.__dict__.keys() if item not in obj.__table__.columns and not item.startswith('_')]
+        missing_attributes = [item for item in obj.__dict__.keys() if item not in result and not item.startswith('_')]
         for attribute in missing_attributes:
             result[attribute] = getattr(obj, attribute)
         return result

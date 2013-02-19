@@ -26,6 +26,7 @@ from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     InvalidInputException
 import logging
 import rest_encoder
+from flask_negotiate import consumes, produces
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,8 @@ class APICampaigns(object):
     def __init__(self):
         self._campagne_manager = CampagneManagement()
 
+    @consumes('application/json')
+    @produces('application/json')
     @realmDigest.requires_auth
     def add_campaign(self):
         try:
@@ -65,6 +68,8 @@ class APICampaigns(object):
         else:
             return make_response(rest_encoder.encode([str(result)]), 500)
 
+    @consumes('application/json')
+    @produces('application/json')
     @realmDigest.requires_auth
     def get(self, campaign_id=None):
         try:
@@ -94,6 +99,7 @@ class APICampaigns(object):
             body = [str(e.args)]
             return make_response(rest_encoder.encode(body), 500)
 
+    @produces('application/json')
     @realmDigest.requires_auth
     def delete(self, campaign_id):
         try:
@@ -110,6 +116,8 @@ class APICampaigns(object):
             return make_response(body, 500)
         return make_response(rest_encoder.encode("Deleted: True"), 200)
 
+    @consumes('application/json')
+    @produces('application/json')
     @realmDigest.requires_auth
     def update(self, campaign_id):
         try:

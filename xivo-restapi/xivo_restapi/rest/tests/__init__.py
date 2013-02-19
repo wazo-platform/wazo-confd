@@ -1,16 +1,31 @@
+from functools import wraps
 from mock import patch, Mock
 from xivo_restapi.rest.authentication import xivo_realm_digest
 from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
+import flask_negotiate
 
-def mock_requires_auth(func):
+
+def mock_basic_decorator(func):
     return func
 
-xivo_realm_digest.realmDigest = Mock()
-xivo_realm_digest.realmDigest.requires_auth.side_effect = mock_requires_auth
 
+def mock_parameterized_decorator(string):
+    def decorated(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    return decorated
+
+xivo_realm_digest.realmDigest = Mock()
+xivo_realm_digest.realmDigest.requires_auth.side_effect = mock_basic_decorator
+flask_negotiate.consumes = Mock()
+flask_negotiate.consumes.side_effect = mock_parameterized_decorator
+flask_negotiate.produces = Mock()
+flask_negotiate.produces.side_effect = mock_parameterized_decorator
 
 patcher_queue = patch("xivo_restapi.rest." + \
                              "API_queues.QueueManagement")
