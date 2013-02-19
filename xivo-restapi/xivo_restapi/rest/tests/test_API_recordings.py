@@ -146,7 +146,7 @@ class TestAPIRecordings(unittest.TestCase):
                                         (1, 20))
         self.assertEquals(result.status, status)
         expected_result = rest_encoder.encode({'total': 1,
-                          'data': [obj.todict()]})
+                          'items': [obj.todict()]})
         self.assertEqual(expected_result, result.data)
 
     def test_list_recording_fail(self):

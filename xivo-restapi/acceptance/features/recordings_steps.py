@@ -164,7 +164,7 @@ def given_i_create_a_recording_for_campaign_with_caller_and_agent(step, campaign
 @step(u'When I search recordings in the campaign "([^"]*)" with the key "([^"]*)"')
 def when_i_search_recordings_in_the_campaign_with_the_key(step, campaign_id, key):
     global result
-    result = rest_campaign.search_recordings(campaign_id, key)['data']
+    result = rest_campaign.search_recordings(campaign_id, key)['items']
     assert len(result) > 0, 'No recording retrieved'
 
 
@@ -213,7 +213,7 @@ def when_i_ask_for_the_recordings_of_group1(step, campaign):
 @step(u'Then the displayed total is equal to the actual number of recordings')
 def then_the_displayed_total_is_equal_to_the_actual_number_of_recordings(step):
     global single_result
-    assert single_result['total'] == len(single_result['data']), 'Inconsistent number'
+    assert single_result['total'] == len(single_result['items']), 'Inconsistent number'
 
 
 @step(u'When I ask for a list of recordings for "([^"]*)" with page "([^"]*)" and page size "([^"]*)"')
@@ -225,7 +225,7 @@ def when_i_ask_for_a_list_of_recordings_for_group1_with_page_group1_and_page_siz
 @step(u'Then I get exactly "([^"]*)" recordings')
 def then_i_get_exactly_group1_recordings(step, number):
     global single_result
-    assert len(single_result['data']) == int(number), 'Inconsistent number retrieved: ' + str(single_result)
+    assert len(single_result['items']) == int(number), 'Inconsistent number retrieved: ' + str(single_result)
 
 
 @step(u'Given I ask for a list of recordings for "([^"]*)" with page "([^"]*)" and page size "([^"]*)"')
@@ -237,7 +237,7 @@ def given_i_ask_for_a_list_of_recordings_for_group1_with_page_group1_and_page_si
 @step(u'Then the two lists of recording do not overlap')
 def then_the_two_lists_of_recording_do_not_overlap(step):
     global result_list
-    intersection = [item for item in result_list[0]['data'] if item in result_list[1]['data']]
+    intersection = [item for item in result_list[0]['items'] if item in result_list[1]['items']]
     assert intersection == [], 'The results overlap: ' + str(intersection)
 
 

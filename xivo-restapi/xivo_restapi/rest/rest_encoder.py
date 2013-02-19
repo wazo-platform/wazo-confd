@@ -37,7 +37,7 @@ def encode(data):
 def _process_paginated_data(data):
     (total, items) = data
     result = {'total': total,
-              'data': items}
+              'items': items}
     return result
 
 

@@ -113,7 +113,7 @@ class TestAPICampaigns(unittest.TestCase):
 
         status = "200 OK"
         data = {'total': 1,
-                'data': [rest_encoder._serialize(campaign)]}
+                'items': [rest_encoder._serialize(campaign)]}
 
         self.instance_campagne_management.get_campaigns.return_value = (1, [campaign])
 

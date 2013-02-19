@@ -174,7 +174,7 @@ class TestXivoRecordingAgi(unittest.TestCase):
     def mock_get_campaigns(self, queue_id):
         if(queue_id == self.xivo_queue_id):
             return rest_encoder.encode({
-                            'data': [{'id': self.xivo_campaign_id,
+                            'items': [{'id': self.xivo_campaign_id,
                                       'activated': "True"}]
                             })
         else:

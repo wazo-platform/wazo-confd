@@ -59,7 +59,7 @@ def when_i_create_a_campaign_named_campagne_name(step, local_campaign_name):
 def then_i_can_consult_this_campaign(step):
     r_campaign = RestCampaign()
     global campaign_name
-    liste = [item["campaign_name"] for item in r_campaign.list()['data']]
+    liste = [item["campaign_name"] for item in r_campaign.list()['items']]
     assert campaign_name in liste, campaign_name + " not in " + str(liste)
 
 
@@ -89,7 +89,7 @@ def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
     queue_id = queue_dao.id_from_name(queue_name)
     r_campaign = RestCampaign()
     global activated_campaigns
-    activated_campaigns = r_campaign.get_activated_campaigns(queue_id)['data']
+    activated_campaigns = r_campaign.get_activated_campaigns(queue_id)['items']
     assert (activated_campaigns != None), "No activated campaign"
 
 
@@ -198,7 +198,7 @@ def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_
     r_campaign = RestCampaign()
     global list_running_campaigns
     queue_id = queue_dao.id_from_name(queue_name)
-    list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(str(queue_id))['data']
+    list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(str(queue_id))['items']
     assert len(list_running_campaigns) > 0, 'No campaign retrieved'
 
 
@@ -215,7 +215,7 @@ def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, group1, g
 def then_this_campaign_is_created_with_its_start_date_and_end_date_equal_to_now(step):
     r_campaign = RestCampaign()
     global campaign_name
-    liste = r_campaign.list()['data']
+    liste = r_campaign.list()['items']
     result = False
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     for item in liste:
@@ -250,8 +250,8 @@ def when_i_ask_for_all_the_campaigns(step):
 @step(u'Then the displayed total is equal to the actual number of campaigns')
 def then_the_displayed_total_is_equal_to_the_actual_number_of_campaigns(step):
     global result
-    assert result['total'] == len(result['data']), 'Got total ' + str(result['total']) + \
-        " but real number was " + str(len(result['data']))
+    assert result['total'] == len(result['items']), 'Got total ' + str(result['total']) + \
+        " but real number was " + str(len(result['items']))
 
 
 @step(u'Given there are at least "([^"]*)" campaigns')
@@ -281,7 +281,7 @@ def when_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(ste
 @step(u'Then I get exactly "([^"]*)" campaigns')
 def then_i_get_exactly_group1_campaigns(step, num_of_campaigns):
     global result
-    assert len(result['data']) == int(num_of_campaigns), "Got wrong number of campaigns: " + str(result)
+    assert len(result['items']) == int(num_of_campaigns), "Got wrong number of campaigns: " + str(result)
 
 
 @step(u'Given I ask for a list of campaigns with page "([^"]*)" and page size "([^"]*)"')
@@ -294,7 +294,7 @@ def given_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(st
 @step(u'Then the two results do not overlap')
 def then_the_two_results_do_not_overlap(step):
     global result_list
-    intersection = [item for item in result_list[0]['data'] if item in result_list[1]['data']]
+    intersection = [item for item in result_list[0]['items'] if item in result_list[1]['items']]
     assert intersection == [], 'The results overlap: ' + str(intersection)
 
 

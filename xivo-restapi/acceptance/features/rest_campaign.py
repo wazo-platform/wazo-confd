@@ -97,7 +97,7 @@ class RestCampaign(object):
                         '/' + str(campaign_id) + "/")
 
         assert reply.data != None, "No result"
-        recordings = reply.data['data']
+        recordings = reply.data['items']
 
         result = False
         for recording in recordings:
@@ -116,7 +116,7 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id))
 
-        result = reply.data['data']
+        result = reply.data['items']
         if(len(result) > 0):
             return result[0]
         else:

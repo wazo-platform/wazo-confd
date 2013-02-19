@@ -51,7 +51,7 @@ class TestRestEncoder(unittest.TestCase):
         obj2 = Recordings()
         my_tuple = (2, [obj1, obj2])
         data = {'total': 2,
-                'data': [obj1, obj2]}
+                'items': [obj1, obj2]}
         result = rest_encoder._process_paginated_data(my_tuple)
         self.assertEqual(result, data)
 
@@ -60,7 +60,7 @@ class TestRestEncoder(unittest.TestCase):
         data = (1, [obj1])
         result = rest_encoder.encode(data)
         expected_result = {u'total': 1,
-                           u'data': [{u'cid': None,
+                           u'items': [{u'cid': None,
                                       u'start_time': None,
                                       u'caller': None,
                                       u'campaign_id': None,

@@ -57,7 +57,7 @@ def when_i_read_the_list_of_recordings_for_the_campaign_group1_from_the_database
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     result = r_campaign.paginated_recordings_list(campaign_id, 1, 10)
     global recordings_list
-    recordings_list = result['data']
+    recordings_list = result['items']
 
 
 @step(u'Then I get one and only one item with caller "([^"]*)", agent "([^"]*)" and I can read the returned file')

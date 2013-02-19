@@ -213,7 +213,7 @@ def determinate_record():
         sys.exit(1)
 
     try:
-        campaigns = rest_encoder.decode(get_campaigns(queue_id))['data']
+        campaigns = rest_encoder.decode(get_campaigns(queue_id))['items']
     except RestAPIError:
         logger.error('Unable to get campaigns via REST WS, exiting.')
         sys.exit(1)
