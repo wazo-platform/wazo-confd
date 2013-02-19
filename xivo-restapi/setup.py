@@ -31,6 +31,7 @@ setup(
     packages=['xivo_restapi',
               'xivo_restapi.rest',
               'xivo_restapi.rest.authentication',
+              'xivo_restapi.rest.authentication.werkzeug',
               'xivo_restapi.rest.helpers',
               'xivo_restapi.services',
               'xivo_restapi.services.utils'],
