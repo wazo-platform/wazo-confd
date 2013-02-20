@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-from mock import Mock, patch
+from mock import Mock
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest import rest_encoder

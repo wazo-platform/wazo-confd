@@ -18,7 +18,8 @@
 
 from datetime import timedelta
 from flask import Flask
-from xivo_restapi.rest.routage import root, queues_service, agents_service
+from xivo_restapi.rest.routage import root, queues_service, agents_service, \
+    users_service
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 import os
@@ -30,6 +31,7 @@ app = Flask(__name__)
 app.register_blueprint(root)
 app.register_blueprint(queues_service)
 app.register_blueprint(agents_service)
+app.register_blueprint(users_service)
 app.debug = True
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(minutes=1)

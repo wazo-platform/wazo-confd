@@ -17,12 +17,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import Blueprint
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.rest.API_agents import APIAgents
 from xivo_restapi.rest.API_campaigns import APICampaigns
 from xivo_restapi.rest.API_queues import APIQueues
 from xivo_restapi.rest.API_recordings import APIRecordings
+from xivo_restapi.rest.API_users import APIUsers
+from xivo_restapi.restapi_config import RestAPIConfig
 import logging
-from xivo_restapi.rest.API_agents import APIAgents
 
 logger = logging.getLogger(__name__)
 
@@ -112,10 +113,37 @@ agents_service = Blueprint("agents_service",
                                     RestAPIConfig.XIVO_AGENTS_SERVICE_PATH)
 
 # ****************** #
-#   API queues       #
+#   API agents       #
 # ****************** #
 
 agents_service.add_url_rule("/",
                   "list_agents",
                   getattr(APIAgents(), "list_agents"),
                   methods=["GET"])
+
+# ****************** #
+#   Useres server    #
+# ****************** #
+users_service = Blueprint("users_service",
+                         __name__,
+                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                    RestAPIConfig.XIVO_USERS_SERVICE_PATH)
+
+# ****************** #
+#   API users        #
+# ****************** #
+
+users_service.add_url_rule("/",
+                  "list",
+                  getattr(APIUsers(), "list"),
+                  methods=["GET"])
+
+users_service.add_url_rule("/<userid>",
+                  "get",
+                  getattr(APIUsers(), "get"),
+                  methods=["GET"])
+
+users_service.add_url_rule("/",
+                  "create",
+                  getattr(APIUsers(), "create"),
+                  methods=["POST"])

@@ -68,7 +68,6 @@ class APICampaigns(object):
         else:
             return make_response(rest_encoder.encode([str(result)]), 500)
 
-    @consumes('application/json')
     @produces('application/json')
     @realmDigest.requires_auth
     def get(self, campaign_id=None):

@@ -5,6 +5,7 @@ from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
+from xivo_restapi.services.user_management import UserManagement
 import flask_negotiate
 
 
@@ -50,3 +51,9 @@ patcher_recordings = patch("xivo_restapi.rest." + \
 mock_recording = patcher_recordings.start()
 instance_recording_management = Mock(RecordingManagement)
 mock_recording.return_value = instance_recording_management
+
+patcher_users = patch("xivo_restapi.rest." + \
+                             "API_users.UserManagement")
+mock_user = patcher_users.start()
+instance_user_management = Mock(UserManagement)
+mock_user.return_value = instance_user_management
