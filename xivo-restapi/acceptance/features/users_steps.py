@@ -19,8 +19,6 @@ from acceptance.features.rest_users import RestUsers
 from lettuce import step
 from xivo_dao import user_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures
-#the following import is necessary to laod CtiProfiles' definition:
-from xivo_dao.alchemy.cti_profile import CtiProfile
 
 result = None
 rest_users = RestUsers()
@@ -80,13 +78,19 @@ def when_i_create_a_user_group1_with_description_group2(step, fullname, descript
 @step(u'Then I get a response with status "([^"]*)"')
 def then_i_get_a_response_with_status_group1(step, status):
     global result
-    assert result.status == int(status)
+    assert result.status == int(status), result.data
 
 
 @step(u'Then the user "([^"]*)" is actually created')
 def then_the_user_group1_is_actually_created(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
-    request_result = rest_users.get_user(userid)
+    request_result = rest_users.get_user(userid).data
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
     assert request_result['firstname'] == firstname
     assert request_result['lastname'] == lastname
+
+
+@step(u'When I ask for the user of id "([^"]*)"')
+def when_i_ask_for_the_user_of_id_group1(step, userid):
+    global result
+    result = rest_users.get_user(userid)

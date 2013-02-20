@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao import user_dao
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,12 @@ class UserManagement:
         return user_dao.get_all()
 
     def get_user(self, userid):
-        return user_dao.get(userid)
+        try:
+            return user_dao.get(userid)
+        except LookupError:
+            raise NoSuchElementException("No such user")
 
     def create_user(self, user):
-        pass
+        if(user.description is None):
+            user.description = ''
+        user_dao.add_user(user)

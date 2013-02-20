@@ -23,6 +23,7 @@ from xivo_restapi.rest.helpers import users_helper
 from xivo_restapi.rest.tests import instance_user_management
 from xivo_restapi.restapi_config import RestAPIConfig
 import unittest
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 
 
 class TestAPIUsers(unittest.TestCase):
@@ -59,8 +60,7 @@ class TestAPIUsers(unittest.TestCase):
         self.instance_user_management.get_all_users\
                     .side_effect = mock_get_all_users
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
-                              '')
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/')
 
         self.instance_user_management.get_all_users.assert_any_call()
         self.assertEqual(result.status, status)
@@ -87,12 +87,25 @@ class TestAPIUsers(unittest.TestCase):
 
         self.instance_user_management.get_user.side_effect = mock_get_user
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
-                              '')
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
 
         self.instance_user_management.get_user.assert_called_with(1)
         self.assertEqual(result.status, status)
-        self.instance_user_management.get_all_users.side_effect = None
+        self.instance_user_management.get_user.side_effect = None
+
+    def test_get_not_found(self):
+        status = "404 NOT FOUND"
+
+        def mock_get_user(userid):
+            raise NoSuchElementException("No such user")
+
+        self.instance_user_management.get_user.side_effect = mock_get_user
+        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        self.instance_user_management.get_user.assert_called_with(1)
+        self.assertEqual(result.status, status)
+        self.instance_user_management.get_user.side_effect = None
 
     def test_create(self):
         status = "201 CREATED"
@@ -109,3 +122,19 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         users_helper.create_instance.assert_called_with(data)
         self.instance_user_management.create_user.assert_called_with(user)
+
+    def test_create_error(self):
+        status = "500 INTERNAL SERVER ERROR"
+        data = {'firstname': 'André',
+                'lastname': 'Dupond',
+                'description': 'éà":;'}
+
+        def mock_create_user(user):
+            raise Exception()
+
+        self.instance_user_management.create_user.side_effect = mock_create_user
+        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
+                              data=rest_encoder.encode(data))
+        self.assertEqual(status, result.status)
+        self.instance_user_management.create_user.side_effect = None

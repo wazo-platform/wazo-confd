@@ -13,6 +13,11 @@ Feature: Users management
 	  When I ask for the user "Clémence Dupond" using its id
 	  Then I get a single user "Clémence Dupond"
 	  
+	Scenario: Getting a non existing user
+	  Given there is no user
+	  When I ask for the user of id "1"
+	  Then I get a response with status "404"
+	  
 	Scenario: Creating a user
 	  Given there is no user
 	  When I create a user "Clémence Dupond" with description "accented description: éà@';"

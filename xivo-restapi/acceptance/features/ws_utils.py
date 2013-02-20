@@ -66,6 +66,7 @@ class WsUtils(object):
         except:
             print "==============================="
             print body
+            data = body
 
         if (status > 299 and status < 200):
             raise RestWsRequestFailedException(status, data)

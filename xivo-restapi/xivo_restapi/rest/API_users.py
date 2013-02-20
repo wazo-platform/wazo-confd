@@ -23,6 +23,7 @@ from xivo_restapi.rest.helpers import users_helper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
 import logging
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,7 @@ class APIUsers:
             result = self._user_management.get_all_users()
             result = {"items": result}
             result = rest_encoder.encode(result)
-            return make_response(result,
-                                 200)
+            return make_response(result, 200)
         except Exception as e:
             result = rest_encoder.encode([str(e)])
             return make_response(result, 500)
@@ -54,6 +54,8 @@ class APIUsers:
             result = self._user_management.get_user(int(userid))
             result = rest_encoder.encode(result)
             return make_response(result, 200)
+        except NoSuchElementException:
+            return make_response('', 404)
         except Exception as e:
             result = rest_encoder.encode([str(e)])
             return make_response(result, 500)
@@ -71,7 +73,7 @@ class APIUsers:
         try:
             user = users_helper.create_instance(data)
             self._user_management.create_user(user)
-            return make_response(None, 201)
+            return make_response('', 201)
         except Exception as e:
             data = rest_encoder.encode([str(e)])
             return make_response(data, 500)
