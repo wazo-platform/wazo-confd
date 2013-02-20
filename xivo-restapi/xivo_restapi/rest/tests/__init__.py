@@ -1,12 +1,12 @@
 from functools import wraps
 from mock import patch, Mock
 from xivo_restapi.rest.authentication import xivo_realm_digest
+from xivo_restapi.rest.negotiate import flask_negotiate
 from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
 from xivo_restapi.services.user_management import UserManagement
-import flask_negotiate
 
 
 def mock_basic_decorator(func):

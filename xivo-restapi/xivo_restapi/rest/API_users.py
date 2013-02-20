@@ -17,12 +17,12 @@
 
 from flask.globals import request
 from flask.helpers import make_response
-from flask_negotiate import produces, consumes
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.rest.helpers import users_helper
+from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
 import logging
-from xivo_restapi.rest.helpers import users_helper
 
 logger = logging.getLogger(__name__)
 
