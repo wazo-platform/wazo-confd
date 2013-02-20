@@ -32,6 +32,7 @@ setup(
               'xivo_restapi.rest',
               'xivo_restapi.rest.authentication',
               'xivo_restapi.rest.authentication.werkzeug',
+              'xivo_restapi.rest.negotiate',
               'xivo_restapi.rest.helpers',
               'xivo_restapi.services',
               'xivo_restapi.services.utils'],

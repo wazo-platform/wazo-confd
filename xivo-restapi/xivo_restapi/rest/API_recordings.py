@@ -18,9 +18,9 @@
 
 from flask import request
 from flask.helpers import make_response
-from flask_negotiate import consumes, produces
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import recordings_helper, global_helper
+from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.recording_management import RecordingManagement
 import logging
 import rest_encoder

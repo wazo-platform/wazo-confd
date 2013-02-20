@@ -18,8 +18,8 @@
 
 from flask import request
 from flask.helpers import make_response
-from flask_negotiate import produces
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.rest.negotiate.flask_negotiate import produces
 from xivo_restapi.services.queue_management import QueueManagement
 import logging
 import rest_encoder

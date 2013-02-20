@@ -21,12 +21,12 @@ from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import campaigns_helper, global_helper
+from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     InvalidInputException
 import logging
 import rest_encoder
-from flask_negotiate import consumes, produces
 
 
 logger = logging.getLogger(__name__)
