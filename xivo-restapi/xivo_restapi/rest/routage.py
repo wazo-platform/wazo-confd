@@ -147,3 +147,13 @@ users_service.add_url_rule("/",
                   "create",
                   getattr(APIUsers(), "create"),
                   methods=["POST"])
+
+users_service.add_url_rule("/<userid>",
+                  "edit",
+                  getattr(APIUsers(), "edit"),
+                  methods=["PUT"])
+
+users_service.add_url_rule("/<userid>",
+                  "delete",
+                  getattr(APIUsers(), "delete"),
+                  methods=["DELETE"])

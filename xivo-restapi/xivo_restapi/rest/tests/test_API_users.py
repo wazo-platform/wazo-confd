@@ -138,3 +138,77 @@ class TestAPIUsers(unittest.TestCase):
                               data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.instance_user_management.create_user.side_effect = None
+
+    def test_edit(self):
+        status = "200 OK"
+        data = {'id': 2,
+                'firstname': 'André',
+                'lastname': 'Dupond',
+                'description': 'éà":;'}
+        self.instance_user_management.edit_user.return_value = True
+        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
+                              data=rest_encoder.encode(data))
+        self.assertEqual(result.status, status)
+        self.instance_user_management.edit_user.assert_called_with(1, data)
+
+    def test_edit_error(self):
+        status = "500 INTERNAL SERVER ERROR"
+        data = {'firstname': 'André',
+                'lastname': 'Dupond',
+                'description': 'éà":;'}
+
+        def mock_edit_user(userid, data):
+            raise Exception()
+
+        self.instance_user_management.edit_user.side_effect = mock_edit_user
+        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
+                              data=rest_encoder.encode(data))
+        self.assertEqual(status, result.status)
+        self.instance_user_management.edit_user.side_effect = None
+
+    def test_edit_not_found(self):
+        status = "404 NOT FOUND"
+        data = {'firstname': 'André',
+                'lastname': 'Dupond',
+                'description': 'éà":;'}
+
+        def mock_edit_user(userid, data):
+            raise NoSuchElementException('')
+
+        self.instance_user_management.edit_user.side_effect = mock_edit_user
+        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
+                              data=rest_encoder.encode(data))
+        self.assertEqual(status, result.status)
+        self.instance_user_management.edit_user.side_effect = None
+
+    def test_delete(self):
+        status = "200 OK"
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                 RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.assertEqual(result.status, status)
+        self.instance_user_management.delete_user.assert_called_with(1)
+
+    def test_delete_not_error(self):
+        status = "500 INTERNAL SERVER ERROR"
+
+        def mock_delete_user(userid):
+            raise Exception
+        self.instance_user_management.delete_user.side_effect = mock_delete_user
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                 RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.assertEqual(result.status, status)
+        self.instance_user_management.delete_user.assert_called_with(1)
+
+    def test_delete_not_found(self):
+        status = "404 NOT FOUND"
+
+        def mock_delete_user(userid):
+            raise NoSuchElementException('')
+        self.instance_user_management.delete_user.side_effect = mock_delete_user
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                 RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.assertEqual(result.status, status)
+        self.instance_user_management.delete_user.assert_called_with(1)

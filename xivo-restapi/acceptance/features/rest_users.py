@@ -49,3 +49,13 @@ class RestUsers():
                 'lastname': lastname,
                 'description': description}
         return self.ws_utils.rest_post(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/", data)
+
+    def update_user(self, userid, lastname=None):
+        data = {}
+        if(not lastname is None):
+            data['lastname'] = lastname
+        return self.ws_utils.rest_put(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid,
+                                      data)
+
+    def delete_user(self, userid):
+        return self.ws_utils.rest_delete(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid)

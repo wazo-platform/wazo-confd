@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao import user_dao
+from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
 
@@ -23,6 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class UserManagement:
+
+    def __init__(self):
+        self._user_columns = [column.name for column\
+                               in UserFeatures.__table__.columns] #@UndefinedVariable
 
     def get_all_users(self):
         return user_dao.get_all()
@@ -37,3 +42,20 @@ class UserManagement:
         if(user.description is None):
             user.description = ''
         user_dao.add_user(user)
+
+    def edit_user(self, userid, data):
+        final_data = self._clean_data_dict(data)
+        updated_rows = user_dao.update(userid, final_data)
+        if(updated_rows == 0):
+            raise NoSuchElementException("No such user")
+
+    def _clean_data_dict(self, data):
+        bad_keys_list = [key for key in data if key == 'id' or key not in self._user_columns]
+        for key in bad_keys_list:
+            del data[key]
+        return data
+
+    def delete_user(self, userid):
+        result = user_dao.delete(userid)
+        if(result == 0):
+            raise NoSuchElementException("No such user")

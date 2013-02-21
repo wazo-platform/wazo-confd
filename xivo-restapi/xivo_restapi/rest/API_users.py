@@ -61,7 +61,6 @@ class APIUsers:
             return make_response(result, 500)
 
     @consumes('application/json')
-    @produces('application/json')
     @realmDigest.requires_auth
     def create(self):
         logger.info("Got a POST request for users")
@@ -74,6 +73,36 @@ class APIUsers:
             user = users_helper.create_instance(data)
             self._user_management.create_user(user)
             return make_response('', 201)
+        except Exception as e:
+            data = rest_encoder.encode([str(e)])
+            return make_response(data, 500)
+
+    @consumes('application/json')
+    @realmDigest.requires_auth
+    def edit(self, userid):
+        logger.info("Got a PUT request for users")
+        try:
+            data = rest_encoder.decode(request.data)
+        except ValueError:
+            response = rest_encoder.encode(["No parsable data in the request"])
+            return make_response(response, 400)
+        try:
+            self._user_management.edit_user(int(userid), data)
+            return make_response('', 200)
+        except NoSuchElementException:
+            return make_response('', 404)
+        except Exception as e:
+            data = rest_encoder.encode([str(e)])
+            return make_response(data, 500)
+
+    @realmDigest.requires_auth
+    def delete(self, userid):
+        logger.info("Got a DELETE request for users")
+        try:
+            self._user_management.delete_user(int(userid))
+            return make_response('', 200)
+        except NoSuchElementException:
+            return make_response('', 404)
         except Exception as e:
             data = rest_encoder.encode([str(e)])
             return make_response(data, 500)
