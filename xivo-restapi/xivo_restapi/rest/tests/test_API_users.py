@@ -109,9 +109,9 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_create(self):
         status = "201 CREATED"
-        data = {'firstname': 'André',
-                'lastname': 'Dupond',
-                'description': 'éà":;'}
+        data = {u'firstname': u'André',
+                u'lastname': u'Dupond',
+                u'description': u'éà":;'}
         self.instance_user_management.create_user.return_value = True
         user = UserFeatures()
         users_helper.create_instance = Mock()
