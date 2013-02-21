@@ -154,9 +154,9 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_edit_error(self):
         status = "500 INTERNAL SERVER ERROR"
-        data = {'firstname': 'André',
-                'lastname': 'Dupond',
-                'description': 'éà":;'}
+        data = {u'firstname': u'André',
+                u'lastname': u'Dupond',
+                u'description': u'éà":;'}
 
         def mock_edit_user(userid, data):
             raise Exception()
