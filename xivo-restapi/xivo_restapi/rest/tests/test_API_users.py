@@ -141,10 +141,10 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_edit(self):
         status = "200 OK"
-        data = {'id': 2,
-                'firstname': 'André',
-                'lastname': 'Dupond',
-                'description': 'éà":;'}
+        data = {u'id': 2,
+                u'firstname': u'André',
+                u'lastname': u'Dupond',
+                u'description': u'éà":;'}
         self.instance_user_management.edit_user.return_value = True
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
@@ -154,9 +154,9 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_edit_error(self):
         status = "500 INTERNAL SERVER ERROR"
-        data = {u'firstname': u'André',
-                u'lastname': u'Dupond',
-                u'description': u'éà":;'}
+        data = {'firstname': 'André',
+                'lastname': 'Dupond',
+                'description': 'éà":;'}
 
         def mock_edit_user(userid, data):
             raise Exception()
