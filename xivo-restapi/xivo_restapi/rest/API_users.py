@@ -19,11 +19,12 @@ from flask.globals import request
 from flask.helpers import make_response
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.rest.helpers import users_helper
+from xivo_restapi.rest.helpers.users_helper import UsersHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    IncorrectParametersException
 import logging
-from xivo_restapi.services.utils.exceptions import NoSuchElementException
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ class APIUsers:
 
     def __init__(self):
         self._user_management = UserManagement()
+        self._users_helper = UsersHelper()
 
     @produces('application/json')
     @realmDigest.requires_auth
@@ -70,9 +72,12 @@ class APIUsers:
             response = rest_encoder.encode(["No parsable data in the request"])
             return make_response(response, 400)
         try:
-            user = users_helper.create_instance(data)
+            user = self._users_helper.create_instance(data)
             self._user_management.create_user(user)
             return make_response('', 201)
+        except IncorrectParametersException as e:
+            data = rest_encoder.encode([str(e)])
+            return make_response(data, 400)
         except Exception as e:
             data = rest_encoder.encode([str(e)])
             return make_response(data, 500)
@@ -87,8 +92,12 @@ class APIUsers:
             response = rest_encoder.encode(["No parsable data in the request"])
             return make_response(response, 400)
         try:
+            self._users_helper.validate_data(data)
             self._user_management.edit_user(int(userid), data)
             return make_response('', 200)
+        except IncorrectParametersException as e:
+            data = rest_encoder.encode([str(e)])
+            return make_response(data, 400)
         except NoSuchElementException:
             return make_response('', 404)
         except Exception as e:

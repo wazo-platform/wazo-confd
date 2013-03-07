@@ -132,3 +132,22 @@ def then_the_user_group1_is_actually_deleted(step, fullname):
 def when_i_delete_the_user_of_id_group1(step, userid):
     global result
     result = rest_users.delete_user(int(userid))
+
+
+@step(u'When I create a user "([^"]*)" with an field "([^"]*)" of value "([^"]*)"')
+def when_i_create_a_user_group1_with_an_field_group2_of_value_group3(step, fullname, fieldname, fieldvalue):
+    global result
+    result = rest_users.create_user_with_field(fullname, fieldname, fieldvalue)
+
+
+@step(u'Then I get an error message "([^"]*)"')
+def then_i_get_an_error_message_group1(step, error_message):
+    global result
+    assert result.data[0] == error_message
+
+
+@step(u'When I update the user "([^"]*)" with a field "([^"]*)" of value "([^"]*)"')
+def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, fullname, field, value):
+    global result
+    userid = rest_users.id_from_fullname(fullname)
+    result = rest_users.update_user_with_field(userid, field, value)

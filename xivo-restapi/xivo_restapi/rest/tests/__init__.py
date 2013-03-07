@@ -7,6 +7,7 @@ from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
 from xivo_restapi.services.user_management import UserManagement
+from xivo_restapi.rest.helpers.users_helper import UsersHelper
 
 
 def mock_basic_decorator(func):
@@ -57,3 +58,8 @@ patcher_users = patch("xivo_restapi.rest." + \
 mock_user = patcher_users.start()
 instance_user_management = Mock(UserManagement)
 mock_user.return_value = instance_user_management
+
+patch_users_helper = patch("xivo_restapi.rest.API_users.UsersHelper")
+mock_users_helper = patch_users_helper.start()
+instance_users_helper = Mock(UsersHelper)
+mock_users_helper.return_value = instance_users_helper

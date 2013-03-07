@@ -24,6 +24,12 @@ Feature: Users management
 	  Then I get a response with status "201"
 	  Then the user "Clémence Dupond" is actually created
 	  
+	Scenario: Creation with errors
+	  Given there is no user
+	  When I create a user "Michel Sardou" with an field "unexisting_field" of value "value"
+	  Then I get a response with status "400"
+	  Then I get an error message "Incorrect parameters sent: unexisting_field"
+	  
 	Scenario: Editing a user
 	  Given there is no user
 	  Given there is a user "Clémence Dupond"
@@ -35,6 +41,13 @@ Feature: Users management
 	  Given there is no user
 	  When I update the user of id "1" with the last name "Dupond"
 	  Then I get a response with status "404"
+	  
+	Scenario: Edition with errors
+	  Given there is no user
+	  Given there is a user "Michel Sardou"
+	  When I update the user "Michel Sardou" with a field "unexisting_field" of value "value"
+	  Then I get a response with status "400"
+	  Then I get an error message "Incorrect parameters sent: unexisting_field"
 	  
 	Scenario: Deleting a user
 	  Given there is no user

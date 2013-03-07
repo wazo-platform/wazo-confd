@@ -59,3 +59,16 @@ class RestUsers():
 
     def delete_user(self, userid):
         return self.ws_utils.rest_delete(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid)
+
+    def create_user_with_field(self, fullname, fieldname, fieldvalue):
+        (firstname, lastname) = self.decompose_fullname(fullname)
+        data = {'firstname': firstname,
+                'lastname': lastname,
+                fieldname: fieldvalue}
+        return self.ws_utils.rest_post(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/", data)
+
+    def update_user_with_field(self, userid, field, value):
+        data = {}
+        data[field] = value
+        return self.ws_utils.rest_put(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid,
+                                      data)

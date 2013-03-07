@@ -15,9 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_restapi.rest.helpers import global_helper
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_restapi.rest.helpers import global_helper
+from xivo_restapi.services.utils.exceptions import IncorrectParametersException
 
 
-def create_instance(data):
-    return global_helper.create_class_instance(UserFeatures, data)
+class UsersHelper:
+
+    def __init__(self):
+        self.accepted_fields = [column.name for column in\
+                                 UserFeatures.__table__.columns] #@UndefinedVariable
+
+    def create_instance(self, data):
+        self.validate_data(data)
+        return global_helper.create_class_instance(UserFeatures, data)
+
+    def validate_data(self, data):
+        invalid_params = []
+        for param in data:
+            if(param not in self.accepted_fields):
+                invalid_params.append(param)
+        if(len(invalid_params) > 0):
+            raise IncorrectParametersException(*invalid_params)

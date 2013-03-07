@@ -42,3 +42,15 @@ class InvalidInputException(Exception):
 
     def __str__(self):
         return self.value + " : " + str(self.errors_list)
+
+
+class IncorrectParametersException(Exception):
+    def __init__(self, *params):
+        self.params = params
+
+    def __str__(self):
+        message = "Incorrect parameters sent: "
+        for param in self.params:
+            message += param + ","
+        message = message.rstrip(",")
+        return message
