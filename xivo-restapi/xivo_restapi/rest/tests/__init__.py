@@ -8,6 +8,8 @@ from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.rest.helpers.users_helper import UsersHelper
+from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
+from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 
 
 def mock_basic_decorator(func):
@@ -47,11 +49,23 @@ mock_campaign = patcher_campaigns.start()
 instance_campaign_management = Mock(CampagneManagement)
 mock_campaign.return_value = instance_campaign_management
 
+patch_campaigns_helper = patch("xivo_restapi.rest." + \
+                             "API_campaigns.CampaignsHelper")
+mock_campaigns_helper = patch_campaigns_helper.start()
+instance_campaigns_helper = Mock(CampaignsHelper)
+mock_campaigns_helper.return_value = instance_campaigns_helper
+
 patcher_recordings = patch("xivo_restapi.rest." + \
                              "API_recordings.RecordingManagement")
 mock_recording = patcher_recordings.start()
 instance_recording_management = Mock(RecordingManagement)
 mock_recording.return_value = instance_recording_management
+
+patcher_recordings_helper = patch("xivo_restapi.rest." + \
+                             "API_recordings.RecordingsHelper")
+mock_recordings_helper = patcher_recordings_helper.start()
+instance_recordings_helper = Mock(RecordingsHelper)
+mock_recordings_helper.return_value = instance_recordings_helper
 
 patcher_users = patch("xivo_restapi.rest." + \
                              "API_users.UserManagement")

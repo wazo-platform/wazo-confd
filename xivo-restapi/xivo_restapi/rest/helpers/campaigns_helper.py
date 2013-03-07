@@ -20,33 +20,34 @@ from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.helpers.global_helper import str_to_datetime
 import logging
 
-
 logger = logging.getLogger()
 
 
-def supplement_add_input(data):
-    '''Returns the supplemented input for add'''
-    logger.debug("Supplementing input for 'add'")
-    for key in data:
-        if(data[key] == ''):
-            data[key] = None
-    if(("start_date" not in data) or data["start_date"] == None):
-        data["start_date"] = datetime.now().strftime("%Y-%m-%d")
-    if(("end_date" not in data) or data["end_date"] == None):
-        data["end_date"] = datetime.now().strftime("%Y-%m-%d")
-    return data
+class CampaignsHelper():
+
+    def supplement_add_input(self, data):
+        '''Returns the supplemented input for add'''
+        logger.debug("Supplementing input for 'add'")
+        for key in data:
+            if(data[key] == ''):
+                data[key] = None
+        if(("start_date" not in data) or data["start_date"] == None):
+            data["start_date"] = datetime.now().strftime("%Y-%m-%d")
+        if(("end_date" not in data) or data["end_date"] == None):
+            data["end_date"] = datetime.now().strftime("%Y-%m-%d")
+        return data
 
 
-def supplement_edit_input(data):
-    '''Returns the supplemented input for edit'''
-    for key in data:
-        if(data[key] == ''):
-            data[key] = None
-    return data
+    def supplement_edit_input(self, data):
+        '''Returns the supplemented input for edit'''
+        for key in data:
+            if(data[key] == ''):
+                data[key] = None
+        return data
 
 
-def create_instance(data):
-    instance = global_helper.create_class_instance(RecordCampaigns, data)
-    instance.start_date = str_to_datetime(instance.start_date)
-    instance.end_date = str_to_datetime(instance.end_date)
-    return instance
+    def create_instance(self, data):
+        instance = global_helper.create_class_instance(RecordCampaigns, data)
+        instance.start_date = str_to_datetime(instance.start_date)
+        instance.end_date = str_to_datetime(instance.end_date)
+        return instance

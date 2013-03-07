@@ -20,8 +20,8 @@
 from mock import Mock
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.helpers import recordings_helper
-from xivo_restapi.rest.tests import instance_recording_management
+from xivo_restapi.rest.tests import instance_recording_management, \
+    instance_recordings_helper
 from xivo_restapi.restapi_config import RestAPIConfig
 import unittest
 
@@ -31,6 +31,7 @@ class TestAPIRecordings(unittest.TestCase):
     def setUp(self):
 
         self.instance_recording_management = instance_recording_management
+        self.instance_recordings_helper = instance_recordings_helper
 
         from xivo_restapi.rest import flask_http_server
         flask_http_server.app.testing = True
@@ -47,18 +48,18 @@ class TestAPIRecordings(unittest.TestCase):
             "agent_id": agent_id
         }
         self.instance_recording_management.add_recording.return_value = False
-        recordings_helper.supplement_add_input = Mock()
-        recordings_helper.supplement_add_input.return_value = data
-        recordings_helper.create_instance = Mock()
+        self.instance_recordings_helper.supplement_add_input = Mock()
+        self.instance_recordings_helper.supplement_add_input.return_value = data
+        self.instance_recordings_helper.create_instance = Mock()
         recording = Recordings()
-        recordings_helper.create_instance.return_value = recording
+        self.instance_recordings_helper.create_instance.return_value = recording
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
-        recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
                     .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
@@ -77,17 +78,17 @@ class TestAPIRecordings(unittest.TestCase):
         }
 
         self.instance_recording_management.add_recording.return_value = True
-        recordings_helper.supplement_add_input.return_value = data
-        recordings_helper.create_instance = Mock()
+        self.instance_recordings_helper.supplement_add_input.return_value = data
+        self.instance_recordings_helper.create_instance = Mock()
         recording = Recordings()
-        recordings_helper.create_instance.return_value = recording
+        self.instance_recordings_helper.create_instance.return_value = recording
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
-        recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
                     .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,
@@ -110,18 +111,18 @@ class TestAPIRecordings(unittest.TestCase):
 
         self.instance_recording_management.add_recording\
                 .side_effect = mock_add_recording
-        recordings_helper.supplement_add_input = Mock()
-        recordings_helper.supplement_add_input.return_value = data
-        recordings_helper.create_instance = Mock()
+        self.instance_recordings_helper.supplement_add_input = Mock()
+        self.instance_recordings_helper.supplement_add_input.return_value = data
+        self.instance_recordings_helper.create_instance = Mock()
         recording = Recordings()
-        recordings_helper.create_instance.return_value = recording
+        self.instance_recordings_helper.create_instance.return_value = recording
 
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
-        recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
                     .assert_called_with(campaign_id, recording)
         self.assertTrue(result.status == status,

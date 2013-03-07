@@ -21,14 +21,15 @@ import logging
 logger = logging.getLogger()
 
 
-def supplement_add_input(data):
-    '''Returns the supplemented input'''
-    logger.debug("Supplementing input for 'add_recording'")
-    for key in data:
-        if(data[key] == ''):
-            data[key] = None
-    return data
+class RecordingsHelper:
 
+    def supplement_add_input(self, data):
+        '''Returns the supplemented input'''
+        logger.debug("Supplementing input for 'add_recording'")
+        for key in data:
+            if(data[key] == ''):
+                data[key] = None
+        return data
 
-def create_instance(data):
-    return global_helper.create_class_instance(Recordings, data)
+    def create_instance(self, data):
+        return global_helper.create_class_instance(Recordings, data)

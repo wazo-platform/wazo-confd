@@ -20,7 +20,8 @@ from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.rest.helpers import campaigns_helper, global_helper
+from xivo_restapi.rest.helpers import global_helper
+from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
@@ -36,6 +37,7 @@ class APICampaigns(object):
 
     def __init__(self):
         self._campagne_manager = CampagneManagement()
+        self._campaigns_helper = CampaignsHelper()
 
     @consumes('application/json')
     @produces('application/json')
@@ -48,8 +50,8 @@ class APICampaigns(object):
         except ValueError:
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
-        body = campaigns_helper.supplement_add_input(body)
-        campaign = campaigns_helper.create_instance(body)
+        body = self._campaigns_helper.supplement_add_input(body)
+        campaign = self._campaigns_helper.create_instance(body)
         logger.debug("Just supplemented: " + str(body))
         try:
             result = self._campagne_manager.create_campaign(campaign)
@@ -127,7 +129,7 @@ class APICampaigns(object):
             body = "No parsable data in the request, data: " + request.data
             return make_response(body, 400)
         try:
-            body = campaigns_helper.supplement_edit_input(body)
+            body = self._campaigns_helper.supplement_edit_input(body)
             result = self._campagne_manager.update_campaign(campaign_id, body)
         except NoSuchElementException:
             liste = ["campaign_not_found"]

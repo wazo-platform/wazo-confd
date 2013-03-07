@@ -17,17 +17,21 @@
 from mock import Mock
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.rest.helpers import recordings_helper, global_helper
+from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 import unittest
 
 
 class TestRecordingsHelper(unittest.TestCase):
+
+    def setUp(self):
+        self.recordings_helper = RecordingsHelper()
 
     def test_supplement_add_input(self):
         data = {'champ1': '',
                 'champ2': ''}
         expected_result = {'champ1': None,
                            'champ2': None}
-        result = recordings_helper.supplement_add_input(data)
+        result = self.recordings_helper.supplement_add_input(data)
         self.assertTrue(expected_result == result)
 
     def test_create_instance(self):
@@ -35,6 +39,6 @@ class TestRecordingsHelper(unittest.TestCase):
         global_helper.create_class_instance = Mock()
         mock_return_value = Mock()
         global_helper.create_class_instance.return_value = mock_return_value
-        result = recordings_helper.create_instance(data)
+        result = self.recordings_helper.create_instance(data)
         global_helper.create_class_instance.assert_called_with(Recordings, data)
         self.assertEqual(result, mock_return_value)

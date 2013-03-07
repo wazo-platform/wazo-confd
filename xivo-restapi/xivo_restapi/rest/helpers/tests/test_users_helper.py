@@ -22,7 +22,7 @@ class TestUsersHelper(unittest.TestCase):
         mock_return_value = Mock()
         global_helper.create_class_instance.return_value = mock_return_value
         result = self.users_helper.create_instance(data)
-        global_helper.create_class_instance.assert_called_with(UserFeatures, data)
+        global_helper.create_class_instance.assert_called_with(UserFeatures, data) #@UndefinedVariable
         self.assertEqual(result, mock_return_value)
 
     def test_create_instance_fail(self):

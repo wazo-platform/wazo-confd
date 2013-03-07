@@ -30,8 +30,9 @@ class TestCampaignsHelper(unittest.TestCase):
                 "champ2": "valeur2",
                 "champ3": ""}
         old_data = copy.deepcopy(data)
-        from xivo_restapi.rest.helpers import campaigns_helper
-        result = campaigns_helper.supplement_add_input(data)
+        from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
+        helper = CampaignsHelper()
+        result = helper.supplement_add_input(data)
         old_data["champ3"] = None
         old_data["end_date"] = datetime.now().strftime("%Y-%m-%d")
         old_data["start_date"] = datetime.now().strftime("%Y-%m-%d")
@@ -42,8 +43,9 @@ class TestCampaignsHelper(unittest.TestCase):
                 "champ2": "valeur2",
                 "champ3": ""}
         old_data = copy.deepcopy(data)
-        from xivo_restapi.rest.helpers import campaigns_helper
-        result = campaigns_helper.supplement_edit_input(data)
+        from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
+        helper = CampaignsHelper()
+        result = helper.supplement_edit_input(data)
         old_data["champ3"] = None
         self.assertTrue(old_data == result)
 
@@ -55,7 +57,8 @@ class TestCampaignsHelper(unittest.TestCase):
         mock_return_value.end_date = '2012-12-13'
         patch_create_class_instance.return_value = mock_return_value
         global_helper.str_to_datetime = Mock()
-        from xivo_restapi.rest.helpers import campaigns_helper
-        result = campaigns_helper.create_instance(data)
+        from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
+        helper = CampaignsHelper()
+        result = helper.create_instance(data)
         global_helper.create_class_instance.assert_called_with(RecordCampaigns, data)  #@UndefinedVariable
         self.assertEqual(result, mock_return_value)
