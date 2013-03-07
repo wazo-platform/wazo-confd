@@ -40,5 +40,5 @@ app.permanent_session_lifetime = timedelta(minutes=1)
 class FlaskHttpServer(object):
 
     def run(self):
-        app.run(host=RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS,
+        app.run(host="0.0.0.0",
                 port=RestAPIConfig.XIVO_RECORD_SERVICE_PORT)

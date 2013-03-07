@@ -35,10 +35,7 @@ Create the tar
 tar -cvf xivo-restapi.tar xivo-restapi/ --exclude '*.log' --exclude '.*' --exclude '*.pyc' --exclude tests --exclude acceptance
 
 
-Nouvelles dépendances:
-----------------------
-fichier en + (authdigest.py)
+Test:
+-----
 
-
-curl --digest --user admin:test https://127.0.0.1:50050/rest/IPBX/recording_campaigns/ --insecure -c cookie.txt -b cookie.txt
- 
+curl --digest --user admin:passadmin http://192.168.51.14:50050/1.0/recording_campaigns/ --insecure -c cookie.txt -b cookie.txt --header "Accept: application/json" 

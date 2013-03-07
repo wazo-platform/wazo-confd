@@ -1,5 +1,8 @@
-from functools import wraps
+#Modified by Avencall:
+#If the "Accept" header is not present, the returned content type
+#is supposed to be supported
 
+from functools import wraps
 from flask import request
 from werkzeug.exceptions import UnsupportedMediaType, NotAcceptable
 
@@ -21,7 +24,7 @@ def produces(*content_types):
         def wrapper(*args, **kwargs):
             requested = set(request.accept_mimetypes.values())
             defined = set(content_types)
-            if len(requested & defined) == 0:
+            if len(requested) != 0 and len(requested & defined) == 0:
                 raise NotAcceptable()
             return fn(*args, **kwargs)
         return wrapper

@@ -47,7 +47,8 @@ def main():
         from flup.server.fcgi import WSGIServer
         if not parsed_args.debug:
             _daemonize()
-        WSGIServer(app, bindAddress='/var/www/restws-fcgi.sock').run()
+        WSGIServer(app, bindAddress='/var/www/restws-fcgi.sock',
+                   multithreaded=False, multiprocess=True).run()
 
 
 def _init_logging(debug_mode):

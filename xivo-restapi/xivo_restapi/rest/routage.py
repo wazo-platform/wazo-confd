@@ -122,7 +122,7 @@ agents_service.add_url_rule("/",
                   methods=["GET"])
 
 # ****************** #
-#   Useres server    #
+#   Users server     #
 # ****************** #
 users_service = Blueprint("users_service",
                          __name__,

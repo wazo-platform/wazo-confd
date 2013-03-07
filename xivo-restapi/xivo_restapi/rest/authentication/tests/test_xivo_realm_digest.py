@@ -31,9 +31,6 @@ class TestXivoRealmDigest(unittest.TestCase):
         self.realmDigest = XivoRealmDigest('xivotestdigest')
         self.app = Flask(__name__)
         self.app.secret_key = 'test'
-#        from xivo_restapi.rest import flask_http_server
-#        flask_http_server.app.testing = True
-#        self.app = flask_http_server.app.test_client()
 
     def test_authentication_needed(self):
         ctx = self.app.test_request_context('/users/', environ_base={'REMOTE_ADDR': '132.52.61.4'})
@@ -66,8 +63,6 @@ class TestXivoRealmDigest(unittest.TestCase):
         decorated_function('arg1', 2, None)
         self.realmDigest.isRemoteAddressAllowed.assert_called_once_with("127.0.0.1")
         service_function.assert_called_once_with('arg1', 2, None)
-
-
 
     def test_client_authenticates(self):
         ctx = self.app.test_request_context('/users/', base_url='http://127.0.0.1/', environ_base={'REMOTE_ADDR': 'njnjj'})
