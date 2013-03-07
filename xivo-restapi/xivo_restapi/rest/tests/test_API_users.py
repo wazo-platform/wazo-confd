@@ -173,9 +173,9 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_edit_error(self):
         status = "500 INTERNAL SERVER ERROR"
-        data = {'firstname': 'André',
-                'lastname': 'Dupond',
-                'description': 'éà":;'}
+        data = {u'firstname': u'André',
+                u'lastname': u'Dupond',
+                u'description': u'éà":;'}
 
         def mock_edit_user(userid, data):
             raise Exception()
@@ -191,9 +191,9 @@ class TestAPIUsers(unittest.TestCase):
     def test_edit_request_error(self):
         status = "400 BAD REQUEST"
         expected_data = "Incorrect parameters sent: unexisting_field"
-        data = {'firstname': 'André',
-                'lastname': 'Dupond',
-                'unexisting_field': 'value'}
+        data = {u'firstname': u'André',
+                u'lastname': u'Dupond',
+                u'unexisting_field': u'value'}
 
         def mock_validate_data(data):
             raise IncorrectParametersException("unexisting_field")
