@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from acceptance.features.rest_queues import RestQueues
-from acceptance.features.ws_utils import WsUtils
+from acceptance.features.steps.helpers.rest_queues import RestQueues
+from acceptance.features.steps.helpers.ws_utils import WsUtils
 from commands import getoutput
 from lettuce.terrain import before
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao

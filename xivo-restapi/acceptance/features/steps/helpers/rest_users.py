@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.features.ws_utils import WsUtils
+from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import user_dao
 from xivo_restapi.restapi_config import RestAPIConfig
 

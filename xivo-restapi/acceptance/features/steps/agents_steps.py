@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from acceptance.features.rest_agents import RestAgents
+from acceptance.features.steps.helpers.rest_agents import RestAgents
 from lettuce import step
 
 rest_agents = RestAgents()

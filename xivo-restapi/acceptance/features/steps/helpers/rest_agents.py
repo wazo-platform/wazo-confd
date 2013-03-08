@@ -16,11 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from acceptance.features.steps.helpers.ws_utils import WsUtils
+from string import upper
 from xivo_dao import agent_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.restapi_config import RestAPIConfig
-from acceptance.features.ws_utils import WsUtils
-from string import upper
 
 
 class RestAgents:

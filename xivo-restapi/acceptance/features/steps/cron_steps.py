@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
-from acceptance.features.cron_utils import create_dir
-from acceptance.features.rest_campaign import RestCampaign
+
+from acceptance.features.steps.helpers.cron_utils import create_dir
+from acceptance.features.steps.helpers.rest_campaign import RestCampaign
 from commands import getoutput
 from datetime import timedelta, datetime
 from lettuce import step

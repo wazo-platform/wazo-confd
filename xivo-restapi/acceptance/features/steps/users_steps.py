@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.features.rest_users import RestUsers
+from acceptance.features.steps.helpers.rest_users import RestUsers
 from lettuce import step
 from xivo_dao import user_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures

@@ -16,10 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.restapi_config import RestAPIConfig
-from acceptance.features.ws_utils import WsUtils
 import random
 
 
