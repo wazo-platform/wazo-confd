@@ -22,6 +22,7 @@ from xivo_restapi.rest.API_campaigns import APICampaigns
 from xivo_restapi.rest.API_queues import APIQueues
 from xivo_restapi.rest.API_recordings import APIRecordings
 from xivo_restapi.rest.API_users import APIUsers
+from xivo_restapi.rest.API_voicemails import APIVoicemails
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 
@@ -128,15 +129,14 @@ users_service = Blueprint("users_service",
                          __name__,
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_USERS_SERVICE_PATH)
-
-# ****************** #
-#   API users        #
-# ****************** #
+# *************** #
+#   API users     #
+# *************** #
 
 users_service.add_url_rule("/",
-                  "list",
-                  getattr(APIUsers(), "list"),
-                  methods=["GET"])
+                           "list",
+                           getattr(APIUsers(), "list"),
+                           methods=["GET"])
 
 users_service.add_url_rule("/<userid>",
                   "get",
@@ -157,3 +157,20 @@ users_service.add_url_rule("/<userid>",
                   "delete",
                   getattr(APIUsers(), "delete"),
                   methods=["DELETE"])
+
+# ********************* #
+#   Voicemails server   #
+# ********************* #
+voicemails_service = Blueprint("voicemails_service",
+                         __name__,
+                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                                    RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH)
+
+# ******************** #
+#   API voicemails     #
+# ******************** #
+
+voicemails_service.add_url_rule("/",
+                  "list",
+                  getattr(APIVoicemails(), "list"),
+                  methods=["GET"])

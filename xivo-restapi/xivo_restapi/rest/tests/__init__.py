@@ -1,15 +1,16 @@
 from functools import wraps
 from mock import patch, Mock
 from xivo_restapi.rest.authentication import xivo_realm_digest
+from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
+from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
+from xivo_restapi.rest.helpers.users_helper import UsersHelper
 from xivo_restapi.rest.negotiate import flask_negotiate
 from xivo_restapi.services.agent_management import AgentManagement
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.queue_management import QueueManagement
 from xivo_restapi.services.recording_management import RecordingManagement
 from xivo_restapi.services.user_management import UserManagement
-from xivo_restapi.rest.helpers.users_helper import UsersHelper
-from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
-from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
+from xivo_restapi.services.voicemail_management import VoicemailManagement
 
 
 def mock_basic_decorator(func):
@@ -77,3 +78,9 @@ patch_users_helper = patch("xivo_restapi.rest.API_users.UsersHelper")
 mock_users_helper = patch_users_helper.start()
 instance_users_helper = Mock(UsersHelper)
 mock_users_helper.return_value = instance_users_helper
+
+
+patcher_voicemails = patch("xivo_restapi.rest.API_voicemails.VoicemailManagement")
+mock_voicemail = patcher_voicemails.start()
+instance_voicemail_management = Mock(VoicemailManagement)
+mock_voicemail.return_value = instance_voicemail_management
