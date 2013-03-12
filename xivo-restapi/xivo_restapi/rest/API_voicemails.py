@@ -19,6 +19,7 @@
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_restapi.rest import rest_encoder
+from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers.voicemails_helper import VoicemailsHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
@@ -36,6 +37,7 @@ class APIVoicemails:
         self._voicemails_helper = VoicemailsHelper()
 
     @produces("application/json")
+    @realmDigest.requires_auth
     def list(self):
         logger.info("List of voicemails requested.")
         try:
@@ -48,6 +50,7 @@ class APIVoicemails:
             return make_response(result, 500)
 
     @consumes("application/json")
+    @realmDigest.requires_auth
     def edit(self, voicemailid):
         logger.info("Edit request for voicemail of id %s with data %s"
                     % (voicemailid, request.data))

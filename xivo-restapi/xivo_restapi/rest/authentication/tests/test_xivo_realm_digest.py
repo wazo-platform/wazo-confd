@@ -31,6 +31,11 @@ class TestXivoRealmDigest(unittest.TestCase):
         self.realmDigest = XivoRealmDigest('xivotestdigest')
         self.app = Flask(__name__)
         self.app.secret_key = 'test'
+        self.template_authorization_header = 'Digest username="%s",' + \
+                                             'realm="a",' + \
+                                             'nonce="a",' + \
+                                             'uri="a",' + \
+                                             'response="a"'
 
     def test_authentication_needed(self):
         ctx = self.app.test_request_context('/users/', environ_base={'REMOTE_ADDR': '132.52.61.4'})
@@ -65,7 +70,10 @@ class TestXivoRealmDigest(unittest.TestCase):
         service_function.assert_called_once_with('arg1', 2, None)
 
     def test_client_authenticates(self):
-        ctx = self.app.test_request_context('/users/', base_url='http://127.0.0.1/', environ_base={'REMOTE_ADDR': 'njnjj'})
+        ctx = self.app.test_request_context('/users/',
+                                            base_url='http://127.0.0.1/',
+                                            environ_base={'REMOTE_ADDR': 'njnjj',
+                                                          'HTTP_AUTHORIZATION': self.template_authorization_header % 'test_user'})
         ctx.push()
         service_function = Mock()
         service_function.__name__ = 'get all campaigns'
@@ -93,19 +101,27 @@ class TestXivoRealmDigest(unittest.TestCase):
         decorated_function('arg1', 2, None)
         service_function.assert_called_once_with('arg1', 2, None)
 
-    def test_logged_after_athentication(self):
+    def test_logged_after_authentication(self):
+        ctx = self.app.test_request_context('/users/',
+                                            base_url='http://127.0.0.1/',
+                                            environ_base={'HTTP_AUTHORIZATION': self.template_authorization_header % 'test_user'})
+        ctx.push()
         self.realmDigest.isSessionLogged = Mock()
-        self.realmDigest.isSessionLogged.return_value = True
+        self.realmDigest.isSessionLogged.return_value = False
         service_function = Mock()
         service_function.__name__ = 'get all campaigns'
         self.realmDigest.isRemoteAddressAllowed = Mock()
         self.realmDigest.isRemoteAddressAllowed.return_value = False
+        self.realmDigest.isAuthenticated = Mock()
+        self.realmDigest.isAuthenticated.return_value = True
 
         decorated_function = self.realmDigest.requires_auth(service_function)
         decorated_function('arg1', 2, None)
         service_function.assert_called_once_with('arg1', 2, None)
-        self.assert_('logged' in session)
-        self.assert_(session['logged'])
+        self.assertTrue('logged' in session)
+        self.assertTrue(session['logged'])
+        self.assertTrue('username' in session)
+        self.assertTrue(session['username'], 'test_user')
 
     def test_session_not_logged(self):
         session = {}

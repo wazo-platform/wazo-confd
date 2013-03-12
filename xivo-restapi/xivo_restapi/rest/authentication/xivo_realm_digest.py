@@ -35,6 +35,7 @@ class XivoRealmDigest(authdigest.RealmDigestDB):
             if self.isAuthenticated(flask.request):
                 session.permanent = True
                 session['logged'] = True
+                session['username'] = flask.request.authorization.username
                 return f(*args, **kwargs)
             return self.challenge()
         return decorated
