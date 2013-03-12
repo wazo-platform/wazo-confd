@@ -16,11 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao import user_dao
-from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
+from xivo_restapi.restapi_config import RestAPIConfig
 
 logger = logging.getLogger(__name__)
+data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
 class UserManagement:
@@ -29,25 +30,31 @@ class UserManagement:
         pass
 
     def get_all_users(self):
+        data_access_logger.info("List of all users.")
         return user_dao.get_all()
 
     def get_user(self, userid):
+        data_access_logger.info("Consulting user of id %s." % userid)
         try:
             return user_dao.get(userid)
         except LookupError:
             raise NoSuchElementException("No such user")
 
     def create_user(self, user):
+        data_access_logger.info("Creating a user with the data %s." % user.todict())
         if(user.description is None):
             user.description = ''
         user_dao.add_user(user)
 
     def edit_user(self, userid, data):
+        data_access_logger.info("Editing the user of id %s with data %s."
+                                % (userid, data))
         updated_rows = user_dao.update(userid, data)
         if(updated_rows == 0):
             raise NoSuchElementException("No such user")
 
     def delete_user(self, userid):
+        data_access_logger.info("Deleting the user of id %s." % userid)
         result = user_dao.delete(userid)
         if(result == 0):
             raise NoSuchElementException("No such user")

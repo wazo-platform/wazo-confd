@@ -37,3 +37,6 @@ class RestAPIConfig(object):
 
     RECORDING_FILE_ROOT_PATH = "/var/lib/pf-xivo/sounds/campagnes"
     RECORDING_FILENAME_WHEN_NO_AGENTNAME = 'NoNameForAgentWithNumber'
+
+    DATA_ACCESS_LOGFILENAME = '/var/log/data-access.log'
+    DATA_ACCESS_LOGGERNAME = 'data-access'

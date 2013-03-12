@@ -24,6 +24,9 @@ from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     IncorrectParametersException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class APIVoicemails:
@@ -34,6 +37,7 @@ class APIVoicemails:
 
     @produces("application/json")
     def list(self):
+        logger.info("List of voicemails requested.")
         try:
             voicemails = self.voicemail_manager.get_all_voicemails()
             result = {"items": voicemails}
@@ -45,6 +49,8 @@ class APIVoicemails:
 
     @consumes("application/json")
     def edit(self, voicemailid):
+        logger.info("Edit request for voicemail of id %s with data %s"
+                    % (voicemailid, request.data))
         try:
             data = rest_encoder.decode(request.data)
         except ValueError:

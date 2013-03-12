@@ -38,7 +38,7 @@ class APIUsers:
     @produces('application/json')
     @realmDigest.requires_auth
     def list(self):
-        logger.info("Got a GET request for users (list)")
+        logger.info("List of users requested.")
         try:
             result = self._user_management.get_all_users()
             result = {"items": result}
@@ -51,7 +51,7 @@ class APIUsers:
     @produces('application/json')
     @realmDigest.requires_auth
     def get(self, userid):
-        logger.info("Got a GET request for users (get)")
+        logger.info("User of id %s requested" % userid)
         try:
             result = self._user_management.get_user(int(userid))
             result = rest_encoder.encode(result)
@@ -65,7 +65,7 @@ class APIUsers:
     @consumes('application/json')
     @realmDigest.requires_auth
     def create(self):
-        logger.info("Got a POST request for users")
+        logger.info("Request for creating a user with data: %s" % request.data)
         try:
             data = rest_encoder.decode(request.data)
         except ValueError:
@@ -85,7 +85,8 @@ class APIUsers:
     @consumes('application/json')
     @realmDigest.requires_auth
     def edit(self, userid):
-        logger.info("Got a PUT request for users")
+        logger.info("Request for editing the user of id %s with data %s ."
+                    % (userid, request.data))
         try:
             data = rest_encoder.decode(request.data)
         except ValueError:
@@ -106,7 +107,7 @@ class APIUsers:
 
     @realmDigest.requires_auth
     def delete(self, userid):
-        logger.info("Got a DELETE request for users")
+        logger.info("Request for deleting the user of id %s ." % userid)
         try:
             self._user_management.delete_user(int(userid))
             return make_response('', 200)

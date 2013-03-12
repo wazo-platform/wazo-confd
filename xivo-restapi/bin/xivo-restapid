@@ -18,11 +18,12 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-import logging
-import sys
-import argparse
 from xivo import daemonize
 from xivo_restapi.services.service_manager import ServiceManager
+import argparse
+import logging
+import sys
+from xivo_restapi.restapi_config import RestAPIConfig
 
 DAEMONNAME = 'xivo-restapid'
 
@@ -33,6 +34,7 @@ DAEMONNAME = 'xivo-restapid'
 LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
+data_access_logger = None
 
 def main():
     parsed_args = _parse_args(sys.argv[1:])
@@ -52,20 +54,30 @@ def main():
 
 
 def _init_logging(debug_mode):
+    data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
     logger = logging.getLogger()
+
     formatter = logging.Formatter('%%(asctime)s %s[%%(process)d] (%%(levelname)s) (%%(name)s): %%(message)s'
                                   % DAEMONNAME)
+
+    logfilehandler = logging.FileHandler(LOGFILENAME)
+    logfilehandler.setFormatter(formatter)
+    logger.addHandler(logfilehandler)
+
+    data_access_handler = logging.FileHandler(RestAPIConfig.DATA_ACCESS_LOGFILENAME)
+    data_access_handler.setFormatter(formatter)
+    data_access_logger.addHandler(data_access_handler)
+    data_access_logger.setLevel(logging.INFO)
     if debug_mode:
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
+        logger.info("Starting xivo-restapid in debug mode.")
     else:
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.INFO)
+        logger.info("Starting xivo-restapid in standard mode.")
 
-    logfilehandler = logging.FileHandler(LOGFILENAME)
-    logfilehandler.setFormatter(formatter)
-    logger.addHandler(logfilehandler)
 
 
 def _daemonize():
