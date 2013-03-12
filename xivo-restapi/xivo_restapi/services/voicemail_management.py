@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from xivo_dao import voicemail_dao
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 
 # Copyright (C) 2013 Avencall
 #
@@ -24,3 +25,9 @@ class VoicemailManagement(object):
 
     def get_all_voicemails(self):
         return voicemail_dao.all()
+
+    def edit_voicemail(self, voicemailid, data):
+        if(voicemail_dao.get(voicemailid) is None):
+            raise NoSuchElementException("No such voicemail: " + str(voicemailid))
+        voicemail_dao.update(voicemailid, data)
+

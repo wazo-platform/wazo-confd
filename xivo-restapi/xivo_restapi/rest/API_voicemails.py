@@ -16,8 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask.globals import request
 from flask.helpers import make_response
 from xivo_restapi.rest import rest_encoder
+from xivo_restapi.rest.helpers.voicemails_helper import VoicemailsHelper
+from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    IncorrectParametersException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 
 
@@ -25,7 +30,9 @@ class APIVoicemails:
 
     def __init__(self):
         self.voicemail_manager = VoicemailManagement()
+        self._voicemails_helper = VoicemailsHelper()
 
+    @produces("application/json")
     def list(self):
         try:
             voicemails = self.voicemail_manager.get_all_voicemails()
@@ -35,3 +42,20 @@ class APIVoicemails:
         except Exception as e:
             result = rest_encoder.encode(str(e))
             return make_response(result, 500)
+
+    @consumes("application/json")
+    def edit(self, voicemailid):
+        try:
+            data = rest_encoder.decode(request.data)
+        except ValueError:
+            result = ["No parsable data in the request"]
+            return make_response(rest_encoder.encode(result), 400)
+        try:
+            self._voicemails_helper.validate_data(data)
+            self.voicemail_manager.edit_voicemail(int(voicemailid), data)
+        except IncorrectParametersException as e:
+            data = rest_encoder.encode([str(e)])
+            return make_response(data, 400)
+        except NoSuchElementException:
+            return make_response('', 404)
+        return make_response('', 200)

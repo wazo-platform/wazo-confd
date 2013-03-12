@@ -18,8 +18,9 @@
 from mock import Mock
 from xivo_dao import voicemail_dao
 from xivo_dao.alchemy.voicemail import Voicemail
-import unittest
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
+import unittest
 
 
 class Test(unittest.TestCase):
@@ -38,4 +39,25 @@ class Test(unittest.TestCase):
 
         result = self.voicemail_manager.get_all_voicemails()
         self.assertEquals(result, expected_result)
-        voicemail_dao.all.assert_called_once_with()
+        voicemail_dao.all.assert_called_once_with() #@UndefinedVariable
+
+    def test_update_voicemail(self):
+        voicemailid = 1
+        voicemail_dao.update = Mock()
+        voicemail_dao.get = Mock()
+        voicemail_dao.get.return_value = Voicemail()
+        data = {"mailbox": "123",
+                "fullname": "test"}
+        self.voicemail_manager.edit_voicemail(voicemailid, data)
+        voicemail_dao.get.assert_called_with(1) #@UndefinedVariable
+        voicemail_dao.update.assert_called_with(voicemailid, data) #@UndefinedVariable
+
+    def test_update_unexisting_voicemail(self):
+        voicemailid = 1
+        voicemail_dao.update = Mock()
+        voicemail_dao.get = Mock()
+        voicemail_dao.get.return_value = None
+        data = {"mailbox": "123",
+                "fullname": "test"}
+        self.assertRaises(NoSuchElementException, self.voicemail_manager.edit_voicemail, voicemailid, data)
+        voicemail_dao.get.assert_called_with(1) #@UndefinedVariable

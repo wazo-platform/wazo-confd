@@ -37,14 +37,12 @@ class CampaignsHelper():
             data["end_date"] = datetime.now().strftime("%Y-%m-%d")
         return data
 
-
     def supplement_edit_input(self, data):
         '''Returns the supplemented input for edit'''
         for key in data:
             if(data[key] == ''):
                 data[key] = None
         return data
-
 
     def create_instance(self, data):
         instance = global_helper.create_class_instance(RecordCampaigns, data)

@@ -174,3 +174,8 @@ voicemails_service.add_url_rule("/",
                   "list",
                   getattr(APIVoicemails(), "list"),
                   methods=["GET"])
+
+voicemails_service.add_url_rule("/<voicemailid>",
+                  "edit",
+                  getattr(APIVoicemails(), "edit"),
+                  methods=["PUT"])

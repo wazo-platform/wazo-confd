@@ -1,14 +1,25 @@
-'''
-Created on Feb 20, 2013
+# -*- coding: utf-8 -*-
 
-@author: jean
-'''
+# Copyright (C) 2013 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
 from mock import Mock
 from xivo_dao import user_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
-import copy
 import unittest
 
 
@@ -56,16 +67,12 @@ class TestUserManagement(unittest.TestCase):
         self.assertEqual(user1.description, '')
 
     def test_edit_user(self):
-        data = {'id': 2,
-                'lastname': 'test',
-                'non_existing_column': 'value'}
-        data_copy = copy.deepcopy(data)
+        data = {'firstname': 'Robert',
+                'lastname': 'Dupond'}
         user_dao.update = Mock()
         user_dao.update.return_value = 1
         self._userManager.edit_user(1, data)
-        del data_copy['id']
-        del data_copy['non_existing_column']
-        user_dao.update.assert_called_once_with(1, data_copy)
+        user_dao.update.assert_called_once_with(1, data)
 
     def test_edit_user_not_found(self):
         data = {'lastname': 'test'}
