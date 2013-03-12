@@ -20,12 +20,14 @@ from datetime import datetime
 from xivo_dao import queue_dao, record_campaigns_dao
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest.helpers.global_helper import str_to_datetime
+from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import DataRetrieveError, \
     NoSuchElementException, InvalidInputException
 from xivo_restapi.services.utils.time_interval import TimeInterval
 import logging
 
 logger = logging.getLogger(__name__)
+data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
 class CampagneManagement:
@@ -34,13 +36,15 @@ class CampagneManagement:
         pass
 
     def create_campaign(self, campaign):
+        data_access_logger.info("Creating a campaign with data %s."
+                                % campaign.todict())
         self._validate_campaign(campaign)
         return record_campaigns_dao.add_or_update(campaign)
 
     def get_campaigns(self, search={}, checkCurrentlyRunning=False, paginator=None):
-        """
-        Calls the DAO and converts data to the final format
-        """
+        data_access_logger.info("Searching recording campaigns with the following parameters:\n" +
+                                "- %s\n- checkCurrentlyRunning: %r\nwith pagination %s"
+                                % (search, checkCurrentlyRunning, paginator))
         search_pattern = {}
         for item in search:
             if (item == 'queue_name'):
@@ -66,6 +70,8 @@ class CampagneManagement:
         return (total, items)
 
     def update_campaign(self, campaign_id, params):
+        data_access_logger.info("Updating campaign of id %s with data %s."
+                                % (campaign_id, params))
         logger.debug("Retrieving original campaign")
         campaign = record_campaigns_dao.get(campaign_id)
         if(campaign is None):
@@ -77,6 +83,7 @@ class CampagneManagement:
         return result
 
     def delete(self, campaign_id):
+        data_access_logger.info("Deleting campaign of id %s." % campaign_id)
         campaign = record_campaigns_dao.get(int(campaign_id))
         if(campaign == None):
             raise NoSuchElementException("No such campaign")

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from xivo_dao import voicemail_dao
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
+import logging
+from xivo_restapi.restapi_config import RestAPIConfig
 
 # Copyright (C) 2013 Avencall
 #
@@ -17,6 +19,8 @@ from xivo_restapi.services.utils.exceptions import NoSuchElementException
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
+
 
 class VoicemailManagement(object):
 
@@ -24,9 +28,12 @@ class VoicemailManagement(object):
         pass
 
     def get_all_voicemails(self):
+        data_access_logger.info("List of all voicemails.")
         return voicemail_dao.all()
 
     def edit_voicemail(self, voicemailid, data):
+        data_access_logger.info("Editing the voicemail of id %d with data %s."
+                                % (voicemailid, data))
         if(voicemail_dao.get(voicemailid) is None):
             raise NoSuchElementException("No such voicemail: " + str(voicemailid))
         voicemail_dao.update(voicemailid, data)

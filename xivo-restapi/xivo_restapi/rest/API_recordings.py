@@ -50,7 +50,7 @@ class APIRecordings(object):
         if('agent_no' in body):
             recording.agent_no = body['agent_no']
         try:
-            result = self._recording_manager.add_recording(campaign_id, recording)
+            result = self._recording_manager.add_recording(int(campaign_id), recording)
         except Exception as e:
             body = "SQL Error: " + str(e.message)
             return make_response(rest_encoder.encode(body), 400)

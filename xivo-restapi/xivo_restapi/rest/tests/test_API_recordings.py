@@ -61,7 +61,7 @@ class TestAPIRecordings(unittest.TestCase):
         self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
-                    .assert_called_with(campaign_id, recording)
+                    .assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
@@ -90,7 +90,7 @@ class TestAPIRecordings(unittest.TestCase):
         self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
-                    .assert_called_with(campaign_id, recording)
+                    .assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
@@ -124,7 +124,7 @@ class TestAPIRecordings(unittest.TestCase):
         self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
         self.instance_recording_management.add_recording\
-                    .assert_called_with(campaign_id, recording)
+                    .assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)

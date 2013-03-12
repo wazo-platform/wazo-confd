@@ -17,14 +17,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao import agent_dao
+from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 
-logger = logging.getLogger(__name__)
+data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
 class AgentManagement:
 
     def get_all_agents(self):
+        data_access_logger.info("List of all agents.")
         result = agent_dao.all()
         if result != None:
             return result

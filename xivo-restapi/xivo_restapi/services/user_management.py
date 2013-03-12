@@ -20,7 +20,6 @@ from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
 from xivo_restapi.restapi_config import RestAPIConfig
 
-logger = logging.getLogger(__name__)
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 

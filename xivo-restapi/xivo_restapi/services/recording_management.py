@@ -23,6 +23,7 @@ import logging
 import os
 
 logger = logging.getLogger(__name__)
+data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
 class RecordingManagement:
@@ -31,10 +32,8 @@ class RecordingManagement:
         pass
 
     def add_recording(self, campaign_id, recording):
-        """
-        Converts data to the final format and calls the DAO
-        """
-        logger.debug("Add_recording: " + str(campaign_id) + ", " + str(recording))
+        data_access_logger.info("Adding a recording to the campaign %d with data %s."
+                                % (campaign_id, recording.todict()))
         if('agent_no' in vars(recording)):
             recording.agent_id = agent_dao.agent_id(recording.agent_no)
         recording.campaign_id = campaign_id
@@ -42,7 +41,9 @@ class RecordingManagement:
         return result
 
     def get_recordings(self, campaign_id, search=None, paginator=None):
-        logger.debug("get_recordings")
+        data_access_logger.info("Getting recordings for campaign %d" % campaign_id +
+                                " with search criteria %s paginated with %s"
+                                % (search, paginator))
         search_pattern = {}
         if(search != None):
             for item in search:
@@ -58,7 +59,8 @@ class RecordingManagement:
         return (total, items)
 
     def search_recordings(self, campaign_id, search, paginator=None):
-        logger.debug("search_recordings")
+        data_access_logger.info("Searching recordings in campaign %d with" % campaign_id +
+                                "search criteria %s paginated with %s" % (search, paginator))
         if(search == None or search == {} or 'key' not in search):
             return self.get_recordings(campaign_id,
                                                {},
@@ -76,6 +78,8 @@ class RecordingManagement:
         return items
 
     def delete(self, campaign_id, recording_id):
+        data_access_logger.info("Deleting recording of id %s in campaign %d."
+                                % (recording_id, campaign_id))
         filename = recordings_dao.delete(campaign_id, recording_id)
         if(filename == None):
             logger.error("Recording file remove error - no filename!")
