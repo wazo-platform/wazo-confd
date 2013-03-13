@@ -23,9 +23,9 @@ restqueues = RestQueues()
 
 
 @step(u'When I create a queue "([^"]*)"')
-def when_i_create_a_queue(step, group1):
+def when_i_create_a_queue(step, queue_name):
     global restqueues
-    assert restqueues.create("test_lettuce")
+    assert restqueues.create(queue_name)
 
 
 @step(u'Then I can consult this queue')
