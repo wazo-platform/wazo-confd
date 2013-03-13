@@ -42,9 +42,6 @@ class CampagneManagement:
         return record_campaigns_dao.add_or_update(campaign)
 
     def get_campaigns(self, search={}, checkCurrentlyRunning=False, paginator=None):
-        data_access_logger.info("Searching recording campaigns with the following parameters:\n" +
-                                "- %s\n- checkCurrentlyRunning: %r\nwith pagination %s"
-                                % (search, checkCurrentlyRunning, paginator))
         search_pattern = {}
         for item in search:
             if (item == 'queue_name'):

@@ -28,7 +28,6 @@ class VoicemailManagement(object):
         pass
 
     def get_all_voicemails(self):
-        data_access_logger.info("List of all voicemails.")
         return voicemail_dao.all()
 
     def edit_voicemail(self, voicemailid, data):

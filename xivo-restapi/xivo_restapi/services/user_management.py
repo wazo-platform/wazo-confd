@@ -29,11 +29,9 @@ class UserManagement:
         pass
 
     def get_all_users(self):
-        data_access_logger.info("List of all users.")
         return user_dao.get_all()
 
     def get_user(self, userid):
-        data_access_logger.info("Consulting user of id %s." % userid)
         try:
             return user_dao.get(userid)
         except LookupError:

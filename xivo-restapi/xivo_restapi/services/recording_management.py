@@ -41,9 +41,6 @@ class RecordingManagement:
         return result
 
     def get_recordings(self, campaign_id, search=None, paginator=None):
-        data_access_logger.info("Getting recordings for campaign %d" % campaign_id +
-                                " with search criteria %s paginated with %s"
-                                % (search, paginator))
         search_pattern = {}
         if(search != None):
             for item in search:
@@ -59,8 +56,6 @@ class RecordingManagement:
         return (total, items)
 
     def search_recordings(self, campaign_id, search, paginator=None):
-        data_access_logger.info("Searching recordings in campaign %d with" % campaign_id +
-                                "search criteria %s paginated with %s" % (search, paginator))
         if(search == None or search == {} or 'key' not in search):
             return self.get_recordings(campaign_id,
                                                {},

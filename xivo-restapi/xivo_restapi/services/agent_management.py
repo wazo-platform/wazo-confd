@@ -26,7 +26,6 @@ data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 class AgentManagement:
 
     def get_all_agents(self):
-        data_access_logger.info("List of all agents.")
         result = agent_dao.all()
         if result != None:
             return result
