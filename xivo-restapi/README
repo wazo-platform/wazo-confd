@@ -1,13 +1,26 @@
-Testing:
---------
+Be sure to pass all tests before submiting any patch.
 
-/!\ Important
-You must execute "xivo-acceptance/utils/prerequisite.py" before testing !
+Acceptance Testing:
+------------------
 
+WARNING !!! all data will be erased by the acceptance tests use an empty xivo installation.
 
-TODO:
------
-- refactor db integration
+- Shutdown your local postgres if any
+- The restapi daemon uses the dao to connect to postgres on port 5432
+    - forward port 5432 to your xivo used for acceptance tests : ssh -L 5432:localhost:5432 root@<xivo acceptance ip address>
+  The lettuce tests use dao on port 5434 to initialize data
+    - forware port 5434 to your xivo used for acceptance tests : ssh -L 5434:localhost:5432 root@<xivo acceptance ip address>
+
+- start xivo-restapid
+
+PYTHONPATH=.:../../xivo-lib-python/xivo-lib-python/:../../xivo-dao/xivo-dao/  ./bin/xivo-restapid -d --dev_mode &
+
+Now you are ready to start the acceptance tests :
+
+    $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/                    # starts all tests 
+    $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/users.feature       # starts user features tests
+    $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/users.feature -s 3  # starts the third scenario
+
 
 Depends :
 ---------
@@ -18,24 +31,5 @@ XiVO:
 Other dependencies will be installed by the install script:
 - Flask-0.6-1, Werkzeug-0.6.2-1, 
 
-Installation :
---------------
-use xivo-recording.tar
 
-tar -xvf xivo-recording.tar
-cd xivo-recording
-
-Be sure to have a corresponding web interface package in the xivo-recording directory (with the support of the recording)! 
-./install.sh
-
-
-Packaging :
------------
-Create the tar
-tar -cvf xivo-restapi.tar xivo-restapi/ --exclude '*.log' --exclude '.*' --exclude '*.pyc' --exclude tests --exclude acceptance
-
-
-Test:
------
-
-curl --digest --user admin:passadmin http://192.168.51.14:50050/1.0/recording_campaigns/ --insecure -c cookie.txt -b cookie.txt --header "Accept: application/json" 
+Packaging info in project squeeze-xivo-skaro
