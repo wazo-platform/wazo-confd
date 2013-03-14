@@ -22,9 +22,9 @@ from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers.users_helper import UsersHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
-from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    IncorrectParametersException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
+from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 
 logger = logging.getLogger(__name__)
 

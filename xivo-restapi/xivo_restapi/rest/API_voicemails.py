@@ -20,12 +20,12 @@ from flask.globals import request
 from flask.helpers import make_response
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.rest.helpers.voicemails_helper import VoicemailsHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
-from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    IncorrectParametersException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
+from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
+from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class APIVoicemails:
 
     def __init__(self):
         self.voicemail_manager = VoicemailManagement()
-        self._voicemails_helper = VoicemailsHelper()
+        self.voicemail_sdm = VoicemailSdm()
 
     @produces("application/json")
     @realmDigest.requires_auth
@@ -60,7 +60,7 @@ class APIVoicemails:
             result = ["No parsable data in the request"]
             return make_response(rest_encoder.encode(result), 400)
         try:
-            self._voicemails_helper.validate_data(data)
+            self.voicemail_sdm.validate(data)
             self.voicemail_manager.edit_voicemail(int(voicemailid), data)
         except IncorrectParametersException as e:
             data = rest_encoder.encode([str(e)])

@@ -21,9 +21,9 @@ from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.tests import instance_user_management, \
     instance_users_helper
 from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    IncorrectParametersException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import unittest
+from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 
 
 class TestAPIUsers(unittest.TestCase):

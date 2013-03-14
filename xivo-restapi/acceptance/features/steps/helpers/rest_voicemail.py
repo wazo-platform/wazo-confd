@@ -35,10 +35,11 @@ class RestVoicemail(object):
     def list(self):
         return self.ws_utils.rest_get(RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/")
 
-    def update_voicemail(self, number, newnumber=None, newfullname=None):
+    def update_voicemail(self, number, newnumber=None, newfullname=None, newdeleteaftersend=False):
         voicemail_id = voicemail_dao.id_from_mailbox(number, "default")
         data = {"mailbox": newnumber,
-                "fullname": newfullname}
+                "fullname": newfullname,
+                "deleteaftersend": newdeleteaftersend}
         return self.update_voicemail_by_id(voicemail_id, data)
 
     def update_voicemail_by_id(self, voicemailid, data):

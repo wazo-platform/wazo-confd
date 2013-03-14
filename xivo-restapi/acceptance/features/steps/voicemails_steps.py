@@ -54,10 +54,11 @@ def then_i_get_one_voicemail_with_fullname_group1_and_with_number_group2(step, f
     assert data["mailbox"] == number
 
 
-@step(u'When I update the voicemail of number "([^"]*)" with number "([^"]*)" and fullname "([^"]*)"')
-def when_i_update_the_voicemail_of_number_group1_with_number_group2_and_fullname_group3(step, oldnumber, newnumber, newfullname):
+@step(u'When I update the voicemail of number "([^"]*)" with number "([^"]*)" and fullname "([^"]*)" and deleteaftersend "([^"]*)"')
+def when_i_update_the_voicemail_of_number_group1_with_number_group2_and_fullname_group3(step, oldnumber, newnumber, newfullname, newdeleteaftersend):
     global result
-    result = rest_voicemail.update_voicemail(oldnumber, newnumber=newnumber, newfullname=newfullname)
+    newdeleteaftersend_bool = bool(newdeleteaftersend)
+    result = rest_voicemail.update_voicemail(oldnumber, newnumber=newnumber, newfullname=newfullname, newdeleteaftersend=newdeleteaftersend_bool)
 
 
 @step(u'Then there is a voicemail with number "([^"]*)" and fullname "([^"]*)"')

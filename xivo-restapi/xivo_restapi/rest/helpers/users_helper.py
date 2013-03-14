@@ -17,7 +17,7 @@
 
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi.rest.helpers import global_helper
-from xivo_restapi.services.utils.exceptions import IncorrectParametersException
+from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 
 
 class UsersHelper:
