@@ -28,7 +28,7 @@ def when_i_create_a_queue(step, queue_name):
     assert restqueues.create(queue_name)
 
 
-@step(u'Then I can consult this queue')
-def then_i_can_consult_this_queue(step):
+@step(u'Then I can consult the queue "([^"]*)" and the other ones')
+def then_i_can_consult_the_queue_group1_and_the_other_ones(step, queue_name):
     global restqueues
-    assert restqueues.find("name", "test_lettuce")
+    assert restqueues.find("name", queue_name)
