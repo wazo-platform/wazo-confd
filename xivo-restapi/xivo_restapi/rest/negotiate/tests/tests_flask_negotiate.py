@@ -83,3 +83,13 @@ class TestFlaskNegotiate(unittest.TestCase):
             return 1
 
         self.assertEquals(1, decorated_func())
+
+    def test_produces_accept_all(self):
+        ctx = self.app.test_request_context('users/', headers={"Accept": "*/*"})
+        ctx.push()
+
+        @produces("application/json")
+        def decorated_func():
+            return 1
+
+        self.assertEquals(1, decorated_func())
