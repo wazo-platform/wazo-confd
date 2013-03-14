@@ -3,6 +3,7 @@ from xivo_dao import voicemail_dao
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 
 # Copyright (C) 2013 Avencall
 #
@@ -28,12 +29,19 @@ class VoicemailManagement(object):
         pass
 
     def get_all_voicemails(self):
-        return voicemail_dao.all()
+        list_voicemails_alchemy = voicemail_dao.all()
+        list_voicemails_sdm = []
+        for voicemail_alchemy in list_voicemails_alchemy:
+            list_voicemails_sdm.append(voicemail_mapping.alchemy_to_sdm(voicemail_alchemy).__dict__)
+        return list_voicemails_sdm
 
     def edit_voicemail(self, voicemailid, data):
         data_access_logger.info("Editing the voicemail of id %d with data %s."
                                 % (voicemailid, data))
+
         if(voicemail_dao.get(voicemailid) is None):
             raise NoSuchElementException("No such voicemail: " + str(voicemailid))
-        voicemail_dao.update(voicemailid, data)
+
+        converted_data = voicemail_mapping.sdm_to_alchemy_dict(data)
+        voicemail_dao.update(voicemailid, converted_data)
 
