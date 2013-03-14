@@ -16,9 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao import user_dao
+from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
+from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
-from xivo_restapi.restapi_config import RestAPIConfig
 
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
@@ -26,14 +27,19 @@ data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 class UserManagement:
 
     def __init__(self):
-        pass
+        self.user_mapping = UserMapping()
 
     def get_all_users(self):
-        return user_dao.get_all()
+        users = user_dao.get_all()
+        return_list = []
+        for user in users:
+            return_list.append(self.user_mapping.alchemy_to_sdm(user))
+        return return_list
 
     def get_user(self, userid):
         try:
-            return user_dao.get(userid)
+            user = user_dao.get(userid)
+            return self.user_mapping.alchemy_to_sdm(user)
         except LookupError:
             raise NoSuchElementException("No such user")
 
@@ -41,12 +47,14 @@ class UserManagement:
         data_access_logger.info("Creating a user with the data %s." % user.todict())
         if(user.description is None):
             user.description = ''
-        user_dao.add_user(user)
+        user_interne = self.user_mapping.sdm_to_alchemy(user)
+        user_dao.add_user(user_interne)
 
     def edit_user(self, userid, data):
         data_access_logger.info("Editing the user of id %s with data %s."
                                 % (userid, data))
-        updated_rows = user_dao.update(userid, data)
+        alchemy_data = self.user_mapping.sdm_to_alchemy_dict(data)
+        updated_rows = user_dao.update(userid, alchemy_data)
         if(updated_rows == 0):
             raise NoSuchElementException("No such user")
 

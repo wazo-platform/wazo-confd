@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from xivo_dao import voicemail_dao
+from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
+from xivo_dao.mapping_alchemy_sdm.voicemail_mapping import VoicemailMapping
+from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
-from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
@@ -26,13 +27,13 @@ data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 class VoicemailManagement(object):
 
     def __init__(self):
-        pass
+        self.voicemail_mapping = VoicemailMapping()
 
     def get_all_voicemails(self):
         list_voicemails_alchemy = voicemail_dao.all()
         list_voicemails_sdm = []
         for voicemail_alchemy in list_voicemails_alchemy:
-            list_voicemails_sdm.append(voicemail_mapping.alchemy_to_sdm(voicemail_alchemy))
+            list_voicemails_sdm.append(self.voicemail_mapping.alchemy_to_sdm(voicemail_alchemy))
         return list_voicemails_sdm
 
     def edit_voicemail(self, voicemailid, data):
@@ -42,6 +43,6 @@ class VoicemailManagement(object):
         if(voicemail_dao.get(voicemailid) is None):
             raise NoSuchElementException("No such voicemail: " + str(voicemailid))
 
-        converted_data = voicemail_mapping.sdm_to_alchemy_dict(data)
+        converted_data = self.voicemail_mapping.sdm_to_alchemy_dict(data)
         voicemail_dao.update(voicemailid, converted_data)
 

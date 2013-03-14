@@ -17,13 +17,14 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.service_data_model.sdm_exception import \
+    IncorrectParametersException
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_user_management, \
+from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, \
     instance_users_helper
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import unittest
-from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 
 
 class TestAPIUsers(unittest.TestCase):
@@ -31,6 +32,7 @@ class TestAPIUsers(unittest.TestCase):
     def setUp(self):
         self.instance_user_management = instance_user_management
         self.instance_users_helper = instance_users_helper
+        self.user_sdm = instance_user_sdm
         from xivo_restapi.rest import flask_http_server
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
@@ -146,16 +148,17 @@ class TestAPIUsers(unittest.TestCase):
                 'lastname': 'Dupond',
                 'unexisting_field': 'value'}
 
-        def mock_create_instance(data):
+        def mock_validate(data):
             raise IncorrectParametersException("unexisting_field")
 
-        self.instance_users_helper.create_instance.side_effect = mock_create_instance
+        self.user_sdm.validate.side_effect = mock_validate
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
                               data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         received_data = rest_encoder.decode(result.data)
         self.assertEquals(expected_data, received_data[0])
+        self.user_sdm.validate.side_effect = None
 
     def test_edit(self):
         status = "200 OK"
@@ -164,11 +167,12 @@ class TestAPIUsers(unittest.TestCase):
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
         self.instance_user_management.edit_user.return_value = True
+        self.user_sdm.validate.return_value = True
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
                               data=rest_encoder.encode(data))
         self.assertEqual(result.status, status)
-        self.instance_users_helper.validate_data.assert_called_with(data)
+        self.user_sdm.validate.assert_called_with(data)
         self.instance_user_management.edit_user.assert_called_with(1, data)
 
     def test_edit_error(self):
@@ -184,7 +188,7 @@ class TestAPIUsers(unittest.TestCase):
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
                               data=rest_encoder.encode(data))
-        self.instance_users_helper.validate_data.assert_called_with(data)
+        self.user_sdm.validate.assert_called_with(data)
         self.assertEqual(status, result.status)
         self.instance_user_management.edit_user.side_effect = None
 
@@ -198,14 +202,15 @@ class TestAPIUsers(unittest.TestCase):
         def mock_validate_data(data):
             raise IncorrectParametersException("unexisting_field")
 
-        self.instance_users_helper.validate_data.side_effect = mock_validate_data
+        self.user_sdm.validate.side_effect = mock_validate_data
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
                               data=rest_encoder.encode(data))
         self.assertEquals(result.status, status)
         received_data = rest_encoder.decode(result.data)
         self.assertEquals(received_data[0], expected_data)
-        self.instance_users_helper.validate_data.assert_called_with(data)
+        self.user_sdm.validate.assert_called_with(data)
+        self.instance_user_management.edit_user.side_effect = None
 
     def test_edit_not_found(self):
         status = "404 NOT FOUND"

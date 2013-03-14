@@ -17,6 +17,9 @@
 
 from flask.globals import request
 from flask.helpers import make_response
+from xivo_dao.service_data_model.sdm_exception import \
+    IncorrectParametersException
+from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers.users_helper import UsersHelper
@@ -24,7 +27,6 @@ from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import logging
-from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,7 @@ class APIUsers:
     def __init__(self):
         self._user_management = UserManagement()
         self._users_helper = UsersHelper()
+        self._user_sdm = UserSdm()
 
     @produces('application/json')
     @realmDigest.requires_auth
@@ -72,6 +75,7 @@ class APIUsers:
             response = rest_encoder.encode(["No parsable data in the request"])
             return make_response(response, 400)
         try:
+            self._user_sdm.validate(data)
             user = self._users_helper.create_instance(data)
             self._user_management.create_user(user)
             return make_response('', 201)
@@ -93,7 +97,7 @@ class APIUsers:
             response = rest_encoder.encode(["No parsable data in the request"])
             return make_response(response, 400)
         try:
-            self._users_helper.validate_data(data)
+            self._user_sdm.validate(data)
             self._user_management.edit_user(int(userid), data)
             return make_response('', 200)
         except IncorrectParametersException as e:

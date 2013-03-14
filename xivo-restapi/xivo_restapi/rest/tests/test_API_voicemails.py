@@ -17,8 +17,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao.alchemy.voicemail import Voicemail
+from xivo_dao.service_data_model.sdm_exception import \
+    IncorrectParametersException
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_voicemail_management
+from xivo_restapi.rest.tests import instance_voicemail_management, \
+    instance_voicemail_sdm
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import unittest
@@ -28,6 +31,7 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         self.instance_voicemail_management = instance_voicemail_management
+        self.voicemail_sdm = instance_voicemail_sdm
         from xivo_restapi.rest import flask_http_server
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
@@ -63,11 +67,13 @@ class Test(unittest.TestCase):
     def test_edit_success(self):
         status = "200 OK"
         self.instance_voicemail_management.edit_voicemail.return_value = True
+        self.voicemail_sdm.validate.return_value = True
         data = {"mailbox": "123",
                 "fullname": "test"}
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/1",
                               data=rest_encoder.encode(data))
+        self.voicemail_sdm.validate.assert_called_with(data)
         self.instance_voicemail_management.edit_voicemail.assert_called_with(1, data)
         self.assertEquals(status, result.status)
 
@@ -99,9 +105,14 @@ class Test(unittest.TestCase):
                 "fullname": "test",
                 "unexisting_field": "value"}
         self.instance_voicemail_management.edit_voicemail.return_value = True
+
+        def mock_validate(data):
+            raise IncorrectParametersException('unexisting_field')
+        self.voicemail_sdm.validate.side_effect = mock_validate
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/1",
                               data=rest_encoder.encode(data))
         self.assertEquals(result.status, status)
         returned_data = rest_encoder.decode(result.data)
         self.assertEquals(returned_data, ["Incorrect parameters sent: unexisting_field"])
+        self.voicemail_sdm.validate.side_effect = None

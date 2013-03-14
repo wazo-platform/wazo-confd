@@ -17,7 +17,6 @@
 
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi.rest.helpers import global_helper
-from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 
 
 class UsersHelper:
@@ -27,13 +26,4 @@ class UsersHelper:
                                  UserFeatures.__table__.columns] #@UndefinedVariable
 
     def create_instance(self, data):
-        self.validate_data(data)
         return global_helper.create_class_instance(UserFeatures, data)
-
-    def validate_data(self, data):
-        invalid_params = []
-        for param in data:
-            if(param not in self.accepted_fields):
-                invalid_params.append(param)
-        if(len(invalid_params) > 0):
-            raise IncorrectParametersException(*invalid_params)

@@ -1,5 +1,7 @@
 from functools import wraps
 from mock import patch, Mock
+from xivo_dao.service_data_model.user_sdm import UserSdm
+from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.rest.authentication import xivo_realm_digest
 from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
 from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
@@ -79,8 +81,18 @@ mock_users_helper = patch_users_helper.start()
 instance_users_helper = Mock(UsersHelper)
 mock_users_helper.return_value = instance_users_helper
 
+patcher_user_sdm = patch("xivo_restapi.rest.API_users.UserSdm")
+mock_user_sdm = patcher_user_sdm.start()
+instance_user_sdm = Mock(UserSdm)
+mock_user_sdm.return_value = instance_user_sdm
+
 
 patcher_voicemails = patch("xivo_restapi.rest.API_voicemails.VoicemailManagement")
 mock_voicemail = patcher_voicemails.start()
 instance_voicemail_management = Mock(VoicemailManagement)
 mock_voicemail.return_value = instance_voicemail_management
+
+patcher_voicemail_sdm = patch("xivo_restapi.rest.API_voicemails.VoicemailSdm")
+mock_voicemail_sdm = patcher_voicemail_sdm.start()
+instance_voicemail_sdm = Mock(VoicemailSdm)
+mock_voicemail_sdm.return_value = instance_voicemail_sdm
