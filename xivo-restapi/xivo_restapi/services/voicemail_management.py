@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-from xivo_dao import voicemail_dao
-from xivo_restapi.services.utils.exceptions import NoSuchElementException
-import logging
-from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 
 # Copyright (C) 2013 Avencall
 #
@@ -19,6 +14,11 @@ from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+from xivo_dao import voicemail_dao
+from xivo_restapi.services.utils.exceptions import NoSuchElementException
+import logging
+from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
@@ -32,7 +32,7 @@ class VoicemailManagement(object):
         list_voicemails_alchemy = voicemail_dao.all()
         list_voicemails_sdm = []
         for voicemail_alchemy in list_voicemails_alchemy:
-            list_voicemails_sdm.append(voicemail_mapping.alchemy_to_sdm(voicemail_alchemy).__dict__)
+            list_voicemails_sdm.append(voicemail_mapping.alchemy_to_sdm(voicemail_alchemy))
         return list_voicemails_sdm
 
     def edit_voicemail(self, voicemailid, data):

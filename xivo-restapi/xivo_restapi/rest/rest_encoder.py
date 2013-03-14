@@ -16,9 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers.db_manager import Base
+from xivo_dao.service_data_model.base_sdm import BaseSdm
 import json
 import logging
-from xivo_dao.helpers.db_manager import Base
 
 logger = logging.getLogger()
 
@@ -48,5 +49,7 @@ def _serialize(obj):
         for attribute in missing_attributes:
             result[attribute] = getattr(obj, attribute)
         return result
+    elif(isinstance(obj, BaseSdm)):
+        return obj.todict()
     else:
         return str(obj)
