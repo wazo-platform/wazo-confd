@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from mock import Mock
-from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.helpers.users_helper import UsersHelper
-from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
 import unittest
 
 
@@ -33,5 +32,5 @@ class TestUsersHelper(unittest.TestCase):
         mock_return_value = Mock()
         global_helper.create_class_instance.return_value = mock_return_value
         result = self.users_helper.create_instance(data)
-        global_helper.create_class_instance.assert_called_with(UserFeatures, data) #@UndefinedVariable
+        global_helper.create_class_instance.assert_called_with(UserSdm, data) #@UndefinedVariable
         self.assertEqual(result, mock_return_value)

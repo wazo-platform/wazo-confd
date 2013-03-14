@@ -69,10 +69,10 @@ def then_i_get_a_single_user_group1(step, fullname):
     assert result['lastname'] == lastname
 
 
-@step(u'When I create a user "([^"]*)" with description "([^"]*)"')
-def when_i_create_a_user_group1_with_description_group2(step, fullname, description):
+@step(u'When I create a user "([^"]*)" with description "([^"]*)" and with ctiprofileid "([^"]*)"')
+def when_i_create_a_user_group1_with_description_group2(step, fullname, description, ctiprofileid):
     global result
-    result = rest_users.create_user(fullname, description)
+    result = rest_users.create_user(fullname, description, int(ctiprofileid))
 
 
 @step(u'Then I get a response with status "([^"]*)"')
@@ -81,13 +81,15 @@ def then_i_get_a_response_with_status_group1(step, status):
     assert result.status == int(status), result.data
 
 
-@step(u'Then the user "([^"]*)" is actually created')
-def then_the_user_group1_is_actually_created(step, fullname):
+@step(u'Then the user "([^"]*)" is actually created with ctiprofileid "([^"]*)" and description "([^"]*)')
+def then_the_user_group1_is_actually_created(step, fullname, ctiprofileid, description):
     userid = rest_users.id_from_fullname(fullname)
     request_result = rest_users.get_user(userid).data
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
     assert request_result['firstname'] == firstname
     assert request_result['lastname'] == lastname
+    assert request_result['ctiprofileid'] == int(ctiprofileid)
+    assert request_result['description'] == description
 
 
 @step(u'When I ask for the user of id "([^"]*)"')

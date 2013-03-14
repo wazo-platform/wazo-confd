@@ -20,9 +20,9 @@ Feature: Users management
 	  
 	Scenario: Creating a user
 	  Given there is no user
-	  When I create a user "Clémence Dupond" with description "accented description: éà@';"
+	  When I create a user "Clémence Dupond" with description "accented description: éà@';" and with ctiprofileid "1"
 	  Then I get a response with status "201"
-	  Then the user "Clémence Dupond" is actually created
+	  Then the user "Clémence Dupond" is actually created with ctiprofileid "1" and description "accented description: éà@';"
 	  
 	Scenario: Creation with errors
 	  Given there is no user

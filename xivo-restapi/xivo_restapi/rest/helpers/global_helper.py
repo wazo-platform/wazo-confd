@@ -26,7 +26,9 @@ logger = logging.getLogger(__name__)
 def create_class_instance(class_type, data):
     instance = class_type()
     for k, v in data.items():
-        if k in dir(class_type):
+        logger.debug("Key: %s, value: %s" % (k, v))
+        logger.debug("dir value: %s" % dir)
+        if k in instance.todict():
             setattr(instance, k, v)
     return instance
 

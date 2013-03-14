@@ -15,15 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.rest.helpers import global_helper
 
 
 class UsersHelper:
 
     def __init__(self):
-        self.accepted_fields = [column.name for column in\
-                                 UserFeatures.__table__.columns] #@UndefinedVariable
+        pass
 
     def create_instance(self, data):
-        return global_helper.create_class_instance(UserFeatures, data)
+        return global_helper.create_class_instance(UserSdm, data)
