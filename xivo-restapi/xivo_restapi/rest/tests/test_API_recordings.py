@@ -226,7 +226,7 @@ class TestAPIRecordings(unittest.TestCase):
                               '/' + campaign_id + '/' + recording_id,
                               '')
         self.instance_recording_management.delete\
-                    .assert_called_with(campaign_id,
+                    .assert_called_with(int(campaign_id),
                                         recording_id)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
@@ -244,7 +244,7 @@ class TestAPIRecordings(unittest.TestCase):
                               '/' + campaign_id + '/' + recording_id,
                               '')
         self.instance_recording_management.delete\
-                    .assert_called_with(campaign_id,
+                    .assert_called_with(int(campaign_id),
                                         recording_id)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
@@ -265,7 +265,7 @@ class TestAPIRecordings(unittest.TestCase):
                               '/' + campaign_id + '/' + recording_id,
                               '')
         self.instance_recording_management.delete\
-                    .assert_called_with(campaign_id,
+                    .assert_called_with(int(campaign_id),
                                         recording_id)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +

@@ -26,9 +26,12 @@ class TestGlobalHelper(unittest.TestCase):
 
     def test_create_class_instance(self):
         class SampleClass():
-            att1 = 1
-            att2 = None
-            att3 = 'foo'
+            def __init__(self):
+                self.att1 = 1
+                self.att2 = None
+                self.att3 = 'foo'
+            def todict(self):
+                return self.__dict__
         dict_data = {'att1': 'foo',
                      'att2': 12,
                      'att3': None,
