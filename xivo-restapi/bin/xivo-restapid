@@ -35,6 +35,7 @@ LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
 data_access_logger = None
+logger = None
 
 def main():
     parsed_args = _parse_args(sys.argv[1:])
@@ -49,11 +50,15 @@ def main():
         from flup.server.fcgi import WSGIServer
         if not parsed_args.debug:
             _daemonize()
+            logger.info("Starting xivo-restapid in standard mode.")
+        else:
+            logger.info("Starting xivo-restapid in debug mode.")
         WSGIServer(app, bindAddress='/var/www/restws-fcgi.sock',
                    multithreaded=False, multiprocess=True).run()
 
 
 def _init_logging(debug_mode):
+    global logger, data_access_logger
     data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
     logger = logging.getLogger()
 
@@ -73,12 +78,8 @@ def _init_logging(debug_mode):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
-        logger.info("Starting xivo-restapid in debug mode.")
     else:
         logger.setLevel(logging.INFO)
-        logger.info("Starting xivo-restapid in standard mode.")
-
-
 
 def _daemonize():
     daemonize.daemonize()
