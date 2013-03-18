@@ -57,9 +57,3 @@ class UserManagement:
         updated_rows = user_dao.update(userid, alchemy_data)
         if(updated_rows == 0):
             raise NoSuchElementException("No such user")
-
-    def delete_user(self, userid):
-        data_access_logger.info("Deleting the user of id %s." % userid)
-        result = user_dao.delete(userid)
-        if(result == 0):
-            raise NoSuchElementException("No such user")

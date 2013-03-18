@@ -101,15 +101,3 @@ class TestUserManagement(unittest.TestCase):
         user_dao.update.return_value = 0
         self.assertRaises(NoSuchElementException, self._userManager.edit_user,
                           1, data)
-
-    def test_delete_user(self):
-        user_dao.delete = Mock()
-        user_dao.delete.return_value = 1
-        self._userManager.delete_user(1)
-        user_dao.delete.assert_called_with(1)  #@UndefinedVariable
-
-    def test_delete_unexisting_user(self):
-        user_dao.delete = Mock()
-        user_dao.delete.return_value = 0
-        self.assertRaises(NoSuchElementException, self._userManager.delete_user, 1)
-        user_dao.delete.assert_called_with(1)  #@UndefinedVariable

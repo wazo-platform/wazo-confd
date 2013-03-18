@@ -117,23 +117,10 @@ def when_i_update_the_user_of_id_group1_with_the_last_name_group2(step, userid, 
     result = rest_users.update_user(int(userid), lastname=lastname)
 
 
-@step(u'When I delete the user "([^"]*)" using its id')
-def when_i_delete_the_user_group1_using_its_id(step, fullname):
-    global result
-    userid = rest_users.id_from_fullname(fullname)
-    result = rest_users.delete_user(userid)
-
-
 @step(u'Then the user "([^"]*)" is actually deleted')
 def then_the_user_group1_is_actually_deleted(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
     assert userid is None
-
-
-@step(u'When I delete the user of id "([^"]*)"')
-def when_i_delete_the_user_of_id_group1(step, userid):
-    global result
-    result = rest_users.delete_user(int(userid))
 
 
 @step(u'When I create a user "([^"]*)" with an field "([^"]*)" of value "([^"]*)"')

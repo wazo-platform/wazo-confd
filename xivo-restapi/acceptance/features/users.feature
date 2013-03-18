@@ -48,14 +48,3 @@ Feature: Users management
 	  When I update the user "Michel Sardou" with a field "unexisting_field" of value "value"
 	  Then I get a response with status "400"
 	  Then I get an error message "Incorrect parameters sent: unexisting_field"
-	  
-	Scenario: Deleting a user
-	  Given there is no user
-	  Given there is a user "Clémence Dupond"
-	  When I delete the user "Clémence Dupond" using its id
-	  Then the user "Clémence Dupond" is actually deleted
-	  
-	Scenario: Deleting a non existing user
-	  Given there is no user
-	  When I delete the user of id "1"
-	  Then I get a response with status "404"
