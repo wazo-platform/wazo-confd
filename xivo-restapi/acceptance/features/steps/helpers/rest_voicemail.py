@@ -15,9 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from acceptance.features.steps.helpers.ws_utils import WsUtils
-from xivo_dao import voicemail_dao
+from xivo_dao import voicemail_dao, user_dao
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_restapi.restapi_config import RestAPIConfig
+import random
 
 
 class RestVoicemail(object):
@@ -50,3 +51,15 @@ class RestVoicemail(object):
         voicemail_id = voicemail_dao.id_from_mailbox(number, "default")
         data = {fieldname: fieldvalue}
         return self.update_voicemail_by_id(voicemail_id, data)
+
+    def generate_non_existing_id(self):
+        generated_id = random.randint(100, 9999)
+        while(voicemail_dao.get(generated_id) is not None):
+            generated_id = random.randint(100, 9999)
+        return generated_id
+
+    def delete_voicemail_from_db(self, voicemailid):
+        users = user_dao.get_by_voicemailid(voicemailid)
+        for user in users:
+            user_dao.update(user.id, {'voicemailid': None})
+        voicemail_dao.delete(voicemailid)

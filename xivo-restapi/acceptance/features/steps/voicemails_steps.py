@@ -23,14 +23,15 @@ rest_voicemail = RestVoicemail()
 result = None
 
 
-@step(u'Given there is no voicemail')
-def given_there_is_no_voicemail(step):
-    voicemail_dao.delete_all()
-
-
 @step(u'Given there is a voicemail with fullname "([^"]*)" and with number "([^"]*)"')
 def given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):
-    rest_voicemail.create_voicemail(fullname=fullname, number=number)
+    voicemailid = voicemail_dao.id_from_mailbox(number, "default")
+    if(voicemailid is None):
+        rest_voicemail.create_voicemail(fullname, number)
+    else:
+        voicemail = voicemail_dao.get(voicemailid)
+        if(voicemail.fullname != fullname):
+            voicemail_dao.update(voicemailid, {'fullname': fullname})
 
 
 @step(u'When I list the voicemails')
@@ -45,13 +46,13 @@ def then_i_get_a_response_from_voicemails_webservice_with_status_group1(step, st
     assert result.status == int(status)
 
 
-@step(u'Then I get one voicemail with fullname "([^"]*)" and with number "([^"]*)"')
+@step(u'Then I get at least one voicemail with fullname "([^"]*)" and with number "([^"]*)"')
 def then_i_get_one_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):
     global result
-    assert len(result.data["items"]) == 1
-    data = result.data["items"][0]
-    assert data["fullname"] == fullname
-    assert data["mailbox"] == number
+    assert len(result.data["items"]) >= 1
+    data = result.data["items"]
+    matching_data = [item for item in data if item['fullname'] == fullname and item['mailbox'] == number]
+    assert len(matching_data) > 0
 
 
 @step(u'When I update the voicemail of number "([^"]*)" with number "([^"]*)" and fullname "([^"]*)" and deleteaftersend "([^"]*)"')
@@ -70,12 +71,6 @@ def then_there_is_a_voicemail_with_number_group1_and_fullname_group2(step, numbe
     assert len(matching_voicemails) > 0
 
 
-@step(u'When I update the voicemail of id "([^"]*)"')
-def when_i_update_the_voicemail_of_id_group1(step, voicemailid):
-    global result
-    result = rest_voicemail.update_voicemail_by_id(int(voicemailid), {})
-
-
 @step(u'When I update the voicemail of number "([^"]*)" with a field "([^"]*)" of value "([^"]*)"')
 def when_i_update_the_voicemail_of_number_group1_with_a_field_group2_of_value_group3(step, number, fieldname, fieldvalue):
     global result
@@ -86,3 +81,17 @@ def when_i_update_the_voicemail_of_number_group1_with_a_field_group2_of_value_gr
 def then_i_get_an_error_message_from_voicemails_webservice_group1(step, message):
     global result
     assert result.data[0] == message
+
+
+@step(u'When I update a voicemail with a non existing id')
+def when_i_update_a_voicemail_with_a_non_existing_id(step):
+    global result
+    generated_id = rest_voicemail.generate_non_existing_id()
+    result = rest_voicemail.update_voicemail_by_id(generated_id, {'fullname': 'test 2'})
+
+
+@step(u'Given there is no voicemail with number "([^"]*)"')
+def given_there_is_no_voicemail_with_number_group1(step, number):
+    voicemailid = voicemail_dao.id_from_mailbox(number, "default")
+    if(voicemailid is not None):
+        rest_voicemail.delete_voicemail_from_db(voicemailid)
