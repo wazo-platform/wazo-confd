@@ -107,15 +107,3 @@ class APIUsers:
         except Exception as e:
             data = rest_encoder.encode([str(e)])
             return make_response(data, 500)
-
-    @realmDigest.requires_auth
-    def delete(self, userid):
-        logger.info("Request for deleting the user of id %s ." % userid)
-        try:
-            self._user_management.delete_user(int(userid))
-            return make_response('', 200)
-        except NoSuchElementException:
-            return make_response('', 404)
-        except Exception as e:
-            data = rest_encoder.encode([str(e)])
-            return make_response(data, 500)

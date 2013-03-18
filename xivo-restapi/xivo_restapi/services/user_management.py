@@ -65,9 +65,3 @@ class UserManagement:
         if(voicemailid is not None):
             fullname = user_dao.get(userid).fullname
             self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
-
-    def delete_user(self, userid):
-        data_access_logger.info("Deleting the user of id %s." % userid)
-        result = user_dao.delete(userid)
-        if(result == 0):
-            raise NoSuchElementException("No such user")

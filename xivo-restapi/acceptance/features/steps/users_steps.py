@@ -20,26 +20,22 @@ from lettuce import step
 from xivo_dao import user_dao, voicemail_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail
-import re
+from acceptance.features.steps.voicemails_steps import given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
+from acceptance.features.steps.helpers.rest_voicemail import RestVoicemail
 
-re.UNICODE = True
 result = None
 rest_users = RestUsers()
 
 
-@step(u'Given there is no user')
-def given_there_is_no_user(step):
-    user_dao.delete_all()
-
-
 @step('Given there is a user "([^"]*)"$')
 def given_there_is_a_user_group1(step, fullname):
-    (firstname, lastname) = rest_users.decompose_fullname(fullname)
-    user = UserFeatures()
-    user.firstname = firstname
-    user.lastname = lastname
-    user.description = 'description'
-    user_dao.add_user(user)
+    if(rest_users.id_from_fullname(fullname) is None):
+        (firstname, lastname) = rest_users.decompose_fullname(fullname)
+        user = UserFeatures()
+        user.firstname = firstname
+        user.lastname = lastname
+        user.description = 'description'
+        user_dao.add_user(user)
 
 
 @step(u'When I ask for all the users')
@@ -51,7 +47,7 @@ def when_i_ask_for_all_the_users(step):
 @step(u'Then I get a list with "([^"]*)" and "([^"]*)"')
 def then_i_get_a_list_with_group1_and_group2(step, fullname1, fullname2):
     global result
-    assert len(result) == 2
+    assert len(result) >= 2
     processed_result = [[item['firstname'], item['lastname']] for item in result]
     assert fullname1.split(" ") in processed_result
     assert fullname2.split(" ") in processed_result
@@ -91,14 +87,8 @@ def then_the_user_group1_is_actually_created(step, fullname, ctiprofileid, descr
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
     assert request_result['firstname'] == firstname
     assert request_result['lastname'] == lastname
-    assert request_result['ctiprofileid'] == int(ctiprofileid)
+    assert request_result['ctiprofileid'] == int(ctiprofileid), "received: " + str(request_result['ctiprofileid']) + " expected: " + ctiprofileid
     assert request_result['description'] == description
-
-
-@step(u'When I ask for the user of id "([^"]*)"')
-def when_i_ask_for_the_user_of_id_group1(step, userid):
-    global result
-    result = rest_users.get_user(userid)
 
 
 @step(u'When I update the user "([^"]*)" with a last name "([^"]*)"')
@@ -114,29 +104,10 @@ def then_i_have_a_user_group1(step, fullname):
     assert userid != None and userid > 0
 
 
-@step(u'When I update the user of id "([^"]*)" with the last name "([^"]*)"')
-def when_i_update_the_user_of_id_group1_with_the_last_name_group2(step, userid, lastname):
-    global result
-    result = rest_users.update_user(int(userid), lastname=lastname)
-
-
-@step(u'When I delete the user "([^"]*)" using its id')
-def when_i_delete_the_user_group1_using_its_id(step, fullname):
-    global result
-    userid = rest_users.id_from_fullname(fullname)
-    result = rest_users.delete_user(userid)
-
-
 @step(u'Then the user "([^"]*)" is actually deleted')
 def then_the_user_group1_is_actually_deleted(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
     assert userid is None
-
-
-@step(u'When I delete the user of id "([^"]*)"')
-def when_i_delete_the_user_of_id_group1(step, userid):
-    global result
-    result = rest_users.delete_user(int(userid))
 
 
 @step(u'When I create a user "([^"]*)" with an field "([^"]*)" of value "([^"]*)"')
@@ -160,18 +131,13 @@ def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, full
 
 @step(u'Given there is a user "([^"]*)" with a voicemail')
 def given_there_is_a_user_group1_with_a_voicemail(step, fullname):
-    voicemail = Voicemail()
-    voicemail.fullname = fullname
-    voicemail.mailbox = "123"
-    voicemail.context = "default"
-    voicemail_dao.add(voicemail)
-    (firstname, lastname) = rest_users.decompose_fullname(fullname)
-    user = UserFeatures()
-    user.firstname = firstname
-    user.lastname = lastname
-    user.description = 'description'
-    user.voicemailid = voicemail.uniqueid
-    user_dao.add_user(user)
+    given_there_is_a_user_group1(step, fullname)
+    userid = rest_users.id_from_fullname(fullname)
+    user = user_dao.get(userid)
+    if(user.voicemailid is None):
+        given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, '123')
+        voicemailid = voicemail_dao.id_from_mailbox('123', 'default')
+        user_dao.update(user.id, {'voicemailid': voicemailid})
 
 
 @step(u'When I update the user "([^"]*)" with a first name "([^"]*)" and a last name "([^"]*)"')
@@ -187,3 +153,21 @@ def then_i_have_a_user_group1_with_a_voicemail_group1(step, user_fullname, voice
     assert userid != None and userid > 0
     voicemail = rest_users.voicemail_from_user(userid)
     assert voicemail.fullname == voicemail_fullname
+
+
+@step(u'When I ask for a user with a non existing id')
+def when_i_ask_for_a_user_with_a_non_existing_id(step):
+    global result
+    result = rest_users.get_user(rest_users.generate_unexisting_id())
+
+
+@step(u'When I update a user with a non existing id with the last name "([^"]*)"')
+def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, lastname):
+    global result
+    generated_id = rest_users.generate_unexisting_id()
+    result = rest_users.update_user(generated_id, lastname)
+
+@step(u'Then I delete the user "([^"]*)" from the database')
+def then_i_delete_the_user_group1_from_the_database(step, fullname):
+    userid = rest_users.id_from_fullname(fullname)
+    rest_users.delete_user_from_db(userid)

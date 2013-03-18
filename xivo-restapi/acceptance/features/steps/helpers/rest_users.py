@@ -18,6 +18,7 @@
 from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import user_dao, voicemail_dao
 from xivo_restapi.restapi_config import RestAPIConfig
+import random
 
 
 class RestUsers():
@@ -60,9 +61,6 @@ class RestUsers():
         return self.ws_utils.rest_put(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid,
                                       data)
 
-    def delete_user(self, userid):
-        return self.ws_utils.rest_delete(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid)
-
     def create_user_with_field(self, fullname, fieldname, fieldvalue):
         (firstname, lastname) = self.decompose_fullname(fullname)
         data = {'firstname': firstname,
@@ -79,3 +77,18 @@ class RestUsers():
     def voicemail_from_user(self, userid):
         voicemailid = user_dao.get(userid).voicemailid
         return voicemail_dao.get(voicemailid)
+
+    def generate_unexisting_id(self):
+        generated_id = random.randint(100, 9999)
+        id_exists = True
+        while(id_exists):
+            try:
+                user_dao.get(generated_id)
+                id_exists = True
+                generated_id = random.randint(100, 9999)
+            except LookupError:
+                id_exists = False
+        return generated_id
+
+    def delete_user_from_db(self, userid):
+        user_dao.delete(userid)
