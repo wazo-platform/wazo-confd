@@ -21,7 +21,6 @@ from mock import Mock, patch
 from xivo_dao import agent_dao, recordings_dao
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.restapi_config import RestAPIConfig
-import copy
 import os
 import unittest
 

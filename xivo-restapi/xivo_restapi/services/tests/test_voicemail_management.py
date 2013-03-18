@@ -18,7 +18,6 @@
 from mock import Mock, call
 from xivo_dao import voicemail_dao
 from xivo_dao.alchemy.voicemail import Voicemail
-from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.services.voicemail_management import VoicemailManagement

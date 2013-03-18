@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from mock import Mock
 from xivo_dao.alchemy.recordings import Recordings
-from xivo_restapi.rest.helpers import recordings_helper, global_helper
+from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 import unittest
 
@@ -40,5 +40,5 @@ class TestRecordingsHelper(unittest.TestCase):
         mock_return_value = Mock()
         global_helper.create_class_instance.return_value = mock_return_value
         result = self.recordings_helper.create_instance(data)
-        global_helper.create_class_instance.assert_called_with(Recordings, data)
+        global_helper.create_class_instance.assert_called_with(Recordings, data)  # @UndefinedVariable
         self.assertEqual(result, mock_return_value)

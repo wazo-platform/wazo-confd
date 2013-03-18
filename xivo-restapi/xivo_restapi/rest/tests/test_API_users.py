@@ -16,12 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from mock import Mock
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.service_data_model.sdm_exception import \
     IncorrectParametersException
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, \
-    instance_users_helper
+from xivo_restapi.rest.helpers import global_helper
+from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, mock_user_sdm
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 import unittest
@@ -31,7 +32,6 @@ class TestAPIUsers(unittest.TestCase):
 
     def setUp(self):
         self.instance_user_management = instance_user_management
-        self.instance_users_helper = instance_users_helper
         self.user_sdm = instance_user_sdm
         from xivo_restapi.rest import flask_http_server
         flask_http_server.app.testing = True
@@ -116,14 +116,14 @@ class TestAPIUsers(unittest.TestCase):
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
         self.instance_user_management.create_user.return_value = True
-        user = UserFeatures()
-        self.instance_users_helper.create_instance.return_value = user
+        global_helper.create_class_instance = Mock()
+        global_helper.create_class_instance.return_value = self.user_sdm
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
                               data=rest_encoder.encode(data))
         self.assertEqual(result.status, status)
-        self.instance_users_helper.create_instance.assert_called_with(data)
-        self.instance_user_management.create_user.assert_called_with(user)
+        global_helper.create_class_instance.assert_called_with(mock_user_sdm, data)  # @UndefinedVariable
+        self.instance_user_management.create_user.assert_called_with(self.user_sdm)
 
     def test_create_error(self):
         status = "500 INTERNAL SERVER ERROR"
