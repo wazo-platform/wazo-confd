@@ -24,19 +24,15 @@ result = None
 rest_users = RestUsers()
 
 
-@step(u'Given there is no user')
-def given_there_is_no_user(step):
-    user_dao.delete_all()
-
-
 @step(u'Given there is a user "([^"]*)"')
 def given_there_is_a_user_group1(step, fullname):
-    (firstname, lastname) = rest_users.decompose_fullname(fullname)
-    user = UserFeatures()
-    user.firstname = firstname
-    user.lastname = lastname
-    user.description = 'description'
-    user_dao.add_user(user)
+    if(rest_users.id_from_fullname(fullname) is None):
+        (firstname, lastname) = rest_users.decompose_fullname(fullname)
+        user = UserFeatures()
+        user.firstname = firstname
+        user.lastname = lastname
+        user.description = 'description'
+        user_dao.add_user(user)
 
 
 @step(u'When I ask for all the users')
@@ -48,7 +44,7 @@ def when_i_ask_for_all_the_users(step):
 @step(u'Then I get a list with "([^"]*)" and "([^"]*)"')
 def then_i_get_a_list_with_group1_and_group2(step, fullname1, fullname2):
     global result
-    assert len(result) == 2
+    assert len(result) >= 2
     processed_result = [[item['firstname'], item['lastname']] for item in result]
     assert fullname1.split(" ") in processed_result
     assert fullname2.split(" ") in processed_result
@@ -88,14 +84,8 @@ def then_the_user_group1_is_actually_created(step, fullname, ctiprofileid, descr
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
     assert request_result['firstname'] == firstname
     assert request_result['lastname'] == lastname
-    assert request_result['ctiprofileid'] == int(ctiprofileid)
+    assert request_result['ctiprofileid'] == int(ctiprofileid), "received: " + str(request_result['ctiprofileid']) + " expected: " + ctiprofileid
     assert request_result['description'] == description
-
-
-@step(u'When I ask for the user of id "([^"]*)"')
-def when_i_ask_for_the_user_of_id_group1(step, userid):
-    global result
-    result = rest_users.get_user(userid)
 
 
 @step(u'When I update the user "([^"]*)" with a last name "([^"]*)"')
@@ -109,12 +99,6 @@ def when_i_update_the_user_group1_with_a_last_name_group2(step, original_fullnam
 def then_i_have_a_user_group1(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
     assert userid != None and userid > 0
-
-
-@step(u'When I update the user of id "([^"]*)" with the last name "([^"]*)"')
-def when_i_update_the_user_of_id_group1_with_the_last_name_group2(step, userid, lastname):
-    global result
-    result = rest_users.update_user(int(userid), lastname=lastname)
 
 
 @step(u'Then the user "([^"]*)" is actually deleted')
@@ -140,3 +124,21 @@ def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, full
     global result
     userid = rest_users.id_from_fullname(fullname)
     result = rest_users.update_user_with_field(userid, field, value)
+
+
+@step(u'When I ask for a user with a non existing id')
+def when_i_ask_for_a_user_with_a_non_existing_id(step):
+    global result
+    result = rest_users.get_user(rest_users.generate_unexisting_id())
+
+
+@step(u'When I update a user with a non existing id with the last name "([^"]*)"')
+def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, lastname):
+    global result
+    generated_id = rest_users.generate_unexisting_id()
+    result = rest_users.update_user(generated_id, lastname)
+
+@step(u'Then I delete the user "([^"]*)" from the database')
+def then_i_delete_the_user_group1_from_the_database(step, fullname):
+    userid = rest_users.id_from_fullname(fullname)
+    rest_users.delete_user_from_db(userid)
