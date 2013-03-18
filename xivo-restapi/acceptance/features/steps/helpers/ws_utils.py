@@ -78,7 +78,7 @@ class RestWsRequestFailedException(Exception):
     code = 0
     body = ""
 
-    def __init__(self, e, code, body):
+    def __init__(self, code, body):
 
         self.code = code
         self.body = body

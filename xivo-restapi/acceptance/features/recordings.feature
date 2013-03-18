@@ -16,7 +16,7 @@ Feature: Call recordings management
 	  Given there is a campaign named "test_campaign" for a queue "test_queue"
 	  Given there is an agent with number "1111"
 	  When I save call details for a call referenced by its "callid" in campaign "test_campaign" replied by agent with number "1111"
-	  Then I can consult these details
+	  Then I can consult the recording "callid" in campaign "test_campaign"
 	  Then I delete this recording and the agent "1111"
 
 	Scenario: Recording consultation and removing
@@ -24,8 +24,8 @@ Feature: Call recordings management
 	  Given there is a queue named "test_queue"
 	  Given there is a campaign named "test_campaign" for a queue "test_queue"
 	  Given there is an agent of number "222"
-	  Given there is a recording referenced by a "callid" with agent "222"
-	  When I delete a recording referenced by this "callid"
+	  Given there is a recording referenced by a "callid" with agent "222" in campaign "test_campaign"
+	  When I delete a recording referenced by this "callid" in campaign "test_campaign"
 	  Then the recording is deleted and I get a response with code "200"
 
 	Scenario: Deleting of unexisting recording
@@ -33,7 +33,7 @@ Feature: Call recordings management
 	  Given there is a queue named "test_queue"
 	  Given there is a campaign named "test_campaign" for a queue "test_queue"
 	  Given there is no recording referenced by a "callid" in campaign "test_campaign"
-	  When I delete a recording referenced by this "callid"
+	  When I delete a recording referenced by this "callid" in campaign "test_campaign"
 	  Then I get a response with error code '404' with message 'No such recording'
 	  
 
