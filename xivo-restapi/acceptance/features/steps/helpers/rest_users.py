@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from acceptance.features.steps.helpers.ws_utils import WsUtils
-from xivo_dao import user_dao
+from xivo_dao import user_dao, voicemail_dao
 from xivo_restapi.restapi_config import RestAPIConfig
 
 
@@ -51,10 +51,12 @@ class RestUsers():
                 'ctiprofileid': ctiprofileid}
         return self.ws_utils.rest_post(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/", data)
 
-    def update_user(self, userid, lastname=None):
+    def update_user(self, userid, firstname=None, lastname=None):
         data = {}
         if(not lastname is None):
             data['lastname'] = lastname
+        if(firstname is not None):
+            data['firstname'] = firstname
         return self.ws_utils.rest_put(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid,
                                       data)
 
@@ -73,3 +75,7 @@ class RestUsers():
         data[field] = value
         return self.ws_utils.rest_put(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/%d" % userid,
                                       data)
+
+    def voicemail_from_user(self, userid):
+        voicemailid = user_dao.get(userid).voicemailid
+        return voicemail_dao.get(voicemailid)

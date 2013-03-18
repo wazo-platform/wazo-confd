@@ -59,3 +59,11 @@ Feature: Users management
 	  Given there is no user
 	  When I delete the user of id "1"
 	  Then I get a response with status "404"
+	
+	Scenario: Editing a user owning a voicemail
+	  Given there is no user
+	  Given there is no voicemail
+	  Given there is a user "Clémence Dupond" with a voicemail
+	  When I update the user "Clémence Dupond" with a first name "Delphine" and a last name "Guébriant"
+	  Then I get a response with status "200"
+	  Then I have a user "Delphine Guébriant" with a voicemail "Delphine Guébriant"

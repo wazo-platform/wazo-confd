@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from xivo_dao import voicemail_dao
-from xivo_dao.mapping_alchemy_sdm import voicemail_mapping
 from xivo_dao.mapping_alchemy_sdm.voicemail_mapping import VoicemailMapping
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException

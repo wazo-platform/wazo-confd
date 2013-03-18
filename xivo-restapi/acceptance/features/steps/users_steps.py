@@ -17,9 +17,12 @@
 
 from acceptance.features.steps.helpers.rest_users import RestUsers
 from lettuce import step
-from xivo_dao import user_dao
+from xivo_dao import user_dao, voicemail_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.alchemy.voicemail import Voicemail
+import re
 
+re.UNICODE = True
 result = None
 rest_users = RestUsers()
 
@@ -29,7 +32,7 @@ def given_there_is_no_user(step):
     user_dao.delete_all()
 
 
-@step(u'Given there is a user "([^"]*)"')
+@step('Given there is a user "([^"]*)"$')
 def given_there_is_a_user_group1(step, fullname):
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
     user = UserFeatures()
@@ -105,7 +108,7 @@ def when_i_update_the_user_group1_with_a_last_name_group2(step, original_fullnam
     result = rest_users.update_user(userid, lastname=new_lastname)
 
 
-@step(u'Then I have a user "([^"]*)"')
+@step(u'Then I have a user "([^"]*)"$')
 def then_i_have_a_user_group1(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
     assert userid != None and userid > 0
@@ -153,3 +156,34 @@ def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, full
     global result
     userid = rest_users.id_from_fullname(fullname)
     result = rest_users.update_user_with_field(userid, field, value)
+
+
+@step(u'Given there is a user "([^"]*)" with a voicemail')
+def given_there_is_a_user_group1_with_a_voicemail(step, fullname):
+    voicemail = Voicemail()
+    voicemail.fullname = fullname
+    voicemail.mailbox = "123"
+    voicemail.context = "default"
+    voicemail_dao.add(voicemail)
+    (firstname, lastname) = rest_users.decompose_fullname(fullname)
+    user = UserFeatures()
+    user.firstname = firstname
+    user.lastname = lastname
+    user.description = 'description'
+    user.voicemailid = voicemail.uniqueid
+    user_dao.add_user(user)
+
+
+@step(u'When I update the user "([^"]*)" with a first name "([^"]*)" and a last name "([^"]*)"')
+def when_i_update_the_user_group1_with_a_first_name_group2_and_a_last_name_group3(step, fullname, newfirstname, newlastname):
+    global result
+    userid = rest_users.id_from_fullname(fullname)
+    result = rest_users.update_user(userid, firstname=newfirstname, lastname=newlastname)
+
+
+@step(u'Then I have a user "([^"]*)" with a voicemail "([^"]*)"')
+def then_i_have_a_user_group1_with_a_voicemail_group1(step, user_fullname, voicemail_fullname):
+    userid = rest_users.id_from_fullname(user_fullname)
+    assert userid != None and userid > 0
+    voicemail = rest_users.voicemail_from_user(userid)
+    assert voicemail.fullname == voicemail_fullname

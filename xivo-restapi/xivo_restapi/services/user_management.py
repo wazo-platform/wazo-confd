@@ -19,6 +19,7 @@ from xivo_dao import user_dao
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
+from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
 
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
@@ -28,6 +29,7 @@ class UserManagement:
 
     def __init__(self):
         self.user_mapping = UserMapping()
+        self.voicemail_manager = VoicemailManagement()
 
     def get_all_users(self):
         users = user_dao.get_all()
@@ -57,6 +59,12 @@ class UserManagement:
         updated_rows = user_dao.update(userid, alchemy_data)
         if(updated_rows == 0):
             raise NoSuchElementException("No such user")
+        if('lastname' not in data and 'firstname' not in data):
+            return
+        voicemailid = user_dao.get(userid).voicemailid
+        if(voicemailid is not None):
+            fullname = user_dao.get(userid).fullname
+            self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
 
     def delete_user(self, userid):
         data_access_logger.info("Deleting the user of id %s." % userid)
