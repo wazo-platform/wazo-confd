@@ -26,23 +26,23 @@ from xivo_restapi.restapi_config import RestAPIConfig
 class RestAgents:
 
     def __init__(self):
-        self.agent = AgentFeatures()
         self.ws_utils = WsUtils()
 
     def create(self, agent_first_name, agent_number):
         print "name:" + agent_first_name
         print "number:" + agent_number
 
-        self.agent.firstname = agent_first_name
-        self.agent.lastname = upper(agent_first_name)
-        self.agent.numgroup = "123"
-        self.agent.number = agent_number
-        self.agent.passwd = self.agent.number
-        self.agent.context = "default"
-        self.agent.language = 'en_US'
-        self.agent.description = ''
+        agent = AgentFeatures()
+        agent.firstname = agent_first_name
+        agent.lastname = upper(agent_first_name)
+        agent.numgroup = "123"
+        agent.number = agent_number
+        agent.passwd = agent.number
+        agent.context = "default"
+        agent.language = 'en_US'
+        agent.description = ''
         try:
-            agent_dao.add_agent(self.agent)
+            agent_dao.add_agent(agent)
         except Exception as e:
             print "Test precondition failed, got exception: ", e
             raise e
@@ -62,6 +62,3 @@ class RestAgents:
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + \
                                        "/" + agent_id)
         return reply.data
-
-    def check_agent_in_list(self, agents_list):
-        return (self.agent.todict() in agents_list)

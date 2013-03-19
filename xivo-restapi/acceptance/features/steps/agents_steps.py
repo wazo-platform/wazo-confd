@@ -20,7 +20,7 @@ from acceptance.features.steps.helpers.rest_agents import RestAgents
 from lettuce import step
 
 rest_agents = RestAgents()
-agents_dict = {}
+agents_list = []
 agent_with_number = None
 
 
@@ -31,12 +31,14 @@ def given_there_is_an_agent_named_group1_with_number_group2(step, agent_first_na
 
 @step(u'When I ask for all agents')
 def when_i_ask_for_all_agents(step):
-    global agents_dict
-    agents_dict = rest_agents.list_agents()
-    assert (agents_dict != {})
+    global agents_list
+    agents_list = rest_agents.list_agents()
+    assert (agents_list != [])
 
 
 @step(u'Then there is an agent named "([^"]*)" with number "([^"]*)" in the response')
-def then_there_is_an_agent_named_group1_with_number_group2_in_the_response(step, group1, group2):
-    global agents_dict
-    rest_agents.check_agent_in_list(agents_dict)
+def then_there_is_an_agent_named_group1_with_number_group2_in_the_response(step, agent_name, agent_number):
+    global agents_list
+    matching_agents = [agent for agent in agents_list if agent['firstname'] == agent_name
+                       and agent['number'] == agent_number]
+    assert len(matching_agents) > 0
