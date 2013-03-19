@@ -26,7 +26,6 @@ from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_dao.helpers import config
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
-import random
 
 
 @before.all
@@ -129,19 +128,17 @@ class RestCampaign(object):
                                     queue_id)
         return reply.data
 
-    def create_if_not_exists(self, campaign_id):
-        result = self.getCampaign(campaign_id)
-        if(result == None or len(result) == 0):
+    def create_if_not_exists(self, campaign_name):
+        result = record_campaigns_dao.id_from_name(campaign_name)
+        if(result is None):
             rest_queues = RestQueues()
             rest_queues.create_if_not_exists('test', 1)
-            result = self.create("lettuce" +
-                                 str(random.randint(100, 999)),
+            result = self.create(campaign_name,
                                  'test',
                                  True,
                                  datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 campaign_id)
-            return type(result) == int and result > 0
+                                 datetime.datetime.now().strftime("%Y-%m-%d"))
+            return type(result.data) == int and result.data > 0
         return True
 
     def queue_create_if_not_exists(self, queue_name):
@@ -196,7 +193,7 @@ class RestCampaign(object):
     def deleteRecording(self, campaign_id, callid):
         #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
         reply = self.ws_utils.rest_delete(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id) + "/" + str(callid))
+                        str(campaign_id) + "/" + callid)
         return (reply.status, reply.data)
 
     def delete_agent(self, agent_no):
