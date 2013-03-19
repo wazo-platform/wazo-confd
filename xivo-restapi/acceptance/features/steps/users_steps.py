@@ -19,9 +19,7 @@ from acceptance.features.steps.helpers.rest_users import RestUsers
 from lettuce import step
 from xivo_dao import user_dao, voicemail_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures
-from xivo_dao.alchemy.voicemail import Voicemail
 from acceptance.features.steps.voicemails_steps import given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
-from acceptance.features.steps.helpers.rest_voicemail import RestVoicemail
 
 result = None
 rest_users = RestUsers()
