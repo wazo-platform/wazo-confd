@@ -56,7 +56,7 @@ class RestCampaign(object):
         if campaign_id != None:
             campaign['id'] = campaign_id
         reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + '/', campaign)
-        return reply.data
+        return reply
 
     def list(self):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + '/')
