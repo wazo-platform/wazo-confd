@@ -54,7 +54,7 @@ def main():
         else:
             logger.info("Starting xivo-restapid in debug mode.")
         WSGIServer(app, bindAddress='/var/www/restws-fcgi.sock',
-                   multithreaded=False, multiprocess=True).run()
+                   multithreaded=False, multiprocess=True, debug=False).run()
 
 
 def _init_logging(debug_mode):
