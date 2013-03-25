@@ -19,6 +19,7 @@
 from flask import request
 from flask.helpers import make_response
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.rest.helpers.exception_catcher import catch_exception
 from xivo_restapi.rest.negotiate.flask_negotiate import produces
 from xivo_restapi.services.agent_management import AgentManagement
 import logging
@@ -33,6 +34,7 @@ class APIAgents(object):
     def __init__(self):
         self._agent_management = AgentManagement()
 
+    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def list_agents(self):

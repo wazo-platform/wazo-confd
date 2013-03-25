@@ -22,6 +22,7 @@ from sqlalchemy.exc import IntegrityError
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
+from xivo_restapi.rest.helpers.exception_catcher import catch_exception
 from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
@@ -39,6 +40,7 @@ class APICampaigns(object):
         self._campagne_manager = CampagneManagement()
         self._campaigns_helper = CampaignsHelper()
 
+    @catch_exception
     @consumes('application/json')
     @produces('application/json')
     @realmDigest.requires_auth
@@ -70,6 +72,7 @@ class APICampaigns(object):
         else:
             return make_response(rest_encoder.encode([str(result)]), 500)
 
+    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def get(self, campaign_id=None):
@@ -100,6 +103,7 @@ class APICampaigns(object):
             body = [str(e.args)]
             return make_response(rest_encoder.encode(body), 500)
 
+    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def delete(self, campaign_id):
@@ -117,6 +121,7 @@ class APICampaigns(object):
             return make_response(body, 500)
         return make_response(rest_encoder.encode("Deleted: True"), 200)
 
+    @catch_exception
     @consumes('application/json')
     @produces('application/json')
     @realmDigest.requires_auth

@@ -18,14 +18,16 @@
 
 from flask.globals import request
 from flask.helpers import make_response
+from xivo_dao.service_data_model.sdm_exception import \
+    IncorrectParametersException
+from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.rest.helpers.exception_catcher import catch_exception
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
-from xivo_dao.service_data_model.sdm_exception import IncorrectParametersException
-from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +38,7 @@ class APIVoicemails:
         self.voicemail_manager = VoicemailManagement()
         self.voicemail_sdm = VoicemailSdm()
 
+    @catch_exception
     @produces("application/json")
     @realmDigest.requires_auth
     def list(self):
@@ -49,6 +52,7 @@ class APIVoicemails:
             result = rest_encoder.encode(str(e))
             return make_response(result, 500)
 
+    @catch_exception
     @consumes("application/json")
     @realmDigest.requires_auth
     def edit(self, voicemailid):
