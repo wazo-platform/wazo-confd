@@ -23,8 +23,8 @@ def catch_exception(func):
     def wrapped(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except:
-            return make_response(500,
-                                 rest_encoder.encode(["An unexpected exception occured"]))
+        except Exception as e:
+            return make_response(rest_encoder.encode(["An unexpected exception occured: %s" % str(e)]),
+                                 500)
     return wrapped
 

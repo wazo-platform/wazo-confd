@@ -34,7 +34,7 @@ class TestExceptionCatcher(unittest.TestCase):
 
         decorated_raising = catch_exception(raising)
         decorated_raising("test")
-        patch_make_response.assert_called_with(500, rest_encoder.encode(["An unexpected exception occured"]));
+        patch_make_response.assert_called_with(rest_encoder.encode(["An unexpected exception occured: "]), 500);
 
         decorated_not_raising = catch_exception(not_raising)
         result = decorated_not_raising("test")
