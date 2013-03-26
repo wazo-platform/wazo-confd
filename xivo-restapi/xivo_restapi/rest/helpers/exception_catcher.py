@@ -17,6 +17,9 @@
 from flask.helpers import make_response
 from functools import wraps
 from xivo_restapi.rest import rest_encoder
+import logging
+
+logger = logging.getLogger(__name__)
 
 def catch_exception(func):
     @wraps(func)
@@ -24,6 +27,7 @@ def catch_exception(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
+            logger.exception("An unexpected exception occured.")
             return make_response(rest_encoder.encode(["An unexpected exception occured: %s" % str(e)]),
                                  500)
     return wrapped
