@@ -23,7 +23,6 @@ from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import global_helper
-from xivo_restapi.rest.helpers.exception_catcher import catch_exception
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
@@ -38,7 +37,6 @@ class APIUsers:
         self._user_management = UserManagement()
         self._user_sdm = UserSdm()
 
-    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def list(self):
@@ -52,7 +50,6 @@ class APIUsers:
             result = rest_encoder.encode([str(e)])
             return make_response(result, 500)
 
-    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def get(self, userid):
@@ -67,7 +64,6 @@ class APIUsers:
             result = rest_encoder.encode([str(e)])
             return make_response(result, 500)
 
-    @catch_exception
     @consumes('application/json')
     @realmDigest.requires_auth
     def create(self):
@@ -89,7 +85,6 @@ class APIUsers:
             data = rest_encoder.encode([str(e)])
             return make_response(data, 500)
 
-    @catch_exception
     @consumes('application/json')
     @realmDigest.requires_auth
     def edit(self, userid):

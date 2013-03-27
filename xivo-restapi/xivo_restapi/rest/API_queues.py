@@ -19,7 +19,6 @@
 from flask import request
 from flask.helpers import make_response
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.rest.helpers.exception_catcher import catch_exception
 from xivo_restapi.rest.negotiate.flask_negotiate import produces
 from xivo_restapi.services.queue_management import QueueManagement
 import logging
@@ -34,7 +33,6 @@ class APIQueues(object):
     def __init__(self):
         self._queue_management = QueueManagement()
 
-    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def list_queues(self):

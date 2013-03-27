@@ -20,7 +20,6 @@ from flask import request
 from flask.helpers import make_response
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.helpers import global_helper
-from xivo_restapi.rest.helpers.exception_catcher import catch_exception
 from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.recording_management import RecordingManagement
@@ -37,7 +36,6 @@ class APIRecordings(object):
         self._recording_manager = RecordingManagement()
         self._recordings_helper = RecordingsHelper()
 
-    @catch_exception
     @consumes('application/json')
     @produces('application/json')
     @realmDigest.requires_auth
@@ -64,7 +62,6 @@ class APIRecordings(object):
             body = rest_encoder.encode([str(result)])
             return make_response(body, 500)
 
-    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def list_recordings(self, campaign_id):
@@ -89,7 +86,6 @@ class APIRecordings(object):
             body = rest_encoder.encode([str(e.args)])
             return make_response(body, 500)
 
-    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def search(self, campaign_id):
@@ -113,7 +109,6 @@ class APIRecordings(object):
             body = rest_encoder.encode([str(e.args)])
             return make_response(body, 500)
 
-    @catch_exception
     @produces('application/json')
     @realmDigest.requires_auth
     def delete(self, campaign_id, recording_id):
