@@ -40,10 +40,11 @@ class APIRecordings(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def add_recording(self, campaign_id):
+        data = request.data.decode("utf-8")
         try:
-            body = rest_encoder.decode(request.data)
+            body = rest_encoder.decode(data)
         except ValueError:
-            body = "No parsable data in the request, data: " + request.data
+            body = "No parsable data in the request, data: " + data
             return make_response(rest_encoder.encode(body), 400)
         body = self._recordings_helper.supplement_add_input(body)
         recording = self._recordings_helper.create_instance(body)

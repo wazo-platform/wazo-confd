@@ -53,10 +53,11 @@ class APIVoicemails:
     @consumes("application/json")
     @realmDigest.requires_auth
     def edit(self, voicemailid):
+        data = request.data.decode("utf-8")
         logger.info("Edit request for voicemail of id %s with data %s"
-                    % (voicemailid, request.data))
+                    % (voicemailid, data))
         try:
-            data = rest_encoder.decode(request.data)
+            data = rest_encoder.decode(data)
         except ValueError:
             result = ["No parsable data in the request"]
             return make_response(rest_encoder.encode(result), 400)

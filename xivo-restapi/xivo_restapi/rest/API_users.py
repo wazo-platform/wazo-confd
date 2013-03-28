@@ -67,9 +67,10 @@ class APIUsers:
     @consumes('application/json')
     @realmDigest.requires_auth
     def create(self):
-        logger.info("Request for creating a user with data: %s" % request.data)
+        data = request.data.decode("utf-8")
+        logger.info("Request for creating a user with data: %s" % data)
         try:
-            data = rest_encoder.decode(request.data)
+            data = rest_encoder.decode(data)
         except ValueError:
             response = rest_encoder.encode(["No parsable data in the request"])
             return make_response(response, 400)
@@ -88,10 +89,11 @@ class APIUsers:
     @consumes('application/json')
     @realmDigest.requires_auth
     def edit(self, userid):
+        data = request.data.decode("utf-8")
         logger.info("Request for editing the user of id %s with data %s ."
-                    % (userid, request.data))
+                    % (userid, data))
         try:
-            data = rest_encoder.decode(request.data)
+            data = rest_encoder.decode(data)
         except ValueError:
             response = rest_encoder.encode(["No parsable data in the request"])
             return make_response(response, 400)

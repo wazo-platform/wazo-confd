@@ -43,12 +43,13 @@ class APICampaigns(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def add_campaign(self):
+        data = request.data.decode("utf-8")
         try:
             logger.debug("Got an ADD request for campaigns")
-            body = rest_encoder.decode(request.data)
+            body = rest_encoder.decode(data)
             logger.debug(str(body))
         except ValueError:
-            body = "No parsable data in the request, data: " + request.data
+            body = "No parsable data in the request, data: " + data
             return make_response(body, 400)
         body = self._campaigns_helper.supplement_add_input(body)
         campaign = self._campaigns_helper.create_instance(body)
@@ -121,12 +122,13 @@ class APICampaigns(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def update(self, campaign_id):
+        data = request.data.decode("utf-8")
         try:
             logger.debug("Got an UPDATE request for campaign id: " + campaign_id)
-            body = rest_encoder.decode(request.data)
+            body = rest_encoder.decode(data)
             logger.debug(str(body))
         except ValueError:
-            body = "No parsable data in the request, data: " + request.data
+            body = "No parsable data in the request, data: " + data
             return make_response(body, 400)
         try:
             body = self._campaigns_helper.supplement_edit_input(body)
