@@ -16,10 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from acceptance.features.steps.helpers.rest_users import RestUsers
+from acceptance.features.steps.voicemails_steps import \
+    given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
 from lettuce import step
+from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao
 from xivo_dao.alchemy.userfeatures import UserFeatures
-from acceptance.features.steps.voicemails_steps import given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
 
 result = None
 rest_users = RestUsers()
@@ -34,6 +36,7 @@ def given_there_is_a_user_group1(step, fullname):
         user.lastname = lastname
         user.description = 'description'
         user_dao.add_user(user)
+        world.userid = user.id
 
 
 @step(u'When I ask for all the users')
@@ -138,18 +141,17 @@ def given_there_is_a_user_group1_with_a_voicemail(step, fullname):
         user_dao.update(user.id, {'voicemailid': voicemailid})
 
 
-@step(u'When I update the user "([^"]*)" with a first name "([^"]*)" and a last name "([^"]*)"')
-def when_i_update_the_user_group1_with_a_first_name_group2_and_a_last_name_group3(step, fullname, newfirstname, newlastname):
+@step(u'When I update this user with a first name "([^"]*)" and a last name "([^"]*)"')
+def when_i_update_the_user_group1_with_a_first_name_group2_and_a_last_name_group3(step, newfirstname, newlastname):
     global result
-    userid = rest_users.id_from_fullname(fullname)
-    result = rest_users.update_user(userid, firstname=newfirstname, lastname=newlastname)
+    result = rest_users.update_user(world.userid, firstname=newfirstname, lastname=newlastname)
 
 
-@step(u'Then I have a user "([^"]*)" with a voicemail "([^"]*)"')
-def then_i_have_a_user_group1_with_a_voicemail_group1(step, user_fullname, voicemail_fullname):
-    userid = rest_users.id_from_fullname(user_fullname)
-    assert userid != None and userid > 0
-    voicemail = rest_users.voicemail_from_user(userid)
+@step(u'Then this user has a voicemail "([^"]*)"')
+def then_i_have_a_user_group1_with_a_voicemail_group1(step, voicemail_fullname):
+    voicemail = rest_users.voicemail_from_user(world.userid)
+    print voicemail.fullname, "\n"
+    print voicemail_fullname, "\n"
     assert voicemail.fullname == voicemail_fullname
 
 

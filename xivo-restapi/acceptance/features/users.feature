@@ -44,6 +44,12 @@ Feature: Users management
 	
 	Scenario: Editing a user owning a voicemail
 	  Given there is a user "Clémence Dupond" with a voicemail
-	  When I update the user "Clémence Dupond" with a first name "Delphine" and a last name "Guébriant"
+	  When I update this user with a first name "Delphine" and a last name "Guébriant"
 	  Then I get a response with status "200"
-	  Then I have a user "Delphine Guébriant" with a voicemail "Delphine Guébriant"
+	  Then this user has a voicemail "Delphine Guébriant"
+
+	Scenario: Line property
+	  Given there is a user "André Charrier" with a line "44500"
+	  When I ask for all the users
+	  Then I have a user "André Charrier" with a line "44500"
+	  Then I delete the line "44500"
