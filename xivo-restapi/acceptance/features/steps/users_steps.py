@@ -20,7 +20,8 @@ from acceptance.features.steps.voicemails_steps import \
     given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
 from lettuce import step
 from lettuce.registry import world
-from xivo_dao import user_dao, voicemail_dao
+from xivo_dao import user_dao, voicemail_dao, line_dao
+from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 
 result = None
@@ -29,7 +30,8 @@ rest_users = RestUsers()
 
 @step('Given there is a user "([^"]*)"$')
 def given_there_is_a_user_group1(step, fullname):
-    if(rest_users.id_from_fullname(fullname) is None):
+    world.userid = rest_users.id_from_fullname(fullname)
+    if(world.userid is None):
         (firstname, lastname) = rest_users.decompose_fullname(fullname)
         user = UserFeatures()
         user.firstname = firstname
@@ -167,7 +169,57 @@ def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, 
     generated_id = rest_users.generate_unexisting_id()
     result = rest_users.update_user(generated_id, lastname)
 
+
 @step(u'Then I delete the user "([^"]*)" from the database')
 def then_i_delete_the_user_group1_from_the_database(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
     rest_users.delete_user_from_db(userid)
+
+
+@step(u'Given there is a user "([^"]*)" with a line "([^"]*)"')
+def given_there_is_a_user_group1_with_a_line_group2(step, fullname, linenumber):
+    given_there_is_a_user_group1(step, fullname)
+    result = line_dao.find_line_id_by_user_id(world.userid)
+    if(result == []):
+        line = LineFeatures()
+        line.iduserfeatures = world.userid
+        line.number = linenumber
+        line.protocolid = 0
+        line.protocol = "sip"
+        line.name = "name"
+        line.context = "default"
+        line.provisioningid = 0
+        line_dao.create(line)
+        world.lineid = line.id
+    else:
+        world.lineid = result[0]
+
+
+@step(u'Then I have a user "([^"]*)" with a line "([^"]*)"')
+def then_i_have_a_user_group1_with_a_line_group2(step, fullname, linenumber):
+    global result
+    (firstname, lastname) = rest_users.decompose_fullname(fullname)
+    matching = None
+    for item in result:
+        if(item['firstname'] == firstname and item['lastname'] == lastname):
+            matching = item
+            break
+    assert matching is not None
+    assert 'line' in matching
+    assert matching['line']['number'] == linenumber
+
+
+@step(u'Then I delete this line')
+def then_i_delete_this_line(step):
+    line_dao.delete(world.lineid)
+
+
+@step(u'Then I have a single user "([^"]*)" with a line "([^"]*)"')
+def then_i_have_a_single_user_group1_with_a_line_group2(step, fullname, linenumber):
+    global result
+    (firstname, lastname) = rest_users.decompose_fullname(fullname)
+    assert result['firstname'] == firstname
+    assert result['lastname'] == lastname
+    assert 'line' in result
+    assert result['line']['number'] == linenumber
+

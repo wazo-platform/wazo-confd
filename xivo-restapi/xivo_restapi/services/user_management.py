@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao import user_dao
+from xivo_dao import user_dao, line_dao
+from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
@@ -29,21 +30,33 @@ class UserManagement:
 
     def __init__(self):
         self.user_mapping = UserMapping()
+        self.line_mapping = LineMapping()
         self.voicemail_manager = VoicemailManagement()
 
     def get_all_users(self):
-        users = user_dao.get_all()
+        users_lines = user_dao.get_all_join_line()
         return_list = []
-        for user in users:
-            return_list.append(self.user_mapping.alchemy_to_sdm(user))
+        for user, line in users_lines:
+            result_user = self.user_mapping.alchemy_to_sdm(user)
+            if(line is not None):
+                result_user.line = self.line_mapping.alchemy_to_sdm(line)
+            return_list.append(result_user)
         return return_list
 
     def get_user(self, userid):
-        try:
-            user = user_dao.get(userid)
-            return self.user_mapping.alchemy_to_sdm(user)
-        except LookupError:
+        user = None
+        line = None
+        result = user_dao.get_user_join_line(userid)
+        if(result is None):
             raise NoSuchElementException("No such user")
+        else:
+            (user, line) = result
+
+        result = self.user_mapping.alchemy_to_sdm(user)
+        if(line is not None):
+            result.line = self.line_mapping.alchemy_to_sdm(line)
+        return result
+
 
     def create_user(self, user):
         data_access_logger.info("Creating a user with the data %s." % user.todict())

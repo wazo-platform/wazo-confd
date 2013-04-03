@@ -17,14 +17,17 @@
 
 from mock import Mock, call
 from xivo_dao import user_dao
+from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
+from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
+from xivo_dao.service_data_model.line_sdm import LineSdm
 from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
-import unittest
-from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
-import copy
 from xivo_restapi.services.voicemail_management import VoicemailManagement
+import copy
+import unittest
 
 
 class TestUserManagement(unittest.TestCase):
@@ -35,6 +38,8 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.user_mapping = self.user_mapping
         self.voicemail_manager = Mock(VoicemailManagement)
         self._userManager.voicemail_manager = self.voicemail_manager
+        self.line_mapping = Mock(LineMapping)
+        self._userManager.line_mapping = self.line_mapping
 
     def test_get_all_users(self):
         user1 = UserFeatures()
@@ -42,39 +47,56 @@ class TestUserManagement(unittest.TestCase):
         user1.cti_profile_id = 1
         user2 = UserFeatures()
         user2.firstname = 'test2'
+        line1 = LineFeatures()
+        line1.number = "123"
+        line2 = LineFeatures()
+        line2.number = "456"
         user_sdm1 = UserSdm()
         user_sdm2 = UserSdm()
         sdm_users = [user_sdm1, user_sdm2]
-        user_dao.get_all = Mock()
-        user_dao.get_all.return_value = [user1, user2]
+
+        line_sdm1 = LineSdm()
+        line_sdm1.number = line1.number
+        line_sdm2 = LineSdm()
+        line_sdm2.number = line2.number
+        user_dao.get_all_join_line = Mock()
+        user_dao.get_all_join_line.return_value = [(user1, line1), (user2, line2)]
         self.user_mapping.alchemy_to_sdm.side_effect = sdm_users
+        self.line_mapping.alchemy_to_sdm.side_effect = [line_sdm1, line_sdm2]
+
         result = self._userManager.get_all_users()
         self.assertEquals(result, sdm_users)
-        user_dao.get_all.assert_called_once_with()  # @UndefinedVariable
+        user_dao.get_all_join_line.assert_called_once_with()  # @UndefinedVariable
         expected = [call(user1), call(user2)]
         self.user_mapping.alchemy_to_sdm.assert_has_calls(expected)  # @UndefinedVariable
+        expected = [call(line1), call(line2)]
+        self.line_mapping.alchemy_to_sdm.assert_has_calls(expected)
+        self.assertEqual(user_sdm1.line.number, "123")
+        self.assertEqual(user_sdm2.line.number, "456")
 
     def test_get_user(self):
         user1 = UserFeatures()
         user1.firstname = 'test1'
-        user_dao.get = Mock()
-        user_dao.get.return_value = user1
+        line1 = LineFeatures()
+        line1.number = "1234"
+        user_dao.get_user_join_line = Mock()
+        user_dao.get_user_join_line.return_value = user1, line1
         user1_sdm = UserSdm()
+        line1_sdm = LineSdm()
         self.user_mapping.alchemy_to_sdm.return_value = user1_sdm
+        self.line_mapping.alchemy_to_sdm.return_value = line1_sdm
+
         result = self._userManager.get_user(1)
-        user_dao.get.assert_called_with(1)  # @UndefinedVariable
+        user_dao.get_user_join_line.assert_called_with(1)  # @UndefinedVariable
         self.user_mapping.alchemy_to_sdm.assert_called_with(user1)
         self.assertEqual(result, user1_sdm)
+        self.assertEquals(result.line, line1_sdm)
 
     def test_get_non_existing_user(self):
-        def mock_get(userid):
-            raise LookupError()
-
-        user_dao.get = Mock()
-        user_dao.get.side_effect = mock_get
+        user_dao.get_user_join_line = Mock()
+        user_dao.get_user_join_line.return_value = None
         self.assertRaises(NoSuchElementException, self._userManager.get_user, 1)
-        user_dao.get.assert_called_with(1)  # @UndefinedVariable
-        user_dao.get.side_effect = None
+        user_dao.get_user_join_line.assert_called_with(1)  # @UndefinedVariable
 
     def test_create_user(self):
         user_sdm = UserSdm()

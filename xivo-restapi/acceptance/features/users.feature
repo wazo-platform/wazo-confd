@@ -50,6 +50,8 @@ Feature: Users management
 
 	Scenario: Line property
 	  Given there is a user "André Charrier" with a line "44500"
+  	  When I ask for the user "André Charrier" using its id
+	  Then I have a single user "André Charrier" with a line "44500"
 	  When I ask for all the users
 	  Then I have a user "André Charrier" with a line "44500"
-	  Then I delete the line "44500"
+	  Then I delete this line
