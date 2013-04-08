@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask.app import Flask
+from flask.helpers import make_response
 from werkzeug.exceptions import UnsupportedMediaType, NotAcceptable
 from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 import unittest
@@ -38,10 +39,10 @@ class TestFlaskNegotiate(unittest.TestCase):
 
         @consumes("application/json")
         def decorated_func():
-            return 1
+            return make_response('', 222)
 
         result = decorated_func()
-        self.assertEqual(1, result)
+        self.assertEqual('222 UNKNOWN', result.status)
 
     def test_consumes_rejected(self):
         ctx = self.app.test_request_context('users/',
@@ -50,7 +51,7 @@ class TestFlaskNegotiate(unittest.TestCase):
 
         @consumes("application/xml")
         def decorated_func():
-            return 1
+            return make_response('', 222)
 
         self.assertRaises(UnsupportedMediaType, decorated_func)
 
@@ -60,9 +61,11 @@ class TestFlaskNegotiate(unittest.TestCase):
 
         @produces("application/json")
         def decorated_func():
-            return 1
+            return make_response('', 222)
 
-        self.assertEquals(1, decorated_func())
+        result = decorated_func()
+        self.assertEquals('222 UNKNOWN', result.status)
+        self.assertEquals("application/json", result.content_type)
 
     def test_produces_rejected(self):
         ctx = self.app.test_request_context('users/', headers={"Accept": "application/json"})
@@ -70,7 +73,7 @@ class TestFlaskNegotiate(unittest.TestCase):
 
         @produces("application/xml")
         def decorated_func():
-            return 1
+            return make_response('', 222)
 
         self.assertRaises(NotAcceptable, decorated_func)
 
@@ -80,9 +83,10 @@ class TestFlaskNegotiate(unittest.TestCase):
 
         @produces("application/json")
         def decorated_func():
-            return 1
+            return make_response('', 222)
 
-        self.assertEquals(1, decorated_func())
+        result = decorated_func()
+        self.assertEquals('222 UNKNOWN', result.status)
 
     def test_produces_accept_all(self):
         ctx = self.app.test_request_context('users/', headers={"Accept": "*/*"})
@@ -90,6 +94,7 @@ class TestFlaskNegotiate(unittest.TestCase):
 
         @produces("application/json")
         def decorated_func():
-            return 1
+            return make_response('', 222)
 
-        self.assertEquals(1, decorated_func())
+        result = decorated_func()
+        self.assertEquals('222 UNKNOWN', result.status)

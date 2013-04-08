@@ -31,6 +31,8 @@ def produces(*content_types):
             defined = set(content_types)
             if len(requested) > 0 and len(requested & defined) == 0:
                 raise NotAcceptable()
-            return fn(*args, **kwargs)
+            result = fn(*args, **kwargs)
+            result.content_type = content_types[0]
+            return result
         return wrapper
     return decorated
