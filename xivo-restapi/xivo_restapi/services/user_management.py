@@ -38,7 +38,7 @@ class UserManagement:
         return_list = []
         for user, line in users_lines:
             result_user = self.user_mapping.alchemy_to_sdm(user)
-            if(line is not None):
+            if line is not None:
                 result_user.line = self.line_mapping.alchemy_to_sdm(line)
             return_list.append(result_user)
         return return_list
@@ -47,20 +47,19 @@ class UserManagement:
         user = None
         line = None
         result = user_dao.get_user_join_line(userid)
-        if(result is None):
+        if result is None:
             raise NoSuchElementException("No such user")
         else:
-            (user, line) = result
+            user, line = result
 
         result = self.user_mapping.alchemy_to_sdm(user)
-        if(line is not None):
+        if line is not None:
             result.line = self.line_mapping.alchemy_to_sdm(line)
         return result
 
-
     def create_user(self, user):
         data_access_logger.info("Creating a user with the data %s." % user.todict())
-        if(user.description is None):
+        if user.description is None:
             user.description = ''
         user_interne = self.user_mapping.sdm_to_alchemy(user)
         user_dao.add_user(user_interne)
@@ -70,11 +69,11 @@ class UserManagement:
                                 % (userid, data))
         alchemy_data = self.user_mapping.sdm_to_alchemy_dict(data)
         updated_rows = user_dao.update(userid, alchemy_data)
-        if(updated_rows == 0):
+        if updated_rows == 0:
             raise NoSuchElementException("No such user")
-        if('lastname' not in data and 'firstname' not in data):
+        if 'lastname' not in data and 'firstname' not in data:
             return
         voicemailid = user_dao.get(userid).voicemailid
-        if(voicemailid is not None):
+        if voicemailid is not None:
             fullname = user_dao.get(userid).fullname
             self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
