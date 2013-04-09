@@ -55,3 +55,8 @@ Feature: Users management
 	  When I ask for all the users
 	  Then I have a user "André Charrier" with a line "44500"
 	  Then I delete this line
+
+	Scenario: User deletion with a SIP line
+	  Given there is a user "André Charrier" with a SIP line "2000"
+	  When I delete this user
+	  Then no data is remaining in the tables "userfeatures,linefeatures,dialaction,usersip,extensions,extenumbers,contextnummember"

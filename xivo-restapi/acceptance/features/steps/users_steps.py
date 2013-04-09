@@ -20,7 +20,8 @@ from acceptance.features.steps.voicemails_steps import \
     given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
 from lettuce import step
 from lettuce.registry import world
-from xivo_dao import user_dao, voicemail_dao, line_dao
+from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
+    extensions_dao, extenumber_dao, contextnummember_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 
@@ -223,3 +224,49 @@ def then_i_have_a_single_user_group1_with_a_line_group2(step, fullname, linenumb
     assert 'line' in result
     assert result['line']['number'] == linenumber
 
+
+@step(u'Given there is a user "([^"]*)" with a SIP line "([^"]*)"')
+def given_there_is_a_user_with_a_sip_line(step, fullname, number):
+    world.userid, world.lineid, world.usersipid = rest_users.create_user_with_sip_line(fullname, number)
+    world.number = number
+
+
+@step(u'When I delete this user')
+def when_i_delete_the_user(step):
+    global result
+    result = rest_users.delete_user(world.userid)
+
+
+@step(u'Then no data is remaining in the tables "([^"]*)"')
+def then_no_data_is_remaining_in_the_tables(step, tables):
+    tables = tables.split(",")
+    table_functions = {"userfeatures": _check_user_features,
+                       "linefeatures": _check_line_features,
+                       "usersip": _check_usersip,
+                       "extensions": _check_extensions,
+                       "extenumbers": _check_extenumbers,
+                       "contextnummembers": _check_contextnummembers}
+    for table in tables:
+        table_functions[table]()
+
+def _check_user_features():
+    try:
+        user_dao.get(world.userid)
+        assert False
+    except LookupError:
+        assert True
+
+def _check_line_features():
+    assert line_dao.find_line_id_by_user_id(world.userid) == []
+
+def _check_usersip():
+    assert usersip_dao.get(world.usersipid) is None
+
+def _check_extensions():
+    assert extensions_dao.get_by_exten(world.number) is None
+
+def _check_extenumbers():
+    assert extenumber_dao.get_by_exten(world.number) is None
+
+def _check_contextnummembers():
+    assert contextnummember_dao.get_by_userid(world.userid) is None

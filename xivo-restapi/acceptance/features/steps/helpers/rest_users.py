@@ -16,7 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from acceptance.features.steps.helpers.ws_utils import WsUtils
-from xivo_dao import user_dao, voicemail_dao
+from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
+    extensions_dao, extenumber_dao, contextnummember_dao
+from xivo_dao.alchemy.contextnummember import ContextNumMember
+from xivo_dao.alchemy.extension import Extension
+from xivo_dao.alchemy.extenumber import ExteNumber
+from xivo_dao.alchemy.linefeatures import LineFeatures
+from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.alchemy.usersip import UserSIP
 from xivo_restapi.restapi_config import RestAPIConfig
 import random
 
@@ -92,3 +99,59 @@ class RestUsers():
 
     def delete_user_from_db(self, userid):
         user_dao.delete(userid)
+
+    def create_user_with_sip_line(self, fullname, number):
+        firstname, lastname = self.decompose_fullname(fullname)
+        user = UserFeatures(firstname=firstname, lastname=lastname)
+        user.callerid = number
+        user.description = ''
+        user_dao.add_user(user)
+
+        usersip = UserSIP()
+        usersip.name = str(random.randint(0, 9999))
+        usersip.callerid = '"%s %s" <%s>' % (firstname, lastname, number)
+        usersip.type = "friend"
+        usersip.category = "user"
+        usersip_dao.create(usersip)
+
+        line = LineFeatures()
+        line.number = number
+        line.context = "default"
+        line.iduserfeatures = user.id
+        line.protocol = 'sip'
+        line.protocolid = usersip.id
+        line.name = str(random.randint(0, 9999))
+        line.provisioningid = str(random.randint(0, 9999))
+        line_dao.create(line)
+
+        exten = Extension()
+        exten.exten = number
+        exten.context = "default"
+        exten.commented = 0
+        extensions_dao.create(exten)
+
+        extnumber = ExteNumber()
+        extnumber.context = "default"
+        extnumber.exten = number
+        extnumber.type = "user"
+        extnumber.typeval = user.id
+        extenumber_dao.create(extnumber)
+
+        member = ContextNumMember()
+        member.context = "default"
+        member.number = number
+        member.type = "user"
+        member.typeval = user.id
+        contextnummember_dao.create(member)
+
+        return user.id, line.id, usersip.id
+
+    def delete_user(self, userid):
+        return self.ws_utils.rest_delete(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/" + str(userid))
+
+    def is_user_deleted(self, userid):
+        try:
+            user_dao.get(userid)
+            return False
+        except LookupError:
+            return True
