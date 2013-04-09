@@ -227,3 +227,11 @@ class TestAPIUsers(unittest.TestCase):
                               data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
         self.instance_user_management.edit_user.side_effect = None
+
+    def test_delete_success(self):
+        status = "200 OK"
+        self.instance_user_management.delete_user.return_value = True
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.assertEqual(result.status, status)
+        self.instance_user_management.delete_user.assert_called_with(1)

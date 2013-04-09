@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from mock import Mock, call
-from xivo_dao import user_dao
+from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
+    extenumber_dao, contextnummember_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
@@ -164,3 +165,37 @@ class TestUserManagement(unittest.TestCase):
         user_dao.update.return_value = 0
         self.assertRaises(NoSuchElementException, self._userManager.edit_user,
                           1, data)
+
+    def test_delete_user(self):
+        user = UserFeatures()
+        user.id = 1
+        user_dao.get = Mock()
+        user_dao.get.return_value = user
+        line = LineFeatures()
+        line.id = 2
+        line.number = "2000"
+        line.protocol = "sip"
+        line.protocolid = 3
+        line.context = "default"
+        line_dao.find_line_id_by_user_id = Mock()
+        line_dao.find_line_id_by_user_id.return_value = [2]
+        line_dao.get = Mock()
+        line_dao.get.return_value = line
+
+        user_dao.delete = Mock()
+        line_dao.delete = Mock()
+        usersip_dao.delete = Mock()
+        extensions_dao.delete_by_exten = Mock()
+        extenumber_dao.delete_by_exten = Mock()
+        contextnummember_dao.delete_by_userid_context = Mock()
+
+        self._userManager.delete_user(1)
+        user_dao.get.assert_called_with(1) # @UndefinedVariable
+        line_dao.find_line_id_by_user_id.assert_called_with(1) # @UndefinedVariable
+        line_dao.get.assert_called_with(2) # @UndefinedVariable
+        user_dao.delete.assert_called_with(1) # @UndefinedVariable
+        line_dao.delete.assert_called_with(2) # @UndefinedVariable
+        usersip_dao.delete.assert_called_with(3) # @UndefinedVariable
+        extensions_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
+        extenumber_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
+        contextnummember_dao.delete_by_userid_context.assert_called_with(1, "default") # @UndefinedVariable

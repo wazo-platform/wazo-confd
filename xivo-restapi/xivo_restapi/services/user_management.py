@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao import user_dao, line_dao
+from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
+    extenumber_dao, contextnummember_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -77,3 +78,16 @@ class UserManagement:
         if voicemailid is not None:
             fullname = user_dao.get(userid).fullname
             self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
+
+    def delete_user(self, userid):
+        user_dao.get(userid)
+        lines = line_dao.find_line_id_by_user_id(userid)
+        if len(lines) > 0:
+            line = line_dao.get(lines[0])
+            line_dao.delete(line.id)
+            usersip_dao.delete(line.protocolid)
+            extensions_dao.delete_by_exten(line.number)
+            extenumber_dao.delete_by_exten(line.number)
+            contextnummember_dao.delete_by_userid_context(userid, line.context)
+        user_dao.delete(userid)
+

@@ -59,4 +59,5 @@ Feature: Users management
 	Scenario: User deletion with a SIP line
 	  Given there is a user "André Charrier" with a SIP line "2000"
 	  When I delete this user
-	  Then no data is remaining in the tables "userfeatures,linefeatures,dialaction,usersip,extensions,extenumbers,contextnummember"
+	  Then I get a response with status "200"
+	  Then no data is remaining in the tables "userfeatures,linefeatures,usersip,extensions,extenumbers,contextnummember"

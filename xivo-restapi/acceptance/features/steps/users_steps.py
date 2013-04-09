@@ -245,7 +245,7 @@ def then_no_data_is_remaining_in_the_tables(step, tables):
                        "usersip": _check_usersip,
                        "extensions": _check_extensions,
                        "extenumbers": _check_extenumbers,
-                       "contextnummembers": _check_contextnummembers}
+                       "contextnummember": _check_contextnummembers}
     for table in tables:
         table_functions[table]()
 
@@ -269,4 +269,4 @@ def _check_extenumbers():
     assert extenumber_dao.get_by_exten(world.number) is None
 
 def _check_contextnummembers():
-    assert contextnummember_dao.get_by_userid(world.userid) is None
+    assert contextnummember_dao.get_by_userid_context(world.userid, "default") is None
