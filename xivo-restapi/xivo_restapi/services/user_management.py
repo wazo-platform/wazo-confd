@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from provd.rest.client.client import new_provisioning_client
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
@@ -33,6 +34,9 @@ class UserManagement:
         self.user_mapping = UserMapping()
         self.line_mapping = LineMapping()
         self.voicemail_manager = VoicemailManagement()
+        self.provisioning_client = new_provisioning_client("http://localhost:8666/provd")
+        self.device_manager = self.provisioning_client.device_manager()
+        self.config_manager = self.provisioning_client.config_manager()
 
     def get_all_users(self):
         users_lines = user_dao.get_all_join_line()
@@ -91,3 +95,16 @@ class UserManagement:
             contextnummember_dao.delete_by_userid_context(userid, line.context)
         user_dao.delete(userid)
 
+    def provd_remove_line(self, deviceid, linenum):
+        config = self.config_manager.get(deviceid)
+        del config["raw_config"]["sip_lines"][str(linenum)]
+        if len(config["raw_config"]["sip_lines"]) == 0:
+            #then we reset to autoprov
+            del config["raw_config"]["sip_lines"]
+            if "funckeys" in config["raw_config"]:
+                del config["raw_config"]["funckeys"]
+            device = self.device_manager.get(deviceid)
+            new_configid = self.config_manager.autocreate()
+            device["config"] = new_configid
+            self.device_manager.update(device)
+        self.config_manager.update(config)

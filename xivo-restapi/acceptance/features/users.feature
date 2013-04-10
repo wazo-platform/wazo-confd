@@ -61,3 +61,9 @@ Feature: Users management
 	  When I delete this user
 	  Then I get a response with status "200"
 	  Then no data is remaining in the tables "userfeatures,linefeatures,usersip,extensions,extenumbers,contextnummember"
+
+	#TODO: manual step
+	#Given I have a device with no line
+	#Given I have a user with a SIP line associated to this device
+	#When I delete this user
+	#Then The device is reset to autoprov mode
