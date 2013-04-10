@@ -46,6 +46,21 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.device_manager = self.device_manager
         self.config_manager = Mock(ConfigManager)
         self._userManager.config_manager = self.config_manager
+        self.deviceid = "abcd"
+        self.config_dict = {"raw_config":
+                         {"sip_lines":
+                           {"1":
+                            {"username": "1234"},
+                            "2":
+                            {"username": "5678"}
+                           },
+                          "funckeys": {}
+                          }
+                        }
+        self.device_dict = {"ip": "10.60.0.109",
+                       "version":"3.2.2.1136",
+                       "config": self.deviceid,
+                       "id": self.deviceid}
 
     def test_get_all_users(self):
         user1 = UserFeatures()
@@ -206,74 +221,41 @@ class TestUserManagement(unittest.TestCase):
         contextnummember_dao.delete_by_userid_context.assert_called_with(1, "default") # @UndefinedVariable
 
     def test_provd_remove_line(self):
-        returned_dict = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"},
-                            "2":
-                            {"username": "4567"}
-                           }
-                          }
-                        }
-        self.config_manager.get.return_value = returned_dict
+        self.config_manager.get.return_value = self.config_dict
 
-        deviceid = "abcdef"
-        expected_arg = copy.deepcopy(returned_dict)
+        expected_arg = copy.deepcopy(self.config_dict)
         del expected_arg["raw_config"]["sip_lines"]["2"]
-        self._userManager.provd_remove_line(deviceid, 2)
+        self._userManager.provd_remove_line(self.deviceid, 2)
 
-        self.config_manager.get.assert_called_with(deviceid)
+        self.config_manager.get.assert_called_with(self.deviceid)
         self.config_manager.update.assert_called_with(expected_arg)
         self.assertEquals(0, self.config_manager.autocreate.call_count)
 
     def test_provd_remove_line_autoprov(self):
-        deviceid = "abcdef"
         autoprovid = "autoprov1234"
-        config_dict = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"}
-                           },
-                          "funckeys": {}
-                          }
-                        }
-        device_dict = {"ip": "10.60.0.109",
-                       "version":"3.2.2.1136",
-                       "config": deviceid,
-                       "id": deviceid}
-        self.config_manager.get.return_value = config_dict
-        self.device_manager.get.return_value = device_dict
+        del self.config_dict["raw_config"]["sip_lines"]["2"]
+        self.config_manager.get.return_value = self.config_dict
+        self.device_manager.get.return_value = self.device_dict
         self.config_manager.autocreate.return_value = autoprovid
 
-        expected_arg_config = copy.deepcopy(config_dict)
+        expected_arg_config = copy.deepcopy(self.config_dict)
         del expected_arg_config["raw_config"]["sip_lines"]
         del expected_arg_config["raw_config"]["funckeys"]
-        expected_arg_device = copy.deepcopy(device_dict)
+        expected_arg_device = copy.deepcopy(self.device_dict)
         expected_arg_device["config"] = autoprovid
-        self._userManager.provd_remove_line(deviceid, 1)
+        self._userManager.provd_remove_line(self.deviceid, 1)
 
-        self.config_manager.get.assert_called_with(deviceid)
+        self.config_manager.get.assert_called_with(self.deviceid)
         self.config_manager.autocreate.assert_called_with()
-        self.device_manager.get.assert_called_with(deviceid)
+        self.device_manager.get.assert_called_with(self.deviceid)
         self.device_manager.update.assert_called_with(expected_arg_device)
         self.config_manager.update.assert_called_with(expected_arg_config)
 
     def test_provd_remove_line_stable_if_no_funckeys(self):
-        deviceid = "abcdef"
         autoprovid = "autoprov1234"
-        config_dict = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"}
-                           }
-                          }
-                        }
-        device_dict = {"ip": "10.60.0.109",
-                       "version":"3.2.2.1136",
-                       "config": deviceid,
-                       "id": deviceid}
-        self.config_manager.get.return_value = config_dict
-        self.device_manager.get.return_value = device_dict
+        del self.config_dict["raw_config"]["sip_lines"]["2"]
+        self.config_manager.get.return_value = self.config_dict
+        self.device_manager.get.return_value = self.device_dict
         self.config_manager.autocreate.return_value = autoprovid
 
         try:
