@@ -18,7 +18,7 @@
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
-    extenumber_dao, contextnummember_dao
+    extenumber_dao, contextnummember_dao, device_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
@@ -197,6 +197,8 @@ class TestUserManagement(unittest.TestCase):
         line.protocol = "sip"
         line.protocolid = 3
         line.context = "default"
+        line.num = 4
+        line.device = 123
         line_dao.find_line_id_by_user_id = Mock()
         line_dao.find_line_id_by_user_id.return_value = [2]
         line_dao.get = Mock()
@@ -208,6 +210,9 @@ class TestUserManagement(unittest.TestCase):
         extensions_dao.delete_by_exten = Mock()
         extenumber_dao.delete_by_exten = Mock()
         contextnummember_dao.delete_by_userid_context = Mock()
+        device_dao.get_deviceid = Mock()
+        device_dao.get_deviceid.return_value = "abcdef"
+        self._userManager.provd_remove_line = Mock()
 
         self._userManager.delete_user(1)
         user_dao.get.assert_called_with(1) # @UndefinedVariable
@@ -219,6 +224,8 @@ class TestUserManagement(unittest.TestCase):
         extensions_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
         extenumber_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
         contextnummember_dao.delete_by_userid_context.assert_called_with(1, "default") # @UndefinedVariable
+        device_dao.get_deviceid.assert_called_with(123) # @UndefinedVariable
+        self._userManager.provd_remove_line.assert_called_with("abcdef", 4)
 
     def test_provd_remove_line(self):
         self.config_manager.get.return_value = self.config_dict

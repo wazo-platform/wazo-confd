@@ -17,7 +17,7 @@
 
 from provd.rest.client.client import new_provisioning_client
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
-    extenumber_dao, contextnummember_dao
+    extenumber_dao, contextnummember_dao, device_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -93,6 +93,10 @@ class UserManagement:
             extensions_dao.delete_by_exten(line.number)
             extenumber_dao.delete_by_exten(line.number)
             contextnummember_dao.delete_by_userid_context(userid, line.context)
+
+            deviceid = device_dao.get_deviceid(line.device)
+            if deviceid is not None:
+                self.provd_remove_line(deviceid, line.num)
         user_dao.delete(userid)
 
     def provd_remove_line(self, deviceid, linenum):
