@@ -269,7 +269,7 @@ def _check_extenumbers():
     assert extenumber_dao.get_by_exten(world.number) is None
 
 def _check_contextnummembers():
-    assert contextnummember_dao.get_by_userid_context(world.userid, "default") is None
+    assert contextnummember_dao.get_by_type_typeval_context("user", world.lineid, "default") is None
 
 
 @step(u'When I delete a non existing user')

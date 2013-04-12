@@ -117,3 +117,6 @@ class APIUsers:
             return make_response('', 200)
         except NoSuchElementException:
             return make_response('', 404)
+        except Exception as e:
+            result = rest_encoder.encode(str(e))
+            return make_response(result, 500)

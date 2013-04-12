@@ -95,7 +95,7 @@ class UserManagement:
             usersip_dao.delete(line.protocolid)
             extensions_dao.delete_by_exten(line.number)
             extenumber_dao.delete_by_exten(line.number)
-            contextnummember_dao.delete_by_userid_context(userid, line.context)
+            contextnummember_dao.delete_by_type_typeval_context("user", line.id, line.context)
 
             deviceid = device_dao.get_deviceid(line.device)
             if deviceid is not None:
