@@ -70,4 +70,11 @@ Feature: Users management
 	#Given I have a device with no line
 	#Given I have a user with a SIP line associated to this device
 	#When I delete this user
-	#Then The device is reset to autoprov mode
+	#Then the device is reset to autoprov mode
+	
+	#TODO: manual step
+	#Given I have a device
+	#Given I have a user with a SIP line associated to this device
+	#Given provd is stopped
+	#When I delete this user
+	#Then I get an error with status "500" and message "The user was deleted but the device could not be reconfigured"
