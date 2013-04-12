@@ -62,6 +62,10 @@ Feature: Users management
 	  Then I get a response with status "200"
 	  Then no data is remaining in the tables "userfeatures,linefeatures,usersip,extensions,extenumbers,contextnummember"
 
+	Scenario: deleting a non existing user
+	  When I delete a non existing user
+	  Then I get a response with status "404"
+	  
 	#TODO: manual step
 	#Given I have a device with no line
 	#Given I have a user with a SIP line associated to this device

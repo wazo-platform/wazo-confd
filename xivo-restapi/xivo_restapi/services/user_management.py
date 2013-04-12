@@ -84,7 +84,10 @@ class UserManagement:
             self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
 
     def delete_user(self, userid):
-        user_dao.get(userid)
+        try:
+            user_dao.get(userid)
+        except LookupError:
+            raise NoSuchElementException("No such user: " + str(userid))
         lines = line_dao.find_line_id_by_user_id(userid)
         if len(lines) > 0:
             line = line_dao.get(lines[0])

@@ -270,3 +270,9 @@ def _check_extenumbers():
 
 def _check_contextnummembers():
     assert contextnummember_dao.get_by_userid_context(world.userid, "default") is None
+
+
+@step(u'When I delete a non existing user')
+def when_i_delete_a_non_existing_user(step):
+    global result
+    result = rest_users.delete_user(rest_users.generate_unexisting_id())

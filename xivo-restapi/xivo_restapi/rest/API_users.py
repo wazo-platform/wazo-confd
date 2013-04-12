@@ -112,5 +112,8 @@ class APIUsers:
 
     @realmDigest.requires_auth
     def delete(self, userid):
-        self._user_management.delete_user(int(userid))
-        return make_response('', 200)
+        try:
+            self._user_management.delete_user(int(userid))
+            return make_response('', 200)
+        except NoSuchElementException:
+            return make_response('', 404)

@@ -258,7 +258,7 @@ class TestUserManagement(unittest.TestCase):
         self.device_manager.update.assert_called_with(expected_arg_device)
         self.config_manager.update.assert_called_with(expected_arg_config)
 
-    def test_provd_remove_line_stable_if_no_funckeys(self):
+    def test_provd_remove_line_no_funckeys(self):
         autoprovid = "autoprov1234"
         del self.config_dict["raw_config"]["sip_lines"]["2"]
         self.config_manager.get.return_value = self.config_dict
@@ -270,3 +270,12 @@ class TestUserManagement(unittest.TestCase):
             self.assertTrue(True)
         except:
             self.assertTrue(False, "An exception was raised whereas it should not")
+
+    def test_delete_unexisting_user(self):
+        def mock_get(userid):
+            raise LookupError()
+
+        user_dao.get = Mock()
+        user_dao.get.side_effect = mock_get
+
+        self.assertRaises(NoSuchElementException, self._userManager.delete_user, 1)

@@ -235,3 +235,17 @@ class TestAPIUsers(unittest.TestCase):
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
         self.assertEqual(result.status, status)
         self.instance_user_management.delete_user.assert_called_with(1)
+
+    def test_delete_not_found(self):
+        status = "404 NOT FOUND"
+
+        def mock_delete(userid):
+            raise NoSuchElementException("")
+
+        self.instance_user_management.delete_user.side_effect = mock_delete
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.assertEqual(result.status, status)
+        self.instance_user_management.delete_user.assert_called_with(1)
+
+        self.instance_user_management.delete_user.side_effect = None
