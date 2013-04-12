@@ -16,12 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from provd.rest.client.client import new_provisioning_client
+from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.services.utils.exceptions import NoSuchElementException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    ProvdError
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
 
@@ -89,6 +91,7 @@ class UserManagement:
         except LookupError:
             raise NoSuchElementException("No such user: " + str(userid))
         lines = line_dao.find_line_id_by_user_id(userid)
+        error = None
         if len(lines) > 0:
             line = line_dao.get(lines[0])
             line_dao.delete(line.id)
@@ -99,8 +102,13 @@ class UserManagement:
 
             deviceid = device_dao.get_deviceid(line.device)
             if deviceid is not None:
-                self.provd_remove_line(deviceid, line.num)
+                try:
+                    self.provd_remove_line(deviceid, line.num)
+                except URLError as e:
+                    error = ProvdError(str(e))
         user_dao.delete(userid)
+        if error is not None:
+            raise error
 
     def provd_remove_line(self, deviceid, linenum):
         config = self.config_manager.get(deviceid)

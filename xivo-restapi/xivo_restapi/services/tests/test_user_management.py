@@ -17,6 +17,7 @@
 
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
+from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
@@ -26,7 +27,8 @@ from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_dao.service_data_model.line_sdm import LineSdm
 from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.services.user_management import UserManagement
-from xivo_restapi.services.utils.exceptions import NoSuchElementException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    ProvdError
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import copy
 import unittest
@@ -46,6 +48,9 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.device_manager = self.device_manager
         self.config_manager = Mock(ConfigManager)
         self._userManager.config_manager = self.config_manager
+        self._generate_test_data()
+
+    def _generate_test_data(self):
         self.deviceid = "abcd"
         self.config_dict = {"raw_config":
                          {"sip_lines":
@@ -61,6 +66,16 @@ class TestUserManagement(unittest.TestCase):
                        "version":"3.2.2.1136",
                        "config": self.deviceid,
                        "id": self.deviceid}
+        self.user = UserFeatures()
+        self.user.id = 1
+        self.line = LineFeatures()
+        self.line.id = 2
+        self.line.number = "2000"
+        self.line.protocol = "sip"
+        self.line.protocolid = 3
+        self.line.context = "default"
+        self.line.num = 4
+        self.line.device = 123
 
     def test_get_all_users(self):
         user1 = UserFeatures()
@@ -187,29 +202,19 @@ class TestUserManagement(unittest.TestCase):
                           1, data)
 
     def test_delete_user(self):
-        user = UserFeatures()
-        user.id = 1
         user_dao.get = Mock()
-        user_dao.get.return_value = user
-        line = LineFeatures()
-        line.id = 2
-        line.number = "2000"
-        line.protocol = "sip"
-        line.protocolid = 3
-        line.context = "default"
-        line.num = 4
-        line.device = 123
+        user_dao.get.return_value = self.user
         line_dao.find_line_id_by_user_id = Mock()
         line_dao.find_line_id_by_user_id.return_value = [2]
         line_dao.get = Mock()
-        line_dao.get.return_value = line
+        line_dao.get.return_value = self.line
 
         user_dao.delete = Mock()
         line_dao.delete = Mock()
         usersip_dao.delete = Mock()
         extensions_dao.delete_by_exten = Mock()
         extenumber_dao.delete_by_exten = Mock()
-        contextnummember_dao.delete_by_userid_context = Mock()
+        contextnummember_dao.delete_by_type_typeval_context = Mock()
         device_dao.get_deviceid = Mock()
         device_dao.get_deviceid.return_value = "abcdef"
         self._userManager.provd_remove_line = Mock()
@@ -223,9 +228,9 @@ class TestUserManagement(unittest.TestCase):
         usersip_dao.delete.assert_called_with(3) # @UndefinedVariable
         extensions_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
         extenumber_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
-        contextnummember_dao.delete_by_userid_context.assert_called_with(1, "default") # @UndefinedVariable
+        contextnummember_dao.delete_by_type_typeval_context.assert_called_with("user", self.line.id, "default") # @UndefinedVariable
         device_dao.get_deviceid.assert_called_with(123) # @UndefinedVariable
-        self._userManager.provd_remove_line.assert_called_with("abcdef", 4)
+        self._userManager.provd_remove_line.assert_called_with("abcdef", self.line.num)
 
     def test_provd_remove_line(self):
         self.config_manager.get.return_value = self.config_dict
@@ -279,3 +284,28 @@ class TestUserManagement(unittest.TestCase):
         user_dao.get.side_effect = mock_get
 
         self.assertRaises(NoSuchElementException, self._userManager.delete_user, 1)
+
+    def test_delete_provd_error(self):
+        def mock_provd_remove_line(deviceid, linenum):
+            raise URLError("sample error")
+
+        user_dao.get = Mock()
+        user_dao.get.return_value = self.user
+        line_dao.find_line_id_by_user_id = Mock()
+        line_dao.find_line_id_by_user_id.return_value = [2]
+        line_dao.get = Mock()
+        line_dao.get.return_value = self.line
+
+        user_dao.delete = Mock()
+        line_dao.delete = Mock()
+        usersip_dao.delete = Mock()
+        extensions_dao.delete_by_exten = Mock()
+        extenumber_dao.delete_by_exten = Mock()
+        contextnummember_dao.delete_by_type_typeval_context = Mock()
+        device_dao.get_deviceid = Mock()
+        device_dao.get_deviceid.return_value = "abcdef"
+        self._userManager.provd_remove_line = Mock()
+        self._userManager.provd_remove_line.side_effect = mock_provd_remove_line
+
+        self.assertRaises(ProvdError, self._userManager.delete_user, 1)
+

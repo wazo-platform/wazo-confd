@@ -78,3 +78,4 @@ Feature: Users management
 	#Given provd is stopped
 	#When I delete this user
 	#Then I get an error with status "500" and message "The user was deleted but the device could not be reconfigured"
+	#Then the user is actually deleted
