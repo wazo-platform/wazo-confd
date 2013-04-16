@@ -21,7 +21,8 @@ from acceptance.features.steps.voicemails_steps import \
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
-    extensions_dao, extenumber_dao, contextnummember_dao
+    extensions_dao, extenumber_dao, contextnummember_dao, queue_dao, \
+    queue_member_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 
@@ -30,7 +31,7 @@ rest_users = RestUsers()
 
 
 @step('Given there is a user "([^"]*)"$')
-def given_there_is_a_user_group1(step, fullname):
+def given_there_is_a_user(step, fullname):
     world.userid = rest_users.id_from_fullname(fullname)
     if(world.userid is None):
         (firstname, lastname) = rest_users.decompose_fullname(fullname)
@@ -135,7 +136,7 @@ def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, full
 
 @step(u'Given there is a user "([^"]*)" with a voicemail')
 def given_there_is_a_user_group1_with_a_voicemail(step, fullname):
-    given_there_is_a_user_group1(step, fullname)
+    given_there_is_a_user(step, fullname)
     userid = rest_users.id_from_fullname(fullname)
     user = user_dao.get(userid)
     if(user.voicemailid is None):
@@ -177,9 +178,9 @@ def then_i_delete_the_user_group1_from_the_database(step, fullname):
     rest_users.delete_user_from_db(userid)
 
 
-@step(u'Given there is a user "([^"]*)" with a line "([^"]*)"')
+@step(u'Given there is a user "([^"]*)" with a line "([^"]*)"$')
 def given_there_is_a_user_group1_with_a_line_group2(step, fullname, linenumber):
-    given_there_is_a_user_group1(step, fullname)
+    given_there_is_a_user(step, fullname)
     result = line_dao.find_line_id_by_user_id(world.userid)
     if(result == []):
         line = LineFeatures()
@@ -245,7 +246,8 @@ def then_no_data_is_remaining_in_the_tables(step, tables):
                        "usersip": _check_usersip,
                        "extensions": _check_extensions,
                        "extenumbers": _check_extenumbers,
-                       "contextnummember": _check_contextnummembers}
+                       "contextnummember": _check_contextnummembers,
+                       "queuemember": _check_queuemembers}
     for table in tables:
         table_functions[table]()
 
@@ -271,8 +273,18 @@ def _check_extenumbers():
 def _check_contextnummembers():
     assert contextnummember_dao.get_by_type_typeval_context("user", world.lineid, "default") is None
 
+def _check_queuemembers():
+    result = queue_member_dao.get_queue_members_for_queues()
+    processed_result = [item.member_name for item in result if item.member_name == world.interface]
+    assert processed_result == [], str(processed_result)
 
 @step(u'When I delete a non existing user')
 def when_i_delete_a_non_existing_user(step):
     global result
     result = rest_users.delete_user(rest_users.generate_unexisting_id())
+
+@step(u'Given there is a user "([^"]*)" member of the queue "([^"]*)"')
+def given_there_is_a_user_member_of_the_queue(step, user, queue):
+    world.userid, _, _ = rest_users.create_user_with_sip_line(user, '1000')
+    world.interface = line_dao.get_interface_from_user_id(world.userid)
+    queue_member_dao.add_user_to_queue(world.userid, queue)
