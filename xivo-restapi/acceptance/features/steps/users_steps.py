@@ -22,8 +22,9 @@ from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
     extensions_dao, extenumber_dao, contextnummember_dao, queue_dao, \
-    queue_member_dao
+    queue_member_dao, rightcall_dao, rightcall_member_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
+from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.userfeatures import UserFeatures
 
 result = None
@@ -247,7 +248,8 @@ def then_no_data_is_remaining_in_the_tables(step, tables):
                        "extensions": _check_extensions,
                        "extenumbers": _check_extenumbers,
                        "contextnummember": _check_contextnummembers,
-                       "queuemember": _check_queuemembers}
+                       "queuemember": _check_queuemembers,
+                       "rightcallmember": _check_rightcallmembers}
     for table in tables:
         table_functions[table]()
 
@@ -278,6 +280,10 @@ def _check_queuemembers():
     processed_result = [item.member_name for item in result if item.member_name == world.interface]
     assert processed_result == [], str(processed_result)
 
+def _check_rightcallmembers():
+    result = rightcall_member_dao.get_by_userid(world.userid)
+    assert result == []
+
 @step(u'When I delete a non existing user')
 def when_i_delete_a_non_existing_user(step):
     global result
@@ -288,3 +294,16 @@ def given_there_is_a_user_member_of_the_queue(step, user, queue):
     world.userid, _, _ = rest_users.create_user_with_sip_line(user, '1000')
     world.interface = line_dao.get_interface_from_user_id(world.userid)
     queue_member_dao.add_user_to_queue(world.userid, queue)
+
+@step(u'Given there is a rightcall "([^"]*)"')
+def given_there_is_a_rightcall(step, rightcallname):
+    right = rightcall_dao.get_by_name(rightcallname)
+    if right is None:
+        right = RightCall(name=rightcallname, passwd='', authorization=0, commented=0, description='')
+        rightcall_dao.add(right)
+
+@step(u'Given there is a user "([^"]*)" with the right call "([^"]*)"')
+def given_there_is_a_user_with_the_right_call(step, username, rightcallname):
+    rightid = rightcall_dao.get_by_name(rightcallname).id
+    step.given('Given there is a user "%s"' % username)
+    rightcall_member_dao.add_user_to_rightcall(world.userid, rightid)
