@@ -20,7 +20,7 @@ from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao, queue_member_dao, \
-    rightcall_member_dao, callfilter_dao
+    rightcall_member_dao, callfilter_dao, dialaction_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
@@ -219,6 +219,7 @@ class TestUserManagement(unittest.TestCase):
         queue_member_dao.delete_by_userid = Mock()
         rightcall_member_dao.delete_by_userid = Mock()
         callfilter_dao.delete_callfiltermember_by_userid = Mock()
+        dialaction_dao.delete_by_userid = Mock()
         device_dao.get_deviceid = Mock()
         device_dao.get_deviceid.return_value = "abcdef"
         self._userManager.provd_remove_line = Mock()
@@ -237,6 +238,7 @@ class TestUserManagement(unittest.TestCase):
         rightcall_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         callfilter_dao.delete_callfiltermember_by_userid.assert_called_with(1) # @UndefinedVariable
         device_dao.get_deviceid.assert_called_with(123) # @UndefinedVariable
+        dialaction_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         self._userManager.provd_remove_line.assert_called_with("abcdef", self.line.num)
 
     def test_provd_remove_line(self):
@@ -312,6 +314,7 @@ class TestUserManagement(unittest.TestCase):
         extensions_dao.delete_by_exten = Mock()
         extenumber_dao.delete_by_exten = Mock()
         contextnummember_dao.delete_by_type_typeval_context = Mock()
+        dialaction_dao.delete_by_userid = Mock()
         device_dao.get_deviceid = Mock()
         device_dao.get_deviceid.return_value = "abcdef"
         self._userManager.provd_remove_line = Mock()

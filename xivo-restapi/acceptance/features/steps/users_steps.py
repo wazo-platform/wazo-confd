@@ -22,8 +22,10 @@ from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
     extensions_dao, extenumber_dao, contextnummember_dao, queue_dao, \
-    queue_member_dao, rightcall_dao, rightcall_member_dao, callfilter_dao
+    queue_member_dao, rightcall_dao, rightcall_member_dao, callfilter_dao, \
+    dialaction_dao
 from xivo_dao.alchemy.callfilter import Callfilter
+from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.userfeatures import UserFeatures
@@ -251,7 +253,8 @@ def then_no_data_is_remaining_in_the_tables(step, tables):
                        "contextnummember": _check_contextnummembers,
                        "queuemember": _check_queuemembers,
                        "rightcallmember": _check_rightcallmembers,
-                       "callfiltermember": _check_callfiltermember}
+                       "callfiltermember": _check_callfiltermember,
+                       "dialaction": _check_dialaction}
     for table in tables:
         table_functions[table]()
 
@@ -288,6 +291,10 @@ def _check_rightcallmembers():
 
 def _check_callfiltermember():
     result = callfilter_dao.get_callfiltermembers_by_userid(world.userid)
+    assert result == []
+
+def _check_dialaction():
+    result = dialaction_dao.get_by_userid(world.userid)
     assert result == []
 
 @step(u'When I delete a non existing user')
@@ -331,3 +338,14 @@ def given_there_is_a_user_with_the_call_filter(step, name, callfilter):
     step.given('Given there is a user "%s"' % name)
     world.filterid = callfilter_dao.get_by_name(callfilter)[0].id
     callfilter_dao.add_user_to_filter(world.userid, world.filterid, 'boss')
+
+@step(u'Given there is a user "([^"]*)" with a dialaction')
+def given_there_is_a_user_with_a_dialaction(step, fullname):
+    step.given('Given there is a user "%s"' % fullname)
+    dialaction = Dialaction()
+    dialaction.action = 'none'
+    dialaction.event = 'answer'
+    dialaction.category = 'user'
+    dialaction.categoryval = str(world.userid)
+    dialaction_dao.add(dialaction)
+
