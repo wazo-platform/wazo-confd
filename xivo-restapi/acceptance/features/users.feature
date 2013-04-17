@@ -92,7 +92,7 @@ Feature: Users management
 	  
 	Scenario: Deleting a user with a schedule
         Given there is a schedule "my schedule"
-        Given there is a user "Théodore Botrel" with a schedule "my schedule"
+        Given there is a user "Théodore Botrel" with this schedule
         When I delete this user
         Then no data is remaining in the tables "userfeatures,schedulepath"
       
