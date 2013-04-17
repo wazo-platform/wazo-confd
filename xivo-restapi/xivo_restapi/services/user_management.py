@@ -25,7 +25,7 @@ from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError
+    ProvdError, VoicemailExistsException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
 
@@ -89,10 +89,13 @@ class UserManagement:
 
     def delete_user(self, userid):
         data_access_logger.info("Deleting the user of id %s" % userid)
+        user = None
         try:
-            user_dao.get(userid)
+            user = user_dao.get(userid)
         except LookupError:
             raise NoSuchElementException("No such user: " + str(userid))
+        if user.voicemailid is not None:
+            raise VoicemailExistsException()
         lines = line_dao.find_line_id_by_user_id(userid)
         error = None
         if len(lines) > 0:
@@ -109,6 +112,7 @@ class UserManagement:
                     self.provd_remove_line(deviceid, line.num)
                 except URLError as e:
                     error = ProvdError(str(e))
+
         user_dao.delete(userid)
         queue_member_dao.delete_by_userid(userid)
         rightcall_member_dao.delete_by_userid(userid)
@@ -116,6 +120,7 @@ class UserManagement:
         dialaction_dao.delete_by_userid(userid)
         phonefunckey_dao.delete_by_userid(userid)
         schedule_dao.remove_user_from_all_schedules(userid)
+
         if error is not None:
             raise error
 

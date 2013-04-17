@@ -49,3 +49,6 @@ class ProvdError(Exception):
 
     def __str__(self):
         return "provd error: %s" % self.value
+
+class VoicemailExistsException(Exception):
+    pass

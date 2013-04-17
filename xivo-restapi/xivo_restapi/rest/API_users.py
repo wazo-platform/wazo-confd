@@ -26,7 +26,7 @@ from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError
+    ProvdError, VoicemailExistsException
 import logging
 
 logger = logging.getLogger(__name__)
@@ -120,8 +120,12 @@ class APIUsers:
             return make_response('', 404)
         except ProvdError as e:
             result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
-            result = rest_encoder.encode(result)
+            result = rest_encoder.encode([result])
             return make_response(result, 500)
+        except VoicemailExistsException:
+            result = "Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user."
+            result = rest_encoder.encode([result])
+            return make_response(result, 412)
         except Exception as e:
             result = rest_encoder.encode(str(e))
             return make_response(result, 500)

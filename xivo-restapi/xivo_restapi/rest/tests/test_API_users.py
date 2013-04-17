@@ -25,7 +25,7 @@ from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, mock_user_sdm
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError
+    ProvdError, VoicemailExistsException
 import unittest
 
 
@@ -264,5 +264,21 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         data = rest_encoder.decode(result.data)
         self.assertEquals("The user was deleted but the device could not be reconfigured " + \
-                          "(provd error: sample error)", data)
+                          "(provd error: sample error)", data[0])
+        self.instance_user_management.delete_user.assert_called_with(1)
+
+    def test_delete_voicemail_exists(self):
+        status = "412 PRECONDITION FAILED"
+
+        def mock_delete(userid):
+            raise VoicemailExistsException()
+
+        self.instance_user_management.delete_user.side_effect = mock_delete
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.instance_user_management.delete_user.side_effect = None
+        self.assertEqual(result.status, status)
+        data = rest_encoder.decode(result.data)
+        self.assertEquals("Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user.",
+                          data[0])
         self.instance_user_management.delete_user.assert_called_with(1)

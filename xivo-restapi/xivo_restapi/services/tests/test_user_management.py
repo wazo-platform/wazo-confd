@@ -30,7 +30,7 @@ from xivo_dao.service_data_model.line_sdm import LineSdm
 from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError
+    ProvdError, VoicemailExistsException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import copy
 import unittest
@@ -328,3 +328,10 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.provd_remove_line.side_effect = mock_provd_remove_line
 
         self.assertRaises(ProvdError, self._userManager.delete_user, 1)
+
+    def test_delete_with_voicemail(self):
+        self.user.voicemailid = 12
+        user_dao.get = Mock()
+        user_dao.get.return_value = self.user
+
+        self.assertRaises(VoicemailExistsException, self._userManager.delete_user, 1)
