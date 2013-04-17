@@ -19,7 +19,7 @@ from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao, queue_member_dao, \
-    rightcall_member_dao
+    rightcall_member_dao, callfilter_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -111,6 +111,7 @@ class UserManagement:
         user_dao.delete(userid)
         queue_member_dao.delete_by_userid(userid)
         rightcall_member_dao.delete_by_userid(userid)
+        callfilter_dao.delete_callfiltermember_by_userid(userid)
         if error is not None:
             raise error
 

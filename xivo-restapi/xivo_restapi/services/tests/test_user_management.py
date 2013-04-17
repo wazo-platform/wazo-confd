@@ -20,7 +20,7 @@ from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao, queue_member_dao, \
-    rightcall_member_dao
+    rightcall_member_dao, callfilter_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
@@ -218,6 +218,7 @@ class TestUserManagement(unittest.TestCase):
         contextnummember_dao.delete_by_type_typeval_context = Mock()
         queue_member_dao.delete_by_userid = Mock()
         rightcall_member_dao.delete_by_userid = Mock()
+        callfilter_dao.delete_callfiltermember_by_userid = Mock()
         device_dao.get_deviceid = Mock()
         device_dao.get_deviceid.return_value = "abcdef"
         self._userManager.provd_remove_line = Mock()
@@ -234,6 +235,7 @@ class TestUserManagement(unittest.TestCase):
         contextnummember_dao.delete_by_type_typeval_context.assert_called_with("user", self.line.id, "default") # @UndefinedVariable
         queue_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         rightcall_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
+        callfilter_dao.delete_callfiltermember_by_userid.assert_called_with(1) # @UndefinedVariable
         device_dao.get_deviceid.assert_called_with(123) # @UndefinedVariable
         self._userManager.provd_remove_line.assert_called_with("abcdef", self.line.num)
 
@@ -304,6 +306,7 @@ class TestUserManagement(unittest.TestCase):
         user_dao.delete = Mock()
         queue_member_dao.delete_by_userid = Mock()
         rightcall_member_dao.delete_by_userid = Mock()
+        callfilter_dao.delete_callfiltermember_by_userid = Mock()
         line_dao.delete = Mock()
         usersip_dao.delete = Mock()
         extensions_dao.delete_by_exten = Mock()
@@ -315,4 +318,3 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.provd_remove_line.side_effect = mock_provd_remove_line
 
         self.assertRaises(ProvdError, self._userManager.delete_user, 1)
-
