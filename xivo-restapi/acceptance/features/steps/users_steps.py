@@ -23,12 +23,13 @@ from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
     extensions_dao, extenumber_dao, contextnummember_dao, queue_dao, \
     queue_member_dao, rightcall_dao, rightcall_member_dao, callfilter_dao, \
-    dialaction_dao
+    dialaction_dao, phonefunckey_dao
 from xivo_dao.alchemy.callfilter import Callfilter
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.alchemy.phonefunckey import PhoneFunckey
 
 result = None
 rest_users = RestUsers()
@@ -254,7 +255,8 @@ def then_no_data_is_remaining_in_the_tables(step, tables):
                        "queuemember": _check_queuemembers,
                        "rightcallmember": _check_rightcallmembers,
                        "callfiltermember": _check_callfiltermember,
-                       "dialaction": _check_dialaction}
+                       "dialaction": _check_dialaction,
+                       "phonefunckey": _check_phonefunckey}
     for table in tables:
         table_functions[table]()
 
@@ -295,6 +297,10 @@ def _check_callfiltermember():
 
 def _check_dialaction():
     result = dialaction_dao.get_by_userid(world.userid)
+    assert result == []
+
+def _check_phonefunckey():
+    result = phonefunckey_dao.get_by_userid(world.userid)
     assert result == []
 
 @step(u'When I delete a non existing user')
@@ -349,3 +355,11 @@ def given_there_is_a_user_with_a_dialaction(step, fullname):
     dialaction.categoryval = str(world.userid)
     dialaction_dao.add(dialaction)
 
+@step(u'Given there is a user "([^"]*)" with a function key')
+def given_there_is_a_user_with_a_function_key(step, fullname):
+    step.given('Given there is a user "%s"' % fullname)
+    key = PhoneFunckey()
+    key.iduserfeatures = world.userid
+    key.fknum = 1
+    key.label = 'my label'
+    phonefunckey_dao.add(key)
