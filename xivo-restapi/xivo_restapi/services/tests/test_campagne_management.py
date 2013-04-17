@@ -61,7 +61,7 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.get_records = Mock()
         record_campaigns_dao.get_records.return_value = data
 
-        (total, items) = self._campagneManager.get_campaigns()
+        (_, items) = self._campagneManager.get_campaigns()
         result = items[0]
         self.assertEqual(result.queue_name, self.queue_name)
         self.assertEqual(result.queue_display_name, self.queue_display_name)
@@ -74,7 +74,7 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.get_records = Mock()
         record_campaigns_dao.get_records.return_value = data
 
-        (total, items) = self._campagneManager.get_campaigns({"campaign_name": campaign.campaign_name},
+        (_, items) = self._campagneManager.get_campaigns({"campaign_name": campaign.campaign_name},
                                                              True,
                                                              (1, 1))
         result = items[0]
