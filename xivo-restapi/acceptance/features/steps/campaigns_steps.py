@@ -25,7 +25,6 @@ import datetime
 
 r_campaign = RestCampaign()
 world.callid = '1'
-world.campaign_id = ''
 world.result_list = []
 
 @step(u'Given there is no campaign')
