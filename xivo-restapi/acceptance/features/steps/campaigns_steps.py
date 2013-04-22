@@ -26,7 +26,6 @@ import datetime
 r_campaign = RestCampaign()
 world.callid = '1'
 world.campaign_id = ''
-world.list_running_campaigns = []
 world.result_list = []
 
 @step(u'Given there is no campaign')
@@ -128,14 +127,13 @@ def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_current
 @step(u'When I ask for running and activated campaigns for queue "([^"]*)"')
 def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_name):
     queue_id = queue_dao.id_from_name(queue_name)
-    world.list_running_campaigns = \
-        r_campaign.get_running_activated_campaigns_for_queue(str(queue_id)).data['items']
-    assert len(world.list_running_campaigns) > 0, 'No campaign retrieved'
+    world.result = r_campaign.get_running_activated_campaigns_for_queue(str(queue_id))
 
 
 @step(u'Then I get campaign "([^"]*)", I do not get "([^"]*)", "([^"]*)"')
 def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, campaign1, campaign2, campaign3):
-    list_names = [item['campaign_name'] for item in world.list_running_campaigns]
+    running_campaigns = world.result.data['items']
+    list_names = [item['campaign_name'] for item in running_campaigns]
     assert campaign1 in list_names, campaign1 + ' was not retrieved.'
     assert campaign2 not in list_names, campaign2 + ' was not retrieved.'
     assert campaign3 not in list_names, campaign3 + ' was not retrieved.'
