@@ -38,11 +38,6 @@ def when_i_list_the_voicemails(step):
     world.result = rest_voicemail.list()
 
 
-@step(u'Then I get a response from voicemails webservice with status "([^"]*)"')
-def then_i_get_a_response_from_voicemails_webservice_with_status_group1(step, status):
-    assert world.result.status == int(status)
-
-
 @step(u'Then I get at least one voicemail with fullname "([^"]*)" and with number "([^"]*)"')
 def then_i_get_one_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):
     assert len(world.result.data["items"]) >= 1
