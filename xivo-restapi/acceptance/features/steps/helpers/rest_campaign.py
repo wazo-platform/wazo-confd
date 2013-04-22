@@ -19,11 +19,9 @@
 from acceptance.features.steps.helpers.rest_queues import RestQueues
 from acceptance.features.steps.helpers.ws_utils import WsUtils
 from commands import getoutput
-from lettuce.terrain import before
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
-from xivo_dao.helpers import config
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
 
@@ -82,7 +80,7 @@ class RestCampaign(object):
         remote_host = remote_host.rstrip()
         file_path = dirname + "/" + recording['filename']
         remote_command = "'touch %s'" % file_path
-        ssh_command = "sudo ssh root@%s %s" % (remote_host, remote_command)
+        ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
         getoutput(ssh_command)
         return reply
 
