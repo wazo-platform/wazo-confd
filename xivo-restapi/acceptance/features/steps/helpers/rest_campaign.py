@@ -28,11 +28,6 @@ from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
 
 
-@before.all
-def modify_db_uri():
-    config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
-
-
 class RestCampaign(object):
 
     def __init__(self):
