@@ -177,12 +177,6 @@ def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, 
     result = rest_users.update_user(generated_id, lastname)
 
 
-@step(u'Then I delete the user "([^"]*)" from the database')
-def then_i_delete_the_user_group1_from_the_database(step, fullname):
-    userid = rest_users.id_from_fullname(fullname)
-    rest_users.delete_user_from_db(userid)
-
-
 @step(u'Given there is a user "([^"]*)" with a line "([^"]*)"$')
 def given_there_is_a_user_group1_with_a_line_group2(step, fullname, linenumber):
     given_there_is_a_user(step, fullname)

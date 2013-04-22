@@ -19,7 +19,6 @@ Feature: Users management
         When I create a user "Irène Dupont" with description "accented description: éà@';" and with ctiprofileid "1"
         Then I get a response with status "201"
         Then the user "Irène Dupont" is actually created with ctiprofileid "1" and description "accented description: éà@';"
-        Then I delete the user "Irène Dupont" from the database
 
     Scenario: Creation with errors
         When I create a user "Michel Sardou" with an field "unexisting_field" of value "value"
@@ -110,7 +109,6 @@ Feature: Users management
     Scenario: Force voicemail deletion
         Given there is a user "Alexandre Soljénitsyne" with a voicemail
         When I delete this user and force voicemail deletion
-        Then I get a response with status "200"
         Then no data is remaining in the tables "voicemail,contextmember"
 
     #TODO: manual step
