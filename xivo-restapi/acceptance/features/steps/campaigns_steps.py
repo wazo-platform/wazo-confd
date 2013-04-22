@@ -37,19 +37,19 @@ def given_there_is_no_campaign(step):
 @step(u'When I create a campaign "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, campaign_name):
     result = r_campaign.create(campaign_name)
-    assert result > 0, "Cannot create a campaign"
+    assert result.data > 0, "Cannot create a campaign"
 
 
 @step(u'Then I can consult the campaign named "([^"]*)"')
 def then_i_can_consult_the_campaign_named_group1(step, campaign_name):
-    liste = [item["campaign_name"] for item in r_campaign.list()['items']]
+    liste = [item["campaign_name"] for item in r_campaign.list().data['items']]
     assert campaign_name in liste, "%s not in %s" % (campaign_name, liste)
 
 
 @step(u'When I ask for activated campaigns for queue "([^"]*)"')
 def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
     queue_id = queue_dao.id_from_name(queue_name)
-    world.activated_campaigns = r_campaign.get_activated_campaigns(queue_id)['items']
+    world.activated_campaigns = r_campaign.get_activated_campaigns(queue_id).data['items']
     assert (world.activated_campaigns != None), "No activated campaign"
 
 
@@ -71,9 +71,8 @@ def given_i_create_a_campaign_with_the_following_parameters(step):
         del campaign['queue_name']
     if 'activated' in campaign:
         campaign['activated'] = bool(campaign['activated'])
-    reply = r_campaign.create(**campaign)
-    world.campaign_id = reply.data
-    world.return_tuple = reply.status, reply.data
+    world.result = r_campaign.create(**campaign)
+    world.campaign_id = world.result.data
 
 
 @step(u'When I edit it with the following parameters:')
@@ -87,7 +86,7 @@ def when_i_edit_it_with_the_following_parameters(step):
 
 @step(u'Then the campaign is actually modified with the following values:')
 def then_the_campaign_is_actually_modified_with_the_following_values(step):
-    campaign = r_campaign.getCampaign(world.campaign_id)
+    campaign = r_campaign.get_campaign(world.campaign_id).data['items'][0]
     expected_campaign = step.hashes[0]
     queue_id = queue_dao.id_from_name(expected_campaign['queue_name'])
     assert campaign['campaign_name'] == expected_campaign['campaign_name']
@@ -106,36 +105,31 @@ def given_there_is_a_queue_group1(step, queue1, queue2):
 def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_currently_running(step, campaign_name, queue_id):
     now = datetime.datetime.now()
     d = datetime.timedelta(days=1)
-    gen_id = r_campaign.create(campaign_name, queue_id, True, (now - d).strftime("%Y-%m-%d"),
-                                                                (now + d).strftime("%Y-%m-%d")).data
-    assert r_campaign.getCampaign(gen_id)["campaign_name"] == campaign_name, 'Campaign ' + \
-                                    campaign_name + ' not properly inserted'
+    r_campaign.create(campaign_name, queue_id, True, (now - d).strftime("%Y-%m-%d"),
+                                                                (now + d).strftime("%Y-%m-%d"))
 
 
 @step(u'Given I create a non activated campaign "([^"]*)" pointing to queue "([^"]*)" currently running')
 def given_i_create_a_non_activated_campaign_group1_pointing_to_queue_group2_currently_running(step, campaign_name, queue_id):
     now = datetime.datetime.now()
     d = datetime.timedelta(days=1)
-    gen_id = r_campaign.create(campaign_name, queue_id, False, (now - d).strftime("%Y-%m-%d"),
-                               (now + d).strftime("%Y-%m-%d")).data
-    assert r_campaign.getCampaign(gen_id)["campaign_name"] == campaign_name, 'Campaign ' + \
-                                    campaign_name + ' not properly inserted'
+    r_campaign.create(campaign_name, queue_id, False, (now - d).strftime("%Y-%m-%d"),
+                               (now + d).strftime("%Y-%m-%d"))
 
 
 @step(u'Given I create an activated campaign "([^"]*)" pointing to queue "([^"]*)" currently not running')
 def given_i_create_an_activated_campaign_group1_pointing_to_queue_group2_currently_not_running(step, campaign_name, queue_id):
     now = datetime.datetime.now()
     d = datetime.timedelta(days=1)
-    gen_id = r_campaign.create(campaign_name, queue_id, True, (now + d).strftime("%Y-%m-%d"),
-                               (now + 2 * d).strftime("%Y-%m-%d")).data
-    assert r_campaign.getCampaign(gen_id)["campaign_name"] == campaign_name, 'Campaign ' + \
-                                    campaign_name + ' not properly inserted'
+    r_campaign.create(campaign_name, queue_id, True, (now + d).strftime("%Y-%m-%d"),
+                               (now + 2 * d).strftime("%Y-%m-%d"))
 
 
 @step(u'When I ask for running and activated campaigns for queue "([^"]*)"')
 def when_i_ask_for_running_and_activated_campaigns_for_queue_group1(step, queue_name):
     queue_id = queue_dao.id_from_name(queue_name)
-    world.list_running_campaigns = r_campaign.getRunningActivatedCampaignsForQueue(str(queue_id))['items']
+    world.list_running_campaigns = \
+        r_campaign.get_running_activated_campaigns_for_queue(str(queue_id)).data['items']
     assert len(world.list_running_campaigns) > 0, 'No campaign retrieved'
 
 
@@ -149,7 +143,7 @@ def then_i_get_campaign_group1_i_do_not_get_group2_group3_group4(step, campaign1
 
 @step(u'Then the campaign "([^"]*)" is created with its start date and end date equal to now')
 def then_the_campaign_group1_is_created_with_its_start_date_and_end_date_equal_to_now(step, campaign_name):
-    liste = r_campaign.list()['items']
+    liste = r_campaign.list().data['items']
     result = False
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     for item in liste:
@@ -168,8 +162,8 @@ def when_i_create_a_campaign_with_the_following_parameters(step):
 
 @step(u'Then I get an error code "([^\']*)" with message "([^\']*)"')
 def then_i_get_an_error_code_group1_with_message_group2(step, error_code, message):
-    assert str(world.return_tuple[0]) == error_code, "Got wrong error code: " + str(world.return_tuple[0])
-    assert world.return_tuple[1] == [message], "Got wrong message: " + str(world.return_tuple[1])
+    assert str(world.result.status) == error_code, "Got wrong error code: " + str(world.result.status)
+    assert world.result.data == [message], "Got wrong message: " + str(world.result.data)
 
 
 @step(u'When I ask for all the campaigns')
@@ -179,13 +173,14 @@ def when_i_ask_for_all_the_campaigns(step):
 
 @step(u'Then the displayed total is equal to the actual number of campaigns')
 def then_the_displayed_total_is_equal_to_the_actual_number_of_campaigns(step):
-    assert world.result['total'] == len(world.result['items']), 'Got total ' + str(world.result['total']) + \
-        " but real number was " + str(len(world.result['items']))
+    assert world.result.data['total'] == len(world.result.data['items']), \
+        'Got total ' + str(world.result.data['total']) + \
+        " but real number was " + str(len(world.result.data['items']))
 
 
 @step(u'Given there are at least "([^"]*)" campaigns')
 def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
-    res = r_campaign.list()
+    res = r_campaign.list().data
     if(res['total'] < int(num_of_campaigns)):
         i = res['total']
         now = datetime.datetime.now()
@@ -195,7 +190,7 @@ def given_there_are_at_least_group1_campaigns(step, num_of_campaigns):
             r_campaign.create('campaign_%d' % i, 'test', True,
                               (now + d).strftime("%Y-%m-%d"), (now + d + oned).strftime("%Y-%m-%d"))
             i += 1
-        res = r_campaign.list()
+        res = r_campaign.list().data
     assert res['total'] >= int(num_of_campaigns), 'Not enough campaigns: ' + str(res)
 
 
@@ -206,13 +201,13 @@ def when_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(ste
 
 @step(u'Then I get exactly "([^"]*)" campaigns')
 def then_i_get_exactly_group1_campaigns(step, num_of_campaigns):
-    assert len(world.result['items']) == int(num_of_campaigns), \
-        "Got wrong number of campaigns: " + str(world.result)
+    assert len(world.result.data['items']) == int(num_of_campaigns), \
+        "Got wrong number of campaigns: " + str(world.result.data)
 
 
 @step(u'Given I ask for a list of campaigns with page "([^"]*)" and page size "([^"]*)"')
 def given_i_ask_for_a_list_of_campaigns_with_page_group1_and_page_size_group2(step, page_number, page_size):
-    world.result_list.append(r_campaign.paginated_list(int(page_number), int(page_size)))
+    world.result_list.append(r_campaign.paginated_list(int(page_number), int(page_size)).data)
 
 
 @step(u'Then the two results do not overlap')
@@ -223,7 +218,7 @@ def then_the_two_results_do_not_overlap(step):
 
 @step(u'When I try to create a campaign "([^"]*)" pointing to queue "([^"]*)" with start date "([^"]*)" and end date "([^"]*)"')
 def when_i_try_to_create_a_campaign_group1_pointing_to_queue_group2_with_start_date_group3_and_end_date_group4(step, name, queue, start, end):
-    world.return_tuple = r_campaign.create_with_errors(name, queue, True, start, end)
+    world.result = r_campaign.create_with_errors(name, queue, True, start, end)
 
 
 @step(u'When I delete the queue "([^"]*)"')
@@ -244,7 +239,7 @@ def then_the_queue_group1_is_actually_deleted(step, queue_name):
 @step(u'Then I can get the campaign "([^"]*)" with an empty queue_id')
 def then_i_can_get_the_campaign_group1_with_an_empty_queue_id(step, campaign_name):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    result = r_campaign.getCampaign(campaign_id)
+    result = r_campaign.get_campaign(campaign_id).data['items'][0]
     assert result != None, "No campaign retrieved"
     assert result['queue_id'] is None, "queue_id not null"
 
@@ -262,8 +257,7 @@ def given_there_s_at_least_one_recording_for_the_campaign_group1(step, campaign_
 @step(u'When I ask to delete the campaign "([^"]*)"')
 def when_i_ask_to_delete_the_campaign_group1(step, campaign_name):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    result = r_campaign.delete_campaign(campaign_id)
-    world.return_tuple = (result.status, result.data)
+    world.result = r_campaign.delete_campaign(campaign_id)
 
 
 @step(u'Given there is not any recording for the campaign "([^"]*)"')
@@ -273,5 +267,5 @@ def given_there_isn_t_any_recording_for_the_campaign_group1(step, campaign_name)
 
 @step(u'Then I get a response with code "([^\']*)" and the campaign is deleted')
 def then_i_get_a_response_with_code_group1_and_the_campaign_is_deleted(step, code):
-    assert str(world.return_tuple[0]) == code
-    assert record_campaigns_dao.get(world.campaign_id) == None
+    assert str(world.result.status) == code
+    assert record_campaigns_dao.get(world.campaign_id) is None
