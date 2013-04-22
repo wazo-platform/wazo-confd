@@ -46,19 +46,6 @@ def then_i_can_consult_the_campaign_named_group1(step, campaign_name):
     assert campaign_name in liste, "%s not in %s" % (campaign_name, liste)
 
 
-@step(u'Given there is an activated campaign named "([^"]*)" focusing queue "([^"]*)"')
-def given_there_is_an_activated_campaign_named_group1_focusing_queue_group2(step, campaign_name, queue_name):
-    result = r_campaign.create(campaign_name, queue_name)
-    assert result > 0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_name
-
-
-@step(u'Given there is an non activated campaign named "([^"]*)" focusing queue "([^"]*)"')
-def given_there_is_an_non_activated_campaign_named_group1_focusing_queue_group2(step, campaign_name, queue_name):
-    r_campaign.queue_create_if_not_exists(queue_name)
-    result = r_campaign.create(campaign_name, queue_name)
-    assert result > 0, "Cannot create campaign: " + campaign_name + " for queue: " + queue_name
-
-
 @step(u'When I ask for activated campaigns for queue "([^"]*)"')
 def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
     queue_id = queue_dao.id_from_name(queue_name)
@@ -82,7 +69,8 @@ def given_i_create_a_campaign_with_the_following_parameters(step):
     campaign = dict(step.hashes[0])
     if (campaign['queue_name'] == ''):
         del campaign['queue_name']
-    #print "campaign: queue_name: ", campaign['queue_name']
+    if 'activated' in campaign:
+        campaign['activated'] = bool(campaign['activated'])
     reply = r_campaign.create(**campaign)
     world.campaign_id = reply.data
     world.return_tuple = reply.status, reply.data

@@ -8,9 +8,11 @@ Feature: Recording campaign management
 	  Then I can consult the campaign named "accents_éèà&"
 	  
 	Scenario: Get activated campaigns
-	  Given there is no campaign
-	  Given there is an activated campaign named "quality" focusing queue "test1"
-	  Given there is an non activated campaign named "disabled" focusing queue "test2"	   
+	  Given there is no campaign	  
+	  Given I create a campaign with the following parameters:
+        | campaign_name | queue_name |      start_date     |       end_date      | activated |
+        | quality       | test1      | 2012-01-01 00:00:00 | 2013-05-05 14:59:14 | 0         |
+        | disabled      | test2      | 2012-01-01 00:00:00 | 2013-05-05 14:59:14 | 1         |
 	  When I ask for activated campaigns for queue "test1"
 	  Then I get a list of activated campaigns with campaign "quality"
 
