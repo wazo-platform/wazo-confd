@@ -30,7 +30,6 @@ from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.schedule import Schedule
 from xivo_dao.alchemy.userfeatures import UserFeatures
 
-result = None
 rest_users = RestUsers()
 
 
@@ -49,44 +48,38 @@ def given_there_is_a_user(step, fullname):
 
 @step(u'When I ask for all the users')
 def when_i_ask_for_all_the_users(step):
-    global result
-    result = rest_users.get_all_users().data['items']
+    world.result = rest_users.get_all_users().data['items']
 
 
 @step(u'Then I get a list with "([^"]*)" and "([^"]*)"')
 def then_i_get_a_list_with_group1_and_group2(step, fullname1, fullname2):
-    global result
-    assert len(result) >= 2
-    processed_result = [[item['firstname'], item['lastname']] for item in result]
+    assert len(world.result) >= 2
+    processed_result = [[item['firstname'], item['lastname']] for item in world.result]
     assert fullname1.split(" ") in processed_result
     assert fullname2.split(" ") in processed_result
 
 
 @step(u'When I ask for the user "([^"]*)" using its id')
 def when_i_ask_for_the_user_group1_using_its_id(step, fullname):
-    global result
     userid = rest_users.id_from_fullname(fullname)
-    result = rest_users.get_user(userid).data
+    world.result = rest_users.get_user(userid).data
 
 
 @step(u'Then I get a single user "([^"]*)"')
 def then_i_get_a_single_user_group1(step, fullname):
-    global result
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
-    assert result['firstname'] == firstname
-    assert result['lastname'] == lastname
+    assert world.result['firstname'] == firstname
+    assert world.result['lastname'] == lastname
 
 
 @step(u'When I create a user "([^"]*)" with description "([^"]*)" and with ctiprofileid "([^"]*)"')
 def when_i_create_a_user_group1_with_description_group2(step, fullname, description, ctiprofileid):
-    global result
-    result = rest_users.create_user(fullname, description, int(ctiprofileid))
+    world.result = rest_users.create_user(fullname, description, int(ctiprofileid))
 
 
 @step(u'Then I get a response with status "([^"]*)"')
 def then_i_get_a_response_with_status_group1(step, status):
-    global result
-    assert result.status == int(status), result.data
+    assert world.result.status == int(status), world.result.data
 
 
 @step(u'Then the user "([^"]*)" is actually created with ctiprofileid "([^"]*)" and description "([^"]*)')
@@ -102,9 +95,8 @@ def then_the_user_group1_is_actually_created(step, fullname, ctiprofileid, descr
 
 @step(u'When I update the user "([^"]*)" with a last name "([^"]*)"')
 def when_i_update_the_user_group1_with_a_last_name_group2(step, original_fullname, new_lastname):
-    global result
     userid = rest_users.id_from_fullname(original_fullname)
-    result = rest_users.update_user(userid, lastname=new_lastname)
+    world.result = rest_users.update_user(userid, lastname=new_lastname)
 
 
 @step(u'Then I have a user "([^"]*)"$')
@@ -121,21 +113,18 @@ def then_the_user_group1_is_actually_deleted(step, fullname):
 
 @step(u'When I create a user "([^"]*)" with an field "([^"]*)" of value "([^"]*)"')
 def when_i_create_a_user_group1_with_an_field_group2_of_value_group3(step, fullname, fieldname, fieldvalue):
-    global result
-    result = rest_users.create_user_with_field(fullname, fieldname, fieldvalue)
+    world.result = rest_users.create_user_with_field(fullname, fieldname, fieldvalue)
 
 
 @step(u'Then I get an error message "([^"]*)"')
 def then_i_get_an_error_message_group1(step, error_message):
-    global result
-    assert result.data[0] == error_message
+    assert world.result.data[0] == error_message
 
 
 @step(u'When I update the user "([^"]*)" with a field "([^"]*)" of value "([^"]*)"')
 def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, fullname, field, value):
-    global result
     userid = rest_users.id_from_fullname(fullname)
-    result = rest_users.update_user_with_field(userid, field, value)
+    world.result = rest_users.update_user_with_field(userid, field, value)
 
 
 @step(u'Given there is a user "([^"]*)" with a voicemail')
@@ -152,8 +141,7 @@ def given_there_is_a_user_with_a_voicemail(step, fullname):
 
 @step(u'When I update this user with a first name "([^"]*)" and a last name "([^"]*)"')
 def when_i_update_the_user_group1_with_a_first_name_group2_and_a_last_name_group3(step, newfirstname, newlastname):
-    global result
-    result = rest_users.update_user(world.userid, firstname=newfirstname, lastname=newlastname)
+    world.result = rest_users.update_user(world.userid, firstname=newfirstname, lastname=newlastname)
 
 
 @step(u'Then this user has a voicemail "([^"]*)"')
@@ -166,15 +154,13 @@ def then_i_have_a_user_group1_with_a_voicemail_group1(step, voicemail_fullname):
 
 @step(u'When I ask for a user with a non existing id')
 def when_i_ask_for_a_user_with_a_non_existing_id(step):
-    global result
-    result = rest_users.get_user(rest_users.generate_unexisting_id())
+    world.result = rest_users.get_user(rest_users.generate_unexisting_id())
 
 
 @step(u'When I update a user with a non existing id with the last name "([^"]*)"')
 def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, lastname):
-    global result
     generated_id = rest_users.generate_unexisting_id()
-    result = rest_users.update_user(generated_id, lastname)
+    world.result = rest_users.update_user(generated_id, lastname)
 
 
 @step(u'Given there is a user "([^"]*)" with a line "([^"]*)"$')
@@ -198,10 +184,9 @@ def given_there_is_a_user_group1_with_a_line_group2(step, fullname, linenumber):
 
 @step(u'Then I have a user "([^"]*)" with a line "([^"]*)"')
 def then_i_have_a_user_group1_with_a_line_group2(step, fullname, linenumber):
-    global result
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
     matching = None
-    for item in result:
+    for item in world.result:
         if(item['firstname'] == firstname and item['lastname'] == lastname):
             matching = item
             break
@@ -217,12 +202,11 @@ def then_i_delete_this_line(step):
 
 @step(u'Then I have a single user "([^"]*)" with a line "([^"]*)"')
 def then_i_have_a_single_user_group1_with_a_line_group2(step, fullname, linenumber):
-    global result
     (firstname, lastname) = rest_users.decompose_fullname(fullname)
-    assert result['firstname'] == firstname
-    assert result['lastname'] == lastname
-    assert 'line' in result
-    assert result['line']['number'] == linenumber
+    assert world.result['firstname'] == firstname
+    assert world.result['lastname'] == lastname
+    assert 'line' in world.result
+    assert world.result['line']['number'] == linenumber
 
 
 @step(u'Given there is a user "([^"]*)" with a SIP line "([^"]*)"')
@@ -233,8 +217,7 @@ def given_there_is_a_user_with_a_sip_line(step, fullname, number):
 
 @step(u'When I delete this user$')
 def when_i_delete_the_user(step):
-    global result
-    result = rest_users.delete_user(world.userid)
+    world.result = rest_users.delete_user(world.userid)
 
 
 @step(u'Then no data is remaining in the tables "([^"]*)"')
@@ -313,8 +296,7 @@ def _check_voicemail():
 
 @step(u'When I delete a non existing user')
 def when_i_delete_a_non_existing_user(step):
-    global result
-    result = rest_users.delete_user(rest_users.generate_unexisting_id())
+    world.result = rest_users.delete_user(rest_users.generate_unexisting_id())
 
 @step(u'Given there is a user "([^"]*)" member of the queue "([^"]*)"')
 def given_there_is_a_user_member_of_the_queue(step, user, queue):
@@ -386,5 +368,4 @@ def given_there_is_a_user_with_a_schedule(step, fullname):
 
 @step(u'When I delete this user and force voicemail deletion')
 def when_i_delete_this_user_and_force_voicemail_deletion(step):
-    global result
-    result = rest_users.delete_user(world.userid, True)
+    world.result = rest_users.delete_user(world.userid, True)

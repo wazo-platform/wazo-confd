@@ -21,8 +21,6 @@ from lettuce.registry import world
 from xivo_dao import voicemail_dao
 
 rest_voicemail = RestVoicemail()
-result = None
-
 
 @step(u'Given there is a voicemail with fullname "([^"]*)" and with number "([^"]*)"')
 def given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):
@@ -37,30 +35,26 @@ def given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step,
 
 @step(u'When I list the voicemails')
 def when_i_list_the_voicemails(step):
-    global result
-    result = rest_voicemail.list()
+    world.result = rest_voicemail.list()
 
 
 @step(u'Then I get a response from voicemails webservice with status "([^"]*)"')
 def then_i_get_a_response_from_voicemails_webservice_with_status_group1(step, status):
-    global result
-    assert result.status == int(status)
+    assert world.result.status == int(status)
 
 
 @step(u'Then I get at least one voicemail with fullname "([^"]*)" and with number "([^"]*)"')
 def then_i_get_one_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):
-    global result
-    assert len(result.data["items"]) >= 1
-    data = result.data["items"]
+    assert len(world.result.data["items"]) >= 1
+    data = world.result.data["items"]
     matching_data = [item for item in data if item['fullname'] == fullname and item['mailbox'] == number]
     assert len(matching_data) > 0
 
 
 @step(u'When I update the voicemail of number "([^"]*)" with number "([^"]*)" and fullname "([^"]*)" and deleteaftersend "([^"]*)"')
 def when_i_update_the_voicemail_of_number_group1_with_number_group2_and_fullname_group3(step, oldnumber, newnumber, newfullname, newdeleteaftersend):
-    global result
     newdeleteaftersend_bool = bool(newdeleteaftersend)
-    result = rest_voicemail.update_voicemail(oldnumber, newnumber=newnumber, newfullname=newfullname, newdeleteaftersend=newdeleteaftersend_bool)
+    world.result = rest_voicemail.update_voicemail(oldnumber, newnumber=newnumber, newfullname=newfullname, newdeleteaftersend=newdeleteaftersend_bool)
 
 
 @step(u'Then there is a voicemail with number "([^"]*)" and fullname "([^"]*)"')
@@ -74,21 +68,18 @@ def then_there_is_a_voicemail_with_number_group1_and_fullname_group2(step, numbe
 
 @step(u'When I update the voicemail of number "([^"]*)" with a field "([^"]*)" of value "([^"]*)"')
 def when_i_update_the_voicemail_of_number_group1_with_a_field_group2_of_value_group3(step, number, fieldname, fieldvalue):
-    global result
-    result = rest_voicemail.update_voicemail_field(number, fieldname, fieldvalue)
+    world.result = rest_voicemail.update_voicemail_field(number, fieldname, fieldvalue)
 
 
 @step(u'Then I get an error message from voicemails webservice "([^"]*)"')
 def then_i_get_an_error_message_from_voicemails_webservice_group1(step, message):
-    global result
-    assert result.data[0] == message
+    assert world.result.data[0] == message
 
 
 @step(u'When I update a voicemail with a non existing id')
 def when_i_update_a_voicemail_with_a_non_existing_id(step):
-    global result
     generated_id = rest_voicemail.generate_non_existing_id()
-    result = rest_voicemail.update_voicemail_by_id(generated_id, {'fullname': 'test 2'})
+    world.result = rest_voicemail.update_voicemail_by_id(generated_id, {'fullname': 'test 2'})
 
 
 @step(u'Given there is no voicemail with number "([^"]*)"')
