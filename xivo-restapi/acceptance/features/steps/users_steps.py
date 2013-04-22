@@ -16,14 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from acceptance.features.steps.helpers.rest_users import RestUsers
-from acceptance.features.steps.voicemails_steps import \
-    given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
-    extensions_dao, extenumber_dao, contextnummember_dao, queue_dao, \
-    queue_member_dao, rightcall_dao, rightcall_member_dao, callfilter_dao, \
-    dialaction_dao, phonefunckey_dao, schedule_dao
+    extensions_dao, extenumber_dao, contextnummember_dao, queue_member_dao, \
+    rightcall_dao, rightcall_member_dao, callfilter_dao, dialaction_dao, \
+    phonefunckey_dao, schedule_dao, contextmember_dao
 from xivo_dao.alchemy.callfilter import Callfilter
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.linefeatures import LineFeatures
@@ -141,14 +139,15 @@ def when_i_update_the_user_group1_with_a_field_group2_of_value_group3(step, full
 
 
 @step(u'Given there is a user "([^"]*)" with a voicemail')
-def given_there_is_a_user_group1_with_a_voicemail(step, fullname):
-    given_there_is_a_user(step, fullname)
+def given_there_is_a_user_with_a_voicemail(step, fullname):
+    step.given('Given there is a user "%s"' % fullname)
     userid = rest_users.id_from_fullname(fullname)
     user = user_dao.get(userid)
-    if(user.voicemailid is None):
-        given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, '123')
-        voicemailid = voicemail_dao.id_from_mailbox('123', 'default')
-        user_dao.update(user.id, {'voicemailid': voicemailid})
+    world.voicemailid = user.voicemailid
+    if world.voicemailid is None:
+        step.given('Given there is a voicemail with fullname "%s" and with number "123"' % fullname)
+        world.voicemailid = voicemail_dao.id_from_mailbox('123', 'default')
+        user_dao.update(user.id, {'voicemailid': world.voicemailid})
 
 
 @step(u'When I update this user with a first name "([^"]*)" and a last name "([^"]*)"')
@@ -238,7 +237,7 @@ def given_there_is_a_user_with_a_sip_line(step, fullname, number):
     world.number = number
 
 
-@step(u'When I delete this user')
+@step(u'When I delete this user$')
 def when_i_delete_the_user(step):
     global result
     result = rest_users.delete_user(world.userid)
@@ -258,7 +257,9 @@ def then_no_data_is_remaining_in_the_tables(step, tables):
                        "callfiltermember": _check_callfiltermember,
                        "dialaction": _check_dialaction,
                        "phonefunckey": _check_phonefunckey,
-                       "schedulepath": _check_schedulepath}
+                       "schedulepath": _check_schedulepath,
+                       "contextmember": _check_contextmember,
+                       "voicemail": _check_voicemail}
     for table in tables:
         table_functions[table]()
 
@@ -308,6 +309,13 @@ def _check_phonefunckey():
 def _check_schedulepath():
     result = schedule_dao.get_schedules_for_user(world.userid)
     assert result == []
+
+def _check_contextmember():
+    result = contextmember_dao.get_by_type_typeval('voicemail', str(world.voicemailid))
+    assert result == None
+
+def _check_voicemail():
+    assert voicemail_dao.get(world.voicemailid) is None
 
 @step(u'When I delete a non existing user')
 def when_i_delete_a_non_existing_user(step):
@@ -381,3 +389,8 @@ def given_there_is_a_schedule(step, name):
 def given_there_is_a_user_with_a_schedule(step, fullname):
     step.given('Given there is a user "%s"' % fullname)
     schedule_dao.add_user_to_schedule(world.userid, world.scheduleid)
+
+@step(u'When I delete this user and force voicemail deletion')
+def when_i_delete_this_user_and_force_voicemail_deletion(step):
+    global result
+    result = rest_users.delete_user(world.userid, True)

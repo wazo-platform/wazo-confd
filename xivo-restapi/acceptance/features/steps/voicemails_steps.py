@@ -17,6 +17,7 @@
 
 from acceptance.features.steps.helpers.rest_voicemail import RestVoicemail
 from lettuce import step
+from lettuce.registry import world
 from xivo_dao import voicemail_dao
 
 rest_voicemail = RestVoicemail()
@@ -27,7 +28,7 @@ result = None
 def given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):
     voicemailid = voicemail_dao.id_from_mailbox(number, "default")
     if(voicemailid is None):
-        rest_voicemail.create_voicemail(fullname, number)
+        world.voicemailid = rest_voicemail.create_voicemail(fullname, number)
     else:
         voicemail = voicemail_dao.get(voicemailid)
         if(voicemail.fullname != fullname):

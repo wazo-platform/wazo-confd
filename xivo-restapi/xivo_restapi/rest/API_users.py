@@ -26,7 +26,7 @@ from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError, VoicemailExistsException
+    ProvdError, VoicemailExistsException, SysconfdError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -114,7 +114,8 @@ class APIUsers:
     @realmDigest.requires_auth
     def delete(self, userid):
         try:
-            self._user_management.delete_user(int(userid))
+            delete_voicemail = 'deleteVoicemail' in request.args
+            self._user_management.delete_user(int(userid), delete_voicemail)
             return make_response('', 200)
         except NoSuchElementException:
             return make_response('', 404)
@@ -126,6 +127,10 @@ class APIUsers:
             result = "Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user."
             result = rest_encoder.encode([result])
             return make_response(result, 412)
+        except SysconfdError as e:
+            result = "The user was deleted but the voicemail content could not be removed  (%s)" % str(e)
+            result = rest_encoder.encode([result])
+            return make_response(result, 500)
         except Exception as e:
             result = rest_encoder.encode(str(e))
             return make_response(result, 500)

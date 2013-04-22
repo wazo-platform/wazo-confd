@@ -15,17 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from httplib import HTTPException
 from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao, queue_member_dao, \
     rightcall_member_dao, callfilter_dao, dialaction_dao, phonefunckey_dao, \
-    schedule_dao
+    schedule_dao, voicemail_dao, contextmember_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError, VoicemailExistsException
+    ProvdError, VoicemailExistsException, SysconfdError
+from xivo_restapi.services.utils.sysconfd_connector import SysconfdConnector
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
 
@@ -41,6 +43,7 @@ class UserManagement:
         self.provisioning_client = new_provisioning_client("http://localhost:8666/provd")
         self.device_manager = self.provisioning_client.device_manager()
         self.config_manager = self.provisioning_client.config_manager()
+        self.sysconfd_connector = SysconfdConnector()
 
     def get_all_users(self):
         users_lines = user_dao.get_all_join_line()
@@ -87,32 +90,65 @@ class UserManagement:
             fullname = user_dao.get(userid).fullname
             self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
 
-    def delete_user(self, userid):
+    def delete_user(self, userid, delete_voicemail=False):
         data_access_logger.info("Deleting the user of id %s" % userid)
         user = None
         try:
             user = user_dao.get(userid)
         except LookupError:
             raise NoSuchElementException("No such user: " + str(userid))
-        if user.voicemailid is not None:
-            raise VoicemailExistsException()
+        voicemailid = user.voicemailid
+        if voicemailid is not None and not delete_voicemail:
+                raise VoicemailExistsException()
+
+        self.delete_user_from_db(userid)
         lines = line_dao.find_line_id_by_user_id(userid)
-        error = None
         if len(lines) > 0:
-            line = line_dao.get(lines[0])
-            line_dao.delete(line.id)
-            usersip_dao.delete(line.protocolid)
-            extensions_dao.delete_by_exten(line.number)
-            extenumber_dao.delete_by_exten(line.number)
-            contextnummember_dao.delete_by_type_typeval_context("user", line.id, line.context)
+            self.remove_line(line_dao.get(lines[0]))
+        if voicemailid is not None:
+            self.delete_voicemail(voicemailid)
 
-            deviceid = device_dao.get_deviceid(line.device)
-            if deviceid is not None:
-                try:
-                    self.provd_remove_line(deviceid, line.num)
-                except URLError as e:
-                    error = ProvdError(str(e))
+    def provd_remove_line(self, deviceid, linenum):
+        config = self.config_manager.get(deviceid)
+        del config["raw_config"]["sip_lines"][str(linenum)]
+        if len(config["raw_config"]["sip_lines"]) == 0:
+            #then we reset to autoprov
+            self._reset_config(config)
+            self._reset_device_to_autoprov(deviceid)
+        self.config_manager.update(config)
 
+    def _reset_config(self, config):
+        del config["raw_config"]["sip_lines"]
+        if "funckeys" in config["raw_config"]:
+            del config["raw_config"]["funckeys"]
+
+    def _reset_device_to_autoprov(self, deviceid):
+        device = self.device_manager.get(deviceid)
+        new_configid = self.config_manager.autocreate()
+        device["config"] = new_configid
+        self.device_manager.update(device)
+
+    def remove_line(self, line):
+        device = line.device
+        self._delete_line_from_db(line)
+        deviceid = device_dao.get_deviceid(device)
+        if deviceid is not None:
+            try:
+                self.provd_remove_line(deviceid, line.num)
+            except URLError as e:
+                raise ProvdError(str(e))
+
+    def delete_voicemail(self, voicemailid):
+        voicemail = voicemail_dao.get(voicemailid)
+        context, mailbox = voicemail.context, voicemail.mailbox
+        voicemail_dao.delete(voicemailid)
+        contextmember_dao.delete_by_type_typeval('voicemail', str(voicemailid))
+        try:
+            self.sysconfd_connector.delete_voicemail_storage(context, mailbox)
+        except Exception as e:
+            raise SysconfdError(str(e))
+
+    def delete_user_from_db(self, userid):
         user_dao.delete(userid)
         queue_member_dao.delete_by_userid(userid)
         rightcall_member_dao.delete_by_userid(userid)
@@ -121,19 +157,9 @@ class UserManagement:
         phonefunckey_dao.delete_by_userid(userid)
         schedule_dao.remove_user_from_all_schedules(userid)
 
-        if error is not None:
-            raise error
-
-    def provd_remove_line(self, deviceid, linenum):
-        config = self.config_manager.get(deviceid)
-        del config["raw_config"]["sip_lines"][str(linenum)]
-        if len(config["raw_config"]["sip_lines"]) == 0:
-            #then we reset to autoprov
-            del config["raw_config"]["sip_lines"]
-            if "funckeys" in config["raw_config"]:
-                del config["raw_config"]["funckeys"]
-            device = self.device_manager.get(deviceid)
-            new_configid = self.config_manager.autocreate()
-            device["config"] = new_configid
-            self.device_manager.update(device)
-        self.config_manager.update(config)
+    def _delete_line_from_db(self, line):
+        line_dao.delete(line.id)
+        usersip_dao.delete(line.protocolid)
+        extensions_dao.delete_by_exten(line.number)
+        extenumber_dao.delete_by_exten(line.number)
+        contextnummember_dao.delete_by_type_typeval_context("user", line.id, line.context)

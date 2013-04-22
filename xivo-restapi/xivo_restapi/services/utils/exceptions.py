@@ -52,3 +52,10 @@ class ProvdError(Exception):
 
 class VoicemailExistsException(Exception):
     pass
+
+class SysconfdError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return "sysconfd error: %s" % self.value

@@ -15,22 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from httplib import HTTPException
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
     extenumber_dao, contextnummember_dao, device_dao, queue_member_dao, \
     rightcall_member_dao, callfilter_dao, dialaction_dao, phonefunckey_dao, \
-    schedule_dao
+    schedule_dao, voicemail_dao, contextmember_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_dao.service_data_model.line_sdm import LineSdm
 from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError, VoicemailExistsException
+    ProvdError, VoicemailExistsException, SysconfdError
+from xivo_restapi.services.utils.sysconfd_connector import SysconfdConnector
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import copy
 import unittest
@@ -50,6 +53,8 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.device_manager = self.device_manager
         self.config_manager = Mock(ConfigManager)
         self._userManager.config_manager = self.config_manager
+        self.sysconfd_connector = Mock(SysconfdConnector)
+        self._userManager.sysconfd_connector = self.sysconfd_connector
         self._generate_test_data()
 
     def _generate_test_data(self):
@@ -212,39 +217,26 @@ class TestUserManagement(unittest.TestCase):
         line_dao.get.return_value = self.line
 
         user_dao.delete = Mock()
-        line_dao.delete = Mock()
-        usersip_dao.delete = Mock()
-        extensions_dao.delete_by_exten = Mock()
-        extenumber_dao.delete_by_exten = Mock()
-        contextnummember_dao.delete_by_type_typeval_context = Mock()
         queue_member_dao.delete_by_userid = Mock()
         rightcall_member_dao.delete_by_userid = Mock()
         callfilter_dao.delete_callfiltermember_by_userid = Mock()
         dialaction_dao.delete_by_userid = Mock()
-        phonefunckey_dao.delete_by_userid = Mock()
         schedule_dao.remove_user_from_all_schedules = Mock()
-        device_dao.get_deviceid = Mock()
-        device_dao.get_deviceid.return_value = "abcdef"
-        self._userManager.provd_remove_line = Mock()
+        self._userManager.remove_line = Mock()
+        phonefunckey_dao.delete_by_userid = Mock()
 
         self._userManager.delete_user(1)
         user_dao.get.assert_called_with(1) # @UndefinedVariable
         line_dao.find_line_id_by_user_id.assert_called_with(1) # @UndefinedVariable
         line_dao.get.assert_called_with(2) # @UndefinedVariable
         user_dao.delete.assert_called_with(1) # @UndefinedVariable
-        line_dao.delete.assert_called_with(2) # @UndefinedVariable
-        usersip_dao.delete.assert_called_with(3) # @UndefinedVariable
-        extensions_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
-        extenumber_dao.delete_by_exten.assert_called_with("2000") # @UndefinedVariable
-        contextnummember_dao.delete_by_type_typeval_context.assert_called_with("user", self.line.id, "default") # @UndefinedVariable
         queue_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         rightcall_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         callfilter_dao.delete_callfiltermember_by_userid.assert_called_with(1) # @UndefinedVariable
-        device_dao.get_deviceid.assert_called_with(123) # @UndefinedVariable
         dialaction_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         phonefunckey_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
         schedule_dao.remove_user_from_all_schedules.assert_called_with(1) # @UndefinedVariable
-        self._userManager.provd_remove_line.assert_called_with("abcdef", self.line.num)
+        self._userManager.remove_line.assert_called_with(self.line)
 
     def test_provd_remove_line(self):
         self.config_manager.get.return_value = self.config_dict
@@ -299,35 +291,18 @@ class TestUserManagement(unittest.TestCase):
 
         self.assertRaises(NoSuchElementException, self._userManager.delete_user, 1)
 
-    def test_delete_provd_error(self):
-        def mock_provd_remove_line(deviceid, linenum):
-            raise URLError("sample error")
-
-        user_dao.get = Mock()
-        user_dao.get.return_value = self.user
-        line_dao.find_line_id_by_user_id = Mock()
-        line_dao.find_line_id_by_user_id.return_value = [2]
-        line_dao.get = Mock()
-        line_dao.get.return_value = self.line
-
-        user_dao.delete = Mock()
-        queue_member_dao.delete_by_userid = Mock()
-        rightcall_member_dao.delete_by_userid = Mock()
-        callfilter_dao.delete_callfiltermember_by_userid = Mock()
+    def test_remove_line_provd_error(self):
         line_dao.delete = Mock()
         usersip_dao.delete = Mock()
         extensions_dao.delete_by_exten = Mock()
         extenumber_dao.delete_by_exten = Mock()
         contextnummember_dao.delete_by_type_typeval_context = Mock()
-        dialaction_dao.delete_by_userid = Mock()
-        phonefunckey_dao.delete_by_userid = Mock()
-        schedule_dao.remove_user_from_all_schedules = Mock()
         device_dao.get_deviceid = Mock()
         device_dao.get_deviceid.return_value = "abcdef"
         self._userManager.provd_remove_line = Mock()
-        self._userManager.provd_remove_line.side_effect = mock_provd_remove_line
+        self._userManager.provd_remove_line.side_effect = URLError("sample error")
 
-        self.assertRaises(ProvdError, self._userManager.delete_user, 1)
+        self.assertRaises(ProvdError, self._userManager.remove_line, self.line)
 
     def test_delete_with_voicemail(self):
         self.user.voicemailid = 12
@@ -335,3 +310,66 @@ class TestUserManagement(unittest.TestCase):
         user_dao.get.return_value = self.user
 
         self.assertRaises(VoicemailExistsException, self._userManager.delete_user, 1)
+
+    def test_delete_voicemail(self):
+        voicemail_dao.delete = Mock()
+        contextmember_dao.delete_by_type_typeval = Mock()
+        voicemail = Voicemail(uniqueid=1, mailbox="123", context="default")
+        voicemail_dao.get = Mock()
+        voicemail_dao.get.return_value = voicemail
+
+        self._userManager.delete_voicemail(1)
+        voicemail_dao.delete.assert_called_with(1) # @UndefinedVariable
+        contextmember_dao.delete_by_type_typeval.assert_called_with('voicemail', '1') # @UndefinedVariable
+        self.sysconfd_connector.delete_voicemail_storage.assert_called_with("default", "123")
+
+    def test_delete_voicemail_sysconfd_error(self):
+        voicemail_dao.delete = Mock()
+        contextmember_dao.delete_by_type_typeval = Mock()
+        voicemail = Voicemail(uniqueid=1, mailbox="123", context="default")
+        voicemail_dao.get = Mock()
+        voicemail_dao.get.return_value = voicemail
+        self.sysconfd_connector.delete_voicemail_storage.side_effect = Exception
+
+        self.assertRaises(SysconfdError, self._userManager.delete_voicemail, 1)
+
+    def test_delete_user_force_voicemail_deletion(self):
+        self.user.voicemailid = 17
+        user_dao.get = Mock()
+        user_dao.get.return_value = self.user
+        line_dao.find_line_id_by_user_id = Mock()
+        line_dao.find_line_id_by_user_id.return_value = [2]
+        line_dao.get = Mock()
+        line_dao.get.return_value = self.line
+
+        self._userManager.delete_user_from_db = Mock()
+        self._userManager.remove_line = Mock()
+        self._userManager.delete_voicemail = Mock()
+
+        self._userManager.delete_user(1, True)
+        user_dao.get.assert_called_with(1) # @UndefinedVariable
+        line_dao.find_line_id_by_user_id.assert_called_with(1) # @UndefinedVariable
+        line_dao.get.assert_called_with(2) # @UndefinedVariable
+
+        self._userManager.remove_line.assert_called_with(self.line)
+        self._userManager.delete_voicemail.assert_called_with(self.user.voicemailid)
+        self._userManager.delete_user_from_db.assert_called_with(1)
+
+    def test_delete_user_from_db(self):
+        user_dao.delete = Mock()
+        queue_member_dao.delete_by_userid = Mock()
+        rightcall_member_dao.delete_by_userid = Mock()
+        callfilter_dao.delete_callfiltermember_by_userid = Mock()
+        dialaction_dao.delete_by_userid = Mock()
+        schedule_dao.remove_user_from_all_schedules = Mock()
+        phonefunckey_dao.delete_by_userid = Mock()
+
+        self._userManager.delete_user_from_db(1)
+
+        user_dao.delete.assert_called_with(1) # @UndefinedVariable
+        queue_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
+        rightcall_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
+        callfilter_dao.delete_callfiltermember_by_userid.assert_called_with(1) # @UndefinedVariable
+        dialaction_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
+        phonefunckey_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
+        schedule_dao.remove_user_from_all_schedules.assert_called_with(1) # @UndefinedVariable

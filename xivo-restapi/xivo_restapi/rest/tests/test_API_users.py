@@ -22,10 +22,11 @@ from xivo_dao.service_data_model.sdm_exception import \
     IncorrectParametersException
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.helpers import global_helper
-from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, mock_user_sdm
+from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, \
+    mock_user_sdm
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
-    ProvdError, VoicemailExistsException
+    ProvdError, VoicemailExistsException, SysconfdError
 import unittest
 
 
@@ -235,26 +236,26 @@ class TestAPIUsers(unittest.TestCase):
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
         self.assertEqual(result.status, status)
-        self.instance_user_management.delete_user.assert_called_with(1)
+        self.instance_user_management.delete_user.assert_called_with(1, False)
 
     def test_delete_not_found(self):
         status = "404 NOT FOUND"
 
-        def mock_delete(userid):
+        def mock_delete(userid, delete_voicemail):
             raise NoSuchElementException("")
 
         self.instance_user_management.delete_user.side_effect = mock_delete
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
         self.assertEqual(result.status, status)
-        self.instance_user_management.delete_user.assert_called_with(1)
+        self.instance_user_management.delete_user.assert_called_with(1, False)
 
         self.instance_user_management.delete_user.side_effect = None
 
     def test_delete_provd_error(self):
         status = "500 INTERNAL SERVER ERROR"
 
-        def mock_delete(userid):
+        def mock_delete(userid, delete_voicemail):
             raise ProvdError("sample error")
 
         self.instance_user_management.delete_user.side_effect = mock_delete
@@ -265,12 +266,12 @@ class TestAPIUsers(unittest.TestCase):
         data = rest_encoder.decode(result.data)
         self.assertEquals("The user was deleted but the device could not be reconfigured " + \
                           "(provd error: sample error)", data[0])
-        self.instance_user_management.delete_user.assert_called_with(1)
+        self.instance_user_management.delete_user.assert_called_with(1, False)
 
     def test_delete_voicemail_exists(self):
         status = "412 PRECONDITION FAILED"
 
-        def mock_delete(userid):
+        def mock_delete(userid, delete_voicemail):
             raise VoicemailExistsException()
 
         self.instance_user_management.delete_user.side_effect = mock_delete
@@ -281,4 +282,24 @@ class TestAPIUsers(unittest.TestCase):
         data = rest_encoder.decode(result.data)
         self.assertEquals("Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user.",
                           data[0])
-        self.instance_user_management.delete_user.assert_called_with(1)
+        self.instance_user_management.delete_user.assert_called_with(1, False)
+
+    def test_delete_force_voicemail_deletion(self):
+        status = "200 OK"
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1?deleteVoicemail')
+        self.assertEqual(result.status, status)
+        self.instance_user_management.delete_user.assert_called_with(1, True)
+
+    def test_delete_sysconfd_error(self):
+        status = "500 INTERNAL SERVER ERROR"
+
+        self.instance_user_management.delete_user.side_effect = SysconfdError("sample error")
+        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+        self.instance_user_management.delete_user.side_effect = None
+        self.assertEqual(result.status, status)
+        data = rest_encoder.decode(result.data)
+        self.assertEquals("The user was deleted but the voicemail content could not be removed  " + \
+                          "(sysconfd error: sample error)", data[0])
+        self.instance_user_management.delete_user.assert_called_with(1, False)

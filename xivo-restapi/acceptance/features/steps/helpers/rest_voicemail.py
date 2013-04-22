@@ -15,7 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from acceptance.features.steps.helpers.ws_utils import WsUtils
-from xivo_dao import voicemail_dao, user_dao
+from xivo_dao import voicemail_dao, user_dao, contextmember_dao
+from xivo_dao.alchemy.contextmember import ContextMember
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_restapi.restapi_config import RestAPIConfig
 import random
@@ -32,6 +33,13 @@ class RestVoicemail(object):
         voicemail.mailbox = number
         voicemail.context = context
         voicemail_dao.add(voicemail)
+
+        contextmember = ContextMember(context="default",
+                                      varname="context",
+                                      type="voicemail",
+                                      typeval=str(voicemail.uniqueid))
+        contextmember_dao.add(contextmember)
+        return voicemail.uniqueid
 
     def list(self):
         return self.ws_utils.rest_get(RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/")

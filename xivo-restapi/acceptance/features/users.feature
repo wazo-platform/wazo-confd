@@ -101,11 +101,17 @@ Feature: Users management
         When I delete a non existing user
         Then I get a response with status "404"
         
-    Scenario: Deletion refused if there si a voicemail
-        Given there is a user "Théodore Botrel" with a voicemail
+    Scenario: Deletion refused if there is a voicemail
+        Given there is a user "Alexandre Soljénitsyne" with a voicemail
         When I delete this user
         Then I get a response with status "412"
         Then I get an error message "Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user."
+        
+    Scenario: Force voicemail deletion
+        Given there is a user "Alexandre Soljénitsyne" with a voicemail
+        When I delete this user and force voicemail deletion
+        Then I get a response with status "200"
+        Then no data is remaining in the tables "voicemail,contextmember"
 
     #TODO: manual step
     #Given I have a device with no line
@@ -114,9 +120,7 @@ Feature: Users management
     #Then the device is reset to autoprov mode
     
     #TODO: manual step
-    #Given I have a device
-    #Given I have a user with a SIP line associated to this device
-    #Given provd is stopped
-    #When I delete this user
-    #Then I get an error with status "500" and message "The user was deleted but the device could not be reconfigured"
-    #Then the user is actually deleted
+    #Given I have a user with a voicemail
+    #Given there are some messages on the voicemail
+    #When I delete the user
+    #Then the folder /var/spool/asterisk/voicemail/<context>/<voicemail_number> does not exist anymore

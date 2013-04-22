@@ -146,8 +146,11 @@ class RestUsers():
 
         return user.id, line.id, usersip.id
 
-    def delete_user(self, userid):
-        return self.ws_utils.rest_delete(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/" + str(userid))
+    def delete_user(self, userid, delete_voicemail=False):
+        url = RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/" + str(userid)
+        if delete_voicemail:
+            url += "?deleteVoicemail"
+        return self.ws_utils.rest_delete(url)
 
     def is_user_deleted(self, userid):
         try:
