@@ -70,26 +70,26 @@ Feature: Recording campaign management
 	  Given there is no campaign
 	  Given I create a campaign with the following parameters:
 	  	| campaign_name | queue_name | start_date | end_date   |
-	  	|     test1     |   test     | 2013-01-01 | 2013-02-01 |
+	  	| test1         | test       | 2013-01-01 | 2013-02-01 |
 	  When I create a campaign with the following parameters:
 	  	| campaign_name | queue_name | start_date | end_date   |
-	  	|      test2    |   test     | 2013-01-15 | 2013-02-15 |
+	  	| test2         | test       | 2013-01-15 | 2013-02-15 |
 	  Then I get an error code "400" with message "concurrent_campaigns"
 	  
 	Scenario: Queue deletion
 	  Given there is no campaign
 	  Given I create a campaign with the following parameters:
 	  	| campaign_name | queue_name | start_date | end_date   |
-	  	|   test1       |  test      | 2013-01-01 | 2013-02-01 |
+	  	| test1         | test       | 2013-01-01 | 2013-02-01 |
 	  When I delete the queue "test"
 	  Then the queue "test" is actually deleted
 	  Then I can get the campaign "test1" with an empty queue_id
-	  
+
 	Scenario: Campaign remove fails because there are still some recordings
 	  Given there is no campaign
 	  Given I create a campaign with the following parameters:
 	  	| campaign_name | queue_name | start_date | end_date   |
-	  	| test_remove   |    test    | 2013-01-01 | 2013-02-01 |
+	  	| test_remove   | test       | 2013-01-01 | 2013-02-01 |
 	  Given there is at least one recording for the campaign "test_remove"
 	  When I ask to delete the campaign "test_remove"
 	  Then I get an error code "412" with message "campaign_not_empty"
@@ -98,7 +98,7 @@ Feature: Recording campaign management
 	  Given there is no campaign
 	  Given I create a campaign with the following parameters:
 	  	| campaign_name | queue_name | start_date | end_date   |
-	  	| test_remove   |    test    | 2013-01-01 | 2013-02-01 |
+	  	| test_remove   | test       | 2013-01-01 | 2013-02-01 |
 	  Given there is not any recording for the campaign "test_remove"
 	  When I ask to delete the campaign "test_remove"
 	  Then I get a response with code "200" and the campaign is deleted
