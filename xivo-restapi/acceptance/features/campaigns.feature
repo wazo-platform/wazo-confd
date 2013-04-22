@@ -1,13 +1,8 @@
 Feature: Recording campaign management
 
 	In order to execute call quality assessment
-	
+  
 	Scenario: Campaign creation and consultation
-	  Given there is no campaign
-	  When I create a campaign "test_campaign"
-	  Then I can consult the campaign named "test_campaign"
-	  
-	Scenario: Campaign creation and consultation with accents
 	  Given there is no campaign
 	  When I create a campaign "accents_éèà&"
 	  Then I can consult the campaign named "accents_éèà&"
