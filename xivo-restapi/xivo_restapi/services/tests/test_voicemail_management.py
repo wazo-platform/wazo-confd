@@ -22,7 +22,6 @@ from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 from xivo_dao.mapping_alchemy_sdm.voicemail_mapping import VoicemailMapping
-import copy
 import unittest
 
 
@@ -60,9 +59,9 @@ class Test(unittest.TestCase):
         data = {"mailbox": "123",
                 "fullname": "test",
                 "deleteaftersend": True}
-        expected_call = copy.deepcopy(data)
-        del expected_call["deleteaftersend"]
-        expected_call["deletevoicemail"] = True
+        expected_call = {"mailbox": "123",
+                         "fullname": "test",
+                         "deletevoicemail": True}
         self.voicemail_mapping.sdm_to_alchemy_dict.return_value = expected_call
         self.voicemail_manager.edit_voicemail(voicemailid, data)
         voicemail_dao.get.assert_called_with(1)  #@UndefinedVariable

@@ -19,7 +19,6 @@ from datetime import datetime
 from mock import patch, Mock
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest.helpers import global_helper
-import copy
 import unittest
 
 
@@ -29,25 +28,27 @@ class TestCampaignsHelper(unittest.TestCase):
         data = {"champ1": "valeur1",
                 "champ2": "valeur2",
                 "champ3": ""}
-        old_data = copy.deepcopy(data)
+        old_data = {"champ1": "valeur1",
+                    "champ2": "valeur2",
+                    "champ3": None,
+                    "end_date": datetime.now().strftime("%Y-%m-%d"),
+                    "start_date": datetime.now().strftime("%Y-%m-%d")}
         from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
         helper = CampaignsHelper()
         result = helper.supplement_add_input(data)
-        old_data["champ3"] = None
-        old_data["end_date"] = datetime.now().strftime("%Y-%m-%d")
-        old_data["start_date"] = datetime.now().strftime("%Y-%m-%d")
         self.assertEquals(old_data, result)
 
     def test_supplement_edit_input(self):
         data = {"champ1": "valeur1",
                 "champ2": "valeur2",
                 "champ3": ""}
-        old_data = copy.deepcopy(data)
+        old_data = {"champ1": "valeur1",
+                    "champ2": "valeur2",
+                    "champ3": None}
         from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
         helper = CampaignsHelper()
         result = helper.supplement_edit_input(data)
-        old_data["champ3"] = None
-        self.assertTrue(old_data == result)
+        self.assertEquals(old_data, result)
 
     @patch('xivo_restapi.rest.helpers.global_helper.create_class_instance')
     def test_create_instance(self, patch_create_class_instance):

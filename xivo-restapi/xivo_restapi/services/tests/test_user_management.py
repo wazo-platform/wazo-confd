@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from httplib import HTTPException
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
@@ -35,7 +34,6 @@ from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     ProvdError, VoicemailExistsException, SysconfdError
 from xivo_restapi.services.utils.sysconfd_connector import SysconfdConnector
 from xivo_restapi.services.voicemail_management import VoicemailManagement
-import copy
 import unittest
 
 
@@ -59,20 +57,6 @@ class TestUserManagement(unittest.TestCase):
 
     def _generate_test_data(self):
         self.deviceid = "abcd"
-        self.config_dict = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"},
-                            "2":
-                            {"username": "5678"}
-                           },
-                          "funckeys": {}
-                          }
-                        }
-        self.device_dict = {"ip": "10.60.0.109",
-                       "version":"3.2.2.1136",
-                       "config": self.deviceid,
-                       "id": self.deviceid}
         self.user = UserFeatures()
         self.user.id = 1
         self.line = LineFeatures()
@@ -155,8 +139,9 @@ class TestUserManagement(unittest.TestCase):
         data = {'firstname': 'Robert',
                 'lastname': 'Dupond',
                 'ctiprofileid': 1}
-        intern_data = copy.deepcopy(data)
-        intern_data['cti_profile_id'] = 1
+        intern_data = {'firstname': 'Robert',
+                       'lastname': 'Dupond',
+                       'cti_profile_id': 1}
         user_dao.update = Mock()
         user_dao.update.return_value = 1
         user_dao.get = Mock()
@@ -172,8 +157,9 @@ class TestUserManagement(unittest.TestCase):
         data = {'firstname': 'Robert',
                 'lastname': 'Dupond',
                 'ctiprofileid': 1}
-        intern_data = copy.deepcopy(data)
-        intern_data['cti_profile_id'] = 1
+        intern_data = {'firstname': 'Robert',
+                       'lastname': 'Dupond',
+                       'cti_profile_id': 1}
         user_dao.update = Mock()
         user_dao.update.return_value = 1
         user_dao.get = Mock()
@@ -190,8 +176,8 @@ class TestUserManagement(unittest.TestCase):
     def test_edit_user_voicemail_update_not_needed(self):
         data = {'description': 'a short description',
                 'ctiprofileid': 1}
-        intern_data = copy.deepcopy(data)
-        intern_data['cti_profile_id'] = 1
+        intern_data = {'description': 'a short description',
+                       'cti_profile_id': 1}
         user_dao.update = Mock()
         user_dao.update.return_value = 1
         user_dao.get = Mock()
@@ -239,10 +225,26 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.remove_line.assert_called_with(self.line)
 
     def test_provd_remove_line(self):
-        self.config_manager.get.return_value = self.config_dict
+        config_dict = {"raw_config":
+                         {"sip_lines":
+                           {"1":
+                            {"username": "1234"},
+                            "2":
+                            {"username": "5678"}
+                           },
+                          "funckeys": {}
+                          }
+                        }
+        self.config_manager.get.return_value = config_dict
 
-        expected_arg = copy.deepcopy(self.config_dict)
-        del expected_arg["raw_config"]["sip_lines"]["2"]
+        expected_arg = {"raw_config":
+                         {"sip_lines":
+                           {"1":
+                            {"username": "1234"},
+                           },
+                          "funckeys": {}
+                          }
+                        }
         self._userManager.provd_remove_line(self.deviceid, 2)
 
         self.config_manager.get.assert_called_with(self.deviceid)
@@ -251,16 +253,27 @@ class TestUserManagement(unittest.TestCase):
 
     def test_provd_remove_line_autoprov(self):
         autoprovid = "autoprov1234"
-        del self.config_dict["raw_config"]["sip_lines"]["2"]
-        self.config_manager.get.return_value = self.config_dict
-        self.device_manager.get.return_value = self.device_dict
+        config_dict = {"raw_config":
+                 {"sip_lines":
+                   {"1":
+                    {"username": "1234"}
+                   },
+                  "funckeys": {}
+                  }
+                }
+        device_dict = {"ip": "10.60.0.109",
+                       "version":"3.2.2.1136",
+                       "config": self.deviceid,
+                       "id": self.deviceid}
+        self.config_manager.get.return_value = config_dict
+        self.device_manager.get.return_value = device_dict
         self.config_manager.autocreate.return_value = autoprovid
 
-        expected_arg_config = copy.deepcopy(self.config_dict)
-        del expected_arg_config["raw_config"]["sip_lines"]
-        del expected_arg_config["raw_config"]["funckeys"]
-        expected_arg_device = copy.deepcopy(self.device_dict)
-        expected_arg_device["config"] = autoprovid
+        expected_arg_config = {"raw_config":{}}
+        expected_arg_device = {"ip": "10.60.0.109",
+                               "version":"3.2.2.1136",
+                               "config": autoprovid,
+                               "id": self.deviceid}
         self._userManager.provd_remove_line(self.deviceid, 1)
 
         self.config_manager.get.assert_called_with(self.deviceid)
@@ -271,9 +284,20 @@ class TestUserManagement(unittest.TestCase):
 
     def test_provd_remove_line_no_funckeys(self):
         autoprovid = "autoprov1234"
-        del self.config_dict["raw_config"]["sip_lines"]["2"]
-        self.config_manager.get.return_value = self.config_dict
-        self.device_manager.get.return_value = self.device_dict
+        config_dict = {"raw_config":
+                         {"sip_lines":
+                           {"1":
+                            {"username": "1234"},
+                           },
+                          "funckeys": {}
+                          }
+                        }
+        device_dict = {"ip": "10.60.0.109",
+                       "version":"3.2.2.1136",
+                       "config": self.deviceid,
+                       "id": self.deviceid}
+        self.config_manager.get.return_value = config_dict
+        self.device_manager.get.return_value = device_dict
         self.config_manager.autocreate.return_value = autoprovid
 
         try:
