@@ -35,7 +35,7 @@ Feature: Users management
         When I update a user with a non existing id with the last name "Dupond"
         Then I get a response with status "404"
 
-    Scenario: Edition with errors
+    Scenario: Editing with errors
         Given there is a user "Michel Sardou"
         When I update the user "Michel Sardou" with a field "unexisting_field" of value "value"
         Then I get a response with status "400"
