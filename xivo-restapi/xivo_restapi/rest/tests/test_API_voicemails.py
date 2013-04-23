@@ -54,10 +54,7 @@ class Test(unittest.TestCase):
     def test_list_error(self):
         status = "500 INTERNAL SERVER ERROR"
 
-        def mock_get_all_users():
-            raise Exception()
-
-        self.instance_voicemail_management.get_all_voicemails.side_effect = mock_get_all_users
+        self.instance_voicemail_management.get_all_voicemails.side_effect = Exception
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/")
         self.instance_voicemail_management.get_all_voicemails.assert_any_call()
@@ -88,10 +85,7 @@ class Test(unittest.TestCase):
         data = {"mailbox": "123",
                 "fullname": "test"}
 
-        def mock_edit_voicemail(voicemaiid, data):
-            raise NoSuchElementException('')
-
-        self.instance_voicemail_management.edit_voicemail.side_effect = mock_edit_voicemail
+        self.instance_voicemail_management.edit_voicemail.side_effect = NoSuchElementException('')
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/1",
                               data=rest_encoder.encode(data))
@@ -106,9 +100,7 @@ class Test(unittest.TestCase):
                 "unexisting_field": "value"}
         self.instance_voicemail_management.edit_voicemail.return_value = True
 
-        def mock_validate(data):
-            raise IncorrectParametersException('unexisting_field')
-        self.voicemail_sdm.validate.side_effect = mock_validate
+        self.voicemail_sdm.validate.side_effect = IncorrectParametersException('unexisting_field')
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/1",
                               data=rest_encoder.encode(data))

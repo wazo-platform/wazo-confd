@@ -54,11 +54,7 @@ class TestAPIAgents(unittest.TestCase):
     def test_list_agents_error(self):
         status = "500 INTERNAL SERVER ERROR"
 
-        def mock_get_all_agents():
-            raise Exception()
-
-        self.instance_agent_management.get_all_agents\
-                    .side_effect = mock_get_all_agents
+        self.instance_agent_management.get_all_agents.side_effect = Exception
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + '/',
                               '')

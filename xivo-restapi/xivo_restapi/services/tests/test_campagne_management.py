@@ -117,10 +117,8 @@ class TestCampagneManagement(unittest.TestCase):
         self.assertRaises(NoSuchElementException, self._campagneManager.delete, '1')
 
     def test_delete_integrity_error(self):
-        def mock_delete(campaign):
-            raise IntegrityError(None, None, None)
         record_campaigns_dao.delete = Mock()
-        record_campaigns_dao.delete.side_effect = mock_delete
+        record_campaigns_dao.delete.side_effect = IntegrityError(None, None, None)
         record_campaigns_dao.get = Mock()
         record_campaigns_dao.get.return_value = RecordCampaigns()
         self.assertRaises(IntegrityError, self._campagneManager.delete, '1')

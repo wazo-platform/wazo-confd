@@ -197,11 +197,7 @@ class TestAPICampaigns(unittest.TestCase):
             "queue_name": "queue_1"
         }
 
-        def mock_update(campaign_id, body):
-            raise NoSuchElementException(str(campaign_id))
-
-        self.instance_campagne_management.update_campaign\
-                    .side_effect = mock_update
+        self.instance_campagne_management.update_campaign.side_effect = NoSuchElementException('1')
         self.instance_campaigns_helper.supplement_edit_input = Mock()
         self.instance_campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -228,11 +224,8 @@ class TestAPICampaigns(unittest.TestCase):
             "queue_name": "queue_1"
         }
 
-        def mock_update(campaign_id, body):
-            raise IntegrityError(None, None, None)
-
         self.instance_campagne_management.update_campaign\
-                    .side_effect = mock_update
+                    .side_effect = IntegrityError(None, None, None)
         self.instance_campaigns_helper.supplement_edit_input = Mock()
         self.instance_campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -249,7 +242,7 @@ class TestAPICampaigns(unittest.TestCase):
 
     def test_edit_campaign_invalid_input(self):
         status = "400 BAD REQUEST"
-        liste = ['un', 'deux', 'trois']
+        my_list = ['un', 'deux', 'trois']
         campaign_id = random.randint(10000, 99999999)
         campagne_name = "campagne-" + str(campaign_id)
 
@@ -260,11 +253,8 @@ class TestAPICampaigns(unittest.TestCase):
             "queue_name": "queue_1"
         }
 
-        def mock_update(campaign_id, body):
-            raise InvalidInputException('', liste)
-
         self.instance_campagne_management.update_campaign\
-                    .side_effect = mock_update
+                    .side_effect = InvalidInputException('', my_list)
         self.instance_campaigns_helper.supplement_edit_input = Mock()
         self.instance_campaigns_helper.supplement_edit_input.return_value = data
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
@@ -272,7 +262,7 @@ class TestAPICampaigns(unittest.TestCase):
                 '/' + str(campaign_id)
         result = self.app.put(url, data=rest_encoder.encode(data))
         self.assertEqual(status, result.status)
-        self.assertTrue(liste == rest_encoder.decode(result.data))
+        self.assertTrue(my_list == rest_encoder.decode(result.data))
         self.instance_campaigns_helper.supplement_edit_input.assert_called_with(data)  #@UndefinedVariable
         self.instance_campagne_management.update_campaign\
                 .assert_called_with(str(campaign_id), data)
@@ -282,11 +272,8 @@ class TestAPICampaigns(unittest.TestCase):
     def test_delete_integrity_error(self):
         campaign_id = str(random.randint(10000, 99999))
         status = '412 PRECONDITION FAILED'
-
-        def mock_delete(campaign_id):
-            raise IntegrityError(None, None, None)
         self.instance_campagne_management.delete\
-                    .side_effect = mock_delete
+                    .side_effect = IntegrityError(None, None, None)
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + campaign_id
@@ -298,11 +285,8 @@ class TestAPICampaigns(unittest.TestCase):
     def test_delete_no_such_element(self):
         campaign_id = str(random.randint(10000, 99999))
         status = '404 NOT FOUND'
-
-        def mock_delete(campaign_id):
-            raise NoSuchElementException("")
         self.instance_campagne_management.delete\
-                    .side_effect = mock_delete
+                    .side_effect = NoSuchElementException("")
         url = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH + \
                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                 '/' + campaign_id

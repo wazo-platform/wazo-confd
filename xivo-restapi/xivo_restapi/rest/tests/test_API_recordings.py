@@ -106,11 +106,7 @@ class TestAPIRecordings(unittest.TestCase):
             "agent_id": agent_id
         }
 
-        def mock_add_recording(campaign_id, data):
-            raise Exception()
-
-        self.instance_recording_management.add_recording\
-                .side_effect = mock_add_recording
+        self.instance_recording_management.add_recording.side_effect = Exception
         self.instance_recordings_helper.supplement_add_input = Mock()
         self.instance_recordings_helper.supplement_add_input.return_value = data
         self.instance_recordings_helper.create_instance = Mock()
@@ -153,11 +149,7 @@ class TestAPIRecordings(unittest.TestCase):
     def test_list_recording_fail(self):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
-
-        def mock_get_recordings(campaign, params, technical_params):
-            raise Exception
-
-        self.instance_recording_management.get_recordings.side_effect = mock_get_recordings
+        self.instance_recording_management.get_recordings.side_effect = Exception
         params = "?_page=1&_pagesize=20&foo=bar"
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
@@ -194,11 +186,7 @@ class TestAPIRecordings(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
 
-        def mock_search(campaign, params, technical):
-            raise Exception()
-
-        self.instance_recording_management.search_recordings\
-            .side_effect = mock_search
+        self.instance_recording_management.search_recordings.side_effect = Exception
         params = "?_page=1&_pagesize=20&foo=bar"
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
@@ -254,12 +242,7 @@ class TestAPIRecordings(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
         recording_id = '001'
-
-        def mock_delete(campaign_id, recording_id):
-            raise Exception()
-
-        self.instance_recording_management.delete\
-            .side_effect = mock_delete
+        self.instance_recording_management.delete.side_effect = Exception
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/' + recording_id,

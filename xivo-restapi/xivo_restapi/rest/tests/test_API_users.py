@@ -58,12 +58,7 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_list_users_error(self):
         status = "500 INTERNAL SERVER ERROR"
-
-        def mock_get_all_users():
-            raise Exception()
-
-        self.instance_user_management.get_all_users\
-                    .side_effect = mock_get_all_users
+        self.instance_user_management.get_all_users.side_effect = Exception
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/')
 
@@ -86,11 +81,7 @@ class TestAPIUsers(unittest.TestCase):
 
     def test_get_error(self):
         status = "500 INTERNAL SERVER ERROR"
-
-        def mock_get_user():
-            raise Exception()
-
-        self.instance_user_management.get_user.side_effect = mock_get_user
+        self.instance_user_management.get_user.side_effect = Exception
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
 
@@ -101,10 +92,7 @@ class TestAPIUsers(unittest.TestCase):
     def test_get_not_found(self):
         status = "404 NOT FOUND"
 
-        def mock_get_user(userid):
-            raise NoSuchElementException("No such user")
-
-        self.instance_user_management.get_user.side_effect = mock_get_user
+        self.instance_user_management.get_user.side_effect = NoSuchElementException("No such user")
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
 
@@ -133,10 +121,7 @@ class TestAPIUsers(unittest.TestCase):
                 'lastname': 'Dupond',
                 'description': 'éà":;'}
 
-        def mock_create_user(user):
-            raise Exception()
-
-        self.instance_user_management.create_user.side_effect = mock_create_user
+        self.instance_user_management.create_user.side_effect = Exception
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
                               data=rest_encoder.encode(data))
@@ -149,11 +134,7 @@ class TestAPIUsers(unittest.TestCase):
         data = {'firstname': 'André',
                 'lastname': 'Dupond',
                 'unexisting_field': 'value'}
-
-        def mock_validate(data):
-            raise IncorrectParametersException("unexisting_field")
-
-        self.user_sdm.validate.side_effect = mock_validate
+        self.user_sdm.validate.side_effect = IncorrectParametersException("unexisting_field")
         result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
                               data=rest_encoder.encode(data))
@@ -182,11 +163,7 @@ class TestAPIUsers(unittest.TestCase):
         data = {u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
-
-        def mock_edit_user(userid, data):
-            raise Exception()
-
-        self.instance_user_management.edit_user.side_effect = mock_edit_user
+        self.instance_user_management.edit_user.side_effect = Exception
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
                               data=rest_encoder.encode(data))
@@ -200,11 +177,7 @@ class TestAPIUsers(unittest.TestCase):
         data = {u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'unexisting_field': u'value'}
-
-        def mock_validate_data(data):
-            raise IncorrectParametersException("unexisting_field")
-
-        self.user_sdm.validate.side_effect = mock_validate_data
+        self.user_sdm.validate.side_effect = IncorrectParametersException("unexisting_field")
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
                               data=rest_encoder.encode(data))
@@ -220,10 +193,7 @@ class TestAPIUsers(unittest.TestCase):
                 'lastname': 'Dupond',
                 'description': 'éà":;'}
 
-        def mock_edit_user(userid, data):
-            raise NoSuchElementException('')
-
-        self.instance_user_management.edit_user.side_effect = mock_edit_user
+        self.instance_user_management.edit_user.side_effect = NoSuchElementException('')
         result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
                               data=rest_encoder.encode(data))
@@ -241,10 +211,7 @@ class TestAPIUsers(unittest.TestCase):
     def test_delete_not_found(self):
         status = "404 NOT FOUND"
 
-        def mock_delete(userid, delete_voicemail):
-            raise NoSuchElementException("")
-
-        self.instance_user_management.delete_user.side_effect = mock_delete
+        self.instance_user_management.delete_user.side_effect = NoSuchElementException("")
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
         self.assertEqual(result.status, status)
@@ -255,10 +222,7 @@ class TestAPIUsers(unittest.TestCase):
     def test_delete_provd_error(self):
         status = "500 INTERNAL SERVER ERROR"
 
-        def mock_delete(userid, delete_voicemail):
-            raise ProvdError("sample error")
-
-        self.instance_user_management.delete_user.side_effect = mock_delete
+        self.instance_user_management.delete_user.side_effect = ProvdError("sample error")
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
         self.instance_user_management.delete_user.side_effect = None
@@ -271,10 +235,7 @@ class TestAPIUsers(unittest.TestCase):
     def test_delete_voicemail_exists(self):
         status = "412 PRECONDITION FAILED"
 
-        def mock_delete(userid, delete_voicemail):
-            raise VoicemailExistsException()
-
-        self.instance_user_management.delete_user.side_effect = mock_delete
+        self.instance_user_management.delete_user.side_effect = VoicemailExistsException
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
         self.instance_user_management.delete_user.side_effect = None

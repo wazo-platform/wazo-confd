@@ -278,16 +278,12 @@ class TestUserManagement(unittest.TestCase):
 
         try:
             self._userManager.provd_remove_line("abcd", 1)
-            self.assertTrue(True)
         except:
-            self.assertTrue(False, "An exception was raised whereas it should not")
+            self.fail("An exception was raised whereas it should not")
 
     def test_delete_unexisting_user(self):
-        def mock_get(userid):
-            raise LookupError()
-
         user_dao.get = Mock()
-        user_dao.get.side_effect = mock_get
+        user_dao.get.side_effect = LookupError
 
         self.assertRaises(NoSuchElementException, self._userManager.delete_user, 1)
 

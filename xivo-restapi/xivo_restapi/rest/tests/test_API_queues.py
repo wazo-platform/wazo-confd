@@ -54,11 +54,7 @@ class TestAPIQueues(unittest.TestCase):
     def test_list_queues_error(self):
         status = "500 INTERNAL SERVER ERROR"
 
-        def mock_get_all_queues():
-            raise Exception()
-
-        self.instance_queue_management.get_all_queues\
-                    .side_effect = mock_get_all_queues
+        self.instance_queue_management.get_all_queues.side_effect = Exception
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + '/',
                               '')
