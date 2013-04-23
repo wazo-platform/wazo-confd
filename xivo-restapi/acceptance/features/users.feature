@@ -59,41 +59,41 @@ Feature: Users management
         Given there is a user "André Charrier" with a SIP line "2000"
         When I delete this user
         Then I get a response with status "200"
-        Then no data is remaining in the tables "userfeatures,linefeatures,usersip,extensions,extenumbers,contextnummember"
+        Then this user no longer exists
 
     Scenario: Deleting a user member of a queue
         Given there is a queue named "myqueue"
         Given there is a user "Théodore Botrel" member of the queue "myqueue"
         When I delete this user
-        Then no data is remaining in the tables "userfeatures,queuemember"
+        Then this user no longer exists
 
     Scenario: Deleting a user with a rightcall
         Given there is a rightcall "my right call"
         Given there is a user "Théodore Botrel" with the right call "my right call"
         When I delete this user
-        Then no data is remaining in the tables "userfeatures,rightcallmember"
+        Then this user no longer exists
 
     Scenario: Deleting a user with a call filter
         Given there is a call filter "my call filter"
         Given there is a user "Théodore Botrel" with the call filter "my call filter"
         When I delete this user
-        Then no data is remaining in the tables "userfeatures,callfiltermember"
+        Then this user no longer exists
 
     Scenario: Deleting a user with a dialaction
         Given there is a user "Théodore Botrel" with a dialaction
         When I delete this user
-        Then no data is remaining in the tables "userfeatures,dialaction"
+        Then this user no longer exists
 
     Scenario: Deleting a user with a function key
         Given there is a user "Théodore Botrel" with a function key
         When I delete this user
-        Then no data is remaining in the tables "userfeatures,phonefunckey"
+        Then this user no longer exists
 
     Scenario: Deleting a user with a schedule
         Given there is a schedule "my schedule"
         Given there is a user "Théodore Botrel" with this schedule
         When I delete this user
-        Then no data is remaining in the tables "userfeatures,schedulepath"
+        Then this user no longer exists
       
 
     Scenario: Deleting a non existing user
@@ -109,4 +109,4 @@ Feature: Users management
     Scenario: Force voicemail deletion
         Given there is a user "Alexandre Soljénitsyne" with a voicemail
         When I delete this user and force voicemail deletion
-        Then no data is remaining in the tables "voicemail,contextmember"
+        Then this user no longer exists

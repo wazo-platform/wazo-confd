@@ -220,25 +220,22 @@ def when_i_delete_the_user(step):
     world.result = rest_users.delete_user(world.userid)
 
 
-@step(u'Then no data is remaining in the tables "([^"]*)"')
-def then_no_data_is_remaining_in_the_tables(step, tables):
-    tables = tables.split(",")
-    table_functions = {"userfeatures": _check_user_features,
-                       "linefeatures": _check_line_features,
-                       "usersip": _check_usersip,
-                       "extensions": _check_extensions,
-                       "extenumbers": _check_extenumbers,
-                       "contextnummember": _check_contextnummembers,
-                       "queuemember": _check_queuemembers,
-                       "rightcallmember": _check_rightcallmembers,
-                       "callfiltermember": _check_callfiltermember,
-                       "dialaction": _check_dialaction,
-                       "phonefunckey": _check_phonefunckey,
-                       "schedulepath": _check_schedulepath,
-                       "contextmember": _check_contextmember,
-                       "voicemail": _check_voicemail}
-    for table in tables:
-        table_functions[table]()
+@step(u'Then this user no longer exists')
+def then_this_user_no_longer_exists(step):
+    _check_user_features()
+    _check_line_features()
+    _check_usersip()
+    _check_extensions()
+    _check_extenumbers()
+    _check_contextnummembers()
+    _check_queuemembers()
+    _check_rightcallmembers()
+    _check_callfiltermember()
+    _check_dialaction()
+    _check_phonefunckey()
+    _check_schedulepath()
+    _check_contextmember()
+    _check_voicemail()
 
 def _check_user_features():
     try:
@@ -289,7 +286,7 @@ def _check_schedulepath():
 
 def _check_contextmember():
     result = contextmember_dao.get_by_type_typeval('voicemail', str(world.voicemailid))
-    assert result == None
+    assert result == None, result
 
 def _check_voicemail():
     assert voicemail_dao.get(world.voicemailid) is None
