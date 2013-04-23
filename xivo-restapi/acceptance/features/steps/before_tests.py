@@ -27,3 +27,4 @@ def reset_world(scenario):
     world.voicemailid = None
     world.userid = None
     world.number = None
+    world.lineid = None
