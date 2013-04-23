@@ -1,6 +1,6 @@
 Feature: Users management
 
-	Scenario: Users listing
+    Scenario: Users listing
         Given there is a user "Clémence Dupond"
         Given there is a user "Louis Martin"
         When I ask for all the users
@@ -110,15 +110,3 @@ Feature: Users management
         Given there is a user "Alexandre Soljénitsyne" with a voicemail
         When I delete this user and force voicemail deletion
         Then no data is remaining in the tables "voicemail,contextmember"
-
-    #TODO: manual step
-    #Given I have a device with no line
-    #Given I have a user with a SIP line associated to this device
-    #When I delete this user
-    #Then the device is reset to autoprov mode
-    
-    #TODO: manual step
-    #Given I have a user with a voicemail
-    #Given there are some messages on the voicemail
-    #When I delete the user
-    #Then the folder /var/spool/asterisk/voicemail/<context>/<voicemail_number> does not exist anymore

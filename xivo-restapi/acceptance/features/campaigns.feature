@@ -1,6 +1,6 @@
 Feature: Recording campaign management
 
-	In order to execute call quality assessment
+    In order to execute call quality assessment
 
     Scenario: Campaign creation and consultation
         Given there is no campaign
