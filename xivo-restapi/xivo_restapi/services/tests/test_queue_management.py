@@ -22,7 +22,7 @@ from xivo_dao.alchemy.queuefeatures import QueueFeatures
 import unittest
 
 
-class SampleClass:
+class SampleClass(object):
 
     def __init__(self):
         self.id = 1

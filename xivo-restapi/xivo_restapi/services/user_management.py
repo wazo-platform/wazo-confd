@@ -34,7 +34,7 @@ import logging
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
-class UserManagement:
+class UserManagement(object):
 
     def __init__(self):
         self.user_mapping = UserMapping()

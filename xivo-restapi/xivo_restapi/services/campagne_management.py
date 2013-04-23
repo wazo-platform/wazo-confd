@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
-class CampagneManagement:
+class CampagneManagement(object):
 
     def __init__(self):
         pass

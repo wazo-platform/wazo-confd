@@ -21,7 +21,7 @@ from datetime import datetime
 import unittest
 
 
-class SampleClass:
+class SampleClass(object):
     id = 1
     _privateFoo = 2
     __privateBar = 3

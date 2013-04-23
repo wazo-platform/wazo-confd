@@ -31,7 +31,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class APIVoicemails:
+class APIVoicemails(object):
 
     def __init__(self):
         self.voicemail_manager = VoicemailManagement()

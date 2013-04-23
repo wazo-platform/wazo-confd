@@ -32,7 +32,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class APIUsers:
+class APIUsers(object):
 
     def __init__(self):
         self._user_management = UserManagement()

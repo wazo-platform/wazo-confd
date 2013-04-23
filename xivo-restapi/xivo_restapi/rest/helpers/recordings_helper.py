@@ -21,7 +21,7 @@ import logging
 logger = logging.getLogger()
 
 
-class RecordingsHelper:
+class RecordingsHelper(object):
 
     def supplement_add_input(self, data):
         '''Returns the supplemented input'''
