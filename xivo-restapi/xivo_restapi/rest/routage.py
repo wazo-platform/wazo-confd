@@ -37,19 +37,22 @@ root = Blueprint("root",
 #   API campaigns    #
 # ****************** #
 
+campaigns = APICampaigns()
+recordings = APIRecordings()
+
 root.add_url_rule("/",
                   "get",
-                  getattr(APICampaigns(), "get"),
+                  campaigns.get,
                   methods=["GET"])
 
 root.add_url_rule("/<campaign_id>",
                   "get",
-                  getattr(APICampaigns(), "get"),
+                  campaigns.get,
                   methods=["GET"])
 
 root.add_url_rule('/',
                   "add_campaign",
-                  getattr(APICampaigns(), "add_campaign"),
+                  campaigns.add_campaign,
                   methods=['POST'])
 
 root.add_url_rule('/<campaign_id>',
@@ -59,7 +62,7 @@ root.add_url_rule('/<campaign_id>',
 
 root.add_url_rule("/<campaign_id>",
                   "delete_campaign",
-                  getattr(APICampaigns(), "delete"),
+                  campaigns.delete,
                   methods=['DELETE'])
 
 
@@ -68,22 +71,22 @@ root.add_url_rule("/<campaign_id>",
 # ****************** #
 root.add_url_rule("/<campaign_id>/search",
                   "search_recording",
-                  getattr(APIRecordings(), "search"),
+                  recordings.search,
                   methods=["GET"])
 
 root.add_url_rule("/<campaign_id>/",
                   "list_recordings",
-                  getattr(APIRecordings(), "list_recordings"),
+                  recordings.list_recordings,
                   methods=["GET"])
 
 root.add_url_rule("/<campaign_id>/",
                   "add_recording",
-                  getattr(APIRecordings(), "add_recording"),
+                  recordings.add_recording,
                   methods=["POST"])
 
 root.add_url_rule("/<campaign_id>/<recording_id>",
                   "delete",
-                  getattr(APIRecordings(), "delete"),
+                  recordings.delete,
                   methods=["DELETE"])
 
 
@@ -95,13 +98,14 @@ queues_service = Blueprint("queues_service",
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_QUEUES_SERVICE_PATH)
 
+queues = APIQueues()
 # ****************** #
 #   API queues       #
 # ****************** #
 
 queues_service.add_url_rule("/",
                   "list_queues",
-                  getattr(APIQueues(), "list_queues"),
+                  queues.list_queues,
                   methods=["GET"])
 
 
@@ -113,13 +117,14 @@ agents_service = Blueprint("agents_service",
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_AGENTS_SERVICE_PATH)
 
+agents = APIAgents()
 # ****************** #
 #   API agents       #
 # ****************** #
 
 agents_service.add_url_rule("/",
                   "list_agents",
-                  getattr(APIAgents(), "list_agents"),
+                  agents.list_agents,
                   methods=["GET"])
 
 # ****************** #
@@ -129,33 +134,35 @@ users_service = Blueprint("users_service",
                          __name__,
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_USERS_SERVICE_PATH)
+
+users = APIUsers()
 # *************** #
 #   API users     #
 # *************** #
 
 users_service.add_url_rule("/",
                            "list",
-                           getattr(APIUsers(), "list"),
+                           users.list,
                            methods=["GET"])
 
 users_service.add_url_rule("/<userid>",
                   "get",
-                  getattr(APIUsers(), "get"),
+                  users.get,
                   methods=["GET"])
 
 users_service.add_url_rule("/",
                   "create",
-                  getattr(APIUsers(), "create"),
+                  users.create,
                   methods=["POST"])
 
 users_service.add_url_rule("/<userid>",
                   "edit",
-                  getattr(APIUsers(), "edit"),
+                  users.edit,
                   methods=["PUT"])
 
 users_service.add_url_rule("/<userid>",
                   "delete",
-                  getattr(APIUsers(), "delete"),
+                  users.delete,
                   methods=["DELETE"])
 
 # ********************* #
@@ -166,16 +173,17 @@ voicemails_service = Blueprint("voicemails_service",
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH)
 
+voicemails = APIVoicemails()
 # ******************** #
 #   API voicemails     #
 # ******************** #
 
 voicemails_service.add_url_rule("/",
                   "list",
-                  getattr(APIVoicemails(), "list"),
+                  voicemails.list,
                   methods=["GET"])
 
 voicemails_service.add_url_rule("/<voicemailid>",
                   "edit",
-                  getattr(APIVoicemails(), "edit"),
+                  voicemails.edit,
                   methods=["PUT"])
