@@ -18,7 +18,7 @@
 
 from datetime import timedelta
 from flask import Flask
-from xivo_restapi.rest.routage import root, queues_service, agents_service, \
+from xivo_restapi.rest.routing import root, queues_service, agents_service, \
     users_service, voicemails_service
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
