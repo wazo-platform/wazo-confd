@@ -28,7 +28,6 @@ rest_campaign = RestCampaign()
 world.caller = '2222'
 world.callee = '3333'
 world.time = strftime("%a, %d %b %Y %H:%M:%S", localtime())
-world.result = []
 world.callid_list = []
 world.result_list = []
 
@@ -48,8 +47,8 @@ def given_there_is_a_queue_named_group1(step, queue_name):
 
 @step(u'Then I get a response with error code \'([^\']*)\' and message \'([^\']*)\'')
 def then_i_get_a_error_code_group1_with_message_group2(step, error_code, error_message):
-    assert (str(world.add_result.status) == error_code), 'Got wrong error code'
-    assert (str(world.add_result.data).strip() == error_message), 'Got wrong error message: ' + world.add_result.data
+    assert (str(world.add_result.status) == error_code), 'Got wrong error code: %s, %s' % (str(world.add_result.status), str(world.add_result.data))
+    assert (world.add_result.data[0] == error_message), 'Got wrong error message: ' + str(world.add_result.data)
 
 
 @step(u'Given there is a campaign named "([^"]*)" for a queue "([^"]*)"')
@@ -111,7 +110,8 @@ def when_i_delete_a_recording_referenced_by_this_callid(step, callid, campaign_n
 
 @step(u'Then the recording is deleted and I get a response with code "([^"]*)"')
 def then_the_recording_is_deleted_and_i_get_a_response_with_code_group1(step, response_code):
-    assert world.del_result[0] == int(response_code), 'Wrong return status: ' + str(world.del_result)
+    assert world.del_result.status == int(response_code), 'Wrong return status: %s, %s' % \
+            (str(world.del_result.status), str(world.del_result.data))
 
 
 @step(u'Given there is a campaign "([^"]*)"')
@@ -129,7 +129,7 @@ def given_there_is_an_agent(step, agent_no):
 @step(u'When I search recordings in the campaign "([^"]*)" with the key "([^"]*)"')
 def when_i_search_recordings_in_the_campaign_with_the_key(step, campaign_name, key):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    world.result = rest_campaign.search_recordings(campaign_id, key)['items']
+    world.result = rest_campaign.search_recordings(campaign_id, key).data['items']
     assert len(world.result) > 0, 'No recording retrieved'
 
 
@@ -150,20 +150,20 @@ def given_there_is_no_recording_referenced_by_a_group1_in_campaign_group2(step, 
 
 @step(u'Then I get a response with error code \'([^\']*)\' with message \'([^\']*)\'')
 def then_i_get_a_response_with_error_code_group1_with_message_group2(step, code, message):
-    assert world.del_result == (int(code), message), \
+    assert (world.del_result.status, world.del_result.data) == (int(code), message), \
         "Got wrong response: " + str(world.del_result) + ", expected " + str((code, message))
 
 
 @step(u'Given there are at least "([^"]*)" recordings for campaign "([^"]*)" and agent "([^"]*)"')
 def given_there_are_at_least_group1_recordings_for_campaign_group2_and_agent_group3(step, nb_recordings, campaign_name, agent_no):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    res = rest_campaign.search_recordings(campaign_id, agent_no)
+    res = rest_campaign.search_recordings(campaign_id, agent_no).data
     if(res['total'] < int(nb_recordings)):
         i = res['total']
         while(i <= int(nb_recordings)):
             rest_campaign.addRecordingDetails(campaign_id, str(random.randint(1000, 9999)), "222", agent_no, world.time)
             i += 1
-        res = rest_campaign.search_recordings(campaign_id, agent_no)
+        res = rest_campaign.search_recordings(campaign_id, agent_no).data
     assert res['total'] >= int(nb_recordings), 'Not enough recordings: ' + str(res)
 
 
@@ -175,7 +175,7 @@ def when_i_ask_for_the_recordings_of_group1(step, campaign_name):
 
 @step(u'Then the displayed total is equal to the actual number of recordings')
 def then_the_displayed_total_is_equal_to_the_actual_number_of_recordings(step):
-    assert world.single_result['total'] == len(world.single_result['items']), 'Inconsistent number'
+    assert world.single_result.data['total'] == len(world.single_result.data['items']), 'Inconsistent number'
 
 
 @step(u'When I ask for a list of recordings for "([^"]*)" with page "([^"]*)" and page size "([^"]*)"')
@@ -186,13 +186,13 @@ def when_i_ask_for_a_list_of_recordings_for_group1_with_page_group1_and_page_siz
 
 @step(u'Then I get exactly "([^"]*)" recordings')
 def then_i_get_exactly_group1_recordings(step, number):
-    assert len(world.single_result['items']) == int(number), \
+    assert len(world.single_result.data['items']) == int(number), \
         'Inconsistent number retrieved: ' + str(world.single_result)
 
 
 @step(u'Given I ask for a list of recordings for "([^"]*)" with page "([^"]*)" and page size "([^"]*)"')
 def given_i_ask_for_a_list_of_recordings_for_group1_with_page_group1_and_page_size_group3(step, campaign, page, pagesize):
-    world.result_list.append(rest_campaign.paginated_recordings_list(campaign, page, pagesize))
+    world.result_list.append(rest_campaign.paginated_recordings_list(campaign, page, pagesize).data)
 
 
 @step(u'Then the two lists of recording do not overlap')

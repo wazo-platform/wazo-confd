@@ -174,8 +174,7 @@ class RestCampaign(object):
             params = "?key=" + key
             serviceURI += params
 
-        reply = self.ws_utils.rest_get(serviceURI)
-        return reply
+        return self.ws_utils.rest_get(serviceURI)
 
     def deleteRecording(self, campaign_id, callid):
         #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
@@ -230,8 +229,7 @@ class RestCampaign(object):
                         "/" + campaign_id + "/"
         params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
 
-        reply = self.ws_utils.rest_get(serviceURI + params)
-        return reply
+        return self.ws_utils.rest_get(serviceURI + params)
 
     def search_paginated_recordings(self, campaign_id, key, page, pagesize):
         serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
