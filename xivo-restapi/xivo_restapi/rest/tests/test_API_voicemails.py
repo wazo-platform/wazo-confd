@@ -45,6 +45,10 @@ class Test(unittest.TestCase):
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 
+    def tearDown(self):
+        self.patcher_voicemail_sdm.stop()
+        self.patcher_voicemails.stop()
+
     def test_list_success(self):
         status = "200 OK"
         voicemail1 = Voicemail()

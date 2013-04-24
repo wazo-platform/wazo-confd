@@ -23,6 +23,7 @@ from xivo_restapi.rest import rest_encoder
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.queue_management import QueueManagement
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class TestAPIQueues(unittest.TestCase):
@@ -33,10 +34,12 @@ class TestAPIQueues(unittest.TestCase):
         mock_queue = self.patcher_queue.start()
         self.instance_queue_management = Mock(QueueManagement)
         mock_queue.return_value = self.instance_queue_management
-        from xivo_restapi.rest import flask_http_server
         flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+
+    def tearDown(self):
+        self.patcher_queue.stop()
 
     def test_list_queues(self):
         status = "200 OK"

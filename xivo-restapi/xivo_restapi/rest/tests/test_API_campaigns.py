@@ -28,6 +28,7 @@ from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     InvalidInputException
 import random
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class TestAPICampaigns(unittest.TestCase):
@@ -44,7 +45,6 @@ class TestAPICampaigns(unittest.TestCase):
         mock_campaigns_helper = self.patch_campaigns_helper.start()
         self.instance_campaigns_helper = Mock(CampaignsHelper)
         mock_campaigns_helper.return_value = self.instance_campaigns_helper
-        from xivo_restapi.rest import flask_http_server
         flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
