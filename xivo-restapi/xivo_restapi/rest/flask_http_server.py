@@ -35,7 +35,7 @@ app.register_blueprint(users_service)
 app.register_blueprint(voicemails_service)
 app.debug = False
 app.secret_key = os.urandom(24)
-app.permanent_session_lifetime = timedelta(minutes=1)
+app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 class FlaskHttpServer(object):
