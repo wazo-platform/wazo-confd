@@ -10,7 +10,7 @@ Feature: Call recordings management
         When I save call details with the following parameters:
             | callid | campaign_name | agent_no | caller |
             | abcd   | test_campaign | 1111     |        |
-        Then I get a response with error code '400' and message 'SQL Error: No such agent'
+        Then I get a response with error code '400' and message 'No such agent'
 
     Scenario: Recording creation and consultation
         Given there is no campaign

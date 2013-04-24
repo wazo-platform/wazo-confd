@@ -26,6 +26,7 @@ from xivo_restapi.services.recording_management import RecordingManagement
 import logging
 import rest_encoder
 from xivo_restapi.rest.helpers.global_helper import exception_catcher
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 
 
 logger = logging.getLogger(__name__)
@@ -48,14 +49,17 @@ class APIRecordings(object):
         recording = self._recordings_helper.create_instance(body)
         if('agent_no' in body):
             recording.agent_no = body['agent_no']
-
-        result = self._recording_manager.add_recording(int(campaign_id), recording)
-        if (result):
-            return make_response(rest_encoder.encode("Added: " + \
-                                                     str(result)), 201)
-        else:
-            body = rest_encoder.encode([str(result)])
-            return make_response(body, 500)
+        try:
+            result = self._recording_manager.add_recording(int(campaign_id), recording)
+            if (result):
+                return make_response(rest_encoder.encode("Added: " + \
+                                                         str(result)), 201)
+            else:
+                body = rest_encoder.encode([str(result)])
+                return make_response(body, 500)
+        except InvalidInputException as e:
+            body = rest_encoder.encode(e.errors_list)
+            return make_response(body, 400)
 
     @exception_catcher
     @produces('application/json')

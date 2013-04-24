@@ -23,6 +23,7 @@ from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.tests import instance_recording_management, \
     instance_recordings_helper
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 import unittest
 
 
@@ -96,7 +97,7 @@ class TestAPIRecordings(unittest.TestCase):
                         result.status)
 
     def test_add_recording_client_error(self):
-        status = "500 INTERNAL SERVER ERROR"
+        status = "400 BAD REQUEST"
         campaign_id = '1'
         cid = '001'
         agent_id = '1'
@@ -106,7 +107,7 @@ class TestAPIRecordings(unittest.TestCase):
             "agent_id": agent_id
         }
 
-        self.instance_recording_management.add_recording.side_effect = Exception
+        self.instance_recording_management.add_recording.side_effect = InvalidInputException('', ['my error'])
         self.instance_recordings_helper.supplement_add_input = Mock()
         self.instance_recordings_helper.supplement_add_input.return_value = data
         self.instance_recordings_helper.create_instance = Mock()
