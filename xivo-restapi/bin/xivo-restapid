@@ -25,11 +25,6 @@ import sys
 from xivo_restapi.restapi_config import RestAPIConfig
 
 DAEMONNAME = 'xivo-restapid'
-
-# Enable debug mode for testing witout gevent WSGi,
-# setting to True activates the internal web server
-#DEBUG_MODE = True
-
 LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
@@ -39,7 +34,7 @@ logger = None
 def main():
     parsed_args = _parse_args(sys.argv[1:])
     _init_logging(parsed_args.debug)
-
+    flask_http_server.register_blueprints()
     if(parsed_args.dev_mode):
         flask_http_server.FlaskHttpServer().run()
     else:

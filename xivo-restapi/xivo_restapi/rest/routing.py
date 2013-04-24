@@ -32,158 +32,124 @@ root = Blueprint("root",
                  __name__,
                  url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                             RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
-
-# ****************** #
-#   API campaigns    #
-# ****************** #
-
-campaigns = APICampaigns()
-recordings = APIRecordings()
-
-root.add_url_rule("/",
-                  "get",
-                  campaigns.get,
-                  methods=["GET"])
-
-root.add_url_rule("/<campaign_id>",
-                  "get",
-                  campaigns.get,
-                  methods=["GET"])
-
-root.add_url_rule('/',
-                  "add_campaign",
-                  campaigns.add_campaign,
-                  methods=['POST'])
-
-root.add_url_rule('/<campaign_id>',
-                  "update",
-                  getattr(APICampaigns(), "update"),
-                  methods=['PUT'])
-
-root.add_url_rule("/<campaign_id>",
-                  "delete_campaign",
-                  campaigns.delete,
-                  methods=['DELETE'])
-
-
-# ****************** #
-#   API recordings   #
-# ****************** #
-root.add_url_rule("/<campaign_id>/search",
-                  "search_recording",
-                  recordings.search,
-                  methods=["GET"])
-
-root.add_url_rule("/<campaign_id>/",
-                  "list_recordings",
-                  recordings.list_recordings,
-                  methods=["GET"])
-
-root.add_url_rule("/<campaign_id>/",
-                  "add_recording",
-                  recordings.add_recording,
-                  methods=["POST"])
-
-root.add_url_rule("/<campaign_id>/<recording_id>",
-                  "delete",
-                  recordings.delete,
-                  methods=["DELETE"])
-
-
-# ****************** #
-#   Queues server    #
-# ****************** #
 queues_service = Blueprint("queues_service",
                          __name__,
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_QUEUES_SERVICE_PATH)
-
-queues = APIQueues()
-# ****************** #
-#   API queues       #
-# ****************** #
-
-queues_service.add_url_rule("/",
-                  "list_queues",
-                  queues.list_queues,
-                  methods=["GET"])
-
-
-# ****************** #
-#   Agents server    #
-# ****************** #
 agents_service = Blueprint("agents_service",
                          __name__,
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_AGENTS_SERVICE_PATH)
-
-agents = APIAgents()
-# ****************** #
-#   API agents       #
-# ****************** #
-
-agents_service.add_url_rule("/",
-                  "list_agents",
-                  agents.list_agents,
-                  methods=["GET"])
-
-# ****************** #
-#   Users server     #
-# ****************** #
 users_service = Blueprint("users_service",
                          __name__,
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_USERS_SERVICE_PATH)
-
-users = APIUsers()
-# *************** #
-#   API users     #
-# *************** #
-
-users_service.add_url_rule("/",
-                           "list",
-                           users.list,
-                           methods=["GET"])
-
-users_service.add_url_rule("/<userid>",
-                  "get",
-                  users.get,
-                  methods=["GET"])
-
-users_service.add_url_rule("/",
-                  "create",
-                  users.create,
-                  methods=["POST"])
-
-users_service.add_url_rule("/<userid>",
-                  "edit",
-                  users.edit,
-                  methods=["PUT"])
-
-users_service.add_url_rule("/<userid>",
-                  "delete",
-                  users.delete,
-                  methods=["DELETE"])
-
-# ********************* #
-#   Voicemails server   #
-# ********************* #
 voicemails_service = Blueprint("voicemails_service",
                          __name__,
                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                                     RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH)
 
-voicemails = APIVoicemails()
-# ******************** #
-#   API voicemails     #
-# ******************** #
+def _root_routes():
+    campaigns = APICampaigns()
+    recordings = APIRecordings()
+    root.add_url_rule("/",
+                      "get",
+                      campaigns.get,
+                      methods=["GET"])
+    root.add_url_rule("/<campaign_id>",
+                      "get",
+                      campaigns.get,
+                      methods=["GET"])
+    root.add_url_rule('/',
+                      "add_campaign",
+                      campaigns.add_campaign,
+                      methods=['POST'])
+    root.add_url_rule('/<campaign_id>',
+                      "update",
+                      getattr(APICampaigns(), "update"),
+                      methods=['PUT'])
 
-voicemails_service.add_url_rule("/",
-                  "list",
-                  voicemails.list,
-                  methods=["GET"])
+    root.add_url_rule("/<campaign_id>",
+                      "delete_campaign",
+                      campaigns.delete,
+                      methods=['DELETE'])
 
-voicemails_service.add_url_rule("/<voicemailid>",
-                  "edit",
-                  voicemails.edit,
-                  methods=["PUT"])
+    root.add_url_rule("/<campaign_id>/search",
+                      "search_recording",
+                      recordings.search,
+                      methods=["GET"])
+
+    root.add_url_rule("/<campaign_id>/",
+                      "list_recordings",
+                      recordings.list_recordings,
+                      methods=["GET"])
+
+    root.add_url_rule("/<campaign_id>/",
+                      "add_recording",
+                      recordings.add_recording,
+                      methods=["POST"])
+
+    root.add_url_rule("/<campaign_id>/<recording_id>",
+                      "delete",
+                      recordings.delete,
+                      methods=["DELETE"])
+
+def _queue_routes():
+    queues = APIQueues()
+    queues_service.add_url_rule("/",
+                      "list_queues",
+                      queues.list_queues,
+                      methods=["GET"])
+
+def _agent_routes():
+    agents = APIAgents()
+    agents_service.add_url_rule("/",
+                      "list_agents",
+                      agents.list_agents,
+                      methods=["GET"])
+
+def _user_routes():
+    users = APIUsers()
+    users_service.add_url_rule("/",
+                               "list",
+                               users.list,
+                               methods=["GET"])
+
+    users_service.add_url_rule("/<userid>",
+                      "get",
+                      users.get,
+                      methods=["GET"])
+
+    users_service.add_url_rule("/",
+                      "create",
+                      users.create,
+                      methods=["POST"])
+
+    users_service.add_url_rule("/<userid>",
+                      "edit",
+                      users.edit,
+                      methods=["PUT"])
+
+    users_service.add_url_rule("/<userid>",
+                      "delete",
+                      users.delete,
+                      methods=["DELETE"])
+
+def _voicemail_routes():
+    voicemails = APIVoicemails()
+    voicemails_service.add_url_rule("/",
+                      "list",
+                      voicemails.list,
+                      methods=["GET"])
+
+    voicemails_service.add_url_rule("/<voicemailid>",
+                      "edit",
+                      voicemails.edit,
+                      methods=["PUT"])
+
+def create_routes():
+    _root_routes()
+    _queue_routes()
+    _agent_routes()
+    _user_routes()
+    _voicemail_routes()

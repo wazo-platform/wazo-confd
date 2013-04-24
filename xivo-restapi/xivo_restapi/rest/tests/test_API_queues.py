@@ -17,18 +17,24 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
+from mock import patch, Mock
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_queue_management
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.queue_management import QueueManagement
 import unittest
 
 
 class TestAPIQueues(unittest.TestCase):
 
     def setUp(self):
-        self.instance_queue_management = instance_queue_management
+        self.patcher_queue = patch("xivo_restapi.rest." + \
+                             "API_queues.QueueManagement")
+        mock_queue = self.patcher_queue.start()
+        self.instance_queue_management = Mock(QueueManagement)
+        mock_queue.return_value = self.instance_queue_management
         from xivo_restapi.rest import flask_http_server
+        flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 

@@ -16,28 +16,41 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from mock import Mock
+from mock import Mock, patch
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.service_data_model.sdm_exception import \
     IncorrectParametersException
+from xivo_dao.service_data_model.user_sdm import UserSdm
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.helpers import global_helper
-from xivo_restapi.rest.tests import instance_user_management, instance_user_sdm, \
-    mock_user_sdm
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     ProvdError, VoicemailExistsException, SysconfdError
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class TestAPIUsers(unittest.TestCase):
 
     def setUp(self):
-        self.instance_user_management = instance_user_management
-        self.user_sdm = instance_user_sdm
-        from xivo_restapi.rest import flask_http_server
+        self.patcher_users = patch("xivo_restapi.rest." + \
+                             "API_users.UserManagement")
+        mock_user = self.patcher_users.start()
+        self.instance_user_management = Mock(UserManagement)
+        mock_user.return_value = self.instance_user_management
+
+        self.patcher_user_sdm = patch("xivo_restapi.rest.API_users.UserSdm")
+        self.mock_user_sdm = self.patcher_user_sdm.start()
+        self.user_sdm = Mock(UserSdm)
+        self.mock_user_sdm.return_value = self.user_sdm
+        flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+
+    def tearDown(self):
+        self.patcher_user_sdm.stop()
+        self.patcher_users.stop()
 
     def test_list_users(self):
         status = "200 OK"
@@ -112,7 +125,7 @@ class TestAPIUsers(unittest.TestCase):
                               RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
                               data=rest_encoder.encode(data))
         self.assertEqual(result.status, status)
-        global_helper.create_class_instance.assert_called_with(mock_user_sdm, data)  # @UndefinedVariable
+        global_helper.create_class_instance.assert_called_with(self.mock_user_sdm, data)  # @UndefinedVariable
         self.instance_user_management.create_user.assert_called_with(self.user_sdm)
 
     def test_create_error(self):

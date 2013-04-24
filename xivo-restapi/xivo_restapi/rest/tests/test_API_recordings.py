@@ -17,26 +17,40 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-from mock import Mock
+from mock import Mock, patch
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_recording_management, \
-    instance_recordings_helper
+from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.recording_management import RecordingManagement
 from xivo_restapi.services.utils.exceptions import InvalidInputException
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class TestAPIRecordings(unittest.TestCase):
 
     def setUp(self):
 
-        self.instance_recording_management = instance_recording_management
-        self.instance_recordings_helper = instance_recordings_helper
+        self.patcher_recordings = patch("xivo_restapi.rest." + \
+                             "API_recordings.RecordingManagement")
+        mock_recording = self.patcher_recordings.start()
+        self.instance_recording_management = Mock(RecordingManagement)
+        mock_recording.return_value = self.instance_recording_management
 
-        from xivo_restapi.rest import flask_http_server
+        self.patcher_recordings_helper = patch("xivo_restapi.rest." + \
+                                     "API_recordings.RecordingsHelper")
+        mock_recordings_helper = self.patcher_recordings_helper.start()
+        self.instance_recordings_helper = Mock(RecordingsHelper)
+        mock_recordings_helper.return_value = self.instance_recordings_helper
+
+        flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+
+    def tearDown(self):
+        self.patcher_recordings.stop()
+        self.patcher_recordings_helper.stop()
 
     def test_add_recording_fail(self):
         status = "500 INTERNAL SERVER ERROR"

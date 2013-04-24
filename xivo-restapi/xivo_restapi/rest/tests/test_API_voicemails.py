@@ -16,23 +16,32 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from mock import patch, Mock
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.service_data_model.sdm_exception import \
     IncorrectParametersException
+from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_voicemail_management, \
-    instance_voicemail_sdm
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import NoSuchElementException
+from xivo_restapi.services.voicemail_management import VoicemailManagement
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class Test(unittest.TestCase):
 
     def setUp(self):
-        self.instance_voicemail_management = instance_voicemail_management
-        self.voicemail_sdm = instance_voicemail_sdm
-        from xivo_restapi.rest import flask_http_server
+        self.patcher_voicemails = patch("xivo_restapi.rest.API_voicemails.VoicemailManagement")
+        mock_voicemail = self.patcher_voicemails.start()
+        self.instance_voicemail_management = Mock(VoicemailManagement)
+        mock_voicemail.return_value = self.instance_voicemail_management
+
+        self.patcher_voicemail_sdm = patch("xivo_restapi.rest.API_voicemails.VoicemailSdm")
+        mock_voicemail_sdm = self.patcher_voicemail_sdm.start()
+        self.voicemail_sdm = Mock(VoicemailSdm)
+        mock_voicemail_sdm.return_value = self.voicemail_sdm
+        flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 

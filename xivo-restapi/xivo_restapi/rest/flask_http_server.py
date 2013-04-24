@@ -18,8 +18,6 @@
 
 from datetime import timedelta
 from flask import Flask
-from xivo_restapi.rest.routing import root, queues_service, agents_service, \
-    users_service, voicemails_service
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 import os
@@ -27,15 +25,18 @@ import os
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-
-app.register_blueprint(root)
-app.register_blueprint(queues_service)
-app.register_blueprint(agents_service)
-app.register_blueprint(users_service)
-app.register_blueprint(voicemails_service)
 app.debug = False
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(minutes=5)
+
+def register_blueprints():
+    from xivo_restapi.rest import routing
+    routing.create_routes()
+    app.register_blueprint(routing.root)
+    app.register_blueprint(routing.queues_service)
+    app.register_blueprint(routing.agents_service)
+    app.register_blueprint(routing.users_service)
+    app.register_blueprint(routing.voicemails_service)
 
 
 class FlaskHttpServer(object):
