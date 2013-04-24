@@ -292,8 +292,6 @@ class TestAPICampaigns(unittest.TestCase):
                 '/' + campaign_id
         result = self.app.delete(url, '')
         self.assertEqual(result.status, status)
-        self.assertEqual(rest_encoder.decode(result.data),
-                         ["campaign_not_found"])
 
     def test_delete_success(self):
         campaign_id = str(random.randint(10000, 99999))

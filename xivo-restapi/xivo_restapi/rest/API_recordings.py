@@ -25,6 +25,7 @@ from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.recording_management import RecordingManagement
 import logging
 import rest_encoder
+from xivo_restapi.rest.helpers.global_helper import exception_catcher
 
 
 logger = logging.getLogger(__name__)
@@ -36,26 +37,19 @@ class APIRecordings(object):
         self._recording_manager = RecordingManagement()
         self._recordings_helper = RecordingsHelper()
 
+    @exception_catcher
     @consumes('application/json')
     @produces('application/json')
     @realmDigest.requires_auth
     def add_recording(self, campaign_id):
         data = request.data.decode("utf-8")
-        try:
-            body = rest_encoder.decode(data)
-        except ValueError:
-            body = "No parsable data in the request, data: " + data
-            return make_response(rest_encoder.encode(body), 400)
+        body = rest_encoder.decode(data)
         body = self._recordings_helper.supplement_add_input(body)
         recording = self._recordings_helper.create_instance(body)
         if('agent_no' in body):
             recording.agent_no = body['agent_no']
-        try:
-            result = self._recording_manager.add_recording(int(campaign_id), recording)
-        except Exception as e:
-            body = "SQL Error: " + str(e.message)
-            return make_response(rest_encoder.encode(body), 400)
 
+        result = self._recording_manager.add_recording(int(campaign_id), recording)
         if (result):
             return make_response(rest_encoder.encode("Added: " + \
                                                      str(result)), 201)
@@ -63,68 +57,55 @@ class APIRecordings(object):
             body = rest_encoder.encode([str(result)])
             return make_response(body, 500)
 
+    @exception_catcher
     @produces('application/json')
     @realmDigest.requires_auth
     def list_recordings(self, campaign_id):
-        try:
-            logger.debug("List args:" + str(request.args))
-            params = {}
-            for item in request.args:
-                if(not item.startswith('_')):
-                    params[item] = request.args[item]
-            paginator = global_helper.create_paginator(request.args)
-            result = self._recording_manager.get_recordings(campaign_id,
-                                                            params,
-                                                            paginator)
+        logger.debug("List args:" + str(request.args))
+        params = {}
+        for item in request.args:
+            if(not item.startswith('_')):
+                params[item] = request.args[item]
+        paginator = global_helper.create_paginator(request.args)
+        result = self._recording_manager.get_recordings(campaign_id,
+                                                        params,
+                                                        paginator)
 
-            logger.debug("got result")
-            body = rest_encoder.encode(result)
-            logger.debug("result encoded")
-            return make_response(body, 200)
+        logger.debug("got result")
+        body = rest_encoder.encode(result)
+        logger.debug("result encoded")
+        return make_response(body, 200)
 
-        except Exception as e:
-            logger.debug("got exception:" + str(e.args))
-            body = rest_encoder.encode([str(e.args)])
-            return make_response(body, 500)
-
+    @exception_catcher
     @produces('application/json')
     @realmDigest.requires_auth
     def search(self, campaign_id):
-        try:
-            logger.debug("List args:" + str(request.args))
-            params = {}
-            for item in request.args:
-                if(not item.startswith('_')):
-                    params[item] = request.args[item]
-            paginator = global_helper.create_paginator(request.args)
-            result = self._recording_manager. \
-                        search_recordings(campaign_id, params,
-                                          paginator)
+        logger.debug("List args:" + str(request.args))
+        params = {}
+        for item in request.args:
+            if(not item.startswith('_')):
+                params[item] = request.args[item]
+        paginator = global_helper.create_paginator(request.args)
+        result = self._recording_manager. \
+                    search_recordings(campaign_id, params,
+                                      paginator)
 
-            logger.debug("got result")
-            body = rest_encoder.encode(result)
-            logger.debug("result encoded")
-            return make_response(body, 200)
-        except Exception as e:
-            logger.debug("got exception:" + str(e.args))
-            body = rest_encoder.encode([str(e.args)])
-            return make_response(body, 500)
+        logger.debug("got result")
+        body = rest_encoder.encode(result)
+        logger.debug("result encoded")
+        return make_response(body, 200)
 
+    @exception_catcher
     @produces('application/json')
     @realmDigest.requires_auth
     def delete(self, campaign_id, recording_id):
-        try:
-            logger.debug("Entering delete:" + str(campaign_id) + ", " + \
-                         str(recording_id))
-            result = self._recording_manager. \
-                        delete(int(campaign_id), recording_id)
-            logger.debug("result encoded")
-            if not result:
-                return make_response(rest_encoder.encode("No such recording"),
-                                     404)
-            else:
-                return make_response(rest_encoder.encode("Deleted: True"), 200)
-        except Exception as e:
-            logger.debug("got exception:" + str(e.args))
-            body = rest_encoder.encode([str(e.args)])
-            return make_response(body, 500)
+        logger.debug("Entering delete:" + str(campaign_id) + ", " + \
+                     str(recording_id))
+        result = self._recording_manager. \
+                    delete(int(campaign_id), recording_id)
+        logger.debug("result encoded")
+        if not result:
+            return make_response(rest_encoder.encode("No such recording"),
+                                 404)
+        else:
+            return make_response(rest_encoder.encode("Deleted: True"), 200)

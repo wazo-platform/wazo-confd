@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from datetime import datetime
-from xivo_restapi.services.utils.exceptions import InvalidInputException
+from flask.helpers import make_response
+from werkzeug.exceptions import HTTPException
+from xivo_restapi.rest import rest_encoder
+from xivo_restapi.services.utils.exceptions import InvalidInputException, \
+    NoSuchElementException
 import logging
 import sys
 import traceback
@@ -61,3 +65,18 @@ def str_to_datetime(string):
                                           exc_traceback)))
         raise InvalidInputException("Invalid data provided",
                                     ["invalid_date_format"])
+
+def exception_catcher(func):
+    def decorated_func(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            data = rest_encoder.encode(["No parsable data in the request"])
+            return make_response(data, 400)
+        except NoSuchElementException:
+            return make_response('', 404)
+        except HTTPException:
+            raise
+        except Exception as e:
+            return make_response(rest_encoder.encode([str(e)]), 500)
+    return decorated_func

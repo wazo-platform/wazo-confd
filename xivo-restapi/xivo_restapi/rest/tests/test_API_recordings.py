@@ -96,7 +96,7 @@ class TestAPIRecordings(unittest.TestCase):
                         result.status)
 
     def test_add_recording_client_error(self):
-        status = "400 BAD REQUEST"
+        status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
         cid = '001'
         agent_id = '1'
