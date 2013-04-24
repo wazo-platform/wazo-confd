@@ -21,6 +21,7 @@ from mock import Mock, patch
 from xivo_dao import agent_dao, recordings_dao
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 import os
 import unittest
 
@@ -63,6 +64,16 @@ class TestCampagneManagement(unittest.TestCase):
 
         self.assertTrue(result)
         recordings_dao.add_recording.assert_called_with(recording)
+
+    def test_add_recording_no_agent(self):
+        campaign_id = 1
+        recording = Recordings()
+        recording.agent_no = '2000'
+        agent_dao.agent_id = Mock()
+        agent_dao.agent_id.side_effect = LookupError('')
+
+        self.assertRaises(InvalidInputException, self._recordingManager.add_recording,
+                          campaign_id, recording)
 
     def test_get_recordings(self):
         campaign_id = 1
