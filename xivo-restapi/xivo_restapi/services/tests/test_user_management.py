@@ -19,9 +19,7 @@ from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
-    extenumber_dao, contextnummember_dao, device_dao, queue_member_dao, \
-    rightcall_member_dao, callfilter_dao, dialaction_dao, phonefunckey_dao, \
-    schedule_dao, voicemail_dao, contextmember_dao
+    extenumber_dao, contextnummember_dao, device_dao, voicemail_dao, contextmember_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail
