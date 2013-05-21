@@ -100,7 +100,7 @@ class UserManagement(object):
         if voicemailid is not None and not delete_voicemail:
                 raise VoicemailExistsException()
 
-        self.delete_user_from_db(userid)
+        user_dao.delete(userid)
         lines = line_dao.find_line_id_by_user_id(userid)
         if len(lines) > 0:
             self.remove_line(line_dao.get(lines[0]))
@@ -146,15 +146,6 @@ class UserManagement(object):
             self.sysconfd_connector.delete_voicemail_storage(context, mailbox)
         except Exception as e:
             raise SysconfdError(str(e))
-
-    def delete_user_from_db(self, userid):
-        user_dao.delete(userid)
-        queue_member_dao.delete_by_userid(userid)
-        rightcall_member_dao.delete_by_userid(userid)
-        callfilter_dao.delete_callfiltermember_by_userid(userid)
-        dialaction_dao.delete_by_userid(userid)
-        phonefunckey_dao.delete_by_userid(userid)
-        schedule_dao.remove_user_from_all_schedules(userid)
 
     def _delete_line_from_db(self, line):
         line_dao.delete(line.id)

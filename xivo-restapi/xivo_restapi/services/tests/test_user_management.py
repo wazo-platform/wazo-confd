@@ -201,27 +201,15 @@ class TestUserManagement(unittest.TestCase):
         line_dao.find_line_id_by_user_id.return_value = [2]
         line_dao.get = Mock()
         line_dao.get.return_value = self.line
-
         user_dao.delete = Mock()
-        queue_member_dao.delete_by_userid = Mock()
-        rightcall_member_dao.delete_by_userid = Mock()
-        callfilter_dao.delete_callfiltermember_by_userid = Mock()
-        dialaction_dao.delete_by_userid = Mock()
-        schedule_dao.remove_user_from_all_schedules = Mock()
         self._userManager.remove_line = Mock()
-        phonefunckey_dao.delete_by_userid = Mock()
 
         self._userManager.delete_user(1)
-        user_dao.get.assert_called_with(1) # @UndefinedVariable
-        line_dao.find_line_id_by_user_id.assert_called_with(1) # @UndefinedVariable
-        line_dao.get.assert_called_with(2) # @UndefinedVariable
-        user_dao.delete.assert_called_with(1) # @UndefinedVariable
-        queue_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        rightcall_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        callfilter_dao.delete_callfiltermember_by_userid.assert_called_with(1) # @UndefinedVariable
-        dialaction_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        phonefunckey_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        schedule_dao.remove_user_from_all_schedules.assert_called_with(1) # @UndefinedVariable
+
+        user_dao.get.assert_called_with(1)
+        line_dao.find_line_id_by_user_id.assert_called_with(1)
+        line_dao.get.assert_called_with(2)
+        user_dao.delete.assert_called_with(1)
         self._userManager.remove_line.assert_called_with(self.line)
 
     def test_provd_remove_line(self):
@@ -355,41 +343,22 @@ class TestUserManagement(unittest.TestCase):
 
     def test_delete_user_force_voicemail_deletion(self):
         self.user.voicemailid = 17
+        lineid = 2
         user_dao.get = Mock()
         user_dao.get.return_value = self.user
         line_dao.find_line_id_by_user_id = Mock()
-        line_dao.find_line_id_by_user_id.return_value = [2]
+        line_dao.find_line_id_by_user_id.return_value = [lineid]
         line_dao.get = Mock()
         line_dao.get.return_value = self.line
-
-        self._userManager.delete_user_from_db = Mock()
+        user_dao.delete = Mock()
         self._userManager.remove_line = Mock()
         self._userManager.delete_voicemail = Mock()
 
-        self._userManager.delete_user(1, True)
-        user_dao.get.assert_called_with(1) # @UndefinedVariable
-        line_dao.find_line_id_by_user_id.assert_called_with(1) # @UndefinedVariable
-        line_dao.get.assert_called_with(2) # @UndefinedVariable
+        self._userManager.delete_user(self.user.id, True)
 
+        user_dao.get.assert_called_with(self.user.id)
+        line_dao.find_line_id_by_user_id.assert_called_with(self.user.id)
+        line_dao.get.assert_called_with(lineid)
+        user_dao.delete.assert_called_with(self.user.id)
         self._userManager.remove_line.assert_called_with(self.line)
         self._userManager.delete_voicemail.assert_called_with(self.user.voicemailid)
-        self._userManager.delete_user_from_db.assert_called_with(1)
-
-    def test_delete_user_from_db(self):
-        user_dao.delete = Mock()
-        queue_member_dao.delete_by_userid = Mock()
-        rightcall_member_dao.delete_by_userid = Mock()
-        callfilter_dao.delete_callfiltermember_by_userid = Mock()
-        dialaction_dao.delete_by_userid = Mock()
-        schedule_dao.remove_user_from_all_schedules = Mock()
-        phonefunckey_dao.delete_by_userid = Mock()
-
-        self._userManager.delete_user_from_db(1)
-
-        user_dao.delete.assert_called_with(1) # @UndefinedVariable
-        queue_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        rightcall_member_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        callfilter_dao.delete_callfiltermember_by_userid.assert_called_with(1) # @UndefinedVariable
-        dialaction_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        phonefunckey_dao.delete_by_userid.assert_called_with(1) # @UndefinedVariable
-        schedule_dao.remove_user_from_all_schedules.assert_called_with(1) # @UndefinedVariable
