@@ -18,7 +18,7 @@
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, contextmember_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail
@@ -316,25 +316,22 @@ class TestUserManagement(unittest.TestCase):
 
     def test_delete_voicemail(self):
         voicemail_dao.delete = Mock()
-        contextmember_dao.delete_by_type_typeval = Mock()
         voicemail = Voicemail(uniqueid=1, mailbox="123", context="default")
         voicemail_dao.get = Mock()
         voicemail_dao.get.return_value = voicemail
 
-        self._userManager.delete_voicemail(1)
+        self._userManager._delete_voicemail(1)
         voicemail_dao.delete.assert_called_with(1) # @UndefinedVariable
-        contextmember_dao.delete_by_type_typeval.assert_called_with('voicemail', '1') # @UndefinedVariable
         self.sysconfd_connector.delete_voicemail_storage.assert_called_with("default", "123")
 
     def test_delete_voicemail_sysconfd_error(self):
         voicemail_dao.delete = Mock()
-        contextmember_dao.delete_by_type_typeval = Mock()
         voicemail = Voicemail(uniqueid=1, mailbox="123", context="default")
         voicemail_dao.get = Mock()
         voicemail_dao.get.return_value = voicemail
         self.sysconfd_connector.delete_voicemail_storage.side_effect = Exception
 
-        self.assertRaises(SysconfdError, self._userManager.delete_voicemail, 1)
+        self.assertRaises(SysconfdError, self._userManager._delete_voicemail, 1)
 
     def test_delete_user_force_voicemail_deletion(self):
         self.user.voicemailid = 17
@@ -347,7 +344,7 @@ class TestUserManagement(unittest.TestCase):
         line_dao.get.return_value = self.line
         user_dao.delete = Mock()
         self._userManager._remove_line = Mock()
-        self._userManager.delete_voicemail = Mock()
+        self._userManager._delete_voicemail = Mock()
 
         self._userManager.delete_user(self.user.id, True)
 
@@ -356,4 +353,4 @@ class TestUserManagement(unittest.TestCase):
         line_dao.get.assert_called_with(lineid)
         user_dao.delete.assert_called_with(self.user.id)
         self._userManager._remove_line.assert_called_with(self.line)
-        self._userManager.delete_voicemail.assert_called_with(self.user.voicemailid)
+        self._userManager._delete_voicemail.assert_called_with(self.user.voicemailid)

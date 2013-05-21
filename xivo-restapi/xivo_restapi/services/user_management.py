@@ -17,7 +17,7 @@
 
 from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, contextmember_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -102,7 +102,7 @@ class UserManagement(object):
         if len(lines) > 0:
             self._remove_line(line_dao.get(lines[0]))
         if voicemailid is not None:
-            self.delete_voicemail(voicemailid)
+            self._delete_voicemail(voicemailid)
 
     def _provd_remove_line(self, deviceid, linenum):
         config = self.config_manager.get(deviceid)
@@ -134,11 +134,10 @@ class UserManagement(object):
             except URLError as e:
                 raise ProvdError(str(e))
 
-    def delete_voicemail(self, voicemailid):
+    def _delete_voicemail(self, voicemailid):
         voicemail = voicemail_dao.get(voicemailid)
         context, mailbox = voicemail.context, voicemail.mailbox
         voicemail_dao.delete(voicemailid)
-        contextmember_dao.delete_by_type_typeval('voicemail', str(voicemailid))
         try:
             self.sysconfd_connector.delete_voicemail_storage(context, mailbox)
         except Exception as e:
