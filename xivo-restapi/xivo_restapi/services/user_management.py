@@ -36,7 +36,7 @@ class UserManagement(object):
         self.user_mapping = UserMapping()
         self.line_mapping = LineMapping()
         self.voicemail_manager = VoicemailManagement()
-        self.provisioning_client = new_provisioning_client("http://localhost:8666/provd")
+        self.provisioning_client = new_provisioning_client(RestAPIConfig.PROVD_URL)
         self.device_manager = self.provisioning_client.device_manager()
         self.config_manager = self.provisioning_client.config_manager()
         self.sysconfd_connector = SysconfdConnector()

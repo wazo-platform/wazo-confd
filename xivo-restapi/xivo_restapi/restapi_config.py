@@ -40,3 +40,5 @@ class RestAPIConfig(object):
 
     DATA_ACCESS_LOGFILENAME = '/var/log/xivo-restapi-data-access.log'
     DATA_ACCESS_LOGGERNAME = 'data-access'
+
+    PROVD_URL = "http://localhost:8666/provd"
