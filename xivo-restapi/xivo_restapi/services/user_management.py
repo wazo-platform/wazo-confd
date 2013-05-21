@@ -17,8 +17,7 @@
 
 from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
-    extenumber_dao, contextnummember_dao, device_dao, voicemail_dao, contextmember_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, contextmember_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
@@ -101,11 +100,11 @@ class UserManagement(object):
         user_dao.delete(userid)
         lines = line_dao.find_line_id_by_user_id(userid)
         if len(lines) > 0:
-            self.remove_line(line_dao.get(lines[0]))
+            self._remove_line(line_dao.get(lines[0]))
         if voicemailid is not None:
             self.delete_voicemail(voicemailid)
 
-    def provd_remove_line(self, deviceid, linenum):
+    def _provd_remove_line(self, deviceid, linenum):
         config = self.config_manager.get(deviceid)
         del config["raw_config"]["sip_lines"][str(linenum)]
         if len(config["raw_config"]["sip_lines"]) == 0:
@@ -125,13 +124,13 @@ class UserManagement(object):
         device["config"] = new_configid
         self.device_manager.update(device)
 
-    def remove_line(self, line):
+    def _remove_line(self, line):
         device = line.device
-        self._delete_line_from_db(line)
+        line_dao.delete(line.id)
         deviceid = device_dao.get_deviceid(device)
         if deviceid is not None:
             try:
-                self.provd_remove_line(deviceid, line.num)
+                self._provd_remove_line(deviceid, line.num)
             except URLError as e:
                 raise ProvdError(str(e))
 
@@ -144,10 +143,3 @@ class UserManagement(object):
             self.sysconfd_connector.delete_voicemail_storage(context, mailbox)
         except Exception as e:
             raise SysconfdError(str(e))
-
-    def _delete_line_from_db(self, line):
-        line_dao.delete(line.id)
-        usersip_dao.delete(line.protocolid)
-        extensions_dao.delete_by_exten(line.number)
-        extenumber_dao.delete_by_exten(line.number)
-        contextnummember_dao.delete_by_type_typeval_context("user", line.id, line.context)

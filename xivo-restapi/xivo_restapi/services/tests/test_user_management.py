@@ -18,8 +18,7 @@
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, usersip_dao, extensions_dao, \
-    extenumber_dao, contextnummember_dao, device_dao, voicemail_dao, contextmember_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, contextmember_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail
@@ -193,22 +192,24 @@ class TestUserManagement(unittest.TestCase):
                           1, data)
 
     def test_delete_user(self):
+        userid = 1
+        lineid = 2
         user_dao.get = Mock()
         user_dao.get.return_value = self.user
         line_dao.find_line_id_by_user_id = Mock()
-        line_dao.find_line_id_by_user_id.return_value = [2]
+        line_dao.find_line_id_by_user_id.return_value = [lineid]
         line_dao.get = Mock()
         line_dao.get.return_value = self.line
         user_dao.delete = Mock()
-        self._userManager.remove_line = Mock()
+        self._userManager._remove_line = Mock()
 
-        self._userManager.delete_user(1)
+        self._userManager.delete_user(userid)
 
-        user_dao.get.assert_called_with(1)
-        line_dao.find_line_id_by_user_id.assert_called_with(1)
-        line_dao.get.assert_called_with(2)
+        user_dao.get.assert_called_with(userid)
+        line_dao.find_line_id_by_user_id.assert_called_with(userid)
+        line_dao.get.assert_called_with(lineid)
         user_dao.delete.assert_called_with(1)
-        self._userManager.remove_line.assert_called_with(self.line)
+        self._userManager._remove_line.assert_called_with(self.line)
 
     def test_provd_remove_line(self):
         config_dict = {"raw_config":
@@ -231,7 +232,7 @@ class TestUserManagement(unittest.TestCase):
                           "funckeys": {}
                           }
                         }
-        self._userManager.provd_remove_line(self.deviceid, 2)
+        self._userManager._provd_remove_line(self.deviceid, 2)
 
         self.config_manager.get.assert_called_with(self.deviceid)
         self.config_manager.update.assert_called_with(expected_arg)
@@ -260,7 +261,7 @@ class TestUserManagement(unittest.TestCase):
                                "version":"3.2.2.1136",
                                "config": autoprovid,
                                "id": self.deviceid}
-        self._userManager.provd_remove_line(self.deviceid, 1)
+        self._userManager._provd_remove_line(self.deviceid, 1)
 
         self.config_manager.get.assert_called_with(self.deviceid)
         self.config_manager.autocreate.assert_called_with()
@@ -287,7 +288,7 @@ class TestUserManagement(unittest.TestCase):
         self.config_manager.autocreate.return_value = autoprovid
 
         try:
-            self._userManager.provd_remove_line("abcd", 1)
+            self._userManager._provd_remove_line("abcd", 1)
         except:
             self.fail("An exception was raised whereas it should not")
 
@@ -299,16 +300,12 @@ class TestUserManagement(unittest.TestCase):
 
     def test_remove_line_provd_error(self):
         line_dao.delete = Mock()
-        usersip_dao.delete = Mock()
-        extensions_dao.delete_by_exten = Mock()
-        extenumber_dao.delete_by_exten = Mock()
-        contextnummember_dao.delete_by_type_typeval_context = Mock()
         device_dao.get_deviceid = Mock()
         device_dao.get_deviceid.return_value = "abcdef"
-        self._userManager.provd_remove_line = Mock()
-        self._userManager.provd_remove_line.side_effect = URLError("sample error")
+        self._userManager._provd_remove_line = Mock()
+        self._userManager._provd_remove_line.side_effect = URLError("sample error")
 
-        self.assertRaises(ProvdError, self._userManager.remove_line, self.line)
+        self.assertRaises(ProvdError, self._userManager._remove_line, self.line)
 
     def test_delete_with_voicemail(self):
         self.user.voicemailid = 12
@@ -349,7 +346,7 @@ class TestUserManagement(unittest.TestCase):
         line_dao.get = Mock()
         line_dao.get.return_value = self.line
         user_dao.delete = Mock()
-        self._userManager.remove_line = Mock()
+        self._userManager._remove_line = Mock()
         self._userManager.delete_voicemail = Mock()
 
         self._userManager.delete_user(self.user.id, True)
@@ -358,5 +355,5 @@ class TestUserManagement(unittest.TestCase):
         line_dao.find_line_id_by_user_id.assert_called_with(self.user.id)
         line_dao.get.assert_called_with(lineid)
         user_dao.delete.assert_called_with(self.user.id)
-        self._userManager.remove_line.assert_called_with(self.line)
+        self._userManager._remove_line.assert_called_with(self.line)
         self._userManager.delete_voicemail.assert_called_with(self.user.voicemailid)
