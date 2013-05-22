@@ -191,26 +191,6 @@ class TestUserManagement(unittest.TestCase):
         self.assertRaises(NoSuchElementException, self._userManager.edit_user,
                           1, data)
 
-    def test_delete_user(self):
-        userid = 1
-        lineid = 2
-        user_dao.get = Mock()
-        user_dao.get.return_value = self.user
-        line_dao.find_line_id_by_user_id = Mock()
-        line_dao.find_line_id_by_user_id.return_value = [lineid]
-        line_dao.get = Mock()
-        line_dao.get.return_value = self.line
-        user_dao.delete = Mock()
-        self._userManager._remove_line = Mock()
-
-        self._userManager.delete_user(userid)
-
-        user_dao.get.assert_called_with(userid)
-        line_dao.find_line_id_by_user_id.assert_called_with(userid)
-        line_dao.get.assert_called_with(lineid)
-        user_dao.delete.assert_called_with(1)
-        self._userManager._remove_line.assert_called_with(self.line)
-
     def test_provd_remove_line(self):
         config_dict = {"raw_config":
                          {"sip_lines":
@@ -291,6 +271,26 @@ class TestUserManagement(unittest.TestCase):
             self._userManager._provd_remove_line("abcd", 1)
         except:
             self.fail("An exception was raised whereas it should not")
+
+    def test_delete_user(self):
+        userid = 1
+        lineid = 2
+        user_dao.get = Mock()
+        user_dao.get.return_value = self.user
+        line_dao.find_line_id_by_user_id = Mock()
+        line_dao.find_line_id_by_user_id.return_value = [lineid]
+        line_dao.get = Mock()
+        line_dao.get.return_value = self.line
+        user_dao.delete = Mock()
+        self._userManager._remove_line = Mock()
+
+        self._userManager.delete_user(userid)
+
+        user_dao.get.assert_called_with(userid)
+        line_dao.find_line_id_by_user_id.assert_called_with(userid)
+        line_dao.get.assert_called_with(lineid)
+        user_dao.delete.assert_called_with(1)
+        self._userManager._remove_line.assert_called_with(self.line)
 
     def test_delete_unexisting_user(self):
         user_dao.get = Mock()
