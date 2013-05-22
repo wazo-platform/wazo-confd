@@ -19,9 +19,9 @@ from acceptance.features.steps.helpers.rest_users import RestUsers
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
-    extensions_dao, extenumber_dao, contextnummember_dao, queue_member_dao, \
+    extensions_dao, extenumber_dao, queue_member_dao, \
     rightcall_dao, rightcall_member_dao, callfilter_dao, dialaction_dao, \
-    phonefunckey_dao, schedule_dao, contextmember_dao
+    phonefunckey_dao, schedule_dao
 from xivo_dao.alchemy.callfilter import Callfilter
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.linefeatures import LineFeatures
@@ -257,7 +257,7 @@ def _check_extenumbers():
     assert extenumber_dao.get_by_exten(world.number) is None
 
 def _check_contextnummembers():
-    assert contextnummember_dao.get_by_type_typeval_context("user", world.lineid, "default") is None
+    assert user_dao.get_contextnummember(world.userid) is None
 
 def _check_queuemembers():
     result = queue_member_dao.get_queue_members_for_queues()
@@ -285,7 +285,7 @@ def _check_schedulepath():
     assert result == []
 
 def _check_contextmember():
-    result = contextmember_dao.get_by_type_typeval('voicemail', str(world.voicemailid))
+    result = voicemail_dao.get_contextmember(world.voicemailid)
     assert result == None, result
 
 def _check_voicemail():
