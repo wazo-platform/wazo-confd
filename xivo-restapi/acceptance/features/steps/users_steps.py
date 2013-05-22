@@ -257,12 +257,13 @@ def _check_extenumbers():
     assert extenumber_dao.get_by_exten(world.number) is None
 
 def _check_contextnummembers():
-    assert user_dao.get_contextnummember(world.userid) is None
+    assert line_dao.get_contextnummember(world.lineid) is None
 
 def _check_queuemembers():
-    result = queue_member_dao.get_queue_members_for_queues()
-    processed_result = [item.member_name for item in result if item.member_name == world.interface]
-    assert processed_result == [], str(processed_result)
+    if hasattr(world, 'interface'):
+        result = queue_member_dao.get_queue_members_for_queues()
+        processed_result = [item.member_name for item in result if item.member_name == world.interface]
+        assert processed_result == [], str(processed_result)
 
 def _check_rightcallmembers():
     result = rightcall_member_dao.get_by_userid(world.userid)
