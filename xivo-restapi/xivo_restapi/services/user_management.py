@@ -88,7 +88,6 @@ class UserManagement(object):
 
     def delete_user(self, userid, delete_voicemail=False):
         data_access_logger.info("Deleting the user of id %s" % userid)
-        user = None
         try:
             user = user_dao.get(userid)
         except LookupError:
