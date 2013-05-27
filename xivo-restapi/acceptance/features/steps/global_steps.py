@@ -17,12 +17,11 @@
 
 from acceptance.features.steps.helpers.rest_campaign import RestCampaign
 from lettuce import step
+from lettuce.registry import world
 from xivo_dao import record_campaigns_dao
 from xivo_restapi.restapi_config import RestAPIConfig
 import httplib
 import os
-status = None
-recordings_list = None
 
 
 @step(u'When I send a "([^"]*)" request to "([^"]*)"')
@@ -34,16 +33,13 @@ def when_i_send_a_group1_request_to_group2(step, method, url):
                         )
     headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request(method, url, None, headers)
-    global status
-    status = connection.getresponse().status
+    world.status = connection.getresponse().status
 
 
 @step(u'Then I get a response with status code "([^"]*)"')
 def then_i_get_a_response_with_status_code_group1(step, status_code):
-    global status
-    print status, " ", type(status)
-    assert status == int(status_code), "Expected status was " + status_code + \
-                    ", actual was " + str(status)
+    assert world.status == int(status_code), "Expected status was " + status_code + \
+                    ", actual was " + str(world.status)
 
 
 @step(u'When I read the list of recordings for the campaign "([^"]*)" from the database')
@@ -51,16 +47,14 @@ def when_i_read_the_list_of_recordings_for_the_campaign_group1_from_the_database
     r_campaign = RestCampaign()
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     result = r_campaign.paginated_recordings_list(campaign_id, 1, 10)
-    global recordings_list
-    recordings_list = result['items']
+    world.recordings_list = result['items']
 
 
 @step(u'Then I get one and only one item with caller "([^"]*)", agent "([^"]*)" and I can read the returned file')
 def then_i_get_one_and_only_one_item_with_caller_group1_agent_group2_and_i_can_read_the_returned_file(step, caller, agent):
-    global recordings_list
-    assert len(recordings_list) == 1, "Retrieved " + str(len(recordings_list))\
+    assert len(world.recordings_list) == 1, "Retrieved " + str(len(world.recordings_list))\
                                                  + " recordings instead of 1"
-    item = recordings_list[0]
+    item = world.recordings_list[0]
     assert item['agent_no'] == agent, "Got wrong agent: " + item['agent_no'] + " instead of " + agent
     assert item['caller'] == caller, "Got wrong agent: " + item['caller'] + " instead of " + caller
     assert os.path.exists(RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + item['filename']), \

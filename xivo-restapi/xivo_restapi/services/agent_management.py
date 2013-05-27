@@ -23,7 +23,7 @@ import logging
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
-class AgentManagement:
+class AgentManagement(object):
 
     def get_all_agents(self):
         result = agent_dao.all()

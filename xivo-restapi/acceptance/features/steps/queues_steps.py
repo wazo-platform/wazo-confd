@@ -24,11 +24,9 @@ restqueues = RestQueues()
 
 @step(u'When I create a queue "([^"]*)"')
 def when_i_create_a_queue(step, queue_name):
-    global restqueues
     assert restqueues.create(queue_name)
 
 
 @step(u'Then I can consult the queue "([^"]*)" and the other ones')
 def then_i_can_consult_the_queue_group1_and_the_other_ones(step, queue_name):
-    global restqueues
     assert restqueues.find("name", queue_name)

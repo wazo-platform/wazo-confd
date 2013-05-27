@@ -17,25 +17,40 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
-from mock import Mock
+from mock import Mock, patch
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_recording_management, \
-    instance_recordings_helper
+from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.recording_management import RecordingManagement
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class TestAPIRecordings(unittest.TestCase):
 
     def setUp(self):
 
-        self.instance_recording_management = instance_recording_management
-        self.instance_recordings_helper = instance_recordings_helper
+        self.patcher_recordings = patch("xivo_restapi.rest." + \
+                             "API_recordings.RecordingManagement")
+        mock_recording = self.patcher_recordings.start()
+        self.instance_recording_management = Mock(RecordingManagement)
+        mock_recording.return_value = self.instance_recording_management
 
-        from xivo_restapi.rest import flask_http_server
+        self.patcher_recordings_helper = patch("xivo_restapi.rest." + \
+                                     "API_recordings.RecordingsHelper")
+        mock_recordings_helper = self.patcher_recordings_helper.start()
+        self.instance_recordings_helper = Mock(RecordingsHelper)
+        mock_recordings_helper.return_value = self.instance_recordings_helper
+
+        flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+
+    def tearDown(self):
+        self.patcher_recordings.stop()
+        self.patcher_recordings_helper.stop()
 
     def test_add_recording_fail(self):
         status = "500 INTERNAL SERVER ERROR"
@@ -106,11 +121,7 @@ class TestAPIRecordings(unittest.TestCase):
             "agent_id": agent_id
         }
 
-        def mock_add_recording(campaign_id, data):
-            raise Exception()
-
-        self.instance_recording_management.add_recording\
-                .side_effect = mock_add_recording
+        self.instance_recording_management.add_recording.side_effect = InvalidInputException('', ['my error'])
         self.instance_recordings_helper.supplement_add_input = Mock()
         self.instance_recordings_helper.supplement_add_input.return_value = data
         self.instance_recordings_helper.create_instance = Mock()
@@ -153,11 +164,7 @@ class TestAPIRecordings(unittest.TestCase):
     def test_list_recording_fail(self):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
-
-        def mock_get_recordings(campaign, params, technical_params):
-            raise Exception
-
-        self.instance_recording_management.get_recordings.side_effect = mock_get_recordings
+        self.instance_recording_management.get_recordings.side_effect = Exception
         params = "?_page=1&_pagesize=20&foo=bar"
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
@@ -194,11 +201,7 @@ class TestAPIRecordings(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
 
-        def mock_search(campaign, params, technical):
-            raise Exception()
-
-        self.instance_recording_management.search_recordings\
-            .side_effect = mock_search
+        self.instance_recording_management.search_recordings.side_effect = Exception
         params = "?_page=1&_pagesize=20&foo=bar"
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
@@ -254,12 +257,7 @@ class TestAPIRecordings(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
         recording_id = '001'
-
-        def mock_delete(campaign_id, recording_id):
-            raise Exception()
-
-        self.instance_recording_management.delete\
-            .side_effect = mock_delete
+        self.instance_recording_management.delete.side_effect = Exception
         result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/' + recording_id,

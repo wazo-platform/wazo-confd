@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#
 # Copyright (C) 2013 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,22 +14,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from xivo_dao.alchemy.recordings import Recordings
-from xivo_restapi.rest.helpers import global_helper
-import logging
+from lettuce.registry import world
+from lettuce.terrain import before
+from xivo_dao.helpers import config
 
-logger = logging.getLogger()
+@before.all
+def modify_db_uri():
+    config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
 
-
-class RecordingsHelper(object):
-
-    def supplement_add_input(self, data):
-        '''Returns the supplemented input'''
-        logger.debug("Supplementing input for 'add_recording'")
-        for key in data:
-            if(data[key] == ''):
-                data[key] = None
-        return data
-
-    def create_instance(self, data):
-        return global_helper.create_class_instance(Recordings, data)
+@before.each_scenario
+def reset_world(scenario):
+    world.voicemailid = None
+    world.userid = None
+    world.number = None
+    world.lineid = None

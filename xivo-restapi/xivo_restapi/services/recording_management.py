@@ -21,12 +21,13 @@ from xivo_dao import agent_dao, recordings_dao
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
 import os
+from xivo_restapi.services.utils.exceptions import InvalidInputException
 
 logger = logging.getLogger(__name__)
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
-class RecordingManagement:
+class RecordingManagement(object):
 
     def __init__(self):
         pass
@@ -35,7 +36,10 @@ class RecordingManagement:
         data_access_logger.info("Adding a recording to the campaign %d with data %s."
                                 % (campaign_id, recording.todict()))
         if('agent_no' in vars(recording)):
-            recording.agent_id = agent_dao.agent_id(recording.agent_no)
+            try:
+                recording.agent_id = agent_dao.agent_id(recording.agent_no)
+            except LookupError:
+                raise InvalidInputException('Could not add the recording', ['No such agent'])
         recording.campaign_id = campaign_id
         result = recordings_dao.add_recording(recording)
         return result

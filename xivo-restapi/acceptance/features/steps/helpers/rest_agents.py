@@ -23,7 +23,7 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.restapi_config import RestAPIConfig
 
 
-class RestAgents:
+class RestAgents(object):
 
     def __init__(self):
         self.ws_utils = WsUtils()

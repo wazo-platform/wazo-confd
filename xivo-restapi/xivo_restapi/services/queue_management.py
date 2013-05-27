@@ -22,7 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class QueueManagement:
+class QueueManagement(object):
 
     def get_all_queues(self):
         result = queue_dao.all_queues()

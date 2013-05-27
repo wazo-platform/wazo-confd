@@ -23,6 +23,7 @@ from xivo_restapi.rest.negotiate.flask_negotiate import produces
 from xivo_restapi.services.agent_management import AgentManagement
 import logging
 import rest_encoder
+from xivo_restapi.rest.helpers.global_helper import exception_catcher
 
 
 logger = logging.getLogger(__name__)
@@ -33,19 +34,14 @@ class APIAgents(object):
     def __init__(self):
         self._agent_management = AgentManagement()
 
+    @exception_catcher
     @produces('application/json')
     @realmDigest.requires_auth
     def list_agents(self):
-        try:
-            logger.debug("List args:" + str(request.args))
-            result = self._agent_management.get_all_agents()
-            result = sorted(result, key=lambda k: k.number)
-            logger.debug("got result")
-            body = rest_encoder.encode(result)
-            logger.debug("result encoded")
-            return make_response(body, 200)
-
-        except Exception as e:
-            logger.debug("got exception:" + str(e.args))
-            body = rest_encoder.encode([str(e.args)])
-            return make_response(body, 500)
+        logger.debug("List args:" + str(request.args))
+        result = self._agent_management.get_all_agents()
+        result = sorted(result, key=lambda k: k.number)
+        logger.debug("got result")
+        body = rest_encoder.encode(result)
+        logger.debug("result encoded")
+        return make_response(body, 200)

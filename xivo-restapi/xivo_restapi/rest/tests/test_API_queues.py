@@ -17,20 +17,29 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 
+from mock import patch, Mock
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.rest.tests import instance_queue_management
 from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.services.queue_management import QueueManagement
 import unittest
+from xivo_restapi.rest import flask_http_server
 
 
 class TestAPIQueues(unittest.TestCase):
 
     def setUp(self):
-        self.instance_queue_management = instance_queue_management
-        from xivo_restapi.rest import flask_http_server
+        self.patcher_queue = patch("xivo_restapi.rest." + \
+                             "API_queues.QueueManagement")
+        mock_queue = self.patcher_queue.start()
+        self.instance_queue_management = Mock(QueueManagement)
+        mock_queue.return_value = self.instance_queue_management
+        flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+
+    def tearDown(self):
+        self.patcher_queue.stop()
 
     def test_list_queues(self):
         status = "200 OK"
@@ -54,11 +63,7 @@ class TestAPIQueues(unittest.TestCase):
     def test_list_queues_error(self):
         status = "500 INTERNAL SERVER ERROR"
 
-        def mock_get_all_queues():
-            raise Exception()
-
-        self.instance_queue_management.get_all_queues\
-                    .side_effect = mock_get_all_queues
+        self.instance_queue_management.get_all_queues.side_effect = Exception
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + '/',
                               '')

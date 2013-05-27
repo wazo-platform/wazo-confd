@@ -17,20 +17,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-
+from xivo_restapi.rest import flask_http_server
 from xivo import daemonize
-from xivo_restapi.services.service_manager import ServiceManager
 import argparse
 import logging
 import sys
 from xivo_restapi.restapi_config import RestAPIConfig
 
 DAEMONNAME = 'xivo-restapid'
-
-# Enable debug mode for testing witout gevent WSGi,
-# setting to True activates the internal web server
-#DEBUG_MODE = True
-
 LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
 PIDFILE = '/var/run/%s.pid' % DAEMONNAME
 
@@ -40,20 +34,17 @@ logger = None
 def main():
     parsed_args = _parse_args(sys.argv[1:])
     _init_logging(parsed_args.debug)
-
+    flask_http_server.register_blueprints()
     if(parsed_args.dev_mode):
-        # flask http server
-        serviceManager = ServiceManager()
-        serviceManager.run()
+        flask_http_server.FlaskHttpServer().run()
     else:
-        from xivo_restapi.rest.flask_http_server import app
         from flup.server.fcgi import WSGIServer
         if not parsed_args.debug:
             _daemonize()
             logger.info("Starting xivo-restapid in standard mode.")
         else:
             logger.info("Starting xivo-restapid in debug mode.")
-        WSGIServer(app, bindAddress='/var/www/restws-fcgi.sock',
+        WSGIServer(flask_http_server.app, bindAddress='/var/www/restws-fcgi.sock',
                    multithreaded=False, multiprocess=True, debug=False).run()
 
 

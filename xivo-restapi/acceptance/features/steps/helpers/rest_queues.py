@@ -23,7 +23,7 @@ from xivo_restapi.restapi_config import RestAPIConfig
 import random
 
 
-class RestQueues:
+class RestQueues(object):
 
     def __init__(self):
         self.queue = QueueFeatures()

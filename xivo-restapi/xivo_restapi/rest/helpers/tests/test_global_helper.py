@@ -16,13 +16,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from datetime import datetime
+from flask.app import Flask
+from mock import Mock
+from werkzeug.exceptions import HTTPException, BadRequest, Unauthorized
+from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.helpers import global_helper
-from xivo_restapi.rest.helpers.global_helper import str_to_datetime
-from xivo_restapi.services.utils.exceptions import InvalidInputException
+from xivo_restapi.rest.helpers.global_helper import str_to_datetime, \
+    exception_catcher
+from xivo_restapi.services.utils.exceptions import InvalidInputException, \
+    NoSuchElementException
 import unittest
 
 
 class TestGlobalHelper(unittest.TestCase):
+
+    def setUp(self):
+        self.app = Flask(__name__)
+        ctx = self.app.test_request_context('users/')
+        ctx.push()
 
     def test_create_class_instance(self):
         class SampleClass():
@@ -83,3 +94,41 @@ class TestGlobalHelper(unittest.TestCase):
 
         invalidTimeStr = 2012
         self.assertRaises(InvalidInputException, str_to_datetime, invalidTimeStr)
+
+    def test_exception_catcher_no_exception(self):
+        function = Mock()
+        function.return_value = 1
+        decorated_function = exception_catcher(function)
+        self.assertEquals(1, decorated_function("a", 1, {}))
+        function.assert_called_with("a", 1, {})
+
+    def test_exception_catcher_standard_exception(self):
+        def function():
+            raise Exception()
+        decorated_function = exception_catcher(function)
+        self.assertEquals("500 INTERNAL SERVER ERROR", decorated_function().status)
+
+    def test_exception_catcher_HTTP_exception(self):
+        def function():
+            raise BadRequest()
+        decorated_function = exception_catcher(function)
+        self.assertRaises(HTTPException, decorated_function)
+
+        def function2():
+            raise Unauthorized()
+        decorated_function = exception_catcher(function2)
+        self.assertRaises(HTTPException, decorated_function)
+
+    def test_exception_catcher_NoSuchElementException(self):
+        def function():
+            raise NoSuchElementException('')
+        decorated_function = exception_catcher(function)
+        self.assertEquals("404 NOT FOUND", decorated_function().status)
+
+    def test_exception_catcher_ValueError(self):
+        def function():
+            raise ValueError()
+        decorated_function = exception_catcher(function)
+        result = decorated_function()
+        self.assertEquals("400 BAD REQUEST", result.status)
+        self.assertEquals(["No parsable data in the request"], rest_encoder.decode(result.data))

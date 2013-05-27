@@ -19,18 +19,11 @@
 from acceptance.features.steps.helpers.rest_queues import RestQueues
 from acceptance.features.steps.helpers.ws_utils import WsUtils
 from commands import getoutput
-from lettuce.terrain import before
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
-from xivo_dao.helpers import config
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
-
-
-@before.all
-def modify_db_uri():
-    config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
 
 
 class RestCampaign(object):
@@ -59,13 +52,13 @@ class RestCampaign(object):
 
     def list(self):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + '/')
-        return reply.data
+        return reply
 
     def get_activated_campaigns(self, queue_id):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                                      "/" + "?activated=true&queue_id=" + \
                                       str(queue_id))
-        return reply.data
+        return reply
 
     def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time):
         recording = {}
@@ -87,7 +80,7 @@ class RestCampaign(object):
         remote_host = remote_host.rstrip()
         file_path = dirname + "/" + recording['filename']
         remote_command = "'touch %s'" % file_path
-        ssh_command = "sudo ssh root@%s %s" % (remote_host, remote_command)
+        ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
         getoutput(ssh_command)
         return reply
 
@@ -111,22 +104,16 @@ class RestCampaign(object):
                         params)
         return reply.status == 200 or reply.status == 201
 
-    def getCampaign(self, campaign_id):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
+    def get_campaign(self, campaign_id):
+        return self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id))
 
-        result = reply.data['items']
-        if(len(result) > 0):
-            return result[0]
-        else:
-            return None
-
-    def getRunningActivatedCampaignsForQueue(self, queue_id):
+    def get_running_activated_campaigns_for_queue(self, queue_id):
         reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
                                     "/" + \
                                     "?activated=true&running=true&queue_id=" + \
                                     queue_id)
-        return reply.data
+        return reply
 
     def create_if_not_exists(self, campaign_name):
         result = record_campaigns_dao.id_from_name(campaign_name)
@@ -187,14 +174,13 @@ class RestCampaign(object):
             params = "?key=" + key
             serviceURI += params
 
-        reply = self.ws_utils.rest_get(serviceURI)
-        return reply.data
+        return self.ws_utils.rest_get(serviceURI)
 
     def deleteRecording(self, campaign_id, callid):
         #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
         reply = self.ws_utils.rest_delete(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
                         str(campaign_id) + "/" + callid)
-        return (reply.status, reply.data)
+        return reply
 
     def delete_agent(self, agent_no):
         try:
@@ -227,7 +213,7 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/",
                                         campaign)
 
-        return (reply.status, reply.data)
+        return reply
 
     def paginated_list(self, page_number, page_size):
         serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/"
@@ -235,7 +221,7 @@ class RestCampaign(object):
 
         reply = self.ws_utils.rest_get(serviceURI + params)
 
-        return reply.data
+        return reply
 
     def paginated_recordings_list(self, campaign_id, page_number, page_size):
 
@@ -243,8 +229,7 @@ class RestCampaign(object):
                         "/" + campaign_id + "/"
         params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
 
-        reply = self.ws_utils.rest_get(serviceURI + params)
-        return reply.data
+        return self.ws_utils.rest_get(serviceURI + params)
 
     def search_paginated_recordings(self, campaign_id, key, page, pagesize):
         serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
@@ -254,7 +239,7 @@ class RestCampaign(object):
                                              pagesize
 
         reply = self.ws_utils.rest_get(serviceURI + params)
-        return reply.data
+        return reply
 
     def delete_all_campaigns(self):
         recordings_dao.delete_all()

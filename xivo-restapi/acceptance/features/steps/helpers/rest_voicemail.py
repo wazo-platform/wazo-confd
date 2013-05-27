@@ -32,6 +32,7 @@ class RestVoicemail(object):
         voicemail.mailbox = number
         voicemail.context = context
         voicemail_dao.add(voicemail)
+        return voicemail.uniqueid
 
     def list(self):
         return self.ws_utils.rest_get(RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH + "/")

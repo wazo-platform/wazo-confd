@@ -24,7 +24,7 @@ import unittest
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 
 
-class SampleClass:
+class SampleClass(object):
 
     def __init__(self):
         self.id = 1

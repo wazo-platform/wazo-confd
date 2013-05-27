@@ -15,23 +15,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao import user_dao, line_dao
+from provd.rest.client.client import new_provisioning_client
+from urllib2 import URLError
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
 from xivo_dao.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_dao.mapping_alchemy_sdm.user_mapping import UserMapping
 from xivo_restapi.restapi_config import RestAPIConfig
-from xivo_restapi.services.utils.exceptions import NoSuchElementException
+from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
+    ProvdError, VoicemailExistsException, SysconfdError
+from xivo_restapi.services.utils.sysconfd_connector import SysconfdConnector
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
 
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
 
-class UserManagement:
+class UserManagement(object):
 
     def __init__(self):
         self.user_mapping = UserMapping()
         self.line_mapping = LineMapping()
         self.voicemail_manager = VoicemailManagement()
+        self.provisioning_client = new_provisioning_client(RestAPIConfig.PROVD_URL)
+        self.device_manager = self.provisioning_client.device_manager()
+        self.config_manager = self.provisioning_client.config_manager()
+        self.sysconfd_connector = SysconfdConnector()
 
     def get_all_users(self):
         users_lines = user_dao.get_all_join_line()
@@ -77,3 +85,59 @@ class UserManagement:
         if voicemailid is not None:
             fullname = user_dao.get(userid).fullname
             self.voicemail_manager.edit_voicemail(voicemailid, {'fullname': fullname})
+
+    def delete_user(self, userid, delete_voicemail=False):
+        data_access_logger.info("Deleting the user of id %s" % userid)
+        try:
+            user = user_dao.get(userid)
+        except LookupError:
+            raise NoSuchElementException("No such user: " + str(userid))
+        voicemailid = user.voicemailid
+        if voicemailid is not None and not delete_voicemail:
+                raise VoicemailExistsException()
+
+        user_dao.delete(userid)
+        lines = line_dao.find_line_id_by_user_id(userid)
+        if len(lines) > 0:
+            self._remove_line(line_dao.get(lines[0]))
+        if voicemailid is not None:
+            self._delete_voicemail(voicemailid)
+
+    def _provd_remove_line(self, deviceid, linenum):
+        config = self.config_manager.get(deviceid)
+        del config["raw_config"]["sip_lines"][str(linenum)]
+        if len(config["raw_config"]["sip_lines"]) == 0:
+            #then we reset to autoprov
+            self._reset_config(config)
+            self._reset_device_to_autoprov(deviceid)
+        self.config_manager.update(config)
+
+    def _reset_config(self, config):
+        del config["raw_config"]["sip_lines"]
+        if "funckeys" in config["raw_config"]:
+            del config["raw_config"]["funckeys"]
+
+    def _reset_device_to_autoprov(self, deviceid):
+        device = self.device_manager.get(deviceid)
+        new_configid = self.config_manager.autocreate()
+        device["config"] = new_configid
+        self.device_manager.update(device)
+
+    def _remove_line(self, line):
+        device = line.device
+        line_dao.delete(line.id)
+        deviceid = device_dao.get_deviceid(device)
+        if deviceid is not None:
+            try:
+                self._provd_remove_line(deviceid, line.num)
+            except URLError as e:
+                raise ProvdError(str(e))
+
+    def _delete_voicemail(self, voicemailid):
+        voicemail = voicemail_dao.get(voicemailid)
+        context, mailbox = voicemail.context, voicemail.mailbox
+        voicemail_dao.delete(voicemailid)
+        try:
+            self.sysconfd_connector.delete_voicemail_storage(context, mailbox)
+        except Exception as e:
+            raise SysconfdError(str(e))

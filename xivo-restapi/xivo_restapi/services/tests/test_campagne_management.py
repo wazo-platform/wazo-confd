@@ -52,7 +52,7 @@ class TestCampagneManagement(unittest.TestCase):
 
         result = self._campagneManager.create_campaign(campaign)
         self.assertEquals(result, 1)
-        record_campaigns_dao.add_or_update.assert_called_with(campaign)
+        record_campaigns_dao.add_or_update.assert_called_with(campaign) # @UndefinedVariable
         self._campagneManager._validate_campaign.assert_called_with(campaign)
 
     def test_get_campaigns_no_pagination(self):
@@ -61,12 +61,12 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.get_records = Mock()
         record_campaigns_dao.get_records.return_value = data
 
-        (total, items) = self._campagneManager.get_campaigns()
+        (_, items) = self._campagneManager.get_campaigns()
         result = items[0]
         self.assertEqual(result.queue_name, self.queue_name)
         self.assertEqual(result.queue_display_name, self.queue_display_name)
         self.assertEqual(result.queue_number, self.queue_number)
-        record_campaigns_dao.get_records.assert_called_with({}, False, (0, 0))
+        record_campaigns_dao.get_records.assert_called_with({}, False, (0, 0)) # @UndefinedVariable
 
     def test_get_campaigns_paginated(self):
         campaign = copy.deepcopy(self.sample_campaign)
@@ -74,14 +74,14 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.get_records = Mock()
         record_campaigns_dao.get_records.return_value = data
 
-        (total, items) = self._campagneManager.get_campaigns({"campaign_name": campaign.campaign_name},
+        (_, items) = self._campagneManager.get_campaigns({"campaign_name": campaign.campaign_name},
                                                              True,
                                                              (1, 1))
         result = items[0]
         self.assertEqual(result.queue_name, self.queue_name)
         self.assertEqual(result.queue_display_name, self.queue_display_name)
         self.assertEqual(result.queue_number, self.queue_number)
-        record_campaigns_dao.get_records.assert_called_with({"campaign_name": campaign.campaign_name},
+        record_campaigns_dao.get_records.assert_called_with({"campaign_name": campaign.campaign_name}, # @UndefinedVariable
                                                              True,
                                                              (1, 1))
     @patch('xivo_restapi.services.campagne_management.CampagneManagement._validate_campaign')
@@ -104,8 +104,8 @@ class TestCampagneManagement(unittest.TestCase):
         result = self._campagneManager.update_campaign(campaign_id,
                                                               data)
         self.assertTrue(result)
-        record_campaigns_dao.get.assert_called_once_with(campaign_id)
-        record_campaigns_dao.add_or_update.assert_called_once_with(campaign)
+        record_campaigns_dao.get.assert_called_once_with(campaign_id) # @UndefinedVariable
+        record_campaigns_dao.add_or_update.assert_called_once_with(campaign) # @UndefinedVariable
         self.assertEqual(campaign.campaign_name, data['campaign_name'])
         self.assertEqual(campaign.activated, data['activated'])
         self.assertEqual(campaign.base_filename, data['base_filename'])
@@ -117,10 +117,8 @@ class TestCampagneManagement(unittest.TestCase):
         self.assertRaises(NoSuchElementException, self._campagneManager.delete, '1')
 
     def test_delete_integrity_error(self):
-        def mock_delete(campaign):
-            raise IntegrityError(None, None, None)
         record_campaigns_dao.delete = Mock()
-        record_campaigns_dao.delete.side_effect = mock_delete
+        record_campaigns_dao.delete.side_effect = IntegrityError(None, None, None)
         record_campaigns_dao.get = Mock()
         record_campaigns_dao.get.return_value = RecordCampaigns()
         self.assertRaises(IntegrityError, self._campagneManager.delete, '1')
@@ -132,7 +130,7 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.delete = Mock()
         record_campaigns_dao.delete.return_value = None
         self._campagneManager.delete('1')
-        record_campaigns_dao.delete.assert_called_with(obj)
+        record_campaigns_dao.delete.assert_called_with(obj) # @UndefinedVariable
 
     def _create_sample_campaign(self):
         self.sample_campaign = RecordCampaigns()

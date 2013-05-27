@@ -24,49 +24,42 @@ from xivo_dao.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.rest.negotiate.flask_negotiate import produces, consumes
-from xivo_restapi.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.services.voicemail_management import VoicemailManagement
 import logging
+from xivo_restapi.rest.helpers.global_helper import exception_catcher
 
 logger = logging.getLogger(__name__)
 
 
-class APIVoicemails:
+class APIVoicemails(object):
 
     def __init__(self):
         self.voicemail_manager = VoicemailManagement()
         self.voicemail_sdm = VoicemailSdm()
 
+    @exception_catcher
     @produces("application/json")
     @realmDigest.requires_auth
     def list(self):
         logger.info("List of voicemails requested.")
-        try:
-            voicemails = self.voicemail_manager.get_all_voicemails()
-            result = {"items": voicemails}
-            result = rest_encoder.encode(result)
-            return make_response(result, 200)
-        except Exception as e:
-            result = rest_encoder.encode(str(e))
-            return make_response(result, 500)
+        voicemails = self.voicemail_manager.get_all_voicemails()
+        result = {"items": voicemails}
+        result = rest_encoder.encode(result)
+        return make_response(result, 200)
 
+    @exception_catcher
     @consumes("application/json")
     @realmDigest.requires_auth
     def edit(self, voicemailid):
         data = request.data.decode("utf-8")
         logger.info("Edit request for voicemail of id %s with data %s"
                     % (voicemailid, data))
-        try:
-            data = rest_encoder.decode(data)
-        except ValueError:
-            result = ["No parsable data in the request"]
-            return make_response(rest_encoder.encode(result), 400)
+
+        data = rest_encoder.decode(data)
         try:
             self.voicemail_sdm.validate(data)
             self.voicemail_manager.edit_voicemail(int(voicemailid), data)
         except IncorrectParametersException as e:
             data = rest_encoder.encode([str(e)])
             return make_response(data, 400)
-        except NoSuchElementException:
-            return make_response('', 404)
         return make_response('', 200)
