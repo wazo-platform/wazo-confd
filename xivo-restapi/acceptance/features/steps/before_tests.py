@@ -18,9 +18,11 @@ from lettuce.registry import world
 from lettuce.terrain import before
 from xivo_dao.helpers import config
 
+
 @before.all
 def modify_db_uri():
     config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
+
 
 @before.each_scenario
 def reset_world(scenario):
