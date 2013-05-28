@@ -35,42 +35,52 @@ class RestCampaign(object):
                start_date=None, end_date=None, campaign_id=None):
 
         self.queue_create_if_not_exists(queue_name)
-        campaign = {}
 
-        campaign["campaign_name"] = campaign_name
-        campaign["base_filename"] = campaign_name + "-file-"
-        campaign["queue_id"] = queue_dao.id_from_name(queue_name)
-        campaign["activated"] = activated
-        if start_date != None:
+        campaign = {
+            "campaign_name": campaign_name,
+            "base_filename": "%s-file-" % campaign_name,
+            "queue_id": queue_dao.id_from_name(queue_name),
+            "activated": activated
+        }
+
+        if start_date is not None:
             campaign["start_date"] = str(start_date)
-        if end_date != None:
+        if end_date is not None:
             campaign["end_date"] = str(end_date)
-        if campaign_id != None:
+        if campaign_id is not None:
             campaign['id'] = campaign_id
-        reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + '/', campaign)
+
+        url = "%s/" % RestAPIConfig.XIVO_RECORDING_SERVICE_PATH
+        reply = self.ws_utils.rest_post(url, campaign)
         return reply
 
     def list(self):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + '/')
+        url = "%s/" % RestAPIConfig.XIVO_RECORDING_SERVICE_PATH
+        reply = self.ws_utils.rest_get(url)
         return reply
 
     def get_activated_campaigns(self, queue_id):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
-                                     "/" + "?activated=true&queue_id=" + \
-                                      str(queue_id))
+        url = "%s/?activated=true&queue_id=%s" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            queue_id
+        )
+
+        reply = self.ws_utils.rest_get(url)
         return reply
 
     def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time):
-        recording = {}
-        recording['cid'] = callid
-        recording['caller'] = caller
-        recording['agent_no'] = agent_no
-        recording['start_time'] = time
-        recording['end_time'] = time
-        recording['filename'] = callid + ".wav"
+        recording = {
+            'cid': callid,
+            'caller': caller,
+            'agent_no': agent_no,
+            'start_time': time,
+            'end_time': time,
+            'filename': "%s.wav" % callid
+        }
 
-        reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
-                        "/" + str(campaign_id) + '/', recording)
+        url = "%s/%s/" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
+
+        reply = self.ws_utils.rest_post(url, recording)
 
         #we create the file
         dirname = RestAPIConfig.RECORDING_FILE_ROOT_PATH
@@ -85,10 +95,10 @@ class RestCampaign(object):
         return reply
 
     def verifyRecordingsDetails(self, campaign_id, callid):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
-                        '/' + str(campaign_id) + "/")
+        url = "%s/%s/" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
+        reply = self.ws_utils.rest_get(url)
 
-        assert reply.data != None, "No result"
+        assert reply.data is not None, "No result"
         recordings = reply.data['items']
 
         result = False
@@ -98,26 +108,25 @@ class RestCampaign(object):
         return result
 
     def updateCampaign(self, campaign_id, params):
-
-        reply = self.ws_utils.rest_put(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id),
-                        params)
+        url = "%s/%s" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
+        reply = self.ws_utils.rest_put(url, params)
         return reply.status == 200 or reply.status == 201
 
     def get_campaign(self, campaign_id):
-        return self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id))
+        url = "%s/%s" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
+        return self.ws_utils.rest_get(url)
 
     def get_running_activated_campaigns_for_queue(self, queue_id):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
-                                    "/" + \
-                                    "?activated=true&running=true&queue_id=" + \
-                                    queue_id)
+        url = "%s/?activated=true&running=true&queue_id=%s" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            queue_id
+        )
+        reply = self.ws_utils.rest_get(url)
         return reply
 
     def create_if_not_exists(self, campaign_name):
         result = record_campaigns_dao.id_from_name(campaign_name)
-        if(result is None):
+        if result is None:
             rest_queues = RestQueues()
             rest_queues.create_if_not_exists('test', 1)
             result = self.create(campaign_name,
@@ -168,18 +177,25 @@ class RestCampaign(object):
         return -1
 
     def search_recordings(self, campaign_id, key=None):
-        serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id) + "/search"
-        if(key != None):
-            params = "?key=" + key
-            serviceURI += params
+        serviceURI = "%s/%s/search" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            campaign_id
+        )
+
+        if key is not None:
+            serviceURI += "?key=%s" % key
 
         return self.ws_utils.rest_get(serviceURI)
 
     def deleteRecording(self, campaign_id, callid):
         #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
-        reply = self.ws_utils.rest_delete(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id) + "/" + callid)
+        url = "%s/%s/%s" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            campaign_id,
+            callid
+        )
+
+        reply = self.ws_utils.rest_delete(url)
         return reply
 
     def delete_agent(self, agent_no):
@@ -197,48 +213,55 @@ class RestCampaign(object):
                            end_date=None, campaign_id=None):
 
         self.queue_create_if_not_exists(queue_name)
-        campaign = {}
+        campaign = {
+            "campaign_name": campaign_name,
+            "base_filename": "%s-file-" % campaign_name,
+            "queue_id": queue_dao.id_from_name(queue_name),
+            "activated": activated
+        }
 
-        campaign["campaign_name"] = campaign_name
-        campaign["base_filename"] = campaign_name + "-file-"
-        campaign["queue_id"] = queue_dao.id_from_name(queue_name)
-        campaign["activated"] = activated
-        if start_date != None:
+        if start_date is not None:
             campaign["start_date"] = str(start_date)
-        if end_date != None:
+        if end_date is not None:
             campaign["end_date"] = str(end_date)
-        if campaign_id != None:
+        if campaign_id is not None:
             campaign['id'] = campaign_id
 
-        reply = self.ws_utils.rest_post(RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/",
-                                        campaign)
+        url = "%s/" % RestAPIConfig.XIVO_RECORDING_SERVICE_PATH
+        reply = self.ws_utils.rest_post(url)
 
         return reply
 
     def paginated_list(self, page_number, page_size):
-        serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/"
-        params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
+        url = "%s/?_page=%s&_pagesize=%s" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            page_number,
+            page_size
+        )
 
-        reply = self.ws_utils.rest_get(serviceURI + params)
-
+        reply = self.ws_utils.rest_get(url)
         return reply
 
     def paginated_recordings_list(self, campaign_id, page_number, page_size):
+        url = "%s/%s/?_page=%s&_pagesize=%s" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            campaign_id,
+            page_number,
+            page_size
+        )
 
-        serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + \
-                        "/" + campaign_id + "/"
-        params = "?_page=" + str(page_number) + "&_pagesize=" + str(page_size)
-
-        return self.ws_utils.rest_get(serviceURI + params)
+        return self.ws_utils.rest_get(url)
 
     def search_paginated_recordings(self, campaign_id, key, page, pagesize):
-        serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id) + "/search"
+        url = "%s/%s/search?key=%s&_page=%s&_pagesize=%s" % (
+            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
+            campaign_id,
+            key,
+            page,
+            pagesize
+        )
 
-        params = "?key=" + key + "&_page=" + page + "&_pagesize=" + \
-                                             pagesize
-
-        reply = self.ws_utils.rest_get(serviceURI + params)
+        reply = self.ws_utils.rest_get(url)
         return reply
 
     def delete_all_campaigns(self):
@@ -250,7 +273,6 @@ class RestCampaign(object):
         return queue_dao.get(queue_id)
 
     def delete_campaign(self, campaign_id):
-        serviceURI = RestAPIConfig.XIVO_RECORDING_SERVICE_PATH + "/" + \
-                        str(campaign_id)
-        reply = self.ws_utils.rest_delete(serviceURI)
+        url = "%s/%s" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
+        reply = self.ws_utils.rest_delete(url)
         return reply
