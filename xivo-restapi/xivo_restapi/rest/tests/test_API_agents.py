@@ -16,20 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import unittest
 
 from mock import patch, Mock
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_restapi.rest import flask_http_server, rest_encoder
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.agent_management import AgentManagement
-import unittest
 
 
 class TestAPIAgents(unittest.TestCase):
 
     def setUp(self):
-        self.patcher_agent = patch("xivo_restapi.rest." + \
-                             "API_agents.AgentManagement")
+        self.patcher_agent = patch("xivo_restapi.rest.API_agents.AgentManagement")
         mock_agent = self.patcher_agent.start()
         self.instance_agent_management = Mock(AgentManagement)
         mock_agent.return_value = self.instance_agent_management
@@ -47,14 +46,12 @@ class TestAPIAgents(unittest.TestCase):
         agent2 = AgentFeatures()
         agent2.number = '2'
         liste = [agent1, agent2]
-        self.instance_agent_management.get_all_agents\
-                    .return_value = liste
+        self.instance_agent_management.get_all_agents.return_value = liste
         result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
                               RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + '/',
                               '')
 
-        self.instance_agent_management.get_all_agents\
-                    .assert_called_with()
+        self.instance_agent_management.get_all_agents.assert_called_with()
         self.assertEquals(result.status, status)
         liste = sorted(liste, key=lambda k: k.number)
         self.assertEquals(rest_encoder.encode(liste), result.data)
@@ -67,10 +64,8 @@ class TestAPIAgents(unittest.TestCase):
                               RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + '/',
                               '')
 
-        self.instance_agent_management.get_all_agents\
-                    .assert_called_with()
+        self.instance_agent_management.get_all_agents.assert_called_with()
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status:" +
                         result.status)
-        self.instance_agent_management.get_all_agents\
-                    .side_effect = None
+        self.instance_agent_management.get_all_agents.side_effect = None

@@ -16,11 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import logging
+import os
+
 from datetime import timedelta
 from flask import Flask
 from xivo_restapi.restapi_config import RestAPIConfig
-import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ app = Flask(__name__)
 app.debug = False
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(minutes=5)
+
 
 def register_blueprints():
     from xivo_restapi.rest import routing

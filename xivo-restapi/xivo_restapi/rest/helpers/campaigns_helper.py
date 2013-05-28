@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
 from datetime import datetime
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest.helpers import global_helper
@@ -29,18 +30,18 @@ class CampaignsHelper():
         '''Returns the supplemented input for add'''
         logger.debug("Supplementing input for 'add'")
         for key in data:
-            if(data[key] == ''):
+            if data[key] == '':
                 data[key] = None
-        if(("start_date" not in data) or data["start_date"] == None):
+        if "start_date" not in data or data["start_date"] is None:
             data["start_date"] = datetime.now().strftime("%Y-%m-%d")
-        if(("end_date" not in data) or data["end_date"] == None):
+        if "end_date" not in data or data["end_date"] is None:
             data["end_date"] = datetime.now().strftime("%Y-%m-%d")
         return data
 
     def supplement_edit_input(self, data):
         '''Returns the supplemented input for edit'''
         for key in data:
-            if(data[key] == ''):
+            if data[key] == '':
                 data[key] = None
         return data
 

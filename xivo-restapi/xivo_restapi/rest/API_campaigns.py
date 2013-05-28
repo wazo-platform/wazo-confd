@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
+import rest_encoder
+
 from flask import request
 from flask.helpers import make_response
 from sqlalchemy.exc import IntegrityError
@@ -26,8 +29,6 @@ from xivo_restapi.rest.helpers.global_helper import exception_catcher
 from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.campagne_management import CampagneManagement
 from xivo_restapi.services.utils.exceptions import InvalidInputException
-import logging
-import rest_encoder
 
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ class APICampaigns(object):
         logger.debug(str(body))
         body = self._campaigns_helper.supplement_add_input(body)
         campaign = self._campaigns_helper.create_instance(body)
-        logger.debug("Just supplemented: " + str(body))
+        logger.debug("Just supplemented: %s", body)
         try:
             result = self._campagne_manager.create_campaign(campaign)
             logger.debug("Just created")
@@ -69,13 +70,11 @@ class APICampaigns(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def get(self, campaign_id=None):
-        logger.debug("Got a GET request for campaign id: " + \
-                     str(campaign_id) + \
-                     "with args: " + \
-                     str(campaign_id))
+        logger.debug("Got a GET request for campaign id: %s with args %s",
+                     campaign_id, campaign_id)
         checkCurrentlyRunning = False
         params = {}
-        if campaign_id != None:
+        if campaign_id is not None:
             params['id'] = campaign_id
         for item in request.args:
             if(item == 'running'):
@@ -86,7 +85,7 @@ class APICampaigns(object):
         result = self._campagne_manager.get_campaigns(params,
                                                       checkCurrentlyRunning,
                                                       paginator)
-        logger.debug("got result: " + str(result))
+        logger.debug("got result: %s", result)
         body = rest_encoder.encode(result)
         logger.debug("result encoded")
         return make_response(body, 200)
@@ -96,7 +95,7 @@ class APICampaigns(object):
     @realmDigest.requires_auth
     def delete(self, campaign_id):
         try:
-            logger.debug("Got an DELETE request for campaign id: " + campaign_id)
+            logger.debug("Got an DELETE request for campaign id: %s", campaign_id)
             self._campagne_manager.delete(campaign_id)
         except IntegrityError:
             liste = ["campaign_not_empty"]
@@ -109,7 +108,7 @@ class APICampaigns(object):
     @realmDigest.requires_auth
     def update(self, campaign_id):
         data = request.data.decode("utf-8")
-        logger.debug("Got an UPDATE request for campaign id: " + campaign_id)
+        logger.debug("Got an UPDATE request for campaign id: %s", campaign_id)
         body = rest_encoder.decode(data)
         logger.debug(str(body))
         try:
@@ -122,9 +121,8 @@ class APICampaigns(object):
             liste = e.errors_list
             return make_response(rest_encoder.encode(liste), 400)
         if (result):
-            body = rest_encoder.encode(("Updated: " + str(result)))
+            body = rest_encoder.encode(("Updated: %s" % result))
             return make_response(body, 200)
         else:
             body = rest_encoder.encode([str(result)])
             return make_response(body, 500)
-

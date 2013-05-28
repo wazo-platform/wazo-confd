@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import unittest
+
 from datetime import datetime
 from mock import patch, Mock
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
 from xivo_restapi.rest.helpers import global_helper
-import unittest
 
 
 class TestCampaignsHelper(unittest.TestCase):
@@ -61,5 +62,5 @@ class TestCampaignsHelper(unittest.TestCase):
         from xivo_restapi.rest.helpers.campaigns_helper import CampaignsHelper
         helper = CampaignsHelper()
         result = helper.create_instance(data)
-        global_helper.create_class_instance.assert_called_with(RecordCampaigns, data)  #@UndefinedVariable
+        global_helper.create_class_instance.assert_called_with(RecordCampaigns, data)
         self.assertEqual(result, mock_return_value)

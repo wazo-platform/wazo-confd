@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
+import rest_encoder
+
 from flask import request
 from flask.helpers import make_response
 from xivo_restapi.rest.authentication.xivo_realm_digest import realmDigest
@@ -23,8 +26,6 @@ from xivo_restapi.rest.helpers import global_helper
 from xivo_restapi.rest.helpers.recordings_helper import RecordingsHelper
 from xivo_restapi.rest.negotiate.flask_negotiate import consumes, produces
 from xivo_restapi.services.recording_management import RecordingManagement
-import logging
-import rest_encoder
 from xivo_restapi.rest.helpers.global_helper import exception_catcher
 from xivo_restapi.services.utils.exceptions import InvalidInputException
 
@@ -52,8 +53,7 @@ class APIRecordings(object):
         try:
             result = self._recording_manager.add_recording(int(campaign_id), recording)
             if (result):
-                return make_response(rest_encoder.encode("Added: " + \
-                                                         str(result)), 201)
+                return make_response(rest_encoder.encode("Added: %s" % result), 201)
             else:
                 body = rest_encoder.encode([str(result)])
                 return make_response(body, 500)
@@ -65,7 +65,7 @@ class APIRecordings(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def list_recordings(self, campaign_id):
-        logger.debug("List args:" + str(request.args))
+        logger.debug("List args: %s", request.args)
         params = {}
         for item in request.args:
             if(not item.startswith('_')):
@@ -84,15 +84,13 @@ class APIRecordings(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def search(self, campaign_id):
-        logger.debug("List args:" + str(request.args))
+        logger.debug("List args: %s", request.args)
         params = {}
         for item in request.args:
             if(not item.startswith('_')):
                 params[item] = request.args[item]
         paginator = global_helper.create_paginator(request.args)
-        result = self._recording_manager. \
-                    search_recordings(campaign_id, params,
-                                      paginator)
+        result = self._recording_manager.search_recordings(campaign_id, params, paginator)
 
         logger.debug("got result")
         body = rest_encoder.encode(result)
@@ -103,10 +101,8 @@ class APIRecordings(object):
     @produces('application/json')
     @realmDigest.requires_auth
     def delete(self, campaign_id, recording_id):
-        logger.debug("Entering delete:" + str(campaign_id) + ", " + \
-                     str(recording_id))
-        result = self._recording_manager. \
-                    delete(int(campaign_id), recording_id)
+        logger.debug("Entering delete: %s, %s", campaign_id, recording_id)
+        result = self._recording_manager.delete(int(campaign_id), recording_id)
         logger.debug("result encoded")
         if not result:
             return make_response(rest_encoder.encode("No such recording"),

@@ -16,21 +16,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import unittest
 
 from mock import patch, Mock
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.queue_management import QueueManagement
-import unittest
 from xivo_restapi.rest import flask_http_server
+
+BASE_URL = "%s%s/" % (RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH, RestAPIConfig.XIVO_QUEUES_SERVICE_PATH)
 
 
 class TestAPIQueues(unittest.TestCase):
 
     def setUp(self):
-        self.patcher_queue = patch("xivo_restapi.rest." + \
-                             "API_queues.QueueManagement")
+        self.patcher_queue = patch("xivo_restapi.rest.API_queues.QueueManagement")
         mock_queue = self.patcher_queue.start()
         self.instance_queue_management = Mock(QueueManagement)
         mock_queue.return_value = self.instance_queue_management
@@ -48,14 +49,10 @@ class TestAPIQueues(unittest.TestCase):
         queue2 = QueueFeatures()
         queue2.number = '2'
         liste = [queue1, queue2]
-        self.instance_queue_management.get_all_queues\
-                    .return_value = liste
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + '/',
-                              '')
+        self.instance_queue_management.get_all_queues.return_value = liste
+        result = self.app.get(BASE_URL, '')
 
-        self.instance_queue_management.get_all_queues\
-                    .assert_any_call()
+        self.instance_queue_management.get_all_queues.assert_any_call()
         self.assertEquals(result.status, status)
         liste = sorted(liste, key=lambda k: k.number)
         self.assertEquals(rest_encoder.encode(liste), result.data)
@@ -64,14 +61,9 @@ class TestAPIQueues(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
 
         self.instance_queue_management.get_all_queues.side_effect = Exception
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_QUEUES_SERVICE_PATH + '/',
-                              '')
+        result = self.app.get(BASE_URL, '')
 
-        self.instance_queue_management.get_all_queues\
-                    .assert_any_call()
+        self.instance_queue_management.get_all_queues.assert_any_call()
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
-        self.instance_queue_management.get_all_queues\
-                    .side_effect = None
+                        "Status comparison failed, received status: %s" % result.status)
+        self.instance_queue_management.get_all_queues.side_effect = None

@@ -31,23 +31,28 @@ logger = logging.getLogger(__name__)
 root = Blueprint("root",
                  __name__,
                  url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                            RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
+                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
+
 queues_service = Blueprint("queues_service",
-                         __name__,
-                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                                    RestAPIConfig.XIVO_QUEUES_SERVICE_PATH)
+                           __name__,
+                           url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                           RestAPIConfig.XIVO_QUEUES_SERVICE_PATH)
+
 agents_service = Blueprint("agents_service",
-                         __name__,
-                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                                    RestAPIConfig.XIVO_AGENTS_SERVICE_PATH)
+                           __name__,
+                           url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                           RestAPIConfig.XIVO_AGENTS_SERVICE_PATH)
+
 users_service = Blueprint("users_service",
-                         __name__,
-                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                                    RestAPIConfig.XIVO_USERS_SERVICE_PATH)
+                          __name__,
+                          url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                          RestAPIConfig.XIVO_USERS_SERVICE_PATH)
+
 voicemails_service = Blueprint("voicemails_service",
-                         __name__,
-                         url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                                    RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH)
+                               __name__,
+                               url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                               RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH)
+
 
 def _root_routes():
     campaigns = APICampaigns()
@@ -94,19 +99,22 @@ def _root_routes():
                       recordings.delete,
                       methods=["DELETE"])
 
+
 def _queue_routes():
     queues = APIQueues()
     queues_service.add_url_rule("/",
-                      "list_queues",
-                      queues.list_queues,
-                      methods=["GET"])
+                                "list_queues",
+                                queues.list_queues,
+                                methods=["GET"])
+
 
 def _agent_routes():
     agents = APIAgents()
     agents_service.add_url_rule("/",
-                      "list_agents",
-                      agents.list_agents,
-                      methods=["GET"])
+                                "list_agents",
+                                agents.list_agents,
+                                methods=["GET"])
+
 
 def _user_routes():
     users = APIUsers()
@@ -116,36 +124,38 @@ def _user_routes():
                                methods=["GET"])
 
     users_service.add_url_rule("/<userid>",
-                      "get",
-                      users.get,
-                      methods=["GET"])
+                               "get",
+                               users.get,
+                               methods=["GET"])
 
     users_service.add_url_rule("/",
-                      "create",
-                      users.create,
-                      methods=["POST"])
+                               "create",
+                               users.create,
+                               methods=["POST"])
 
     users_service.add_url_rule("/<userid>",
-                      "edit",
-                      users.edit,
-                      methods=["PUT"])
+                               "edit",
+                               users.edit,
+                               methods=["PUT"])
 
     users_service.add_url_rule("/<userid>",
-                      "delete",
-                      users.delete,
-                      methods=["DELETE"])
+                               "delete",
+                               users.delete,
+                               methods=["DELETE"])
+
 
 def _voicemail_routes():
     voicemails = APIVoicemails()
     voicemails_service.add_url_rule("/",
-                      "list",
-                      voicemails.list,
-                      methods=["GET"])
+                                    "list",
+                                    voicemails.list,
+                                    methods=["GET"])
 
     voicemails_service.add_url_rule("/<voicemailid>",
-                      "edit",
-                      voicemails.edit,
-                      methods=["PUT"])
+                                    "edit",
+                                    voicemails.edit,
+                                    methods=["PUT"])
+
 
 def create_routes():
     _root_routes()

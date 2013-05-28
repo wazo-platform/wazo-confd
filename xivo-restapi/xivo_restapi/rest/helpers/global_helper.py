@@ -14,15 +14,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+import logging
+import sys
+import traceback
+
 from datetime import datetime
 from flask.helpers import make_response
 from werkzeug.exceptions import HTTPException
 from xivo_restapi.rest import rest_encoder
 from xivo_restapi.services.utils.exceptions import InvalidInputException, \
     NoSuchElementException
-import logging
-import sys
-import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -30,15 +32,15 @@ logger = logging.getLogger(__name__)
 def create_class_instance(class_type, data):
     instance = class_type()
     for k, v in data.items():
-        logger.debug("Key: %s, value: %s" % (k, v))
-        logger.debug("dir value: %s" % dir)
+        logger.debug("Key: %s, value: %s", k, v)
+        logger.debug("dir value: %s", dir)
         if k in instance.todict():
             setattr(instance, k, v)
     return instance
 
 
 def create_paginator(data):
-    if('_page' not in data or '_pagesize' not in data):
+    if '_page' not in data or '_pagesize' not in data:
         return (0, 0)
     else:
         page = int(data['_page'])
@@ -47,24 +49,25 @@ def create_paginator(data):
 
 
 def str_to_datetime(string):
-    if(type(string) != str and type(string) != unicode):
+    if type(string) != str and type(string) != unicode:
         raise InvalidInputException("Invalid data provided",
                                     ["invalid_date_format"])
-    if (len(string) != 10 and len(string) != 19):
+    if len(string) != 10 and len(string) != 19:
         raise InvalidInputException("Invalid data provided",
                                     ["invalid_date_format"])
     try:
-        if(len(string) == 10):
+        if len(string) == 10:
             result = datetime.strptime(string, "%Y-%m-%d")
             return result
-        elif(len(string) == 19):
+        elif len(string) == 19:
             return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
     except Exception:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         logger.error(repr(traceback.format_exception(exc_type, exc_value,
-                                          exc_traceback)))
+                     exc_traceback)))
         raise InvalidInputException("Invalid data provided",
                                     ["invalid_date_format"])
+
 
 def exception_catcher(func):
     def decorated_func(*args, **kwargs):

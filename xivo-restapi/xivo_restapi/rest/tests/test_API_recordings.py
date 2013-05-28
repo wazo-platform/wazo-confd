@@ -73,8 +73,8 @@ class TestAPIRecordings(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
-        self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)
+        self.instance_recordings_helper.create_instance.assert_called_with(data)
         self.instance_recording_management.add_recording\
                     .assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
@@ -102,13 +102,12 @@ class TestAPIRecordings(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
-        self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)
+        self.instance_recordings_helper.create_instance.assert_called_with(data)
         self.instance_recording_management.add_recording\
                     .assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                        "Status comparison failed, received status: %s" % result.status)
 
     def test_add_recording_client_error(self):
         status = "400 BAD REQUEST"
@@ -132,8 +131,8 @@ class TestAPIRecordings(unittest.TestCase):
                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
                               '/' + campaign_id + '/',
                               data=rest_encoder.encode(data))
-        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)  #@UndefinedVariable
-        self.instance_recordings_helper.create_instance.assert_called_with(data)  #@UndefinedVariable
+        self.instance_recordings_helper.supplement_add_input.assert_called_with(data)
+        self.instance_recordings_helper.create_instance.assert_called_with(data)
         self.instance_recording_management.add_recording\
                     .assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,

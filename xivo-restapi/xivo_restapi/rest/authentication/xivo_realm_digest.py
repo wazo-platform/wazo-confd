@@ -16,11 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import flask
+
 from flask import session
 from functools import wraps
 from xivo_dao import accesswebservice_dao
 from xivo_restapi.rest.authentication.werkzeug import authdigest
-import flask
 
 
 class XivoRealmDigest(authdigest.RealmDigestDB):
@@ -41,7 +42,7 @@ class XivoRealmDigest(authdigest.RealmDigestDB):
         return decorated
 
     def isRemoteAddressAllowed(self, address):
-        if  address == '127.0.0.1' or (address in accesswebservice_dao.get_allowed_hosts()):
+        if address == '127.0.0.1' or (address in accesswebservice_dao.get_allowed_hosts()):
             return True
         else:
             return False

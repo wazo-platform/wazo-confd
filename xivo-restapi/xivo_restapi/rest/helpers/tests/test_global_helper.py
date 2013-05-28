@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import unittest
+
 from datetime import datetime
 from flask.app import Flask
 from mock import Mock
@@ -25,7 +27,6 @@ from xivo_restapi.rest.helpers.global_helper import str_to_datetime, \
     exception_catcher
 from xivo_restapi.services.utils.exceptions import InvalidInputException, \
     NoSuchElementException
-import unittest
 
 
 class TestGlobalHelper(unittest.TestCase):
@@ -41,8 +42,10 @@ class TestGlobalHelper(unittest.TestCase):
                 self.att1 = 1
                 self.att2 = None
                 self.att3 = 'foo'
+
             def todict(self):
                 return self.__dict__
+
         dict_data = {'att1': 'foo',
                      'att2': 12,
                      'att3': None,
