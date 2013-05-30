@@ -22,6 +22,7 @@ from commands import getoutput
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
+from xivo_lettuce.ssh import SSHClient
 from xivo_restapi.restapi_config import RestAPIConfig
 import datetime
 
@@ -89,9 +90,9 @@ class RestCampaign(object):
         config_file.close()
         remote_host = remote_host.rstrip()
         file_path = dirname + "/" + recording['filename']
-        remote_command = "'touch %s'" % file_path
-        ssh_command = "ssh root@%s %s" % (remote_host, remote_command)
-        getoutput(ssh_command)
+        cmd = ['touch', file_path]
+        sshclient = SSHClient('root', remote_host)
+        sshclient.call(cmd)
         return reply
 
     def verifyRecordingsDetails(self, campaign_id, callid):
