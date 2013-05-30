@@ -39,8 +39,8 @@ class TestCampagneManagement(unittest.TestCase):
         queue_dao.id_from_name = Mock(return_value='1')
         queue_dao.queue_name = Mock(return_value=self.queue_name)
         queue_dao.get_display_name_number = Mock(
-                                  return_value=(self.queue_display_name,
-                                                self.queue_number))
+            return_value=(self.queue_display_name,
+                          self.queue_number))
         self._create_sample_campaign()
 
     def test_create_campaign(self):
@@ -52,7 +52,7 @@ class TestCampagneManagement(unittest.TestCase):
 
         result = self._campagneManager.create_campaign(campaign)
         self.assertEquals(result, 1)
-        record_campaigns_dao.add_or_update.assert_called_with(campaign) # @UndefinedVariable
+        record_campaigns_dao.add_or_update.assert_called_with(campaign)
         self._campagneManager._validate_campaign.assert_called_with(campaign)
 
     def test_get_campaigns_no_pagination(self):
@@ -66,7 +66,7 @@ class TestCampagneManagement(unittest.TestCase):
         self.assertEqual(result.queue_name, self.queue_name)
         self.assertEqual(result.queue_display_name, self.queue_display_name)
         self.assertEqual(result.queue_number, self.queue_number)
-        record_campaigns_dao.get_records.assert_called_with({}, False, (0, 0)) # @UndefinedVariable
+        record_campaigns_dao.get_records.assert_called_with({}, False, (0, 0))
 
     def test_get_campaigns_paginated(self):
         campaign = copy.deepcopy(self.sample_campaign)
@@ -75,15 +75,16 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.get_records.return_value = data
 
         (_, items) = self._campagneManager.get_campaigns({"campaign_name": campaign.campaign_name},
-                                                             True,
-                                                             (1, 1))
+                                                         True,
+                                                         (1, 1))
         result = items[0]
         self.assertEqual(result.queue_name, self.queue_name)
         self.assertEqual(result.queue_display_name, self.queue_display_name)
         self.assertEqual(result.queue_number, self.queue_number)
-        record_campaigns_dao.get_records.assert_called_with({"campaign_name": campaign.campaign_name}, # @UndefinedVariable
-                                                             True,
-                                                             (1, 1))
+        record_campaigns_dao.get_records.assert_called_with({"campaign_name": campaign.campaign_name},
+                                                            True,
+                                                            (1, 1))
+
     @patch('xivo_restapi.services.campagne_management.CampagneManagement._validate_campaign')
     def test_update_campaign(self, mock_validate):
         campaign_id = 1
@@ -101,11 +102,11 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.add_or_update = Mock()
         record_campaigns_dao.add_or_update.return_value = True
 
-        result = self._campagneManager.update_campaign(campaign_id,
-                                                              data)
+        result = self._campagneManager.update_campaign(campaign_id, data)
+
         self.assertTrue(result)
-        record_campaigns_dao.get.assert_called_once_with(campaign_id) # @UndefinedVariable
-        record_campaigns_dao.add_or_update.assert_called_once_with(campaign) # @UndefinedVariable
+        record_campaigns_dao.get.assert_called_once_with(campaign_id)
+        record_campaigns_dao.add_or_update.assert_called_once_with(campaign)
         self.assertEqual(campaign.campaign_name, data['campaign_name'])
         self.assertEqual(campaign.activated, data['activated'])
         self.assertEqual(campaign.base_filename, data['base_filename'])
@@ -130,7 +131,7 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.delete = Mock()
         record_campaigns_dao.delete.return_value = None
         self._campagneManager.delete('1')
-        record_campaigns_dao.delete.assert_called_with(obj) # @UndefinedVariable
+        record_campaigns_dao.delete.assert_called_with(obj)
 
     def _create_sample_campaign(self):
         self.sample_campaign = RecordCampaigns()
@@ -141,7 +142,7 @@ class TestCampagneManagement(unittest.TestCase):
         self.sample_campaign.start_date = datetime.strptime('2012-01-01 12:12:12',
                                                             "%Y-%m-%d %H:%M:%S")
         self.sample_campaign.end_date = datetime.strptime('2012-12-12 12:12:12',
-                                                            "%Y-%m-%d %H:%M:%S")
+                                                          "%Y-%m-%d %H:%M:%S")
 
     def test_validate_campaign(self):
         campaign = RecordCampaigns()
@@ -163,9 +164,9 @@ class TestCampagneManagement(unittest.TestCase):
         campaign1 = RecordCampaigns()
         campaign1.campaign_name = 'name1'
         campaign1.start_date = datetime.strptime('2012-01-31',
-                                              "%Y-%m-%d")
+                                                 "%Y-%m-%d")
         campaign1.end_date = datetime.strptime('2012-12-31',
-                                                "%Y-%m-%d")
+                                               "%Y-%m-%d")
         campaign1.base_filename = 'file-'
         campaign1.activated = True
         campaign1.queue_id = 1
@@ -174,9 +175,9 @@ class TestCampagneManagement(unittest.TestCase):
         record_campaigns_dao.get_records.return_value = (1, [campaign1])
         campaign2 = copy.deepcopy(campaign1)
         campaign2.start_date = datetime.strptime('2012-02-28',
-                                              "%Y-%m-%d")
+                                                 "%Y-%m-%d")
         campaign2.end_date = datetime.strptime('2013-01-31',
-                                                "%Y-%m-%d")
+                                               "%Y-%m-%d")
         campaign2.id = 2
         gotException = False
         try:

@@ -40,5 +40,5 @@ class TestRecordingsHelper(unittest.TestCase):
         mock_return_value = Mock()
         global_helper.create_class_instance.return_value = mock_return_value
         result = self.recordings_helper.create_instance(data)
-        global_helper.create_class_instance.assert_called_with(Recordings, data)  # @UndefinedVariable
+        global_helper.create_class_instance.assert_called_with(Recordings, data)
         self.assertEqual(result, mock_return_value)

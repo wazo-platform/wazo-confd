@@ -90,9 +90,9 @@ class TestUserManagement(unittest.TestCase):
 
         result = self._userManager.get_all_users()
         self.assertEquals(result, sdm_users)
-        user_dao.get_all_join_line.assert_called_once_with()  # @UndefinedVariable
+        user_dao.get_all_join_line.assert_called_once_with()
         expected = [call(user1), call(user2)]
-        self.user_mapping.alchemy_to_sdm.assert_has_calls(expected)  # @UndefinedVariable
+        self.user_mapping.alchemy_to_sdm.assert_has_calls(expected)
         expected = [call(line1), call(line2)]
         self.line_mapping.alchemy_to_sdm.assert_has_calls(expected)
         self.assertEqual(user_sdm1.line.number, "123")
@@ -111,7 +111,7 @@ class TestUserManagement(unittest.TestCase):
         self.line_mapping.alchemy_to_sdm.return_value = line1_sdm
 
         result = self._userManager.get_user(1)
-        user_dao.get_user_join_line.assert_called_with(1)  # @UndefinedVariable
+        user_dao.get_user_join_line.assert_called_with(1)
         self.user_mapping.alchemy_to_sdm.assert_called_with(user1)
         self.assertEqual(result, user1_sdm)
         self.assertEquals(result.line, line1_sdm)
@@ -120,7 +120,7 @@ class TestUserManagement(unittest.TestCase):
         user_dao.get_user_join_line = Mock()
         user_dao.get_user_join_line.return_value = None
         self.assertRaises(NoSuchElementException, self._userManager.get_user, 1)
-        user_dao.get_user_join_line.assert_called_with(1)  # @UndefinedVariable
+        user_dao.get_user_join_line.assert_called_with(1)
 
     def test_create_user(self):
         user_sdm = UserSdm()
@@ -129,7 +129,7 @@ class TestUserManagement(unittest.TestCase):
         self.user_mapping.sdm_to_alchemy.return_value = user1
         user_dao.add_user = Mock()
         self._userManager.create_user(user_sdm)
-        user_dao.add_user.assert_called_with(user1)  # @UndefinedVariable
+        user_dao.add_user.assert_called_with(user1)
         self.user_mapping.sdm_to_alchemy.assert_called_with(user_sdm)
 
     def test_edit_user_without_voicemail(self):
@@ -145,8 +145,8 @@ class TestUserManagement(unittest.TestCase):
         user_dao.get.return_value = UserFeatures(firstname='Robert', lastname='Dupond')
         self.user_mapping.sdm_to_alchemy_dict.return_value = intern_data
         self._userManager.edit_user(1, data)
-        user_dao.update.assert_called_once_with(1, intern_data)  # @UndefinedVariable
-        user_dao.get.assert_called_with(1)  # @UndefinedVariable
+        user_dao.update.assert_called_once_with(1, intern_data)
+        user_dao.get.assert_called_with(1)
         self.assertFalse(self.voicemail_manager.edit_voicemail.called)
         self.user_mapping.sdm_to_alchemy_dict.assert_called_with(data)
 
@@ -165,8 +165,8 @@ class TestUserManagement(unittest.TestCase):
                                                  voicemailid=2)
         self.user_mapping.sdm_to_alchemy_dict.return_value = intern_data
         self._userManager.edit_user(1, data)
-        user_dao.update.assert_called_once_with(1, intern_data)  # @UndefinedVariable
-        user_dao.get.assert_called_with(1)  # @UndefinedVariable
+        user_dao.update.assert_called_once_with(1, intern_data)
+        user_dao.get.assert_called_with(1)
         self.voicemail_manager.edit_voicemail.assert_called_with(2, {'fullname': 'Robert Dupond'})
         self.user_mapping.sdm_to_alchemy_dict.assert_called_with(data)
 
@@ -180,8 +180,8 @@ class TestUserManagement(unittest.TestCase):
         user_dao.get = Mock()
         self.user_mapping.sdm_to_alchemy_dict.return_value = intern_data
         self._userManager.edit_user(1, data)
-        user_dao.update.assert_called_once_with(1, intern_data)  # @UndefinedVariable
-        self.assertFalse(user_dao.get.called)  # @UndefinedVariable
+        user_dao.update.assert_called_once_with(1, intern_data)
+        self.assertFalse(user_dao.get.called)
         self.assertFalse(self.voicemail_manager.edit_voicemail.called)
 
     def test_edit_user_not_found(self):
@@ -192,26 +192,26 @@ class TestUserManagement(unittest.TestCase):
                           1, data)
 
     def test_provd_remove_line(self):
-        config_dict = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"},
-                            "2":
-                            {"username": "5678"}
-                           },
-                          "funckeys": {}
-                          }
-                        }
+        config_dict = {
+            "raw_config": {
+                "sip_lines": {
+                    "1": {"username": "1234"},
+                    "2": {"username": "5678"}
+                },
+                "funckeys": {}
+            }
+        }
         self.config_manager.get.return_value = config_dict
 
-        expected_arg = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"},
-                           },
-                          "funckeys": {}
-                          }
-                        }
+        expected_arg = {
+            "raw_config": {
+                "sip_lines": {
+                    "1": {"username": "1234"}
+                },
+                "funckeys": {}
+            }
+        }
+
         self._userManager._provd_remove_line(self.deviceid, 2)
 
         self.config_manager.get.assert_called_with(self.deviceid)
@@ -220,25 +220,26 @@ class TestUserManagement(unittest.TestCase):
 
     def test_provd_remove_line_autoprov(self):
         autoprovid = "autoprov1234"
-        config_dict = {"raw_config":
-                 {"sip_lines":
-                   {"1":
-                    {"username": "1234"}
-                   },
-                  "funckeys": {}
-                  }
-                }
+        config_dict = {
+            "raw_config": {
+                "sip_lines": {
+                    "1": {"username": "1234"}
+                },
+                "funckeys": {}
+            }
+        }
+
         device_dict = {"ip": "10.60.0.109",
-                       "version":"3.2.2.1136",
+                       "version": "3.2.2.1136",
                        "config": self.deviceid,
                        "id": self.deviceid}
         self.config_manager.get.return_value = config_dict
         self.device_manager.get.return_value = device_dict
         self.config_manager.autocreate.return_value = autoprovid
 
-        expected_arg_config = {"raw_config":{}}
+        expected_arg_config = {"raw_config": {}}
         expected_arg_device = {"ip": "10.60.0.109",
-                               "version":"3.2.2.1136",
+                               "version": "3.2.2.1136",
                                "config": autoprovid,
                                "id": self.deviceid}
         self._userManager._provd_remove_line(self.deviceid, 1)
@@ -251,16 +252,16 @@ class TestUserManagement(unittest.TestCase):
 
     def test_provd_remove_line_no_funckeys(self):
         autoprovid = "autoprov1234"
-        config_dict = {"raw_config":
-                         {"sip_lines":
-                           {"1":
-                            {"username": "1234"},
-                           },
-                          "funckeys": {}
-                          }
-                        }
+        config_dict = {
+            "raw_config": {
+                "sip_lines": {
+                    "1": {"username": "1234"}
+                },
+                "funckeys": {}
+            }
+        }
         device_dict = {"ip": "10.60.0.109",
-                       "version":"3.2.2.1136",
+                       "version": "3.2.2.1136",
                        "config": self.deviceid,
                        "id": self.deviceid}
         self.config_manager.get.return_value = config_dict
@@ -321,7 +322,7 @@ class TestUserManagement(unittest.TestCase):
         voicemail_dao.get.return_value = voicemail
 
         self._userManager._delete_voicemail(1)
-        voicemail_dao.delete.assert_called_with(1) # @UndefinedVariable
+        voicemail_dao.delete.assert_called_with(1)
         self.sysconfd_connector.delete_voicemail_storage.assert_called_with("default", "123")
 
     def test_delete_voicemail_sysconfd_error(self):

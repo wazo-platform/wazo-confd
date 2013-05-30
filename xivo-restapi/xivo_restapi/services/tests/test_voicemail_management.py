@@ -47,9 +47,9 @@ class Test(unittest.TestCase):
         self.voicemail_mapping.alchemy_to_sdm.side_effect = sdm_voicemails
         result = self.voicemail_manager.get_all_voicemails()
         self.assertEquals(result, sdm_voicemails)
-        voicemail_dao.all.assert_called_once_with()  #@UndefinedVariable
+        voicemail_dao.all.assert_called_once_with()
         expected = [call(voicemail1), call(voicemail2)]
-        self.voicemail_mapping.alchemy_to_sdm.assert_has_calls(expected)  #@UndefinedVariable
+        self.voicemail_mapping.alchemy_to_sdm.assert_has_calls(expected)
 
     def test_edit_voicemail(self):
         voicemailid = 1
@@ -64,8 +64,8 @@ class Test(unittest.TestCase):
                          "deletevoicemail": True}
         self.voicemail_mapping.sdm_to_alchemy_dict.return_value = expected_call
         self.voicemail_manager.edit_voicemail(voicemailid, data)
-        voicemail_dao.get.assert_called_with(1)  #@UndefinedVariable
-        voicemail_dao.update.assert_called_with(voicemailid, expected_call)  #@UndefinedVariable
+        voicemail_dao.get.assert_called_with(1)
+        voicemail_dao.update.assert_called_with(voicemailid, expected_call)
 
     def test_edit_unexisting_voicemail(self):
         voicemailid = 1
@@ -75,4 +75,4 @@ class Test(unittest.TestCase):
         data = {"mailbox": "123",
                 "fullname": "test"}
         self.assertRaises(NoSuchElementException, self.voicemail_manager.edit_voicemail, voicemailid, data)
-        voicemail_dao.get.assert_called_with(1)  #@UndefinedVariable
+        voicemail_dao.get.assert_called_with(1)
