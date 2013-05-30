@@ -29,7 +29,7 @@ decode = json.loads
 
 def encode(data):
     result = data
-    if(isinstance(data, tuple)):
+    if isinstance(data, tuple):
         result = _process_paginated_data(data)
     return_value = json.dumps(result, default=_serialize)
     return return_value
@@ -43,13 +43,13 @@ def _process_paginated_data(data):
 
 
 def _serialize(obj):
-    if(isinstance(obj, Base)):
+    if isinstance(obj, Base):
         result = obj.todict()
         missing_attributes = [item for item in obj.__dict__.keys() if item not in result and not item.startswith('_')]
         for attribute in missing_attributes:
             result[attribute] = getattr(obj, attribute)
         return result
-    elif(isinstance(obj, BaseSdm)):
+    elif isinstance(obj, BaseSdm):
         return obj.todict()
     else:
         return str(obj)

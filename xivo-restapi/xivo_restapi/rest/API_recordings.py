@@ -48,7 +48,7 @@ class APIRecordings(object):
         body = rest_encoder.decode(data)
         body = self._recordings_helper.supplement_add_input(body)
         recording = self._recordings_helper.create_instance(body)
-        if('agent_no' in body):
+        if 'agent_no' in body:
             recording.agent_no = body['agent_no']
         try:
             result = self._recording_manager.add_recording(int(campaign_id), recording)
@@ -68,7 +68,7 @@ class APIRecordings(object):
         logger.debug("List args: %s", request.args)
         params = {}
         for item in request.args:
-            if(not item.startswith('_')):
+            if not item.startswith('_'):
                 params[item] = request.args[item]
         paginator = global_helper.create_paginator(request.args)
         result = self._recording_manager.get_recordings(campaign_id,
@@ -87,7 +87,7 @@ class APIRecordings(object):
         logger.debug("List args: %s", request.args)
         params = {}
         for item in request.args:
-            if(not item.startswith('_')):
+            if not item.startswith('_'):
                 params[item] = request.args[item]
         paginator = global_helper.create_paginator(request.args)
         result = self._recording_manager.search_recordings(campaign_id, params, paginator)

@@ -27,9 +27,9 @@ class TimeInterval(object):
         '''
         Creates a TimeInterval object using two DateTime objects
         '''
-        if(type(start_date) != datetime and type(end_date) != datetime):
+        if type(start_date) != datetime and type(end_date) != datetime:
             raise Exception('Two datetime objects must be provided.')
-        if(start_date > end_date):
+        if start_date > end_date:
             raise Exception('Start date must be lesser than end date')
         self._start_date = start_date
         self._end_date = end_date
@@ -39,9 +39,9 @@ class TimeInterval(object):
         Return a TimeInterval object representing the intersection between
         two time intervals, None if they do not intersect
         '''
-        if(type(other_interval) != TimeInterval):
+        if type(other_interval) != TimeInterval:
             raise Exception('A TimeInterval object must be provided.')
-        if(self._start_date >= other_interval._end_date or\
+        if (self._start_date >= other_interval._end_date or
            self._end_date <= other_interval._start_date):
             return None
         else:

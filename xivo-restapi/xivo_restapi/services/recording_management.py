@@ -35,7 +35,7 @@ class RecordingManagement(object):
     def add_recording(self, campaign_id, recording):
         data_access_logger.info("Adding a recording to the campaign %d with data %s."
                                 % (campaign_id, recording.todict()))
-        if('agent_no' in vars(recording)):
+        if 'agent_no' in vars(recording):
             try:
                 recording.agent_id = agent_dao.agent_id(recording.agent_no)
             except LookupError:
@@ -46,11 +46,10 @@ class RecordingManagement(object):
 
     def get_recordings(self, campaign_id, search=None, paginator=None):
         search_pattern = {}
-        if(search != None):
+        if search is not None:
             for item in search:
                 if (item == 'agent_no'):
-                    search_pattern["agent_id"] = agent_dao\
-                                            .agent_id(search['agent_no'])
+                    search_pattern["agent_id"] = agent_dao.agent_id(search['agent_no'])
                 else:
                     search_pattern[item] = search[item]
         (total, items) = recordings_dao.get_recordings(campaign_id,
@@ -60,14 +59,12 @@ class RecordingManagement(object):
         return (total, items)
 
     def search_recordings(self, campaign_id, search, paginator=None):
-        if(search == None or search == {} or 'key' not in search):
-            return self.get_recordings(campaign_id,
-                                               {},
-                                               paginator)
+        if search is None or search == {} or 'key' not in search:
+            return self.get_recordings(campaign_id, {}, paginator)
         else:
             (total, items) = recordings_dao.search_recordings(campaign_id,
-                                                      search['key'],
-                                                      paginator)
+                                                              search['key'],
+                                                              paginator)
             self._insert_agent_no(items)
             return (total, items)
 
@@ -80,7 +77,7 @@ class RecordingManagement(object):
         data_access_logger.info("Deleting recording of id %s in campaign %d."
                                 % (recording_id, campaign_id))
         filename = recordings_dao.delete(campaign_id, recording_id)
-        if(filename == None):
+        if filename is None:
             logger.error("Recording file remove error - no filename!")
             return False
         else:

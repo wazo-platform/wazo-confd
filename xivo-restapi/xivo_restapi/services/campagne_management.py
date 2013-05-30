@@ -48,14 +48,14 @@ class CampagneManagement(object):
                 search_pattern["queue_id"] = queue_dao.id_from_name(search["queue_name"])
             else:
                 search_pattern[item] = search[item]
-        if(paginator is None):
+        if paginator is None:
             paginator = (0, 0)
         (total, items) = record_campaigns_dao.get_records(search,
                                                   checkCurrentlyRunning,
                                                   paginator)
         try:
             for item in items:
-                if(item.queue_id != None):
+                if item.queue_id != None:
                     item.queue_name = queue_dao.queue_name(item.queue_id)
                     item.queue_display_name, item.queue_number = queue_dao\
                                                         .get_display_name_number(item.queue_id)
@@ -71,7 +71,7 @@ class CampagneManagement(object):
                                 % (campaign_id, params))
         logger.debug("Retrieving original campaign")
         campaign = record_campaigns_dao.get(campaign_id)
-        if(campaign is None):
+        if campaign is None:
             raise NoSuchElementException('No such campaign')
         logger.debug('Going to update')
         campaign = self._update_campaign_with_params(campaign, params)
@@ -82,7 +82,7 @@ class CampagneManagement(object):
     def delete(self, campaign_id):
         data_access_logger.info("Deleting campaign of id %s." % campaign_id)
         campaign = record_campaigns_dao.get(int(campaign_id))
-        if(campaign == None):
+        if campaign == None:
             raise NoSuchElementException("No such campaign")
         else:
             record_campaigns_dao.delete(campaign)
@@ -92,9 +92,9 @@ class CampagneManagement(object):
         with a list of errors if it is not the case.'''
         errors_list = []
         logger.debug("validating campaign")
-        if(campaign.campaign_name == None):
+        if campaign.campaign_name == None:
             errors_list.append("empty_name")
-        if(campaign.start_date > campaign.end_date):
+        if campaign.start_date > campaign.end_date:
             errors_list.append("start_greater_than_end")
         else:
             criteria = {'queue_id': campaign.queue_id}
@@ -104,15 +104,15 @@ class CampagneManagement(object):
                                                                        paginator)
             campaigns_list = [item for item in campaigns_list if item.id != campaign.id]
             intersects = self._check_for_interval_overlap(campaign, campaigns_list)
-            if(intersects):
+            if intersects:
                 errors_list.append("concurrent_campaigns")
-        if(len(errors_list) > 0):
+        if len(errors_list) > 0:
             raise InvalidInputException("Invalid data provided", errors_list)
         return campaign.id
 
     def _update_campaign_with_params(self, campaign, params):
         for k, v in params.items():
-            if((k == 'start_date' or k == 'end_date') and not isinstance(v, datetime)):
+            if (k == 'start_date' or k == 'end_date') and not isinstance(v, datetime):
                 v = str_to_datetime(v)
             if k in dir(RecordCampaigns):
                 setattr(campaign, k, v)
@@ -126,7 +126,7 @@ class CampagneManagement(object):
         for item in campaigns_list:
             item_interval = TimeInterval(item.start_date,
                                              item.end_date)
-            if(campaign_interval.intersect(item_interval) != None):
+            if campaign_interval.intersect(item_interval) != None:
                 intersects = True
                 break
         return intersects

@@ -27,7 +27,7 @@ class RecordingsHelper(object):
         '''Returns the supplemented input'''
         logger.debug("Supplementing input for 'add_recording'")
         for key in data:
-            if(data[key] == ''):
+            if data[key] == '':
                 data[key] = None
         return data
 

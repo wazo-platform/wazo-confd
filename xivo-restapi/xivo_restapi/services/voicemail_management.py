@@ -39,9 +39,8 @@ class VoicemailManagement(object):
         data_access_logger.info("Editing the voicemail of id %d with data %s."
                                 % (voicemailid, data))
 
-        if(voicemail_dao.get(voicemailid) is None):
-            raise NoSuchElementException("No such voicemail: " + str(voicemailid))
+        if voicemail_dao.get(voicemailid) is None:
+            raise NoSuchElementException("No such voicemail: %s" % voicemailid)
 
         converted_data = self.voicemail_mapping.sdm_to_alchemy_dict(data)
         voicemail_dao.update(voicemailid, converted_data)
-

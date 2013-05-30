@@ -77,9 +77,9 @@ class APICampaigns(object):
         if campaign_id is not None:
             params['id'] = campaign_id
         for item in request.args:
-            if(item == 'running'):
+            if item == 'running':
                 checkCurrentlyRunning = (request.args[item] == 'true')
-            elif(not item.startswith('_')):
+            elif not item.startswith('_'):
                 params[item] = request.args[item]
         paginator = global_helper.create_paginator(request.args)
         result = self._campagne_manager.get_campaigns(params,
