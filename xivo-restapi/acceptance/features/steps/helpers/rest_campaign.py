@@ -18,7 +18,6 @@
 
 from acceptance.features.steps.helpers.rest_queues import RestQueues
 from acceptance.features.steps.helpers.ws_utils import WsUtils
-from commands import getoutput
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
