@@ -27,19 +27,19 @@ from xivo_restapi.services.utils.exceptions import InvalidInputException
 import unittest
 from xivo_restapi.rest import flask_http_server
 
+BASE_URL = "%s%s" % (RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH, RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
+
 
 class TestAPIRecordings(unittest.TestCase):
 
     def setUp(self):
 
-        self.patcher_recordings = patch("xivo_restapi.rest." + \
-                             "API_recordings.RecordingManagement")
+        self.patcher_recordings = patch("xivo_restapi.rest.API_recordings.RecordingManagement")
         mock_recording = self.patcher_recordings.start()
         self.instance_recording_management = Mock(RecordingManagement)
         mock_recording.return_value = self.instance_recording_management
 
-        self.patcher_recordings_helper = patch("xivo_restapi.rest." + \
-                                     "API_recordings.RecordingsHelper")
+        self.patcher_recordings_helper = patch("xivo_restapi.rest.API_recordings.RecordingsHelper")
         mock_recordings_helper = self.patcher_recordings_helper.start()
         self.instance_recordings_helper = Mock(RecordingsHelper)
         mock_recordings_helper.return_value = self.instance_recordings_helper
@@ -69,17 +69,13 @@ class TestAPIRecordings(unittest.TestCase):
         recording = Recordings()
         self.instance_recordings_helper.create_instance.return_value = recording
 
-        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/',
-                              data=rest_encoder.encode(data))
+        result = self.app.post("%s/%s/" % (BASE_URL, campaign_id), data=rest_encoder.encode(data))
+
         self.instance_recordings_helper.supplement_add_input.assert_called_with(data)
         self.instance_recordings_helper.create_instance.assert_called_with(data)
-        self.instance_recording_management.add_recording\
-                    .assert_called_with(int(campaign_id), recording)
+        self.instance_recording_management.add_recording.assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                        "Status comparison failed, received status: %s" % result.status)
 
     def test_add_recording_success(self):
         status = "201 CREATED"
@@ -98,14 +94,11 @@ class TestAPIRecordings(unittest.TestCase):
         recording = Recordings()
         self.instance_recordings_helper.create_instance.return_value = recording
 
-        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/',
-                              data=rest_encoder.encode(data))
+        result = self.app.post("%s/%s/" % (BASE_URL, campaign_id), data=rest_encoder.encode(data))
+
         self.instance_recordings_helper.supplement_add_input.assert_called_with(data)
         self.instance_recordings_helper.create_instance.assert_called_with(data)
-        self.instance_recording_management.add_recording\
-                    .assert_called_with(int(campaign_id), recording)
+        self.instance_recording_management.add_recording.assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
                         "Status comparison failed, received status: %s" % result.status)
 
@@ -127,17 +120,14 @@ class TestAPIRecordings(unittest.TestCase):
         recording = Recordings()
         self.instance_recordings_helper.create_instance.return_value = recording
 
-        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/',
-                              data=rest_encoder.encode(data))
+        result = self.app.post("%s/%s/" % (BASE_URL, campaign_id), data=rest_encoder.encode(data))
+
         self.instance_recordings_helper.supplement_add_input.assert_called_with(data)
         self.instance_recordings_helper.create_instance.assert_called_with(data)
-        self.instance_recording_management.add_recording\
-                    .assert_called_with(int(campaign_id), recording)
+        self.instance_recording_management.add_recording.assert_called_with(int(campaign_id), recording)
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                        "Status comparison failed, received status: %s" % result.status)
+
         self.instance_recording_management.add_recording.side_effect = None
 
     def test_list_recording_success(self):
@@ -146,126 +136,114 @@ class TestAPIRecordings(unittest.TestCase):
         obj = Recordings()
         data = (1, [obj])
         self.instance_recording_management.get_recordings.return_value = data
-        params = "?_page=1&_pagesize=20&foo=bar"
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/' + params,
-                              '')
-        self.instance_recording_management.get_recordings\
-                    .assert_called_with(campaign_id,
-                                        {"foo": "bar"},
-                                        (1, 20))
+
+        url = "%s/%s/?_page=1&_pagesize=20&foo=bar" % (BASE_URL, campaign_id)
+        result = self.app.get(url, '')
+
+        self.instance_recording_management.get_recordings.assert_called_with(
+            campaign_id,
+            {"foo": "bar"},
+            (1, 20))
         self.assertEquals(result.status, status)
+
         expected_result = rest_encoder.encode({'total': 1,
-                          'items': [obj.todict()]})
+                                               'items': [obj.todict()]})
         self.assertEqual(expected_result, result.data)
 
     def test_list_recording_fail(self):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
         self.instance_recording_management.get_recordings.side_effect = Exception
-        params = "?_page=1&_pagesize=20&foo=bar"
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/' + params,
-                              '')
-        self.instance_recording_management.get_recordings\
-                    .assert_called_with(campaign_id,
-                                        {"foo": "bar"},
-                                        (1, 20))
+
+        url = "%s/%s/?_page=1&_pagesize=20&foo=bar" % (BASE_URL, campaign_id)
+        result = self.app.get(url, '')
+
+        self.instance_recording_management.get_recordings.assert_called_with(
+            campaign_id,
+            {"foo": "bar"},
+            (1, 20))
         self.assertEquals(result.status, status)
-        self.instance_recording_management.get_recordings\
-            .side_effect = None
+        self.instance_recording_management.get_recordings.side_effect = None
 
     def test_search(self):
         status = "200 OK"
         campaign_id = '1'
 
-        self.instance_recording_management.search_recordings\
-            .return_value = True
-        params = "?_page=1&_pagesize=20&foo=bar"
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/search' + params,
-                              '')
-        self.instance_recording_management.search_recordings\
-                    .assert_called_with(campaign_id,
-                                        {"foo": "bar"},
-                                        (1, 20))
+        self.instance_recording_management.search_recordings.return_value = True
+
+        url = "%s/%s/search?_page=1&_pagesize=20&foo=bar" % (BASE_URL, campaign_id)
+        result = self.app.get(url, '')
+
+        self.instance_recording_management.search_recordings.assert_called_with(
+            campaign_id,
+            {"foo": "bar"},
+            (1, 20))
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                        "Status comparison failed, received status: %s" % result.status)
 
     def test_search_fail(self):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
 
         self.instance_recording_management.search_recordings.side_effect = Exception
-        params = "?_page=1&_pagesize=20&foo=bar"
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/search' + params,
-                              '')
-        self.instance_recording_management.search_recordings\
-                    .assert_called_with(campaign_id,
-                                        {"foo": "bar"},
-                                        (1, 20))
+
+        url = "%s/%s/search?_page=1&_pagesize=20&foo=bar" % (BASE_URL, campaign_id)
+        result = self.app.get(url, '')
+
+        self.instance_recording_management.search_recordings.assert_called_with(
+            campaign_id,
+            {"foo": "bar"},
+            (1, 20))
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
-        self.instance_recording_management.search_recordings\
-            .side_effect = None
+                        "Status comparison failed, received status: %s" % result.status)
+        self.instance_recording_management.search_recordings.side_effect = None
 
     def test_delete(self):
         status = "200 OK"
         campaign_id = '1'
         recording_id = '001'
 
-        self.instance_recording_management.delete\
-            .return_value = True
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/' + recording_id,
-                              '')
-        self.instance_recording_management.delete\
-                    .assert_called_with(int(campaign_id),
-                                        recording_id)
+        self.instance_recording_management.delete.return_value = True
+
+        url = "%s/%s/%s" % (BASE_URL, campaign_id, recording_id)
+        result = self.app.delete(url, '')
+
+        self.instance_recording_management.delete.assert_called_with(
+            int(campaign_id),
+            recording_id)
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                        "Status comparison failed, received status: %s" % result.status)
 
     def test_delete_not_found(self):
         status = "404 NOT FOUND"
         campaign_id = '1'
         recording_id = '001'
 
-        self.instance_recording_management.delete\
-            .return_value = False
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/' + recording_id,
-                              '')
-        self.instance_recording_management.delete\
-                    .assert_called_with(int(campaign_id),
-                                        recording_id)
+        self.instance_recording_management.delete.return_value = False
+
+        url = "%s/%s/%s" % (BASE_URL, campaign_id, recording_id)
+        result = self.app.delete(url, '')
+
+        self.instance_recording_management.delete.assert_called_with(
+            int(campaign_id),
+            recording_id)
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
+                        "Status comparison failed, received status: %s" % result.status)
 
     def test_delete_error(self):
         status = "500 INTERNAL SERVER ERROR"
         campaign_id = '1'
         recording_id = '001'
         self.instance_recording_management.delete.side_effect = Exception
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH +
-                              '/' + campaign_id + '/' + recording_id,
-                              '')
-        self.instance_recording_management.delete\
-                    .assert_called_with(int(campaign_id),
-                                        recording_id)
+
+        url = "%s/%s/%s" % (BASE_URL, campaign_id, recording_id)
+        result = self.app.delete(url, '')
+
+        self.instance_recording_management.delete.assert_called_with(
+            int(campaign_id),
+            recording_id)
+
         self.assertTrue(result.status == status,
-                        "Status comparison failed, received status:" +
-                        result.status)
-        self.instance_recording_management.delete\
-            .side_effect = None
+                        "Status comparison failed, received status: %s" % result.status)
+
+        self.instance_recording_management.delete.side_effect = None

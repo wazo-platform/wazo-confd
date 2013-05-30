@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import unittest
+
 from mock import Mock, patch
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.service_data_model.sdm_exception import \
@@ -27,15 +29,15 @@ from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.user_management import UserManagement
 from xivo_restapi.services.utils.exceptions import NoSuchElementException, \
     ProvdError, VoicemailExistsException, SysconfdError
-import unittest
 from xivo_restapi.rest import flask_http_server
+
+BASE_URL = "%s%s" % (RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH, RestAPIConfig.XIVO_USERS_SERVICE_PATH)
 
 
 class TestAPIUsers(unittest.TestCase):
 
     def setUp(self):
-        self.patcher_users = patch("xivo_restapi.rest." + \
-                             "API_users.UserManagement")
+        self.patcher_users = patch("xivo_restapi.rest.API_users.UserManagement")
         mock_user = self.patcher_users.start()
         self.instance_user_management = Mock(UserManagement)
         mock_user.return_value = self.instance_user_management
@@ -61,9 +63,8 @@ class TestAPIUsers(unittest.TestCase):
         expected_list = [user1, user2]
         expected_result = {"items": expected_list}
         self.instance_user_management.get_all_users.return_value = expected_list
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
-                              '')
+
+        result = self.app.get("%s/" % BASE_URL, '')
 
         self.instance_user_management.get_all_users.assert_any_call()
         self.assertEquals(result.status, status)
@@ -72,8 +73,8 @@ class TestAPIUsers(unittest.TestCase):
     def test_list_users_error(self):
         status = "500 INTERNAL SERVER ERROR"
         self.instance_user_management.get_all_users.side_effect = Exception
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/')
+
+        result = self.app.get("%s/" % BASE_URL)
 
         self.instance_user_management.get_all_users.assert_any_call()
         self.assertEqual(result.status, status)
@@ -84,9 +85,8 @@ class TestAPIUsers(unittest.TestCase):
         user1 = UserFeatures()
         user1.firstname = 'test1'
         self.instance_user_management.get_user.return_value = user1
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
-                              '')
+
+        result = self.app.get("%s/1" % BASE_URL, '')
 
         self.instance_user_management.get_user.assert_called_with(1)
         self.assertEquals(result.status, status)
@@ -95,8 +95,8 @@ class TestAPIUsers(unittest.TestCase):
     def test_get_error(self):
         status = "500 INTERNAL SERVER ERROR"
         self.instance_user_management.get_user.side_effect = Exception
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.get("%s/1" % BASE_URL)
 
         self.instance_user_management.get_user.assert_called_with(1)
         self.assertEqual(result.status, status)
@@ -106,8 +106,8 @@ class TestAPIUsers(unittest.TestCase):
         status = "404 NOT FOUND"
 
         self.instance_user_management.get_user.side_effect = NoSuchElementException("No such user")
-        result = self.app.get(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.get("%s/1" % BASE_URL)
 
         self.instance_user_management.get_user.assert_called_with(1)
         self.assertEqual(result.status, status)
@@ -121,11 +121,11 @@ class TestAPIUsers(unittest.TestCase):
         self.instance_user_management.create_user.return_value = True
         global_helper.create_class_instance = Mock()
         global_helper.create_class_instance.return_value = self.user_sdm
-        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.post("%s/" % BASE_URL, data=rest_encoder.encode(data))
+
         self.assertEqual(result.status, status)
-        global_helper.create_class_instance.assert_called_with(self.mock_user_sdm, data)  # @UndefinedVariable
+        global_helper.create_class_instance.assert_called_with(self.mock_user_sdm, data)
         self.instance_user_management.create_user.assert_called_with(self.user_sdm)
 
     def test_create_error(self):
@@ -135,9 +135,9 @@ class TestAPIUsers(unittest.TestCase):
                 'description': 'éà":;'}
 
         self.instance_user_management.create_user.side_effect = Exception
-        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.post("%s/" % BASE_URL, data=rest_encoder.encode(data))
+
         self.assertEqual(status, result.status)
         self.instance_user_management.create_user.side_effect = None
 
@@ -148,9 +148,9 @@ class TestAPIUsers(unittest.TestCase):
                 'lastname': 'Dupond',
                 'unexisting_field': 'value'}
         self.user_sdm.validate.side_effect = IncorrectParametersException("unexisting_field")
-        result = self.app.post(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.post("%s/" % BASE_URL, data=rest_encoder.encode(data))
+
         self.assertEqual(status, result.status)
         received_data = rest_encoder.decode(result.data)
         self.assertEquals(expected_data, received_data[0])
@@ -164,9 +164,9 @@ class TestAPIUsers(unittest.TestCase):
                 u'description': u'éà":;'}
         self.instance_user_management.edit_user.return_value = True
         self.user_sdm.validate.return_value = True
-        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.put("%s/1" % BASE_URL, data=rest_encoder.encode(data))
+
         self.assertEqual(result.status, status)
         self.user_sdm.validate.assert_called_with(data)
         self.instance_user_management.edit_user.assert_called_with(1, data)
@@ -177,9 +177,9 @@ class TestAPIUsers(unittest.TestCase):
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
         self.instance_user_management.edit_user.side_effect = Exception
-        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.put("%s/1" % BASE_URL, data=rest_encoder.encode(data))
+
         self.user_sdm.validate.assert_called_with(data)
         self.assertEqual(status, result.status)
         self.instance_user_management.edit_user.side_effect = None
@@ -191,9 +191,9 @@ class TestAPIUsers(unittest.TestCase):
                 u'lastname': u'Dupond',
                 u'unexisting_field': u'value'}
         self.user_sdm.validate.side_effect = IncorrectParametersException("unexisting_field")
-        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.put("%s/1" % BASE_URL, data=rest_encoder.encode(data))
+
         self.assertEquals(result.status, status)
         received_data = rest_encoder.decode(result.data)
         self.assertEquals(received_data[0], expected_data)
@@ -207,17 +207,18 @@ class TestAPIUsers(unittest.TestCase):
                 'description': 'éà":;'}
 
         self.instance_user_management.edit_user.side_effect = NoSuchElementException('')
-        result = self.app.put(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1',
-                              data=rest_encoder.encode(data))
+
+        result = self.app.put("%s/1" % BASE_URL, data=rest_encoder.encode(data))
+
         self.assertEqual(status, result.status)
         self.instance_user_management.edit_user.side_effect = None
 
     def test_delete_success(self):
         status = "200 OK"
         self.instance_user_management.delete_user.return_value = True
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
         self.assertEqual(result.status, status)
         self.instance_user_management.delete_user.assert_called_with(1, False)
 
@@ -225,8 +226,9 @@ class TestAPIUsers(unittest.TestCase):
         status = "404 NOT FOUND"
 
         self.instance_user_management.delete_user.side_effect = NoSuchElementException("")
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
         self.assertEqual(result.status, status)
         self.instance_user_management.delete_user.assert_called_with(1, False)
 
@@ -236,32 +238,38 @@ class TestAPIUsers(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
 
         self.instance_user_management.delete_user.side_effect = ProvdError("sample error")
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
         self.instance_user_management.delete_user.side_effect = None
         self.assertEqual(result.status, status)
         data = rest_encoder.decode(result.data)
-        self.assertEquals("The user was deleted but the device could not be reconfigured " + \
-                          "(provd error: sample error)", data[0])
+
+        expected_msg = "The user was deleted but the device could not be reconfigured (provd error: sample error)"
+        self.assertEquals(expected_msg, data[0])
+
         self.instance_user_management.delete_user.assert_called_with(1, False)
 
     def test_delete_voicemail_exists(self):
         status = "412 PRECONDITION FAILED"
 
         self.instance_user_management.delete_user.side_effect = VoicemailExistsException
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
         self.instance_user_management.delete_user.side_effect = None
         self.assertEqual(result.status, status)
         data = rest_encoder.decode(result.data)
-        self.assertEquals("Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user.",
-                          data[0])
+
+        expected_msg = "Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user."
+        self.assertEquals(expected_msg, data[0])
         self.instance_user_management.delete_user.assert_called_with(1, False)
 
     def test_delete_force_voicemail_deletion(self):
         status = "200 OK"
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1?deleteVoicemail')
+
+        result = self.app.delete("%s/1?deleteVoicemail" % BASE_URL)
+
         self.assertEqual(result.status, status)
         self.instance_user_management.delete_user.assert_called_with(1, True)
 
@@ -269,11 +277,13 @@ class TestAPIUsers(unittest.TestCase):
         status = "500 INTERNAL SERVER ERROR"
 
         self.instance_user_management.delete_user.side_effect = SysconfdError("sample error")
-        result = self.app.delete(RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                              RestAPIConfig.XIVO_USERS_SERVICE_PATH + '/1')
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
         self.instance_user_management.delete_user.side_effect = None
         self.assertEqual(result.status, status)
         data = rest_encoder.decode(result.data)
-        self.assertEquals("The user was deleted but the voicemail content could not be removed  " + \
-                          "(sysconfd error: sample error)", data[0])
+
+        expected_msg = "The user was deleted but the voicemail content could not be removed  (sysconfd error: sample error)"
+        self.assertEquals(expected_msg, data[0])
         self.instance_user_management.delete_user.assert_called_with(1, False)
