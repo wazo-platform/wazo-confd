@@ -90,7 +90,7 @@ class RestCampaign(object):
         remote_host = remote_host.rstrip()
         file_path = dirname + "/" + recording['filename']
         cmd = ['touch', file_path]
-        sshclient = SSHClient('root', remote_host)
+        sshclient = SSHClient(remote_host, 'root')
         print "\n SSH command output: ", sshclient.out_call(cmd), "\n"
         return reply
 
