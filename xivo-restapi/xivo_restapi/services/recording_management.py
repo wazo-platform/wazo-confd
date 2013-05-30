@@ -81,12 +81,11 @@ class RecordingManagement(object):
             logger.error("Recording file remove error - no filename!")
             return False
         else:
-            logger.debug("Deleting file: " + \
-                         RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + \
-                         filename)
+            filepath = "%s/%s" % (RestAPIConfig.RECORDING_FILE_ROOT_PATH, filename)
+            logger.debug("Deleting file: %s", filepath)
 
-            logphrase = "File " + filename + " is being deleted."
-            getoutput('logger -t xivo-recording "' + logphrase + '"')
-            os.remove(RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + \
-                       filename)
+            logphrase = "File %s is being deleted." % filename
+            cmd = 'logger -t xivo-recording "%s"' % logphrase
+            getoutput(cmd)
+            os.remove(filepath)
             return True
