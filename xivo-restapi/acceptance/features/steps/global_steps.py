@@ -26,11 +26,8 @@ import os
 
 @step(u'When I send a "([^"]*)" request to "([^"]*)"')
 def when_i_send_a_group1_request_to_group2(step, method, url):
-    connection = httplib.HTTPConnection(
-                            RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
+    url = "%s:%s" % (RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS, RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+    connection = httplib.HTTPConnection(url)
     headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request(method, url, None, headers)
     world.status = connection.getresponse().status
@@ -38,8 +35,8 @@ def when_i_send_a_group1_request_to_group2(step, method, url):
 
 @step(u'Then I get a response with status code "([^"]*)"')
 def then_i_get_a_response_with_status_code_group1(step, status_code):
-    assert world.status == int(status_code), "Expected status was " + status_code + \
-                    ", actual was " + str(world.status)
+    message = "Expected status was %s, actual was %s" % (status_code, world.status)
+    assert world.status == int(status_code), message
 
 
 @step(u'When I read the list of recordings for the campaign "([^"]*)" from the database')
@@ -52,10 +49,11 @@ def when_i_read_the_list_of_recordings_for_the_campaign_group1_from_the_database
 
 @step(u'Then I get one and only one item with caller "([^"]*)", agent "([^"]*)" and I can read the returned file')
 def then_i_get_one_and_only_one_item_with_caller_group1_agent_group2_and_i_can_read_the_returned_file(step, caller, agent):
-    assert len(world.recordings_list) == 1, "Retrieved " + str(len(world.recordings_list))\
-                                                 + " recordings instead of 1"
+    assert len(world.recordings_list) == 1, "Retrieved %s recordings instead of 1" % len(world.recordings_list)
+
     item = world.recordings_list[0]
-    assert item['agent_no'] == agent, "Got wrong agent: " + item['agent_no'] + " instead of " + agent
-    assert item['caller'] == caller, "Got wrong agent: " + item['caller'] + " instead of " + caller
-    assert os.path.exists(RestAPIConfig.RECORDING_FILE_ROOT_PATH + "/" + item['filename']), \
-           "The file " + item['filename'] + " does not exist."
+    assert item['agent_no'] == agent, "Got wrong agent: %s instead of %s" % (item['agent_no'], agent)
+    assert item['caller'] == caller, "Got wrong agent: %s instead of %s" % (item['caller'], caller)
+
+    filepath = os.path.join(RestAPIConfig.RECORDING_FILE_ROOT_PATH, item['filename'])
+    assert os.path.exists(filepath, "The file %s does not exist" % item['filename'])
