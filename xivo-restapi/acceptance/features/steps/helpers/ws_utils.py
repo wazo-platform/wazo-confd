@@ -64,8 +64,6 @@ class WsUtils(object):
         try:
             data = rest_encoder.decode(body)
         except:
-            print "==============================="
-            print body
             data = body
 
         if (status > 299 and status < 200):
