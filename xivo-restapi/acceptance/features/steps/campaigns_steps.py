@@ -53,12 +53,15 @@ def when_i_ask_for_activated_campaigns_for_queue_group1(step, queue_name):
 
 @step(u'Then I get a list of activated campaigns with campaign "([^"]*)"')
 def then_i_get_a_list_of_activated_campaigns_with_campaign_group1(step, campaign_name):
-    result = False
+    campaign_found = _is_campaign_activated(campaign_name)
+    assert campaign_found, 'Did not find campaign %s in %s' % (campaign_name, world.activated_campaigns)
+
+
+def _is_campaign_activated(campaign_name):
     for campaign in world.activated_campaigns:
         if campaign['campaign_name'] == campaign_name and campaign['activated']:
-            result = True
-            break
-    assert result, 'Did not find campaign %s in %s' % (campaign_name, world.activated_campaigns)
+            return True
+    return False
 
 
 @step(u'Given I create a campaign with the following parameters:')
