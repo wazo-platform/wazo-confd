@@ -19,7 +19,6 @@
 from acceptance.features.steps.helpers.rest_campaign import RestCampaign
 from lettuce import step
 from lettuce.registry import world
-from time import strftime, localtime
 from xivo_dao import queue_dao, record_campaigns_dao, recordings_dao
 import datetime
 
@@ -255,7 +254,10 @@ def given_there_s_at_least_one_recording_for_the_campaign_group1(step, campaign_
     agent_no = '4000'
     rest_campaign.add_agent_if_not_exists(agent_no)
     world.callid += '1'
-    time = strftime("%a, %d %b %Y %H:%M:%S", localtime())
+
+    time_format = "%a, %d %b %Y %H:%M:%S"
+    time = datetime.datetime.now().strftime(time_format)
+
     rest_campaign.add_recording_details(campaign_id, world.callid, '2002', agent_no, time)
 
 
