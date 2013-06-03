@@ -41,7 +41,8 @@ class InvalidInputException(Exception):
         self.errors_list = errors_list
 
     def __str__(self):
-        return self.value + " : " + str(self.errors_list)
+        return "%s : %s" % (self.value, self.errors_list)
+
 
 class ProvdError(Exception):
     def __init__(self, value):
@@ -50,8 +51,10 @@ class ProvdError(Exception):
     def __str__(self):
         return "provd error: %s" % self.value
 
+
 class VoicemailExistsException(Exception):
     pass
+
 
 class SysconfdError(Exception):
     def __init__(self, value):

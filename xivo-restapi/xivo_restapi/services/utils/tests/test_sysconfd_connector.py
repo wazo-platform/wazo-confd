@@ -19,6 +19,7 @@ from mock import Mock
 from unittest import TestCase
 from xivo_restapi.services.utils.sysconfd_connector import SysconfdConnector
 
+
 class TestSysconfdConnector(TestCase):
     def setUp(self):
         self.connection = Mock(HTTPConnection)

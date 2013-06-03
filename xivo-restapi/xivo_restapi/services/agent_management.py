@@ -16,9 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
+
 from xivo_dao import agent_dao
 from xivo_restapi.restapi_config import RestAPIConfig
-import logging
 
 data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
 
@@ -27,6 +28,6 @@ class AgentManagement(object):
 
     def get_all_agents(self):
         result = agent_dao.all()
-        if result != None:
+        if result is not None:
             return result
         return False

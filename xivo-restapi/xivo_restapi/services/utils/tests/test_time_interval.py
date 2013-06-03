@@ -44,4 +44,4 @@ class Test(unittest.TestCase):
         interval2 = TimeInterval(datetime.strptime("2012-03-01", "%Y-%m-%d"),
                                  datetime.strptime("2012-03-31", "%Y-%m-%d"))
         result = interval2.intersect(interval1)
-        self.assertTrue(result == None)
+        self.assertTrue(result is None)

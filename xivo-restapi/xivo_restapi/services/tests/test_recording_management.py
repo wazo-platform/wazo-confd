@@ -16,14 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import os
+import unittest
+
 from datetime import datetime
 from mock import Mock, patch
 from xivo_dao import agent_dao, recordings_dao
 from xivo_dao.alchemy.recordings import Recordings
 from xivo_restapi.restapi_config import RestAPIConfig
 from xivo_restapi.services.utils.exceptions import InvalidInputException
-import os
-import unittest
 
 
 class FakeDate(datetime):
@@ -89,7 +90,7 @@ class TestCampagneManagement(unittest.TestCase):
         agent_dao.agent_id.return_value = '1'
 
         result = self._recordingManager.get_recordings(campaign_id,
-                                                               search, None)
+                                                       search, None)
         del search['agent_no']
         search['agent_id'] = '1'
         self.assertEquals(result, dao_result)
@@ -146,7 +147,7 @@ class TestCampagneManagement(unittest.TestCase):
         agent_dao.agent_number.return_value = '1000'
 
         result = self._recordingManager.search_recordings(campaign_id,
-                                                               search, None)
+                                                          search, None)
         self.assertEqual(result, dao_result)
         self.assertEqual(result[1][0].agent_no, '1000')
         recordings_dao.search_recordings.assert_called_with(campaign_id, '2002', None)
@@ -160,5 +161,6 @@ class TestCampagneManagement(unittest.TestCase):
         os.remove = Mock()
         self.assertTrue(self._recordingManager.delete(campaign_id, cid))
         recordings_dao.delete.assert_called_with(campaign_id, cid)
-        os.remove.assert_called_with(RestAPIConfig.RECORDING_FILE_ROOT_PATH + \
-                         '/' + filename)
+
+        filepath = "%s/%s" % (RestAPIConfig.RECORDING_FILE_ROOT_PATH, filename)
+        os.remove.assert_called_with(filepath)

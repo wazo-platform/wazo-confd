@@ -44,25 +44,25 @@ class CampagneManagement(object):
     def get_campaigns(self, search={}, checkCurrentlyRunning=False, paginator=None):
         search_pattern = {}
         for item in search:
-            if (item == 'queue_name'):
+            if item == 'queue_name':
                 search_pattern["queue_id"] = queue_dao.id_from_name(search["queue_name"])
             else:
                 search_pattern[item] = search[item]
         if paginator is None:
             paginator = (0, 0)
         (total, items) = record_campaigns_dao.get_records(search,
-                                                  checkCurrentlyRunning,
-                                                  paginator)
+                                                          checkCurrentlyRunning,
+                                                          paginator)
         try:
             for item in items:
-                if item.queue_id != None:
+                if item.queue_id is not None:
                     item.queue_name = queue_dao.queue_name(item.queue_id)
-                    item.queue_display_name, item.queue_number = queue_dao\
-                                                        .get_display_name_number(item.queue_id)
+                    item.queue_display_name, item.queue_number = queue_dao.get_display_name_number(item.queue_id)
 
         except Exception as e:
-            logger.critical("DAO failure(" + str(e) + ")!")
-            raise DataRetrieveError("DAO failure(" + str(e) + ")!")
+            message = "DAO failure (%s)!" % e
+            logger.critical(message)
+            raise DataRetrieveError(message)
 
         return (total, items)
 
@@ -80,9 +80,9 @@ class CampagneManagement(object):
         return result
 
     def delete(self, campaign_id):
-        data_access_logger.info("Deleting campaign of id %s." % campaign_id)
+        data_access_logger.info("Deleting campaign of id %s.", campaign_id)
         campaign = record_campaigns_dao.get(int(campaign_id))
-        if campaign == None:
+        if campaign is None:
             raise NoSuchElementException("No such campaign")
         else:
             record_campaigns_dao.delete(campaign)
@@ -92,7 +92,7 @@ class CampagneManagement(object):
         with a list of errors if it is not the case.'''
         errors_list = []
         logger.debug("validating campaign")
-        if campaign.campaign_name == None:
+        if campaign.campaign_name is None:
             errors_list.append("empty_name")
         if campaign.start_date > campaign.end_date:
             errors_list.append("start_greater_than_end")
@@ -125,8 +125,8 @@ class CampagneManagement(object):
         intersects = False
         for item in campaigns_list:
             item_interval = TimeInterval(item.start_date,
-                                             item.end_date)
-            if campaign_interval.intersect(item_interval) != None:
+                                         item.end_date)
+            if campaign_interval.intersect(item_interval) is not None:
                 intersects = True
                 break
         return intersects
