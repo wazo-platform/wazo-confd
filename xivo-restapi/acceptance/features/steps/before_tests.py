@@ -16,12 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from lettuce.registry import world
 from lettuce.terrain import before
-from xivo_dao.helpers import config
+from xivo_dao.helpers import config, db_manager
 
 
 @before.all
 def modify_db_uri():
     config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
+    db_manager._init()
 
 
 @before.each_scenario
