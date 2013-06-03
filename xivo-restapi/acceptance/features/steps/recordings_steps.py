@@ -85,8 +85,7 @@ def then_i_can_consult_these_details(step, callid, campaign_name):
 
 @step(u'Given there is an agent of number "([^"]*)"')
 def given_there_is_an_agent_of_number(step, agent_number):
-    r_campaign = RestCampaign()
-    result = r_campaign.add_agent_if_not_exists(agent_number)
+    result = rest_campaign.add_agent_if_not_exists(agent_number)
     assert result > 0, 'The agent could not be created: ' + str(result)
 
 
@@ -110,14 +109,13 @@ def when_i_delete_a_recording_referenced_by_this_callid(step, callid, campaign_n
 
 @step(u'Then the recording is deleted and I get a response with code "([^"]*)"')
 def then_the_recording_is_deleted_and_i_get_a_response_with_code_group1(step, response_code):
-    assert world.del_result.status == int(response_code), 'Wrong return status: %s, %s' % \
-            (str(world.del_result.status), str(world.del_result.data))
+    assert world.del_result.status == int(response_code), (
+        'Wrong return status: %s, %s' % (str(world.del_result.status), str(world.del_result.data)))
 
 
 @step(u'Given there is a campaign "([^"]*)"')
 def given_there_is_a_campaign_group1(step, campaign_name):
-    assert rest_campaign.create_if_not_exists(campaign_name), \
-            'The campaign could not be created'
+    assert rest_campaign.create_if_not_exists(campaign_name), 'The campaign could not be created'
 
 
 @step(u'Given there is an agent "([^"]*)"')

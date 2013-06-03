@@ -44,9 +44,9 @@ def then_i_get_a_response_with_status_code_group1(step, status_code):
 
 @step(u'When I read the list of recordings for the campaign "([^"]*)" from the database')
 def when_i_read_the_list_of_recordings_for_the_campaign_group1_from_the_database(step, campaign_name):
-    r_campaign = RestCampaign()
+    rest_campaign = RestCampaign()
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    result = r_campaign.paginated_recordings_list(campaign_id, 1, 10)
+    result = rest_campaign.paginated_recordings_list(campaign_id, 1, 10)
     world.recordings_list = result['items']
 
 
