@@ -256,7 +256,7 @@ def given_there_s_at_least_one_recording_for_the_campaign_group1(step, campaign_
     rest_campaign.add_agent_if_not_exists(agent_no)
     world.callid += '1'
     time = strftime("%a, %d %b %Y %H:%M:%S", localtime())
-    rest_campaign.addRecordingDetails(campaign_id, world.callid, '2002', agent_no, time)
+    rest_campaign.add_recording_details(campaign_id, world.callid, '2002', agent_no, time)
 
 
 @step(u'When I ask to delete the campaign "([^"]*)"')

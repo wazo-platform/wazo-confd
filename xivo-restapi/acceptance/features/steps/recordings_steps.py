@@ -72,7 +72,7 @@ def when_i_save_call_details_with_the_following_parameters(step):
         data['campaign_id'] = campaign_id
         del data['campaign_name']
         data['time'] = world.time
-        world.add_result = rest_campaign.addRecordingDetails(**data)
+        world.add_result = rest_campaign.add_recording_details(**data)
 
 
 @step(u'Then I can consult the recording "([^"]*)" in campaign "([^"]*)"')
@@ -159,7 +159,7 @@ def given_there_are_at_least_group1_recordings_for_campaign_group2_and_agent_gro
     if(res['total'] < int(nb_recordings)):
         i = res['total']
         while(i <= int(nb_recordings)):
-            rest_campaign.addRecordingDetails(campaign_id, str(random.randint(1000, 9999)), "222", agent_no, world.time)
+            rest_campaign.add_recording_details(campaign_id, str(random.randint(1000, 9999)), "222", agent_no, world.time)
             i += 1
         res = rest_campaign.search_recordings(campaign_id, agent_no).data
     assert res['total'] >= int(nb_recordings), 'Not enough recordings: ' + str(res)
@@ -209,5 +209,5 @@ def when_we_search_recordings_in_the_campaign_with_the_key_page_and_page_size(st
 def given_there_is_a_recording_in_campaign_group1_referenced_by_a_group2_answered_by_agent_group3(step, campaign_name, callid, agent_no):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     time = "2012-01-01 00:00:00"
-    assert rest_campaign.addRecordingDetails(campaign_id, callid, "caller",
-                                             agent_no, time), "Impossible to create recording"
+    assert rest_campaign.add_recording_details(campaign_id, callid, "caller",
+                                               agent_no, time), "Impossible to create recording"

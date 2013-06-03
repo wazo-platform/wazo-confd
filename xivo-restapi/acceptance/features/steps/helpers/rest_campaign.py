@@ -68,7 +68,7 @@ class RestCampaign(object):
         reply = self.ws_utils.rest_get(url)
         return reply
 
-    def addRecordingDetails(self, campaign_id, callid, caller, agent_no, time):
+    def add_recording_details(self, campaign_id, callid, caller, agent_no, time):
         recording = {
             'cid': callid,
             'caller': caller,
