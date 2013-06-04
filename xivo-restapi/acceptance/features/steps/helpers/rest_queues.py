@@ -16,11 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import random
+import traceback
+
 from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.restapi_config import RestAPIConfig
-import random
 
 
 class RestQueues(object):
@@ -40,7 +42,7 @@ class RestQueues(object):
         try:
             queue_dao.add_queue(self.queue)
         except Exception as e:
-            print "Test precondition failed, got exception: ", e
+            traceback.print_exc()
             raise e
         return True
 
@@ -51,7 +53,7 @@ class RestQueues(object):
         except LookupError:
             return self.create(queue_name, queue_id)
         except Exception as e:
-            print "Test precondition failed, got exception: ", e
+            traceback.print_exc()
             raise e
 
     def find(self, columnName, searchItem):

@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import datetime
+import traceback
+
 from acceptance.features.steps.helpers.rest_queues import RestQueues
 from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
@@ -23,7 +26,6 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_lettuce.ssh import SSHClient
 from xivo_restapi.restapi_config import RestAPIConfig
-import datetime
 
 
 class RestCampaign(object):
@@ -201,12 +203,10 @@ class RestCampaign(object):
     def delete_agent(self, agent_no):
         try:
             agent_id = agent_dao.agent_id(agent_no)
-            print "\nAgent id: " + agent_id + "\n"
             agent_dao.del_agent(agent_id)
             return True
-        except Exception as e:
-            print "\nException raised: " + str(e) + "\n"
-            return False
+        except Exception:
+            traceback.print_exc()
 
     def create_with_errors(self, campaign_name, queue_name='test',
                            activated=True, start_date=None,

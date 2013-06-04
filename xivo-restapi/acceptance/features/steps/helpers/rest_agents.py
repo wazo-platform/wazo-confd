@@ -29,9 +29,6 @@ class RestAgents(object):
         self.ws_utils = WsUtils()
 
     def create(self, agent_first_name, agent_number):
-        print "name:" + agent_first_name
-        print "number:" + agent_number
-
         agent = AgentFeatures()
         agent.firstname = agent_first_name
         agent.lastname = upper(agent_first_name)
@@ -44,7 +41,6 @@ class RestAgents(object):
         try:
             agent_dao.add_agent(agent)
         except Exception as e:
-            print "Test precondition failed, got exception: ", e
             raise e
         return True
 
@@ -55,7 +51,6 @@ class RestAgents(object):
         except LookupError:
             return self.create(agent_first_name, agent_number)
         except Exception as e:
-            print "Test precondition failed, got exception: ", e
             raise e
 
     def list_agents(self, agent_id=""):

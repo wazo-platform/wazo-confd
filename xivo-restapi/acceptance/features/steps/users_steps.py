@@ -147,8 +147,6 @@ def when_i_update_the_user_group1_with_a_first_name_group2_and_a_last_name_group
 @step(u'Then this user has a voicemail "([^"]*)"')
 def then_i_have_a_user_group1_with_a_voicemail_group1(step, voicemail_fullname):
     voicemail = rest_users.voicemail_from_user(world.userid)
-    print voicemail.fullname, "\n"
-    print voicemail_fullname, "\n"
     assert voicemail.fullname == voicemail_fullname
 
 
