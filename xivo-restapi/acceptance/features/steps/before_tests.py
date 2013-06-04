@@ -22,7 +22,7 @@ from xivo_dao.helpers import config, db_manager
 @before.all
 def modify_db_uri():
     config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
-    db_manager._init()
+    db_manager.reinit()
 
 
 @before.each_scenario
