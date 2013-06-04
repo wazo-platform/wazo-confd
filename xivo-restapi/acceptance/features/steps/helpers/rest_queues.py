@@ -34,7 +34,7 @@ class RestQueues(object):
     def create(self, queue_name, queue_id=None):
         alea = random.randint(10000, 99999999)
 
-        if queue_id == None:
+        if queue_id is None:
             self.queue.id = str(alea)
 
         self.queue.name = queue_name + str(alea)

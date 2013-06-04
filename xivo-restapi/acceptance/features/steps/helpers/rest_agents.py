@@ -54,6 +54,6 @@ class RestAgents(object):
             raise e
 
     def list_agents(self, agent_id=""):
-        reply = self.ws_utils.rest_get(RestAPIConfig.XIVO_AGENTS_SERVICE_PATH + \
-                                       "/" + agent_id)
+        url = "%s/%s" % (RestAPIConfig.XIVO_AGENTS_SERVICE_PATH, agent_id)
+        reply = self.ws_utils.rest_get(url)
         return reply.data

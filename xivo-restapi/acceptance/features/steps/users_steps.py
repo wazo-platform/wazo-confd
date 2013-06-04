@@ -102,7 +102,7 @@ def when_i_update_the_user_group1_with_a_last_name_group2(step, original_fullnam
 @step(u'Then I have a user "([^"]*)"$')
 def then_i_have_a_user_group1(step, fullname):
     userid = rest_users.id_from_fullname(fullname)
-    assert userid != None and userid > 0
+    assert userid is not None and userid > 0
 
 
 @step(u'Then the user "([^"]*)" is actually deleted')
@@ -235,6 +235,7 @@ def then_this_user_no_longer_exists(step):
     _check_contextmember()
     _check_voicemail()
 
+
 def _check_user_features():
     try:
         user_dao.get(world.userid)
@@ -242,20 +243,26 @@ def _check_user_features():
     except LookupError:
         assert True
 
+
 def _check_line_features():
     assert line_dao.find_line_id_by_user_id(world.userid) == []
+
 
 def _check_usersip():
     assert usersip_dao.get(world.usersipid) is None
 
+
 def _check_extensions():
     assert extensions_dao.get_by_exten(world.number) is None
+
 
 def _check_extenumbers():
     assert extenumber_dao.get_by_exten(world.number) is None
 
+
 def _check_contextnummembers():
     assert line_dao.get_contextnummember(world.lineid) is None
+
 
 def _check_queuemembers():
     if hasattr(world, 'interface'):
@@ -263,42 +270,52 @@ def _check_queuemembers():
         processed_result = [item.member_name for item in result if item.member_name == world.interface]
         assert processed_result == [], str(processed_result)
 
+
 def _check_rightcallmembers():
     result = rightcall_member_dao.get_by_userid(world.userid)
     assert result == []
+
 
 def _check_callfiltermember():
     result = callfilter_dao.get_callfiltermembers_by_userid(world.userid)
     assert result == []
 
+
 def _check_dialaction():
     result = dialaction_dao.get_by_userid(world.userid)
     assert result == []
+
 
 def _check_phonefunckey():
     result = phonefunckey_dao.get_by_userid(world.userid)
     assert result == []
 
+
 def _check_schedulepath():
     result = schedule_dao.get_schedules_for_user(world.userid)
     assert result == []
 
+
 def _check_contextmember():
     result = voicemail_dao.get_contextmember(world.voicemailid)
-    assert result == None, result
+    assert result is None, result
+
 
 def _check_voicemail():
     assert voicemail_dao.get(world.voicemailid) is None
 
+
 @step(u'When I delete a non existing user')
 def when_i_delete_a_non_existing_user(step):
     world.result = rest_users.delete_user(rest_users.generate_unexisting_id())
+
 
 @step(u'Given there is a user "([^"]*)" member of the queue "([^"]*)"')
 def given_there_is_a_user_member_of_the_queue(step, user, queue):
     world.userid, _, _ = rest_users.create_user_with_sip_line(user, '1000')
     world.interface = line_dao.get_interface_from_user_id(world.userid)
     queue_member_dao.add_user_to_queue(world.userid, queue)
+
 
 @step(u'Given there is a rightcall "([^"]*)"')
 def given_there_is_a_rightcall(step, rightcallname):
@@ -307,11 +324,13 @@ def given_there_is_a_rightcall(step, rightcallname):
         right = RightCall(name=rightcallname, passwd='', authorization=0, commented=0, description='')
         rightcall_dao.add(right)
 
+
 @step(u'Given there is a user "([^"]*)" with the right call "([^"]*)"')
 def given_there_is_a_user_with_the_right_call(step, username, rightcallname):
     rightid = rightcall_dao.get_by_name(rightcallname).id
     step.given('Given there is a user "%s"' % username)
     rightcall_member_dao.add_user_to_rightcall(world.userid, rightid)
+
 
 @step(u'Given there is a call filter "([^"]*)"')
 def given_there_is_a_call_filter(step, filtername):
@@ -325,11 +344,13 @@ def given_there_is_a_call_filter(step, filtername):
         callfilter.description = ''
         callfilter_dao.add(callfilter)
 
+
 @step(u'Given there is a user "([^"]*)" with the call filter "([^"]*)"')
 def given_there_is_a_user_with_the_call_filter(step, name, callfilter):
     step.given('Given there is a user "%s"' % name)
     world.filterid = callfilter_dao.get_by_name(callfilter)[0].id
     callfilter_dao.add_user_to_filter(world.userid, world.filterid, 'boss')
+
 
 @step(u'Given there is a user "([^"]*)" with a dialaction')
 def given_there_is_a_user_with_a_dialaction(step, fullname):
@@ -341,6 +362,7 @@ def given_there_is_a_user_with_a_dialaction(step, fullname):
     dialaction.categoryval = str(world.userid)
     dialaction_dao.add(dialaction)
 
+
 @step(u'Given there is a user "([^"]*)" with a function key')
 def given_there_is_a_user_with_a_function_key(step, fullname):
     step.given('Given there is a user "%s"' % fullname)
@@ -350,6 +372,7 @@ def given_there_is_a_user_with_a_function_key(step, fullname):
     key.label = 'my label'
     phonefunckey_dao.add(key)
 
+
 @step(u'Given there is a schedule "([^"]*)"')
 def given_there_is_a_schedule(step, name):
     schedule = Schedule()
@@ -357,10 +380,12 @@ def given_there_is_a_schedule(step, name):
     schedule_dao.add(schedule)
     world.scheduleid = schedule.id
 
+
 @step(u'Given there is a user "([^"]*)" with this schedule')
 def given_there_is_a_user_with_a_schedule(step, fullname):
     step.given('Given there is a user "%s"' % fullname)
     schedule_dao.add_user_to_schedule(world.userid, world.scheduleid)
+
 
 @step(u'When I delete this user and force voicemail deletion')
 def when_i_delete_this_user_and_force_voicemail_deletion(step):
