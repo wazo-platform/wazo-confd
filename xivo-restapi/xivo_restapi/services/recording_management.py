@@ -16,11 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from commands import getoutput
+import subprocess
+import os
+
 from xivo_dao import agent_dao, recordings_dao
 from xivo_restapi.restapi_config import RestAPIConfig
 import logging
-import os
 from xivo_restapi.services.utils.exceptions import InvalidInputException
 
 logger = logging.getLogger(__name__)
@@ -81,11 +82,11 @@ class RecordingManagement(object):
             logger.error("Recording file remove error - no filename!")
             return False
         else:
-            filepath = "%s/%s" % (RestAPIConfig.RECORDING_FILE_ROOT_PATH, filename)
+            filepath = os.path.join(RestAPIConfig.RECORDING_FILE_ROOT_PATH, filename)
             logger.debug("Deleting file: %s", filepath)
 
             logphrase = "File %s is being deleted." % filename
-            cmd = 'logger -t xivo-recording "%s"' % logphrase
-            getoutput(cmd)
+            cmd = ['logger', '-t', 'xivo-recording', '"%s"' % logphrase]
+            subprocess.check_call(cmd)
             os.remove(filepath)
             return True
