@@ -80,7 +80,7 @@ def then_i_can_consult_these_details(step, callid, campaign_name):
     assert (world.add_result.status == 201), 'Cannot add call details'
     assert (world.add_result.data == "Added: True"), 'Cannot add call details'
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    assert rest_campaign.verifyRecordingsDetails(campaign_id, callid), "Recording not found"
+    assert rest_campaign.verify_recording_details(campaign_id, callid), "Recording not found"
 
 
 @step(u'Given there is an agent of number "([^"]*)"')
@@ -104,7 +104,7 @@ def given_there_are_recordings_with_the_following_values(step):
 @step(u'When I delete a recording referenced by this "([^"]*)" in campaign "([^"]*)"')
 def when_i_delete_a_recording_referenced_by_this_callid(step, callid, campaign_name):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    world.del_result = rest_campaign.deleteRecording(campaign_id, callid)
+    world.del_result = rest_campaign.delete_recording(campaign_id, callid)
 
 
 @step(u'Then the recording is deleted and I get a response with code "([^"]*)"')
@@ -142,7 +142,7 @@ def then_i_get_the_first_two_recordings(step):
 @step(u'Given there is no recording referenced by a "([^"]*)" in campaign "([^"]*)"')
 def given_there_is_no_recording_referenced_by_a_group1_in_campaign_group2(step, callid, campaign_name):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
-    result = rest_campaign.verifyRecordingsDetails(campaign_id, callid)
+    result = rest_campaign.verify_recording_details(campaign_id, callid)
     assert not result, 'The recording already exists'
 
 

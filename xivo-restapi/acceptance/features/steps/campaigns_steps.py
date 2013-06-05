@@ -80,7 +80,7 @@ def when_i_edit_it_with_the_following_parameters(step):
     params = dict(campaign)
     params['queue_id'] = queue_dao.id_from_name(campaign['queue_name'])
     del params['queue_name']
-    assert rest_campaign.updateCampaign(world.campaign_id, params), "Cannot update campaign %s" % world.campaign_id
+    assert rest_campaign.update_campaign(world.campaign_id, params), "Cannot update campaign %s" % world.campaign_id
 
 
 @step(u'Then the campaign is actually modified with the following values:')

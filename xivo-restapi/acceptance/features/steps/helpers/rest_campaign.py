@@ -96,7 +96,7 @@ class RestCampaign(object):
         sshclient.call(cmd)
         return reply
 
-    def verifyRecordingsDetails(self, campaign_id, callid):
+    def verify_recording_details(self, campaign_id, callid):
         url = "%s/%s/" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
         reply = self.ws_utils.rest_get(url)
 
@@ -109,7 +109,7 @@ class RestCampaign(object):
                 result = True
         return result
 
-    def updateCampaign(self, campaign_id, params):
+    def update_campaign(self, campaign_id, params):
         url = "%s/%s" % (RestAPIConfig.XIVO_RECORDING_SERVICE_PATH, campaign_id)
         reply = self.ws_utils.rest_put(url, params)
         return reply.status == 200 or reply.status == 201
@@ -189,7 +189,7 @@ class RestCampaign(object):
 
         return self.ws_utils.rest_get(serviceURI)
 
-    def deleteRecording(self, campaign_id, callid):
+    def delete_recording(self, campaign_id, callid):
         #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
         url = "%s/%s/%s" % (
             RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
