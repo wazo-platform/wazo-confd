@@ -65,22 +65,36 @@ def _is_campaign_activated(campaign_name):
 
 @step(u'Given I create a campaign with the following parameters:')
 def given_i_create_a_campaign_with_the_following_parameters(step):
-    campaign = dict(step.hashes[0])
-    if campaign['queue_name'] == '':
-        del campaign['queue_name']
-    if 'activated' in campaign:
-        campaign['activated'] = bool(campaign['activated'])
+    campaign = _convert_step_to_creation_params(step.hashes[0])
     world.result = rest_campaign.create(**campaign)
     world.campaign_id = world.result.data
 
 
+def _convert_step_to_creation_params(step_hash):
+    params = dict(step_hash)
+
+    if params['queue_name'] == '':
+        del params['queue_name']
+    if 'activated' in params:
+        params['activated'] = bool(params['activated'])
+
+    return params
+
+
 @step(u'When I edit it with the following parameters:')
 def when_i_edit_it_with_the_following_parameters(step):
-    campaign = step.hashes[0]
-    params = dict(campaign)
-    params['queue_id'] = queue_dao.id_from_name(campaign['queue_name'])
+    campaign_id = world.campaign_id
+    params = _convert_step_to_update_params(step.hashes[0])
+
+    assert rest_campaign.update_campaign(campaign_id, params), "Cannot update campaign %s" % campaign_id
+
+
+def _convert_step_to_update_params(step_hash):
+    params = dict(step_hash)
+    params['queue_id'] = queue_dao.id_from_name(params['queue_name'])
     del params['queue_name']
-    assert rest_campaign.update_campaign(world.campaign_id, params), "Cannot update campaign %s" % world.campaign_id
+
+    return params
 
 
 @step(u'Then the campaign is actually modified with the following values:')
