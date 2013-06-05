@@ -23,7 +23,6 @@ from xivo_dao import queue_dao, record_campaigns_dao, recordings_dao
 import datetime
 
 rest_campaign = RestCampaign()
-world.callid = '1'
 world.result_list = []
 
 
@@ -255,13 +254,15 @@ def then_i_can_get_the_campaign_group1_with_an_empty_queue_id(step, campaign_nam
 def given_there_s_at_least_one_recording_for_the_campaign_group1(step, campaign_name):
     campaign_id = record_campaigns_dao.id_from_name(campaign_name)
     agent_no = '4000'
+    call_id = '42'
+    caller_number = '2002'
+
     rest_campaign.add_agent_if_not_exists(agent_no)
-    world.callid += '1'
 
     time_format = "%a, %d %b %Y %H:%M:%S"
     time = datetime.datetime.now().strftime(time_format)
 
-    rest_campaign.add_recording_details(campaign_id, world.callid, '2002', agent_no, time)
+    rest_campaign.add_recording_details(campaign_id, call_id, caller_number, agent_no, time)
 
 
 @step(u'When I ask to delete the campaign "([^"]*)"')
