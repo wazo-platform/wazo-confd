@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2013  Avencall
+# Copyright (C) 2013 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ def _init_root_logger(formatter, debug_mode):
         handler.setFormatter(formatter)
         root_logger.addHandler(handler)
         root_logger.setLevel(logging.DEBUG)
+        config.DEBUG = True
     else:
         root_logger.setLevel(logging.INFO)
 

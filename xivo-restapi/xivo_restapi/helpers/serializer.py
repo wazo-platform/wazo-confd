@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-
-# Copyright (C) 2013 Avencall
+#
+# Copyright (C) 2012  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,17 +14,25 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-HOST = '0.0.0.0'
-PORT = 50050
+import json
+import logging
 
-DEBUG = False
+logger = logging.getLogger()
+decode = json.loads
 
-CSV_SEPARATOR = ","
-DATA_ACCESS_LOGFILENAME = '/var/log/xivo-restapi-data-access.log'
-DATA_ACCESS_LOGGERNAME = 'data-access'
-RESSOURCES_PACKAGE = 'xivo_restapi.ressources'
 
-VERSION_1_0 = '1.0'
-VERSION_1_1 = '1.1'
+def encode(data):
+    result = data
+    if isinstance(data, tuple):
+        result = _process_paginated_data(data)
+    return_value = json.dumps(result)
+    return return_value
+
+
+def _process_paginated_data(data):
+    (total, items) = data
+    result = {'total': total,
+              'items': items}
+    return result
