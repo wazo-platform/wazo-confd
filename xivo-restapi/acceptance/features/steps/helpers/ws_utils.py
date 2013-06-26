@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_restapi.rest import rest_encoder
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.v1_0 import rest_encoder
+from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 import httplib
 
 

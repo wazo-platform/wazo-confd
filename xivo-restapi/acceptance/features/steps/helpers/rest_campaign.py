@@ -25,7 +25,7 @@ from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_lettuce.ssh import SSHClient
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 
 
 class RestCampaign(object):

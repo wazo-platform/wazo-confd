@@ -17,9 +17,10 @@
 
 import argparse
 import logging
+
 from xivo import daemonize
-from xivo_restapi.rest import flask_http_server
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi import flask_http_server
+from xivo_restapi import config
 
 DAEMONNAME = 'xivo-restapid'
 LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
@@ -37,7 +38,7 @@ def main():
     if parsed_args.dev_mode:
         flask_http_server.FlaskHttpServer().run()
     else:
-        from flup.server.fcgi import WSGIServer
+        from flup.server.fcgi import WSGIServer  # @UnresolvedImport
 
         if parsed_args.debug:
             logger.info("Starting xivo-restapid in debug mode.")
@@ -63,10 +64,10 @@ def _init_logging(debug_mode):
 
 
 def _init_data_access_logger(formatter):
-    handler = logging.FileHandler(RestAPIConfig.DATA_ACCESS_LOGFILENAME)
+    handler = logging.FileHandler(config.DATA_ACCESS_LOGFILENAME)
     handler.setFormatter(formatter)
 
-    data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
+    data_access_logger = logging.getLogger(config.DATA_ACCESS_LOGGERNAME)
     data_access_logger.addHandler(handler)
     data_access_logger.setLevel(logging.INFO)
 
