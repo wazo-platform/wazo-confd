@@ -21,6 +21,8 @@ import traceback
 
 from acceptance.features.steps.helpers.rest_queues import RestQueues
 from acceptance.features.steps.helpers.ws_utils import WsUtils
+from acceptance.utils.config import get_config_value
+
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
@@ -86,10 +88,8 @@ class RestCampaign(object):
 
         #we create the file
         dirname = RestAPIConfig.RECORDING_FILE_ROOT_PATH
-        config_file = open("config.ini", "r")
-        remote_host = config_file.read()
-        config_file.close()
-        remote_host = remote_host.rstrip()
+        remote_host = get_config_value('xivo', 'hostname')
+
         file_path = dirname + "/" + recording['filename']
         cmd = ['touch', file_path]
         sshclient = SSHClient(remote_host, 'root')
