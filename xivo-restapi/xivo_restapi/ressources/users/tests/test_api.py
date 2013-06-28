@@ -20,11 +20,11 @@ import unittest
 
 from mock import Mock, patch
 from xivo_dao.alchemy.userfeatures import UserFeatures
-from xivo_dao.models.user import User
-from xivo_dao.services.exception import MissingParametersError
 from xivo_restapi import flask_http_server
 from xivo_restapi.ressources.users.mapper import UserMapper
 from xivo_restapi.helpers import serializer
+from xivo_dao.data_handler.user.model import User
+from xivo_dao.helpers.services_exception import MissingParametersError
 
 BASE_URL = "/1.1/users"
 
@@ -36,7 +36,7 @@ class TestAPIUsers(unittest.TestCase):
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 
-    @patch('xivo_dao.services.user_services.find_all')
+    @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users(self, mock_user_services_find_all):
         status = "200 OK"
         user1 = UserFeatures()
@@ -62,7 +62,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEquals(result.status, status)
         self.assertEquals(serializer.encode(expected_result), result.data)
 
-    @patch('xivo_dao.services.user_services.find_all')
+    @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users_error(self, mock_user_services_find_all):
         status = "500 INTERNAL SERVER ERROR"
         mock_user_services_find_all.side_effect = Exception
@@ -73,7 +73,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         mock_user_services_find_all.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
     def test_get(self, mock_user_services_get_by_user_id):
         status = "200 OK"
         user1 = UserFeatures()
@@ -89,7 +89,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEquals(result.status, status)
         self.assertEquals(serializer.encode(user1), result.data)
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
     def test_get_error(self, mock_user_services_get_by_user_id):
         status = "500 INTERNAL SERVER ERROR"
         mock_user_services_get_by_user_id.side_effect = Exception
@@ -100,7 +100,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         mock_user_services_get_by_user_id.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
     def test_get_not_found(self, mock_user_services_get_by_user_id):
         status = "404 NOT FOUND"
 
@@ -112,7 +112,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         mock_user_services_get_by_user_id.side_effect = None
 
-    @patch('xivo_dao.services.user_services.create')
+    @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
         status = "201 CREATED"
         data = {u'firstname': u'André',
@@ -126,7 +126,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.data, '1')
         mock_user_services_create.assert_called_with(User.from_user_data(data))
 
-    @patch('xivo_dao.services.user_services.create')
+    @patch('xivo_dao.data_handler.user.services.create')
     def test_create_error(self, mock_user_services_create):
         status = "500 INTERNAL SERVER ERROR"
         data = {'firstname': 'André',
@@ -140,7 +140,7 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(status, result.status)
         mock_user_services_create.side_effect = None
 
-    @patch('xivo_dao.services.user_services.create')
+    @patch('xivo_dao.data_handler.user.services.create')
     def test_create_request_error(self, mock_user_services_create):
         status = "400 BAD REQUEST"
         expected_data = "Missing parameters: lastname"
@@ -154,8 +154,8 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEquals(expected_data, received_data[0])
         mock_user_services_create.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
-    @patch('xivo_dao.services.user_services.edit')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.edit')
     def test_edit(self, mock_user_services_edit, mock_user_services_get_by_user_id):
         status = "200 OK"
         data = {u'id': 1,
@@ -169,8 +169,8 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         mock_user_services_edit.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
-    @patch('xivo_dao.services.user_services.edit')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.edit')
     def test_edit_error(self, mock_user_services_edit, mock_user_services_get_by_user_id):
         status = "500 INTERNAL SERVER ERROR"
         data = {u'firstname': u'André',
@@ -185,8 +185,8 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(status, result.status)
         mock_user_services_edit.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
-    @patch('xivo_dao.services.user_services.edit')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.edit')
     def test_edit_not_found(self, mock_user_services_edit, mock_user_services_get_by_user_id):
         status = "404 NOT FOUND"
         data = {'firstname': 'André',
@@ -201,8 +201,8 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(status, result.status)
         mock_user_services_edit.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
-    @patch('xivo_dao.services.user_services.delete')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.delete')
     def test_delete_success(self, mock_user_services_delete, mock_user_services_get_by_user_id):
         status = "200 OK"
         user = Mock(User)
@@ -215,8 +215,8 @@ class TestAPIUsers(unittest.TestCase):
         mock_user_services_delete.assert_called_with(user)
         mock_user_services_delete.side_effect = None
 
-    @patch('xivo_dao.services.user_services.get_by_user_id')
-    @patch('xivo_dao.services.user_services.delete')
+    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.delete')
     def test_delete_not_found(self, mock_user_services_delete, mock_user_services_get_by_user_id):
         status = "404 NOT FOUND"
         user = Mock(User)

@@ -19,9 +19,9 @@ import logging
 
 from flask.helpers import make_response
 from xivo_restapi.helpers import serializer
-from xivo_dao.services.exception import MissingParametersError, \
-    InvalidParametersError, ElementExistsError
 from werkzeug.exceptions import HTTPException
+from xivo_dao.helpers.services_exception import MissingParametersError, \
+    InvalidParametersError, ElementExistsError
 
 logger = logging.getLogger(__name__)
 

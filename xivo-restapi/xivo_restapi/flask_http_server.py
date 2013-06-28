@@ -51,7 +51,7 @@ def _list_ressources():
         return []
     ressources = []
     for entry in contents:
-        if not entry.endswith('.py') and  not entry.endswith('.pyc'):
+        if not entry.endswith('.py') and not entry.endswith('.pyc'):
             if pkg_resources.resource_isdir(config.RESSOURCES_PACKAGE, entry):
                 logger.debug('Ressources found: %s', entry)
                 ressources.append(entry)

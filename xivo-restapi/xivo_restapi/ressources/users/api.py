@@ -19,8 +19,8 @@ import logging
 
 from flask.globals import request
 from flask.helpers import make_response
-from xivo_dao.models.user import User
-from xivo_dao.services import user_services
+from xivo_dao.data_handler.user import services as user_services
+from xivo_dao.data_handler.user.model import User
 from xivo_restapi.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.ressources.users.mapper import UserMapper
