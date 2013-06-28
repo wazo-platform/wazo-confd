@@ -21,7 +21,7 @@ import traceback
 
 from acceptance.features.steps.helpers.rest_queues import RestQueues
 from acceptance.features.steps.helpers.ws_utils import WsUtils
-from acceptance.utils.config import get_config_value
+from acceptance.features.steps.helpers.config import get_config_value
 
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
