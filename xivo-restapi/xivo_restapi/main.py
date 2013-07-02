@@ -38,7 +38,7 @@ def main():
     if parsed_args.dev_mode:
         flask_http_server.FlaskHttpServer().run()
     else:
-        from flup.server.fcgi import WSGIServer  # @UnresolvedImport
+        from flup.server.fcgi import WSGIServer
 
         if parsed_args.debug:
             logger.info("Starting xivo-restapid in debug mode.")
