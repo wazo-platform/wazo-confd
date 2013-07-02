@@ -41,15 +41,10 @@ class TestAPIUsers(unittest.TestCase):
     def test_list_users(self, mock_user_services_find_all):
         status_code = 200
 
-        user1 = UserFeatures()
-        user1.id = 1
-        user1.firstname = 'test1'
-        user1 = User.from_data_source(user1)
-        user2 = UserFeatures()
-        user2.id = 2
-        user2.firstname = 'test2'
-        user2 = User.from_data_source(user2)
-        status_code = 200
+        user1 = User(id=1,
+                     firstname='test1')
+        user2 = User(id=2,
+                     firstname='test2')
 
         expected_list = [user1, user2]
 
