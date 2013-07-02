@@ -23,7 +23,7 @@ from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User
 from xivo_restapi.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.negotiate.flask_negotiate import produces, consumes
-from xivo_restapi.ressources.users.mapper import UserMapper
+from xivo_restapi.resources.users.mapper import UserMapper
 from xivo_restapi.helpers.common import exception_catcher
 from xivo_restapi.helpers import serializer
 from xivo_dao.helpers.provd_connector import ProvdError

@@ -41,28 +41,28 @@ def register_blueprints():
     app.register_blueprint(routing.users_service)
     app.register_blueprint(routing.voicemails_service)
 
-    _load_ressources()
+    _load_resources()
 
 
-def _list_ressources():
+def _list_resources():
     try:
-        contents = pkg_resources.resource_listdir(config.RESSOURCES_PACKAGE, "")
+        contents = pkg_resources.resource_listdir(config.RESOURCES_PACKAGE, "")
     except ImportError:
         return []
-    ressources = []
+    resources = []
     for entry in contents:
         if not entry.endswith('.py') and not entry.endswith('.pyc'):
-            if pkg_resources.resource_isdir(config.RESSOURCES_PACKAGE, entry):
-                logger.debug('Ressources found: %s', entry)
-                ressources.append(entry)
-    return ressources
+            if pkg_resources.resource_isdir(config.RESOURCES_PACKAGE, entry):
+                logger.debug('Resources found: %s', entry)
+                resources.append(entry)
+    return resources
 
 
-def _load_ressources():
-    ressources = _list_ressources()
-    for ressource in ressources:
-        pkg_ressource = '%s.%s' % (config.RESSOURCES_PACKAGE, ressource)
-        _load_module('%s.routes' % pkg_ressource)
+def _load_resources():
+    resources = _list_resources()
+    for resource in resources:
+        pkg_resource = '%s.%s' % (config.RESOURCES_PACKAGE, resource)
+        _load_module('%s.routes' % pkg_resource)
 
 
 def _load_module(name):

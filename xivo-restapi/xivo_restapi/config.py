@@ -24,7 +24,7 @@ DEBUG = False
 CSV_SEPARATOR = ","
 DATA_ACCESS_LOGFILENAME = '/var/log/xivo-restapi-data-access.log'
 DATA_ACCESS_LOGGERNAME = 'data-access'
-RESSOURCES_PACKAGE = 'xivo_restapi.ressources'
+RESOURCES_PACKAGE = 'xivo_restapi.resources'
 
 VERSION_1_0 = '1.0'
 VERSION_1_1 = '1.1'

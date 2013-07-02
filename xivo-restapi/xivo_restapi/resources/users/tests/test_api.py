@@ -21,7 +21,7 @@ import unittest
 from mock import Mock, patch
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi import flask_http_server
-from xivo_restapi.ressources.users.mapper import UserMapper
+from xivo_restapi.resources.users.mapper import UserMapper
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.exception import MissingParametersError, \
