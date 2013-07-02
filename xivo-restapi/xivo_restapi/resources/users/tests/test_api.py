@@ -54,7 +54,7 @@ class TestAPIUsers(unittest.TestCase):
 
         expected_result = UserMapper.encode(expected_list)
 
-        result = self.app.get("%s/" % BASE_URL, '')
+        result = self.app.get("%s/" % BASE_URL)
 
         mock_user_services_find_all.assert_any_call()
         self.assertEquals(result.status, status)
@@ -81,7 +81,7 @@ class TestAPIUsers(unittest.TestCase):
 
         expected_result = UserMapper.encode(user1)
 
-        result = self.app.get("%s/1" % BASE_URL, '')
+        result = self.app.get("%s/1" % BASE_URL)
 
         mock_user_services_get.assert_called_with(1)
         self.assertEquals(result.status, status)
