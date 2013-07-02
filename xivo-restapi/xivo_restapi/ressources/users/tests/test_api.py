@@ -24,7 +24,8 @@ from xivo_restapi import flask_http_server
 from xivo_restapi.ressources.users.mapper import UserMapper
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.user.model import User
-from xivo_dao.helpers.services_exception import MissingParametersError
+from xivo_dao.data_handler.exception import MissingParametersError, \
+    ElementNotExistsError
 
 BASE_URL = "/1.1/users"
 
@@ -73,44 +74,44 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(result.status, status)
         mock_user_services_find_all.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
-    def test_get(self, mock_user_services_get_by_user_id):
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_get(self, mock_user_services_get):
         status = "200 OK"
         user1 = UserFeatures()
         user1.id = 1
         user1.firstname = 'test1'
         user1 = User.from_data_source(user1)
-        mock_user_services_get_by_user_id.return_value = user1
+        mock_user_services_get.return_value = user1
         user1 = UserMapper.run_one_object(user1)
 
         result = self.app.get("%s/1" % BASE_URL, '')
 
-        mock_user_services_get_by_user_id.assert_called_with(1)
+        mock_user_services_get.assert_called_with(1)
         self.assertEquals(result.status, status)
         self.assertEquals(serializer.encode(user1), result.data)
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
-    def test_get_error(self, mock_user_services_get_by_user_id):
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_get_error(self, mock_user_services_get):
         status = "500 INTERNAL SERVER ERROR"
-        mock_user_services_get_by_user_id.side_effect = Exception
+        mock_user_services_get.side_effect = Exception
 
         result = self.app.get("%s/1" % BASE_URL)
 
-        mock_user_services_get_by_user_id.assert_called_with(1)
+        mock_user_services_get.assert_called_with(1)
         self.assertEqual(result.status, status)
-        mock_user_services_get_by_user_id.side_effect = None
+        mock_user_services_get.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
-    def test_get_not_found(self, mock_user_services_get_by_user_id):
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_get_not_found(self, mock_user_services_get):
         status = "404 NOT FOUND"
 
-        mock_user_services_get_by_user_id.side_effect = LookupError("No such user")
+        mock_user_services_get.side_effect = ElementNotExistsError('user')
 
         result = self.app.get("%s/1" % BASE_URL)
 
-        mock_user_services_get_by_user_id.assert_called_with(1)
+        mock_user_services_get.assert_called_with(1)
         self.assertEqual(result.status, status)
-        mock_user_services_get_by_user_id.side_effect = None
+        mock_user_services_get.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
@@ -154,29 +155,29 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEquals(expected_data, received_data[0])
         mock_user_services_create.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
-    def test_edit(self, mock_user_services_edit, mock_user_services_get_by_user_id):
+    def test_edit(self, mock_user_services_edit, mock_user_services_get):
         status = "200 OK"
         data = {u'id': 1,
                 u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
-        mock_user_services_get_by_user_id.return_value = Mock(User)
+        mock_user_services_get.return_value = Mock(User)
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(result.status, status)
         mock_user_services_edit.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
-    def test_edit_error(self, mock_user_services_edit, mock_user_services_get_by_user_id):
+    def test_edit_error(self, mock_user_services_edit, mock_user_services_get):
         status = "500 INTERNAL SERVER ERROR"
         data = {u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
-        mock_user_services_get_by_user_id.return_value = user = Mock(User)
+        mock_user_services_get.return_value = user = Mock(User)
         mock_user_services_edit.side_effect = Exception
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
@@ -185,28 +186,28 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(status, result.status)
         mock_user_services_edit.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
-    def test_edit_not_found(self, mock_user_services_edit, mock_user_services_get_by_user_id):
+    def test_edit_not_found(self, mock_user_services_edit, mock_user_services_get):
         status = "404 NOT FOUND"
         data = {'firstname': 'André',
                 'lastname': 'Dupond',
                 'description': 'éà":;'}
-        mock_user_services_get_by_user_id.return_value = Mock(User)
+        mock_user_services_get.return_value = Mock(User)
 
-        mock_user_services_edit.side_effect = LookupError('')
+        mock_user_services_edit.side_effect = ElementNotExistsError('user')
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status, result.status)
         mock_user_services_edit.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
-    def test_delete_success(self, mock_user_services_delete, mock_user_services_get_by_user_id):
+    def test_delete_success(self, mock_user_services_delete, mock_user_services_get):
         status = "200 OK"
         user = Mock(User)
-        mock_user_services_get_by_user_id.return_value = user
+        mock_user_services_get.return_value = user
         mock_user_services_delete.return_value = True
 
         result = self.app.delete("%s/1" % BASE_URL)
@@ -215,13 +216,13 @@ class TestAPIUsers(unittest.TestCase):
         mock_user_services_delete.assert_called_with(user)
         mock_user_services_delete.side_effect = None
 
-    @patch('xivo_dao.data_handler.user.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
-    def test_delete_not_found(self, mock_user_services_delete, mock_user_services_get_by_user_id):
+    def test_delete_not_found(self, mock_user_services_delete, mock_user_services_get):
         status = "404 NOT FOUND"
         user = Mock(User)
-        mock_user_services_get_by_user_id.return_value = user
-        mock_user_services_delete.side_effect = LookupError('')
+        mock_user_services_get.return_value = user
+        mock_user_services_delete.side_effect = ElementNotExistsError('user')
 
         result = self.app.delete("%s/1" % BASE_URL)
 

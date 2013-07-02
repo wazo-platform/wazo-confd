@@ -20,8 +20,8 @@ import logging
 from flask.helpers import make_response
 from xivo_restapi.helpers import serializer
 from werkzeug.exceptions import HTTPException
-from xivo_dao.helpers.services_exception import MissingParametersError, \
-    InvalidParametersError, ElementExistsError
+from xivo_dao.data_handler.exception import MissingParametersError, \
+    InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError
 
 logger = logging.getLogger(__name__)
 
@@ -36,13 +36,13 @@ def exception_catcher(func):
         except InvalidParametersError as e:
             data = serializer.encode([str(e)])
             return make_response(data, 400)
-        except ElementExistsError as e:
+        except ElementAlreadyExistsError as e:
             data = serializer.encode([str(e)])
             return make_response(data, 400)
         except ValueError:
             data = serializer.encode(["No parsable data in the request"])
             return make_response(data, 400)
-        except LookupError:
+        except ElementNotExistsError:
             return make_response('', 404)
         except HTTPException:
             raise

@@ -26,6 +26,8 @@ from xivo_restapi.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.ressources.users.mapper import UserMapper
 from xivo_restapi.helpers.common import exception_catcher
 from xivo_restapi.helpers import serializer
+from xivo_dao.helpers.provd_connector import ProvdError
+from xivo_dao.helpers.sysconfd_connector import SysconfdError
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +53,7 @@ class APIUsers(object):
     @realmDigest.requires_auth
     def get(self, userid):
         logger.info("User of id %s requested" % userid)
-        user = user_services.get_by_user_id(int(userid))
+        user = user_services.get(int(userid))
         result = UserMapper.run_one_object(user)
         result = serializer.encode(result)
         return make_response(result, 200)
@@ -75,7 +77,7 @@ class APIUsers(object):
         data = request.data.decode("utf-8")
         logger.info("Request for editing the user of id %s with data %s ." % (userid, data))
         data = serializer.decode(data)
-        user = user_services.get_by_user_id(int(userid))
+        user = user_services.get(int(userid))
         user.update_from_data(data)
         user_services.edit(user)
         return make_response('', 200)
@@ -84,6 +86,15 @@ class APIUsers(object):
     @realmDigest.requires_auth
     def delete(self, userid):
         logger.info("Request for deleting a user with id: %s" % userid)
-        user = user_services.get_by_user_id(int(userid))
-        user_services.delete(user)
-        return make_response('', 200)
+        user = user_services.get(int(userid))
+        try:
+            user_services.delete(user)
+            return make_response('', 200)
+        except ProvdError as e:
+            result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
+            result = serializer.encode([result])
+            return make_response(result, 500)
+        except SysconfdError as e:
+            result = "The user was deleted but the voicemail content could not be removed (%s)" % str(e)
+            result = serializer.encode([result])
+            return make_response(result, 500)
