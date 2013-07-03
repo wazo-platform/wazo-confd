@@ -33,13 +33,13 @@ def exception_catcher(func):
         try:
             return func(*args, **kwargs)
         except MissingParametersError as e:
-            data = serializer.encode([str(e)])
+            data = serializer.encode([unicode(e)])
             return make_response(data, 400)
         except InvalidParametersError as e:
-            data = serializer.encode([str(e)])
+            data = serializer.encode([unicode(e)])
             return make_response(data, 400)
         except ElementAlreadyExistsError as e:
-            data = serializer.encode([str(e)])
+            data = serializer.encode([unicode(e)])
             return make_response(data, 400)
         except ValueError:
             data = serializer.encode(["No parsable data in the request"])
@@ -49,5 +49,6 @@ def exception_catcher(func):
         except HTTPException:
             raise
         except Exception as e:
-            return make_response(serializer.encode([str(e)]), 500)
+            logger.error("unexpected error during request: %s", e, exc_info=True)
+            return make_response(serializer.encode([unicode(e)]), 500)
     return decorated_func
