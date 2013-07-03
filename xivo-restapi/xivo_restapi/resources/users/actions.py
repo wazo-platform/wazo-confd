@@ -54,8 +54,8 @@ def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
     user = User.from_user_data(data)
-    user_id = user_services.create(user)
-    result = serializer.encode(user_id)
+    user = user_services.create(user)
+    result = serializer.encode(user.id)
     return make_response(result, 201)
 
 

@@ -113,10 +113,13 @@ class TestUserActions(unittest.TestCase):
     def test_create(self, mock_user_services_create):
         status_code = 201
 
+        user = Mock(User)
+        user.id = 1
+
         data = {u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
-        mock_user_services_create.return_value = 1
+        mock_user_services_create.return_value = user
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
 
