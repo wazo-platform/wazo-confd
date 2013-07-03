@@ -24,7 +24,7 @@ from xivo_dao.alchemy.extenumber import ExteNumber
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.usersip import UserSIP
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 import random
 
 

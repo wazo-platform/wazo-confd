@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2013  Avencall
+# Copyright (C) 2013 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 
 import argparse
 import logging
+
 from xivo import daemonize
-from xivo_restapi.rest import flask_http_server
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi import flask_http_server
+from xivo_restapi import config
 
 DAEMONNAME = 'xivo-restapid'
 LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
@@ -63,10 +64,10 @@ def _init_logging(debug_mode):
 
 
 def _init_data_access_logger(formatter):
-    handler = logging.FileHandler(RestAPIConfig.DATA_ACCESS_LOGFILENAME)
+    handler = logging.FileHandler(config.DATA_ACCESS_LOGFILENAME)
     handler.setFormatter(formatter)
 
-    data_access_logger = logging.getLogger(RestAPIConfig.DATA_ACCESS_LOGGERNAME)
+    data_access_logger = logging.getLogger(config.DATA_ACCESS_LOGGERNAME)
     data_access_logger.addHandler(handler)
     data_access_logger.setLevel(logging.INFO)
 
@@ -82,6 +83,7 @@ def _init_root_logger(formatter, debug_mode):
         handler.setFormatter(formatter)
         root_logger.addHandler(handler)
         root_logger.setLevel(logging.DEBUG)
+        config.DEBUG = True
     else:
         root_logger.setLevel(logging.INFO)
 

@@ -22,7 +22,7 @@ from acceptance.features.steps.helpers.rest_campaign import RestCampaign
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import record_campaigns_dao
-from xivo_restapi.restapi_config import RestAPIConfig
+from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from acceptance.features.steps.helpers.config import get_config_value
 
 
