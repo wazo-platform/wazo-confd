@@ -15,18 +15,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import httplib
+import os
+
 from acceptance.features.steps.helpers.rest_campaign import RestCampaign
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import record_campaigns_dao
 from xivo_restapi.restapi_config import RestAPIConfig
-import httplib
-import os
+from acceptance.features.steps.helpers.config import get_config_value
 
 
 @step(u'When I send a "([^"]*)" request to "([^"]*)"')
 def when_i_send_a_group1_request_to_group2(step, method, url):
-    url = "%s:%s" % (RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS, RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
+    hostname = get_config_value('xivo', 'hostname')
+    port = get_config_value('restapi', 'port')
+    url = "%s:%s" % (hostname, port)
     connection = httplib.HTTPConnection(url)
     headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
     connection.request(method, url, None, headers)
