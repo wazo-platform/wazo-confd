@@ -16,43 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
 
-from flask import Blueprint
-from xivo_restapi.ressources.users import api
-from xivo_restapi import config
-
-logger = logging.getLogger(__name__)
-
-root_1_1 = Blueprint("root_users_%s" % config.VERSION_1_1,
-                     __name__,
-                     url_prefix='/%s/users' % config.VERSION_1_1)
-
-root_1_1.add_url_rule("/",
-                      "list",
-                      api.list,
-                      methods=["GET"])
-
-root_1_1.add_url_rule("/<int:userid>",
-                      "get",
-                      api.get,
-                      methods=["GET"])
-
-root_1_1.add_url_rule("/",
-                      "create",
-                      api.create,
-                      methods=["POST"])
-
-root_1_1.add_url_rule("/<int:userid>",
-                      "edit",
-                      api.edit,
-                      methods=["PUT"])
-
-root_1_1.add_url_rule("/<int:userid>",
-                      "delete",
-                      api.delete,
-                      methods=["DELETE"])
+from xivo_restapi.resources.users.api import blueprint as user_blueprint
 
 
 def register_blueprints(app):
-    app.register_blueprint(root_1_1)
+    app.register_blueprint(user_blueprint)

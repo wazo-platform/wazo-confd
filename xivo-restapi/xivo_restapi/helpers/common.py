@@ -22,11 +22,13 @@ from xivo_restapi.helpers import serializer
 from werkzeug.exceptions import HTTPException
 from xivo_dao.data_handler.exception import MissingParametersError, \
     InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
 
 def exception_catcher(func):
+    @wraps(func)
     def decorated_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
