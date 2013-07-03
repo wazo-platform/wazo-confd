@@ -15,11 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_restapi.helpers import serializer
+
 
 class AbstractMapper(object):
 
     @classmethod
-    def run_one_object(cls, object_dao):
+    def encode(cls, data):
+        if isinstance(data, list):
+            result = cls._map_objects(data)
+        else:
+            result = cls._map_object(data)
+        return serializer.encode(result)
+
+    @classmethod
+    def _map_object(cls, object_dao):
         res = {}
         for obj_attr, mapping_key in cls._MAPPING.iteritems():
             if hasattr(object_dao, obj_attr):
@@ -27,8 +37,16 @@ class AbstractMapper(object):
         return res
 
     @classmethod
-    def run_list_object(cls, object_list):
+    def _map_objects(cls, object_list):
         res = []
         for object_dao in object_list:
-            res.append(cls.run_one_object(object_dao))
-        return res
+            res.append(cls._map_object(object_dao))
+        return cls._process_paginated_data(res)
+
+    @classmethod
+    def _process_paginated_data(cls, items):
+        result = {
+            'total': len(items),
+            'items': items
+        }
+        return result

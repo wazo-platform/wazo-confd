@@ -38,12 +38,7 @@ logger = logging.getLogger(__name__)
 def list():
     logger.info("List of users requested.")
     users = user_services.find_all()
-    users = UserMapper.run_list_object(users)
-    result = {
-        'total': len(users),
-        "items": users
-    }
-    result = serializer.encode(result)
+    result = UserMapper.encode(users)
     return make_response(result, 200)
 
 
@@ -53,8 +48,7 @@ def list():
 def get(userid):
     logger.info("User of id %s requested" % userid)
     user = user_services.get(userid)
-    result = UserMapper.run_one_object(user)
-    result = serializer.encode(result)
+    result = UserMapper.encode(user)
     return make_response(result, 200)
 
 

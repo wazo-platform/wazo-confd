@@ -52,16 +52,13 @@ class TestAPIUsers(unittest.TestCase):
 
         mock_user_services_find_all.return_value = expected_list
 
-        expected_result = {
-            "total": len(expected_list),
-            "items": UserMapper.run_list_object(expected_list)
-        }
+        expected_result = UserMapper.encode(expected_list)
 
         result = self.app.get("%s/" % BASE_URL, '')
 
         mock_user_services_find_all.assert_any_call()
         self.assertEquals(result.status, status)
-        self.assertEquals(serializer.encode(expected_result), result.data)
+        self.assertEquals(expected_result, result.data)
 
     @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users_error(self, mock_user_services_find_all):
@@ -81,13 +78,14 @@ class TestAPIUsers(unittest.TestCase):
         user1.firstname = 'test1'
         user1 = User.from_data_source(user1)
         mock_user_services_get.return_value = user1
-        user1 = UserMapper.run_one_object(user1)
+
+        expected_result = UserMapper.encode(user1)
 
         result = self.app.get("%s/1" % BASE_URL, '')
 
         mock_user_services_get.assert_called_with(1)
         self.assertEquals(result.status, status)
-        self.assertEquals(serializer.encode(user1), result.data)
+        self.assertEquals(expected_result, result.data)
 
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get_error(self, mock_user_services_get):

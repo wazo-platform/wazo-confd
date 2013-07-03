@@ -19,20 +19,9 @@
 import json
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 decode = json.loads
 
 
 def encode(data):
-    result = data
-    if isinstance(data, tuple):
-        result = _process_paginated_data(data)
-    return_value = json.dumps(result)
-    return return_value
-
-
-def _process_paginated_data(data):
-    (total, items) = data
-    result = {'total': total,
-              'items': items}
-    return result
+    return json.dumps(data)
