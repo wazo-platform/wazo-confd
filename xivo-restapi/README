@@ -5,15 +5,13 @@ Acceptance Testing:
 
 WARNING !!! all data will be erased by the acceptance tests use an empty xivo installation.
 
-- Shutdown your local postgres if any
-- The restapi daemon uses the dao to connect to postgres on port 5432
-    - forward port 5432 to your xivo used for acceptance tests : ssh -L 5432:localhost:5432 root@<xivo acceptance ip address>
-  The lettuce tests use dao on port 5434 to initialize data
-    - forware port 5434 to your xivo used for acceptance tests : ssh -L 5434:localhost:5432 root@<xivo acceptance ip address>
+- The acceptance tests use xivo_dao to test the database. postgres needs to accept connections from the exterior.
+  On the XiVO under test, add the following lines to the postgres configuration files:
+    - /etc/postgresql/9.0/main/pg_hba.conf : host    all             all             192.168.0.0/16          md5
+    - /etc/postgresql/9.0/main/postgres.conf : listen_addresses = '*'
 
-- start xivo-restapid
-
-PYTHONPATH=.:../../xivo-lib-python/xivo-lib-python/:../../xivo-dao/xivo-dao/  ./bin/xivo-restapid -d --dev_mode &
+- For the moment, xivo-restapi only listents to requests on localhost. Create a SSH tunnel to forward requests:
+    - ssh -fNL 50050:localhost:50050 root@xivo.ip.address
 
 Now you are ready to start the acceptance tests :
 

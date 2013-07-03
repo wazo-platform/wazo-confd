@@ -17,11 +17,15 @@
 from lettuce.registry import world
 from lettuce.terrain import before
 from xivo_dao.helpers import config, db_manager
+from acceptance.features.steps.helpers.config import get_config_value
 
 
 @before.all
 def modify_db_uri():
-    config.DB_URI = 'postgresql://asterisk:proformatique@localhost:5434/asterisk'
+    hostname = get_config_value('xivo', 'hostname')
+    db_uri = 'postgresql://asterisk:proformatique@%s:5432/asterisk' % hostname
+
+    config.DB_URI = db_uri
     db_manager.reinit()
 
 

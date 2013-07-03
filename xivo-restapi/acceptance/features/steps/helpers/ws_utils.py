@@ -17,8 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_restapi.rest import rest_encoder
-from xivo_restapi.restapi_config import RestAPIConfig
-import httplib
+from acceptance.features.steps.helpers.config import get_config_value
+import requests
 
 
 class WsUtils(object):
@@ -29,46 +29,59 @@ class WsUtils(object):
     '''
 
     def __init__(self):
-        self.connection = httplib.HTTPConnection(
-                            RestAPIConfig.XIVO_RECORD_SERVICE_ADDRESS +
-                            ":" +
-                            str(RestAPIConfig.XIVO_RECORD_SERVICE_PORT)
-                        )
-        self.requestURI = RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH
+        hostname = get_config_value('xivo', 'hostname')
+        protocol = get_config_value('restapi', 'protocol')
+        port = get_config_value('restapi', 'port')
+        api_version = get_config_value('restapi', 'api_version')
 
-    def rest_get(self, serviceURI):
-        method = "GET"
-        return self._http_request(serviceURI, method)
+        self.baseurl = "%s://%s:%s/%s" % (protocol, hostname, port, api_version)
+        self.username = get_config_value('restapi', 'username')
+        self.password = get_config_value('restapi', 'password')
 
-    def rest_post(self, serviceURI, data):
-        method = "POST"
-        body = rest_encoder.encode(data)
-        return self._http_request(serviceURI, method, body)
+    def rest_get(self, path):
+        url = "%s/%s" % (self.baseurl, path)
+        response = requests.get(url,
+                                verify=False,
+                                headers={'Content-Type': 'application/json'},
+                                auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+        return self._process_response(response)
 
-    def rest_put(self, serviceURI, data):
-        method = "PUT"
-        body = rest_encoder.encode(data)
-        return self._http_request(serviceURI, method, body)
+    def rest_post(self, path, payload):
+        url = "%s/%s" % (self.baseurl, path)
+        response = requests.post(url,
+                                 verify=False,
+                                 headers={'Content-Type': 'application/json'},
+                                 data=rest_encoder.encode(payload),
+                                 auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+        return self._process_response(response)
 
-    def rest_delete(self, serviceURI):
-        method = "DELETE"
-        return self._http_request(serviceURI, method)
+    def rest_put(self, path, payload):
+        url = "%s/%s" % (self.baseurl, path)
+        response = requests.put(url,
+                                verify=False,
+                                headers={'Content-Type': 'application/json'},
+                                data=rest_encoder.encode(payload),
+                                auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+        return self._process_response(response)
 
-    def _http_request(self, serviceURI, method, body=""):
-        headers = RestAPIConfig.CTI_REST_DEFAULT_CONTENT_TYPE
-        uri = self.requestURI + serviceURI
-        self.connection.request(method, uri, body, headers)
-        reply = self.connection.getresponse()
-        status = reply.status
-        body = reply.read()
+    def rest_delete(self, path):
+        url = "%s/%s" % (self.baseurl, path)
+        response = requests.delete(url,
+                                   verify=False,
+                                   headers={'Content-Type': 'application/json'},
+                                   auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+        return self._process_response(response)
+
+    def _process_response(self, response):
+        status_code = response.status_code
+        body = response.text
+
         try:
-            data = rest_encoder.decode(body)
+            body = rest_encoder.decode(body)
         except:
-            data = body
+            pass
 
-        if (status > 299 and status < 200):
-            raise RestWsRequestFailedException(status, data)
-        return RestResponse(status, data)
+        return RestResponse(status_code, body)
 
 
 class RestWsRequestFailedException(Exception):
@@ -77,7 +90,7 @@ class RestWsRequestFailedException(Exception):
     body = ""
 
     def __init__(self, code, body):
-
+        Exception.__init__(self, "%s %s" % (code, body))
         self.code = code
         self.body = body
 
