@@ -21,7 +21,7 @@ import os
 import pkg_resources
 
 from datetime import timedelta
-from flask import Flask
+from flask import Flask, request
 from xivo_restapi import config
 
 logger = logging.getLogger(__name__)
@@ -75,6 +75,17 @@ def _load_module(name):
         logger.error('Module not found %s', name)
     else:
         mod.register_blueprints(app)
+
+
+@app.before_request
+def log_requests():
+    params = {
+        'method': request.method,
+        'path': request.path,
+        'data': request.data
+    }
+
+    logger.info("%(method)s %(path)s with data %(data)s", params)
 
 
 class FlaskHttpServer(object):

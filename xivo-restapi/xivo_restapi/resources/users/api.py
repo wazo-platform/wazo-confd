@@ -37,7 +37,6 @@ route = RouteGenerator(blueprint)
 
 @route('/')
 def list():
-    logger.info("List of users requested.")
     users = user_services.find_all()
     result = UserMapper.encode(users)
     return make_response(result, 200)
@@ -45,7 +44,6 @@ def list():
 
 @route('/<int:userid>')
 def get(userid):
-    logger.info("User of id %s requested" % userid)
     user = user_services.get(userid)
     result = UserMapper.encode(user)
     return make_response(result, 200)
@@ -54,7 +52,6 @@ def get(userid):
 @route('/', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
-    logger.info("Request for creating a user with data: %s" % data)
     data = serializer.decode(data)
     user = User.from_user_data(data)
     user_id = user_services.create(user)
@@ -65,7 +62,6 @@ def create():
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):
     data = request.data.decode("utf-8")
-    logger.info("Request for editing the user of id %s with data %s ." % (userid, data))
     data = serializer.decode(data)
     user = user_services.get(userid)
     user.update_from_data(data)
@@ -75,7 +71,6 @@ def edit(userid):
 
 @route('/<int:userid>', methods=['DELETE'])
 def delete(userid):
-    logger.info("Request for deleting a user with id: %s" % userid)
     user = user_services.get(userid)
     try:
         user_services.delete(user)
