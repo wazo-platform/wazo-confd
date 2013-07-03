@@ -43,7 +43,7 @@ class WsUtils(object):
         response = requests.get(url,
                                 verify=False,
                                 headers={'Content-Type': 'application/json'},
-                                auth=requests.auth.HTTPBasicAuth(self.username, self.password))
+                                auth=requests.auth.HTTPDigestAuth(self.username, self.password))
         return self._process_response(response)
 
     def rest_post(self, path, payload):
@@ -52,7 +52,7 @@ class WsUtils(object):
                                  verify=False,
                                  headers={'Content-Type': 'application/json'},
                                  data=rest_encoder.encode(payload),
-                                 auth=requests.auth.HTTPBasicAuth(self.username, self.password))
+                                 auth=requests.auth.HTTPDigestAuth(self.username, self.password))
         return self._process_response(response)
 
     def rest_put(self, path, payload):
@@ -61,7 +61,7 @@ class WsUtils(object):
                                 verify=False,
                                 headers={'Content-Type': 'application/json'},
                                 data=rest_encoder.encode(payload),
-                                auth=requests.auth.HTTPBasicAuth(self.username, self.password))
+                                auth=requests.auth.HTTPDigestAuth(self.username, self.password))
         return self._process_response(response)
 
     def rest_delete(self, path):
@@ -69,15 +69,12 @@ class WsUtils(object):
         response = requests.delete(url,
                                    verify=False,
                                    headers={'Content-Type': 'application/json'},
-                                   auth=requests.auth.HTTPBasicAuth(self.username, self.password))
+                                   auth=requests.auth.HTTPDigestAuth(self.username, self.password))
         return self._process_response(response)
 
     def _process_response(self, response):
         status_code = response.status_code
         body = response.text
-
-        if status_code > 299 or status_code < 200:
-            raise RestWsRequestFailedException(status_code, body)
 
         try:
             body = rest_encoder.decode(body)
