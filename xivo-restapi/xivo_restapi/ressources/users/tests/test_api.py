@@ -72,7 +72,6 @@ class TestAPIUsers(unittest.TestCase):
 
         mock_user_services_find_all.assert_any_call()
         self.assertEqual(result.status, status)
-        mock_user_services_find_all.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get(self, mock_user_services_get):
@@ -99,7 +98,6 @@ class TestAPIUsers(unittest.TestCase):
 
         mock_user_services_get.assert_called_with(1)
         self.assertEqual(result.status, status)
-        mock_user_services_get.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get_not_found(self, mock_user_services_get):
@@ -111,7 +109,6 @@ class TestAPIUsers(unittest.TestCase):
 
         mock_user_services_get.assert_called_with(1)
         self.assertEqual(result.status, status)
-        mock_user_services_get.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
@@ -139,7 +136,6 @@ class TestAPIUsers(unittest.TestCase):
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status, result.status)
-        mock_user_services_create.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create_request_error(self, mock_user_services_create):
@@ -153,7 +149,6 @@ class TestAPIUsers(unittest.TestCase):
         self.assertEqual(status, result.status)
         received_data = serializer.decode(result.data)
         self.assertEquals(expected_data, received_data[0])
-        mock_user_services_create.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
@@ -168,7 +163,6 @@ class TestAPIUsers(unittest.TestCase):
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(result.status, status)
-        mock_user_services_edit.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
@@ -184,7 +178,6 @@ class TestAPIUsers(unittest.TestCase):
 
         user.update_from_data.assert_called_with(data)
         self.assertEqual(status, result.status)
-        mock_user_services_edit.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
@@ -200,7 +193,6 @@ class TestAPIUsers(unittest.TestCase):
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status, result.status)
-        mock_user_services_edit.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
@@ -214,7 +206,6 @@ class TestAPIUsers(unittest.TestCase):
 
         self.assertEqual(result.status, status)
         mock_user_services_delete.assert_called_with(user)
-        mock_user_services_delete.side_effect = None
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
@@ -228,4 +219,3 @@ class TestAPIUsers(unittest.TestCase):
 
         self.assertEqual(result.status, status)
         mock_user_services_delete.assert_called_with(user)
-        mock_user_services_delete.side_effect = None
