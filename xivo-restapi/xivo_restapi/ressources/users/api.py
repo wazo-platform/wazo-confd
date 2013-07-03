@@ -52,7 +52,7 @@ def list():
 @realmDigest.requires_auth
 def get(userid):
     logger.info("User of id %s requested" % userid)
-    user = user_services.get(int(userid))
+    user = user_services.get(userid)
     result = UserMapper.run_one_object(user)
     result = serializer.encode(result)
     return make_response(result, 200)
@@ -78,7 +78,7 @@ def edit(userid):
     data = request.data.decode("utf-8")
     logger.info("Request for editing the user of id %s with data %s ." % (userid, data))
     data = serializer.decode(data)
-    user = user_services.get(int(userid))
+    user = user_services.get(userid)
     user.update_from_data(data)
     user_services.edit(user)
     return make_response('', 200)
@@ -88,7 +88,7 @@ def edit(userid):
 @realmDigest.requires_auth
 def delete(userid):
     logger.info("Request for deleting a user with id: %s" % userid)
-    user = user_services.get(int(userid))
+    user = user_services.get(userid)
     try:
         user_services.delete(user)
         return make_response('', 200)

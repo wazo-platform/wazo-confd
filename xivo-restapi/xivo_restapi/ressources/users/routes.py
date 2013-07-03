@@ -33,7 +33,7 @@ root_1_1.add_url_rule("/",
                       api.list,
                       methods=["GET"])
 
-root_1_1.add_url_rule("/<userid>",
+root_1_1.add_url_rule("/<int:userid>",
                       "get",
                       api.get,
                       methods=["GET"])
@@ -43,12 +43,12 @@ root_1_1.add_url_rule("/",
                       api.create,
                       methods=["POST"])
 
-root_1_1.add_url_rule("/<userid>",
+root_1_1.add_url_rule("/<int:userid>",
                       "edit",
                       api.edit,
                       methods=["PUT"])
 
-root_1_1.add_url_rule("/<userid>",
+root_1_1.add_url_rule("/<int:userid>",
                       "delete",
                       api.delete,
                       methods=["DELETE"])
