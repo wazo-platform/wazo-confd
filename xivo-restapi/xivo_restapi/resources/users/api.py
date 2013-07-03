@@ -22,25 +22,20 @@ from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User
-from xivo_restapi.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.negotiate.flask_negotiate import produces, consumes
 from xivo_restapi.resources.users.mapper import UserMapper
-from xivo_restapi.helpers.common import exception_catcher
 from xivo_restapi.helpers import serializer
 from xivo_dao.helpers.provd_connector import ProvdError
 from xivo_dao.helpers.sysconfd_connector import SysconfdError
+from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
 
+
 logger = logging.getLogger(__name__)
-
-
 blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
+route = RouteGenerator(blueprint)
 
 
-@produces('application/json')
-@realmDigest.requires_auth
-@blueprint.route('/')
-@exception_catcher
+@route('/')
 def list():
     logger.info("List of users requested.")
     users = user_services.find_all()
@@ -48,10 +43,7 @@ def list():
     return make_response(result, 200)
 
 
-@produces('application/json')
-@realmDigest.requires_auth
-@blueprint.route('/<int:userid>')
-@exception_catcher
+@route('/<int:userid>')
 def get(userid):
     logger.info("User of id %s requested" % userid)
     user = user_services.get(userid)
@@ -59,10 +51,7 @@ def get(userid):
     return make_response(result, 200)
 
 
-@consumes('application/json')
-@realmDigest.requires_auth
-@blueprint.route('/', methods=["POST"])
-@exception_catcher
+@route('/', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
     logger.info("Request for creating a user with data: %s" % data)
@@ -73,10 +62,7 @@ def create():
     return make_response(result, 201)
 
 
-@consumes('application/json')
-@realmDigest.requires_auth
-@blueprint.route('/<int:userid>', methods=["PUT"])
-@exception_catcher
+@route('/<int:userid>', methods=['PUT'])
 def edit(userid):
     data = request.data.decode("utf-8")
     logger.info("Request for editing the user of id %s with data %s ." % (userid, data))
@@ -87,9 +73,7 @@ def edit(userid):
     return make_response('', 200)
 
 
-@realmDigest.requires_auth
-@blueprint.route('/<int:userid>', methods=["DELETE"])
-@exception_catcher
+@route('/<int:userid>', methods=['DELETE'])
 def delete(userid):
     logger.info("Request for deleting a user with id: %s" % userid)
     user = user_services.get(userid)
