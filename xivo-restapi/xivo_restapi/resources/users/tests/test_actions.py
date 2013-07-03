@@ -30,7 +30,7 @@ from xivo_dao.data_handler.exception import MissingParametersError, \
 BASE_URL = "/1.1/users"
 
 
-class TestAPIUsers(unittest.TestCase):
+class TestUserActions(unittest.TestCase):
 
     def setUp(self):
         flask_http_server.register_blueprints()
