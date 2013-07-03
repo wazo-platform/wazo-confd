@@ -32,69 +32,71 @@ from xivo_dao.helpers.sysconfd_connector import SysconfdError
 logger = logging.getLogger(__name__)
 
 
-class APIUsers(object):
+@exception_catcher
+@produces('application/json')
+@realmDigest.requires_auth
+def list():
+    logger.info("List of users requested.")
+    users = user_services.find_all()
+    users = UserMapper.run_list_object(users)
+    result = {
+        'total': len(users),
+        "items": users
+    }
+    result = serializer.encode(result)
+    return make_response(result, 200)
 
-    @exception_catcher
-    @produces('application/json')
-    @realmDigest.requires_auth
-    def list(self):
-        logger.info("List of users requested.")
-        users = user_services.find_all()
-        users = UserMapper.run_list_object(users)
-        result = {
-            'total': len(users),
-            "items": users
-        }
-        result = serializer.encode(result)
-        return make_response(result, 200)
 
-    @exception_catcher
-    @produces('application/json')
-    @realmDigest.requires_auth
-    def get(self, userid):
-        logger.info("User of id %s requested" % userid)
-        user = user_services.get(int(userid))
-        result = UserMapper.run_one_object(user)
-        result = serializer.encode(result)
-        return make_response(result, 200)
+@exception_catcher
+@produces('application/json')
+@realmDigest.requires_auth
+def get(userid):
+    logger.info("User of id %s requested" % userid)
+    user = user_services.get(int(userid))
+    result = UserMapper.run_one_object(user)
+    result = serializer.encode(result)
+    return make_response(result, 200)
 
-    @exception_catcher
-    @consumes('application/json')
-    @realmDigest.requires_auth
-    def create(self):
-        data = request.data.decode("utf-8")
-        logger.info("Request for creating a user with data: %s" % data)
-        data = serializer.decode(data)
-        user = User.from_user_data(data)
-        user_id = user_services.create(user)
-        result = serializer.encode(user_id)
-        return make_response(result, 201)
 
-    @exception_catcher
-    @consumes('application/json')
-    @realmDigest.requires_auth
-    def edit(self, userid):
-        data = request.data.decode("utf-8")
-        logger.info("Request for editing the user of id %s with data %s ." % (userid, data))
-        data = serializer.decode(data)
-        user = user_services.get(int(userid))
-        user.update_from_data(data)
-        user_services.edit(user)
+@exception_catcher
+@consumes('application/json')
+@realmDigest.requires_auth
+def create():
+    data = request.data.decode("utf-8")
+    logger.info("Request for creating a user with data: %s" % data)
+    data = serializer.decode(data)
+    user = User.from_user_data(data)
+    user_id = user_services.create(user)
+    result = serializer.encode(user_id)
+    return make_response(result, 201)
+
+
+@exception_catcher
+@consumes('application/json')
+@realmDigest.requires_auth
+def edit(userid):
+    data = request.data.decode("utf-8")
+    logger.info("Request for editing the user of id %s with data %s ." % (userid, data))
+    data = serializer.decode(data)
+    user = user_services.get(int(userid))
+    user.update_from_data(data)
+    user_services.edit(user)
+    return make_response('', 200)
+
+
+@exception_catcher
+@realmDigest.requires_auth
+def delete(userid):
+    logger.info("Request for deleting a user with id: %s" % userid)
+    user = user_services.get(int(userid))
+    try:
+        user_services.delete(user)
         return make_response('', 200)
-
-    @exception_catcher
-    @realmDigest.requires_auth
-    def delete(self, userid):
-        logger.info("Request for deleting a user with id: %s" % userid)
-        user = user_services.get(int(userid))
-        try:
-            user_services.delete(user)
-            return make_response('', 200)
-        except ProvdError as e:
-            result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
-            result = serializer.encode([result])
-            return make_response(result, 500)
-        except SysconfdError as e:
-            result = "The user was deleted but the voicemail content could not be removed (%s)" % str(e)
-            result = serializer.encode([result])
-            return make_response(result, 500)
+    except ProvdError as e:
+        result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
+        result = serializer.encode([result])
+        return make_response(result, 500)
+    except SysconfdError as e:
+        result = "The user was deleted but the voicemail content could not be removed (%s)" % str(e)
+        result = serializer.encode([result])
+        return make_response(result, 500)

@@ -19,11 +19,10 @@
 import logging
 
 from flask import Blueprint
-from xivo_restapi.ressources.users.api import APIUsers
+from xivo_restapi.ressources.users import api
 from xivo_restapi import config
 
 logger = logging.getLogger(__name__)
-users = APIUsers()
 
 root_1_1 = Blueprint("root_users_%s" % config.VERSION_1_1,
                      __name__,
@@ -31,27 +30,27 @@ root_1_1 = Blueprint("root_users_%s" % config.VERSION_1_1,
 
 root_1_1.add_url_rule("/",
                       "list",
-                      users.list,
+                      api.list,
                       methods=["GET"])
 
 root_1_1.add_url_rule("/<userid>",
                       "get",
-                      users.get,
+                      api.get,
                       methods=["GET"])
 
 root_1_1.add_url_rule("/",
                       "create",
-                      users.create,
+                      api.create,
                       methods=["POST"])
 
 root_1_1.add_url_rule("/<userid>",
                       "edit",
-                      users.edit,
+                      api.edit,
                       methods=["PUT"])
 
 root_1_1.add_url_rule("/<userid>",
                       "delete",
-                      users.delete,
+                      api.delete,
                       methods=["DELETE"])
 
 
