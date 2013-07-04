@@ -1,6 +1,27 @@
-Be sure to pass all tests before submiting any patch.
+XiVO RestAPI
+************
 
-Acceptance Testing:
+ ..warning:
+ 
+   Be sure to pass all tests before submiting any patch.
+
+
+Dependencies 
+------------
+
+pip install requests
+
+XiVO:
+- xivo-dao
+- lib-python
+
+Other dependencies will be installed by the install script:
+- Flask-0.6-1, Werkzeug-0.6.2-1, 
+
+Packaging info in project squeeze-xivo-skaro
+
+
+Acceptance Testing
 ------------------
 
 WARNING !!! all data will be erased by the acceptance tests use an empty xivo installation.
@@ -10,24 +31,8 @@ WARNING !!! all data will be erased by the acceptance tests use an empty xivo in
     - /etc/postgresql/9.0/main/pg_hba.conf : host    all             all             192.168.0.0/16          md5
     - /etc/postgresql/9.0/main/postgres.conf : listen_addresses = '*'
 
-- For the moment, xivo-restapi only listents to requests on localhost. Create a SSH tunnel to forward requests:
-    - ssh -fNL 50050:localhost:50050 root@xivo.ip.address
-
 Now you are ready to start the acceptance tests :
 
     $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/                    # starts all tests 
     $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/users.feature       # starts user features tests
     $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/users.feature -s 3  # starts the third scenario
-
-
-Depends :
----------
-XiVO:
-- xivo-dao
-- lib-python
-
-Other dependencies will be installed by the install script:
-- Flask-0.6-1, Werkzeug-0.6.2-1, 
-
-
-Packaging info in project squeeze-xivo-skaro
