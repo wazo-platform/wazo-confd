@@ -17,7 +17,7 @@
 from lettuce.registry import world
 from lettuce.terrain import before
 from xivo_dao.helpers import config, db_manager
-from acceptance.features.steps.helpers.config import get_config_value
+from acceptance.helpers.config import get_config_value
 
 
 @before.all

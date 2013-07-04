@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
     extensions_dao, extenumber_dao, contextnummember_dao
 from xivo_dao.alchemy.contextnummember import ContextNumMember
@@ -26,12 +25,13 @@ from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.usersip import UserSIP
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 import random
+from acceptance.features_1_0 import ws_utils_session
 
 
 class RestUsers():
 
     def __init__(self):
-        self.ws_utils = WsUtils()
+        self.ws_utils = ws_utils_session
 
     def get_all_users(self):
         return self.ws_utils.rest_get(RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/")

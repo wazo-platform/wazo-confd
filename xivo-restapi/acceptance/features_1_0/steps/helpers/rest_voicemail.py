@@ -14,17 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import voicemail_dao, user_dao
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 import random
+from acceptance.features_1_0 import ws_utils_session
 
 
 class RestVoicemail(object):
 
     def __init__(self):
-        self.ws_utils = WsUtils()
+        self.ws_utils = ws_utils_session
 
     def create_voicemail(self, fullname=None, number=None, context="default"):
         voicemail = Voicemail()

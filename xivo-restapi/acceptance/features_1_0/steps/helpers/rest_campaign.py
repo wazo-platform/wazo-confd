@@ -19,21 +19,21 @@
 import datetime
 import traceback
 
-from acceptance.features.steps.helpers.rest_queues import RestQueues
-from acceptance.features.steps.helpers.ws_utils import WsUtils
-from acceptance.features.steps.helpers.config import get_config_value
+from rest_queues import RestQueues
 
 from xivo_dao import agent_dao, queue_dao, record_campaigns_dao, recordings_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_lettuce.ssh import SSHClient
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
+from acceptance.features_1_0 import ws_utils_session
+from acceptance.helpers.config import get_config_value
 
 
 class RestCampaign(object):
 
     def __init__(self):
-        self.ws_utils = WsUtils()
+        self.ws_utils = ws_utils_session
 
     def create(self, campaign_name, queue_name='test', activated=True,
                start_date=None, end_date=None, campaign_id=None):
@@ -86,7 +86,7 @@ class RestCampaign(object):
 
         reply = self.ws_utils.rest_post(url, recording)
 
-        #we create the file
+        # we create the file
         dirname = RestAPIConfig.RECORDING_FILE_ROOT_PATH
         remote_host = get_config_value('xivo', 'hostname')
 
@@ -190,7 +190,7 @@ class RestCampaign(object):
         return self.ws_utils.rest_get(serviceURI)
 
     def delete_recording(self, campaign_id, callid):
-        #os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
+        # os.chmod(RestAPIConfig.RECORDING_FILE_ROOT_PATH, 0777)
         url = "%s/%s/%s" % (
             RestAPIConfig.XIVO_RECORDING_SERVICE_PATH,
             campaign_id,

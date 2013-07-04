@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.features.steps.helpers.rest_users import RestUsers
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
@@ -29,6 +28,7 @@ from xivo_dao.alchemy.phonefunckey import PhoneFunckey
 from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.schedule import Schedule
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from helpers.rest_users import RestUsers
 
 rest_users = RestUsers()
 

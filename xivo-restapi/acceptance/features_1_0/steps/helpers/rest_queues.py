@@ -19,10 +19,10 @@
 import random
 import traceback
 
-from acceptance.features.steps.helpers.ws_utils import WsUtils
 from xivo_dao import queue_dao
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
+from acceptance.helpers.ws_utils import WsUtils
 
 
 class RestQueues(object):

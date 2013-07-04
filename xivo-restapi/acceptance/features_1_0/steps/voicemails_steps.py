@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.features.steps.helpers.rest_voicemail import RestVoicemail
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import voicemail_dao
+from helpers.rest_voicemail import RestVoicemail
 
 rest_voicemail = RestVoicemail()
+
 
 @step(u'Given there is a voicemail with fullname "([^"]*)" and with number "([^"]*)"')
 def given_there_is_a_voicemail_with_fullname_group1_and_with_number_group2(step, fullname, number):

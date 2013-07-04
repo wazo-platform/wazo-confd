@@ -16,11 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from acceptance.features.steps.helpers.rest_campaign import RestCampaign
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import queue_dao, record_campaigns_dao, recordings_dao
 import datetime
+from helpers.rest_campaign import RestCampaign
 
 rest_campaign = RestCampaign()
 world.result_list = []
