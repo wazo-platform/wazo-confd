@@ -43,8 +43,6 @@ setup(
               'xivo_restapi.v1_0.service_data_model',
               'xivo_restapi.v1_0.services',
               'xivo_restapi.v1_0.services.utils',
-              'xivo_restapi.authentification',
-              'xivo_restapi.authentification.werkzeug',
               'xivo_restapi.helpers',
               'xivo_restapi.negotiate',
               'xivo_restapi.resources',
