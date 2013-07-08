@@ -38,7 +38,25 @@ class TestUserActions(unittest.TestCase):
         self.app = flask_http_server.app.test_client()
 
     @patch('xivo_dao.data_handler.user.services.find_all')
-    def test_list_users(self, mock_user_services_find_all):
+    def test_list_users_with_no_users(self, mock_user_services_find_all):
+        status_code = 200
+
+        expected_list = []
+        expected_result = {
+            'total': 0,
+            'items': []
+        }
+
+        mock_user_services_find_all.return_value = expected_list
+
+        result = self.app.get("%s/" % BASE_URL)
+
+        mock_user_services_find_all.assert_any_call()
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals(serializer.encode(expected_result), result.data)
+
+    @patch('xivo_dao.data_handler.user.services.find_all')
+    def test_list_users_with_two_users(self, mock_user_services_find_all):
         status_code = 200
 
         user1 = User(id=1,
