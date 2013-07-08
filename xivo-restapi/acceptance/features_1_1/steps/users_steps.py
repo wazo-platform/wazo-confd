@@ -245,7 +245,6 @@ def then_this_user_no_longer_has_a_line(step):
     _check_usersip()
     _check_extensions()
     _check_extenumbers()
-    _check_contextnummembers()
 
 
 def _check_user_features():
@@ -271,10 +270,6 @@ def _check_extensions():
 
 def _check_extenumbers():
     assert extenumber_dao.get_by_exten(world.number) is None
-
-
-def _check_contextnummembers():
-    assert line_dao.get_contextnummember(world.lineid) is None
 
 
 def _check_queuemembers():
