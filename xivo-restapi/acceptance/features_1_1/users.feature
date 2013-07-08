@@ -49,10 +49,11 @@ Feature: Users
         Given there are the following users:
           | id | firstname | lastname |
           | 1  | Irène     | Dupont   |
-        When I ask for the user with id "1"
-        Then I get a user with the following properties:
-          | id | firstname | lastname | userfield |
-          | 1  | Irène     | Dupont   |           |
+      When I ask for the user with id "1"
+      Then I get a response with status "200"
+      Then I get a user with the following properties:
+        | id | firstname | lastname | userfield |
+        | 1  | Irène     | Dupont   |           |
 
     Scenario: Creating an empty user
         Given there are no users
@@ -129,7 +130,7 @@ Feature: Users
           | firstname |
           | Brézé     |
         Then I get a response with status "204"
-        When I ask for user with id "1"
+        When I ask for the user with id "1"
         Then I get a user with the following properties:
           | id | firstname | lastname | userfield |
           | 1  | Brézé     | Dupont   |           |
@@ -142,7 +143,7 @@ Feature: Users
           | lastname      |
           | Argentine     |
         Then I get a response with status "204"
-        When I ask for user with id "1"
+        When I ask for the user with id "1"
         Then I get a user with the following properties:
           | id | firstname | lastname  | userfield |
           | 1  | Clémence  | Argentine |           |
