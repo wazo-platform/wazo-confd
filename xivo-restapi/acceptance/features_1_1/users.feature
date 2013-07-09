@@ -133,7 +133,7 @@ Feature: Users
         When I ask for the user with id "1"
         Then I get a user with the following properties:
           | id | firstname | lastname | userfield |
-          | 1  | Brézé     | Dupont   |           |
+          | 1  | Brézé     | Dupond   |           |
 
     Scenario: Editing the lastname of a user
         Given there are the following users:
