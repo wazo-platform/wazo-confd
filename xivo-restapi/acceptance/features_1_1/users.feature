@@ -115,13 +115,13 @@ Feature: Users
     Scenario: User search with 2 users
         Given there are the following users:
           | firstname | lastname |
-          | Andreï    | Bélier   |
           | Remy      | Licorne  |
+          | Andreï    | Bélier   |
         When I search for the user "re"
         Then I get a list with the following users:
           | firstname | lastname |
-          | Remy      | Licorne  |
           | Andreï    | Bélier   |
+          | Remy      | Licorne  |
         When I search for the user "lic"
         Then I get a list with the following users:
           | firstname | lastname |
