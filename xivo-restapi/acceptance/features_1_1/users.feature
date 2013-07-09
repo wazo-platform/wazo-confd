@@ -84,6 +84,9 @@ Feature: Users
           | Irène     |
         Then I get a response with status "201"
         Then I get a response with a user id
+        Then the created user has the following parameters:
+         | firstname | lastname | userfield |
+         | Irène     |          |           |
 
     Scenario: Creating two users with the same firstname
         Given there are no users
@@ -104,6 +107,9 @@ Feature: Users
           | Irène     | Dupont   | accented description: éà@'; | customdata |
         Then I get a response with status "201"
         Then I get a response with a user id
+        Then the created user has the following parameters:
+          | firstname | lastname | description                 | userfield  |
+          | Irène     | Dupont   | accented description: éà@'; | customdata |
 
     Scenario: Editing a user that doesn't exist
         Given there are no users

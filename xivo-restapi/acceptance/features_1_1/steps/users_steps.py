@@ -107,6 +107,16 @@ def _get_user_info(hashes):
     return userinfo
 
 
+@step(u'Then the created user has the following parameters:')
+def then_the_created_user_has_the_following_parameters(step):
+    userid = world.response.data['id']
+
+    user = user_ws.get_user(userid).data
+    expected_user = _get_user_info(step.hashes)
+
+    assert_that(user, has_entries(expected_user))
+
+
 @step(u'Then I get an error message "([^"]*)"')
 def then_i_get_an_error_message_group1(step, error_message):
     assert_that(world.response.data, has_item(error_message))
