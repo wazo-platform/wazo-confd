@@ -130,6 +130,7 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
         status_code = 201
+        expected_result = {'id': 1}
 
         user = Mock(User)
         user.id = 1
@@ -142,7 +143,7 @@ class TestUserActions(unittest.TestCase):
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
-        self.assertEqual(result.data, '1')
+        self.assertEqual(result.data, serializer.encode(expected_result))
         mock_user_services_create.assert_called_with(User.from_user_data(data))
 
     @patch('xivo_dao.data_handler.user.services.create')
