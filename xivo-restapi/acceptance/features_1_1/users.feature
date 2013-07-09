@@ -97,11 +97,11 @@ Feature: Users
           | Lord      |          |           |
           | Lord      |          |           |
 
-    Scenario: Creating a user with a firstname, lastname and description
+    Scenario: Creating a user with a firstname, lastname, description and userfield
         Given there are no users
         When I create users with the following parameters:
-          | firstname | lastname | description                 |
-          | Irène     | Dupont   | accented description: éà@'; |
+          | firstname | lastname | description                 | userfield  |
+          | Irène     | Dupont   | accented description: éà@'; | customdata |
         Then I get a response with status "201"
         Then I get a response with a user id
 
@@ -147,6 +147,19 @@ Feature: Users
         Then I get a user with the following properties:
           | id | firstname | lastname  | userfield |
           | 1  | Clémence  | Argentine |           |
+
+    Scenario: Editing the firstname, lastname and userfield of a user
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Clémence  | Dupond   |
+        When I update the user with id "1" using the following parameters:
+          | firstname | lastname  | userfield  |
+          | Claude    | Argentine | customdata |
+        Then I get a response with status "204"
+        When I ask for the user with id "1"
+        Then I get a user with the following properties:
+          | id | firstname | lastname  | userfield  |
+          | 1  | Claude    | Argentine | customdata |
 
     Scenario: Deleting a user that doesn't exist
         Given there are no users
