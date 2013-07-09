@@ -39,38 +39,42 @@ class WsUtils(object):
         self.username = get_config_value('restapi', 'username')
         self.password = get_config_value('restapi', 'password')
 
-    def rest_get(self, path):
+    def rest_get(self, path, **kwargs):
         url = "%s/%s" % (self.baseurl, path)
         response = requests.get(url,
                                 verify=False,
                                 headers={'Content-Type': 'application/json'},
-                                auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+                                auth=requests.auth.HTTPDigestAuth(self.username, self.password),
+                                **kwargs)
         return self._process_response(response)
 
-    def rest_post(self, path, payload):
+    def rest_post(self, path, payload, **kwargs):
         url = "%s/%s" % (self.baseurl, path)
         response = requests.post(url,
                                  verify=False,
                                  headers={'Content-Type': 'application/json'},
                                  data=serializer.encode(payload),
-                                 auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+                                 auth=requests.auth.HTTPDigestAuth(self.username, self.password),
+                                 **kwargs)
         return self._process_response(response)
 
-    def rest_put(self, path, payload):
+    def rest_put(self, path, payload, **kwargs):
         url = "%s/%s" % (self.baseurl, path)
         response = requests.put(url,
                                 verify=False,
                                 headers={'Content-Type': 'application/json'},
                                 data=serializer.encode(payload),
-                                auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+                                auth=requests.auth.HTTPDigestAuth(self.username, self.password),
+                                **kwargs)
         return self._process_response(response)
 
-    def rest_delete(self, path):
+    def rest_delete(self, path, **kwargs):
         url = "%s/%s" % (self.baseurl, path)
         response = requests.delete(url,
                                    verify=False,
                                    headers={'Content-Type': 'application/json'},
-                                   auth=requests.auth.HTTPDigestAuth(self.username, self.password))
+                                   auth=requests.auth.HTTPDigestAuth(self.username, self.password),
+                                   **kwargs)
         return self._process_response(response)
 
     def _process_response(self, response):
