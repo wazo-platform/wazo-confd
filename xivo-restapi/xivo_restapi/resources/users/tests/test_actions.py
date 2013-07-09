@@ -226,7 +226,8 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
     def test_delete_success(self, mock_user_services_delete, mock_user_services_get):
-        status_code = 200
+        status_code = 204
+        expected_data = ''
 
         user = Mock(User)
         mock_user_services_get.return_value = user
@@ -235,6 +236,7 @@ class TestUserActions(unittest.TestCase):
         result = self.app.delete("%s/1" % BASE_URL)
 
         self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_data, result.data)
         mock_user_services_delete.assert_called_with(user)
 
     @patch('xivo_dao.data_handler.user.services.get')

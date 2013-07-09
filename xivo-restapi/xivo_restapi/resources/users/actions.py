@@ -78,7 +78,7 @@ def delete(userid):
     user = user_services.get(userid)
     try:
         user_services.delete(user)
-        return make_response('', 200)
+        return make_response('', 204)
     except ProvdError as e:
         result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
         result = serializer.encode([result])
