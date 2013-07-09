@@ -59,7 +59,7 @@ Feature: Users
         Given there are no users
         When I create an empty user
         Then I get a response with status "400"
-        Then I get an error message "Missing paramters: firstname"
+        Then I get an error message "Missing parameters: firstname"
 
     Scenario: Creating a user with paramters that don't exist
         Given there are no users
@@ -67,7 +67,7 @@ Feature: Users
           | unexisting_field |
           | unexisting_value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters: unexisting_field"
+        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Creating a user with a firstname and parameters that don't exist
         Given there are no users
@@ -75,7 +75,7 @@ Feature: Users
           | firstname | unexisting_field |
           | Joe       | unexisting_value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters: unexisting_field"
+        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Creating a user with a firstname
         Given there are no users
@@ -120,7 +120,7 @@ Feature: Users
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters: unexisting_field"
+        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the firstname of a user
         Given there are the following users:
