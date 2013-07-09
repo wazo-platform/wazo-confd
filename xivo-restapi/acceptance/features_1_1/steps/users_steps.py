@@ -119,4 +119,5 @@ def then_i_get_a_response_with_a_user_id(step):
 
 @step(u'Then the user with id "([^"]*)" no longer exists')
 def then_the_user_with_id_group1_no_longer_exists(step, userid):
-    user_helper.assert_user_deleted(userid)
+    response = user_ws.get_user(userid)
+    assert_that(response.status, equal_to(404))
