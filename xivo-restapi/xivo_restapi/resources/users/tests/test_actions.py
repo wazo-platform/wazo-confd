@@ -177,7 +177,8 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
     def test_edit(self, mock_user_services_edit, mock_user_services_get):
-        status_code = 200
+        status_code = 204
+        expected_data = ''
 
         data = {u'id': 1,
                 u'firstname': u'André',
@@ -188,6 +189,7 @@ class TestUserActions(unittest.TestCase):
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_data, result.data)
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')

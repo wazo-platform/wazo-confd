@@ -70,7 +70,7 @@ def edit(userid):
     user = user_services.get(userid)
     user.update_from_data(data)
     user_services.edit(user)
-    return make_response('', 200)
+    return make_response('', 204)
 
 
 @route('/<int:userid>', methods=['DELETE'])
