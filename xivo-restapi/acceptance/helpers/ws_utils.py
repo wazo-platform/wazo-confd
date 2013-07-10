@@ -29,92 +29,71 @@ class WsUtils(object):
     '''
 
     def __init__(self, api_version=None):
+        self.baseurl = self._prepare_baseurl(api_version)
+        self.auth = self._prepare_auth()
+        self.session = requests.Session()
+
+    def _prepare_baseurl(self, api_version=None):
         hostname = get_config_value('xivo', 'hostname')
         protocol = get_config_value('restapi', 'protocol')
         port = get_config_value('restapi', 'port')
-        if api_version is None:
-            api_version = get_config_value('restapi', 'api_version')
+        api_version = api_version or get_config_value('restapi', 'api_version')
 
-        self.baseurl = "%s://%s:%s/%s" % (protocol, hostname, port, api_version)
-        self.username = get_config_value('restapi', 'username')
-        self.password = get_config_value('restapi', 'password')
+        baseurl = "%s://%s:%s/%s" % (protocol, hostname, port, api_version)
+        return baseurl
+
+    def _prepare_auth(self):
+        username = get_config_value('restapi', 'username')
+        password = get_config_value('restapi', 'password')
+
+        auth = requests.auth.HTTPDigestAuth(username, password)
+        return auth
 
     def rest_get(self, path, **kwargs):
-        url = "%s/%s" % (self.baseurl, path)
-        response = requests.get(url,
-                                verify=False,
-                                headers={'Content-Type': 'application/json'},
-                                auth=requests.auth.HTTPDigestAuth(self.username, self.password),
-                                **kwargs)
-        return self._process_response(response)
+        request = self._prepare_request('GET', path, **kwargs)
+        return self._process_request(request)
 
     def rest_post(self, path, payload, **kwargs):
-        url = "%s/%s" % (self.baseurl, path)
-        response = requests.post(url,
-                                 verify=False,
-                                 headers={'Content-Type': 'application/json'},
-                                 data=serializer.encode(payload),
-                                 auth=requests.auth.HTTPDigestAuth(self.username, self.password),
-                                 **kwargs)
-        return self._process_response(response)
+        data = serializer.encode(payload)
+        request = self._prepare_request('POST', path, data=data, **kwargs)
+        return self._process_request(request)
 
     def rest_put(self, path, payload, **kwargs):
-        url = "%s/%s" % (self.baseurl, path)
-        response = requests.put(url,
-                                verify=False,
-                                headers={'Content-Type': 'application/json'},
-                                data=serializer.encode(payload),
-                                auth=requests.auth.HTTPDigestAuth(self.username, self.password),
-                                **kwargs)
-        return self._process_response(response)
+        data = serializer.encode(payload)
+        request = self._prepare_request('PUT', path, data=data, **kwargs)
+        return self._process_request(request)
 
     def rest_delete(self, path, **kwargs):
+        request = self._prepare_request('DELETE', path, **kwargs)
+        return self._process_request(request)
+
+    def _prepare_request(self, method, path, **kwargs):
+        headers = {'Content-Type': 'application/json'}
         url = "%s/%s" % (self.baseurl, path)
-        response = requests.delete(url,
-                                   verify=False,
-                                   headers={'Content-Type': 'application/json'},
-                                   auth=requests.auth.HTTPDigestAuth(self.username, self.password),
-                                   **kwargs)
+
+        return requests.Request(method=method, url=url, headers=headers, auth=self.auth, **kwargs)
+
+    def _process_request(self, request):
+        prep = request.prepare()
+        response = self.session.send(prep, verify=False)
         return self._process_response(response)
 
     def _process_response(self, response):
         status_code = response.status_code
         body = response.text
+        headers = response.headers
 
         try:
             body = serializer.decode(body)
         except:
             pass
 
-        return RestResponse(status_code, body)
-
-
-class RestWsRequestFailedException(Exception):
-
-    code = 0
-    body = ""
-
-    def __init__(self, code, body):
-        Exception.__init__(self, "%s %s" % (code, body))
-        self.code = code
-        self.body = body
-
-
-class RestWsInvalidDataException(Exception):
-
-    code = 0
-    body = ""
-
-    def __init__(self, code, body):
-        self.code = code
-        self.body = body
+        return RestResponse(status_code, headers, body)
 
 
 class RestResponse(object):
 
-    status = 0
-    data = ""
-
-    def __init__(self, status, data):
+    def __init__(self, status, headers, data):
         self.status = status
+        self.headers = headers
         self.data = data
