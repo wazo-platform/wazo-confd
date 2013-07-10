@@ -17,7 +17,7 @@
 
 import logging
 
-from flask import Blueprint
+from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
@@ -61,10 +61,14 @@ def create():
     user = User.from_user_data(data)
     user = user_services.create(user)
 
+    user_location = url_for('.get', userid=user.id)
     result = serializer.encode({
         'id': user.id
     })
-    return make_response(result, 201)
+
+    response = make_response(result, 201)
+    response.headers['Location'] = user_location
+    return response
 
 
 @route('/<int:userid>', methods=['PUT'])
