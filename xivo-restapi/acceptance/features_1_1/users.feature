@@ -171,6 +171,7 @@ Feature: Users
           | Irène     |
         Then I get a response with status "201"
         Then I get a response with a user id
+        Then I get a response header with a location for the new user
         Then the created user has the following parameters:
          | firstname | lastname | userfield |
          | Irène     |          |           |
@@ -194,6 +195,7 @@ Feature: Users
           | Irène     | Dupont   | accented description: éà@'; | customdata |
         Then I get a response with status "201"
         Then I get a response with a user id
+        Then I get a response header with a location for the new user
         Then the created user has the following parameters:
           | firstname | lastname | description                 | userfield  |
           | Irène     | Dupont   | accented description: éà@'; | customdata |

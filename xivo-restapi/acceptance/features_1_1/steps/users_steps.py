@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from hamcrest import assert_that, has_entry, has_entries, has_key, equal_to, \
-    has_item, instance_of
+    has_item, instance_of, ends_with
 from helpers import user_helper, user_ws
 from lettuce import step, world
 
@@ -93,6 +93,18 @@ def then_i_get_a_list_with_the_following_users(step):
 def then_i_get_a_response_with_status_group1(step, status):
     status_code = int(status)
     assert_that(world.response.status, equal_to(status_code))
+
+
+@step(u'Then I get a response header with a location for the new user')
+def then_i_get_a_response_header_with_a_location_for_the_new_user(step):
+    userid = world.response.data['id']
+
+    assert_that(world.response.headers, has_key('location'))
+
+    location = world.response.headers['Location']
+    expected_location = '/1.1/users/%s' % userid
+
+    assert_that(location, ends_with(expected_location))
 
 
 @step(u'Then I get a user with the following properties:')
