@@ -16,8 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
-    extensions_dao, extenumber_dao, contextnummember_dao
-from xivo_dao.alchemy.contextnummember import ContextNumMember
+    extensions_dao, extenumber_dao
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.extenumber import ExteNumber
 from xivo_dao.alchemy.linefeatures import LineFeatures
@@ -136,13 +135,6 @@ class RestUsers():
         extnumber.type = "user"
         extnumber.typeval = user.id
         extenumber_dao.create(extnumber)
-
-        member = ContextNumMember()
-        member.context = "default"
-        member.number = number
-        member.type = "user"
-        member.typeval = user.id
-        contextnummember_dao.create(member)
 
         return user.id, line.id, usersip.id
 

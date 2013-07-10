@@ -1,61 +1,161 @@
-Feature: Users management
+Feature: Users
 
-    Scenario: Users listing
-        Given there is a user "Clémence Dupond"
-        Given there is a user "Louis Martin"
-        When I ask for all the users
-        Then I get a list with "Clémence Dupond" and "Louis Martin"
+    Scenario: User list with no users
+        Given there are no users
+        When I ask for the list of users
+        Then I get an empty list
 
-    Scenario: Getting an existing user
-        Given there is a user "Clémence Dupond"
-        When I ask for the user "Clémence Dupond" using its id
-        Then I get a single user "Clémence Dupond"
+    Scenario: User list with one user
+        Given there are the following users:
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+        When I ask for the list of users
+        Then I get a list with the following users:
+          | firstname | lastname | userfield |
+          | Clémence  | Dupond   |           |
 
-    Scenario: Getting a non existing user
-        When I ask for a user with a non existing id
+    Scenario: User list with two users
+        Given there are the following users:
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+          | Louis     | Martin   |
+        When I ask for the list of users
+        Then I get a list with the following users:
+          | firstname | lastname | userfield |
+          | Clémence  | Dupond   |           |
+          | Louis     | Martin   |           |
+
+    Scenario: User list ordered by lastname, then firstname
+        Given there are the following users:
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+          | Louis     | Martin   |
+          | Albert    | Dupond   |
+          | Frédéric  | Martin   |
+        When I ask for the list of users
+        Then I get a list with the following users:
+          | firstname | lastname | userfield |
+          | Albert    | Dupond   |           |
+          | Clémence  | Dupond   |           |
+          | Frédéric  | Martin   |           |
+          | Louis     | Martin   |           |
+
+    Scenario: Getting a user that doesn't exist
+        Given there are no users
+        When I ask for the user with id "1"
         Then I get a response with status "404"
 
-    Scenario: Creating a user
-        Given there is no user "Irène Dupont"
-        When I create a user "Irène Dupont" with description "accented description: éà@';"
+    Scenario: Getting a user that exists
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Irène     | Dupont   |
+        When I ask for the user with id "1"
+        Then I get a user with the following properties:
+          | id | firstname | lastname | userfield |
+          | 1  | Irène     | Dupont   |           |
+
+    Scenario: Creating an empty user
+        Given there are no users
+        When I create an empty user
+        Then I get a response with status "400"
+        Then I get an error message "Missing paramters: firstname"
+
+    Scenario: Creating a user with paramters that don't exist
+        Given there are no users
+        When I create users with the following parameters:
+          | unexisting_field |
+          | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Incorrect parameters: unexisting_field"
+
+    Scenario: Creating a user with a firstname and parameters that don't exist
+        Given there are no users
+        When I create users with the following parameters:
+          | firstname | unexisting_field |
+          | Joe       | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Incorrect parameters: unexisting_field"
+
+    Scenario: Creating a user with a firstname
+        Given there are no users
+        When I create users with the following parameters:
+          | firstname |
+          | Irène     |
         Then I get a response with status "201"
-        Then the user "Irène Dupont" is actually created with description "accented description: éà@';"
+        Then I get a response with a user id
 
-    Scenario: Creating a user with unexisting field
-        Given there is no user "Michel Sardou"
-        When I create a user "Michel Sardou" with an field "unexisting_field" of value "value"
-        Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters sent: unexisting_field"
+    Scenario: Creating two users with the same firstname
+        Given there are no users
+        When I create users with the following parameters:
+          | firstname |
+          | Lord      |
+          | Lord      |
+        When I ask for the list of users
+        Then I get a list with the following users:
+          | firstname | lastname | userfield |
+          | Lord      |          |           |
+          | Lord      |          |           |
 
-    Scenario: Editing a user
-        Given there is a user "Clémence Dupond"
-        When I update the user "Clémence Dupond" with a last name "Brézé"
-        Then I get a response with status "200"
-        Then I have a user "Clémence Brézé"
+    Scenario: Creating a user with a firstname, lastname and description
+        Given there are no users
+        When I create users with the following parameters:
+          | firstname | lastname | description                 |
+          | Irène     | Dupont   | accented description: éà@'; |
+        Then I get a response with status "201"
+        Then I get a response with a user id
 
-    Scenario: Editing a non existing user
-        When I update a user with a non existing id with the last name "Dupond"
+    Scenario: Editing a user that doesn't exist
+        Given there are no users
+        When I update the user with id "1" using the following parameters:
+          | firstname |
+          | Bob       |
         Then I get a response with status "404"
 
-    Scenario: Editing a user with unexisting field
-        Given there is a user "Michel Sardou"
-        When I update the user "Michel Sardou" with a field "unexisting_field" of value "value"
+    Scenario: Editing a user with parameters that don't exist
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Clémence  | Dupond   |
+        When I update the user with id "1" using the following parameters:
+          | unexisting_field |
+          | unexisting value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters sent: unexisting_field"
+        Then I get an error message "Incorrect parameters: unexisting_field"
 
-    Scenario: Editing a user owning a voicemail
-        Given there is no user "Clémence Dupond"
-        Given there is no user "Delphine Guébriant"
-        Given there is a user "Clémence Dupond" with a voicemail
-        When I update this user with a first name "Delphine" and a last name "Guébriant"
-        Then I get a response with status "200"
-        Then this user has a voicemail "Delphine Guébriant"
+    Scenario: Editing the firstname of a user
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Clémence  | Dupond   |
+        When I update the user with id "1" using the following parameters:
+          | firstname |
+          | Brézé     |
+        Then I get a response with status "204"
+        When I ask for user with id "1"
+        Then I get a user with the following properties:
+          | id | firstname | lastname | userfield |
+          | 1  | Brézé     | Dupont   |           |
 
-    Scenario: Deleting a user 
-        Given there is a user "Théodore Botrel"
-        When I delete this user
-        Then this user no longer exists
+    Scenario: Editing the lastname of a user
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Clémence  | Dupond   |
+        When I update the user with id "1" using the following parameters:
+          | lastname      |
+          | Argentine     |
+        Then I get a response with status "204"
+        When I ask for user with id "1"
+        Then I get a user with the following properties:
+          | id | firstname | lastname  | userfield |
+          | 1  | Clémence  | Argentine |           |
 
-    Scenario: Deleting a non existing user
-        When I delete a non existing user
+    Scenario: Deleting a user that doesn't exist
+        Given there are no users
+        When I delete the user with id "1"
         Then I get a response with status "404"
+
+    Scenario: Deleting a user
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Clémence  | Dupond   |
+        When I delete the user with id "1"
+        Then I get a response with status "204"
+        Then the user with id "1" no longer exists
