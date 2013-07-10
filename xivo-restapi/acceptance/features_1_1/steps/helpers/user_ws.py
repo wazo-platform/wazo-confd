@@ -9,6 +9,11 @@ def get_user(userid):
     return ws_utils.rest_get('users/%s' % userid)
 
 
+def user_search(search):
+    params = {'q': search}
+    return ws_utils.rest_get('users/', params=params)
+
+
 def create_user(properties):
     return ws_utils.rest_post('users/', properties)
 

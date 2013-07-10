@@ -76,6 +76,23 @@ class TestUserActions(unittest.TestCase):
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, result.data)
 
+    @patch('xivo_dao.data_handler.user.services.find_all_by_fullname')
+    def test_list_users_with_search(self, mock_user_services_find_all_by_fullname):
+        status_code = 200
+        search = 'bob'
+
+        user = User(id=1, firstname='Bob')
+        expected_list = [user]
+        expected_result = UserMapper.encode(expected_list)
+
+        mock_user_services_find_all_by_fullname.return_value = expected_list
+
+        result = self.app.get("%s/?q=%s" % (BASE_URL, search))
+
+        mock_user_services_find_all_by_fullname.assert_called_once_with(search)
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals(expected_result, result.data)
+
     @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users_error(self, mock_user_services_find_all):
         status_code = 500

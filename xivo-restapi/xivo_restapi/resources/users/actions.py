@@ -37,7 +37,11 @@ route = RouteGenerator(blueprint)
 
 @route('/')
 def list():
-    users = user_services.find_all()
+    if 'q' in request.args:
+        users = user_services.find_all_by_fullname(request.args['q'])
+    else:
+        users = user_services.find_all()
+
     result = UserMapper.encode(users)
     return make_response(result, 200)
 

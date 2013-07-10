@@ -40,6 +40,93 @@ Feature: Users
           | Frédéric  | Martin   |           |
           | Louis     | Martin   |           |
 
+    Scenario: User search with no users
+        Given there are no users
+        When I search for the user "Bob"
+        Then I get an empty list
+
+    Scenario: User search with an empty filter
+        Given there are the following users:
+          | firstname | lastname |
+          | George    | Lucas    |
+        When I search for the user ""
+        Then I get a list with the following users:
+         | firstname | lastname |
+         | George    | Lucas    |
+
+    Scenario: User search with a filter that returns nothing
+        Given there are the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "bob"
+        Then I get an empty list
+        When I search for the user "rei"
+        Then I get an empty list
+
+    Scenario: User search using the firstname
+        Given there are the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "and"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "reï"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "andou"
+        Then I get an empty list
+
+    Scenario: User search using the lastname
+        Given there are the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "lie"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "bél"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "belou"
+        Then I get an empty list
+
+    Scenario: User search using the firstname and lastname
+        Given there are the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "andreï"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "bélier"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "reï bél"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+        When I search for the user "rei bel"
+        Then I get an empty list
+
+    Scenario: User search with 2 users
+        Given there are the following users:
+          | firstname | lastname |
+          | Remy      | Licorne  |
+          | Andreï    | Bélier   |
+        When I search for the user "re"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Andreï    | Bélier   |
+          | Remy      | Licorne  |
+        When I search for the user "lic"
+        Then I get a list with the following users:
+          | firstname | lastname |
+          | Remy      | Licorne  |
+
     Scenario: Getting a user that doesn't exist
         Given there are no users
         When I ask for the user with id "1"

@@ -43,6 +43,11 @@ def when_i_ask_for_the_user_with_id_group1(step, userid):
     world.response = user_ws.get_user(userid)
 
 
+@step(u'When I search for the user "([^"]*)"')
+def when_i_search_for_user_group1(step, search):
+    world.response = user_ws.user_search(search)
+
+
 @step(u'When I create an empty user')
 def when_i_create_an_empty_user(step):
     world.response = user_ws.create_user({})
