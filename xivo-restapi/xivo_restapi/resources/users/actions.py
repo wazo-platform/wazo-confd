@@ -53,9 +53,13 @@ def get(userid):
 def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
+
     user = User.from_user_data(data)
     user = user_services.create(user)
-    result = serializer.encode(user.id)
+
+    result = serializer.encode({
+        'id': user.id
+    })
     return make_response(result, 201)
 
 
@@ -66,7 +70,7 @@ def edit(userid):
     user = user_services.get(userid)
     user.update_from_data(data)
     user_services.edit(user)
-    return make_response('', 200)
+    return make_response('', 204)
 
 
 @route('/<int:userid>', methods=['DELETE'])
@@ -74,7 +78,7 @@ def delete(userid):
     user = user_services.get(userid)
     try:
         user_services.delete(user)
-        return make_response('', 200)
+        return make_response('', 204)
     except ProvdError as e:
         result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
         result = serializer.encode([result])

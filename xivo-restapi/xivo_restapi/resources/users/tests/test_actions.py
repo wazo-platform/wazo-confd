@@ -38,7 +38,25 @@ class TestUserActions(unittest.TestCase):
         self.app = flask_http_server.app.test_client()
 
     @patch('xivo_dao.data_handler.user.services.find_all')
-    def test_list_users(self, mock_user_services_find_all):
+    def test_list_users_with_no_users(self, mock_user_services_find_all):
+        status_code = 200
+
+        expected_list = []
+        expected_result = {
+            'total': 0,
+            'items': []
+        }
+
+        mock_user_services_find_all.return_value = expected_list
+
+        result = self.app.get("%s/" % BASE_URL)
+
+        mock_user_services_find_all.assert_any_call()
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals(serializer.encode(expected_result), result.data)
+
+    @patch('xivo_dao.data_handler.user.services.find_all')
+    def test_list_users_with_two_users(self, mock_user_services_find_all):
         status_code = 200
 
         user1 = User(id=1,
@@ -112,6 +130,7 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
         status_code = 201
+        expected_result = {'id': 1}
 
         user = Mock(User)
         user.id = 1
@@ -124,7 +143,7 @@ class TestUserActions(unittest.TestCase):
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
-        self.assertEqual(result.data, '1')
+        self.assertEqual(result.data, serializer.encode(expected_result))
         mock_user_services_create.assert_called_with(User.from_user_data(data))
 
     @patch('xivo_dao.data_handler.user.services.create')
@@ -158,7 +177,8 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
     def test_edit(self, mock_user_services_edit, mock_user_services_get):
-        status_code = 200
+        status_code = 204
+        expected_data = ''
 
         data = {u'id': 1,
                 u'firstname': u'André',
@@ -169,6 +189,7 @@ class TestUserActions(unittest.TestCase):
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_data, result.data)
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
@@ -205,7 +226,8 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
     def test_delete_success(self, mock_user_services_delete, mock_user_services_get):
-        status_code = 200
+        status_code = 204
+        expected_data = ''
 
         user = Mock(User)
         mock_user_services_get.return_value = user
@@ -214,6 +236,7 @@ class TestUserActions(unittest.TestCase):
         result = self.app.delete("%s/1" % BASE_URL)
 
         self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_data, result.data)
         mock_user_services_delete.assert_called_with(user)
 
     @patch('xivo_dao.data_handler.user.services.get')

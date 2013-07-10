@@ -49,16 +49,17 @@ Feature: Users
         Given there are the following users:
           | id | firstname | lastname |
           | 1  | Irène     | Dupont   |
-        When I ask for the user with id "1"
-        Then I get a user with the following properties:
-          | id | firstname | lastname | userfield |
-          | 1  | Irène     | Dupont   |           |
+      When I ask for the user with id "1"
+      Then I get a response with status "200"
+      Then I get a user with the following properties:
+        | id | firstname | lastname | userfield |
+        | 1  | Irène     | Dupont   |           |
 
     Scenario: Creating an empty user
         Given there are no users
         When I create an empty user
         Then I get a response with status "400"
-        Then I get an error message "Missing paramters: firstname"
+        Then I get an error message "Missing parameters: firstname"
 
     Scenario: Creating a user with paramters that don't exist
         Given there are no users
@@ -66,7 +67,7 @@ Feature: Users
           | unexisting_field |
           | unexisting_value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters: unexisting_field"
+        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Creating a user with a firstname and parameters that don't exist
         Given there are no users
@@ -74,7 +75,7 @@ Feature: Users
           | firstname | unexisting_field |
           | Joe       | unexisting_value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters: unexisting_field"
+        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Creating a user with a firstname
         Given there are no users
@@ -83,6 +84,9 @@ Feature: Users
           | Irène     |
         Then I get a response with status "201"
         Then I get a response with a user id
+        Then the created user has the following parameters:
+         | firstname | lastname | userfield |
+         | Irène     |          |           |
 
     Scenario: Creating two users with the same firstname
         Given there are no users
@@ -96,13 +100,16 @@ Feature: Users
           | Lord      |          |           |
           | Lord      |          |           |
 
-    Scenario: Creating a user with a firstname, lastname and description
+    Scenario: Creating a user with a firstname, lastname, description and userfield
         Given there are no users
         When I create users with the following parameters:
-          | firstname | lastname | description                 |
-          | Irène     | Dupont   | accented description: éà@'; |
+          | firstname | lastname | description                 | userfield  |
+          | Irène     | Dupont   | accented description: éà@'; | customdata |
         Then I get a response with status "201"
         Then I get a response with a user id
+        Then the created user has the following parameters:
+          | firstname | lastname | description                 | userfield  |
+          | Irène     | Dupont   | accented description: éà@'; | customdata |
 
     Scenario: Editing a user that doesn't exist
         Given there are no users
@@ -119,7 +126,7 @@ Feature: Users
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
-        Then I get an error message "Incorrect parameters: unexisting_field"
+        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the firstname of a user
         Given there are the following users:
@@ -129,10 +136,10 @@ Feature: Users
           | firstname |
           | Brézé     |
         Then I get a response with status "204"
-        When I ask for user with id "1"
+        When I ask for the user with id "1"
         Then I get a user with the following properties:
           | id | firstname | lastname | userfield |
-          | 1  | Brézé     | Dupont   |           |
+          | 1  | Brézé     | Dupond   |           |
 
     Scenario: Editing the lastname of a user
         Given there are the following users:
@@ -142,10 +149,23 @@ Feature: Users
           | lastname      |
           | Argentine     |
         Then I get a response with status "204"
-        When I ask for user with id "1"
+        When I ask for the user with id "1"
         Then I get a user with the following properties:
           | id | firstname | lastname  | userfield |
           | 1  | Clémence  | Argentine |           |
+
+    Scenario: Editing the firstname, lastname and userfield of a user
+        Given there are the following users:
+          | id | firstname | lastname |
+          | 1  | Clémence  | Dupond   |
+        When I update the user with id "1" using the following parameters:
+          | firstname | lastname  | userfield  |
+          | Claude    | Argentine | customdata |
+        Then I get a response with status "204"
+        When I ask for the user with id "1"
+        Then I get a user with the following properties:
+          | id | firstname | lastname  | userfield  |
+          | 1  | Claude    | Argentine | customdata |
 
     Scenario: Deleting a user that doesn't exist
         Given there are no users
