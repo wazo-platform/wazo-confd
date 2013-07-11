@@ -18,7 +18,7 @@
 from lettuce import step
 from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
-    extensions_dao, extenumber_dao, queue_member_dao, \
+    extensions_dao, queue_member_dao, \
     rightcall_dao, rightcall_member_dao, callfilter_dao, dialaction_dao, \
     phonefunckey_dao, schedule_dao
 from xivo_dao.alchemy.callfilter import Callfilter
@@ -224,7 +224,6 @@ def then_this_user_no_longer_exists(step):
     _check_line_features()
     _check_usersip()
     _check_extensions()
-    _check_extenumbers()
     _check_queuemembers()
     _check_rightcallmembers()
     _check_callfiltermember()
@@ -253,10 +252,6 @@ def _check_usersip():
 
 def _check_extensions():
     assert extensions_dao.get_by_exten(world.number) is None
-
-
-def _check_extenumbers():
-    assert extenumber_dao.get_by_exten(world.number) is None
 
 
 def _check_queuemembers():
