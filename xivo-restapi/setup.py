@@ -37,7 +37,6 @@ setup(
         'xivo_restapi.resources',
         'xivo_restapi.resources.users',
         'xivo_restapi.v1_0',
-        'xivo_restapi.v1_0.bin',
         'xivo_restapi.v1_0.mapping_alchemy_sdm',
         'xivo_restapi.v1_0.rest',
         'xivo_restapi.v1_0.rest.helpers',
