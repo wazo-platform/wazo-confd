@@ -46,9 +46,6 @@ setup(
         'xivo_restapi.v1_0.services.utils',
     ],
     scripts=[
-        'bin/xivo-restapid',
-        'xivo_restapi/v1_0/bin/xivo_recording_agi.py',
-        'xivo_restapi/v1_0/bin/xivo-recording-del-old-items',
-        'xivo_restapi/v1_0/bin/xivo-recording-log-and-del',
+        'bin/xivo-restapid'
     ],
 )
