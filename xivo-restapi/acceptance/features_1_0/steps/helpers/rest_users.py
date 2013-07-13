@@ -125,6 +125,8 @@ class RestUsers():
         exten = Extension()
         exten.exten = number
         exten.context = "default"
+        exten.type = 'user'
+        exten.typeval = str(user.id)
         exten.commented = 0
         extensions_dao.create(exten)
 
