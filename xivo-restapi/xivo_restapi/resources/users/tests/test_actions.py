@@ -19,9 +19,7 @@
 import unittest
 
 from mock import Mock, patch
-from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_restapi import flask_http_server
-from xivo_restapi.resources.users.mapper import UserMapper
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.exception import MissingParametersError, \
@@ -40,58 +38,68 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users_with_no_users(self, mock_user_services_find_all):
         status_code = 200
-
-        expected_list = []
         expected_result = {
             'total': 0,
             'items': []
         }
 
-        mock_user_services_find_all.return_value = expected_list
+        mock_user_services_find_all.return_value = []
 
         result = self.app.get("%s/" % BASE_URL)
+        decoded_result = serializer.decode(result.data)
 
         mock_user_services_find_all.assert_any_call()
         self.assertEquals(status_code, result.status_code)
-        self.assertEquals(serializer.encode(expected_result), result.data)
+        self.assertEquals(expected_result, decoded_result)
 
     @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users_with_two_users(self, mock_user_services_find_all):
         status_code = 200
+        expected_result = {
+            'total': 2,
+            'items': [
+                {'id': 1,
+                 'firstname': 'test1'},
+                {'id': 2,
+                 'firstname': 'test2'}
+            ]
+        }
 
         user1 = User(id=1,
                      firstname='test1')
         user2 = User(id=2,
                      firstname='test2')
-
-        expected_list = [user1, user2]
-
-        mock_user_services_find_all.return_value = expected_list
-
-        expected_result = UserMapper.encode(expected_list)
+        mock_user_services_find_all.return_value = [user1, user2]
 
         result = self.app.get("%s/" % BASE_URL)
+        decoded_result = serializer.decode(result.data)
 
         mock_user_services_find_all.assert_any_call()
         self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, result.data)
+        self.assertEquals(expected_result, decoded_result)
 
     @patch('xivo_dao.data_handler.user.services.find_all_by_fullname')
     def test_list_users_with_search(self, mock_user_services_find_all_by_fullname):
         status_code = 200
         search = 'bob'
 
-        user = User(id=1, firstname='Bob')
-        expected_list = [user]
-        expected_result = UserMapper.encode(expected_list)
+        expected_result = {
+            'total': 1,
+            'items': [
+                {'id': 1,
+                 'firstname': 'Bob'}
+            ]
+        }
 
-        mock_user_services_find_all_by_fullname.return_value = expected_list
+        user = User(id=1, firstname='Bob')
+        mock_user_services_find_all_by_fullname.return_value = [user]
 
         result = self.app.get("%s/?q=%s" % (BASE_URL, search))
+        decoded_result = serializer.decode(result.data)
 
         mock_user_services_find_all_by_fullname.assert_called_once_with(search)
         self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, result.data)
+        self.assertEquals(expected_result, decoded_result)
 
     @patch('xivo_dao.data_handler.user.services.find_all')
     def test_list_users_error(self, mock_user_services_find_all):
@@ -107,20 +115,20 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get(self, mock_user_services_get):
         status_code = 200
+        expected_result = {
+            'id': 1,
+            'firstname': 'test1'
+        }
 
-        user1 = UserFeatures()
-        user1.id = 1
-        user1.firstname = 'test1'
-        user1 = User.from_data_source(user1)
-        mock_user_services_get.return_value = user1
-
-        expected_result = UserMapper.encode(user1)
+        user = User(id=1, firstname='test1')
+        mock_user_services_get.return_value = user
 
         result = self.app.get("%s/1" % BASE_URL)
+        decoded_result = serializer.decode(result.data)
 
         mock_user_services_get.assert_called_with(1)
         self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, result.data)
+        self.assertEquals(expected_result, decoded_result)
 
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get_error(self, mock_user_services_get):
@@ -151,17 +159,18 @@ class TestUserActions(unittest.TestCase):
 
         user = Mock(User)
         user.id = 1
+        mock_user_services_create.return_value = user
 
         data = {u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
-        mock_user_services_create.return_value = user
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        decoded_result = serializer.decode(result.data)
 
-        self.assertEqual(status_code, result.status_code)
-        self.assertEqual(result.data, serializer.encode(expected_result))
         mock_user_services_create.assert_called_with(User.from_user_data(data))
+        self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_result, decoded_result)
 
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create_error(self, mock_user_services_create):
@@ -180,16 +189,17 @@ class TestUserActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create_request_error(self, mock_user_services_create):
         status_code = 400
+        expected_result = ["Missing parameters: lastname"]
 
-        expected_data = "Missing parameters: lastname"
-        data = {'firstname': 'André'}
         mock_user_services_create.side_effect = MissingParametersError(["lastname"])
 
+        data = {'firstname': 'André'}
+
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)
-        received_data = serializer.decode(result.data)
-        self.assertEquals(expected_data, received_data[0])
+        self.assertEquals(expected_result, decoded_result)
 
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
@@ -201,6 +211,7 @@ class TestUserActions(unittest.TestCase):
                 u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
+
         mock_user_services_get.return_value = Mock(User)
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
@@ -216,6 +227,7 @@ class TestUserActions(unittest.TestCase):
         data = {u'firstname': u'André',
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
+
         mock_user_services_get.return_value = user = Mock(User)
         mock_user_services_edit.side_effect = Exception
 
@@ -232,8 +244,8 @@ class TestUserActions(unittest.TestCase):
         data = {'firstname': 'André',
                 'lastname': 'Dupond',
                 'description': 'éà":;'}
-        mock_user_services_get.return_value = Mock(User)
 
+        mock_user_services_get.return_value = Mock(User)
         mock_user_services_edit.side_effect = ElementNotExistsError('user')
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
