@@ -9,6 +9,11 @@ def get_user(userid):
     return ws_utils.rest_get('users/%s' % userid)
 
 
+def get_user_with_voicemail(userid):
+    params = {'include': 'voicemail'}
+    return ws_utils.rest_get('users/%s' % userid, params=params)
+
+
 def user_search(search):
     params = {'q': search}
     return ws_utils.rest_get('users/', params=params)

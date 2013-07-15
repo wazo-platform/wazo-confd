@@ -142,6 +142,17 @@ Feature: Users
         | id | firstname | lastname | userfield |
         | 1  | Irène     | Dupont   |           |
 
+    Scenario: Getting a user with his voicemail
+        Given there are the following users:
+          | id | firstname | lastname | line number | voicemail number | language |
+          | 1  | Irène     | Dupont   | 1000        | 1000             | fr_FR    |
+        When I ask for user "Irène Dupont", including his voicemail
+        Then I get a response with status "200"
+        Then I get a user with the following properties:
+          | firstname | lastname | userfield |
+          | Irène     | Dupont   |           |
+        Then I get a user with a voicemail
+
     Scenario: Creating an empty user
         Given there are no users
         When I create an empty user

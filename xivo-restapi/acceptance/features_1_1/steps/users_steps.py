@@ -43,6 +43,19 @@ def when_i_ask_for_the_user_with_id_group1(step, userid):
     world.response = user_ws.get_user(userid)
 
 
+@step(u'When I ask for user "([^"]*)", including his voicemail')
+def when_i_ask_for_user_with_id_group1_including_his_voicemail(step, name):
+    user = user_helper.find_user_by_name(name)
+    world.response = user_ws.get_user_with_voicemail(user.id)
+
+
+@step(u'Then I get a user with a voicemail')
+def then_i_get_a_user_with_a_voicemail(step):
+    user = world.response.data
+    assert_that(user, has_key('voicemail'))
+    assert_that(user['voicemail'], has_entry('id', instance_of(int)))
+
+
 @step(u'When I search for the user "([^"]*)"')
 def when_i_search_for_user_group1(step, search):
     world.response = user_ws.user_search(search)
