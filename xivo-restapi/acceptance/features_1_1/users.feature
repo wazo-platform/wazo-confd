@@ -6,7 +6,7 @@ Feature: Users
         Then I get an empty list
 
     Scenario: User list with one user
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Clémence  | Dupond   |
         When I ask for the list of users
@@ -15,7 +15,7 @@ Feature: Users
           | Clémence  | Dupond   |           |
 
     Scenario: User list with two users
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Clémence  | Dupond   |
           | Louis     | Martin   |
@@ -26,7 +26,7 @@ Feature: Users
           | Louis     | Martin   |           |
 
     Scenario: User list ordered by lastname, then firstname
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Clémence  | Dupond   |
           | Louis     | Martin   |
@@ -46,7 +46,7 @@ Feature: Users
         Then I get an empty list
 
     Scenario: User search with an empty filter
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | George    | Lucas    |
         When I search for the user ""
@@ -55,7 +55,7 @@ Feature: Users
          | George    | Lucas    |
 
     Scenario: User search with a filter that returns nothing
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Andreï    | Bélier   |
         When I search for the user "bob"
@@ -64,7 +64,7 @@ Feature: Users
         Then I get an empty list
 
     Scenario: User search using the firstname
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Andreï    | Bélier   |
         When I search for the user "and"
@@ -79,7 +79,7 @@ Feature: Users
         Then I get an empty list
 
     Scenario: User search using the lastname
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Andreï    | Bélier   |
         When I search for the user "lie"
@@ -94,7 +94,7 @@ Feature: Users
         Then I get an empty list
 
     Scenario: User search using the firstname and lastname
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Andreï    | Bélier   |
         When I search for the user "andreï"
@@ -113,7 +113,7 @@ Feature: Users
         Then I get an empty list
 
     Scenario: User search with 2 users
-        Given there are the following users:
+        Given there are only the following users:
           | firstname | lastname |
           | Remy      | Licorne  |
           | Andreï    | Bélier   |
@@ -133,7 +133,7 @@ Feature: Users
         Then I get a response with status "404"
 
     Scenario: Getting a user that exists
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname |
           | 1  | Irène     | Dupont   |
         When I ask for the user with id "1"
@@ -143,7 +143,7 @@ Feature: Users
           | 1  | Irène     | Dupont   |           |
 
     Scenario: Getting a user with his voicemail
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname | line number | voicemail number | language |
           | 1  | Irène     | Dupont   | 1000        | 1000             | fr_FR    |
         When I ask for user "Irène Dupont", including his voicemail
@@ -219,7 +219,7 @@ Feature: Users
         Then I get a response with status "404"
 
     Scenario: Editing a user with parameters that don't exist
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname |
           | 1  | Clémence  | Dupond   |
         When I update the user with id "1" using the following parameters:
@@ -229,7 +229,7 @@ Feature: Users
         Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the firstname of a user
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname |
           | 1  | Clémence  | Dupond   |
         When I update the user with id "1" using the following parameters:
@@ -242,7 +242,7 @@ Feature: Users
           | 1  | Brézé     | Dupond   |           |
 
     Scenario: Editing the lastname of a user
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname |
           | 1  | Clémence  | Dupond   |
         When I update the user with id "1" using the following parameters:
@@ -255,7 +255,7 @@ Feature: Users
           | 1  | Clémence  | Argentine |           |
 
     Scenario: Editing the firstname, lastname and userfield of a user
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname |
           | 1  | Clémence  | Dupond   |
         When I update the user with id "1" using the following parameters:
@@ -273,7 +273,7 @@ Feature: Users
         Then I get a response with status "404"
 
     Scenario: Deleting a user
-        Given there are the following users:
+        Given there are only the following users:
           | id | firstname | lastname |
           | 1  | Clémence  | Dupond   |
         When I delete the user with id "1"
