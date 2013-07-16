@@ -21,15 +21,20 @@ from xivo_restapi.helpers import serializer
 class AbstractMapper(object):
 
     @classmethod
-    def encode(cls, data):
+    def map(cls, data, **kwargs):
         if isinstance(data, list):
-            result = cls._map_objects(data)
+            result = cls._map_objects(data, **kwargs)
         else:
-            result = cls._map_object(data)
+            result = cls._map_object(data, **kwargs)
+        return result
+
+    @classmethod
+    def encode(cls, data, **kwargs):
+        result = cls.map(data, **kwargs)
         return serializer.encode(result)
 
     @classmethod
-    def _map_object(cls, object_dao):
+    def _map_object(cls, object_dao, **kwargs):
         res = {}
         for obj_attr, mapping_key in cls._MAPPING.iteritems():
             if hasattr(object_dao, obj_attr):
@@ -37,10 +42,10 @@ class AbstractMapper(object):
         return res
 
     @classmethod
-    def _map_objects(cls, object_list):
+    def _map_objects(cls, object_list, **kwargs):
         res = []
         for object_dao in object_list:
-            res.append(cls._map_object(object_dao))
+            res.append(cls._map_object(object_dao, **kwargs))
         return cls._process_paginated_data(res)
 
     @classmethod
