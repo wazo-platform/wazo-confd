@@ -49,7 +49,9 @@ def list():
     else:
         users = user_services.find_all()
 
-    result = UserMapper.encode(users)
+    include = _parse_include_list()
+
+    result = UserMapper.encode(users, include=include)
     return make_response(result, 200)
 
 

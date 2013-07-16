@@ -78,6 +78,35 @@ class TestUserActions(unittest.TestCase):
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
+    @patch('xivo_dao.data_handler.user.services.find_all')
+    def test_list_users_with_voicemail(self, mock_user_services_find_all):
+        status_code = 200
+        expected_result = {
+            'total': 2,
+            'items': [
+                {'id': 1,
+                 'firstname': 'test1',
+                 'voicemail': {'id': 3}},
+                {'id': 2,
+                 'firstname': 'test2',
+                 'voicemail': None},
+            ]
+        }
+
+        user1 = User(id=1,
+                     firstname='test1',
+                     voicemail_id=3)
+        user2 = User(id=2,
+                     firstname='test2')
+        mock_user_services_find_all.return_value = [user1, user2]
+
+        result = self.app.get("%s/?include=voicemail" % BASE_URL)
+        decoded_result = serializer.decode(result.data)
+
+        mock_user_services_find_all.assert_any_call()
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals(expected_result, decoded_result)
+
     @patch('xivo_dao.data_handler.user.services.find_all_by_fullname')
     def test_list_users_with_search(self, mock_user_services_find_all_by_fullname):
         status_code = 200
