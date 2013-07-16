@@ -1,34 +1,37 @@
 from xivo_dao.data_handler.user import dao as user_dao
-from xivo_dao.data_handler.line import dao as line_dao
 from xivo_dao.data_handler.user.model import User
-from xivo_dao.data_handler.exception import ElementNotExistsError
-from xivo_lettuce.manager_ws import user_manager_ws, voicemail_manager_ws
+from xivo_lettuce.manager_ws import user_manager_ws, voicemail_manager_ws, line_manager_ws
 
 
 def delete_all():
     for user in user_dao.find_all():
-        _delete_line_if_needed(user)
         user_dao.delete(user)
-
-
-def _delete_line_if_needed(user):
-    try:
-        line = line_dao.get_by_user_id(user.id)
-        line_dao.delete(line)
-    except ElementNotExistsError:
-        pass
 
 
 def create_user(userinfo):
     if 'line number' in userinfo or 'voicemail number' in userinfo:
         _create_user_with_old_ws(userinfo)
     else:
-        user = User(**userinfo)
-        user_dao.create(user)
+        _delete_user_if_needed(userinfo)
+        _create_user(userinfo)
+
+
+def _delete_user_if_needed(userinfo):
+    user = user_dao.find_user(userinfo['firstname'], userinfo['lastname'])
+    if user:
+        user_dao.delete(user)
+
+
+def _create_user(userinfo):
+    user = User(**userinfo)
+    user_dao.create(user)
 
 
 def _create_user_with_old_ws(userinfo):
     voicemail_manager_ws.delete_voicemails_with_number(userinfo['voicemail number'])
+    line_manager_ws.delete_lines_with_number(
+        userinfo['line number'],
+        userinfo.get('context', 'default'))
 
     wsinfo = {
         'firstname': userinfo['firstname'],
