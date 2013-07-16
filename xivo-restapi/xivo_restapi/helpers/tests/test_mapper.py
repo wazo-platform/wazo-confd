@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from xivo_restapi.resources.users.mapper import UserMapper
+from xivo_restapi.resources.users import mapper
 from xivo_dao.data_handler.user.model import User
 
 
@@ -29,7 +29,7 @@ class TestMapper(unittest.TestCase):
 
         excpected_result = '{"items": [{"lastname": "1", "id": 1, "firstname": "User"}, {"lastname": "2", "id": 2, "firstname": "User"}], "total": 2}'
 
-        result = UserMapper.encode(data)
+        result = mapper.encode_list(data)
 
         self.assertEqual(excpected_result, result)
 
@@ -38,6 +38,6 @@ class TestMapper(unittest.TestCase):
 
         excpected_result = '{"lastname": "1", "id": 1, "firstname": "User"}'
 
-        result = UserMapper.encode(data)
+        result = mapper.encode_user(data)
 
         self.assertEqual(excpected_result, result)

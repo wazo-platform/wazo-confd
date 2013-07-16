@@ -18,40 +18,25 @@
 from xivo_restapi.helpers import serializer
 
 
-class AbstractMapper(object):
+def encode(data):
+    return serializer.encode(data)
 
-    @classmethod
-    def map(cls, data, **kwargs):
-        if isinstance(data, list):
-            result = cls._map_objects(data, **kwargs)
-        else:
-            result = cls._map_object(data, **kwargs)
-        return result
 
-    @classmethod
-    def encode(cls, data, **kwargs):
-        result = cls.map(data, **kwargs)
-        return serializer.encode(result)
+def encode_list(items):
+    return serializer.encode(process_paginated_data(items))
 
-    @classmethod
-    def _map_object(cls, object_dao, **kwargs):
-        res = {}
-        for obj_attr, mapping_key in cls._MAPPING.iteritems():
-            if hasattr(object_dao, obj_attr):
-                res[mapping_key] = getattr(object_dao, obj_attr)
-        return res
 
-    @classmethod
-    def _map_objects(cls, object_list, **kwargs):
-        res = []
-        for object_dao in object_list:
-            res.append(cls._map_object(object_dao, **kwargs))
-        return cls._process_paginated_data(res)
+def map_entity(mapping, obj):
+    res = {}
+    for obj_attr, mapping_key in mapping.iteritems():
+        if hasattr(obj, obj_attr):
+            res[mapping_key] = getattr(obj, obj_attr)
+    return res
 
-    @classmethod
-    def _process_paginated_data(cls, items):
-        result = {
-            'total': len(items),
-            'items': items
-        }
-        return result
+
+def process_paginated_data(items):
+    result = {
+        'total': len(items),
+        'items': items
+    }
+    return result

@@ -22,7 +22,7 @@ from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User
-from xivo_restapi.resources.users.mapper import UserMapper
+from xivo_restapi.resources.users import mapper
 from xivo_restapi.helpers import serializer
 from xivo_dao.helpers.provd_connector import ProvdError
 from xivo_dao.helpers.sysconfd_connector import SysconfdError
@@ -51,7 +51,7 @@ def list():
 
     include = _parse_include_list()
 
-    result = UserMapper.encode(users, include=include)
+    result = mapper.encode_list(users, include=include)
     return make_response(result, 200)
 
 
@@ -60,7 +60,7 @@ def get(userid):
     include = _parse_include_list()
 
     user = user_services.get(userid)
-    result = UserMapper.encode(user, include=include)
+    result = mapper.encode_user(user, include=include)
 
     return make_response(result, 200)
 

@@ -15,42 +15,48 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_restapi.helpers.mapper import AbstractMapper
+from xivo_restapi.helpers import mapper
+
+# mapping = {db_field: model_field}
+MAPPING = {
+    'id': 'id',
+    'firstname': 'firstname',
+    'lastname': 'lastname',
+    'callerid': 'callerid',
+    'outcallerid': 'outcallerid',
+    'username': 'username',
+    'password': 'password',
+    'musiconhold': 'musiconhold',
+    'mobilephonenumber': 'mobilephonenumber',
+    'userfield': 'userfield',
+    'timezone': 'timezone',
+    'language': 'language',
+    'description': 'description'
+}
 
 
-class UserMapper(AbstractMapper):
+def encode_list(users, include=[]):
+    mapped_users = [map_user(user, include) for user in users]
+    return mapper.encode_list(mapped_users)
 
-    # mapping = {db_field: model_field}
-    _MAPPING = {
-        'id': 'id',
-        'firstname': 'firstname',
-        'lastname': 'lastname',
-        'callerid': 'callerid',
-        'outcallerid': 'outcallerid',
-        'username': 'username',
-        'password': 'password',
-        'musiconhold': 'musiconhold',
-        'mobilephonenumber': 'mobilephonenumber',
-        'userfield': 'userfield',
-        'timezone': 'timezone',
-        'language': 'language',
-        'description': 'description'
-    }
 
-    @classmethod
-    def _map_object(cls, user, **kwargs):
-        data = super(UserMapper, cls)._map_object(user)
+def encode_user(user, include=[]):
+    mapped_user = map_user(user, include)
+    return mapper.encode(mapped_user)
 
-        if 'voicemail' in kwargs.get('include', []):
-            data = cls._add_voicemail(data, user)
 
-        return data
+def map_user(user, include=[]):
+    data = mapper.map_entity(MAPPING, user)
 
-    @classmethod
-    def _add_voicemail(cls, data, user):
-        voicemail = None
-        if hasattr(user, 'voicemail_id') and user.voicemail_id is not None:
-            voicemail = {'id': user.voicemail_id}
+    if 'voicemail' in include:
+        data['voicemail'] = _add_voicemail(user)
 
-        data['voicemail'] = voicemail
-        return data
+    return data
+
+
+def _add_voicemail(user):
+    voicemail = None
+    if hasattr(user, 'voicemail_id') and user.voicemail_id is not None:
+        voicemail = {'id': user.voicemail_id}
+
+    return voicemail
