@@ -33,9 +33,14 @@ def given_there_are_the_following_users(step):
         user_helper.create_user(userinfo)
 
 
-@step(u'When I ask for the list of users')
+@step(u'When I ask for the list of users$')
 def when_i_ask_for_the_list_of_users(step):
     world.response = user_ws.all_users()
+
+
+@step(u'When I ask for the list of users, including the voicemail')
+def when_i_ask_for_the_list_of_users_including_the_voicemail(step):
+    world.response = user_ws.all_users_with_voicemail()
 
 
 @step(u'When I ask for the user with id "([^"]*)"')
@@ -52,8 +57,25 @@ def when_i_ask_for_user_with_id_group1_including_his_voicemail(step, name):
 @step(u'Then I get a user with a voicemail')
 def then_i_get_a_user_with_a_voicemail(step):
     user = world.response.data
+    _check_user_has_voicemail(user)
+
+
+def _check_user_has_voicemail(user):
     assert_that(user, has_key('voicemail'))
     assert_that(user['voicemail'], has_entry('id', instance_of(int)))
+
+
+@step(u'Then I get a user without a voicemail')
+def then_i_get_a_user_without_a_voicemail(step):
+    user = world.response.data
+    assert_that(user, has_key('voicemail'))
+    assert_that(user['voicemail'], equal_to(None))
+
+
+@step(u'Then each user has a voicemail id')
+def then_each_user_has_a_voicemail_id(step):
+    for user in world.response.data['items']:
+        _check_user_has_voicemail(user)
 
 
 @step(u'When I search for the user "([^"]*)"')

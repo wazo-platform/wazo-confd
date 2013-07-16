@@ -5,6 +5,10 @@ def all_users():
     return ws_utils.rest_get('users/')
 
 
+def all_users_with_voicemail():
+    return ws_utils.rest_get('users/?include=voicemail')
+
+
 def get_user(userid):
     return ws_utils.rest_get('users/%s' % userid)
 
