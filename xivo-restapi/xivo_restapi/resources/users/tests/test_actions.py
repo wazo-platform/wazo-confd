@@ -152,6 +152,55 @@ class TestUserActions(unittest.TestCase):
         mock_user_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
 
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_get_with_voicemail(self, mock_user_services_get):
+        status_code = 200
+
+        user_id = 1
+        firstname = 'Bob'
+        voicemail_id = 2
+
+        expected_result = {
+            'id': user_id,
+            'firstname': firstname,
+            'voicemail': {
+                'id': voicemail_id
+            }
+        }
+
+        user = User(id=user_id, firstname=firstname, voicemail_id=voicemail_id)
+        mock_user_services_get.return_value = user
+
+        result = self.app.get("%s/1?include=voicemail" % BASE_URL)
+        decoded_result = serializer.decode(result.data)
+
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals(expected_result, decoded_result)
+        mock_user_services_get.assert_called_once_with(user_id)
+
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_get_without_voicemail(self, mock_user_services_get):
+        status_code = 200
+
+        user_id = 1
+        firstname = 'Bob'
+
+        expected_result = {
+            'id': user_id,
+            'firstname': firstname,
+            'voicemail': None,
+        }
+
+        user = User(id=user_id, firstname=firstname)
+        mock_user_services_get.return_value = user
+
+        result = self.app.get("%s/1?include=voicemail" % BASE_URL)
+        decoded_result = serializer.decode(result.data)
+
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals(expected_result, decoded_result)
+        mock_user_services_get.assert_called_once_with(user_id)
+
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
         status_code = 201

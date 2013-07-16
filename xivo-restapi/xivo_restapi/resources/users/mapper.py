@@ -36,3 +36,21 @@ class UserMapper(AbstractMapper):
         'language': 'language',
         'description': 'description'
     }
+
+    @classmethod
+    def _map_object(cls, user, **kwargs):
+        data = super(UserMapper, cls)._map_object(user)
+
+        if 'voicemail' in kwargs.get('include', []):
+            data = cls._add_voicemail(data, user)
+
+        return data
+
+    @classmethod
+    def _add_voicemail(cls, data, user):
+        voicemail = None
+        if hasattr(user, 'voicemail_id') and user.voicemail_id is not None:
+            voicemail = {'id': user.voicemail_id}
+
+        data['voicemail'] = voicemail
+        return data

@@ -35,6 +35,13 @@ blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION
 route = RouteGenerator(blueprint)
 
 
+def _parse_include_list():
+    include = []
+    if 'include' in request.args:
+        include = request.args['include'].split(',')
+    return include
+
+
 @route('/')
 def list():
     if 'q' in request.args:
@@ -48,8 +55,11 @@ def list():
 
 @route('/<int:userid>')
 def get(userid):
+    include = _parse_include_list()
+
     user = user_services.get(userid)
-    result = UserMapper.encode(user)
+    result = UserMapper.encode(user, include=include)
+
     return make_response(result, 200)
 
 
