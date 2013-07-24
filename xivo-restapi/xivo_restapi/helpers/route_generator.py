@@ -23,14 +23,15 @@ from xivo_restapi.negotiate.flask_negotiate import produces, consumes
 
 class RouteGenerator(object):
 
-    def __init__(self, blueprint):
+    def __init__(self, blueprint, content_type='application/json'):
         self._blueprint = blueprint
+        self._content_type = content_type
 
     def __call__(self, route, *args, **kwargs):
         def decorator(func):
             func = exception_catcher(func)
             func = self._blueprint.route(route, *args, **kwargs)(func)
             func = realmDigest.requires_auth(func)
-            func = produces('application/json')(func)
-            func = consumes('application/json')(func)
+            func = produces(self._content_type)(func)
+            func = consumes(self._content_type)(func)
         return decorator
