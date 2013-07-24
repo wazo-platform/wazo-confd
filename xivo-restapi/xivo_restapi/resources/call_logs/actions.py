@@ -16,16 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
 from datetime import datetime
 from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
-from xivo_dao.data_handlers.call.services import call_services
+from xivo_dao.data_handler.call import services as call_services
 from xivo_restapi import config
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.resources.call_logs import mapper
 
 
+logger = logging.getLogger(__name__)
 blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config.VERSION_1_1)
 route = RouteGenerator(blueprint, content_type='text/csv')
 

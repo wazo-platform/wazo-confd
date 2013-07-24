@@ -16,7 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import csv
+import logging
 from StringIO import StringIO
+
+
+logger = logging.getLogger(__name__)
 
 
 def encode_list(calls):
@@ -33,4 +37,4 @@ def encode_list(calls):
                call.duration,
                call.user_field]
         csv_writer.writerow(row)
-    return encoded_data
+    return encoded_data.getvalue()
