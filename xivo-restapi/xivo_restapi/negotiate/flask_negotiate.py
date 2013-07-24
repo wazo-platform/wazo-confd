@@ -7,7 +7,7 @@ from functools import wraps
 from werkzeug.exceptions import UnsupportedMediaType, NotAcceptable
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def consumes(*content_types):

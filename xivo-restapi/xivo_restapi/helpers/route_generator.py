@@ -16,9 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
 from xivo_restapi.helpers.common import exception_catcher
 from xivo_restapi.authentication.xivo_realm_digest import realmDigest
 from xivo_restapi.negotiate.flask_negotiate import produces, consumes
+
+
+logger = logging.getLogger(__name__)
 
 
 class RouteGenerator(object):
