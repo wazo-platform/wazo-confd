@@ -32,9 +32,9 @@ def encode_list(calls):
 
     for call in calls:
         row = [call.date,
-               call.source,
-               call.destination,
+               call.source.encode("utf-8"),
+               call.destination.encode("utf-8"),
                call.duration,
-               call.user_field]
+               call.user_field.encode("utf-8")]
         csv_writer.writerow(row)
     return encoded_data.getvalue()
