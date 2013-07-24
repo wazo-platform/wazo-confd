@@ -41,8 +41,9 @@ def exception_catcher(func):
         except ElementAlreadyExistsError as e:
             data = serializer.encode([unicode(e)])
             return make_response(data, 400)
-        except ValueError:
+        except ValueError, e:
             data = serializer.encode(["No parsable data in the request"])
+            logger.exception(e)
             return make_response(data, 400)
         except ElementNotExistsError:
             return make_response('', 404)
