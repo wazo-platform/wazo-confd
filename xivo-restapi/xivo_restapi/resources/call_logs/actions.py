@@ -38,9 +38,9 @@ route = RouteGenerator(blueprint, content_type='text/csv')
 def list():
     start = end = None
     if 'start' in request.args:
-        start = datetime.strptime('%Y:%m:dT%H:%M:%S', request.args['start'])
+        start = datetime.strptime(request.args['start'], '%Y-%m-%dT%H:%M:%S')
     if 'end' in request.args:
-        end = datetime.strptime('%Y:%m:dT%H:%M:%S', request.args['end'])
+        end = datetime.strptime(request.args['end'], '%Y-%m-%dT%H:%M:%S')
 
     calls = call_services.find_all(start, end)
 
