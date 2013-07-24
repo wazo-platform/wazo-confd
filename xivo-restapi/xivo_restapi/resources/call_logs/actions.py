@@ -24,6 +24,7 @@ from flask.helpers import make_response
 from xivo_dao.data_handler.call import services as call_services
 from xivo_restapi import config
 from xivo_restapi.helpers.route_generator import RouteGenerator
+from xivo_restapi.negotiate.flask_negotiate import produces
 from xivo_restapi.resources.call_logs import mapper
 
 
@@ -33,6 +34,7 @@ route = RouteGenerator(blueprint, content_type='text/csv')
 
 
 @route('/')
+@produces('text/csv')
 def list():
     start = end = None
     if 'start' in request.args:
