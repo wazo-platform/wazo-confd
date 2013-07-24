@@ -27,11 +27,11 @@ def encode_list(calls):
     encoded_data = StringIO()
     csv_writer = csv.writer(encoded_data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-    headers = ['time', 'source', 'destination', 'duration', 'user_field']
+    headers = ['date', 'source', 'destination', 'duration', 'user_field']
     csv_writer.writerow(headers)
 
     for call in calls:
-        row = [call.time,
+        row = [call.date,
                call.source,
                call.destination,
                call.duration,
