@@ -19,7 +19,8 @@ import logging
 
 from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, \
+    user_line_dao
 from xivo_restapi import config
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.utils.exceptions import NoSuchElementException, \
@@ -99,7 +100,7 @@ class UserManagement(object):
                 raise VoicemailExistsException()
 
         user_dao.delete(userid)
-        lines = line_dao.find_line_id_by_user_id(userid)
+        lines = user_line_dao.find_line_id_by_user_id(userid)
         if len(lines) > 0:
             self._remove_line(line_dao.get(lines[0]))
         if voicemailid is not None:
