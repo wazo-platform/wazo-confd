@@ -20,7 +20,8 @@ import unittest
 from mock import Mock, call
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, \
+    user_line_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail
@@ -279,8 +280,8 @@ class TestUserManagement(unittest.TestCase):
         lineid = 2
         user_dao.get = Mock()
         user_dao.get.return_value = self.user
-        line_dao.find_line_id_by_user_id = Mock()
-        line_dao.find_line_id_by_user_id.return_value = [lineid]
+        user_line_dao.find_line_id_by_user_id = Mock()
+        user_line_dao.find_line_id_by_user_id.return_value = [lineid]
         line_dao.get = Mock()
         line_dao.get.return_value = self.line
         user_dao.delete = Mock()
@@ -289,8 +290,8 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.delete_user(userid)
 
         user_dao.get.assert_called_with(userid)
-        line_dao.find_line_id_by_user_id.assert_called_with(userid)
-        line_dao.get.assert_called_with(lineid)
+        user_line_dao.find_line_id_by_user_id.assert_called_with(userid)
+        user_line_dao.get.assert_called_with(lineid)
         user_dao.delete.assert_called_with(1)
         self._userManager._remove_line.assert_called_with(self.line)
 

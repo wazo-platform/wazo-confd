@@ -20,7 +20,7 @@ from lettuce.registry import world
 from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
     extensions_dao, queue_member_dao, \
     rightcall_dao, rightcall_member_dao, callfilter_dao, dialaction_dao, \
-    phonefunckey_dao, schedule_dao
+    phonefunckey_dao, schedule_dao, user_line_dao
 from xivo_dao.alchemy.callfilter import Callfilter
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.linefeatures import LineFeatures
@@ -164,10 +164,9 @@ def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, 
 @step(u'Given there is a user "([^"]*)" with a line "([^"]*)"$')
 def given_there_is_a_user_group1_with_a_line_group2(step, fullname, linenumber):
     given_there_is_a_user(step, fullname)
-    result = line_dao.find_line_id_by_user_id(world.userid)
+    result = user_line_dao.find_line_id_by_user_id(world.userid)
     if(result == []):
         line = LineFeatures()
-        line.iduserfeatures = world.userid
         line.number = linenumber
         line.protocolid = 0
         line.protocol = "sip"
@@ -243,7 +242,7 @@ def _check_user_features():
 
 
 def _check_line_features():
-    assert line_dao.find_line_id_by_user_id(world.userid) == []
+    assert user_line_dao.find_line_id_by_user_id(world.userid) == []
 
 
 def _check_usersip():
@@ -303,7 +302,7 @@ def when_i_delete_a_non_existing_user(step):
 @step(u'Given there is a user "([^"]*)" member of the queue "([^"]*)"')
 def given_there_is_a_user_member_of_the_queue(step, user, queue):
     world.userid, _, _ = rest_users.create_user_with_sip_line(user, '1000')
-    world.interface = line_dao.get_interface_from_user_id(world.userid)
+    world.interface = user_line_dao.get_line_identity_by_user_id(world.userid)
     queue_member_dao.add_user_to_queue(world.userid, queue)
 
 

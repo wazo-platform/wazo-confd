@@ -114,7 +114,6 @@ class RestUsers():
         line = LineFeatures()
         line.number = number
         line.context = "default"
-        line.iduserfeatures = user.id
         line.protocol = 'sip'
         line.protocolid = usersip.id
         line.name = str(random.randint(0, 9999))
