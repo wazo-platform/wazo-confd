@@ -21,7 +21,8 @@ from flask.helpers import make_response
 from xivo_restapi.helpers import serializer
 from werkzeug.exceptions import HTTPException
 from xivo_dao.data_handler.exception import MissingParametersError, \
-    InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError
+    InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError, \
+    ElementCreationError, ElementDeletionError, ElementEditionError
 from functools import wraps
 
 logger = logging.getLogger(__name__)
@@ -41,10 +42,20 @@ def exception_catcher(func):
         except ElementAlreadyExistsError as e:
             data = serializer.encode([unicode(e)])
             return make_response(data, 400)
-        except ValueError:
-            data = serializer.encode(["No parsable data in the request"])
+        except ValueError, e:
+            data = serializer.encode(["No parsable data in the request, Be sure to send a valid JSON file"])
             return make_response(data, 400)
-        except ElementNotExistsError:
+        except ElementCreationError, e:
+            logger.error("error during creation: %s", e)
+            return make_response(data, 400)
+        except ElementEditionError, e:
+            logger.error("error during edition: %s", e)
+            return make_response(data, 400)
+        except ElementDeletionError, e:
+            logger.error("error during deletion: %s", e)
+            return make_response(data, 400)
+        except ElementNotExistsError, e:
+            logger.error("error element not exist: %s", e)
             return make_response('', 404)
         except HTTPException:
             raise
