@@ -17,16 +17,15 @@
 
 import logging
 
+from . import mapper
+
 from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
 from xivo_dao.data_handler.extension.model import Extension
-from xivo_restapi.resources.extensions import mapper
-from xivo_restapi.helpers import serializer
-from xivo_dao.helpers.provd_connector import ProvdError
-from xivo_dao.helpers.sysconfd_connector import SysconfdError
 from xivo_restapi.helpers.route_generator import RouteGenerator
+from xivo_restapi.helpers import serializer
 from xivo_restapi import config
 
 
@@ -62,7 +61,7 @@ def create():
     if 'type' not in data and 'typeval' not in data:
         data.update({
             'type': 'user',
-            'typeval': 0
+            'typeval': '0'
          })
 
     extension = Extension.from_user_data(data)
@@ -92,14 +91,5 @@ def edit(extensionid):
 @route('/<int:extensionid>', methods=['DELETE'])
 def delete(extensionid):
     extension = extension_services.get(extensionid)
-    try:
-        extension_services.delete(extension)
-        return make_response('', 204)
-    except ProvdError as e:
-        result = "The extension was deleted but the device could not be reconfigured (%s)" % str(e)
-        result = serializer.encode([result])
-        return make_response(result, 500)
-    except SysconfdError as e:
-        result = "The extension was deleted but the voicemail content could not be removed (%s)" % str(e)
-        result = serializer.encode([result])
-        return make_response(result, 500)
+    extension_services.delete(extension)
+    return make_response('', 204)

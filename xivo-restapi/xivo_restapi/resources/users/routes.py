@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from xivo_restapi.resources.users.actions import blueprint as user_blueprint
+from actions import blueprint as user_blueprint
 
 
 def register_blueprints(app):

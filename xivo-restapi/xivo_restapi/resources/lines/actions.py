@@ -17,15 +17,14 @@
 
 import logging
 
+from . import mapper
+
 from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.line import services as line_services
 from xivo_dao.data_handler.line.model import LineSIP, LineIAX, LineSCCP, LineCUSTOM
-from xivo_restapi.resources.lines import mapper
 from xivo_restapi.helpers import serializer
-from xivo_dao.helpers.provd_connector import ProvdError
-from xivo_dao.helpers.sysconfd_connector import SysconfdError
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
 
@@ -94,14 +93,5 @@ def edit(lineid):
 @route('/<int:lineid>', methods=['DELETE'])
 def delete(lineid):
     line = line_services.get(lineid)
-    try:
-        line_services.delete(line)
-        return make_response('', 204)
-    except ProvdError as e:
-        result = "The line was deleted but the device could not be reconfigured (%s)" % str(e)
-        result = serializer.encode([result])
-        return make_response(result, 500)
-    except SysconfdError as e:
-        result = "The line was deleted but the voicemail content could not be removed (%s)" % str(e)
-        result = serializer.encode([result])
-        return make_response(result, 500)
+    line_services.delete(line)
+    return make_response('', 204)

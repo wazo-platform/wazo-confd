@@ -17,12 +17,13 @@
 
 import logging
 
+from . import mapper
+
 from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User
-from xivo_restapi.resources.users import mapper
 from xivo_restapi.helpers import serializer
 from xivo_dao.helpers.provd_connector import ProvdError
 from xivo_dao.helpers.sysconfd_connector import SysconfdError
