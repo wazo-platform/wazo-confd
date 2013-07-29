@@ -36,6 +36,8 @@ setup(
         'xivo_restapi.negotiate',
         'xivo_restapi.resources',
         'xivo_restapi.resources.users',
+        'xivo_restapi.resources.lines',
+        'xivo_restapi.resources.extensions',
         'xivo_restapi.v1_0',
         'xivo_restapi.v1_0.mapping_alchemy_sdm',
         'xivo_restapi.v1_0.rest',
