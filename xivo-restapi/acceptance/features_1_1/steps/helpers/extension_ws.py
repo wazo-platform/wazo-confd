@@ -7,3 +7,7 @@ def all_extensions():
 
 def get_extension(extension_id):
     return ws_utils.rest_get('extensions/%s' % extension_id)
+
+
+def create_extension(properties):
+    return ws_utils.rest_post('extensions/', properties)
