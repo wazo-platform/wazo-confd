@@ -46,6 +46,22 @@ Feature: Extensions
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: exten,context"
 
+    Scenario: Creating an extension with an empty number:
+        Given I have no extensions
+        When I create an extension with the following properties:
+            | exten | context |
+            |       | default |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: Exten required"
+
+    Scenario: Creating an extension with an empty context:
+        Given I have no extensions
+        When I create an extension with the following properties:
+            | exten | context |
+            | 1000  |         |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: Context required"
+
     Scenario: Creating an extension with only the number
         Given I have no extensions
         When I create an extension with the following properties:
