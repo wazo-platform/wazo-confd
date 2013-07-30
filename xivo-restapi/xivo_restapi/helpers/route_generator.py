@@ -29,8 +29,9 @@ class RouteGenerator(object):
     def __call__(self, route, *args, **kwargs):
         def decorator(func):
             func = exception_catcher(func)
-            func = self._blueprint.route(route, *args, **kwargs)(func)
             func = realmDigest.requires_auth(func)
             func = produces('application/json')(func)
             func = consumes('application/json')(func)
+            # MUST BE CALLED AS THE END
+            self._blueprint.route(route, *args, **kwargs)(func)
         return decorator
