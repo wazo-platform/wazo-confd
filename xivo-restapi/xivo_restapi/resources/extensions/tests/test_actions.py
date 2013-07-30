@@ -170,8 +170,9 @@ class TestExtensionActions(unittest.TestCase):
         mock_extension_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
 
+    @patch('xivo_dao.data_handler.extension.model.Extension.from_user_data')
     @patch('xivo_dao.data_handler.extension.services.create')
-    def test_create(self, mock_extension_services_create):
+    def test_create(self, mock_extension_services_create, mock_from_user_data):
         status_code = 201
         expected_result = {
             'id': 1,
@@ -183,7 +184,9 @@ class TestExtensionActions(unittest.TestCase):
 
         extension = Mock(Extension)
         extension.id = 1
+
         mock_extension_services_create.return_value = extension
+        mock_from_user_data.return_value = extension
 
         data = {
             u'exten': u'1324',
@@ -193,12 +196,7 @@ class TestExtensionActions(unittest.TestCase):
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
-        data.update({
-            u'type': 'user',
-            u'typeval': '0'
-        })
-
-        mock_extension_services_create.assert_called_with(Extension.from_user_data(data))
+        mock_extension_services_create.assert_called_once_with(extension)
         self.assertEqual(status_code, result.status_code)
         self.assertEqual(expected_result, decoded_result)
 
