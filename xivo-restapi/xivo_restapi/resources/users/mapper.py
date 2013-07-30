@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_restapi.helpers import mapper
-from flask.helpers import url_for
+from flask import helpers as flask_helpers
 
 # mapping = {db_field: model_field}
 MAPPING = {
@@ -46,7 +46,7 @@ def encode_list(users):
 
 
 def add_links_to_dict(user_dict):
-    user_location = url_for('.get', userid=user_dict['id'], _external=True)
+    user_location = flask_helpers.url_for('.get', userid=user_dict['id'], _external=True)
     user_dict.update({
         'links': [
             {
