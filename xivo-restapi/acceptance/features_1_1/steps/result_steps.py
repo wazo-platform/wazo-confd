@@ -24,3 +24,15 @@ def then_i_get_an_empty_list(step):
     user_response = world.response.data
     assert_that(user_response, has_entry('total', 0))
     assert_that(user_response, has_entry('items', []))
+
+
+@step(u'Then I get a response with status "([^"]*)"')
+def then_i_get_a_response_with_status_group1(step, status):
+    status_code = int(status)
+    error_msg = "response received: %s" % world.response.data
+    assert_that(world.response.status, equal_to(status_code), error_msg)
+
+
+@step(u'Then I get an error message "([^"]*)"')
+def then_i_get_an_error_message_group1(step, error_message):
+    assert_that(world.response.data, has_item(error_message))
