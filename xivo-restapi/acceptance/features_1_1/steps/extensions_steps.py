@@ -25,6 +25,12 @@ def given_i_have_no_extensions(step):
     extension_helper.delete_all()
 
 
+@step(u'Given I only have the following extensions:')
+def given_i_have_the_following_extensions(step):
+    extension_helper.delete_all()
+    extension_helper.create_extensions(step.hashes)
+
+
 @step(u'When I access the list of extensions')
 def when_i_access_the_list_of_extensions(step):
     world.response = extension_ws.all_extensions()
@@ -36,6 +42,13 @@ def then_i_get_a_list_with_only_the_default_extensions(step):
     assert_that(extensions, has_length(0))
 
 
+@step(u'Then I get a list containing the following extensions:')
+def then_i_get_a_list_containing_the_following_extensions(step):
+    expected_extensions = step.hashes
+    extensions = _filter_out_default_extensions()
+
+    entries = [has_entries(e) for e in expected_extensions]
+    assert_that(extensions, has_items(*entries))
 
 
 def _filter_out_default_extensions():
