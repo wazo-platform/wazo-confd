@@ -144,3 +144,16 @@ Feature: Extensions
             | 1000  | mysuperdupercontext |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: context"
+
+    Scenario: Delete an extension that doesn't exist
+        Given I have no extensions
+        When I delete extension "100"
+        Then I get a response with status "404"
+
+    Scenario: Delete an extension
+        Given I only have the following extensions:
+            | id  | exten | context | type | typeval |
+            | 100 | 1000  | default | user | 1       |
+        When I delete extension "100"
+        Then I get a response with status "204"
+        Then the extension "100" no longer exists

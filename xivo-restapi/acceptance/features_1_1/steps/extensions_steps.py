@@ -54,6 +54,11 @@ def when_i_create_an_extension_with_the_following_properties(step):
     world.response = extension_ws.create_extension(properties)
 
 
+@step(u'When I delete extension "([^"]*)"')
+def when_i_delete_extension_group1(step, extension_id):
+    world.response = extension_ws.delete_extension(extension_id)
+
+
 @step(u'Then I get a list with only the default extensions')
 def then_i_get_a_list_with_only_the_default_extensions(step):
     extensions = _filter_out_default_extensions()
@@ -108,6 +113,12 @@ def then_i_get_a_response_header_with_a_location_for_the_new_extension(step):
     expected_location = '/1.1/extensions/%s' % extension_id
 
     assert_that(location, ends_with(expected_location))
+
+
+@step(u'Then the extension "([^"]*)" no longer exists')
+def then_the_extension_group1_no_longer_exists(step, extension_id):
+    response = extension_ws.get_extension(extension_id)
+    assert_that(response.status, equal_to(404))
 
 
 def _filter_out_default_extensions():
