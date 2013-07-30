@@ -96,6 +96,16 @@ Feature: Extensions
         Then I get a response header with a location for the new extension
         Then I get a response with a link to an extension resource
 
+    Scenario: Creating an alphanumeric extension
+        Given I have no extensions
+        When I create an extension with the following properties:
+            | exten  | context |
+            | ABC123 | context |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a response header with a location for the new extension
+        Then I get a response with a link to an extension resource
+
     Scenario: Creating twice the same extension
         Given I have no extensions
         When I create an extension with the following properties:
@@ -117,3 +127,19 @@ Feature: Extensions
             | exten | context     |
             | 1000  | from-extern |
         Then I get a response with status "201"
+
+    Scenario: Creating an extension outside of context range
+        Given I have no extensions
+        When I create an extension with the following properties:
+            | exten | context |
+            | 99999 | default |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: exten"
+
+    Scenario: Creating an extension with a context that doesn't exist
+        Given I have no extensions
+        When I create an extension with the following properties:
+            | exten | context             |
+            | 1000  | mysuperdupercontext |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: context"
