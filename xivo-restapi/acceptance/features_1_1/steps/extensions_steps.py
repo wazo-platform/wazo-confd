@@ -36,6 +36,11 @@ def when_i_access_the_list_of_extensions(step):
     world.response = extension_ws.all_extensions()
 
 
+@step(u'When I access the extension with id "([^"]*)"')
+def when_i_access_the_extension_with_id_group1(step, extension_id):
+    world.response = extension_ws.get_extension(extension_id)
+
+
 @step(u'Then I get a list with only the default extensions')
 def then_i_get_a_list_with_only_the_default_extensions(step):
     extensions = _filter_out_default_extensions()
@@ -51,7 +56,24 @@ def then_i_get_a_list_containing_the_following_extensions(step):
     assert_that(extensions, has_items(*entries))
 
 
+@step(u'Then I have an extension with the following properties:')
+def then_i_have_an_extension_with_the_following_properties(step):
+    properties = _extract_extension_properties(step)
+    extension = world.response.data
+
+    assert_that(extension, has_entries(properties))
+
+
 def _filter_out_default_extensions():
     assert_that(world.response.data, has_key('items'))
     extensions = [e for e in world.response.data['items'] if e['context'] != 'xivo-features']
     return extensions
+
+
+def _extract_extension_properties(step):
+    properties = step.hashes[0]
+
+    if 'id' in properties:
+        properties['id'] = int(properties['id'])
+
+    return properties
