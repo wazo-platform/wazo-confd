@@ -47,13 +47,13 @@ def exception_catcher(func):
             return make_response(data, 400)
         except ElementCreationError, e:
             logger.error("error during creation: %s", e)
-            return make_response(data, 400)
+            return make_response("error during creation: %s" % e, 400)
         except ElementEditionError, e:
             logger.error("error during edition: %s", e)
-            return make_response(data, 400)
+            return make_response("error during edition: %s" % e, 400)
         except ElementDeletionError, e:
             logger.error("error during deletion: %s", e)
-            return make_response(data, 400)
+            return make_response("error during deletion: %s" % e, 400)
         except ElementNotExistsError, e:
             logger.error("error element not exist: %s", e)
             return make_response('', 404)
