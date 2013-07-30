@@ -62,7 +62,7 @@ def create():
         data.update({
             'type': 'user',
             'typeval': '0'
-         })
+        })
 
     extension = Extension.from_user_data(data)
     extension = extension_services.create(extension)

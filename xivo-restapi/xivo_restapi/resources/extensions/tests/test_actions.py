@@ -26,6 +26,8 @@ from xivo_dao.data_handler.exception import MissingParametersError, \
     ElementNotExistsError
 
 BASE_URL = "/1.1/extensions"
+HOST = 'host'
+SCHEME = 'http'
 
 
 class TestExtensionActions(unittest.TestCase):
@@ -33,6 +35,8 @@ class TestExtensionActions(unittest.TestCase):
     def setUp(self):
         flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
+        flask_http_server.app.config['SERVER_NAME'] = HOST
+        flask_http_server.app.config['PREFERRED_URL_SCHEME'] = SCHEME
         self.app = flask_http_server.app.test_client()
 
     @patch('xivo_dao.data_handler.extension.services.find_all')
@@ -62,7 +66,7 @@ class TestExtensionActions(unittest.TestCase):
                     'id': 1,
                     'exten': '1324',
                     'links': [{
-                        'href': 'http://localhost/1.1/extensions/1',
+                        'href': '%s://%s/1.1/extensions/1' % (SCHEME, HOST),
                         'rel': 'extensions'
                     }]
                  },
@@ -70,7 +74,7 @@ class TestExtensionActions(unittest.TestCase):
                     'id': 2,
                     'exten': '1325',
                     'links': [{
-                        'href': 'http://localhost/1.1/extensions/2',
+                        'href': '%s://%s/1.1/extensions/2' % (SCHEME, HOST),
                         'rel': 'extensions'
                     }]
                  }
@@ -102,7 +106,7 @@ class TestExtensionActions(unittest.TestCase):
                     'id': 1,
                     'exten': '1324',
                     'links': [{
-                        'href': 'http://localhost/1.1/extensions/1',
+                        'href': '%s://%s/1.1/extensions/1' % (SCHEME, HOST),
                         'rel': 'extensions'
                     }]
                  }
@@ -176,10 +180,12 @@ class TestExtensionActions(unittest.TestCase):
         status_code = 201
         expected_result = {
             'id': 1,
-            'links': [{
-                'href': 'http://localhost/1.1/extensions/1',
-                'rel': 'extensions'
-            }]
+            'links': [
+                {
+                    'rel': 'extensions',
+                    'href': '%s://%s/1.1/extensions/1' % (SCHEME, HOST)
+                }
+            ]
         }
 
         extension = Mock(Extension)
