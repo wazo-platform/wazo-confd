@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_restapi.helpers import mapper
+from flask.helpers import url_for
 
 # mapping = {db_field: model_field}
 MAPPING = {
@@ -26,17 +27,31 @@ MAPPING = {
 }
 
 
-def encode_list(extensions, include=[]):
-    mapped_extensions = [map_extension(extension, include) for extension in extensions]
+def encode_list(extensions):
+    mapped_extensions = []
+    for extension in extensions:
+        mapped_extension = map_extension(extension)
+        add_links_to_dict(mapped_extension)
+        mapped_extensions.append(mapped_extension)
     return mapper.encode_list(mapped_extensions)
 
 
-def encode_extension(extension, include=[]):
-    mapped_extension = map_extension(extension, include)
+def add_links_to_dict(extension_dict):
+    extension_location = url_for('.get', extensionid=extension_dict['id'], _external=True)
+    extension_dict.update({
+        'links': [
+            {
+                'rel': 'extensions',
+                'href': extension_location
+            }
+        ]
+    })
+
+
+def encode_extension(extension):
+    mapped_extension = map_extension(extension)
     return mapper.encode(mapped_extension)
 
 
-def map_extension(extension, include=[]):
-    data = mapper.map_entity(MAPPING, extension)
-
-    return data
+def map_extension(extension):
+    return mapper.map_entity(MAPPING, extension)

@@ -58,10 +58,22 @@ class TestExtensionActions(unittest.TestCase):
         expected_result = {
             'total': 2,
             'items': [
-                {'id': 1,
-                 'exten': '1324'},
-                {'id': 2,
-                 'exten': '1325'}
+                {
+                    'id': 1,
+                    'exten': '1324',
+                    'links': [{
+                        'href': 'http://localhost/1.1/extensions/1',
+                        'rel': 'extensions'
+                    }]
+                 },
+                {
+                    'id': 2,
+                    'exten': '1325',
+                    'links': [{
+                        'href': 'http://localhost/1.1/extensions/2',
+                        'rel': 'extensions'
+                    }]
+                 }
             ]
         }
 
@@ -86,8 +98,14 @@ class TestExtensionActions(unittest.TestCase):
         expected_result = {
             'total': 1,
             'items': [
-                {'id': 1,
-                 'exten': '1324'}
+                {
+                    'id': 1,
+                    'exten': '1324',
+                    'links': [{
+                        'href': 'http://localhost/1.1/extensions/1',
+                        'rel': 'extensions'
+                    }]
+                 }
             ]
         }
 
@@ -155,21 +173,32 @@ class TestExtensionActions(unittest.TestCase):
     @patch('xivo_dao.data_handler.extension.services.create')
     def test_create(self, mock_extension_services_create):
         status_code = 201
-        expected_result = {'id': 1}
+        expected_result = {
+            'id': 1,
+            'links': [{
+                'href': 'http://localhost/1.1/extensions/1',
+                'rel': 'extensions'
+            }]
+        }
 
         extension = Mock(Extension)
         extension.id = 1
         mock_extension_services_create.return_value = extension
 
         data = {
-            'exten': '1324',
-            'context': 'jd'
+            u'exten': u'1324',
+            u'context': u'jd'
         }
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
-        mock_extension_services_create.assert_called_with(Extension.from_data_source(data))
+        data.update({
+            u'type': 'user',
+            u'typeval': '0'
+        })
+
+        mock_extension_services_create.assert_called_with(Extension.from_user_data(data))
         self.assertEqual(status_code, result.status_code)
         self.assertEqual(expected_result, decoded_result)
 

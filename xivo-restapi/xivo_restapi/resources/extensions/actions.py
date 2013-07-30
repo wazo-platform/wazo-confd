@@ -19,7 +19,7 @@ import logging
 
 from . import mapper
 
-from flask import Blueprint, url_for
+from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
@@ -65,17 +65,13 @@ def create():
          })
 
     extension = Extension.from_user_data(data)
-
     extension = extension_services.create(extension)
 
-    extension_location = url_for('.get', extensionid=extension.id)
-    result = serializer.encode({
-        'id': extension.id
-    })
+    result = {'id': extension.id}
+    mapper.add_links_to_dict(result)
+    result = serializer.encode(result)
 
-    response = make_response(result, 201)
-    response.headers['Location'] = extension_location
-    return response
+    return make_response(result, 201)
 
 
 @route('/<int:extensionid>', methods=['PUT'])
