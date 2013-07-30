@@ -45,8 +45,11 @@ def main():
         else:
             _daemonize()
             logger.info("Starting xivo-restapid in standard mode.")
-        WSGIServer(flask_http_server.app, bindAddress='/var/www/restws-fcgi.sock',
-                   multithreaded=False, multiprocess=True, debug=False).run()
+        WSGIServer(flask_http_server.app,
+                   bindAddress='/var/www/restws-fcgi.sock',
+                   multithreaded=False,
+                   multiprocess=True,
+                   debug=False).run()
 
 
 def _parse_args():
