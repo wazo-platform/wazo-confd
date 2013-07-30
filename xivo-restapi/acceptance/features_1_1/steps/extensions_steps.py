@@ -32,7 +32,13 @@ def when_i_access_the_list_of_extensions(step):
 
 @step(u'Then I get a list with only the default extensions')
 def then_i_get_a_list_with_only_the_default_extensions(step):
-    assert_that(world.response.data, has_key('items'))
-
-    extensions = [e for e in world.response.data['items'] if e['context'] != 'xivo-features']
+    extensions = _filter_out_default_extensions()
     assert_that(extensions, has_length(0))
+
+
+
+
+def _filter_out_default_extensions():
+    assert_that(world.response.data, has_key('items'))
+    extensions = [e for e in world.response.data['items'] if e['context'] != 'xivo-features']
+    return extensions
