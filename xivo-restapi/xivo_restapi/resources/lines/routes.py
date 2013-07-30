@@ -18,7 +18,9 @@
 
 
 from actions import blueprint as line_blueprint
+from actions_sip import blueprint as line_sip_blueprint
 
 
 def register_blueprints(app):
     app.register_blueprint(line_blueprint)
+    app.register_blueprint(line_sip_blueprint)

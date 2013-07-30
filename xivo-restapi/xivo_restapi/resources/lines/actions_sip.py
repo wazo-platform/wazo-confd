@@ -23,7 +23,7 @@ from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.line.model import LineSIP, LineIAX, LineSCCP, LineCUSTOM
+from xivo_dao.data_handler.line.model import LineSIP
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
@@ -55,16 +55,7 @@ def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
 
-    protocol = data['protocol'].lower()
-    if protocol == 'sip':
-        line = LineSIP.from_user_data(data)
-    elif protocol == 'iax':
-        line = LineIAX.from_user_data(data)
-    elif protocol == 'sccp':
-        line = LineSCCP.from_user_data(data)
-    elif protocol == 'custom':
-        line = LineCUSTOM.from_user_data(data)
-
+    line = LineSIP.from_user_data(data)
     line = line_services.create(line)
 
     result = {'id': line.id}

@@ -18,12 +18,11 @@
 
 import unittest
 
-from mock import Mock, patch
+from mock import patch
 from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
-from xivo_dao.data_handler.line.model import Line, LineSIP
-from xivo_dao.data_handler.exception import MissingParametersError, \
-    ElementNotExistsError
+from xivo_dao.data_handler.line.model import Line
+from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "/1.1/lines"
 
@@ -58,10 +57,20 @@ class TestLineActions(unittest.TestCase):
         expected_result = {
             'total': 2,
             'items': [
-                {'id': 1,
-                 'name': 'test1'},
-                {'id': 2,
-                 'name': 'test2'}
+                {
+                    'id': 1,
+                    'name': 'test1',
+                    'links': [{
+                            'href': 'http://localhost/1.1/lines/1',
+                            'rel': 'lines'
+                    }]},
+                {
+                    'id': 2,
+                    'name': 'test2',
+                    'links': [{
+                            'href': 'http://localhost/1.1/lines/2',
+                            'rel': 'lines'
+                    }]}
             ]
         }
 
@@ -86,8 +95,14 @@ class TestLineActions(unittest.TestCase):
         expected_result = {
             'total': 1,
             'items': [
-                {'id': 1,
-                 'name': 'Bob'}
+                {
+                    'id': 1,
+                    'name': 'Bob',
+                    'links': [{
+                            'href': 'http://localhost/1.1/lines/1',
+                            'rel': 'lines'
+                    }]
+                 }
             ]
         }
 
@@ -151,145 +166,3 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
-
-    @patch('xivo_dao.data_handler.line.services.create')
-    def test_create(self, mock_line_services_create):
-        status_code = 201
-        expected_result = {'id': 1}
-
-        line = Mock(LineSIP)
-        line.id = 1
-        mock_line_services_create.return_value = line
-
-        data = {
-            'protocol': 'sip',
-            'name': 'toto',
-            'context': 'default'
-        }
-
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
-        decoded_result = serializer.decode(result.data)
-
-        mock_line_services_create.assert_called_with(LineSIP.from_data_source(data))
-        self.assertEqual(status_code, result.status_code)
-        self.assertEqual(expected_result, decoded_result)
-
-    @patch('xivo_dao.data_handler.line.services.create')
-    def test_create_error(self, mock_line_services_create):
-        status_code = 500
-
-        data = {
-            'protocol': 'sip',
-            'name': 'toto',
-            'context': 'default'
-        }
-
-        mock_line_services_create.side_effect = Exception
-
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
-
-        self.assertEqual(status_code, result.status_code)
-
-    @patch('xivo_dao.data_handler.line.services.create')
-    def test_create_request_error(self, mock_line_services_create):
-        status_code = 400
-        expected_result = ["Missing parameters: context"]
-
-        mock_line_services_create.side_effect = MissingParametersError(["context"])
-
-        data = {
-            'protocol': 'sip'
-        }
-
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
-        decoded_result = serializer.decode(result.data)
-
-        self.assertEqual(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.edit')
-    def test_edit(self, mock_line_services_edit, mock_line_services_get):
-        status_code = 204
-        expected_data = ''
-
-        data = {
-            'id': 1,
-            'protocol': 'sip',
-            'name': 'toto',
-            'context': 'default'
-        }
-
-        mock_line_services_get.return_value = Mock(Line)
-
-        result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
-
-        self.assertEqual(status_code, result.status_code)
-        self.assertEqual(expected_data, result.data)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.edit')
-    def test_edit_error(self, mock_line_services_edit, mock_line_services_get):
-        status_code = 500
-
-        data = {
-            'protocol': 'sip',
-            'name': 'toto',
-            'context': 'default'
-        }
-
-        mock_line_services_get.return_value = line = Mock(Line)
-        mock_line_services_edit.side_effect = Exception
-
-        result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
-
-        line.update_from_data.assert_called_with(data)
-        self.assertEqual(status_code, result.status_code)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.edit')
-    def test_edit_not_found(self, mock_line_services_edit, mock_line_services_get):
-        status_code = 404
-
-        data = {
-            'protocol': 'sip',
-            'name': 'toto',
-            'context': 'default'
-        }
-
-        mock_line_services_get.return_value = Mock(Line)
-        mock_line_services_edit.side_effect = ElementNotExistsError('line')
-
-        result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
-
-        self.assertEqual(status_code, result.status_code)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.delete')
-    def test_delete_success(self, mock_line_services_delete, mock_line_services_get):
-        status_code = 204
-        expected_data = ''
-
-        line = Mock(Line)
-        mock_line_services_get.return_value = line
-        mock_line_services_delete.return_value = True
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        self.assertEqual(status_code, result.status_code)
-        self.assertEqual(expected_data, result.data)
-        mock_line_services_delete.assert_called_with(line)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.delete')
-    def test_delete_not_found(self, mock_line_services_delete, mock_line_services_get):
-        status_code = 404
-
-        line = Mock(Line)
-        mock_line_services_get.return_value = line
-        mock_line_services_delete.side_effect = ElementNotExistsError('line')
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        self.assertEqual(status_code, result.status_code)
-        mock_line_services_delete.assert_called_with(line)

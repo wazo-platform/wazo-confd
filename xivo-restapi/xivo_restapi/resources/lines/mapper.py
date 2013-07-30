@@ -16,25 +16,43 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_restapi.helpers import mapper
+from flask.helpers import url_for
 
 # mapping = {db_field: model_field}
 MAPPING = {
     'id': 'id',
     'name': 'name',
+    'protocol': 'protocol',
+    'context': 'context',
+    'interface': 'interface'
 }
 
 
-def encode_list(lines, include=[]):
-    mapped_lines = [map_line(line, include) for line in lines]
+def encode_list(lines):
+    mapped_lines = []
+    for line in lines:
+        mapped_line = map_line(line)
+        add_links_to_dict(mapped_line)
+        mapped_lines.append(mapped_line)
     return mapper.encode_list(mapped_lines)
 
 
-def encode_line(line, include=[]):
-    mapped_line = map_line(line, include)
+def add_links_to_dict(line_dict):
+    line_location = url_for('.get', lineid=line_dict['id'], _external=True)
+    line_dict.update({
+        'links': [
+            {
+                'rel': 'lines',
+                'href': line_location
+            }
+        ]
+    })
+
+
+def encode_line(line):
+    mapped_line = map_line(line)
     return mapper.encode(mapped_line)
 
 
-def map_line(line, include=[]):
-    data = mapper.map_entity(MAPPING, line)
-
-    return data
+def map_line(line):
+    return mapper.map_entity(MAPPING, line)
