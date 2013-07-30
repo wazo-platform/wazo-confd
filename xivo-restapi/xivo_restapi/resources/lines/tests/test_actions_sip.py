@@ -21,7 +21,7 @@ import unittest
 from mock import Mock, patch
 from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
-from xivo_dao.data_handler.line.model import Line, LineSIP
+from xivo_dao.data_handler.line.model import LineSIP
 from xivo_dao.data_handler.exception import MissingParametersError, \
     ElementNotExistsError
 
@@ -60,27 +60,27 @@ class TestLineActions(unittest.TestCase):
             'items': [
                 {
                     'id': 1,
-                    'name': 'test1',
+                    'username': 'test1',
                     'links': [{
-                            'href': 'http://localhost/1.1/lines_sip/1',
-                            'rel': 'lines'
+                        'href': 'http://localhost/1.1/lines_sip/1',
+                        'rel': 'lines_sip'
                     }]
                 },
                 {
                     'id': 2,
-                    'name': 'test2',
+                    'username': 'test2',
                     'links': [{
-                            'href': 'http://localhost/1.1/lines_sip/2',
-                            'rel': 'lines'
+                        'href': 'http://localhost/1.1/lines_sip/2',
+                        'rel': 'lines_sip'
                     }]
                 }
             ]
         }
 
-        line1 = Line(id=1,
-                     name='test1')
-        line2 = Line(id=2,
-                     name='test2')
+        line1 = LineSIP(id=1,
+                        username='test1')
+        line2 = LineSIP(id=2,
+                        username='test2')
         mock_line_services_find_by_protocol.return_value = [line1, line2]
 
         result = self.app.get("%s/" % BASE_URL)
@@ -106,10 +106,10 @@ class TestLineActions(unittest.TestCase):
         status_code = 200
         expected_result = {
             'id': 1,
-            'name': 'test1'
+            'username': 'test1'
         }
 
-        line = Line(id=1, name='test1')
+        line = LineSIP(id=1, username='test1')
         mock_line_services_get.return_value = line
 
         result = self.app.get("%s/1" % BASE_URL)
@@ -148,7 +148,7 @@ class TestLineActions(unittest.TestCase):
             'id': 1,
             'links': [{
                     'href': 'http://localhost/1.1/lines_sip/1',
-                    'rel': 'lines'
+                    'rel': 'lines_sip'
             }]
         }
 
@@ -158,7 +158,7 @@ class TestLineActions(unittest.TestCase):
 
         data = {
             'protocol': 'sip',
-            'name': 'toto',
+            'username': 'toto',
             'context': 'default'
         }
 
@@ -175,7 +175,7 @@ class TestLineActions(unittest.TestCase):
 
         data = {
             'protocol': 'sip',
-            'name': 'toto',
+            'username': 'toto',
             'context': 'default'
         }
 
@@ -211,11 +211,11 @@ class TestLineActions(unittest.TestCase):
         data = {
             'id': 1,
             'protocol': 'sip',
-            'name': 'toto',
+            'username': 'toto',
             'context': 'default'
         }
 
-        mock_line_services_get.return_value = Mock(Line)
+        mock_line_services_get.return_value = Mock(LineSIP)
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
@@ -229,11 +229,11 @@ class TestLineActions(unittest.TestCase):
 
         data = {
             'protocol': 'sip',
-            'name': 'toto',
+            'username': 'toto',
             'context': 'default'
         }
 
-        mock_line_services_get.return_value = line = Mock(Line)
+        mock_line_services_get.return_value = line = Mock(LineSIP)
         mock_line_services_edit.side_effect = Exception
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
@@ -248,11 +248,11 @@ class TestLineActions(unittest.TestCase):
 
         data = {
             'protocol': 'sip',
-            'name': 'toto',
+            'username': 'toto',
             'context': 'default'
         }
 
-        mock_line_services_get.return_value = Mock(Line)
+        mock_line_services_get.return_value = Mock(LineSIP)
         mock_line_services_edit.side_effect = ElementNotExistsError('line')
 
         result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
@@ -265,7 +265,7 @@ class TestLineActions(unittest.TestCase):
         status_code = 204
         expected_data = ''
 
-        line = Mock(Line)
+        line = Mock(LineSIP)
         mock_line_services_get.return_value = line
         mock_line_services_delete.return_value = True
 
@@ -280,7 +280,7 @@ class TestLineActions(unittest.TestCase):
     def test_delete_not_found(self, mock_line_services_delete, mock_line_services_get):
         status_code = 404
 
-        line = Mock(Line)
+        line = Mock(LineSIP)
         mock_line_services_get.return_value = line
         mock_line_services_delete.side_effect = ElementNotExistsError('line')
 

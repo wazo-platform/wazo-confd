@@ -142,8 +142,8 @@ class TestULEActions(unittest.TestCase):
         mock_ule_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
 
-    @patch('xivo_dao.data_handler.user_line_extension.services.create')
-    def test_create(self, mock_ule_services_create):
+    @patch('xivo_dao.data_handler.user.association.associate_user_line_extension')
+    def test_create(self, mock_associate_user_line_extension):
         status_code = 201
         expected_result = {
             'id': 1,
@@ -155,7 +155,7 @@ class TestULEActions(unittest.TestCase):
 
         ule = Mock(UserLineExtension)
         ule.id = 1
-        mock_ule_services_create.return_value = ule
+        mock_associate_user_line_extension.return_value = ule
 
         data = {
             'user_id': 3,
@@ -166,30 +166,41 @@ class TestULEActions(unittest.TestCase):
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
-        mock_ule_services_create.assert_called_with(UserLineExtension.from_user_data(data))
+        mock_associate_user_line_extension.assert_called_with(data['user_id'],
+                                                              data['line_id'],
+                                                              data['extension_id'],
+                                                              True,
+                                                              True)
         self.assertEqual(status_code, result.status_code)
         self.assertEqual(expected_result, decoded_result)
 
-    @patch('xivo_dao.data_handler.user_line_extension.services.create')
-    def test_create_error(self, mock_ule_services_create):
+    @patch('xivo_dao.data_handler.user.association.associate_user_line_extension')
+    def test_create_error(self, mock_associate_user_line_extension):
         status_code = 500
 
-        data = {'user_id': 3}
+        data = {
+            'user_id': 3,
+            'line_id': 6,
+            'extension_id': 4
+        }
 
-        mock_ule_services_create.side_effect = Exception
+        mock_associate_user_line_extension.side_effect = Exception
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
 
-    @patch('xivo_dao.data_handler.user_line_extension.services.create')
-    def test_create_request_error(self, mock_ule_services_create):
+    @patch('xivo_dao.data_handler.user.association.associate_user_line_extension')
+    def test_create_request_error(self, mock_associate_user_line_extension):
         status_code = 400
         expected_result = ["Missing parameters: user_id"]
 
-        mock_ule_services_create.side_effect = MissingParametersError(["user_id"])
+        mock_associate_user_line_extension.side_effect = MissingParametersError(["user_id"])
 
-        data = {'user_id': 4}
+        data = {
+            'line_id': 4,
+            'extension_id': 4
+        }
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
