@@ -82,6 +82,7 @@ def _load_module(name):
 
 @app.before_request
 def log_requests():
+    app.config['SERVER_NAME'] = request.environ['HTTP_HOST']
     params = {
         'method': request.method,
         'path': request.path
