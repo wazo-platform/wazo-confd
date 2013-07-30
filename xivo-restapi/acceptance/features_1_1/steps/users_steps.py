@@ -127,7 +127,8 @@ def then_i_get_a_list_with_the_following_users(step):
 @step(u'Then I get a response with status "([^"]*)"')
 def then_i_get_a_response_with_status_group1(step, status):
     status_code = int(status)
-    assert_that(world.response.status, equal_to(status_code))
+    error_msg = "response received: %s" % world.response.data
+    assert_that(world.response.status, equal_to(status_code), error_msg)
 
 
 @step(u'Then I get a response header with a location for the new user')

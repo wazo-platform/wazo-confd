@@ -116,6 +116,7 @@ Feature: Extensions
             | exten | context |
             | 1000  | default |
         Then I get a response with status "400"
+        Then I get an error message "Creation error: exten already exists"
 
     Scenario: Creating two extensions in different contexts
         Given I have no extensions
