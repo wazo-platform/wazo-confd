@@ -85,9 +85,10 @@ def then_i_get_a_response_with_an_id(step):
 @step(u'Then I get a response with a link to an extension resource')
 def then_i_get_a_response_with_a_link_to_an_extension_resource(step):
     host = get_config_value('xivo', 'hostname')
+    port = get_config_value('restapi', 'port')
     extension_id = world.response.data['id']
 
-    expected_url = "https://%s/1.1/extensions/%s" % (host, extension_id)
+    expected_url = "https://%s:%s/1.1/extensions/%s" % (host, port, extension_id)
 
     assert_that(world.response.data,
                 has_entry('links', contains(
