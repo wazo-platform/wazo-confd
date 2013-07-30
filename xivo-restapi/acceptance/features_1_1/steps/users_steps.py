@@ -105,13 +105,6 @@ def when_i_delete_the_user_with_id_group1(step, userid):
     world.response = user_ws.delete_user(userid)
 
 
-@step(u'Then I get an empty list')
-def then_i_get_an_empty_list(step):
-    user_response = world.response.data
-    assert_that(user_response, has_entry('total', 0))
-    assert_that(user_response, has_entry('items', []))
-
-
 @step(u'Then I get a list with the following users:')
 def then_i_get_a_list_with_the_following_users(step):
     user_response = world.response.data
