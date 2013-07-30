@@ -17,7 +17,7 @@
 
 import logging
 
-from . import mapper
+from . import mapper_sip
 
 from flask import Blueprint
 from flask.globals import request
@@ -37,7 +37,7 @@ route = RouteGenerator(blueprint)
 @route('/')
 def list_sip():
     lines = line_services.find_by_protocol('sip')
-    result = mapper.encode_list(lines)
+    result = mapper_sip.encode_list(lines)
 
     return make_response(result, 200)
 
@@ -45,7 +45,7 @@ def list_sip():
 @route('/<int:lineid>')
 def get(lineid):
     line = line_services.get(lineid)
-    result = mapper.encode_line(line)
+    result = mapper_sip.encode_line(line)
 
     return make_response(result, 200)
 
@@ -59,7 +59,7 @@ def create():
     line = line_services.create(line)
 
     result = {'id': line.id}
-    mapper.add_links_to_dict(result)
+    mapper_sip.add_links_to_dict(result)
     result = serializer.encode(result)
 
     return make_response(result, 201)

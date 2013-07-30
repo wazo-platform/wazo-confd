@@ -53,6 +53,11 @@ def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
 
+    if 'main_line' not in data:
+        data.update({'main_line': True})
+    if 'main_user' not in data:
+        data.update({'main_user': True})
+
     ule = UserLineExtension.from_user_data(data)
     ule = ule_services.create(ule)
 

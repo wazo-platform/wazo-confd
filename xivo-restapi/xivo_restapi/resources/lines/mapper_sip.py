@@ -21,8 +21,8 @@ from flask.helpers import url_for
 # mapping = {db_field: model_field}
 MAPPING = {
     'id': 'id',
-    'name': 'name',
-    'protocol': 'protocol',
+    'username': 'username',
+    'secret': 'secret',
     'context': 'context',
     'interface': 'interface',
     'provisioningid': 'provisioning_extension',
@@ -45,7 +45,7 @@ def add_links_to_dict(line_dict):
     line_dict.update({
         'links': [
             {
-                'rel': 'lines',
+                'rel': 'lines_sip',
                 'href': line_location
             }
         ]
