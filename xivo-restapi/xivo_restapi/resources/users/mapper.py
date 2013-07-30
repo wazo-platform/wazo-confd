@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_restapi.helpers import mapper
+from flask.helpers import url_for
 
 # mapping = {db_field: model_field}
 MAPPING = {
@@ -35,28 +36,31 @@ MAPPING = {
 }
 
 
-def encode_list(users, include=[]):
-    mapped_users = [map_user(user, include) for user in users]
+def encode_list(users):
+    mapped_users = []
+    for user in users:
+        mapped_user = map_user(user)
+        add_links_to_dict(mapped_user)
+        mapped_users.append(mapped_user)
     return mapper.encode_list(mapped_users)
 
 
-def encode_user(user, include=[]):
-    mapped_user = map_user(user, include)
+def add_links_to_dict(user_dict):
+    user_location = url_for('.get', userid=user_dict['id'], _external=True)
+    user_dict.update({
+        'links': [
+            {
+                'rel': 'users',
+                'href': user_location
+            }
+        ]
+    })
+
+
+def encode_user(user):
+    mapped_user = map_user(user)
     return mapper.encode(mapped_user)
 
 
-def map_user(user, include=[]):
-    data = mapper.map_entity(MAPPING, user)
-
-    if 'voicemail' in include:
-        data['voicemail'] = _add_voicemail(user)
-
-    return data
-
-
-def _add_voicemail(user):
-    voicemail = None
-    if hasattr(user, 'voicemail_id') and user.voicemail_id is not None:
-        voicemail = {'id': user.voicemail_id}
-
-    return voicemail
+def map_user(user):
+    return mapper.map_entity(MAPPING, user)
