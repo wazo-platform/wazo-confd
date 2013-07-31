@@ -291,7 +291,7 @@ class TestUserManagement(unittest.TestCase):
 
         user_dao.get.assert_called_with(userid)
         user_line_dao.find_line_id_by_user_id.assert_called_with(userid)
-        user_line_dao.get.assert_called_with(lineid)
+        line_dao.get.assert_called_with(lineid)
         user_dao.delete.assert_called_with(1)
         self._userManager._remove_line.assert_called_with(self.line)
 
@@ -341,8 +341,8 @@ class TestUserManagement(unittest.TestCase):
         lineid = 2
         user_dao.get = Mock()
         user_dao.get.return_value = self.user
-        line_dao.find_line_id_by_user_id = Mock()
-        line_dao.find_line_id_by_user_id.return_value = [lineid]
+        user_line_dao.find_line_id_by_user_id = Mock()
+        user_line_dao.find_line_id_by_user_id.return_value = [lineid]
         line_dao.get = Mock()
         line_dao.get.return_value = self.line
         user_dao.delete = Mock()
@@ -352,7 +352,7 @@ class TestUserManagement(unittest.TestCase):
         self._userManager.delete_user(self.user.id, True)
 
         user_dao.get.assert_called_with(self.user.id)
-        line_dao.find_line_id_by_user_id.assert_called_with(self.user.id)
+        user_line_dao.find_line_id_by_user_id.assert_called_with(self.user.id)
         line_dao.get.assert_called_with(lineid)
         user_dao.delete.assert_called_with(self.user.id)
         self._userManager._remove_line.assert_called_with(self.line)
