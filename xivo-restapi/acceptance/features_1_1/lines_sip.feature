@@ -30,18 +30,21 @@ Feature: SIP Lines
         When I create a line with the following properties:
             | context |
             | default |
-        Then I get a response with status "204"
+        Then I get a response with status "201"
         Then I get a line with an id
         Then I get a line with links to the resource
+        Then I get a location in the headers
         Then I see the line in the webi
 
-    Scenario: Create a line with a context other than default
+    Scenario: Create a line with an internal context other than default
+        Given I have an internal context named "statscenter"
         When I create a line with the following properties:
             | context     |
-            | from-extern |
+            | statscenter |
         Then I get a response with status "204"
         Then I get a line with an id
         Then I get a line with links to the resource
+        Then I get a location in the headers
         Then I see the line in the webi
 
     Scenario: Create 2 lines in same context
