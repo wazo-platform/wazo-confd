@@ -40,18 +40,6 @@ Feature: Users
           | Frédéric  | Martin   |           |
           | Louis     | Martin   |           |
 
-    Scenario: User list with voicemail
-      Given there are only the following users:
-        | id | firstname | lastname | line number | voicemail number | language |
-        | 1  | Irène     | Dupont   | 1000        | 1000             | fr_FR    |
-        | 2  | Benoît    | Bolduc   | 1001        | 1001             | fr_FR    |
-      When I ask for the list of users, including the voicemail
-      Then I get a list with the following users:
-        | firstname | lastname |
-        | Benoît    | Bolduc   |
-        | Irène     | Dupont   |
-      Then each user has a voicemail id
-
     Scenario: User search with no users
         Given there are no users
         When I search for the user "Bob"
@@ -153,28 +141,6 @@ Feature: Users
         Then I get a user with the following properties:
           | id | firstname | lastname | userfield |
           | 1  | Irène     | Dupont   |           |
-
-    Scenario: Getting a user with his voicemail
-        Given there are only the following users:
-          | id | firstname | lastname | line number | voicemail number | language |
-          | 1  | Irène     | Dupont   | 1000        | 1000             | fr_FR    |
-        When I ask for user "Irène Dupont", including his voicemail
-        Then I get a response with status "200"
-        Then I get a user with the following properties:
-          | firstname | lastname | userfield |
-          | Irène     | Dupont   |           |
-        Then I get a user with a voicemail
-
-    Scenario: Getting a user that doesn't have a voicemail
-        Given there are only the following users:
-          | id | firstname | lastname |
-          | 1  | Irène     | Dupont   |
-        When I ask for user "Irène Dupont", including his voicemail
-        Then I get a response with status "200"
-        Then I get a user with the following properties:
-          | firstname | lastname | userfield |
-          | Irène     | Dupont   |           |
-        Then I get a user without a voicemail
 
     Scenario: Creating an empty user
         Given there are no users
