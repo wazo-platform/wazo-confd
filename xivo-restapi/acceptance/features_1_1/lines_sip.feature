@@ -5,6 +5,7 @@ Feature: SIP Lines
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: context"
 
+    FAIL
     Scenario: Create a line with an empty context
         When I create a line with the following properties:
             | context |
@@ -12,6 +13,7 @@ Feature: SIP Lines
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: context"
 
+    FAIL
     Scenario: Create a line with a context that doesn't exist
         When I create a line with the following properties:
             | context           |
