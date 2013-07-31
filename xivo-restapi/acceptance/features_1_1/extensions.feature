@@ -129,21 +129,21 @@ Feature: Extensions
             | 1000  | from-extern |
         Then I get a response with status "201"
 
-    Scenario: Creating an extension outside of context range
-        Given I have no extensions
-        When I create an extension with the following properties:
-            | exten | context |
-            | 99999 | default |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: exten"
+    #Scenario: Creating an extension outside of context range
+    #    Given I have no extensions
+    #    When I create an extension with the following properties:
+    #        | exten | context |
+    #        | 99999 | default |
+    #    Then I get a response with status "400"
+    #    Then I get an error message "Invalid parameters: exten"
 
-    Scenario: Creating an extension with a context that doesn't exist
-        Given I have no extensions
-        When I create an extension with the following properties:
-            | exten | context             |
-            | 1000  | mysuperdupercontext |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: context"
+    #Scenario: Creating an extension with a context that doesn't exist
+    #    Given I have no extensions
+    #    When I create an extension with the following properties:
+    #        | exten | context             |
+    #        | 1000  | mysuperdupercontext |
+    #    Then I get a response with status "400"
+    #    Then I get an error message "Invalid parameters: context"
 
     Scenario: Delete an extension that doesn't exist
         Given I have no extensions

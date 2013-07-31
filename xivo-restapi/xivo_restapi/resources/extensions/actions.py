@@ -74,7 +74,7 @@ def create():
     return make_response(result, 201)
 
 
-@route('/<int:extensionid>', methods=['PUT'])
+#@route('/<int:extensionid>', methods=['PUT'])
 def edit(extensionid):
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
