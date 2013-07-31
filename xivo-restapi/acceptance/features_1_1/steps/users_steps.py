@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from acceptance.helpers.config import get_config_value
 from hamcrest import assert_that, has_entry, has_entries, has_key, equal_to, \
-    has_item, instance_of, ends_with
+    has_item, instance_of, ends_with, contains
 from helpers import user_helper, user_ws
 from lettuce import step, world
 
@@ -38,44 +39,9 @@ def when_i_ask_for_the_list_of_users(step):
     world.response = user_ws.all_users()
 
 
-@step(u'When I ask for the list of users, including the voicemail')
-def when_i_ask_for_the_list_of_users_including_the_voicemail(step):
-    world.response = user_ws.all_users_with_voicemail()
-
-
 @step(u'When I ask for the user with id "([^"]*)"')
 def when_i_ask_for_the_user_with_id_group1(step, userid):
     world.response = user_ws.get_user(userid)
-
-
-@step(u'When I ask for user "([^"]*)", including his voicemail')
-def when_i_ask_for_user_with_id_group1_including_his_voicemail(step, name):
-    user = user_helper.find_user_by_name(name)
-    world.response = user_ws.get_user_with_voicemail(user.id)
-
-
-@step(u'Then I get a user with a voicemail')
-def then_i_get_a_user_with_a_voicemail(step):
-    user = world.response.data
-    _check_user_has_voicemail(user)
-
-
-def _check_user_has_voicemail(user):
-    assert_that(user, has_key('voicemail'))
-    assert_that(user['voicemail'], has_entry('id', instance_of(int)))
-
-
-@step(u'Then I get a user without a voicemail')
-def then_i_get_a_user_without_a_voicemail(step):
-    user = world.response.data
-    assert_that(user, has_key('voicemail'))
-    assert_that(user['voicemail'], equal_to(None))
-
-
-@step(u'Then each user has a voicemail id')
-def then_each_user_has_a_voicemail_id(step):
-    for user in world.response.data['items']:
-        _check_user_has_voicemail(user)
 
 
 @step(u'When I search for the user "([^"]*)"')
@@ -127,7 +93,8 @@ def then_i_get_a_list_with_the_following_users(step):
 @step(u'Then I get a response with status "([^"]*)"')
 def then_i_get_a_response_with_status_group1(step, status):
     status_code = int(status)
-    assert_that(world.response.status, equal_to(status_code))
+    error_msg = "response received: %s" % world.response.data
+    assert_that(world.response.status, equal_to(status_code), error_msg)
 
 
 @step(u'Then I get a response header with a location for the new user')
@@ -157,6 +124,22 @@ def _get_user_info(hashes):
         userinfo['id'] = int(userinfo['id'])
 
     return userinfo
+
+
+@step(u'Then I get a response with user links')
+def then_i_get_a_response_with_user_links(step):
+    host = get_config_value('xivo', 'hostname')
+    port = get_config_value('restapi', 'port')
+    user_id = world.response.data['id']
+
+    expected_url = "https://%s:%s/1.1/users/%s" % (host, port, user_id)
+
+    assert_that(world.response.data,
+                has_entry('links', contains(
+                    has_entries({
+                        'rel': 'users',
+                        'href': expected_url
+                    }))))
 
 
 @step(u'Then the created user has the following parameters:')

@@ -19,7 +19,7 @@ import logging
 
 from . import mapper
 
-from flask import Blueprint
+from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
@@ -66,8 +66,8 @@ def create():
     mapper.add_links_to_dict(result)
     result = serializer.encode(result)
 
-    return make_response(result, 201)
-
+    location = url_for('.get', userid=user.id)
+    return make_response(result, 201, {'Location': location})
 
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):

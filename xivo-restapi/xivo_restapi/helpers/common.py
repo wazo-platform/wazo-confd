@@ -31,30 +31,32 @@ logger = logging.getLogger(__name__)
 def exception_catcher(func):
     @wraps(func)
     def decorated_func(*args, **kwargs):
+        generic_errors = (MissingParametersError,
+                          InvalidParametersError,
+                          ElementAlreadyExistsError)
+
         try:
             return func(*args, **kwargs)
-        except MissingParametersError as e:
-            data = serializer.encode([unicode(e)])
-            return make_response(data, 400)
-        except InvalidParametersError as e:
-            data = serializer.encode([unicode(e)])
-            return make_response(data, 400)
-        except ElementAlreadyExistsError as e:
+        except generic_errors as e:
             data = serializer.encode([unicode(e)])
             return make_response(data, 400)
         except ValueError, e:
             data = serializer.encode(["No parsable data in the request, Be sure to send a valid JSON file"])
             return make_response(data, 400)
         except ElementCreationError, e:
+            data = serializer.encode([unicode(e)])
             logger.error("error during creation: %s", e)
             return make_response("error during creation: %s" % e, 400)
         except ElementEditionError, e:
+            data = serializer.encode([unicode(e)])
             logger.error("error during edition: %s", e)
             return make_response("error during edition: %s" % e, 400)
         except ElementDeletionError, e:
+            data = serializer.encode([unicode(e)])
             logger.error("error during deletion: %s", e)
             return make_response("error during deletion: %s" % e, 400)
         except ElementNotExistsError, e:
+            data = serializer.encode([unicode(e)])
             logger.error("error element not exist: %s", e)
             return make_response('', 404)
         except HTTPException:
