@@ -84,11 +84,8 @@ def log_requests():
         'path': request.path,
         'data': request.data
     }
-
-    logger.info("%(method)s %(path)s with data %(data)s", params)
-
-
-class FlaskHttpServer(object):
-
-    def run(self):
-        app.run(host=config.HOST, port=config.PORT)
+    if request.data:
+        params.update({'data': request.data})
+        logger.info("%(method)s %(path)s with data %(data)s", params)
+    else:
+        logger.info("%(method)s %(path)s", params)

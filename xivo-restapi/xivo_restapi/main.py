@@ -34,26 +34,69 @@ def main():
 
     _init_logging(parsed_args.debug)
 
+    if config.DEBUG:
+        logger.info("Debug mode enabled.")
+        flask_http_server.app.debug = True
+
     flask_http_server.register_blueprints()
+
     if parsed_args.dev_mode:
-        flask_http_server.FlaskHttpServer().run()
+        logger.info("Starting xivo-restapid in dev mode.")
+        config.HOST = parsed_args.listen_addr
+        config.PORT = parsed_args.listen_port
+        logger.info("Running on %s:%s", config.HOST, config.PORT)
+        flask_http_server.app.run(host=config.HOST, port=config.PORT)
     else:
         from flup.server.fcgi import WSGIServer
 
-        if parsed_args.debug:
-            logger.info("Starting xivo-restapid in debug mode.")
+        if parsed_args.foreground:
+            logger.info("Starting xivo-restapid in foreground mode.")
         else:
-            _daemonize()
             logger.info("Starting xivo-restapid in standard mode.")
-        WSGIServer(flask_http_server.app, bindAddress='/var/www/restws-fcgi.sock',
-                   multithreaded=False, multiprocess=True, debug=False).run()
+            _daemonize()
+
+        WSGIServer(flask_http_server.app,
+                   bindAddress='/var/www/restws-fcgi.sock',
+                   multithreaded=False,
+                   multiprocess=True,
+                   debug=config.DEBUG).run()
 
 
 def _parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--debug', action='store_true')
-    parser.add_argument('--dev_mode', action='store_true')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-f",
+                        '--foreground',
+                        action='store_true',
+                        default=False,
+                        help="Foreground, don't daemonize. Note use with <dev_mode>. Default: %(default)s")
+    group.add_argument('--dev_mode',
+                        action='store_true',
+                        default=False,
+                        help="Launch Flask in dev mode, not use wsgi. Default: %(default)s")
+    parser.add_argument('-d',
+                        '--debug',
+                        action='store_true',
+                        default=False,
+                        help="Activate debug message. Default: %(default)s")
+    parser.add_argument("--listen-addr",
+                        default='0.0.0.0',
+                        help="Listen on address <listen_addr> instead of %(default)s")
+    parser.add_argument("--listen-port",
+                        type=_port_number,
+                        default=50050,
+                        help="Listen on port <listen_port> instead of %(default)s")
     return parser.parse_args()
+
+
+def _port_number(value):
+    try:
+        port = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError('%r is not a valid port number' % value)
+    if port < 1 or port > 65535:
+        raise argparse.ArgumentTypeError('%r is not a valid port number' % value)
+    return port
 
 
 def _init_logging(debug_mode):
@@ -78,10 +121,10 @@ def _init_root_logger(formatter, debug_mode):
 
     root_logger = logging.getLogger()
     root_logger.addHandler(handler)
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
     if debug_mode:
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        root_logger.addHandler(handler)
         root_logger.setLevel(logging.DEBUG)
         config.DEBUG = True
     else:
