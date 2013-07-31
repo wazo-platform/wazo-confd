@@ -49,6 +49,7 @@ class TestAPICampaigns(unittest.TestCase):
         flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+        flask_http_server.app.config['SERVER_NAME'] = None
 
     def tearDown(self):
         self.patch_campaigns_helper.stop()

@@ -35,6 +35,7 @@ class TestAPIAgents(unittest.TestCase):
         mock_agent.return_value = self.instance_agent_management
         flask_http_server.app.testing = True
         flask_http_server.register_blueprints()
+        flask_http_server.app.config['SERVER_NAME'] = None
         self.app = flask_http_server.app.test_client()
 
     def tearDown(self):
