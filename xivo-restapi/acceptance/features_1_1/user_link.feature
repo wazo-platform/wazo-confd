@@ -11,6 +11,7 @@ Feature: Link user with a line and extension
         When I create a link with the following parameters:
             | user_id | extension_id | line_id |
             |         |              |         |
+        #WARN: SQL error and 500 status code
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user_id,extension_id,line_id"
 
@@ -19,6 +20,7 @@ Feature: Link user with a line and extension
         When I create a link with the following parameters:
             | user_id | extension_id | line_id |
             | asdf    | 1            | 2       |
+        #WARN: SQL error and 500 status code
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user_id"
 
@@ -27,7 +29,9 @@ Feature: Link user with a line and extension
         When I create a line with the following properties:
             | user_id | extension_id | line_id | invalid |
             | 3       | 1            | 2       | invalid |
+        #WARN: SQL error and 404 instead of 400
         Then I get a response with status "400"
+        #WARN: checks that user exists before checking invalid parameters
         Then I get an error message "Invalid parameters: invalid"
 
     Scenario: Create a link with a missing line id
