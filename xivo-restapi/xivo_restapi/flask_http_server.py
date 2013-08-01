@@ -33,6 +33,7 @@ app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 def register_blueprints():
+    # 1.0 ressources
     from xivo_restapi.v1_0.rest import routing
     routing.create_routes()
     app.register_blueprint(routing.root)
@@ -41,7 +42,15 @@ def register_blueprints():
     app.register_blueprint(routing.users_service)
     app.register_blueprint(routing.voicemails_service)
 
+    # 1.1 ressources
     _load_resources()
+
+
+def _load_resources():
+    resources = _list_resources()
+    for resource in resources:
+        pkg_resource = '%s.%s' % (config.RESOURCES_PACKAGE, resource)
+        _load_module('%s.routes' % pkg_resource)
 
 
 def _list_resources():
@@ -58,13 +67,6 @@ def _list_resources():
     return resources
 
 
-def _load_resources():
-    resources = _list_resources()
-    for resource in resources:
-        pkg_resource = '%s.%s' % (config.RESOURCES_PACKAGE, resource)
-        _load_module('%s.routes' % pkg_resource)
-
-
 def _load_module(name):
     try:
         mod = __import__(name)
@@ -75,14 +77,15 @@ def _load_module(name):
         logger.error('Module not found %s', name)
     else:
         mod.register_blueprints(app)
+        logger.debug('Module successfully loaded: %s', name)
 
 
 @app.before_request
 def log_requests():
+    app.config['SERVER_NAME'] = request.environ['HTTP_HOST']
     params = {
         'method': request.method,
-        'path': request.path,
-        'data': request.data
+        'path': request.path
     }
     if request.data:
         params.update({'data': request.data})

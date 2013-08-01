@@ -18,16 +18,20 @@
 import unittest
 from xivo_restapi.resources.users import mapper
 from xivo_dao.data_handler.user.model import User
+from mock import patch
 
 
 class TestMapper(unittest.TestCase):
 
-    def test_encode_list(self):
+    @patch('flask.helpers.url_for')
+    def test_encode_list(self, mock_url_for):
         obj1 = User(id=1, firstname='User', lastname='1')
         obj2 = User(id=2, firstname='User', lastname='2')
         data = [obj1, obj2]
 
-        excpected_result = '{"items": [{"lastname": "1", "id": 1, "firstname": "User"}, {"lastname": "2", "id": 2, "firstname": "User"}], "total": 2}'
+        mock_url_for.return_value = 'http://localhost:50050/1.1/users/1'
+
+        excpected_result = '{"items": [{"lastname": "1", "links": [{"href": "http://localhost:50050/1.1/users/1", "rel": "users"}], "id": 1, "firstname": "User"}, {"lastname": "2", "links": [{"href": "http://localhost:50050/1.1/users/1", "rel": "users"}], "id": 2, "firstname": "User"}], "total": 2}'
 
         result = mapper.encode_list(data)
 

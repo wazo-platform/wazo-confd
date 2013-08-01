@@ -17,8 +17,10 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from actions import blueprint as user_blueprint
+from actions import blueprint as line_blueprint
+from actions_sip import blueprint as line_sip_blueprint
 
 
 def register_blueprints(app):
-    app.register_blueprint(user_blueprint)
+    app.register_blueprint(line_blueprint)
+    app.register_blueprint(line_sip_blueprint)

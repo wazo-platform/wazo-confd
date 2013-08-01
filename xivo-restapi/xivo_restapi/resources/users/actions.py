@@ -17,12 +17,13 @@
 
 import logging
 
+from . import mapper
+
 from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User
-from xivo_restapi.resources.users import mapper
 from xivo_restapi.helpers import serializer
 from xivo_dao.helpers.provd_connector import ProvdError
 from xivo_dao.helpers.sysconfd_connector import SysconfdError
@@ -35,13 +36,6 @@ blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION
 route = RouteGenerator(blueprint)
 
 
-def _parse_include_list():
-    include = []
-    if 'include' in request.args:
-        include = request.args['include'].split(',')
-    return include
-
-
 @route('/')
 def list():
     if 'q' in request.args:
@@ -49,19 +43,14 @@ def list():
     else:
         users = user_services.find_all()
 
-    include = _parse_include_list()
-
-    result = mapper.encode_list(users, include=include)
+    result = mapper.encode_list(users)
     return make_response(result, 200)
 
 
 @route('/<int:userid>')
 def get(userid):
-    include = _parse_include_list()
-
     user = user_services.get(userid)
-    result = mapper.encode_user(user, include=include)
-
+    result = mapper.encode_user(user)
     return make_response(result, 200)
 
 
@@ -73,15 +62,12 @@ def create():
     user = User.from_user_data(data)
     user = user_services.create(user)
 
-    user_location = url_for('.get', userid=user.id)
-    result = serializer.encode({
-        'id': user.id
-    })
+    result = {'id': user.id}
+    mapper.add_links_to_dict(result)
+    result = serializer.encode(result)
 
-    response = make_response(result, 201)
-    response.headers['Location'] = user_location
-    return response
-
+    location = url_for('.get', userid=user.id)
+    return make_response(result, 201, {'Location': location})
 
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):

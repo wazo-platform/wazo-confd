@@ -60,7 +60,7 @@ def main():
                    bindAddress='/var/www/restws-fcgi.sock',
                    multithreaded=False,
                    multiprocess=True,
-                   debug=config.DEBUG).run()
+                   debug=False).run()
 
 
 def _parse_args():

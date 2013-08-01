@@ -58,10 +58,22 @@ class TestUserActions(unittest.TestCase):
         expected_result = {
             'total': 2,
             'items': [
-                {'id': 1,
-                 'firstname': 'test1'},
-                {'id': 2,
-                 'firstname': 'test2'}
+                {
+                    'id': 1,
+                    'firstname': 'test1',
+                    'links': [{
+                            'href': 'http://localhost/1.1/users/1',
+                            'rel': 'users'
+                    }]
+                },
+                {
+                    'id': 2,
+                    'firstname': 'test2',
+                    'links': [{
+                            'href': 'http://localhost/1.1/users/2',
+                            'rel': 'users'
+                    }]
+                 }
             ]
         }
 
@@ -78,35 +90,6 @@ class TestUserActions(unittest.TestCase):
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
-    @patch('xivo_dao.data_handler.user.services.find_all')
-    def test_list_users_with_voicemail(self, mock_user_services_find_all):
-        status_code = 200
-        expected_result = {
-            'total': 2,
-            'items': [
-                {'id': 1,
-                 'firstname': 'test1',
-                 'voicemail': {'id': 3}},
-                {'id': 2,
-                 'firstname': 'test2',
-                 'voicemail': None},
-            ]
-        }
-
-        user1 = User(id=1,
-                     firstname='test1',
-                     voicemail_id=3)
-        user2 = User(id=2,
-                     firstname='test2')
-        mock_user_services_find_all.return_value = [user1, user2]
-
-        result = self.app.get("%s/?include=voicemail" % BASE_URL)
-        decoded_result = serializer.decode(result.data)
-
-        mock_user_services_find_all.assert_any_call()
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
-
     @patch('xivo_dao.data_handler.user.services.find_all_by_fullname')
     def test_list_users_with_search(self, mock_user_services_find_all_by_fullname):
         status_code = 200
@@ -115,8 +98,13 @@ class TestUserActions(unittest.TestCase):
         expected_result = {
             'total': 1,
             'items': [
-                {'id': 1,
-                 'firstname': 'Bob'}
+                {
+                    'id': 1,
+                    'firstname': 'Bob',
+                    'links': [{
+                            'href': 'http://localhost/1.1/users/1',
+                            'rel': 'users'
+                    }]}
             ]
         }
 
@@ -181,59 +169,16 @@ class TestUserActions(unittest.TestCase):
         mock_user_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
 
-    @patch('xivo_dao.data_handler.user.services.get')
-    def test_get_with_voicemail(self, mock_user_services_get):
-        status_code = 200
-
-        user_id = 1
-        firstname = 'Bob'
-        voicemail_id = 2
-
-        expected_result = {
-            'id': user_id,
-            'firstname': firstname,
-            'voicemail': {
-                'id': voicemail_id
-            }
-        }
-
-        user = User(id=user_id, firstname=firstname, voicemail_id=voicemail_id)
-        mock_user_services_get.return_value = user
-
-        result = self.app.get("%s/1?include=voicemail" % BASE_URL)
-        decoded_result = serializer.decode(result.data)
-
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
-        mock_user_services_get.assert_called_once_with(user_id)
-
-    @patch('xivo_dao.data_handler.user.services.get')
-    def test_get_without_voicemail(self, mock_user_services_get):
-        status_code = 200
-
-        user_id = 1
-        firstname = 'Bob'
-
-        expected_result = {
-            'id': user_id,
-            'firstname': firstname,
-            'voicemail': None,
-        }
-
-        user = User(id=user_id, firstname=firstname)
-        mock_user_services_get.return_value = user
-
-        result = self.app.get("%s/1?include=voicemail" % BASE_URL)
-        decoded_result = serializer.decode(result.data)
-
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
-        mock_user_services_get.assert_called_once_with(user_id)
-
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):
         status_code = 201
-        expected_result = {'id': 1}
+        expected_result = {
+            'id': 1,
+            'links': [{
+                    'href': 'http://localhost/1.1/users/1',
+                    'rel': 'users'
+            }]
+        }
 
         user = Mock(User)
         user.id = 1
