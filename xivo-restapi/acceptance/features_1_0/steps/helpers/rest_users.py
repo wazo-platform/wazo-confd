@@ -15,14 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
-    extensions_dao
-from xivo_dao.alchemy.extension import Extension
-from xivo_dao.alchemy.linefeatures import LineFeatures
-from xivo_dao.alchemy.userfeatures import UserFeatures
-from xivo_dao.alchemy.usersip import UserSIP
-from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 import random
+
+from xivo_dao import user_dao, voicemail_dao
+from xivo_dao.data_handler.user import dao as user_newdao
+from xivo_dao.data_handler.user.model import User
+from xivo_dao.data_handler.line import dao as line_newdao
+from xivo_dao.data_handler.line.model import LineSIP
+from xivo_dao.data_handler.extension import dao as extension_newdao
+from xivo_dao.data_handler.extension.model import Extension
+from xivo_dao.data_handler.user_line_extension import dao as user_line_extension_newdao
+from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
+from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from acceptance.features_1_0 import ws_utils_session
 
 
@@ -99,37 +103,34 @@ class RestUsers():
         user_dao.delete(userid)
 
     def create_user_with_sip_line(self, fullname, number):
+        context = 'default'
         firstname, lastname = self.decompose_fullname(fullname)
-        user = UserFeatures(firstname=firstname, lastname=lastname)
-        user.callerid = number
-        user.description = ''
-        user_dao.add_user(user)
+        user = User(firstname=firstname, lastname=lastname)
+        user = user_newdao.create(user)
 
-        usersip = UserSIP()
-        usersip.name = str(random.randint(0, 9999))
-        usersip.callerid = '"%s %s" <%s>' % (firstname, lastname, number)
-        usersip.type = "friend"
-        usersip.category = "user"
-        usersip_dao.create(usersip)
-
-        line = LineFeatures()
+        line = LineSIP()
         line.number = number
-        line.context = "default"
-        line.protocol = 'sip'
-        line.protocolid = usersip.id
         line.name = str(random.randint(0, 9999))
-        line.provisioningid = str(random.randint(0, 9999))
-        line_dao.create(line)
+        line.context = context
+        line.provisioningid = 0
+        line = line_newdao.create(line)
 
         exten = Extension()
         exten.exten = number
-        exten.context = "default"
+        exten.context = context
         exten.type = 'user'
-        exten.typeval = str(user.id)
-        exten.commented = 0
-        extensions_dao.create(exten)
+        exten.typeval = user.id
+        exten = extension_newdao.create(exten)
 
-        return user.id, line.id, usersip.id
+        user_line_extension = UserLineExtension()
+        user_line_extension.user_id = user.id
+        user_line_extension.line_id = line.id
+        user_line_extension.extension_id = exten.id
+        user_line_extension.main_user = True
+        user_line_extension.main_line = True
+        user_line_extension_newdao.create(user_line_extension)
+
+        return user.id, line.id, user_line_extension.id
 
     def delete_user(self, userid, delete_voicemail=False):
         url = RestAPIConfig.XIVO_USERS_SERVICE_PATH + "/" + str(userid)

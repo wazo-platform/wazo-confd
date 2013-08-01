@@ -17,17 +17,22 @@
 
 from lettuce import step
 from lettuce.registry import world
-from xivo_dao import user_dao, voicemail_dao, line_dao, usersip_dao, \
+from xivo_dao import user_dao, voicemail_dao, usersip_dao, \
     extensions_dao, queue_member_dao, \
     rightcall_dao, rightcall_member_dao, callfilter_dao, dialaction_dao, \
     phonefunckey_dao, schedule_dao, user_line_dao
 from xivo_dao.alchemy.callfilter import Callfilter
 from xivo_dao.alchemy.dialaction import Dialaction
-from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.phonefunckey import PhoneFunckey
 from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.schedule import Schedule
 from xivo_dao.alchemy.userfeatures import UserFeatures
+from xivo_dao.data_handler.extension import dao as extension_dao
+from xivo_dao.data_handler.extension.model import Extension
+from xivo_dao.data_handler.line import dao as line_dao
+from xivo_dao.data_handler.line.model import LineSIP
+from xivo_dao.data_handler.user_line_extension import dao as user_line_extension_dao
+from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from helpers.rest_users import RestUsers
 
 rest_users = RestUsers()
@@ -163,20 +168,7 @@ def when_i_update_a_user_with_a_non_existing_id_with_the_last_name_group1(step, 
 
 @step(u'Given there is a user "([^"]*)" with a line "([^"]*)"$')
 def given_there_is_a_user_group1_with_a_line_group2(step, fullname, linenumber):
-    given_there_is_a_user(step, fullname)
-    result = user_line_dao.find_line_id_by_user_id(world.userid)
-    if(result == []):
-        line = LineFeatures()
-        line.number = linenumber
-        line.protocolid = 0
-        line.protocol = "sip"
-        line.name = "name"
-        line.context = "default"
-        line.provisioningid = 0
-        line_dao.create(line)
-        world.lineid = line.id
-    else:
-        world.lineid = result[0]
+    world.userid, world.lineid, world.user_line_extension_id = rest_users.create_user_with_sip_line(fullname, linenumber)
 
 
 @step(u'Then I have a user "([^"]*)" with a line "([^"]*)"')
@@ -194,7 +186,13 @@ def then_i_have_a_user_group1_with_a_line_group2(step, fullname, linenumber):
 
 @step(u'Then I delete this line')
 def then_i_delete_this_line(step):
-    line_dao.delete(world.lineid)
+    user_line_extension = user_line_extension_dao.get(world.user_line_extension_id)
+    extension = extension_dao.get(user_line_extension.extension_id)
+    line = line_dao.get(world.lineid)
+
+    user_line_extension_dao.delete(user_line_extension)
+    extension_dao.delete(extension)
+    line_dao.delete(line)
 
 
 @step(u'Then I have a single user "([^"]*)" with a line "([^"]*)"')
@@ -221,7 +219,6 @@ def when_i_delete_the_user(step):
 def then_this_user_no_longer_exists(step):
     _check_user_features()
     _check_line_features()
-    _check_usersip()
     _check_extensions()
     _check_queuemembers()
     _check_rightcallmembers()
@@ -243,10 +240,6 @@ def _check_user_features():
 
 def _check_line_features():
     assert user_line_dao.find_line_id_by_user_id(world.userid) == []
-
-
-def _check_usersip():
-    assert usersip_dao.get(world.usersipid) is None
 
 
 def _check_extensions():

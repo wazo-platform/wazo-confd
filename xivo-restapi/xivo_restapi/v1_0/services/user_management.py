@@ -19,8 +19,11 @@ import logging
 
 from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, \
-    user_line_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
+from xivo_dao.data_handler.exception import ElementNotExistsError
+from xivo_dao.data_handler.user import services as user_services
+from xivo_dao.data_handler.user_line_extension import dao as user_line_extension_dao
+from xivo_dao.data_handler.user_line_extension import services as user_line_extension_services
 from xivo_restapi import config
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.utils.exceptions import NoSuchElementException, \
@@ -92,19 +95,32 @@ class UserManagement(object):
     def delete_user(self, userid, delete_voicemail=False):
         data_access_logger.info("Deleting the user of id %s" % userid)
         try:
-            user = user_dao.get(userid)
-        except LookupError:
+            user = user_services.get(userid)
+        except ElementNotExistsError:
             raise NoSuchElementException("No such user: " + str(userid))
-        voicemailid = user.voicemailid
-        if voicemailid is not None and not delete_voicemail:
-                raise VoicemailExistsException()
+        self._remove_voicemail(user, delete_voicemail)
+        self._remove_lines(user)
+        user_services.delete(user)
 
-        user_dao.delete(userid)
-        lines = user_line_dao.find_line_id_by_user_id(userid)
-        if len(lines) > 0:
-            self._remove_line(line_dao.get(lines[0]))
-        if voicemailid is not None:
-            self._delete_voicemail(voicemailid)
+    def _remove_lines(self, user):
+        associations = user_line_extension_services.find_all_by_user_id(user.id)
+        for association in associations:
+            self._remove_association(association)
+
+    def _remove_association(self, association):
+        user_line_extension_dao.delete(association)
+        line = line_dao.get(association.line_id)
+        self._remove_line(line)
+
+    def _remove_line(self, line):
+        device = line.device
+        line_dao.delete(line.id)
+        deviceid = device_dao.get_deviceid(device)
+        if deviceid is not None:
+            try:
+                self._provd_remove_line(deviceid, line.num)
+            except URLError as e:
+                raise ProvdError(str(e))
 
     def _provd_remove_line(self, deviceid, linenum):
         config = self.config_manager.get(deviceid)
@@ -126,15 +142,12 @@ class UserManagement(object):
         device["config"] = new_configid
         self.device_manager.update(device)
 
-    def _remove_line(self, line):
-        device = line.device
-        line_dao.delete(line.id)
-        deviceid = device_dao.get_deviceid(device)
-        if deviceid is not None:
-            try:
-                self._provd_remove_line(deviceid, line.num)
-            except URLError as e:
-                raise ProvdError(str(e))
+    def _remove_voicemail(self, user, delete_voicemail):
+        voicemailid = user.voicemail_id
+        if voicemailid and not delete_voicemail:
+            raise VoicemailExistsException()
+        if voicemailid:
+            self._delete_voicemail(voicemailid)
 
     def _delete_voicemail(self, voicemailid):
         voicemail = voicemail_dao.get(voicemailid)

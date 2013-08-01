@@ -17,14 +17,15 @@
 
 import unittest
 
-from mock import Mock, call
+from hamcrest import assert_that, equal_to
+from mock import Mock, call, patch
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao, \
-    user_line_dao
+from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail
+from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_restapi.v1_0.service_data_model.line_sdm import LineSdm
 from xivo_restapi.v1_0.service_data_model.user_sdm import UserSdm
 from xivo_restapi.v1_0.services.user_management import UserManagement
@@ -275,31 +276,96 @@ class TestUserManagement(unittest.TestCase):
         except:
             self.fail("An exception was raised whereas it should not")
 
-    def test_delete_user(self):
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_delete_unexisting_user(self, mock_user_services):
+        user_id = 1
+        mock_user_services.side_effect = ElementNotExistsError('User', id=user_id)
+        self.assertRaises(NoSuchElementException, self._userManager.delete_user, user_id)
+
+    @patch('xivo_dao.data_handler.user.services.get')
+    @patch('xivo_dao.data_handler.user.services.delete')
+    def test_delete_user(self, mock_user_delete, mock_user_get):
         userid = 1
-        lineid = 2
-        user_dao.get = Mock()
-        user_dao.get.return_value = self.user
-        user_line_dao.find_line_id_by_user_id = Mock()
-        user_line_dao.find_line_id_by_user_id.return_value = [lineid]
-        line_dao.get = Mock()
-        line_dao.get.return_value = self.line
-        user_dao.delete = Mock()
-        self._userManager._remove_line = Mock()
+        user = Mock()
+        user.voicemail_id = None
+        mock_user_get.return_value = user
+        self._userManager._remove_lines = Mock()
+        self._userManager._delete_voicemail = Mock()
 
         self._userManager.delete_user(userid)
 
-        user_dao.get.assert_called_with(userid)
-        user_line_dao.find_line_id_by_user_id.assert_called_with(userid)
-        line_dao.get.assert_called_with(lineid)
-        user_dao.delete.assert_called_with(1)
-        self._userManager._remove_line.assert_called_with(self.line)
+        mock_user_get.assert_called_once_with(userid)
+        mock_user_delete.assert_called_once_with(user)
+        self._userManager._remove_lines.assert_called_with(user)
+        assert_that(self._userManager._delete_voicemail.call_count, equal_to(0))
 
-    def test_delete_unexisting_user(self):
-        user_dao.get = Mock()
-        user_dao.get.side_effect = LookupError
+    @patch('xivo_dao.data_handler.user.services.get')
+    @patch('xivo_dao.data_handler.user.services.delete')
+    def test_delete_with_voicemail(self, mock_user_delete, mock_user_get):
+        userid = 1
+        user = Mock()
+        user.voicemail_id = 12
+        mock_user_get.return_value = user
 
-        self.assertRaises(NoSuchElementException, self._userManager.delete_user, 1)
+        self.assertRaises(VoicemailExistsException, self._userManager.delete_user, userid)
+
+    @patch('xivo_dao.data_handler.user.services.get')
+    @patch('xivo_dao.data_handler.user.services.delete')
+    def test_delete_user_force_voicemail_deletion(self, mock_user_delete, mock_user_get):
+        userid = 1
+        user = Mock()
+        user.voicemail_id = 17
+        mock_user_get.return_value = user
+        self._userManager._remove_lines = Mock()
+        self._userManager._remove_voicemail = Mock()
+
+        self._userManager.delete_user(userid, delete_voicemail=True)
+
+        mock_user_get.assert_called_once_with(userid)
+        mock_user_delete.assert_called_once_with(user)
+        self._userManager._remove_lines.assert_called_with(user)
+        self._userManager._remove_voicemail.assert_called_with(user, True)
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id', Mock(return_value=[]))
+    def test_remove_lines_no_lines(self):
+        user = Mock()
+        self._userManager._remove_association = Mock()
+
+        self._userManager._remove_lines(user)
+
+        assert_that(self._userManager._remove_association.call_count, equal_to(0))
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
+    def test_remove_lines_one_lines(self, mock_find_associations):
+        user_id = 34
+        user = Mock(id=user_id)
+        ule = Mock()
+        mock_find_associations.return_value = [ule]
+        self._userManager._remove_association = Mock()
+
+        self._userManager._remove_lines(user)
+
+        mock_find_associations.assert_called_once_with(user_id)
+        self._userManager._remove_association.assert_called_once_with(ule)
+
+    @patch('xivo_dao.data_handler.user_line_extension.dao.delete')
+    @patch('xivo_dao.line_dao.get')
+    def test_remove_association(self,
+                                mock_line_dao,
+                                mock_ule_delete):
+        user_id = 12
+        line_id = 23
+        extension_id = 43
+        ule = Mock(user_id=user_id, line_id=line_id, extension_id=extension_id)
+        line = Mock()
+        mock_line_dao.return_value = line
+        self._userManager._remove_line = Mock()
+
+        self._userManager._remove_association(ule)
+
+        mock_ule_delete.assert_called_once_with(ule)
+        mock_line_dao.assert_called_once_with(line_id)
+        self._userManager._remove_line.assert_any_call(line)
 
     def test_remove_line_provd_error(self):
         line_dao.delete = Mock()
@@ -309,13 +375,6 @@ class TestUserManagement(unittest.TestCase):
         self._userManager._provd_remove_line.side_effect = URLError("sample error")
 
         self.assertRaises(ProvdError, self._userManager._remove_line, self.line)
-
-    def test_delete_with_voicemail(self):
-        self.user.voicemailid = 12
-        user_dao.get = Mock()
-        user_dao.get.return_value = self.user
-
-        self.assertRaises(VoicemailExistsException, self._userManager.delete_user, 1)
 
     def test_delete_voicemail(self):
         voicemail_dao.delete = Mock()
@@ -335,25 +394,3 @@ class TestUserManagement(unittest.TestCase):
         self.sysconfd_connector.delete_voicemail_storage.side_effect = Exception
 
         self.assertRaises(SysconfdError, self._userManager._delete_voicemail, 1)
-
-    def test_delete_user_force_voicemail_deletion(self):
-        self.user.voicemailid = 17
-        lineid = 2
-        user_dao.get = Mock()
-        user_dao.get.return_value = self.user
-        user_line_dao.find_line_id_by_user_id = Mock()
-        user_line_dao.find_line_id_by_user_id.return_value = [lineid]
-        line_dao.get = Mock()
-        line_dao.get.return_value = self.line
-        user_dao.delete = Mock()
-        self._userManager._remove_line = Mock()
-        self._userManager._delete_voicemail = Mock()
-
-        self._userManager.delete_user(self.user.id, True)
-
-        user_dao.get.assert_called_with(self.user.id)
-        user_line_dao.find_line_id_by_user_id.assert_called_with(self.user.id)
-        line_dao.get.assert_called_with(lineid)
-        user_dao.delete.assert_called_with(self.user.id)
-        self._userManager._remove_line.assert_called_with(self.line)
-        self._userManager._delete_voicemail.assert_called_with(self.user.voicemailid)
