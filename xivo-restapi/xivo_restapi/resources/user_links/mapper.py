@@ -22,10 +22,10 @@ from flask.helpers import url_for
 MAPPING = {
     'id': 'id',
     'user_id': 'user_id',
-    'ule_id': 'ule_id',
-    'ule_id': 'ule_id',
+    'extension_id': 'extension_id',
+    'line_id': 'line_id',
     'main_user': 'main_user',
-    'main_ule': 'main_ule'
+    'main_line': 'main_line'
 }
 
 
