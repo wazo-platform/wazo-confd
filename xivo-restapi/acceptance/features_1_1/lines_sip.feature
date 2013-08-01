@@ -43,7 +43,7 @@ Feature: SIP Lines
         When I create a line with the following properties:
             | context     |
             | statscenter |
-        Then I get a response with status "204"
+        Then I get a response with status "201"
         Then I get a line with an id
         Then I get a line with links to the resource
         Then I get a location in the headers
@@ -53,9 +53,9 @@ Feature: SIP Lines
         When I create a line with the following properties:
             | context |
             | default |
-        Then I get a response with status "204"
+        Then I get a response with status "201"
         When I create a line with the following properties:
             | context |
             | default |
-        Then I get a response with status "204"
+        Then I get a response with status "201"
         Then i see 2 lines in the webi
