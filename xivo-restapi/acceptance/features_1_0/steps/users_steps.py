@@ -17,7 +17,7 @@
 
 from lettuce import step
 from lettuce.registry import world
-from xivo_dao import user_dao, voicemail_dao, usersip_dao, \
+from xivo_dao import user_dao, voicemail_dao, \
     extensions_dao, queue_member_dao, \
     rightcall_dao, rightcall_member_dao, callfilter_dao, dialaction_dao, \
     phonefunckey_dao, schedule_dao, user_line_dao
@@ -28,11 +28,8 @@ from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.schedule import Schedule
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.data_handler.extension import dao as extension_dao
-from xivo_dao.data_handler.extension.model import Extension
 from xivo_dao.data_handler.line import dao as line_dao
-from xivo_dao.data_handler.line.model import LineSIP
 from xivo_dao.data_handler.user_line_extension import dao as user_line_extension_dao
-from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from helpers.rest_users import RestUsers
 
 rest_users = RestUsers()
