@@ -144,10 +144,15 @@ class UserManagement(object):
 
     def _remove_voicemail(self, user, delete_voicemail):
         voicemailid = user.voicemail_id
-        if voicemailid and not delete_voicemail:
-            raise VoicemailExistsException()
-        if voicemailid:
+
+        if not voicemailid:
+            return
+
+        if delete_voicemail:
+            user_dao.update(user.id, {'voicemailid': None})
             self._delete_voicemail(voicemailid)
+        else:
+            raise VoicemailExistsException()
 
     def _delete_voicemail(self, voicemailid):
         voicemail = voicemail_dao.get(voicemailid)

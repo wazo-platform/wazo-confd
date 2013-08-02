@@ -28,3 +28,4 @@ class SysconfdConnector(object):
 
     def delete_voicemail_storage(self, context, number):
         self.connection.request('GET', '/delete_voicemail?context=%s&name=%s' % (context, number), '')
+        self.connection.getresponse()

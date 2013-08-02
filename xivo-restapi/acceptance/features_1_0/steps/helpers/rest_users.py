@@ -109,6 +109,9 @@ class RestUsers():
         existing_user = user_newdao.find_by_number_context(number, context)
         if existing_user:
             self.delete_user(existing_user.id, delete_voicemail=True)
+        existing_users = user_newdao.find_all_by_fullname(fullname)
+        for existing_user in existing_users:
+            self.delete_user(existing_user.id, delete_voicemail=True)
 
         user = User(firstname=firstname, lastname=lastname)
         user = user_newdao.create(user)

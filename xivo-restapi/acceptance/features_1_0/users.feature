@@ -94,19 +94,19 @@ Feature: Users management
         Given there is a user "Théodore Botrel" with this schedule
         When I delete this user
         Then this user no longer exists
-      
 
     Scenario: Deleting a non existing user
         When I delete a non existing user
         Then I get a response with status "404"
-        
+
     Scenario: Deletion refused if there is a voicemail
         Given there is a user "Alexandre Soljénitsyne" with a voicemail
         When I delete this user
         Then I get a response with status "412"
         Then I get an error message "Cannot remove a user with a voicemail. Delete the voicemail or dissociate it from the user."
-        
+
     Scenario: Force voicemail deletion
         Given there is a user "Alexandre Soljénitsyne" with a voicemail
         When I delete this user and force voicemail deletion
+        Then I get a response with status "200"
         Then this user no longer exists
