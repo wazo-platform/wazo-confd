@@ -105,6 +105,11 @@ class RestUsers():
     def create_user_with_sip_line(self, fullname, number):
         context = 'default'
         firstname, lastname = self.decompose_fullname(fullname)
+
+        existing_user = user_newdao.find_by_number_context(number, context)
+        if existing_user:
+            self.delete_user(existing_user.id, delete_voicemail=True)
+
         user = User(firstname=firstname, lastname=lastname)
         user = user_newdao.create(user)
 
