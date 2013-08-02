@@ -87,8 +87,8 @@ class TestLineActions(unittest.TestCase):
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
-    @patch('xivo_dao.data_handler.line.services.find_by_name')
-    def test_list_lines_with_search(self, mock_line_services_find_by_name):
+    @patch('xivo_dao.data_handler.line.services.find_all_by_name')
+    def test_list_lines_with_search(self, mock_line_services_find_all_by_name):
         status_code = 200
         search = 'bob'
 
@@ -107,12 +107,12 @@ class TestLineActions(unittest.TestCase):
         }
 
         line = Line(id=1, name='Bob')
-        mock_line_services_find_by_name.return_value = [line]
+        mock_line_services_find_all_by_name.return_value = [line]
 
         result = self.app.get("%s/?q=%s" % (BASE_URL, search))
         decoded_result = serializer.decode(result.data)
 
-        mock_line_services_find_by_name.assert_called_once_with(search)
+        mock_line_services_find_all_by_name.assert_called_once_with(search)
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 

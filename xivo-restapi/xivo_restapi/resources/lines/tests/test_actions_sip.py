@@ -35,25 +35,25 @@ class TestLineActions(unittest.TestCase):
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
 
-    @patch('xivo_dao.data_handler.line.services.find_by_protocol')
-    def test_list_lines_with_no_lines(self, mock_line_services_find_by_protocol):
+    @patch('xivo_dao.data_handler.line.services.find_all_by_protocol')
+    def test_list_lines_with_no_lines(self, mock_line_services_find_all_by_protocol):
         status_code = 200
         expected_result = {
             'total': 0,
             'items': []
         }
 
-        mock_line_services_find_by_protocol.return_value = []
+        mock_line_services_find_all_by_protocol.return_value = []
 
         result = self.app.get("%s/" % BASE_URL)
         decoded_result = serializer.decode(result.data)
 
-        mock_line_services_find_by_protocol.assert_called_once_with('sip')
+        mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
-    @patch('xivo_dao.data_handler.line.services.find_by_protocol')
-    def test_list_lines_with_two_lines(self, mock_line_services_find_by_protocol):
+    @patch('xivo_dao.data_handler.line.services.find_all_by_protocol')
+    def test_list_lines_with_two_lines(self, mock_line_services_find_all_by_protocol):
         status_code = 200
         expected_result = {
             'total': 2,
@@ -81,24 +81,24 @@ class TestLineActions(unittest.TestCase):
                         username='test1')
         line2 = LineSIP(id=2,
                         username='test2')
-        mock_line_services_find_by_protocol.return_value = [line1, line2]
+        mock_line_services_find_all_by_protocol.return_value = [line1, line2]
 
         result = self.app.get("%s/" % BASE_URL)
         decoded_result = serializer.decode(result.data)
 
-        mock_line_services_find_by_protocol.assert_called_once_with('sip')
+        mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
         self.assertEquals(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
-    @patch('xivo_dao.data_handler.line.services.find_by_protocol')
-    def test_list_lines_error(self, mock_line_services_find_by_protocol):
+    @patch('xivo_dao.data_handler.line.services.find_all_by_protocol')
+    def test_list_lines_error(self, mock_line_services_find_all_by_protocol):
         status_code = 500
 
-        mock_line_services_find_by_protocol.side_effect = Exception
+        mock_line_services_find_all_by_protocol.side_effect = Exception
 
         result = self.app.get("%s/" % BASE_URL)
 
-        mock_line_services_find_by_protocol.assert_called_once_with('sip')
+        mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
         self.assertEqual(status_code, result.status_code)
 
     @patch('xivo_dao.data_handler.line.services.get')

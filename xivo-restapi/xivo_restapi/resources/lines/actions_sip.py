@@ -36,7 +36,7 @@ route = RouteGenerator(blueprint)
 
 @route('/')
 def list_sip():
-    lines = line_services.find_by_protocol('sip')
+    lines = line_services.find_all_by_protocol('sip')
     result = mapper_sip.encode_list(lines)
 
     return make_response(result, 200)
