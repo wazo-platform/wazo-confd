@@ -23,11 +23,10 @@ from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user_line_extension import services as ule_services
+from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
-from xivo_dao.data_handler.user import association as user_association
-from xivo_dao.data_handler.exception import MissingParametersError
 
 
 logger = logging.getLogger(__name__)
@@ -54,23 +53,8 @@ def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
 
-    if 'main_line' not in data:
-        data.update({'main_line': True})
-    if 'main_user' not in data:
-        data.update({'main_user': True})
-    if 'user_id' not in data:
-        raise MissingParametersError(['user_id'])
-    if 'line_id' not in data:
-        raise MissingParametersError(['line_id'])
-    if 'extension_id' not in data:
-        raise MissingParametersError(['extension_id'])
-
-    ule = user_association.associate_user_line_extension(data['user_id'],
-                                                        data['line_id'],
-                                                        data['extension_id'],
-                                                        data['main_user'],
-                                                        data['main_line'])
-
+    ule = UserLineExtension.from_user_data(data)
+    ule_services.create(ule)
     result = {'id': ule.id}
     mapper.add_links_to_dict(result)
     result = serializer.encode(result)

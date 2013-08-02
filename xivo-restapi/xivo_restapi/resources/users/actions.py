@@ -69,6 +69,7 @@ def create():
     location = url_for('.get', userid=user.id)
     return make_response(result, 201, {'Location': location})
 
+
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):
     data = request.data.decode("utf-8")
