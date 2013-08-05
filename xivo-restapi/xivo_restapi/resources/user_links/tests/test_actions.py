@@ -61,26 +61,62 @@ class TestULEActions(unittest.TestCase):
                 {
                     'id': 1,
                     'user_id': 4,
-                    'links': [{
+                    'line_id': 5,
+                    'extension_id': 6,
+                    'links': [
+                        {
                             'href': 'http://localhost/1.1/user_links/1',
                             'rel': 'user_links'
-                    }]
-                 },
-                 {
+                        },
+                        {
+                            'href': 'http://localhost/1.1/users/4',
+                            'rel': 'users'
+                        },
+                        {
+                            'href': 'http://localhost/1.1/lines/5',
+                            'rel': 'lines'
+                        },
+                        {
+                            'href': 'http://localhost/1.1/extensions/6',
+                            'rel': 'extensions'
+                        }
+                    ]
+                },
+                {
                     'id': 2,
-                    'user_id': 5,
-                    'links': [{
+                    'user_id': 7,
+                    'line_id': 8,
+                    'extension_id': 9,
+                    'links': [
+                        {
                             'href': 'http://localhost/1.1/user_links/2',
                             'rel': 'user_links'
-                    }]
-                 }
+                        },
+                        {
+                            'href': 'http://localhost/1.1/users/7',
+                            'rel': 'users'
+                        },
+                        {
+                            'href': 'http://localhost/1.1/lines/8',
+                            'rel': 'lines'
+                        },
+                        {
+                            'href': 'http://localhost/1.1/extensions/9',
+                            'rel': 'extensions'
+                        }
+                    ]
+                }
             ]
         }
 
         ule1 = UserLineExtension(id=1,
-                                 user_id=4)
+                                 user_id=4,
+                                 line_id=5,
+                                 extension_id=6)
         ule2 = UserLineExtension(id=2,
-                                 user_id=5)
+                                 user_id=7,
+                                 line_id=8,
+                                 extension_id=9)
         mock_ule_services_find_all.return_value = [ule1, ule2]
 
         result = self.app.get("%s/" % BASE_URL)
@@ -147,30 +183,42 @@ class TestULEActions(unittest.TestCase):
         status_code = 201
         expected_result = {
             'id': 1,
-            'links': [{
-                'href': 'http://localhost/1.1/user_links/1',
-                'rel': 'user_links'
-            }]
+            'links': [
+                {
+                    'href': 'http://localhost/1.1/user_links/1',
+                    'rel': 'user_links'
+                },
+                {
+                    'href': 'http://localhost/1.1/users/2',
+                    'rel': 'users'
+                },
+                {
+                    'href': 'http://localhost/1.1/lines/3',
+                    'rel': 'lines'
+                },
+                {
+                    'href': 'http://localhost/1.1/extensions/4',
+                    'rel': 'extensions'
+                }
+            ]
         }
 
         ule = Mock(UserLineExtension)
         ule.id = 1
+        ule.user_id = 2
+        ule.line_id = 3
+        ule.extension_id = 4
         mock_ule_services_create.return_value = ule
 
         data = {
-            'user_id': 3,
-            'line_id': 6,
+            'user_id': 2,
+            'line_id': 3,
             'extension_id': 4
         }
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
-        mock_ule_services_create.assert_called_with(data['user_id'],
-                                                    data['line_id'],
-                                                    data['extension_id'],
-                                                    True,
-                                                    True)
         self.assertEqual(status_code, result.status_code)
         self.assertEqual(expected_result, decoded_result)
 

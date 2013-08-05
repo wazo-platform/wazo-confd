@@ -54,9 +54,9 @@ def create():
     data = serializer.decode(data)
 
     ule = UserLineExtension.from_user_data(data)
-    ule_services.create(ule)
+    ule = ule_services.create(ule)
     result = {'id': ule.id}
-    mapper.add_links_to_dict(result)
+    mapper.add_links_to_dict(result, ule)
     result = serializer.encode(result)
 
     return make_response(result, 201)
