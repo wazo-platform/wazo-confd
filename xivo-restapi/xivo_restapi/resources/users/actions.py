@@ -63,11 +63,12 @@ def create():
     user = user_services.create(user)
 
     result = {'id': user.id}
-    mapper.add_links_to_dict(result)
+    mapper.add_links_to_dict(result, user)
     result = serializer.encode(result)
 
     location = url_for('.get', userid=user.id)
     return make_response(result, 201, {'Location': location})
+
 
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):

@@ -31,13 +31,13 @@ def encode_list(extensions):
     mapped_extensions = []
     for extension in extensions:
         mapped_extension = map_extension(extension)
-        add_links_to_dict(mapped_extension)
+        add_links_to_dict(mapped_extension, extension)
         mapped_extensions.append(mapped_extension)
     return mapper.encode_list(mapped_extensions)
 
 
-def add_links_to_dict(extension_dict):
-    extension_location = url_for('.get', extensionid=extension_dict['id'], _external=True)
+def add_links_to_dict(extension_dict, extension):
+    extension_location = url_for('.get', extensionid=extension.id, _external=True)
     extension_dict.update({
         'links': [
             {

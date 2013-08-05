@@ -40,13 +40,13 @@ def encode_list(users):
     mapped_users = []
     for user in users:
         mapped_user = map_user(user)
-        add_links_to_dict(mapped_user)
+        add_links_to_dict(mapped_user, user)
         mapped_users.append(mapped_user)
     return mapper.encode_list(mapped_users)
 
 
-def add_links_to_dict(user_dict):
-    user_location = flask_helpers.url_for('.get', userid=user_dict['id'], _external=True)
+def add_links_to_dict(user_dict, user):
+    user_location = flask_helpers.url_for('.get', userid=user.id, _external=True)
     user_dict.update({
         'links': [
             {

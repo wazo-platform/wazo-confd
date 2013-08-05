@@ -33,18 +33,33 @@ def encode_list(ules):
     mapped_ules = []
     for ule in ules:
         mapped_ule = map_ule(ule)
-        add_links_to_dict(mapped_ule)
+        add_links_to_dict(mapped_ule, ule)
         mapped_ules.append(mapped_ule)
     return mapper.encode_list(mapped_ules)
 
 
-def add_links_to_dict(ule_dict):
-    ule_location = url_for('.get', uleid=ule_dict['id'], _external=True)
+def add_links_to_dict(ule_dict, ule):
+    ule_location = url_for('.get', uleid=ule.id, _external=True)
+    user_location = url_for('users.get', userid=ule.user_id, _external=True)
+    line_location = url_for('lines.get', lineid=ule.line_id, _external=True)
+    extension_location = url_for('extensions.get', extensionid=ule.extension_id, _external=True)
     ule_dict.update({
         'links': [
             {
                 'rel': 'user_links',
                 'href': ule_location
+            },
+            {
+                'rel': 'users',
+                'href': user_location
+            },
+            {
+                'rel': 'lines',
+                'href': line_location
+            },
+            {
+                'rel': 'extensions',
+                'href': extension_location
             }
         ]
     })
