@@ -67,7 +67,7 @@ def create():
     extension = extension_services.create(extension)
 
     result = {'id': extension.id}
-    mapper.add_links_to_dict(result)
+    mapper.add_links_to_dict(result, extension)
 
     result = serializer.encode(result)
 

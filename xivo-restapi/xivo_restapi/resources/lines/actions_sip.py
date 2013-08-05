@@ -59,7 +59,7 @@ def create():
     line = line_services.create(line)
 
     result = {'id': line.id}
-    mapper_sip.add_links_to_dict(result)
+    mapper_sip.add_links_to_dict(result, line)
     result = serializer.encode(result)
 
     return make_response(result, 201)

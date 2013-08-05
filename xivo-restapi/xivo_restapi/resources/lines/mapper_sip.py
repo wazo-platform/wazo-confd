@@ -35,13 +35,13 @@ def encode_list(lines):
     mapped_lines = []
     for line in lines:
         mapped_line = map_line(line)
-        add_links_to_dict(mapped_line)
+        add_links_to_dict(mapped_line, line)
         mapped_lines.append(mapped_line)
     return mapper.encode_list(mapped_lines)
 
 
-def add_links_to_dict(line_dict):
-    line_location = url_for('.get', lineid=line_dict['id'], _external=True)
+def add_links_to_dict(line_dict, line):
+    line_location = url_for('.get', lineid=line.id, _external=True)
     line_dict.update({
         'links': [
             {
