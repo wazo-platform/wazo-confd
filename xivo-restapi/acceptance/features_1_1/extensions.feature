@@ -93,8 +93,8 @@ Feature: Extensions
             | 1000  | default |
         Then I get a response with status "201"
         Then I get a response with an id
-        Then I get a response header with a location for the new extension
-        Then I get a response with a link to an extension resource
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
 
     Scenario: Creating an alphanumeric extension
         Given I have no extensions
@@ -103,8 +103,8 @@ Feature: Extensions
             | ABC123 | context |
         Then I get a response with status "201"
         Then I get a response with an id
-        Then I get a response header with a location for the new extension
-        Then I get a response with a link to an extension resource
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
 
     Scenario: Creating twice the same extension
         Given I have no extensions

@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.helpers.config import get_config_value
-
 from hamcrest import *
 from helpers import extension_helper, extension_ws
 from lettuce import step, world
@@ -80,34 +78,6 @@ def then_i_have_an_extension_with_the_following_properties(step):
     extension = world.response.data
 
     assert_that(extension, has_entries(properties))
-
-
-@step(u'Then I get a response with a link to an extension resource')
-def then_i_get_a_response_with_a_link_to_an_extension_resource(step):
-    host = get_config_value('xivo', 'hostname')
-    port = get_config_value('restapi', 'port')
-    extension_id = world.response.data['id']
-
-    expected_url = "https://%s:%s/1.1/extensions/%s" % (host, port, extension_id)
-
-    assert_that(world.response.data,
-                has_entry('links', contains(
-                    has_entries({
-                        'rel': 'extensions',
-                        'href': expected_url
-                    }))))
-
-
-@step(u'Then I get a response header with a location for the new extension')
-def then_i_get_a_response_header_with_a_location_for_the_new_extension(step):
-    extension_id = world.response.data['id']
-
-    assert_that(world.response.headers, has_key('location'))
-
-    location = world.response.headers['Location']
-    expected_location = '/1.1/extensions/%s' % extension_id
-
-    assert_that(location, ends_with(expected_location))
 
 
 @step(u'Then the extension "([^"]*)" no longer exists')
