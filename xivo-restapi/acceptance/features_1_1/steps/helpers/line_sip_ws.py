@@ -21,5 +21,9 @@ from acceptance.features_1_1 import ws_utils_session as ws_utils
 LINES_SIP_PATH = 'lines_sip/'
 
 
+def all_lines():
+    return ws_utils.rest_get(LINES_SIP_PATH)
+
+
 def create_line_sip(properties):
     return ws_utils.rest_post(LINES_SIP_PATH, properties)
