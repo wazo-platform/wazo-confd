@@ -15,10 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from helpers import line_sip_ws
+from helpers import line_sip_ws, context_helper
 from lettuce import step, world
 
 
 @step(u'When I create an empty SIP line')
 def when_i_create_an_empty_line(step):
     world.response = line_sip_ws.create_line_sip({})
+
+
+@step(u'When I create a line with the following properties:')
+def when_i_create_a_line_with_the_following_properties(step):
+    properties = _extract_line_properties(step)
+    world.response = line_sip_ws.create_line_sip(properties)
+
+
+@step(u'Given I have an internal context named "([^"]*)"')
+def given_i_have_an_internal_context_named_group1(step, context):
+    context_helper.create_context(context)
+
+
+def _extract_line_properties(step):
+    return step.hashes[0]
