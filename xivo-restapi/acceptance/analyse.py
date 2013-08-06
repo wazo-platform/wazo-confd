@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import sys
+import time
 import traceback
 from httplib2 import Http
 from json import dumps, loads
@@ -16,13 +17,17 @@ h = Http(disable_ssl_certificate_validation=True)
 headers = {'Content-type': 'application/json'}
 
 
-def handle_test(function):
+def handle_test(f):
     def handleProblems():
         try:
-            caller_name = function.__name__
+            caller_name = f.__name__
             splitter = '-' * 120
             print ("%s%s\n%s\n%s%s\n" % (HEADER_COLOR, splitter, caller_name, splitter, END_COLOR))
-            function()
+            time1 = time.time()
+            ret = f()
+            time2 = time.time()
+            print '%s function took %0.3f ms' % (f.func_name, (time2 - time1) * 1000.0)
+            return ret
 
         except AssertionError:
             tb = sys.exc_info()[-1]
@@ -152,7 +157,7 @@ def test_create_link_missing_lineid():
 
 @handle_test
 def test_create_link_unexisting_extension():
-    data = dict(firstname="toto")
+    data = dict(firstname="tata")
     resp_p1, content_p1 = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
     new_user_id = loads(content_p1)['id']
     _print_result(resp_p1, content_p1)
@@ -176,13 +181,13 @@ def test_create_link_unexisting_extension():
 def test_create_link_unexisting_line():
     data = dict(firstname="Greg")
     resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
+    _print_result(resp, content)
     new_user_id = loads(content)['id']
-    _print_result(resp, content)
 
-    data = dict(exten="1000", context="default")
+    data = dict(exten="1313", context="default")
     resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers,  body=dumps(data))
-    new_extension_id = loads(content)['id']
     _print_result(resp, content)
+    new_extension_id = loads(content)['id']
 
     data = dict(user_id=new_user_id, line_id="999999999", extension_id=new_extension_id)
     resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
@@ -203,15 +208,15 @@ def test_create_link_unexisting_user():
 def test_create_link_default_context():
     data = dict(firstname="Greg")
     resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
-    new_user_id = loads(content)['id']
     _print_result(resp, content)
+    new_user_id = loads(content)['id']
 
     data = dict(context="default")
     resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
-    new_line_id = loads(content)['id']
     _print_result(resp, content)
+    new_line_id = loads(content)['id']
 
-    data = dict(exten="1000", context="default")
+    data = dict(exten="1313", context="default")
     resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers,  body=dumps(data))
     new_extension_id = loads(content)['id']
     _print_result(resp, content)
@@ -234,23 +239,23 @@ def test_create_link_default_context():
 def test_create_link_other_context():
     data = dict(firstname="Greg")
     resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
-    new_user_id = loads(content)['id']
     _print_result(resp, content)
+    new_user_id = loads(content)['id']
 
     data = dict(context="statscenter")
     resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    _print_result(resp, content)
     new_line_id = loads(content)['id']
-    _print_result(resp, content)
 
-    data = dict(exten="1000", context="default")
+    data = dict(exten="1313", context="default")
     resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers,  body=dumps(data))
-    new_extension_id = loads(content)['id']
     _print_result(resp, content)
+    new_extension_id = loads(content)['id']
 
     data = dict(user_id=new_user_id, line_id=new_line_id, extension_id=new_extension_id)
     resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
-    new_link_id = loads(content)['id']
     _print_result(resp, content)
+    new_link_id = loads(content)['id']
 
     _delete_link(new_link_id)
     _delete_user(new_user_id)
@@ -297,7 +302,7 @@ if __name__ == "__main__":
     handle_test.failed_tests = 0
     print "Running Acceptance tests on REST API"
 
-    test_list_lines()
+    #test_list_lines()
     test_create_empty_sip_line()
     test_create_line_empty_context()
     test_create_line_fake_context()
