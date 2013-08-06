@@ -82,11 +82,6 @@ def then_i_have_an_extension_with_the_following_properties(step):
     assert_that(extension, has_entries(properties))
 
 
-@step(u'Then I get a response with an id')
-def then_i_get_a_response_with_an_id(step):
-    assert_that(world.response.data, has_entry('id', instance_of(int)))
-
-
 @step(u'Then I get a response with a link to an extension resource')
 def then_i_get_a_response_with_a_link_to_an_extension_resource(step):
     host = get_config_value('xivo', 'hostname')

@@ -16,7 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from lettuce import step, world
-from hamcrest import assert_that, has_entry, equal_to, has_item
+from hamcrest import *
+
+from acceptance.helpers.config import get_config_value
 
 
 @step(u'Then I get an empty list')
@@ -33,6 +35,35 @@ def then_i_get_a_response_with_status_group1(step, status):
     assert_that(world.response.status, equal_to(status_code), error_msg)
 
 
+@step(u'Then I get a response with an id')
+def then_i_get_a_response_with_an_id(step):
+    assert_that(world.response.data, has_entry('id', instance_of(int)))
+
+
 @step(u'Then I get an error message "([^"]*)"')
 def then_i_get_an_error_message_group1(step, error_message):
     assert_that(world.response.data, has_item(error_message))
+
+
+@step(u'Then I get a header with a location for the "([^"]*)" resource')
+def then_i_get_a_header_with_a_location_for_the_group1_resource(step, resource):
+    resource_id = world.response.data['id']
+    expected_location = '/1.1/%s/%s' % (resource, resource_id)
+
+    assert_that(world.response.headers, has_entry('location', ends_with(expected_location)))
+
+
+@step(u'Then I get a response with a link to the "([^"]*)" resource')
+def then_i_get_a_response_with_a_link_to_an_extension_resource(step, resource):
+    host = get_config_value('xivo', 'hostname')
+    port = get_config_value('restapi', 'port')
+    resource_id = world.response.data['id']
+
+    expected_url = "https://%s:%s/1.1/%s/%s" % (host, port, resource, resource_id)
+
+    assert_that(world.response.data,
+                has_entry('links', contains(
+                    has_entries({
+                        'rel': resource,
+                        'href': expected_url
+                    }))))
