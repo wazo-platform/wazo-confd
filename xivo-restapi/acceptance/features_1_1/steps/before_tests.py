@@ -14,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import xivo_ws
 
 from acceptance.helpers.config import get_config_value
 from lettuce.registry import world
@@ -25,20 +24,11 @@ from xivo_dao.helpers import config, db_manager
 @before.all
 def modify_db_uri():
     hostname = get_config_value('xivo', 'hostname')
-    login = get_config_value('xivo_ws', 'login')
-    password = get_config_value('xivo_ws', 'password')
 
     db_uri = 'postgresql://asterisk:proformatique@%s:5432/asterisk' % hostname
 
     config.DB_URI = db_uri
     db_manager.reinit()
 
-    world.ws = xivo_ws.XivoServer(hostname, login, password)
 
 
-@before.each_scenario
-def reset_world(scenario):
-    world.voicemailid = None
-    world.userid = None
-    world.number = None
-    world.lineid = None
