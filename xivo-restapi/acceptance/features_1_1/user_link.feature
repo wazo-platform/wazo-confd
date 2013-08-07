@@ -90,11 +90,11 @@ Feature: Link user with a line and extension
             | 1       | 10      | 100          |
         Then I get a response with status "201"
 
-        Then I get a response with a link to the "user_link" resource
-        Then I get a response with a link to the "extension" resource
-        Then I get a response with a link to the "line" resource
-        Then I get a response with a link to the "user" resource
-        Then I get a header with a location for the "user_link" resource
+        Then I get a response with a link to the "user_links" resource
+        Then I get a response with a link to the "extensions" resource
+        Then I get a response with a link to the "lines" resource
+        Then I get a response with a link to the "users" resource
+        Then I get a header with a location for the "user_links" resource
         #Then I see the line with an extension in the webi
         #Then I see a user with a line in the webi
         #Then I can pass a call with a SIP phone
@@ -113,13 +113,11 @@ Feature: Link user with a line and extension
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
-
-        Then I get a response with a link to the "user_link" resource
-        Then I get a response with a link to the "extension" resource
-        Then I get a response with a link to the "line" resource
-        Then I get a response with a link to the "user" resource
-        Then I get a header with a location for the "user_link" resource
-
+        Then I get a response with a link to the "user_links" resource
+        Then I get a response with a link to the "extensions" resource
+        Then I get a response with a link to the "lines" resource
+        Then I get a response with a link to the "users" resource
+        Then I get a header with a location for the "user_links" resource
         #Then I see the line with an extension in the webi
         #Then I see a user with a line in the webi
         #Then I see the extension in the "statscenter" dialplan
