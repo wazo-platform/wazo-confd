@@ -15,13 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.data_handler.line import dao as line_dao
 from helpers.remote import remote_exec
 
 
 def delete_all():
-    for line in line_dao.find_all():
-        line_dao.delete(line)
+    remote_exec(_delete_all)
+
+
+def _delete_all(channel):
+    from xivo_dao.data_handler.line import services as line_services
+    from xivo_dao.data_handler.user_line_extension import services as ule_services
+
+    all_ules = ule_services.find_all()
+
+    for line in line_services.find_all():
+
+        ules = [u for u in all_ules if u.line_id == line.id]
+        for ule in ules:
+            ule_services.delete(ule)
+
+        line_services.delete(line)
 
 
 def create_line_sip(parameters):
