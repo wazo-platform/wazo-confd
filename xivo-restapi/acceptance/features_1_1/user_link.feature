@@ -6,7 +6,7 @@ Feature: Link user with a line and extension
         Then I get an error message "Missing parameters: user_id,line_id,extension_id"
 
     Scenario: Create a link with empty parameters
-        When I create a link with the following parameters:
+        When I create a link with the following invalid parameters:
             | user_id | extension_id | line_id |
             |         |              |         |
         Then I get a response with status "400"
@@ -34,11 +34,11 @@ Feature: Link user with a line and extension
         Then I get an error message "Missing parameters: line_id"
 
     Scenario: Create link with an extension that doesn't exist
-        Given there are no extensions
-        Given I have the following users:
+        Given I have no extensions
+        Given I only have the following users:
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
-        Given I have the following lines:
+        Given I only have the following lines:
             | id | context | protocol |
             | 10 | default | sip      |
         When I create a link with the following parameters:
@@ -48,11 +48,11 @@ Feature: Link user with a line and extension
         Then I get an error message "Invalid parameters: extension_id"
 
     Scenario: Create link with a line that doesn't exist
-        Given there are no lines
-        Given I have the following users:
+        Given I have no lines
+        Given I only have the following users:
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
-        Given I have the following extensions:
+        Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
         When I create a link with the following parameters:
@@ -62,13 +62,13 @@ Feature: Link user with a line and extension
         Then I get an error message "Invalid parameters: line_id"
 
     Scenario: Create link with a user that doesn't exist
-        Given there are no users
-        Given I have the following lines:
+        Given I have no users
+        Given I only have the following lines:
             | id | context | protocol |
             | 10 | default | sip      |
-        Given I have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+        Given I only have the following extensions:
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
         When I create a link with the following parameters:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -76,15 +76,15 @@ Feature: Link user with a line and extension
         Then I get an error message "Invalid parameters: user_id"
 
     Scenario: Create a link
-        Given I have the following users:
-            | id | firstname |
-            | 1  | Greg      |
-        Given I have the following lines:
-            | id | context |
-            | 10 | default |
-        Given I have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+        Given I only have the following users:
+            | id | firstname | lastname  |
+            | 1  | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id | context | protocol |
+            | 10 | default | sip      |
+        Given I only have the following extensions:
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
         When I create a link with the following parameters:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -100,15 +100,16 @@ Feature: Link user with a line and extension
         #Then I can pass a call with a SIP phone
 
     Scenario: Create a link in another context
-        Given I have the following users:
-            | id | firstname |
-            | 1  | Greg      |
-        Given I have the following lines:
-            | id | context     |
-            | 10 | statscenter |
-        Given I have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+        Given I have an internal context named "mycontext"
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id  | context   | protocol  |
+            | 10  | mycontext | sip       |
+        Given I only have the following extensions:
+            | id  | context   | exten     | type | typeval |
+            | 100 | mycontext | 1000      | user | 1       |
         When I create a link with the following parameters:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
