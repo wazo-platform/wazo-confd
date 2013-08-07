@@ -19,7 +19,7 @@ from helpers import line_helper, line_ws
 from lettuce import step, world
 
 
-@step(u'Given there are no lines')
+@step(u'Given I have no lines')
 def given_there_are_no_lines(step):
     line_helper.delete_all()
 

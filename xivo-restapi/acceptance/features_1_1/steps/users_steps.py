@@ -15,19 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from acceptance.helpers.config import get_config_value
-from hamcrest import assert_that, has_entry, has_entries, has_key, equal_to, \
-    has_item, instance_of, ends_with, contains
+from hamcrest import *
 from helpers import user_helper, user_ws
 from lettuce import step, world
 
 
-@step(u'Given there are no users')
+@step(u'Given I have no users')
 def given_there_are_no_users(step):
     user_helper.delete_all()
 
 
-@step(u'Given there are only the following users:')
+@step(u'Given I have only the following users:')
 def given_there_are_the_following_users(step):
     user_helper.delete_all()
     for userinfo in step.hashes:
