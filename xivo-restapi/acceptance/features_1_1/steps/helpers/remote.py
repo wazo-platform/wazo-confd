@@ -16,17 +16,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import execnet
+from lettuce import world
 
 from acceptance.helpers.config import get_config_value
 
 
-def remote_exec(func, **kwargs):
+def create_gateway():
     host = get_config_value('xivo', 'hostname')
     username = 'root'
-
     gw = execnet.makegateway('ssh=%s@%s' % (username, host))
+    return gw
 
+
+def remote_exec(func, **kwargs):
+    gw = world.gateway
     channel = gw.remote_exec(func, **kwargs)
     channel.waitclose()
-    gw.exit()
-

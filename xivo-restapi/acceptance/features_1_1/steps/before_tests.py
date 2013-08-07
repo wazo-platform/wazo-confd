@@ -17,8 +17,9 @@
 
 from acceptance.helpers.config import get_config_value
 from lettuce.registry import world
-from lettuce.terrain import before
+from lettuce.terrain import before, after
 from xivo_dao.helpers import config, db_manager
+from acceptance.features_1_1.steps.helpers.remote import create_gateway
 
 
 @before.all
@@ -31,4 +32,12 @@ def modify_db_uri():
     db_manager.reinit()
 
 
+@before.all
+def open_gateway():
+    world.gateway = create_gateway()
 
+
+@after.all
+def close_gateway(total):
+    if hasattr(world, 'gateway'):
+        world.gateway.exit()
