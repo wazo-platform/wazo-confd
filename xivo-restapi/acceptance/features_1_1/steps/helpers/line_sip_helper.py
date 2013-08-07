@@ -33,11 +33,4 @@ def _create_line_sip(channel, parameters):
     from xivo_dao.data_handler.line.model import Line
 
     line = Line(**parameters)
-
-    try:
-        existing_line = line_services.get(line)
-        line_services.delete(existing_line)
-    except:
-        pass
-
     line_services.create(line)
