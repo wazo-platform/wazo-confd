@@ -16,8 +16,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao.data_handler.line import dao as line_dao
+from helpers.remote import remote_exec
 
 
 def delete_all():
     for line in line_dao.find_all():
         line_dao.delete(line)
+
+
+def create_line_sip(parameters):
+    remote_exec(_create_line_sip, parameters=parameters)
+
+
+def _create_line_sip(channel, parameters):
+    from xivo_dao.data_handler.line import services as line_services
+    from xivo_dao.data_handler.line.model import Line
+
+    line = Line(**parameters)
+
+    try:
+        existing_line = line_services.get(line)
+        line_services.delete(existing_line)
+    except:
+        pass
+
+    line_services.create(line)
