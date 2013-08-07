@@ -170,9 +170,9 @@ Feature: Users
           | firstname |
           | Irène     |
         Then I get a response with status "201"
-        Then I get a response with a user id
-        Then I get a response header with a location for the new user
-        Then I get a response with user links
+        Then I get a response with an id
+        Then I get a header with a location for the "users" resource
+        Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
          | firstname | lastname | userfield |
          | Irène     |          |           |

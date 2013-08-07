@@ -81,18 +81,6 @@ def then_i_get_a_list_with_the_following_users(step):
         assert_that(user, has_entries(expected_user))
 
 
-@step(u'Then I get a response header with a location for the new user')
-def then_i_get_a_response_header_with_a_location_for_the_new_user(step):
-    userid = world.response.data['id']
-
-    assert_that(world.response.headers, has_key('location'))
-
-    location = world.response.headers['Location']
-    expected_location = '/1.1/users/%s' % userid
-
-    assert_that(location, ends_with(expected_location))
-
-
 @step(u'Then I get a user with the following properties:')
 def then_i_get_a_user_with_the_following_properties(step):
     user = world.response.data
@@ -110,22 +98,6 @@ def _get_user_info(hashes):
     return userinfo
 
 
-@step(u'Then I get a response with user links')
-def then_i_get_a_response_with_user_links(step):
-    host = get_config_value('xivo', 'hostname')
-    port = get_config_value('restapi', 'port')
-    user_id = world.response.data['id']
-
-    expected_url = "https://%s:%s/1.1/users/%s" % (host, port, user_id)
-
-    assert_that(world.response.data,
-                has_entry('links', contains(
-                    has_entries({
-                        'rel': 'users',
-                        'href': expected_url
-                    }))))
-
-
 @step(u'Then the created user has the following parameters:')
 def then_the_created_user_has_the_following_parameters(step):
     userid = world.response.data['id']
@@ -134,11 +106,6 @@ def then_the_created_user_has_the_following_parameters(step):
     expected_user = _get_user_info(step.hashes)
 
     assert_that(user, has_entries(expected_user))
-
-
-@step(u'Then I get a response with a user id')
-def then_i_get_a_response_with_a_user_id(step):
-    assert_that(world.response.data, has_entry('id', instance_of(int)))
 
 
 @step(u'Then the user with id "([^"]*)" no longer exists')
