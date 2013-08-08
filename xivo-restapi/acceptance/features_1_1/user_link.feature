@@ -95,9 +95,6 @@ Feature: Link user with a line and extension
         Then I get a response with a link to the "lines" resource with id "10"
         Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
-        #Then I see the line with an extension in the webi
-        #Then I see a user with a line in the webi
-        #Then I can pass a call with a SIP phone
 
     Scenario: Create a link in another context
         Given I have an internal context named "mycontext"
@@ -119,6 +116,3 @@ Feature: Link user with a line and extension
         Then I get a response with a link to the "lines" resource with id "10"
         Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
-        #Then I see the line with an extension in the webi
-        #Then I see a user with a line in the webi
-        #Then I see the extension in the "statscenter" dialplan
