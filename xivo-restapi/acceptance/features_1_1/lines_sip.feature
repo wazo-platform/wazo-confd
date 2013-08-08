@@ -11,7 +11,7 @@ Feature: SIP Lines
             | context |
             |         |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: context"
+        Then I get an error message "Invalid parameters: context cannot be empty"
 
     #FAIL
     Scenario: Create a line with a context that doesn't exist
@@ -19,7 +19,7 @@ Feature: SIP Lines
             | context           |
             | superdupercontext |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: context"
+        Then I get an error message "Invalid parameters: context superdupercontext does not exist"
 
     Scenario: Create a line with invalid parameters
         When I create a line with the following properties:
