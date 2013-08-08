@@ -19,7 +19,7 @@ import logging
 
 from . import mapper_sip
 
-from flask import Blueprint
+from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.line import services as line_services
@@ -62,7 +62,8 @@ def create():
     mapper_sip.add_links_to_dict(result, line)
     result = serializer.encode(result)
 
-    return make_response(result, 201)
+    location = url_for('.get', lineid=line.id)
+    return make_response(result, 201, {'Location': location})
 
 
 @route('/<int:lineid>', methods=['PUT'])
