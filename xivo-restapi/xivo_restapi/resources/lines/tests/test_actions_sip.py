@@ -186,7 +186,7 @@ class TestLineActions(unittest.TestCase):
         self.assertEqual(status_code, result.status_code)
 
     @patch('xivo_dao.data_handler.line.services.create')
-    def test_create_request_error(self, mock_line_services_create):
+    def test_create_missing_parameters_error(self, mock_line_services_create):
         status_code = 400
         expected_result = ["Missing parameters: context"]
 
