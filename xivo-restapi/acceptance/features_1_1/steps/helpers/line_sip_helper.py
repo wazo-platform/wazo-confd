@@ -43,7 +43,7 @@ def create_line_sip(parameters):
 
 def _create_line_sip(channel, parameters):
     from xivo_dao.data_handler.line import services as line_services
-    from xivo_dao.data_handler.line.model import Line
+    from xivo_dao.data_handler.line.model import LineSIP
 
-    line = Line(**parameters)
+    line = LineSIP(**parameters)
     line_services.create(line)
