@@ -45,7 +45,7 @@ Feature: Link user with a line and extension
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: extension_id"
+        Then I get an error message "Nonexistent parameters: extension_id 100 does not exist"
 
     Scenario: Create link with a line that doesn't exist
         Given I have no lines
@@ -59,7 +59,7 @@ Feature: Link user with a line and extension
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: line_id"
+        Then I get an error message "Nonexistent parameters: line_id 10 does not exist"
 
     Scenario: Create link with a user that doesn't exist
         Given I have no users
@@ -73,7 +73,7 @@ Feature: Link user with a line and extension
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: user_id"
+        Then I get an error message "Nonexistent parameters: user_id 1 does not exist"
 
     Scenario: Create a link
         Given I only have the following users:
