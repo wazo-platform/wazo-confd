@@ -22,7 +22,7 @@ from xivo_restapi.helpers import serializer
 from werkzeug.exceptions import HTTPException
 from xivo_dao.data_handler.exception import MissingParametersError, \
     InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError, \
-    ElementCreationError, ElementDeletionError, ElementEditionError
+    ElementCreationError, ElementDeletionError, ElementEditionError, NonexistentParametersError
 from functools import wraps
 
 logger = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ def exception_catcher(func):
     def decorated_func(*args, **kwargs):
         generic_errors = (MissingParametersError,
                           InvalidParametersError,
+                          NonexistentParametersError,
                           ElementAlreadyExistsError)
 
         try:

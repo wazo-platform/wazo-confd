@@ -23,7 +23,7 @@ from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from xivo_dao.data_handler.exception import MissingParametersError, \
-    ElementNotExistsError
+    ElementNotExistsError, NonexistentParametersError
 
 BASE_URL = "/1.1/user_links"
 
@@ -233,6 +233,22 @@ class TestULEActions(unittest.TestCase):
         }
 
         mock_ule_services_create.side_effect = Exception
+
+        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+
+        self.assertEqual(status_code, result.status_code)
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.create')
+    def test_create_nonexistient_paramters_error(self, mock_ule_services_create):
+        status_code = 400
+
+        data = {
+            'user_id': 3,
+            'line_id': 6,
+            'extension_id': 4
+        }
+
+        mock_ule_services_create.side_effect = NonexistentParametersError()
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
 
