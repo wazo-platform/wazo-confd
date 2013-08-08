@@ -147,8 +147,8 @@ class TestLineActions(unittest.TestCase):
         expected_result = {
             'id': 1,
             'links': [{
-                    'href': 'http://localhost/1.1/lines_sip/1',
-                    'rel': 'lines_sip'
+                'href': 'http://localhost/1.1/lines_sip/1',
+                'rel': 'lines_sip'
             }]
         }
 
