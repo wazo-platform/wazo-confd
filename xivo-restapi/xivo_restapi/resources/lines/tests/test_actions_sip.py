@@ -23,7 +23,7 @@ from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.line.model import LineSIP
 from xivo_dao.data_handler.exception import MissingParametersError, \
-    ElementNotExistsError
+    ElementNotExistsError, InvalidParametersError
 
 BASE_URL = "/1.1/lines_sip"
 
@@ -194,6 +194,23 @@ class TestLineActions(unittest.TestCase):
 
         data = {
             'protocol': 'sip'
+        }
+
+        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        decoded_result = serializer.decode(result.data)
+
+        self.assertEqual(status_code, result.status_code)
+        self.assertEquals(expected_result, decoded_result)
+
+    @patch('xivo_dao.data_handler.line.services.create')
+    def test_create_invalid_parameters_error(self, mock_line_services_create):
+        status_code = 400
+        expected_result = ["Invalid parameters: context"]
+
+        mock_line_services_create.side_effect = InvalidParametersError(["context"])
+
+        data = {
+            'context': ''
         }
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
