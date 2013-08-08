@@ -53,7 +53,7 @@ def then_i_get_a_header_with_a_location_for_the_group1_resource(step, resource):
     assert_that(world.response.headers, has_entry('location', ends_with(expected_location)))
 
 
-@step(u'Then I get a response with a link to the "([^"]*)" resource')
+@step(u'Then I get a response with a link to the "([^"]*)" resource$')
 def then_i_get_a_response_with_a_link_to_an_extension_resource(step, resource):
     host = get_config_value('xivo', 'hostname')
     port = get_config_value('restapi', 'port')
@@ -62,8 +62,23 @@ def then_i_get_a_response_with_a_link_to_an_extension_resource(step, resource):
     expected_url = "https://%s:%s/1.1/%s/%s" % (host, port, resource, resource_id)
 
     assert_that(world.response.data,
-                has_entry('links', contains(
+                has_entry(u'links', has_item(
                     has_entries({
-                        'rel': resource,
-                        'href': expected_url
+                        u'rel': resource,
+                        u'href': expected_url
+                    }))))
+
+
+@step(u'Then I get a response with a link to the "([^"]*)" resource with id "([^"]*)"')
+def then_i_get_a_response_with_a_link_to_a_resource_with_id(step, resource, resource_id):
+    host = get_config_value('xivo', 'hostname')
+    port = get_config_value('restapi', 'port')
+
+    expected_url = "https://%s:%s/1.1/%s/%s" % (host, port, resource, resource_id)
+
+    assert_that(world.response.data,
+                has_entry(u'links', has_item(
+                    has_entries({
+                        u'rel': resource,
+                        u'href': expected_url
                     }))))

@@ -91,9 +91,9 @@ Feature: Link user with a line and extension
         Then I get a response with status "201"
 
         Then I get a response with a link to the "user_links" resource
-        Then I get a response with a link to the "extensions" resource
-        Then I get a response with a link to the "lines" resource
-        Then I get a response with a link to the "users" resource
+        Then I get a response with a link to the "extensions" resource with id "100"
+        Then I get a response with a link to the "lines" resource with id "10"
+        Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
         #Then I see the line with an extension in the webi
         #Then I see a user with a line in the webi
@@ -115,9 +115,9 @@ Feature: Link user with a line and extension
             | 1       | 10      | 100          |
         Then I get a response with status "201"
         Then I get a response with a link to the "user_links" resource
-        Then I get a response with a link to the "extensions" resource
-        Then I get a response with a link to the "lines" resource
-        Then I get a response with a link to the "users" resource
+        Then I get a response with a link to the "extensions" resource with id "100"
+        Then I get a response with a link to the "lines" resource with id "10"
+        Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
         #Then I see the line with an extension in the webi
         #Then I see a user with a line in the webi
