@@ -97,16 +97,15 @@ Feature: Link user with a line and extension
         Then I get a header with a location for the "user_links" resource
 
     Scenario: Create a link in another context
-        Given I have an internal context named "mycontext"
         Given I only have the following users:
             | id  | firstname | lastname  |
             | 1   | Greg      | Sanderson |
         Given I only have the following lines:
-            | id  | context   | protocol  |
-            | 10  | mycontext | sip       |
+            | id | context     | protocol |
+            | 10 | statscenter | sip      |
         Given I only have the following extensions:
-            | id  | context   | exten     | type | typeval |
-            | 100 | mycontext | 1000      | user | 1       |
+            | id  | context     | exten | type | typeval |
+            | 100 | statscenter | 1000  | user | 1       |
         When I create a link with the following parameters:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
