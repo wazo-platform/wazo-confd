@@ -19,8 +19,9 @@ from helpers import user_link_ws, user_helper, line_sip_helper, extension_helper
 from lettuce import step, world
 
 from hamcrest import *
-from acceptance.features_1_1.steps.helpers import device_helper
+from acceptance.features_1_1.steps.helpers import device_helper, provd_helper
 from xivo_dao.data_handler.line import dao as line_dao
+from xivo_dao.data_handler.device import dao as device_dao
 
 
 @step(u'When I create an empty link')
@@ -67,9 +68,10 @@ def when_i_provision_my_device_with_my_line_id_group1(step, line_id, device_ip):
     device_helper.provision_device_using_webi(line.provisioningid, device_ip)
 
 
-@step(u'Then the device has been provisioned with a configuration:')
-def then_the_device_has_been_provisioned_with_a_configuration(step):
-    assert False, 'This step must be implemented'
+@step(u'Then the device "([^"]*)" has been provisioned with a configuration:')
+def then_the_device_has_been_provisioned_with_a_configuration(step, device_id):
+    device = device_dao.get(device_id)
+    provd_helper.device_config_has_properties(device, step.hashes)
 
 
 def _extract_parameters(step):

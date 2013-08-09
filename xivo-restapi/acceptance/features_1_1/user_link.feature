@@ -122,14 +122,14 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol | username | secret |
-            | 10 | default | sip      | toto     | tata   |
+            | id | context | protocol | username | secret | num |
+            | 10 | default | sip      | toto     | tata   | 1   |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
         Given I only have the following devices:
-            | id   | ip       | mac               |
-            | 1000 | 10.0.0.1 | 00:00:00:00:00:00 |
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
         When I create a link with the following parameters:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -142,7 +142,7 @@ Feature: Link user with a line and extension
         Then I get a header with a location for the "user_links" resource
         
         When I provision my device with my line_id "10" and ip "10.0.0.1"
-        Then the device has been provisioned with a configuration:
+        Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |
             | Greg Sanderson | 1000   | toto     | toto          | tata     |
         

@@ -12,13 +12,11 @@ HEADERS = {'Content-Type': 'application/json'}
 def provision_device_using_webi(provcode, device_ip):
     hostname = get_config_value('xivo', 'hostname')
     data = json.dumps({'code': provcode, 'ip': device_ip})
-    response = requests.post(url=AUTOPROV_URL % hostname,
+    requests.post(url=AUTOPROV_URL % hostname,
                   headers=HEADERS,
                   auth=_prepare_auth(),
                   data=data,
                   verify=False)
-
-    print response.text
 
 
 def _prepare_auth():
