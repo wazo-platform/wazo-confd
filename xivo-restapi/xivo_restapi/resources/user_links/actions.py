@@ -34,7 +34,7 @@ blueprint = Blueprint('user_links', __name__, url_prefix='/%s/user_links' % conf
 route = RouteGenerator(blueprint)
 
 
-@route('/')
+@route('')
 def list():
     ules = ule_services.find_all()
     result = mapper.encode_list(ules)
@@ -48,7 +48,7 @@ def get(uleid):
     return make_response(result, 200)
 
 
-@route('/', methods=['POST'])
+@route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)

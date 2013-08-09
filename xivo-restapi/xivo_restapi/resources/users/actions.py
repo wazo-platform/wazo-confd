@@ -36,7 +36,7 @@ blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION
 route = RouteGenerator(blueprint)
 
 
-@route('/')
+@route('')
 def list():
     if 'q' in request.args:
         users = user_services.find_all_by_fullname(request.args['q'])
@@ -54,7 +54,7 @@ def get(userid):
     return make_response(result, 200)
 
 
-@route('/', methods=['POST'])
+@route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
