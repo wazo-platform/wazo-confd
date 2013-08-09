@@ -33,12 +33,12 @@ Feature: Extensions
     Scenario: Get an extension
         Given I only have the following extensions:
             | id  | exten | context | type | typeval |
-            | 100 | 2000  | default | user | 1       |
+            | 100 | 1500  | default | user | 1       |
         When I access the extension with id "100"
         Then I get a response with status "200"
         Then I have an extension with the following properties:
             | id  | exten | context |
-            | 100 | 2000  | default |
+            | 100 | 1500  | default |
 
     Scenario: Creating an empty extension
         Given I have no extensions
