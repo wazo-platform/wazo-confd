@@ -23,7 +23,7 @@ from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.extension.model import Extension
 from xivo_dao.data_handler.exception import MissingParametersError, \
-    ElementNotExistsError
+    ElementNotExistsError, NonexistentParametersError
 
 BASE_URL = "/1.1/extensions"
 
@@ -218,7 +218,7 @@ class TestExtensionActions(unittest.TestCase):
         self.assertEqual(status_code, result.status_code)
 
     @patch('xivo_dao.data_handler.extension.services.create')
-    def test_create_request_error(self, mock_extension_services_create):
+    def test_create_missing_parameters(self, mock_extension_services_create):
         status_code = 400
         expected_result = ["Missing parameters: lastname"]
 
@@ -226,6 +226,24 @@ class TestExtensionActions(unittest.TestCase):
 
         data = {
             'exten': '1324'
+        }
+
+        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        decoded_result = serializer.decode(result.data)
+
+        self.assertEqual(status_code, result.status_code)
+        self.assertEquals(expected_result, decoded_result)
+
+    @patch('xivo_dao.data_handler.extension.services.create')
+    def test_create_nonexistent_parameters(self, mock_extension_services_create):
+        status_code = 400
+        expected_result = ["Nonexistent parameters: context mycontext does not exist"]
+
+        mock_extension_services_create.side_effect = NonexistentParametersError(context='mycontext')
+
+        data = {
+            'exten': '1324',
+            'context': 'mycontext'
         }
 
         result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
