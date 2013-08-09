@@ -57,11 +57,11 @@ def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
 
-    if 'type' not in data and 'typeval' not in data:
-        data.update({
-            'type': 'user',
-            'typeval': '0'
-        })
+    if 'type' not in data:
+        data['type'] = 'user'
+
+    if 'typeval' not in data:
+        data['typeval'] = '0'
 
     extension = Extension.from_user_data(data)
     extension = extension_services.create(extension)

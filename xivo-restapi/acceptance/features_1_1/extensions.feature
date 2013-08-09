@@ -123,8 +123,8 @@ Feature: Extensions
             | 1000  | default |
         Then I get a response with status "201"
         When I create an extension with the following properties:
-            | exten | context     |
-            | 1000  | from-extern |
+            | exten | context     | type   |
+            | 1000  | from-extern | incall |
         Then I get a response with status "201"
 
     Scenario: Creating an extension with a context that doesn't exist
