@@ -65,7 +65,7 @@ class TestExtensionActions(unittest.TestCase):
                         'href': 'http://localhost/1.1/extensions/1',
                         'rel': 'extensions'
                     }]
-                 },
+                },
                 {
                     'id': 2,
                     'exten': '1325',
@@ -73,7 +73,7 @@ class TestExtensionActions(unittest.TestCase):
                         'href': 'http://localhost/1.1/extensions/2',
                         'rel': 'extensions'
                     }]
-                 }
+                }
             ]
         }
 
@@ -105,7 +105,7 @@ class TestExtensionActions(unittest.TestCase):
                         'href': 'http://localhost/1.1/extensions/1',
                         'rel': 'extensions'
                     }]
-                 }
+                }
             ]
         }
 
