@@ -34,7 +34,7 @@ blueprint = Blueprint('lines_sip', __name__, url_prefix='/%s/lines_sip' % config
 route = RouteGenerator(blueprint)
 
 
-@route('/')
+@route('')
 def list_sip():
     lines = line_services.find_all_by_protocol('sip')
     result = mapper_sip.encode_list(lines)
@@ -50,7 +50,7 @@ def get(lineid):
     return make_response(result, 200)
 
 
-@route('/', methods=['POST'])
+@route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)

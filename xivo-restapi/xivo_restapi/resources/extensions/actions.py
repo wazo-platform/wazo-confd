@@ -33,7 +33,7 @@ blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % conf
 route = RouteGenerator(blueprint)
 
 
-@route('/')
+@route('')
 def list():
     if 'q' in request.args:
         extensions = extension_services.find_by_exten(request.args['q'])
@@ -52,7 +52,7 @@ def get(extensionid):
     return make_response(result, 200)
 
 
-@route('/', methods=['POST'])
+@route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)

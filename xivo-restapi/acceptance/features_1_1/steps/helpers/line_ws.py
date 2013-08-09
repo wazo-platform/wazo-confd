@@ -17,8 +17,8 @@
 
 from acceptance.features_1_1 import ws_utils_session as ws_utils
 
-LINES_PATH = 'lines/'
+LINES_URL = 'lines'
 
 
 def all_lines():
-    return ws_utils.rest_get(LINES_PATH)
+    return ws_utils.rest_get(LINES_URL)

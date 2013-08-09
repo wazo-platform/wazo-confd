@@ -32,7 +32,7 @@ blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION
 route = RouteGenerator(blueprint)
 
 
-@route('/')
+@route('')
 def list():
     if 'q' in request.args:
         lines = line_services.find_all_by_name(request.args['q'])

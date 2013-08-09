@@ -18,7 +18,7 @@
 from acceptance.features_1_1 import ws_utils_session as ws_utils
 
 
-USER_LINK_PATH = 'user_links/'
+USER_LINK_PATH = 'user_links'
 
 
 def create_user_link(parameters):
