@@ -100,11 +100,9 @@ Feature: Extensions
         Given I have no extensions
         When I create an extension with the following properties:
             | exten  | context |
-            | ABC123 | context |
-        Then I get a response with status "201"
-        Then I get a response with an id
-        Then I get a header with a location for the "extensions" resource
-        Then I get a response with a link to the "extensions" resource
+            | ABC123 | default |
+        Then I get a response with status "400"
+        Then i get an error message "Invalid parameters: Alphanumeric extensions are not supported"
 
     Scenario: Creating twice the same extension
         Given I have no extensions
