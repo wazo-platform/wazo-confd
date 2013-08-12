@@ -75,8 +75,7 @@ def then_the_device_has_been_provisioned_with_a_configuration(step, device_id):
     provd_helper.device_config_has_properties(device, step.hashes)
 
 
-def _extract_parameters(step):
-    user_line = step.hashes[0]
+def _extract_parameters(user_line):
 
     if 'extension_id' in user_line:
         user_line['extension_id'] = int(user_line['extension_id'])

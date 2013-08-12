@@ -20,14 +20,14 @@ Feature: Link user with a line and extension
         Then I get an error message "Invalid parameters: user_id must be integer,line_id must be integer,extension_id must be integer"
 
     Scenario: Create a link with invalid parameters
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | extension_id | line_id | invalid |
             | 3       | 1            | 2       | invalid |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: invalid"
 
     Scenario: Create a link with a missing line id
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | extension_id |
             | 1       | 2            |
         Then I get a response with status "400"
@@ -41,7 +41,7 @@ Feature: Link user with a line and extension
         Given I only have the following lines:
             | id | context | protocol |
             | 10 | default | sip      |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
@@ -55,7 +55,7 @@ Feature: Link user with a line and extension
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
@@ -69,7 +69,7 @@ Feature: Link user with a line and extension
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
@@ -85,7 +85,7 @@ Feature: Link user with a line and extension
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
@@ -106,7 +106,7 @@ Feature: Link user with a line and extension
         Given I only have the following extensions:
             | id  | context     | exten | type | typeval |
             | 100 | statscenter | 1000  | user | 1       |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
@@ -129,7 +129,7 @@ Feature: Link user with a line and extension
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
@@ -157,7 +157,7 @@ Feature: Link user with a line and extension
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
 
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
@@ -168,7 +168,7 @@ Feature: Link user with a line and extension
             | lines      | 10  |
             | extensions | 100 |
 
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 2       | 10      | 100          |
         Then I get a response with status "201"
@@ -187,14 +187,14 @@ Feature: Link user with a line and extension
             | id | context     | protocol |
             | 10 | default     | sip      |
         Given I only have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
 
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
