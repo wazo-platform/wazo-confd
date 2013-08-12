@@ -45,7 +45,7 @@ class TestULEActions(unittest.TestCase):
 
         mock_ule_services_find_all.return_value = []
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_ule_services_find_all.assert_any_call()
@@ -119,7 +119,7 @@ class TestULEActions(unittest.TestCase):
                                  extension_id=9)
         mock_ule_services_find_all.return_value = [ule1, ule2]
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_ule_services_find_all.assert_any_call()
@@ -132,7 +132,7 @@ class TestULEActions(unittest.TestCase):
 
         mock_ule_services_find_all.side_effect = Exception
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
 
         mock_ule_services_find_all.assert_any_call()
         self.assertEqual(status_code, result.status_code)
@@ -216,7 +216,7 @@ class TestULEActions(unittest.TestCase):
             'extension_id': 4
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)
@@ -234,7 +234,7 @@ class TestULEActions(unittest.TestCase):
 
         mock_ule_services_create.side_effect = Exception
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
 
@@ -250,7 +250,7 @@ class TestULEActions(unittest.TestCase):
 
         mock_ule_services_create.side_effect = NonexistentParametersError()
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
 
@@ -266,7 +266,7 @@ class TestULEActions(unittest.TestCase):
             'extension_id': 4
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)

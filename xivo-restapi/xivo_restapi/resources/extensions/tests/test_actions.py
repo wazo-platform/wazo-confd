@@ -45,7 +45,7 @@ class TestExtensionActions(unittest.TestCase):
 
         mock_extension_services_find_all.return_value = []
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_extension_services_find_all.assert_any_call()
@@ -83,7 +83,7 @@ class TestExtensionActions(unittest.TestCase):
                                exten='1325')
         mock_extension_services_find_all.return_value = [extension1, extension2]
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_extension_services_find_all.assert_any_call()
@@ -112,7 +112,7 @@ class TestExtensionActions(unittest.TestCase):
         extension = Extension(id=1, exten='1324')
         mock_extension_services_find_by_exten.return_value = [extension]
 
-        result = self.app.get("%s/?q=%s" % (BASE_URL, search))
+        result = self.app.get("%s?q=%s" % (BASE_URL, search))
         decoded_result = serializer.decode(result.data)
 
         mock_extension_services_find_by_exten.assert_called_once_with(search)
@@ -125,7 +125,7 @@ class TestExtensionActions(unittest.TestCase):
 
         mock_extension_services_find_all.side_effect = Exception
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
 
         mock_extension_services_find_all.assert_any_call()
         self.assertEqual(status_code, result.status_code)
@@ -195,7 +195,7 @@ class TestExtensionActions(unittest.TestCase):
             u'context': u'jd'
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         mock_extension_services_create.assert_called_once_with(extension)
@@ -213,7 +213,7 @@ class TestExtensionActions(unittest.TestCase):
 
         mock_extension_services_create.side_effect = Exception
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
 
@@ -228,7 +228,7 @@ class TestExtensionActions(unittest.TestCase):
             'exten': '1324'
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)
@@ -246,7 +246,7 @@ class TestExtensionActions(unittest.TestCase):
             'context': 'mycontext'
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)

@@ -45,7 +45,7 @@ class TestUserActions(unittest.TestCase):
 
         mock_user_services_find_all.return_value = []
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_user_services_find_all.assert_any_call()
@@ -83,7 +83,7 @@ class TestUserActions(unittest.TestCase):
                      firstname='test2')
         mock_user_services_find_all.return_value = [user1, user2]
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_user_services_find_all.assert_any_call()
@@ -111,7 +111,7 @@ class TestUserActions(unittest.TestCase):
         user = User(id=1, firstname='Bob')
         mock_user_services_find_all_by_fullname.return_value = [user]
 
-        result = self.app.get("%s/?q=%s" % (BASE_URL, search))
+        result = self.app.get("%s?q=%s" % (BASE_URL, search))
         decoded_result = serializer.decode(result.data)
 
         mock_user_services_find_all_by_fullname.assert_called_once_with(search)
@@ -124,7 +124,7 @@ class TestUserActions(unittest.TestCase):
 
         mock_user_services_find_all.side_effect = Exception
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
 
         mock_user_services_find_all.assert_any_call()
         self.assertEqual(status_code, result.status_code)
@@ -188,7 +188,7 @@ class TestUserActions(unittest.TestCase):
                 u'lastname': u'Dupond',
                 u'description': u'éà":;'}
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         mock_user_services_create.assert_called_with(User.from_user_data(data))
@@ -205,7 +205,7 @@ class TestUserActions(unittest.TestCase):
 
         mock_user_services_create.side_effect = Exception
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
 
@@ -218,7 +218,7 @@ class TestUserActions(unittest.TestCase):
 
         data = {'firstname': 'André'}
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)

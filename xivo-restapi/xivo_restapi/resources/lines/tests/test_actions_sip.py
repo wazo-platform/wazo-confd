@@ -45,7 +45,7 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_find_all_by_protocol.return_value = []
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
@@ -83,7 +83,7 @@ class TestLineActions(unittest.TestCase):
                         username='test2')
         mock_line_services_find_all_by_protocol.return_value = [line1, line2]
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
@@ -96,7 +96,7 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_find_all_by_protocol.side_effect = Exception
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
 
         mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
         self.assertEqual(status_code, result.status_code)
@@ -162,7 +162,7 @@ class TestLineActions(unittest.TestCase):
             'context': 'default'
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         mock_line_services_create.assert_called_with(LineSIP.from_user_data(data))
@@ -181,7 +181,7 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_create.side_effect = Exception
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
 
         self.assertEqual(status_code, result.status_code)
 
@@ -196,7 +196,7 @@ class TestLineActions(unittest.TestCase):
             'protocol': 'sip'
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)
@@ -213,7 +213,7 @@ class TestLineActions(unittest.TestCase):
             'context': ''
         }
 
-        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        result = self.app.post(BASE_URL, data=serializer.encode(data))
         decoded_result = serializer.decode(result.data)
 
         self.assertEqual(status_code, result.status_code)

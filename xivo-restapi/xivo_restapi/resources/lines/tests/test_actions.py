@@ -44,7 +44,7 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_find_all.return_value = []
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all.assert_any_call()
@@ -80,7 +80,7 @@ class TestLineActions(unittest.TestCase):
                      name='test2')
         mock_line_services_find_all.return_value = [line1, line2]
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
         decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all.assert_any_call()
@@ -109,7 +109,7 @@ class TestLineActions(unittest.TestCase):
         line = Line(id=1, name='Bob')
         mock_line_services_find_all_by_name.return_value = [line]
 
-        result = self.app.get("%s/?q=%s" % (BASE_URL, search))
+        result = self.app.get("%s?q=%s" % (BASE_URL, search))
         decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all_by_name.assert_called_once_with(search)
@@ -122,7 +122,7 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_find_all.side_effect = Exception
 
-        result = self.app.get("%s/" % BASE_URL)
+        result = self.app.get(BASE_URL)
 
         mock_line_services_find_all.assert_any_call()
         self.assertEqual(status_code, result.status_code)
