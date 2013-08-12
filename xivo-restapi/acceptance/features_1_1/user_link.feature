@@ -144,3 +144,97 @@ Feature: Link user with a line and extension
         Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |
             | Greg Sanderson | 1000   | toto     | toto          | tata     |
+
+    Scenario: Link 2 users to a line
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol |
+            | 10 | default     | sip      |
+        Given I only have the following extensions:
+            | id  | context     | exten |
+            | 100 | default | 1000  |
+
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | true      |
+        Then I get a response with status "201"
+        Then I get a response with a link to the "user_links" resource
+        Then I get a response with the following link resources:
+            | resource   | id  |
+            | users      | 1   |
+            | lines      | 10  |
+            | extensions | 100 |
+
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 2       | 10      | 100          | false     |
+        Then I get a response with status "201"
+        Then I get a response with a link to the "user_links" resource
+        Then I get a response with the following link resources:
+            | resource   | id  |
+            | users      | 2   |
+            | lines      | 10  |
+            | extensions | 100 |
+
+    Scenario: Link a user already associated to a line
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id | context     | protocol |
+            | 10 | default     | sip      |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | true      |
+        Then I get a response with status "201"
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | true      |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameter: user is already associated to this line"
+
+    Scenario: Link 2 main users to a line
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol |
+            | 10 | default     | sip      |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | true      |
+        Then I get a response with status "201"
+
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 2       | 10      | 100          | true      |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameter: there is already a main user associated to this line"
+
+    Scenario: Link a secondary user to a new line
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id | context     | protocol |
+            | 10 | default     | sip      |
+        Given I only have the following extensions:
+            | id  | context     | exten |
+            | 100 | default | 1000  |
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | false     |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameter: there are no main users associated to this line"
