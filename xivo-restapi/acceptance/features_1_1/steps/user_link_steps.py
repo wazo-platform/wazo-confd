@@ -24,23 +24,6 @@ from xivo_dao.data_handler.line import dao as line_dao
 from xivo_dao.data_handler.device import dao as device_dao
 
 
-@step(u'When I create an empty link')
-def when_i_create_an_empty_link(step):
-    world.response = user_link_ws.create_user_link({})
-
-
-@step(u'When I create a link with the following parameters:')
-def when_i_create_a_link_with_the_following_parameters(step):
-    parameters = _extract_parameters(step)
-    world.response = user_link_ws.create_user_link(parameters)
-
-
-@step(u'When I create a link with the following invalid parameters:')
-def when_i_create_a_link_with_the_following_invalid_parameters(step):
-    parameters = step.hashes[0]
-    world.response = user_link_ws.create_user_link(parameters)
-
-
 @step(u'Given I only have the following users:')
 def given_i_created_the_following_users(step):
     user_helper.delete_all()
@@ -60,6 +43,24 @@ def given_i_have_the_following_extensions(step):
     extension_helper.delete_all()
     for exteninfo in step.hashes:
         extension_helper.create_extensions([exteninfo])
+
+
+@step(u'When I create an empty link')
+def when_i_create_an_empty_link(step):
+    world.response = user_link_ws.create_user_link({})
+
+
+@step(u'When I create the following links:')
+def when_i_create_the_following_links(step):
+    for link_info in step.hashes:
+        userlink = _extract_parameters(link_info)
+        world.response = user_link_ws.create_user_link(userlink)
+
+
+@step(u'When I create a link with the following invalid parameters:')
+def when_i_create_a_link_with_the_following_invalid_parameters(step):
+    parameters = step.hashes[0]
+    world.response = user_link_ws.create_user_link(parameters)
 
 
 @step(u'When I provision my device with my line_id "([^"]*)" and ip "([^"]*)"')
