@@ -154,8 +154,8 @@ Feature: Link user with a line and extension
             | id | context     | protocol |
             | 10 | default     | sip      |
         Given I only have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
 
         When I create a link with the following parameters:
             | user_id | line_id | extension_id |
@@ -209,8 +209,8 @@ Feature: Link user with a line and extension
             | id | context     | protocol | username | secret | num |
             | 10 | default     | sip      | abc123   | def456 | 1   |
         Given I only have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
@@ -232,8 +232,8 @@ Feature: Link user with a line and extension
             | id | context     | protocol | username | secret | num |
             | 10 | default     | sip      | abc123   | def456 | 1   |
         Given I only have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
