@@ -154,7 +154,7 @@ Feature: Link user with a line and extension
             | id | context     | protocol |
             | 10 | default     | sip      |
         Given I only have the following extensions:
-            | id  | context     | exten |
+            | id  | context | exten |
             | 100 | default | 1000  |
 
         When I create a link with the following parameters:
