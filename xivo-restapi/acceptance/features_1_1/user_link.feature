@@ -198,7 +198,7 @@ Feature: Link user with a line and extension
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameter: user is already associated to this line"
+        Then I get an error message "Invalid parameters: user is already associated to this line"
 
     Scenario: Provision a device for 2 users
         Given I only have the following users:
