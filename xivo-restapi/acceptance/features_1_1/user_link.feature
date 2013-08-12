@@ -238,3 +238,56 @@ Feature: Link user with a line and extension
             | 1       | 10      | 100          | false     |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameter: there are no main users associated to this line"
+
+    Scenario: Provision a device for 2 users
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol | username | secret | num |
+            | 10 | default     | sip      | abc123   | def456 | 1   |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+        Given I only have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
+        When I create the following links:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | true      |
+            | 2       | 10      | 100          | false     |
+        When I provision my device with my line_id "10" and ip "10.0.0.1"
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
+
+    Scenario: Link a second user after provisioning a device
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol | username | secret | num |
+            | 10 | default     | sip      | abc123   | def456 | 1   |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+        Given I only have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
+
+        When I create the following links:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | true      |
+        When I provision my device with my line_id "10" and ip "10.0.0.1"
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
+
+        When I create the following links:
+            | user_id | line_id | extension_id | main_user |
+            | 2       | 10      | 100          | true      |
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
