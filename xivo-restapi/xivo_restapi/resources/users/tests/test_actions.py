@@ -62,18 +62,18 @@ class TestUserActions(unittest.TestCase):
                     'id': 1,
                     'firstname': 'test1',
                     'links': [{
-                            'href': 'http://localhost/1.1/users/1',
-                            'rel': 'users'
+                        'href': 'http://localhost/1.1/users/1',
+                        'rel': 'users'
                     }]
                 },
                 {
                     'id': 2,
                     'firstname': 'test2',
                     'links': [{
-                            'href': 'http://localhost/1.1/users/2',
-                            'rel': 'users'
+                        'href': 'http://localhost/1.1/users/2',
+                        'rel': 'users'
                     }]
-                 }
+                }
             ]
         }
 
@@ -102,8 +102,8 @@ class TestUserActions(unittest.TestCase):
                     'id': 1,
                     'firstname': 'Bob',
                     'links': [{
-                            'href': 'http://localhost/1.1/users/1',
-                            'rel': 'users'
+                        'href': 'http://localhost/1.1/users/1',
+                        'rel': 'users'
                     }]}
             ]
         }
@@ -175,8 +175,8 @@ class TestUserActions(unittest.TestCase):
         expected_result = {
             'id': 1,
             'links': [{
-                    'href': 'http://localhost/1.1/users/1',
-                    'rel': 'users'
+                'href': 'http://localhost/1.1/users/1',
+                'rel': 'users'
             }]
         }
 

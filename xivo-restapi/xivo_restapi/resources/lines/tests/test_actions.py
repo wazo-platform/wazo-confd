@@ -99,10 +99,10 @@ class TestLineActions(unittest.TestCase):
                     'id': 1,
                     'name': 'Bob',
                     'links': [{
-                            'href': 'http://localhost/1.1/lines/1',
-                            'rel': 'lines'
+                        'href': 'http://localhost/1.1/lines/1',
+                        'rel': 'lines'
                     }]
-                 }
+                }
             ]
         }
 
