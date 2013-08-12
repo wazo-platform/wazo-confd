@@ -144,4 +144,3 @@ Feature: Link user with a line and extension
         Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |
             | Greg Sanderson | 1000   | toto     | toto          | tata     |
-        
