@@ -69,6 +69,11 @@ def when_i_delete_the_user_with_id_group1(step, userid):
     world.response = user_ws.delete_user(userid)
 
 
+@step(u'When I get the lines associated to a user "([^"]*)"')
+def when_i_get_the_lines_associated_to_a_user(step, userid):
+    world.response = user_ws.get_lines_associated_to_a_user(userid)
+
+
 @step(u'Then I get a list with the following users:')
 def then_i_get_a_list_with_the_following_users(step):
     user_response = world.response.data

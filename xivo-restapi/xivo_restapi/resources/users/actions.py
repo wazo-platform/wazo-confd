@@ -18,17 +18,19 @@
 import logging
 
 from . import mapper
+from ..user_links import mapper as user_link_mapper
 
 from flask import Blueprint, url_for
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user import services as user_services
+from xivo_dao.data_handler.user_line_extension import services as ule_services
 from xivo_dao.data_handler.user.model import User
-from xivo_restapi.helpers import serializer
 from xivo_dao.helpers.provd_connector import ProvdError
 from xivo_dao.helpers.sysconfd_connector import SysconfdError
-from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
+from xivo_restapi.helpers import serializer
+from xivo_restapi.helpers.route_generator import RouteGenerator
 
 
 logger = logging.getLogger(__name__)
@@ -51,6 +53,15 @@ def list():
 def get(userid):
     user = user_services.get(userid)
     result = mapper.encode_user(user)
+    return make_response(result, 200)
+
+
+@route('/<int:userid>/user_links')
+def get_user_links(userid):
+    user_links = ule_services.find_all_by_user_id(userid)
+    if not user_links:
+        return make_response('', 404)
+    result = user_link_mapper.encode_list(user_links)
     return make_response(result, 200)
 
 

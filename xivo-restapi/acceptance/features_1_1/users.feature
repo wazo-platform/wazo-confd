@@ -270,3 +270,36 @@ Feature: Users
         When I delete the user with id "1"
         Then I get a response with status "204"
         Then the user with id "1" no longer exists
+
+    Scenario: List the links associated to a user with no links
+        Given I have only the following users:
+            | id | firstname | lastname |
+            | 1  | Francisco | Montoya  |
+        When I get the lines associated to a user "1"
+        Then I get a response with status "404"
+
+    Scenario: List the links associated to a user
+        Given I have only the following users:
+            | id | firstname | lastname |
+            | 1  | Francisco | Montoya  |
+        Given I only have the following lines:
+            | id | context | protocol |
+            | 10 | default | sip      |
+            | 20 | default | sip      |
+        Given I only have the following extensions:
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_line |
+            | 1       | 10      | 100          | True      |
+            | 1       | 20      | 100          | False     |
+        Then I get a response with status "201"
+        Then I get a response with a link to the "user_links" resource
+        Then I get a header with a location for the "user_links" resource
+        
+        When I get the lines associated to a user "1"
+        Then I get a response with status "200"
+        Then I get the user_links with the following properties:
+            | user_id | line_id | extension_id | main_line |
+            | 1       | 10      | 100          | True      |
+            | 1       | 20      | 100          | False     |

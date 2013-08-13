@@ -39,7 +39,7 @@ def encode_list(ules):
 
 
 def add_links_to_dict(ule_dict, ule):
-    ule_location = url_for('.get', uleid=ule.id, _external=True)
+    ule_location = url_for('user_links.get', uleid=ule.id, _external=True)
     user_location = url_for('users.get', userid=ule.user_id, _external=True)
     line_location = url_for('lines.get', lineid=ule.line_id, _external=True)
     extension_location = url_for('extensions.get', extensionid=ule.extension_id, _external=True)

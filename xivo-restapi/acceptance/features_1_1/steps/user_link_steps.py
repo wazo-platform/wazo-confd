@@ -28,8 +28,9 @@ def when_i_create_an_empty_link(step):
 
 @step(u'When I create a link with the following parameters:')
 def when_i_create_a_link_with_the_following_parameters(step):
-    parameters = _extract_parameters(step)
-    world.response = user_link_ws.create_user_link(parameters)
+    for data_dict in step.hashes:
+        parameters = _extract_parameters(data_dict)
+        world.response = user_link_ws.create_user_link(parameters)
 
 
 @step(u'When I create a link with the following invalid parameters:')
@@ -59,8 +60,16 @@ def given_i_have_the_following_extensions(step):
         extension_helper.create_extensions([exteninfo])
 
 
-def _extract_parameters(step):
-    user_line = step.hashes[0]
+@step(u'Then I get the user_links with the following properties:')
+def then_i_get_the_lines_with_the_following_properties(step):
+    for expected_data in step.hashes:
+        assert_that(world.response.data['items'], has_item(
+            has_entries(_extract_parameters(expected_data))
+        ))
+
+
+def _extract_parameters(data_dict):
+    user_line = data_dict
 
     if 'extension_id' in user_line:
         user_line['extension_id'] = int(user_line['extension_id'])
@@ -70,5 +79,11 @@ def _extract_parameters(step):
 
     if 'line_id' in user_line:
         user_line['line_id'] = int(user_line['line_id'])
+
+    if 'main_line' in user_line:
+        user_line['main_line'] = user_line['main_line'] == 'True'
+
+    if 'main_user' in user_line:
+        user_line['main_user'] = user_line['main_user'] == 'True'
 
     return user_line

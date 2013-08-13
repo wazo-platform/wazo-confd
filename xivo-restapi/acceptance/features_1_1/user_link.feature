@@ -121,3 +121,46 @@ Feature: Link user with a line and extension
         #Then I see the line with an extension in the webi
         #Then I see a user with a line in the webi
         #Then I see the extension in the "statscenter" dialplan
+
+    Scenario: Associate 3 users to the same line/extension
+        Given I only have the following lines:
+            | id | context | protocol |
+            | 10 | default | sip      |
+        Given I only have the following extensions:
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
+        Given I only have the following users:
+            | id | firstname | lastname  |
+            | 1  | Salle     | Doctorant |
+            | 2  | Greg      | Sanderson |
+            | 3  | Roberto   | Da Silva  |
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id | main_user |
+            | 1       | 10      | 100          | True      |
+            | 2       | 10      | 100          | False     |
+            | 3       | 10      | 100          | False     |
+        Then I get a response with status "201"
+        
+        Then I see a user with infos:
+            | fullname        | protocol | context | number |
+            | Salle Doctorant | sip      | default | 1000   |
+        When I edit the user "Salle" "Doctorant" without changing anything
+        Then I see a user with infos:
+            | fullname        | protocol | context | number |
+            | Salle Doctorant | sip      | default | 1000   |
+            
+        Then I see a user with infos:
+            | fullname       | protocol | context | number |
+            | Greg Sanderson | sip      | default | 1000   |
+        When I edit the user "Greg" "Sanderson" without changing anything
+        Then I see a user with infos:
+            | fullname       | protocol | context | number |
+            | Greg Sanderson | sip      | default | 1000   |
+        
+        Then I see a user with infos:
+            | fullname         | protocol | context | number |
+            | Roberto Da Silva | sip      | default | 1000   |
+        When I edit the user "Roberto" "Da Silva" without changing anything
+        Then I see a user with infos:
+            | fullname         | protocol | context | number |
+            | Roberto Da Silva | sip      | default | 1000   |

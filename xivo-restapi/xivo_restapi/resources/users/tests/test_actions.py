@@ -19,11 +19,14 @@
 import unittest
 
 from mock import Mock, patch
+from hamcrest import assert_that, equal_to, contains, has_entries
+
 from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.exception import MissingParametersError, \
     ElementNotExistsError
+from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 
 BASE_URL = "/1.1/users"
 
@@ -168,6 +171,163 @@ class TestUserActions(unittest.TestCase):
 
         mock_user_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
+    def test_list_lines_associated_to_a_user_with_no_lines(self, ule_find_all_by_user_id):
+        expected_status_code = 404
+        user_id = 1
+
+        ule_find_all_by_user_id.return_value = []
+
+        result = self.app.get("%s/%d/user_links" % (BASE_URL, user_id))
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(''))
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
+    def test_list_lines_associated_to_a_user(self, ule_find_all_by_user_id):
+        status_code = 200
+        user_link_id = 83
+        user_id = 14
+        line_id = 42324
+        extension_id = 2132
+
+        expected_result = {
+            "total": 1,
+            "items": [
+                {
+                    "id": user_link_id,
+                    "user_id": user_id,
+                    "line_id": line_id,
+                    "extension_id": extension_id,
+                    "main_user": True,
+                    "main_line": True,
+                    "links": [
+                        {
+                            "rel": "user_links",
+                            "href": "http://localhost/1.1/user_links/%d" % user_link_id
+                        },
+                        {
+                            "rel": "users",
+                            "href": "http://localhost/1.1/users/%d" % user_id
+                        },
+                        {
+                            "rel": "lines",
+                            "href": "http://localhost/1.1/lines/%d" % line_id
+                        },
+                        {
+                            "rel": "extensions",
+                            "href": "http://localhost/1.1/extensions/%d" % extension_id
+                        }
+                    ]
+                }
+            ]
+        }
+
+        ule_find_all_by_user_id.return_value = [
+            UserLineExtension(id=user_link_id,
+                              user_id=user_id,
+                              line_id=line_id,
+                              extension_id=extension_id,
+                              main_user=True,
+                              main_line=True)
+        ]
+
+        result = self.app.get("%s/%d/user_links" % (BASE_URL, user_id))
+
+        decoded_result = serializer.decode(result.data)
+
+        assert_that(result.status_code, equal_to(status_code))
+        assert_that(decoded_result, has_entries(expected_result))
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
+    def test_list_lines_associated_to_a_user_with_two_line(self, ule_find_all_by_user_id):
+        status_code = 200
+        user_link_id = 83
+        user_id = 14
+        line_id_1 = 42324
+        line_id_2 = 25698
+        extension_id = 2132
+
+        expected_result = {
+            "total": 2,
+            "items": [
+                {
+                    "id": user_link_id,
+                    "user_id": user_id,
+                    "line_id": line_id_1,
+                    "extension_id": extension_id,
+                    "main_user": True,
+                    "main_line": True,
+                    "links": [
+                        {
+                            "rel": "user_links",
+                            "href": "http://localhost/1.1/user_links/%d" % user_link_id
+                        },
+                        {
+                            "rel": "users",
+                            "href": "http://localhost/1.1/users/%d" % user_id
+                        },
+                        {
+                            "rel": "lines",
+                            "href": "http://localhost/1.1/lines/%d" % line_id_1
+                        },
+                        {
+                            "rel": "extensions",
+                            "href": "http://localhost/1.1/extensions/%d" % extension_id
+                        }
+                    ]
+                },
+                {
+                    "id": user_link_id,
+                    "user_id": user_id,
+                    "line_id": line_id_2,
+                    "extension_id": extension_id,
+                    "main_user": True,
+                    "main_line": True,
+                    "links": [
+                        {
+                            "rel": "user_links",
+                            "href": "http://localhost/1.1/user_links/%d" % user_link_id
+                        },
+                        {
+                            "rel": "users",
+                            "href": "http://localhost/1.1/users/%d" % user_id
+                        },
+                        {
+                            "rel": "lines",
+                            "href": "http://localhost/1.1/lines/%d" % line_id_2
+                        },
+                        {
+                            "rel": "extensions",
+                            "href": "http://localhost/1.1/extensions/%d" % extension_id
+                        }
+                    ]
+                }
+            ]
+        }
+
+        ule_find_all_by_user_id.return_value = [
+            UserLineExtension(id=user_link_id,
+                              user_id=user_id,
+                              line_id=line_id_1,
+                              extension_id=extension_id,
+                              main_user=True,
+                              main_line=True),
+            UserLineExtension(id=user_link_id,
+                              user_id=user_id,
+                              line_id=line_id_2,
+                              extension_id=extension_id,
+                              main_user=True,
+                              main_line=True)
+        ]
+
+        result = self.app.get("%s/%d/user_links" % (BASE_URL, user_id))
+
+        decoded_result = serializer.decode(result.data)
+
+        assert_that(result.status_code, equal_to(status_code))
+        assert_that(decoded_result, has_entries(expected_result))
 
     @patch('xivo_dao.data_handler.user.services.create')
     def test_create(self, mock_user_services_create):

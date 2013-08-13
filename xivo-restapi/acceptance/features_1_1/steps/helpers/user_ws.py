@@ -11,6 +11,10 @@ def all_users_with_voicemail():
     return ws_utils.rest_get('%s/?include=voicemail' % USERS_URL)
 
 
+def get_lines_associated_to_a_user(userid):
+    return ws_utils.rest_get('%s/%s/user_links' % (USERS_URL, userid))
+
+
 def get_user(userid):
     return ws_utils.rest_get('%s/%s' % (USERS_URL, userid))
 
