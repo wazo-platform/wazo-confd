@@ -38,7 +38,7 @@ Feature: Link user with a line and extension
         Given I only have the following users:
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I only have the following lines_sip:
             | id | context | protocol |
             | 10 | default | sip      |
         When I create a link with the following parameters:
@@ -63,7 +63,7 @@ Feature: Link user with a line and extension
 
     Scenario: Create link with a user that doesn't exist
         Given I have no users
-        Given I only have the following lines:
+        Given I only have the following lines_sip:
             | id | context | protocol |
             | 10 | default | sip      |
         Given I only have the following extensions:
@@ -79,7 +79,7 @@ Feature: Link user with a line and extension
         Given I only have the following users:
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I only have the following lines_sip:
             | id | context | protocol |
             | 10 | default | sip      |
         Given I only have the following extensions:
@@ -103,7 +103,7 @@ Feature: Link user with a line and extension
         Given I only have the following users:
             | id  | firstname | lastname  |
             | 1   | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I only have the following lines_sip:
             | id | context     | protocol |
             | 10 | statscenter | sip      |
         Given I only have the following extensions:
@@ -123,7 +123,7 @@ Feature: Link user with a line and extension
         #Then I see the extension in the "statscenter" dialplan
 
     Scenario: Associate 3 users to the same line/extension
-        Given I only have the following lines:
+        Given I only have the following lines_sip:
             | id | context | protocol |
             | 10 | default | sip      |
         Given I only have the following extensions:
