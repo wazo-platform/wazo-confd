@@ -98,4 +98,7 @@ def _extract_extension_properties(step):
     if 'id' in properties:
         properties['id'] = int(properties['id'])
 
+    if 'commented' in properties:
+        properties['commented'] = (properties['commented'] == 'true')
+
     return properties
