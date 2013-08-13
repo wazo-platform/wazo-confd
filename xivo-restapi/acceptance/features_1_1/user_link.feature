@@ -239,16 +239,18 @@ Feature: Link user with a line and extension
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
 
         When I create the following links:
-            | user_id | line_id | extension_id | main_user |
-            | 1       | 10      | 100          | true      |
+            | user_id | line_id | extension_id |
+            | 1       | 10      | 100          |
+        Then I get a response with status "201"
         When I provision my device with my line_id "10" and ip "10.0.0.1"
         Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |
             | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
 
         When I create the following links:
-            | user_id | line_id | extension_id | main_user |
-            | 2       | 10      | 100          | true      |
+            | user_id | line_id | extension_id |
+            | 2       | 10      | 100          |
+        Then I get a response with status "201"
         Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |
             | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
