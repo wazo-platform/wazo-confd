@@ -9,7 +9,10 @@ def _delete_all(channel):
     from xivo_dao.data_handler.extension import services as extension_services
     from xivo_dao.data_handler.user_line_extension import services as ule_services
 
-    extensions = [e for e in extension_services.find_all() if e.context != 'xivo-features']
+    hidden_extensions = extension_services.find_all(commented=True)
+    visible_extensions = extension_services.find_all()
+
+    extensions = [e for e in hidden_extensions + visible_extensions if e.context != 'xivo-features']
 
     for extension in extensions:
 
