@@ -56,10 +56,10 @@ def when_i_update_the_user_with_id_group1_using_the_following_parameters(step, l
 
 @step(u'Then I have a line_sip with the following parameters:')
 def then_i_have_an_line_sip_with_the_following_parameters(step):
-    properties = _extract_line_parameters(step)
+    parameters = _extract_line_parameters(step)
     line = world.response.data
 
-    assert_that(line, has_entries(properties))
+    assert_that(line, has_entries(parameters))
 
 
 def _extract_line_parameters(step):

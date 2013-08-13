@@ -28,9 +28,9 @@ def get(lineid):
     return ws_utils.rest_get('%s/%s' % (LINES_SIP_URL, lineid))
 
 
-def create_line_sip(properties):
-    return ws_utils.rest_post(LINES_SIP_URL, properties)
+def create_line_sip(parameters):
+    return ws_utils.rest_post(LINES_SIP_URL, parameters)
 
 
-def update(lineid, properties):
-    return ws_utils.rest_put('%s/%s' % (LINES_SIP_URL, lineid), properties)
+def update(lineid, parameters):
+    return ws_utils.rest_put('%s/%s' % (LINES_SIP_URL, lineid), parameters)

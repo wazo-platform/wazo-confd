@@ -88,7 +88,7 @@ Feature: Extensions
 
     Scenario: Creating a commented extension
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context | commented |
             | 1000  | default | true      |
         Then I get a response with status "201"
@@ -98,7 +98,7 @@ Feature: Extensions
 
     Scenario: Creating an extension that isn't commented
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context | commented |
             | 1000  | default | false     |
         Then I get a response with status "201"

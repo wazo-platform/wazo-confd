@@ -15,9 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from remote import remote_exec
 from xivo_dao.data_handler.line import dao as line_dao
 
 
 def delete_all():
     for line in line_dao.find_all():
         line_dao.delete(line)
+
+
+def create(parameters):
+    remote_exec(_create, parameters=parameters)
+
+
+def _create(channel, parameters):
+    from xivo_dao.data_handler.line import services as line_services
+    from xivo_dao.data_handler.line.model import Line
+
+    line = Line(**parameters)
+    line_services.create(line)

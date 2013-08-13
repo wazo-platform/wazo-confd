@@ -20,6 +20,13 @@ from helpers import line_helper, line_ws
 from lettuce import step, world
 
 
+@step(u'Given I only have the following lines:')
+def given_i_created_the_following_lines(step):
+    line_helper.delete_all()
+    for lineinfo in step.hashes:
+        line_helper.create(lineinfo)
+
+
 @step(u'Given I have no lines')
 def given_there_are_no_lines(step):
     line_helper.delete_all()
