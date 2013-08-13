@@ -25,7 +25,7 @@ def given_there_are_no_users(step):
     user_helper.delete_all()
 
 
-@step(u'Given I have only the following users:')
+@step(u'Given I only have the following users:')
 def given_there_are_the_following_users(step):
     user_helper.delete_all()
     for userinfo in step.hashes:
