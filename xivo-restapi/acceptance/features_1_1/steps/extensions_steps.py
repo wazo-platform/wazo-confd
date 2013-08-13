@@ -28,7 +28,8 @@ def given_i_have_no_extensions(step):
 @step(u'Given I only have the following extensions:')
 def given_i_have_the_following_extensions(step):
     extension_helper.delete_all()
-    extension_helper.create_extensions(step.hashes)
+    for exteninfo in step.hashes:
+        extension_helper.create_extensions([exteninfo])
 
 
 @step(u'When I access the list of extensions')
@@ -97,5 +98,8 @@ def _extract_extension_properties(step):
 
     if 'id' in properties:
         properties['id'] = int(properties['id'])
+
+    if 'commented' in properties:
+        properties['commented'] = (properties['commented'] == 'true')
 
     return properties
