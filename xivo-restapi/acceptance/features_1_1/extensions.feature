@@ -86,11 +86,21 @@ Feature: Extensions
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: toto"
 
-    Scenario: Creating a hidden extension
+    Scenario: Creating a commented extension
         Given I have no extensions
         When I create an extension with the following properties:
             | exten | context | commented |
             | 1000  | default | true      |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
+
+    Scenario: Creating an extension that isn't commented
+        Given I have no extensions
+        When I create an extension with the following properties:
+            | exten | context | commented |
+            | 1000  | default | false     |
         Then I get a response with status "201"
         Then I get a response with an id
         Then I get a header with a location for the "extensions" resource
