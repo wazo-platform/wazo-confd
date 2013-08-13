@@ -56,7 +56,6 @@ def get(userid):
     return make_response(result, 200)
 
 
-<<<<<<< HEAD
 @route('/<int:userid>/user_links')
 def get_user_links(userid):
     user_links = ule_services.find_all_by_user_id(userid)
@@ -66,8 +65,6 @@ def get_user_links(userid):
     return make_response(result, 200)
 
 
-=======
->>>>>>> 4263_multi_user
 @route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
