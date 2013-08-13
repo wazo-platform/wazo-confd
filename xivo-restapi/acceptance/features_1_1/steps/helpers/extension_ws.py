@@ -11,8 +11,9 @@ def get_extension(extension_id):
     return ws_utils.rest_get('%s/%s' % (EXTENSIONS_URL, extension_id))
 
 
-def create_extension(properties):
-    return ws_utils.rest_post(EXTENSIONS_URL, properties)
+def create_extension(parameters):
+    return ws_utils.rest_post(EXTENSIONS_URL, parameters)
+
 
 
 def delete_extension(extension_id):

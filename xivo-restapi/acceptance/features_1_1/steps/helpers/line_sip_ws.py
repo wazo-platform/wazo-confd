@@ -25,5 +25,5 @@ def all_lines():
     return ws_utils.rest_get(LINES_SIP_URL)
 
 
-def create_line_sip(properties):
-    return ws_utils.rest_post(LINES_SIP_URL, properties)
+def create_line_sip(parameters):
+    return ws_utils.rest_post(LINES_SIP_URL, parameters)

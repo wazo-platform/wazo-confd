@@ -60,8 +60,8 @@ def given_i_have_the_following_extensions(step):
         extension_helper.create_extensions([exteninfo])
 
 
-@step(u'Then I get the user_links with the following properties:')
-def then_i_get_the_lines_with_the_following_properties(step):
+@step(u'Then I get the user_links with the following parameters:')
+def then_i_get_the_lines_with_the_following_parameters(step):
     for expected_data in step.hashes:
         assert_that(world.response.data['items'], has_item(
             has_entries(_extract_parameters(expected_data))

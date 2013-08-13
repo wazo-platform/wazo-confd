@@ -24,10 +24,10 @@ def when_i_create_an_empty_line(step):
     world.response = line_sip_ws.create_line_sip({})
 
 
-@step(u'When I create a line with the following properties:')
-def when_i_create_a_line_with_the_following_properties(step):
-    properties = _extract_line_properties(step)
-    world.response = line_sip_ws.create_line_sip(properties)
+@step(u'When I create a line with the following parameters:')
+def when_i_create_a_line_with_the_following_parameters(step):
+    parameters = _extract_line_parameters(step)
+    world.response = line_sip_ws.create_line_sip(parameters)
 
 
 @step(u'Given I have an internal context named "([^"]*)"')
@@ -35,5 +35,5 @@ def given_i_have_an_internal_context_named_group1(step, context):
     context_helper.create_context(context)
 
 
-def _extract_line_properties(step):
+def _extract_line_parameters(step):
     return step.hashes[0]

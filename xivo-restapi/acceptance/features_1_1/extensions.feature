@@ -36,7 +36,7 @@ Feature: Extensions
             | 100 | 1500  | default | user | 1       |
         When I access the extension with id "100"
         Then I get a response with status "200"
-        Then I have an extension with the following properties:
+        Then I have an extension with the following parameters:
             | id  | exten | context |
             | 100 | 1500  | default |
 
@@ -48,7 +48,7 @@ Feature: Extensions
 
     Scenario: Creating an extension with an empty number:
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             |       | default |
         Then I get a response with status "400"
@@ -56,7 +56,7 @@ Feature: Extensions
 
     Scenario: Creating an extension with an empty context:
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             | 1000  |         |
         Then I get a response with status "400"
@@ -64,7 +64,7 @@ Feature: Extensions
 
     Scenario: Creating an extension with only the number
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten |
             | 1000  |
         Then I get a response with status "400"
@@ -72,7 +72,7 @@ Feature: Extensions
 
     Scenario: Creating an extension with only the context
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | context |
             | default |
         Then I get a response with status "400"
@@ -80,7 +80,7 @@ Feature: Extensions
 
     Scenario: Creating an extension with invalid parameters
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | toto |
             | tata |
         Then I get a response with status "400"
@@ -88,7 +88,7 @@ Feature: Extensions
 
     Scenario: Creating an extension
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             | 1000  | default |
         Then I get a response with status "201"
@@ -98,7 +98,7 @@ Feature: Extensions
 
     Scenario: Creating an alphanumeric extension
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten  | context |
             | ABC123 | default |
         Then I get a response with status "400"
@@ -106,11 +106,11 @@ Feature: Extensions
 
     Scenario: Creating twice the same extension
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             | 1000  | default |
         Then I get a response with status "201"
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             | 1000  | default |
         Then I get a response with status "400"
@@ -118,18 +118,18 @@ Feature: Extensions
 
     Scenario: Creating two extensions in different contexts
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             | 1000  | default |
         Then I get a response with status "201"
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context     | type   |
             | 1000  | from-extern | incall |
         Then I get a response with status "201"
 
     Scenario: Creating an extension with a context that doesn't exist
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context             |
             | 1000  | mysuperdupercontext |
         Then I get a response with status "400"
@@ -137,7 +137,7 @@ Feature: Extensions
 
     Scenario: Creating an extension outside of context range
         Given I have no extensions
-        When I create an extension with the following properties:
+        When I create an extension with the following parameters:
             | exten | context |
             | 99999 | default |
         Then I get a response with status "400"

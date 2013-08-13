@@ -138,7 +138,7 @@ Feature: Users
           | 1  | Irène     | Dupont   |
         When I ask for the user with id "1"
         Then I get a response with status "200"
-        Then I get a user with the following properties:
+        Then I get a user with the following parameters:
           | id | firstname | lastname | userfield |
           | 1  | Irène     | Dupont   |           |
 
@@ -254,7 +254,7 @@ Feature: Users
           | Claude    | Argentine | customdata |
         Then I get a response with status "204"
         When I ask for the user with id "1"
-        Then I get a user with the following properties:
+        Then I get a user with the following parameters:
           | id | firstname | lastname  | userfield  |
           | 1  | Claude    | Argentine | customdata |
 
@@ -299,7 +299,7 @@ Feature: Users
         
         When I get the lines associated to a user "1"
         Then I get a response with status "200"
-        Then I get the user_links with the following properties:
+        Then I get the user_links with the following parameters:
             | user_id | line_id | extension_id | main_line |
             | 1       | 10      | 100          | True      |
             | 1       | 20      | 100          | False     |
