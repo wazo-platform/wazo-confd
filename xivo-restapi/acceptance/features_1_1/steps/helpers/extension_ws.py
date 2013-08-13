@@ -15,6 +15,9 @@ def create_extension(parameters):
     return ws_utils.rest_post(EXTENSIONS_URL, parameters)
 
 
+def update(extension_id, parameters):
+    return ws_utils.rest_put('%s/%s' % (EXTENSIONS_URL, extension_id), parameters)
+
 
 def delete_extension(extension_id):
     return ws_utils.rest_delete('%s/%s' % (EXTENSIONS_URL, extension_id))

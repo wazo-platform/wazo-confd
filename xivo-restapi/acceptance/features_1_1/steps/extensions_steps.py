@@ -36,6 +36,11 @@ def when_i_access_the_list_of_extensions(step):
     world.response = extension_ws.all_extensions()
 
 
+@step(u'When I ask for the extension with id "([^"]*)"')
+def when_i_ask_for_the_extension_with_id_group1(step, extension_id):
+    world.response = extension_ws.get_extension(extension_id)
+
+
 @step(u'When I access the extension with id "([^"]*)"')
 def when_i_access_the_extension_with_id_group1(step, extension_id):
     world.response = extension_ws.get_extension(extension_id)
@@ -51,6 +56,11 @@ def when_i_create_an_extension_with_the_following_parameters(step):
     parameters = _extract_extension_parameters(step)
     world.response = extension_ws.create_extension(parameters)
 
+
+@step(u'When I update the extension with id "([^"]*)" using the following parameters:')
+def when_i_update_the_extension_with_id_group1_using_the_following_parameters(step, extensionid):
+    extensioninfo = _extract_extension_parameters(step)
+    world.response = extension_ws.update(extensionid, extensioninfo)
 
 
 @step(u'When I delete extension "([^"]*)"')

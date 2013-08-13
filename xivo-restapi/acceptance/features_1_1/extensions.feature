@@ -143,6 +143,68 @@ Feature: Extensions
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: exten 99999 not inside range of context default"
 
+    Scenario: Editing a extension that doesn't exist
+        Given I have no extensions
+        When I update the extension with id "1" using the following parameters:
+          | exten |
+          | 1001  |
+        Then I get a response with status "404"
+
+    Scenario: Editing a extension with parameters that don't exist
+        Given I only have the following extensions:
+          | id | exten | context | type | typeval |
+          | 1  | 1001  | default | user | 1       |
+        When I update the extension with id "1" using the following parameters:
+          | unexisting_field |
+          | unexisting value |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Editing the exten of a extension
+        Given I only have the following extensions:
+          | id | exten | context | type | typeval |
+          | 1  | 1001  | default | user | 1       |
+        When I update the extension with id "1" using the following parameters:
+          | exten |
+          | 1003  |
+        Then I get a response with status "204"
+        When I ask for the extension with id "1"
+        Then I have an extension with the following parameters:
+          | id | exten | context |
+          | 1  | 1003  | default |
+
+    Scenario: Editing the context of a extension
+        Given I only have the following extensions:
+          | id | exten | context | type | typeval |
+          | 1  | 1001  | default | user | 1       |
+        Given I have the following context:
+          | name | numberbeg | numberend |
+          | toto | 1000      | 1999      |
+        When I update the extension with id "1" using the following parameters:
+          | context |
+          | toto    |
+        Then I get a response with status "204"
+        When I ask for the extension with id "1"
+        Then I have an extension with the following parameters:
+          | id | exten | context |
+          | 1  | 1001  | toto    |
+
+    Scenario: Editing the exten, context of a extension
+        Given I only have the following extensions:
+          | id | exten | context | type | typeval |
+          | 1  | 1001  | default | user | 1       |
+        Given I have the following context:
+          | name   | numberbeg | numberend |
+          | patate | 1000      | 1999      |
+        When I update the extension with id "1" using the following parameters:
+          | exten | context |
+          | 1006  | patate  |
+        Then I get a response with status "204"
+        When I ask for the extension with id "1"
+        Then I have an extension with the following parameters:
+          | id | exten | context |
+          | 1  | 1006  | patate  |
+
     Scenario: Delete an extension that doesn't exist
         Given I have no extensions
         When I delete extension "100"

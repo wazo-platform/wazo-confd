@@ -69,11 +69,12 @@ def create():
     return make_response(result, 201, {'Location': location})
 
 
-#@route('/<int:extensionid>', methods=['PUT'])
+@route('/<int:extensionid>', methods=['PUT'])
 def edit(extensionid):
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
     extension = extension_services.get(extensionid)
+    _normalize_input_data(data)
     extension.update_from_data(data)
     extension_services.edit(extension)
     return make_response('', 204)

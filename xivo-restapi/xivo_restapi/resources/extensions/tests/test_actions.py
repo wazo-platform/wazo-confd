@@ -252,58 +252,60 @@ class TestExtensionActions(unittest.TestCase):
         self.assertEqual(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
-    #@patch('xivo_dao.data_handler.extension.services.get')
-    #@patch('xivo_dao.data_handler.extension.services.edit')
-    #def test_edit(self, mock_extension_services_edit, mock_extension_services_get):
-    #    status_code = 204
-    #    expected_data = ''
+    @patch('xivo_dao.data_handler.extension.services.get')
+    @patch('xivo_dao.data_handler.extension.services.edit')
+    def test_edit(self, mock_extension_services_edit, mock_extension_services_get):
+        status_code = 204
+        expected_data = ''
 
-    #    data = {
-    #        'exten': '1324',
-    #        'context': 'jd'
-    #    }
+        data = {
+            'exten': '1324',
+            'context': 'jd'
+        }
 
-    #    mock_extension_services_get.return_value = Mock(Extension)
+        mock_extension_services_get.return_value = Mock(Extension)
 
-    #    result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
+        result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
-    #    self.assertEqual(status_code, result.status_code)
-    #    self.assertEqual(expected_data, result.data)
+        self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_data, result.data)
 
-    #@patch('xivo_dao.data_handler.extension.services.get')
-    #@patch('xivo_dao.data_handler.extension.services.edit')
-    #def test_edit_error(self, mock_extension_services_edit, mock_extension_services_get):
-    #    status_code = 500
+    @patch('xivo_dao.data_handler.extension.services.get')
+    @patch('xivo_dao.data_handler.extension.services.edit')
+    def test_edit_error(self, mock_extension_services_edit, mock_extension_services_get):
+        status_code = 500
 
-    #    data = {
-    #        'exten': '1324',
-    #        'context': 'jd'
-    #    }
+        data = {
+            'exten': '1324',
+            'context': 'jd',
+            'type': 'user',
+            'typeval': '0'
+        }
 
-    #    mock_extension_services_get.return_value = extension = Mock(Extension)
-    #    mock_extension_services_edit.side_effect = Exception
+        mock_extension_services_get.return_value = extension = Mock(Extension)
+        mock_extension_services_edit.side_effect = Exception
 
-    #    result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
+        result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
-    #    extension.update_from_data.assert_called_with(data)
-    #    self.assertEqual(status_code, result.status_code)
+        extension.update_from_data.assert_called_with(data)
+        self.assertEqual(status_code, result.status_code)
 
-    #@patch('xivo_dao.data_handler.extension.services.get')
-    #@patch('xivo_dao.data_handler.extension.services.edit')
-    #def test_edit_not_found(self, mock_extension_services_edit, mock_extension_services_get):
-    #    status_code = 404
+    @patch('xivo_dao.data_handler.extension.services.get')
+    @patch('xivo_dao.data_handler.extension.services.edit')
+    def test_edit_not_found(self, mock_extension_services_edit, mock_extension_services_get):
+        status_code = 404
 
-    #    data = {
-    #        'exten': '1324',
-    #        'context': 'jd'
-    #    }
+        data = {
+            'exten': '1324',
+            'context': 'jd'
+        }
 
-    #    mock_extension_services_get.return_value = Mock(Extension)
-    #    mock_extension_services_edit.side_effect = ElementNotExistsError('extension')
+        mock_extension_services_get.return_value = Mock(Extension)
+        mock_extension_services_edit.side_effect = ElementNotExistsError('extension')
 
-    #    result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
+        result = self.app.put("%s/1" % BASE_URL, data=serializer.encode(data))
 
-    #    self.assertEqual(status_code, result.status_code)
+        self.assertEqual(status_code, result.status_code)
 
     @patch('xivo_dao.data_handler.extension.services.get')
     @patch('xivo_dao.data_handler.extension.services.delete')
