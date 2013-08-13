@@ -56,13 +56,7 @@ def get(extensionid):
 def create():
     data = request.data.decode("utf-8")
     data = serializer.decode(data)
-
-    if 'type' not in data:
-        data['type'] = 'user'
-
-    if 'typeval' not in data:
-        data['typeval'] = '0'
-
+    _normalize_input_data(data)
     extension = Extension.from_user_data(data)
     extension = extension_services.create(extension)
 
@@ -90,3 +84,11 @@ def delete(extensionid):
     extension = extension_services.get(extensionid)
     extension_services.delete(extension)
     return make_response('', 204)
+
+
+def _normalize_input_data(data):
+    if 'type' not in data:
+        data['type'] = 'user'
+
+    if 'typeval' not in data:
+        data['typeval'] = '0'
