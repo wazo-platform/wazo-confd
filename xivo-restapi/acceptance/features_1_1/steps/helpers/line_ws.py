@@ -22,3 +22,11 @@ LINES_URL = 'lines'
 
 def all_lines():
     return ws_utils.rest_get(LINES_URL)
+
+
+def get(line_id):
+    return ws_utils.rest_get('%s/%s' % (LINES_URL, line_id))
+
+
+def delete(line_id):
+    return ws_utils.rest_delete('%s/%s' % (LINES_URL, line_id))

@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from hamcrest import *
 from helpers import line_helper, line_ws
 from lettuce import step, world
 
@@ -27,3 +28,14 @@ def given_there_are_no_lines(step):
 @step(u'When I ask for the list of lines$')
 def when_i_ask_for_the_list_of_lines(step):
     world.response = line_ws.all_lines()
+
+
+@step(u'When I delete line "([^"]*)"')
+def when_i_delete_line_group1(step, line_id):
+    world.response = line_ws.delete(line_id)
+
+
+@step(u'Then the line "([^"]*)" no longer exists')
+def then_the_line_group1_no_longer_exists(step, line_id):
+    response = line_ws.get(line_id)
+    assert_that(response.status, equal_to(404))
