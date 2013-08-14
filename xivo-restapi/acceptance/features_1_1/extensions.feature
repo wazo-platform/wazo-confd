@@ -235,6 +235,19 @@ Feature: Extensions
           | id  | exten | context |
           | 100 | 1006  | patate  |
 
+    Scenario: Editing a commented extension
+        Given I only have the following extensions:
+          | id  | exten | context | type | typeval | commented |
+          | 100 | 1007  | default | user | 1       | true      |
+        When I update the extension with id "100" using the following parameters:
+          | commented |
+          | false     |
+        Then I get a response with status "204"
+        When I ask for the extension with id "100"
+        Then I have an extension with the following parameters:
+          | id  | exten | context | commented |
+          | 100 | 1007  | default | false     |
+
     Scenario: Delete an extension that doesn't exist
         Given I have no extensions
         When I delete extension "100"
