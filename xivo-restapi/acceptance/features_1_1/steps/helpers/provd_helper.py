@@ -14,8 +14,11 @@ def _device_config_has_properties(channel, config, properties):
     provd_config_manager = provd_connector.config_manager()
     config = provd_config_manager.get(config)
     sip_lines = config['raw_config']['sip_lines']
-    assert sip_lines['1']['username'] == properties['username'], 'Invalid Username'
-    assert sip_lines['1']['auth_username'] == properties['auth_username'], 'Invalid Auth Username'
-    assert sip_lines['1']['display_name'] == properties['display_name'], 'Invalid Display Name'
-    assert sip_lines['1']['password'] == properties['password'], 'Invalid Password'
-    assert sip_lines['1']['number'] == properties['number'], 'Invalid Number'
+
+    sip_line = sip_lines['1']
+
+    keys = [u'username', u'auth_username', u'display_name', u'password', u'number']
+    for key in keys:
+        message = u"Invalid %s ('%s' instead of '%s')" % (key, sip_line[key], properties[key])
+        message = message.encode('utf8')
+        assert sip_line[key] == properties[key], message

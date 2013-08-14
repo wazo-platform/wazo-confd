@@ -19,7 +19,7 @@ from hamcrest import *
 from helpers import user_link_ws
 from lettuce import step, world
 from acceptance.features_1_1.steps.helpers import device_helper, provd_helper,\
-    extension_helper
+    extension_helper, user_helper, line_sip_helper
 from xivo_dao.data_handler.line import dao as line_dao
 from xivo_dao.data_handler.device import dao as device_dao
 
@@ -50,11 +50,32 @@ def then_i_get_the_lines_with_the_following_parameters(step):
         ))
 
 
+@step(u'Given I only have the following users:')
+def given_i_created_the_following_users(step):
+    user_helper.delete_all()
+    for userinfo in step.hashes:
+        user_helper.create_user(userinfo)
+
+
+@step(u'Given I only have the following lines:')
+def given_i_created_the_following_lines(step):
+    line_sip_helper.delete_all()
+    for lineinfo in step.hashes:
+        line_sip_helper.create_line_sip(lineinfo)
+
+
 @step(u'Given I only have the following extensions:')
 def given_i_have_the_following_extensions(step):
     extension_helper.delete_all()
     for exteninfo in step.hashes:
         extension_helper.create_extensions([exteninfo])
+
+
+@step(u'When I create the following links:')
+def when_i_create_the_following_links(step):
+    for link_info in step.hashes:
+        userlink = _extract_parameters(link_info)
+        world.response = user_link_ws.create_user_link(userlink)
 
 
 @step(u'When I provision my device with my line_id "([^"]*)" and ip "([^"]*)"')
@@ -69,9 +90,7 @@ def then_the_device_has_been_provisioned_with_a_configuration(step, device_id):
     provd_helper.device_config_has_properties(device, step.hashes)
 
 
-def _extract_parameters(data_dict):
-    user_line = data_dict
-
+def _extract_parameters(user_line):
     if 'extension_id' in user_line:
         user_line['extension_id'] = int(user_line['extension_id'])
 

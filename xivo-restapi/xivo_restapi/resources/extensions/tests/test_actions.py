@@ -252,6 +252,24 @@ class TestExtensionActions(unittest.TestCase):
         self.assertEqual(status_code, result.status_code)
         self.assertEquals(expected_result, decoded_result)
 
+    @patch('xivo_dao.data_handler.extension.services.create')
+    def test_create_nonexistent_parameters(self, mock_extension_services_create):
+        status_code = 400
+        expected_result = ["Nonexistent parameters: context mycontext does not exist"]
+
+        mock_extension_services_create.side_effect = NonexistentParametersError(context='mycontext')
+
+        data = {
+            'exten': '1324',
+            'context': 'mycontext'
+        }
+
+        result = self.app.post("%s/" % BASE_URL, data=serializer.encode(data))
+        decoded_result = serializer.decode(result.data)
+
+        self.assertEqual(status_code, result.status_code)
+        self.assertEquals(expected_result, decoded_result)
+
     #@patch('xivo_dao.data_handler.extension.services.get')
     #@patch('xivo_dao.data_handler.extension.services.edit')
     #def test_edit(self, mock_extension_services_edit, mock_extension_services_get):
