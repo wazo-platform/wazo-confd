@@ -298,6 +298,6 @@ Feature: Users
         When I get the lines associated to user "1"
         Then I get a response with status "200"
         Then I get the user_links with the following parameters:
-            | user_id | line_id | extension_id | main_line |
-            | 1       | 10      | 100          | True      |
-            | 1       | 20      | 100          | False     |
+            | user_id | line_id | extension_id |
+            | 1       | 10      | 100          |
+            | 1       | 20      | 100          |
