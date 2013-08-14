@@ -69,7 +69,7 @@ def when_i_delete_the_user_with_id_group1(step, userid):
     world.response = user_ws.delete_user(userid)
 
 
-@step(u'When I get the lines associated to a user "([^"]*)"')
+@step(u'When I get the lines associated to user "([^"]*)"')
 def when_i_get_the_lines_associated_to_a_user(step, userid):
     world.response = user_ws.get_lines_associated_to_a_user(userid)
 
