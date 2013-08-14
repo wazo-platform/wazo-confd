@@ -94,14 +94,5 @@ def edit(userid):
 @route('/<int:userid>', methods=['DELETE'])
 def delete(userid):
     user = user_services.get(userid)
-    try:
-        user_services.delete(user)
-        return make_response('', 204)
-    except ProvdError as e:
-        result = "The user was deleted but the device could not be reconfigured (%s)" % str(e)
-        result = serializer.encode([result])
-        return make_response(result, 500)
-    except SysconfdError as e:
-        result = "The user was deleted but the voicemail content could not be removed (%s)" % str(e)
-        result = serializer.encode([result])
-        return make_response(result, 500)
+    user_services.delete(user)
+    return make_response('', 204)
