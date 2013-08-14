@@ -33,17 +33,12 @@ def given_i_created_the_following_lines(step):
 
 @step(u'Given I have no lines')
 def given_there_are_no_lines(step):
-    line_sip_helper.delete_all()
+    line_helper.delete_all()
 
 
 @step(u'When I ask for the list of lines$')
 def when_i_ask_for_the_list_of_lines(step):
     world.response = line_ws.all_lines()
-
-
-@step(u'When I delete line "([^"]*)"')
-def when_i_delete_line_group1(step, line_id):
-    world.response = line_ws.delete(line_id)
 
 
 @step(u'Then the line "([^"]*)" no longer exists')

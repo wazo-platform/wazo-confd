@@ -133,3 +133,16 @@ Feature: SIP Lines
           | id | username | context | callerid   |
           | 1  | titi     | patate  | Petit Toto |
           
+    Scenario: Delete a line that doesn't exist
+        Given I have no lines
+        When I delete line sip "10"
+        Then I get a response with status "404"
+
+    Scenario: Delete a line
+        Given I only have the following lines:
+            | id | context | protocol |
+            | 10 | default | sip      |
+        When I delete line sip "10"
+        Then I get a response with status "204"
+        Then the line sip "10" no longer exists
+        Then the line "10" no longer exists

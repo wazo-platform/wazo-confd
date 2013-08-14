@@ -34,3 +34,7 @@ def create_line_sip(parameters):
 
 def update(lineid, parameters):
     return ws_utils.rest_put('%s/%s' % (LINES_SIP_URL, lineid), parameters)
+
+
+def delete(line_id):
+    return ws_utils.rest_delete('%s/%s' % (LINES_SIP_URL, line_id))

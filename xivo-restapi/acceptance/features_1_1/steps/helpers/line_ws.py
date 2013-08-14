@@ -26,7 +26,3 @@ def all_lines():
 
 def get(line_id):
     return ws_utils.rest_get('%s/%s' % (LINES_URL, line_id))
-
-
-def delete(line_id):
-    return ws_utils.rest_delete('%s/%s' % (LINES_URL, line_id))

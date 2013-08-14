@@ -47,6 +47,11 @@ def when_i_update_the_user_with_id_group1_using_the_following_parameters(step, l
     world.response = line_sip_ws.update(lineid, lineinfo)
 
 
+@step(u'When I delete line sip "([^"]*)"')
+def when_i_delete_line_group1(step, line_id):
+    world.response = line_sip_ws.delete(line_id)
+
+
 @step(u'Then I have a line_sip with the following parameters:')
 def then_i_have_an_line_sip_with_the_following_parameters(step):
     parameters = _extract_line_parameters(step)
@@ -62,3 +67,9 @@ def _extract_line_parameters(step):
         parameters['id'] = int(parameters['id'])
 
     return parameters
+
+
+@step(u'Then the line sip "([^"]*)" no longer exists')
+def then_the_line_group1_no_longer_exists(step, line_id):
+    response = line_sip_ws.get(line_id)
+    assert_that(response.status, equal_to(404))

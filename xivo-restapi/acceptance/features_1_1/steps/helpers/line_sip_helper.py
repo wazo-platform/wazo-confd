@@ -18,25 +18,6 @@
 from remote import remote_exec
 
 
-def delete_all():
-    remote_exec(_delete_all)
-
-
-def _delete_all(channel):
-    from xivo_dao.data_handler.line import services as line_services
-    from xivo_dao.data_handler.user_line_extension import services as ule_services
-
-    all_ules = ule_services.find_all()
-
-    for line in line_services.find_all():
-
-        ules = [u for u in all_ules if u.line_id == line.id]
-        for ule in ules:
-            ule_services.delete(ule)
-
-        line_services.delete(line)
-
-
 def create_line_sip(parameters):
     remote_exec(_create_line_sip, parameters=parameters)
 
