@@ -27,7 +27,8 @@ MAPPING = {
     'interface': 'interface',
     'provisioningid': 'provisioning_extension',
     'commented': 'commented',
-    'description': 'description'
+    'description': 'description',
+    'callerid': 'callerid'
 }
 
 

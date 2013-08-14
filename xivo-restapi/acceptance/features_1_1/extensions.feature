@@ -163,18 +163,18 @@ Feature: Extensions
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: exten 99999 not inside range of context default"
 
-    Scenario: Editing a extension that doesn't exist
+    Scenario: Editing an extension that doesn't exist
         Given I have no extensions
-        When I update the extension with id "1" using the following parameters:
+        When I update the extension with id "9999" using the following parameters:
           | exten |
           | 1001  |
         Then I get a response with status "404"
 
-    Scenario: Editing a extension with parameters that don't exist
+    Scenario: Editing an extension with parameters that don't exist
         Given I only have the following extensions:
-          | id | exten | context | type | typeval |
-          | 1  | 1001  | default | user | 1       |
-        When I update the extension with id "1" using the following parameters:
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
+        When I update the extension with id "100" using the following parameters:
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
@@ -182,48 +182,81 @@ Feature: Extensions
 
     Scenario: Editing the exten of a extension
         Given I only have the following extensions:
-          | id | exten | context | type | typeval |
-          | 1  | 1001  | default | user | 1       |
-        When I update the extension with id "1" using the following parameters:
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
+        When I update the extension with id "100" using the following parameters:
           | exten |
           | 1003  |
         Then I get a response with status "204"
-        When I ask for the extension with id "1"
+        When I ask for the extension with id "100"
         Then I have an extension with the following parameters:
-          | id | exten | context |
-          | 1  | 1003  | default |
+          | id  | exten | context |
+          | 100 | 1003  | default |
+
+    Scenario: Editing an extension with an exten outside of context range
+        Given I only have the following extensions:
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
+        When I update the extension with id "100" using the following parameters:
+          | exten |
+          | 9999  |
+      Then I get a response with status "400"
+      Then I get an error message "Invalid parameters: exten 9999 not inside range of context default"
 
     Scenario: Editing the context of a extension
         Given I only have the following extensions:
-          | id | exten | context | type | typeval |
-          | 1  | 1001  | default | user | 1       |
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
         Given I have the following context:
           | name | numberbeg | numberend |
           | toto | 1000      | 1999      |
-        When I update the extension with id "1" using the following parameters:
+        When I update the extension with id "100" using the following parameters:
           | context |
           | toto    |
         Then I get a response with status "204"
-        When I ask for the extension with id "1"
+        When I ask for the extension with id "100"
         Then I have an extension with the following parameters:
-          | id | exten | context |
-          | 1  | 1001  | toto    |
+          | id  | exten | context |
+          | 100 | 1001  | toto    |
+
+    Scenario: Editing the extension with a context that doesn't exist
+        Given I only have the following extensions:
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
+        When I update the extension with id "100" using the following parameters:
+          | context             |
+          | mysuperdupercontext |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
 
     Scenario: Editing the exten, context of a extension
         Given I only have the following extensions:
-          | id | exten | context | type | typeval |
-          | 1  | 1001  | default | user | 1       |
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
         Given I have the following context:
           | name   | numberbeg | numberend |
           | patate | 1000      | 1999      |
-        When I update the extension with id "1" using the following parameters:
+        When I update the extension with id "100" using the following parameters:
           | exten | context |
           | 1006  | patate  |
         Then I get a response with status "204"
-        When I ask for the extension with id "1"
+        When I ask for the extension with id "100"
         Then I have an extension with the following parameters:
-          | id | exten | context |
-          | 1  | 1006  | patate  |
+          | id  | exten | context |
+          | 100 | 1006  | patate  |
+
+    Scenario: Editing a commented extension
+        Given I only have the following extensions:
+          | id  | exten | context | type | typeval | commented |
+          | 100 | 1007  | default | user | 1       | true      |
+        When I update the extension with id "100" using the following parameters:
+          | commented |
+          | false     |
+        Then I get a response with status "204"
+        When I ask for the extension with id "100"
+        Then I have an extension with the following parameters:
+          | id  | exten | context | commented |
+          | 100 | 1007  | default | false     |
 
     Scenario: Delete an extension that doesn't exist
         Given I have no extensions

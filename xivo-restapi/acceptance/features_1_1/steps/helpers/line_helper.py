@@ -18,13 +18,30 @@
 from remote import remote_exec
 
 
-def create_line_sip(parameters):
-    remote_exec(_create_line_sip, parameters=parameters)
+def delete_all():
+    remote_exec(_delete_all)
 
 
-def _create_line_sip(channel, parameters):
+def _delete_all(channel):
     from xivo_dao.data_handler.line import services as line_services
-    from xivo_dao.data_handler.line.model import LineSIP
+    from xivo_dao.data_handler.user_line_extension import services as ule_services
 
-    line = LineSIP(**parameters)
+    for line in line_services.find_all():
+
+        links = ule_services.find_all_by_line_id(line.id)
+        for link in links:
+            ule_services.delete(link)
+
+        line_services.delete(line)
+
+
+def create(parameters):
+    remote_exec(_create, parameters=parameters)
+
+
+def _create(channel, parameters):
+    from xivo_dao.data_handler.line import services as line_services
+    from xivo_dao.data_handler.line.model import Line
+
+    line = Line(**parameters)
     line_services.create(line)

@@ -29,7 +29,8 @@ def given_i_have_no_extensions(step):
 def given_i_have_the_following_extensions(step):
     extension_helper.delete_all()
     for exteninfo in step.hashes:
-        extension_helper.create_extensions([exteninfo])
+        extension = _extract_extension_parameters(exteninfo)
+        extension_helper.create_extensions([extension])
 
 
 @step(u'When I access the list of extensions')
@@ -54,13 +55,13 @@ def when_i_create_an_empty_extension(step):
 
 @step(u'When I create an extension with the following parameters:')
 def when_i_create_an_extension_with_the_following_parameters(step):
-    parameters = _extract_extension_parameters(step)
+    parameters = _extract_extension_parameters(step.hashes[0])
     world.response = extension_ws.create_extension(parameters)
 
 
 @step(u'When I update the extension with id "([^"]*)" using the following parameters:')
 def when_i_update_the_extension_with_id_group1_using_the_following_parameters(step, extensionid):
-    extensioninfo = _extract_extension_parameters(step)
+    extensioninfo = _extract_extension_parameters(step.hashes[0])
     world.response = extension_ws.update(extensionid, extensioninfo)
 
 
@@ -86,7 +87,7 @@ def then_i_get_a_list_containing_the_following_extensions(step):
 
 @step(u'Then I have an extension with the following parameters:')
 def then_i_have_an_extension_with_the_following_parameters(step):
-    parameters = _extract_extension_parameters(step)
+    parameters = _extract_extension_parameters(step.hashes[0])
     extension = world.response.data
 
     assert_that(extension, has_entries(parameters))
@@ -104,8 +105,7 @@ def _filter_out_default_extensions():
     return extensions
 
 
-def _extract_extension_parameters(step):
-    parameters = step.hashes[0]
+def _extract_extension_parameters(parameters):
 
     if 'id' in parameters:
         parameters['id'] = int(parameters['id'])

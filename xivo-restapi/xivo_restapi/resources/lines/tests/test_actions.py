@@ -166,33 +166,3 @@ class TestLineActions(unittest.TestCase):
 
         mock_line_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.delete')
-    def test_delete_success(self, mock_line_services_delete, mock_line_services_get):
-        status_code = 204
-        expected_data = ''
-
-        line = Line()
-        mock_line_services_get.return_value = line
-        mock_line_services_delete.return_value = True
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        self.assertEqual(status_code, result.status_code)
-        self.assertEqual(expected_data, result.data)
-        mock_line_services_delete.assert_called_with(line)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.delete')
-    def test_delete_not_found(self, mock_line_services_delete, mock_line_services_get):
-        status_code = 404
-
-        line = Line()
-        mock_line_services_get.return_value = line
-        mock_line_services_delete.side_effect = ElementNotExistsError('line')
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        self.assertEqual(status_code, result.status_code)
-        mock_line_services_delete.assert_called_with(line)
