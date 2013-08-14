@@ -32,8 +32,8 @@ Feature: SIP Lines
             | default |
         Then I get a response with status "201"
         Then I get a response with an id
-        Then I get a response with a link to the "lines" resource
-        Then I get a header with a location for the "lines" resource
+        Then I get a response with a link to the "lines_sip" resource
+        Then I get a header with a location for the "lines_sip" resource
 
     Scenario: Create a line with an internal context other than default
         Given I have an internal context named "mycontext"
@@ -42,8 +42,8 @@ Feature: SIP Lines
             | mycontext   |
         Then I get a response with status "201"
         Then I get a response with an id
-        Then I get a response with a link to the "lines" resource
-        Then I get a header with a location for the "lines" resource
+        Then I get a response with a link to the "lines_sip" resource
+        Then I get a header with a location for the "lines_sip" resource
 
     Scenario: Create 2 lines in same context
         When I create a line_sip with the following parameters:
