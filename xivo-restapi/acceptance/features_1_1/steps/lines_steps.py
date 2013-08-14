@@ -24,7 +24,8 @@ from lettuce import step, world
 def given_i_created_the_following_lines(step):
     line_helper.delete_all()
     for lineinfo in step.hashes:
-        if lineinfo['protocol'] == 'sip':
+        protocol = lineinfo['protocol'].lower()
+        if protocol == 'sip':
             line_sip_helper.create_line_sip(lineinfo)
         else:
             line_helper.create(lineinfo)
