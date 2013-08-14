@@ -128,7 +128,7 @@ Feature: SIP Lines
         When I ask for the line_sip with id "1"
         Then I have a line_sip with the following parameters:
           | id | username | context | callerid  |
-          | 1  | toto     | lolo    | Mega Toto |
+          | 1  | toto     | default | Mega Toto |
 
     Scenario: Editing the username, context, callerid of a line_sip
         Given I only have the following lines:
