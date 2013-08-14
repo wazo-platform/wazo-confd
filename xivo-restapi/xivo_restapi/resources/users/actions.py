@@ -59,8 +59,6 @@ def get(userid):
 @route('/<int:userid>/user_links')
 def get_user_links(userid):
     user_links = ule_services.find_all_by_user_id(userid)
-    if not user_links:
-        return make_response('', 404)
     result = user_link_mapper.encode_list(user_links)
     return make_response(result, 200)
 

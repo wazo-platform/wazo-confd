@@ -33,7 +33,7 @@ def given_i_created_the_following_lines(step):
 
 @step(u'Given I have no lines')
 def given_there_are_no_lines(step):
-    line_helper.delete_all()
+    line_sip_helper.delete_all()
 
 
 @step(u'When I ask for the list of lines$')

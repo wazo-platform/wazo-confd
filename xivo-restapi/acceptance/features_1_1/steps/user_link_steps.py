@@ -69,7 +69,6 @@ def then_the_device_has_been_provisioned_with_a_configuration(step, device_id):
 
 
 def _extract_parameters(user_line):
-
     if 'extension_id' in user_line:
         user_line['extension_id'] = int(user_line['extension_id'])
 
