@@ -78,7 +78,7 @@ Feature: SIP Lines
           | 1  | toto     | default | sip      |
         When I update the line_sip with id "1" using the following parameters:
           | username |
-          | tata  |
+          | tata     |
         Then I get a response with status "204"
         When I ask for the line_sip with id "1"
         Then I have a line_sip with the following parameters:
@@ -90,16 +90,16 @@ Feature: SIP Lines
           | id | username | context | protocol |
           | 1  | toto     | default | sip      |
         Given I have the following context:
-          | name | numberbeg | numberend |
-          | lolo | 1000      | 1999      |
+            | name | numberbeg | numberend |
+            | lolo | 1000      | 1999      |
         When I update the line_sip with id "1" using the following parameters:
-          | context |
-          | lolo    |
+            | context |
+            | lolo    |
         Then I get a response with status "204"
         When I ask for the line_sip with id "1"
         Then I have a line_sip with the following parameters:
-          | id | username | context |
-          | 1  | toto     | lolo    |
+            | id | username | context |
+            | 1  | toto     | lolo    |
 
     Scenario: Editing the callerid of a line
         Given I only have the following lines:

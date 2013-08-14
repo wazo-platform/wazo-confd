@@ -144,7 +144,7 @@ Feature: Link user with a line and extension
             | 2       | 10      | 100          | False     |
             | 3       | 10      | 100          | False     |
         Then I get a response with status "201"
-        
+
         Then I see a user with infos:
             | fullname        | protocol | context | number |
             | Salle Doctorant | sip      | default | 1000   |
