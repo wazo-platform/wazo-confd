@@ -49,3 +49,10 @@ def get(lineid):
     result = mapper.encode_line(line)
 
     return make_response(result, 200)
+
+
+@route('/<int:lineid>', methods=['DELETE'])
+def delete(lineid):
+    line = line_services.get(lineid)
+    line_services.delete(line)
+    return make_response('', 204)

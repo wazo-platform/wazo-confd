@@ -134,7 +134,7 @@ Feature: Link user with a line and extension
             | 2       | 10      | 100          | False     |
             | 3       | 10      | 100          | False     |
         Then I get a response with status "201"
-        
+
         Then I see a user with infos:
             | fullname        | protocol | context | number |
             | Salle Doctorant | sip      | default | 1000   |
@@ -142,7 +142,7 @@ Feature: Link user with a line and extension
         Then I see a user with infos:
             | fullname        | protocol | context | number |
             | Salle Doctorant | sip      | default | 1000   |
-            
+
         Then I see a user with infos:
             | fullname       | protocol | context | number |
             | Greg Sanderson | sip      | default | 1000   |
@@ -150,7 +150,7 @@ Feature: Link user with a line and extension
         Then I see a user with infos:
             | fullname       | protocol | context | number |
             | Greg Sanderson | sip      | default | 1000   |
-        
+
         Then I see a user with infos:
             | fullname         | protocol | context | number |
             | Roberto Da Silva | sip      | default | 1000   |
@@ -182,7 +182,7 @@ Feature: Link user with a line and extension
         Then I get a response with a link to the "lines" resource with id "10"
         Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
-        
+
         When I provision my device with my line_id "10" and ip "10.0.0.1"
         Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |

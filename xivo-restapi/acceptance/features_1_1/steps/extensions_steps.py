@@ -37,6 +37,11 @@ def when_i_access_the_list_of_extensions(step):
     world.response = extension_ws.all_extensions()
 
 
+@step(u'When I ask for the extension with id "([^"]*)"')
+def when_i_ask_for_the_extension_with_id_group1(step, extension_id):
+    world.response = extension_ws.get_extension(extension_id)
+
+
 @step(u'When I access the extension with id "([^"]*)"')
 def when_i_access_the_extension_with_id_group1(step, extension_id):
     world.response = extension_ws.get_extension(extension_id)
@@ -47,10 +52,16 @@ def when_i_create_an_empty_extension(step):
     world.response = extension_ws.create_extension({})
 
 
-@step(u'When I create an extension with the following properties:')
-def when_i_create_an_extension_with_the_following_properties(step):
-    properties = _extract_extension_properties(step)
-    world.response = extension_ws.create_extension(properties)
+@step(u'When I create an extension with the following parameters:')
+def when_i_create_an_extension_with_the_following_parameters(step):
+    parameters = _extract_extension_parameters(step)
+    world.response = extension_ws.create_extension(parameters)
+
+
+@step(u'When I update the extension with id "([^"]*)" using the following parameters:')
+def when_i_update_the_extension_with_id_group1_using_the_following_parameters(step, extensionid):
+    extensioninfo = _extract_extension_parameters(step)
+    world.response = extension_ws.update(extensionid, extensioninfo)
 
 
 @step(u'When I delete extension "([^"]*)"')
@@ -73,12 +84,12 @@ def then_i_get_a_list_containing_the_following_extensions(step):
     assert_that(extensions, has_items(*entries))
 
 
-@step(u'Then I have an extension with the following properties:')
-def then_i_have_an_extension_with_the_following_properties(step):
-    properties = _extract_extension_properties(step)
+@step(u'Then I have an extension with the following parameters:')
+def then_i_have_an_extension_with_the_following_parameters(step):
+    parameters = _extract_extension_parameters(step)
     extension = world.response.data
 
-    assert_that(extension, has_entries(properties))
+    assert_that(extension, has_entries(parameters))
 
 
 @step(u'Then the extension "([^"]*)" no longer exists')
@@ -93,13 +104,13 @@ def _filter_out_default_extensions():
     return extensions
 
 
-def _extract_extension_properties(step):
-    properties = step.hashes[0]
+def _extract_extension_parameters(step):
+    parameters = step.hashes[0]
 
-    if 'id' in properties:
-        properties['id'] = int(properties['id'])
+    if 'id' in parameters:
+        parameters['id'] = int(parameters['id'])
 
-    if 'commented' in properties:
-        properties['commented'] = (properties['commented'] == 'true')
+    if 'commented' in parameters:
+        parameters['commented'] = (parameters['commented'] == 'true')
 
-    return properties
+    return parameters

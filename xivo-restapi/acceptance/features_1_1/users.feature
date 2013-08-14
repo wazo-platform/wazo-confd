@@ -138,7 +138,7 @@ Feature: Users
           | 1  | Irène     | Dupont   |
         When I ask for the user with id "1"
         Then I get a response with status "200"
-        Then I get a user with the following properties:
+        Then I get a user with the following parameters:
           | id | firstname | lastname | userfield |
           | 1  | Irène     | Dupont   |           |
 
@@ -228,7 +228,7 @@ Feature: Users
           | Brézé     |
         Then I get a response with status "204"
         When I ask for the user with id "1"
-        Then I get a user with the following properties:
+        Then I get a user with the following parameters:
           | id | firstname | lastname | userfield |
           | 1  | Brézé     | Dupond   |           |
 
@@ -241,7 +241,7 @@ Feature: Users
           | Argentine     |
         Then I get a response with status "204"
         When I ask for the user with id "1"
-        Then I get a user with the following properties:
+        Then I get a user with the following parameters:
           | id | firstname | lastname  | userfield |
           | 1  | Clémence  | Argentine |           |
 
@@ -254,7 +254,7 @@ Feature: Users
           | Claude    | Argentine | customdata |
         Then I get a response with status "204"
         When I ask for the user with id "1"
-        Then I get a user with the following properties:
+        Then I get a user with the following parameters:
           | id | firstname | lastname  | userfield  |
           | 1  | Claude    | Argentine | customdata |
 

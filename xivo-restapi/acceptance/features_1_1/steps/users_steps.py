@@ -86,8 +86,8 @@ def then_i_get_a_list_with_the_following_users(step):
         assert_that(user, has_entries(expected_user))
 
 
-@step(u'Then I get a user with the following properties:')
-def then_i_get_a_user_with_the_following_properties(step):
+@step(u'Then I get a user with the following parameters:')
+def then_i_get_a_user_with_the_following_parameters(step):
     user = world.response.data
     expected_user = _get_user_info(step.hashes)
 

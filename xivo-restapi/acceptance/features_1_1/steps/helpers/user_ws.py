@@ -29,12 +29,12 @@ def user_search(search):
     return ws_utils.rest_get(USERS_URL, params=params)
 
 
-def create_user(properties):
-    return ws_utils.rest_post(USERS_URL, properties)
+def create_user(parameters):
+    return ws_utils.rest_post(USERS_URL, parameters)
 
 
-def update_user(userid, properties):
-    return ws_utils.rest_put('%s/%s' % (USERS_URL, userid), properties)
+def update_user(userid, parameters):
+    return ws_utils.rest_put('%s/%s' % (USERS_URL, userid), parameters)
 
 
 def delete_user(userid):
