@@ -19,7 +19,7 @@
 import unittest
 
 from mock import Mock, patch
-from hamcrest import assert_that, equal_to, contains, has_entries
+from hamcrest import assert_that, equal_to, has_entries
 
 from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
@@ -174,15 +174,21 @@ class TestUserActions(unittest.TestCase):
 
     @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
     def test_list_lines_associated_to_a_user_with_no_lines(self, ule_find_all_by_user_id):
-        expected_status_code = 404
+        expected_status_code = 200
+        expected_result = {
+            'total': 0,
+            'items': []
+        }
+
         user_id = 1
 
         ule_find_all_by_user_id.return_value = []
 
         result = self.app.get("%s/%d/user_links" % (BASE_URL, user_id))
+        decoded_result = serializer.decode(result.data)
 
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(''))
+        assert_that(decoded_result, equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
     def test_list_lines_associated_to_a_user(self, ule_find_all_by_user_id):
