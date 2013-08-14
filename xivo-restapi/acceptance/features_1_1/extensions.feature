@@ -209,6 +209,16 @@ Feature: Extensions
           | id  | exten | context |
           | 100 | 1001  | toto    |
 
+    Scenario: Editing the extension with a context that doesn't exist
+        Given I only have the following extensions:
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
+        When I update the extension with id "100" using the following parameters:
+          | context             |
+          | mysuperdupercontext |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
+
     Scenario: Editing the exten, context of a extension
         Given I only have the following extensions:
           | id  | exten | context | type | typeval |
