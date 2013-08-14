@@ -275,7 +275,7 @@ Feature: Users
         Given I only have the following users:
             | id | firstname | lastname |
             | 1  | Francisco | Montoya  |
-        When I get the lines associated to a user "1"
+        When I get the lines associated to user "1"
         Then I get a response with status "404"
 
     Scenario: List the links associated to a user
@@ -297,9 +297,9 @@ Feature: Users
         Then I get a response with a link to the "user_links" resource
         Then I get a header with a location for the "user_links" resource
         
-        When I get the lines associated to a user "1"
+        When I get the lines associated to user "1"
         Then I get a response with status "200"
-        Then I get the user_links with the following properties:
+        Then I get the user_links with the following parameters:
             | user_id | line_id | extension_id | main_line |
             | 1       | 10      | 100          | True      |
             | 1       | 20      | 100          | False     |
