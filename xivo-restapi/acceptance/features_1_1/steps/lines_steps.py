@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from helpers import line_helper, line_ws
+from helpers import line_sip_helper, line_ws
 from lettuce import step, world
 
 
 @step(u'Given I have no lines')
 def given_there_are_no_lines(step):
-    line_helper.delete_all()
+    line_sip_helper.delete_all()
 
 
 @step(u'When I ask for the list of lines$')
