@@ -24,6 +24,7 @@ LINES_SIP_URL = 'lines_sip'
 def all_lines():
     return ws_utils.rest_get(LINES_SIP_URL)
 
+
 def get(lineid):
     return ws_utils.rest_get('%s/%s' % (LINES_SIP_URL, lineid))
 

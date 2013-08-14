@@ -64,8 +64,8 @@ Feature: SIP Lines
 
     Scenario: Editing a line_sip with parameters that don't exist
         Given I only have the following lines:
-          | id | username | context |
-          | 1  | toto     | default |
+          | id | username | context | protocol |
+          | 1  | toto     | default | sip      |
         When I update the line_sip with id "1" using the following parameters:
           | unexisting_field |
           | unexisting value |
@@ -74,8 +74,8 @@ Feature: SIP Lines
 
     Scenario: Editing the username of a line_sip
         Given I only have the following lines:
-          | id | username | context |
-          | 1  | toto     | default |
+          | id | username | context | protocol |
+          | 1  | toto     | default | sip      |
         When I update the line_sip with id "1" using the following parameters:
           | username |
           | tata  |
@@ -87,8 +87,8 @@ Feature: SIP Lines
 
     Scenario: Editing the context of a line_sip
         Given I only have the following lines:
-          | id | username | context |
-          | 1  | toto     | default |
+          | id | username | context | protocol |
+          | 1  | toto     | default | sip      |
         Given I have the following context:
           | name | numberbeg | numberend |
           | lolo | 1000      | 1999      |
@@ -103,8 +103,8 @@ Feature: SIP Lines
 
     Scenario: Editing the callerid of a line
         Given I only have the following lines:
-          | id | username | context | callerid   |
-          | 1  | toto     | default | Super Toto |
+          | id | username | context | callerid   | protocol |
+          | 1  | toto     | default | Super Toto | sip      |
         Given I have the following context:
           | name | numberbeg | numberend |
           | lolo | 1000      | 1999      |
@@ -119,8 +119,8 @@ Feature: SIP Lines
 
     Scenario: Editing the username, context, callerid of a line_sip
         Given I only have the following lines:
-          | id | username | context | callerid   |
-          | 1  | titi     | default | Super Toto |
+          | id | username | context | callerid   | protocol |
+          | 1  | titi     | default | Super Toto | sip      |
         Given I have the following context:
           | name   | numberbeg | numberend |
           | patate | 1000      | 1999      |
