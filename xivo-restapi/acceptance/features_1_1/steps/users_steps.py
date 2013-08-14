@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from hamcrest import *
-from helpers import user_helper, user_ws
+from acceptance.features_1_1.steps.helpers import user_helper, user_ws
 from lettuce import step, world
 
 

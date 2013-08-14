@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from hamcrest import *
-from helpers import line_sip_ws, context_helper
+from acceptance.features_1_1.steps.helpers import line_sip_ws, context_helper
 from lettuce import step, world
 
 

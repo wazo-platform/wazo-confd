@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from helpers import device_helper
+from acceptance.features_1_1.steps.helpers import device_helper
 from lettuce import step
 
 

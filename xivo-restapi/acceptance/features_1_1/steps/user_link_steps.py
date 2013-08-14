@@ -16,9 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from hamcrest import *
-from helpers import user_link_ws
 from lettuce import step, world
-from acceptance.features_1_1.steps.helpers import device_helper, provd_helper
+from acceptance.features_1_1.steps.helpers import device_helper, provd_helper, user_link_ws
 from xivo_dao.data_handler.line import dao as line_dao
 from xivo_dao.data_handler.device import dao as device_dao
 
