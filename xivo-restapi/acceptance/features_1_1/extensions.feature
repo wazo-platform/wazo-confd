@@ -193,6 +193,16 @@ Feature: Extensions
           | id  | exten | context |
           | 100 | 1003  | default |
 
+    Scenario: Editing an extension with an exten outside of context range
+        Given I only have the following extensions:
+          | id  | exten | context | type | typeval |
+          | 100 | 1001  | default | user | 1       |
+        When I update the extension with id "100" using the following parameters:
+          | exten |
+          | 9999  |
+      Then I get a response with status "400"
+      Then I get an error message "Invalid parameters: exten 9999 not inside range of context default"
+
     Scenario: Editing the context of a extension
         Given I only have the following extensions:
           | id  | exten | context | type | typeval |
