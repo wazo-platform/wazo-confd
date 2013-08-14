@@ -282,7 +282,7 @@ Feature: Users
         Given I only have the following users:
             | id | firstname | lastname |
             | 1  | Francisco | Montoya  |
-        Given I only have the following lines_sip:
+        Given I only have the following lines:
             | id | context | protocol |
             | 10 | default | sip      |
             | 20 | default | sip      |

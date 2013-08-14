@@ -32,8 +32,8 @@ Feature: SIP Lines
             | default |
         Then I get a response with status "201"
         Then I get a response with an id
-        Then I get a response with a link to the "lines_sip" resource
-        Then I get a header with a location for the "lines_sip" resource
+        Then I get a response with a link to the "lines" resource
+        Then I get a header with a location for the "lines" resource
 
     Scenario: Create a line with an internal context other than default
         Given I have an internal context named "mycontext"
@@ -42,8 +42,8 @@ Feature: SIP Lines
             | mycontext   |
         Then I get a response with status "201"
         Then I get a response with an id
-        Then I get a response with a link to the "lines_sip" resource
-        Then I get a header with a location for the "lines_sip" resource
+        Then I get a response with a link to the "lines" resource
+        Then I get a header with a location for the "lines" resource
 
     Scenario: Create 2 lines in same context
         When I create a line_sip with the following parameters:
@@ -63,7 +63,7 @@ Feature: SIP Lines
         Then I get a response with status "404"
 
     Scenario: Editing a line_sip with parameters that don't exist
-        Given I only have the following lines_sip:
+        Given I only have the following lines:
           | id | username | context |
           | 1  | toto     | default |
         When I update the line_sip with id "1" using the following parameters:
@@ -73,7 +73,7 @@ Feature: SIP Lines
         Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the username of a line_sip
-        Given I only have the following lines_sip:
+        Given I only have the following lines:
           | id | username | context |
           | 1  | toto     | default |
         When I update the line_sip with id "1" using the following parameters:
@@ -86,7 +86,7 @@ Feature: SIP Lines
           | 1  | tata     | default |
 
     Scenario: Editing the context of a line_sip
-        Given I only have the following lines_sip:
+        Given I only have the following lines:
           | id | username | context |
           | 1  | toto     | default |
         Given I have the following context:
@@ -102,7 +102,7 @@ Feature: SIP Lines
           | 1  | toto     | lolo    |
 
     Scenario: Editing the callerid of a line
-        Given I only have the following lines_sip:
+        Given I only have the following lines:
           | id | username | context | callerid   |
           | 1  | toto     | default | Super Toto |
         Given I have the following context:
@@ -118,7 +118,7 @@ Feature: SIP Lines
           | 1  | toto     | lolo    | Mega Toto |
 
     Scenario: Editing the username, context, callerid of a line_sip
-        Given I only have the following lines_sip:
+        Given I only have the following lines:
           | id | username | context | callerid   |
           | 1  | titi     | default | Super Toto |
         Given I have the following context:

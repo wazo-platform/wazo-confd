@@ -20,13 +20,6 @@ from helpers import line_sip_ws, context_helper, line_sip_helper
 from lettuce import step, world
 
 
-@step(u'Given I only have the following lines_sip:')
-def given_i_created_the_following_lines(step):
-    line_sip_helper.delete_all()
-    for lineinfo in step.hashes:
-        line_sip_helper.create_line_sip(lineinfo)
-
-
 @step(u'Given I have an internal context named "([^"]*)"')
 def given_i_have_an_internal_context_named_group1(step, context):
     context_helper.create_context(context)
