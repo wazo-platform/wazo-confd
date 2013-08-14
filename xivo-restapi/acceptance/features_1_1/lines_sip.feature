@@ -101,6 +101,19 @@ Feature: SIP Lines
             | id | username | context |
             | 1  | toto     | lolo    |
 
+    Scenario: Editing a line_sip with a context that doesn't exist
+        Given I only have the following lines:
+          | id | username | context | protocol |
+          | 1  | toto     | default | sip      |
+        Given I have the following context:
+          | name | numberbeg | numberend |
+          | lolo | 1000      | 1999      |
+        When I update the line_sip with id "1" using the following parameters:
+          | context             |
+          | mysuperdupercontext |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: context mysuperdupercontext does not exist"
+
     Scenario: Editing the callerid of a line
         Given I only have the following lines:
           | id | username | context | callerid   | protocol |
