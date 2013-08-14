@@ -18,6 +18,10 @@
 from hamcrest import *
 from helpers import user_link_ws
 from lettuce import step, world
+from acceptance.features_1_1.steps.helpers import device_helper, provd_helper,\
+    extension_helper
+from xivo_dao.data_handler.line import dao as line_dao
+from xivo_dao.data_handler.device import dao as device_dao
 
 
 @step(u'When I create an empty link')
@@ -44,6 +48,25 @@ def then_i_get_the_lines_with_the_following_parameters(step):
         assert_that(world.response.data['items'], has_item(
             has_entries(_extract_parameters(expected_data))
         ))
+
+
+@step(u'Given I only have the following extensions:')
+def given_i_have_the_following_extensions(step):
+    extension_helper.delete_all()
+    for exteninfo in step.hashes:
+        extension_helper.create_extensions([exteninfo])
+
+
+@step(u'When I provision my device with my line_id "([^"]*)" and ip "([^"]*)"')
+def when_i_provision_my_device_with_my_line_id_group1(step, line_id, device_ip):
+    line = line_dao.get(line_id)
+    device_helper.provision_device_using_webi(line.provisioningid, device_ip)
+
+
+@step(u'Then the device "([^"]*)" has been provisioned with a configuration:')
+def then_the_device_has_been_provisioned_with_a_configuration(step, device_id):
+    device = device_dao.get(device_id)
+    provd_helper.device_config_has_properties(device, step.hashes)
 
 
 def _extract_parameters(data_dict):

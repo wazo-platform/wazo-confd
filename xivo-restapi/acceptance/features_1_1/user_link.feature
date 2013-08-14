@@ -95,9 +95,6 @@ Feature: Link user with a line and extension
         Then I get a response with a link to the "lines" resource with id "10"
         Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
-        #Then I see the line with an extension in the webi
-        #Then I see a user with a line in the webi
-        #Then I can pass a call with a SIP phone
 
     Scenario: Create a link in another context
         Given I only have the following users:
@@ -118,9 +115,6 @@ Feature: Link user with a line and extension
         Then I get a response with a link to the "lines" resource with id "10"
         Then I get a response with a link to the "users" resource with id "1"
         Then I get a header with a location for the "user_links" resource
-        #Then I see the line with an extension in the webi
-        #Then I see a user with a line in the webi
-        #Then I see the extension in the "statscenter" dialplan
 
     Scenario: Associate 3 users to the same line/extension
         Given I only have the following lines:
@@ -164,3 +158,32 @@ Feature: Link user with a line and extension
         Then I see a user with infos:
             | fullname         | protocol | context | number |
             | Roberto Da Silva | sip      | default | 1000   |
+
+    Scenario: Create a link with a provision device
+        Given I only have the following users:
+            | id | firstname | lastname  |
+            | 1  | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id | context | protocol | username | secret | num |
+            | 10 | default | sip      | toto     | tata   | 1   |
+        Given I only have the following extensions:
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
+        Given I only have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
+        When I create a link with the following parameters:
+            | user_id | line_id | extension_id |
+            | 1       | 10      | 100          |
+        Then I get a response with status "201"
+
+        Then I get a response with a link to the "user_links" resource
+        Then I get a response with a link to the "extensions" resource with id "100"
+        Then I get a response with a link to the "lines" resource with id "10"
+        Then I get a response with a link to the "users" resource with id "1"
+        Then I get a header with a location for the "user_links" resource
+        
+        When I provision my device with my line_id "10" and ip "10.0.0.1"
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | toto     | toto          | tata     |
