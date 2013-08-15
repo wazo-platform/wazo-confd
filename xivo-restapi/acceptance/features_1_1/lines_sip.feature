@@ -57,7 +57,7 @@ Feature: SIP Lines
 
     Scenario: Editing a line_sip that doesn't exist
         Given I have no lines
-        When I update the line_sip with id "1" using the following parameters:
+        When I update the line_sip with id "10" using the following parameters:
           | username |
           | toto     |
         Then I get a response with status "404"
@@ -65,8 +65,8 @@ Feature: SIP Lines
     Scenario: Editing a line_sip with parameters that don't exist
         Given I only have the following lines:
           | id | username | context | protocol |
-          | 1  | toto     | default | sip      |
-        When I update the line_sip with id "1" using the following parameters:
+          | 10 | toto     | default | sip      |
+        When I update the line_sip with id "10" using the following parameters:
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
@@ -75,40 +75,40 @@ Feature: SIP Lines
     Scenario: Editing the username of a line_sip
         Given I only have the following lines:
           | id | username | context | protocol |
-          | 1  | toto     | default | sip      |
-        When I update the line_sip with id "1" using the following parameters:
+          | 10 | toto     | default | sip      |
+        When I update the line_sip with id "10" using the following parameters:
           | username |
           | tata     |
         Then I get a response with status "204"
-        When I ask for the line_sip with id "1"
+        When I ask for the line_sip with id "10"
         Then I have a line_sip with the following parameters:
           | id | username | context |
-          | 1  | tata     | default |
+          | 10 | tata     | default |
 
     Scenario: Editing the context of a line_sip
         Given I only have the following lines:
-          | id | username | context | protocol |
-          | 1  | toto     | default | sip      |
+            | id | username | context | protocol |
+            | 10 | toto     | default | sip      |
         Given I have the following context:
             | name | numberbeg | numberend |
             | lolo | 1000      | 1999      |
-        When I update the line_sip with id "1" using the following parameters:
+        When I update the line_sip with id "10" using the following parameters:
             | context |
             | lolo    |
         Then I get a response with status "204"
-        When I ask for the line_sip with id "1"
+        When I ask for the line_sip with id "10"
         Then I have a line_sip with the following parameters:
             | id | username | context |
-            | 1  | toto     | lolo    |
+            | 10 | toto     | lolo    |
 
     Scenario: Editing a line_sip with a context that doesn't exist
         Given I only have the following lines:
           | id | username | context | protocol |
-          | 1  | toto     | default | sip      |
+          | 10 | toto     | default | sip      |
         Given I have the following context:
           | name | numberbeg | numberend |
           | lolo | 1000      | 1999      |
-        When I update the line_sip with id "1" using the following parameters:
+        When I update the line_sip with id "10" using the following parameters:
           | context             |
           | mysuperdupercontext |
         Then I get a response with status "400"
@@ -117,34 +117,34 @@ Feature: SIP Lines
     Scenario: Editing the callerid of a line
         Given I only have the following lines:
           | id | username | context | callerid   | protocol |
-          | 1  | toto     | default | Super Toto | sip      |
+          | 10 | toto     | default | Super Toto | sip      |
         Given I have the following context:
           | name | numberbeg | numberend |
           | lolo | 1000      | 1999      |
-        When I update the line_sip with id "1" using the following parameters:
+        When I update the line_sip with id "10" using the following parameters:
           | callerid  |
           | Mega Toto |
         Then I get a response with status "204"
-        When I ask for the line_sip with id "1"
+        When I ask for the line_sip with id "10"
         Then I have a line_sip with the following parameters:
           | id | username | context | callerid  |
-          | 1  | toto     | default | Mega Toto |
+          | 10 | toto     | default | Mega Toto |
 
     Scenario: Editing the username, context, callerid of a line_sip
         Given I only have the following lines:
           | id | username | context | callerid   | protocol |
-          | 1  | titi     | default | Super Toto | sip      |
+          | 10 | titi     | default | Super Toto | sip      |
         Given I have the following context:
           | name   | numberbeg | numberend |
           | patate | 1000      | 1999      |
-        When I update the line_sip with id "1" using the following parameters:
+        When I update the line_sip with id "10" using the following parameters:
           | username | context | callerid   |
           | titi     | patate  | Petit Toto |
         Then I get a response with status "204"
-        When I ask for the line_sip with id "1"
+        When I ask for the line_sip with id "10"
         Then I have a line_sip with the following parameters:
           | id | username | context | callerid   |
-          | 1  | titi     | patate  | Petit Toto |
+          | 10 | titi     | patate  | Petit Toto |
           
     Scenario: Delete a line that doesn't exist
         Given I have no lines
