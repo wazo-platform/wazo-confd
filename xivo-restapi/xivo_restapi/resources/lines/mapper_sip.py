@@ -18,13 +18,14 @@
 from xivo_restapi.helpers import mapper
 from flask.helpers import url_for
 
-# mapping = {db_field: model_field}
+# mapping = {model_field: api_field}
 MAPPING = {
     'id': 'id',
     'username': 'username',
     'secret': 'secret',
     'context': 'context',
     'interface': 'interface',
+    'device_slot': 'device_slot',
     'provisioning_extension': 'provisioning_extension',
     'commented': 'commented',
     'description': 'description',

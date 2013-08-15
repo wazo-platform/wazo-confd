@@ -164,8 +164,8 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol | username | secret | num |
-            | 10 | default | sip      | toto     | tata   | 1   |
+            | id | context | protocol | username | secret | device_slot |
+            | 10 | default | sip      | toto     | tata   | 1           |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
@@ -249,8 +249,8 @@ Feature: Link user with a line and extension
             | 1   | Greg      | Sanderson |
             | 2   | Cédric    | Abunar    |
         Given I only have the following lines:
-            | id | context     | protocol | username | secret | num |
-            | 10 | default     | sip      | abc123   | def456 | 1   |
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | abc123   | def456 | 1           |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
@@ -272,8 +272,8 @@ Feature: Link user with a line and extension
             | 1   | Greg      | Sanderson |
             | 2   | Cédric    | Abunar    |
         Given I only have the following lines:
-            | id | context     | protocol | username | secret | num |
-            | 10 | default     | sip      | abc123   | def456 | 1   |
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | abc123   | def456 | 1           |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
@@ -303,8 +303,8 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol | username | secret | num |
-            | 10 | default | sip      | toto     | tata   | 1   |
+            | id | context | protocol | username | secret | device_slot |
+            | 10 | default | sip      | toto     | tata   | 1           |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |

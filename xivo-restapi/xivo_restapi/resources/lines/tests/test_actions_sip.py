@@ -141,40 +141,43 @@ class TestLineActions(unittest.TestCase):
         mock_line_services_get.assert_called_with(1)
         self.assertEqual(status_code, result.status_code)
 
+    @patch('xivo_dao.data_handler.line.model.LineSIP.from_user_data')
+    @patch('xivo_restapi.helpers.serializer.decode')
     @patch('xivo_dao.data_handler.line.services.create')
-    def test_create(self, mock_line_services_create):
+    def test_create(self, mock_line_services_create, serializer_decode, line_sip_from_user_data):
         status_code = 201
-        expected_result = {
-            'id': 1,
-            'links': [{
-                'href': 'http://localhost/1.1/lines_sip/1',
-                'rel': 'lines_sip'
-            }]
-        }
-
-        line = Mock(LineSIP)
-        line.id = 1
-        mock_line_services_create.return_value = line
-
-        data = {
-            'protocol': 'sip',
+        data_json = '{"username": "toto", "device_slot": 2, "context": "default", "provisioning_extension": 123456}'
+        model_data = serializer_decode.return_value = {
+            'provisioning_extension': 123456,
+            'device_slot': 2,
             'username': 'toto',
             'context': 'default'
         }
 
-        result = self.app.post(BASE_URL, data=serializer.encode(data))
-        decoded_result = serializer.decode(result.data)
+        expected_result = '{"id": 1, "links": [{"href": "http://localhost/1.1/lines_sip/1", "rel": "lines_sip"}]}'
 
-        mock_line_services_create.assert_called_with(LineSIP.from_user_data(data))
+        line = Mock(LineSIP)
+        line.id = 1
+
+        line_sip_from_user_data.return_value = line
+
+        mock_line_services_create.return_value = line
+
+        result = self.app.post(BASE_URL, data=data_json)
+
+        serializer_decode.assert_called_once_with(data_json)
+        line_sip_from_user_data.assert_called_once_with(model_data)
+
+        mock_line_services_create.assert_called_with(line)
+
         self.assertEqual(status_code, result.status_code)
-        self.assertEqual(expected_result, decoded_result)
+        self.assertEqual(expected_result, result.data)
 
     @patch('xivo_dao.data_handler.line.services.create')
     def test_create_error(self, mock_line_services_create):
         status_code = 500
 
         data = {
-            'protocol': 'sip',
             'username': 'toto',
             'context': 'default'
         }
@@ -193,7 +196,7 @@ class TestLineActions(unittest.TestCase):
         mock_line_services_create.side_effect = MissingParametersError(["context"])
 
         data = {
-            'protocol': 'sip'
+            'username': 'toto'
         }
 
         result = self.app.post(BASE_URL, data=serializer.encode(data))
@@ -227,7 +230,6 @@ class TestLineActions(unittest.TestCase):
 
         data = {
             'id': 1,
-            'protocol': 'sip',
             'username': 'toto',
             'context': 'default'
         }
@@ -245,7 +247,6 @@ class TestLineActions(unittest.TestCase):
         status_code = 500
 
         data = {
-            'protocol': 'sip',
             'username': 'toto',
             'context': 'default'
         }
@@ -264,7 +265,6 @@ class TestLineActions(unittest.TestCase):
         status_code = 404
 
         data = {
-            'protocol': 'sip',
             'username': 'toto',
             'context': 'default'
         }
