@@ -116,6 +116,10 @@ class RestUsers():
         user = User(firstname=firstname, lastname=lastname)
         user = user_newdao.create(user)
 
+        existing_extension = extension_newdao.find_by_exten_context(number, context)
+        if existing_extension:
+            self._delete_extension(existing_extension)
+
         line = LineSIP()
         line.number = number
         line.name = str(random.randint(0, 9999))
@@ -152,3 +156,10 @@ class RestUsers():
             return False
         except LookupError:
             return True
+
+    def _delete_extension(self, extension):
+        links = user_line_extension_newdao.find_all_by_extension_id(extension.id)
+        for link in links:
+            user_line_extension_newdao.delete(link)
+
+        extension_newdao.delete(extension)
