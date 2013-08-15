@@ -58,7 +58,7 @@ def when_i_create_the_following_links(step):
 @step(u'When I provision my device with my line_id "([^"]*)" and ip "([^"]*)"')
 def when_i_provision_my_device_with_my_line_id_group1(step, line_id, device_ip):
     line = line_dao.get(line_id)
-    device_helper.provision_device_using_webi(line.provisioningid, device_ip)
+    device_helper.provision_device_using_webi(line.provisioning_extension, device_ip)
 
 
 @step(u'Then the device "([^"]*)" has been provisioned with a configuration:')

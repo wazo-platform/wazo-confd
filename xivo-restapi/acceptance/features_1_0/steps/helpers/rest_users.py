@@ -124,7 +124,7 @@ class RestUsers():
         line.number = number
         line.name = str(random.randint(0, 9999))
         line.context = context
-        line.provisioningid = 0
+        line.provisioning_extension = 0
         line = line_newdao.create(line)
 
         exten = Extension()

@@ -25,7 +25,7 @@ MAPPING = {
     'protocol': 'protocol',
     'context': 'context',
     'interface': 'interface',
-    'provisioningid': 'provisioning_extension',
+    'provisioning_extension': 'provisioning_extension',
     'commented': 'commented',
     'description': 'description'
 }
