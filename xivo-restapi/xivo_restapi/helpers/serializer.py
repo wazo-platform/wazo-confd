@@ -17,11 +17,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json
-import logging
-
-logger = logging.getLogger(__name__)
-decode = json.loads
 
 
 def encode(data):
     return json.dumps(data)
+
+
+def decode(data):
+    return json.loads(data)

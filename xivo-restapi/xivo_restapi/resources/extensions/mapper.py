@@ -15,25 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_restapi.helpers import mapper
 from flask.helpers import url_for
 
-# mapping = {db_field: model_field}
+# mapping = {model_field: api_field}
 MAPPING = {
     'id': 'id',
     'exten': 'exten',
     'context': 'context',
     'commented': 'commented'
 }
-
-
-def encode_list(extensions):
-    mapped_extensions = []
-    for extension in extensions:
-        mapped_extension = map_extension(extension)
-        add_links_to_dict(mapped_extension, extension)
-        mapped_extensions.append(mapped_extension)
-    return mapper.encode_list(mapped_extensions)
 
 
 def add_links_to_dict(extension_dict, extension):
@@ -46,12 +36,3 @@ def add_links_to_dict(extension_dict, extension):
             }
         ]
     })
-
-
-def encode_extension(extension):
-    mapped_extension = map_extension(extension)
-    return mapper.encode(mapped_extension)
-
-
-def map_extension(extension):
-    return mapper.map_entity(MAPPING, extension)

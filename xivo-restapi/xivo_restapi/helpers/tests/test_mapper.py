@@ -16,32 +16,60 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from xivo_restapi.resources.users import mapper
-from xivo_dao.data_handler.user.model import User
-from mock import patch
+
+from xivo_restapi.helpers import mapper
 
 
 class TestMapper(unittest.TestCase):
 
-    @patch('flask.helpers.url_for')
-    def test_encode_list(self, mock_url_for):
-        obj1 = User(id=1, firstname='User', lastname='1')
-        obj2 = User(id=2, firstname='User', lastname='2')
-        data = [obj1, obj2]
+    def test_map_to_api(self):
+        excpected_result = {
+            "id": 1,
+            "username": 'toto',
+            "device_slot": 1,
+            "provisioning_extension": 123456
+        }
 
-        mock_url_for.return_value = 'http://localhost:50050/1.1/users/1'
+        data_dict = {
+            'id': 1,
+            'provisioningid': 123456,
+            'username': 'toto',
+            'num': 1
+        }
 
-        excpected_result = '{"items": [{"lastname": "1", "links": [{"href": "http://localhost:50050/1.1/users/1", "rel": "users"}], "id": 1, "firstname": "User"}, {"lastname": "2", "links": [{"href": "http://localhost:50050/1.1/users/1", "rel": "users"}], "id": 2, "firstname": "User"}], "total": 2}'
+        mapping_model_to_api = {
+            'id': 'id',
+            'username': 'username',
+            'num': 'device_slot',
+            'provisioningid': 'provisioning_extension',
+        }
 
-        result = mapper.encode_list(data)
+        result = mapper.map_to_api(mapping_model_to_api, data_dict)
 
         self.assertEqual(excpected_result, result)
 
-    def test_encode(self):
-        data = User(id=1, firstname='User', lastname='1')
+    def test_map_to_model(self):
+        excpected_result = {
+            'id': 1,
+            'provisioning_extension': 123456,
+            'username': 'toto',
+            'device_slot': 1
+        }
 
-        excpected_result = '{"lastname": "1", "id": 1, "firstname": "User"}'
+        data_dict = {
+            "id": 1,
+            "username": 'toto',
+            "num": 1,
+            "provisioningid": 123456
+        }
 
-        result = mapper.encode_user(data)
+        mapping_model_to_api = {
+            'id': 'id',
+            'username': 'username',
+            'num': 'device_slot',
+            'provisioningid': 'provisioning_extension',
+        }
+
+        result = mapper.map_to_api(mapping_model_to_api, data_dict)
 
         self.assertEqual(excpected_result, result)
