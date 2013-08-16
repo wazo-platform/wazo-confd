@@ -26,14 +26,18 @@ def delete_all():
 def _delete_all(channel):
     from xivo_dao.data_handler.user import services as user_services
     from xivo_dao.data_handler.user_line_extension import services as ule_services
+    from xivo_dao.data_handler.exception import ElementDeletionError
 
     for user in user_services.find_all():
 
         ules = ule_services.find_all_by_user_id(user.id)
-        for ule in ules:
-            ule_services.delete(ule)
+        try:
+            for ule in ules:
+                ule_services.delete_everything(ule)
 
-        user_services.delete(user)
+            user_services.delete(user)
+        except ElementDeletionError:
+            pass
 
 
 def create_user(userinfo):
