@@ -24,8 +24,8 @@ MAPPING = {
     'secret': 'secret',
     'context': 'context',
     'interface': 'interface',
-    'num': 'device_slot',
-    'provisioningid': 'provisioning_extension',
+    'device_slot': 'device_slot',
+    'provisioning_extension': 'provisioning_extension',
     'commented': 'commented',
     'description': 'description',
     'callerid': 'callerid'

@@ -283,9 +283,9 @@ Feature: Users
             | id | firstname | lastname |
             | 1  | Francisco | Montoya  |
         Given I only have the following lines:
-            | id | context | protocol |
-            | 10 | default | sip      |
-            | 20 | default | sip      |
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
+            | 20 | default | sip      | 1           |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |

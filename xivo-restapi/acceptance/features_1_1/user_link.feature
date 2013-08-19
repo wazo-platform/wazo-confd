@@ -39,8 +39,8 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol |
-            | 10 | default | sip      |
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
         When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -53,8 +53,8 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -64,11 +64,11 @@ Feature: Link user with a line and extension
     Scenario: Create link with a user that doesn't exist
         Given I have no users
         Given I only have the following lines:
-            | id | context | protocol |
-            | 10 | default | sip      |
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -80,11 +80,11 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol |
-            | 10 | default | sip      |
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -101,11 +101,11 @@ Feature: Link user with a line and extension
             | id  | firstname | lastname  |
             | 1   | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context     | protocol |
-            | 10 | statscenter | sip      |
+            | id | context     | protocol | device_slot |
+            | 10 | statscenter | sip      | 1           |
         Given I only have the following extensions:
-            | id  | context     | exten | type | typeval |
-            | 100 | statscenter | 1000  | user | 1       |
+            | id  | context     | exten |
+            | 100 | statscenter | 1000  |
         When I create the following links:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
@@ -118,11 +118,11 @@ Feature: Link user with a line and extension
 
     Scenario: Associate 3 users to the same line/extension
         Given I only have the following lines:
-            | id | context | protocol |
-            | 10 | default | sip      |
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         Given I only have the following users:
             | id | firstname | lastname  |
             | 1  | Salle     | Doctorant |
@@ -164,11 +164,11 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol | username | secret | num |
-            | 10 | default | sip      | toto     | tata   | 1   |
+            | id | context | protocol | username | secret | device_slot |
+            | 10 | default | sip      | toto     | tata   | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
@@ -194,11 +194,11 @@ Feature: Link user with a line and extension
             | 1   | Greg      | Sanderson |
             | 2   | Cédric    | Abunar    |
         Given I only have the following lines:
-            | id | context     | protocol |
-            | 10 | default     | sip      |
+            | id | context     | protocol | device_slot |
+            | 10 | default     | sip      | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
 
         When I create the following links:
             | user_id | line_id | extension_id |
@@ -227,11 +227,11 @@ Feature: Link user with a line and extension
             | id  | firstname | lastname  |
             | 1   | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context     | protocol |
-            | 10 | default     | sip      |
+            | id | context     | protocol | device_slot |
+            | 10 | default     | sip      | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
 
         When I create the following links:
             | user_id | line_id | extension_id |
@@ -249,11 +249,11 @@ Feature: Link user with a line and extension
             | 1   | Greg      | Sanderson |
             | 2   | Cédric    | Abunar    |
         Given I only have the following lines:
-            | id | context     | protocol | username | secret | num |
-            | 10 | default     | sip      | abc123   | def456 | 1   |
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | abc123   | def456 | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
@@ -272,11 +272,11 @@ Feature: Link user with a line and extension
             | 1   | Greg      | Sanderson |
             | 2   | Cédric    | Abunar    |
         Given I only have the following lines:
-            | id | context     | protocol | username | secret | num |
-            | 10 | default     | sip      | abc123   | def456 | 1   |
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | abc123   | def456 | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
@@ -303,11 +303,11 @@ Feature: Link user with a line and extension
             | id | firstname | lastname  |
             | 1  | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol | username | secret | num |
-            | 10 | default | sip      | toto     | tata   | 1   |
+            | id | context | protocol | username | secret | device_slot |
+            | 10 | default | sip      | toto     | tata   | 1           |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            | id  | context | exten |
+            | 100 | default | 1000  |
         Given I only have the following devices:
             | id | ip       | mac               |
             | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
