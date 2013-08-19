@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao.data_handler.exception import InvalidParametersError
+
 
 def map_to_api(mapping, data_dict):
     res = {}
@@ -26,9 +28,21 @@ def map_to_api(mapping, data_dict):
 
 
 def map_to_model(mapping, data_dict):
+    data_from_api_validator(mapping, data_dict)
     res = {}
     for model_key, api_key in mapping.iteritems():
         if api_key in data_dict:
             res[model_key] = data_dict[api_key]
 
     return res
+
+
+def data_from_api_validator(mapping, data_dict):
+    invalid_parameters = []
+
+    for api_key in data_dict.iterkeys():
+        if api_key not in mapping.values():
+            invalid_parameters.append(api_key)
+
+    if invalid_parameters:
+        raise InvalidParametersError(invalid_parameters)
