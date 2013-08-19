@@ -24,42 +24,38 @@ from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.user_line_extension import services as ule_services
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
-from xivo_restapi.helpers import serializer
-from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
+from xivo_restapi.helpers import serializer
+from xivo_restapi.helpers.formatter import Formatter
+from xivo_restapi.helpers.route_generator import RouteGenerator
 
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('user_links', __name__, url_prefix='/%s/user_links' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
+formatter = Formatter(mapper, serializer, UserLineExtension)
 
 
 @route('')
 def list():
     ules = ule_services.find_all()
-    result = mapper.encode_list(ules)
+    result = formatter.list_to_api(ules)
     return make_response(result, 200)
 
 
 @route('/<int:uleid>')
 def get(uleid):
     ule = ule_services.get(uleid)
-    result = mapper.encode_ule(ule)
+    result = formatter.to_api(ule)
     return make_response(result, 200)
 
 
 @route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
-    data = serializer.decode(data)
-
-    ule = UserLineExtension.from_user_data(data)
+    ule = formatter.to_model(data)
     ule = ule_services.create(ule)
-
-    result = {'id': ule.id}
-    mapper.add_links_to_dict(result, ule)
-    result = serializer.encode(result)
-
+    result = formatter.to_api(ule)
     location = url_for('.get', uleid=ule.id)
     return make_response(result, 201, {'Location': location})
 
@@ -67,9 +63,8 @@ def create():
 @route('/<int:uleid>', methods=['PUT'])
 def edit(uleid):
     data = request.data.decode("utf-8")
-    data = serializer.decode(data)
     ule = ule_services.get(uleid)
-    ule.update_from_data(data)
+    formatter.to_model_update(data, ule)
     ule_services.edit(ule)
     return make_response('', 204)
 
