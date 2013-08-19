@@ -6,7 +6,7 @@ Feature: Call recordings management
         Given there is no campaign
         Given there is a queue named "test_queue"
         Given there is a campaign named "test_campaign" for a queue "test_queue"
-        Given there is no agent with number "1111"
+        Given I have no agent with number "1111"
         When I save call details with the following parameters:
             | callid | campaign_name | agent_no | caller |
             | abcd   | test_campaign | 1111     |        |
