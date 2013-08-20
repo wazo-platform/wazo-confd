@@ -22,14 +22,18 @@ from . import mapper
 from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
+from xivo_dao.data_handler.line.model import Line
 from xivo_dao.data_handler.line import services as line_services
-from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi import config
+from xivo_restapi.helpers import serializer
+from xivo_restapi.helpers.route_generator import RouteGenerator
+from xivo_restapi.helpers.formatter import Formatter
 
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
+formatter = Formatter(mapper, serializer, Line)
 
 
 @route('')
@@ -39,13 +43,12 @@ def list():
     else:
         lines = line_services.find_all()
 
-    result = mapper.encode_list(lines)
+    result = formatter.list_to_api(lines)
     return make_response(result, 200)
 
 
 @route('/<int:lineid>')
 def get(lineid):
     line = line_services.get(lineid)
-    result = mapper.encode_line(line)
-
+    result = formatter.to_api(line)
     return make_response(result, 200)
