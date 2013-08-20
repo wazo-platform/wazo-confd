@@ -16,24 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import unittest
-
 from mock import Mock, patch
-from xivo_restapi import flask_http_server
-from xivo_restapi.helpers import serializer
+from hamcrest import assert_that, equal_to
+
 from xivo_dao.data_handler.extension.model import Extension
 from xivo_dao.data_handler.exception import MissingParametersError, \
     ElementNotExistsError, NonexistentParametersError
+from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "/1.1/extensions"
 
 
-class TestExtensionActions(unittest.TestCase):
-
-    def setUp(self):
-        flask_http_server.register_blueprints()
-        flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
+class TestExtensionActions(TestResources):
 
     @patch('xivo_dao.data_handler.extension.services.find_all')
     def test_list_extensions_with_no_extensions(self, mock_extension_services_find_all):
