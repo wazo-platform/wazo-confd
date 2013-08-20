@@ -22,6 +22,7 @@ MAPPING = {
     'id': 'id',
     'exten': 'exten',
     'context': 'context',
+    'type': 'type',
     'commented': 'commented'
 }
 

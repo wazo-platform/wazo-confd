@@ -23,14 +23,16 @@ from flask import Blueprint, url_for, request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
 from xivo_dao.data_handler.extension.model import Extension
+from xivo_restapi import config
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers import serializer
-from xivo_restapi import config
+from xivo_restapi.helpers.formatter import Formatter
 
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
+formatter = Formatter(mapper, serializer, Extension)
 
 
 @route('')
@@ -40,31 +42,24 @@ def list():
     else:
         extensions = extension_services.find_all()
 
-    result = mapper.encode_list(extensions)
+    result = formatter.list_to_api(extensions)
     return make_response(result, 200)
 
 
 @route('/<int:extensionid>')
 def get(extensionid):
     extension = extension_services.get(extensionid)
-    result = mapper.encode_extension(extension)
-
+    result = formatter.to_api(extension)
     return make_response(result, 200)
 
 
 @route('', methods=['POST'])
 def create():
     data = request.data.decode("utf-8")
-    data = serializer.decode(data)
-    _normalize_input_data(data)
-    extension = Extension.from_user_data(data)
+    extension = formatter.to_model(data)
+    _normalize_to_model(extension)
     extension = extension_services.create(extension)
-
-    result = {'id': extension.id}
-    mapper.add_links_to_dict(result, extension)
-
-    result = serializer.encode(result)
-
+    result = formatter.to_api(extension)
     location = url_for('.get', extensionid=extension.id)
     return make_response(result, 201, {'Location': location})
 
@@ -72,10 +67,8 @@ def create():
 @route('/<int:extensionid>', methods=['PUT'])
 def edit(extensionid):
     data = request.data.decode("utf-8")
-    data = serializer.decode(data)
     extension = extension_services.get(extensionid)
-    _normalize_input_data(data)
-    extension.update_from_data(data)
+    formatter.to_model_update(data, extension)
     extension_services.edit(extension)
     return make_response('', 204)
 
@@ -87,9 +80,9 @@ def delete(extensionid):
     return make_response('', 204)
 
 
-def _normalize_input_data(data):
-    if 'type' not in data:
-        data['type'] = 'user'
+def _normalize_to_model(extension):
+    if not hasattr(extension, 'type'):
+        extension.type = 'user'
 
-    if 'typeval' not in data:
-        data['typeval'] = '0'
+    if not hasattr(extension, 'typeval'):
+        extension.typeval = '0'
