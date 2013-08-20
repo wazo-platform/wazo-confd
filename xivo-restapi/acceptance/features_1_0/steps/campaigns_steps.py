@@ -34,7 +34,7 @@ def given_there_is_no_campaign(step):
 @step(u'When I create a campaign "([^"]*)"')
 def when_i_create_a_campaign_named_campagne_name(step, campaign_name):
     result = rest_campaign.create(campaign_name)
-    assert result.data > 0, "Cannot create a campaign"
+    assert result.status == 201, "Cannot create campaign. %s" % result.data
 
 
 @step(u'Then I can consult the campaign named "([^"]*)"')

@@ -71,11 +71,15 @@ class WsUtils(object):
         headers = {'Content-Type': 'application/json'}
         url = "%s/%s" % (self.baseurl, path)
 
-        return requests.Request(method=method, url=url, headers=headers, auth=self.auth, **kwargs)
+        return requests.Request(method=method,
+                                url=url,
+                                headers=headers,
+                                auth=self.auth,
+                                **kwargs)
 
     def _process_request(self, request):
         prep = request.prepare()
-        response = self.session.send(prep, verify=False)
+        response = self.session.send(prep, verify=False, allow_redirects=False)
         return self._process_response(response)
 
     def _process_response(self, response):
