@@ -20,7 +20,7 @@ from flask.helpers import url_for
 # mapping = {model_field: api_field}
 MAPPING = {
     'id': 'id',
-    'username': 'username',
+    'name': 'username',
     'secret': 'secret',
     'context': 'context',
     'interface': 'interface',
