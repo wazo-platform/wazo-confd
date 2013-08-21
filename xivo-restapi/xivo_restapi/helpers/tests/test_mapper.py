@@ -33,9 +33,9 @@ class TestMapper(unittest.TestCase):
 
         data_dict = {
             'id': 1,
-            'provisioningid': 123456,
             'username': 'toto',
-            'num': 1
+            'num': 1,
+            'provisioningid': 123456
         }
 
         mapping_model_to_api = {
@@ -52,16 +52,16 @@ class TestMapper(unittest.TestCase):
     def test_map_to_model(self):
         excpected_result = {
             'id': 1,
-            'provisioning_extension': 123456,
             'username': 'toto',
-            'device_slot': 1
+            'num': 1,
+            'provisioningid': 123456
         }
 
         data_dict = {
             "id": 1,
             "username": 'toto',
-            "num": 1,
-            "provisioningid": 123456
+            "device_slot": 1,
+            "provisioning_extension": 123456
         }
 
         mapping_model_to_api = {
@@ -71,7 +71,7 @@ class TestMapper(unittest.TestCase):
             'provisioningid': 'provisioning_extension',
         }
 
-        result = mapper.map_to_api(mapping_model_to_api, data_dict)
+        result = mapper.map_to_model(mapping_model_to_api, data_dict)
 
         self.assertEqual(excpected_result, result)
 
@@ -90,7 +90,10 @@ class TestMapper(unittest.TestCase):
             'model_key4': 'api_key4',
         }
 
-        mapper.map_to_api(mapping, data_dict)
+        try:
+            mapper.data_from_api_validator(mapping, data_dict)
+        except:
+            self.fail("validate_data_from_api raised an error")
 
     def test_data_from_api_validator_with_invalid_data(self):
         data_dict = {
