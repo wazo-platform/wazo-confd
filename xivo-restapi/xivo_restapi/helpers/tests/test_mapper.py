@@ -75,7 +75,7 @@ class TestMapper(unittest.TestCase):
 
         self.assertEqual(excpected_result, result)
 
-    def test_data_from_api_validator(self):
+    def test_validate_data_from_api_with_valid_data(self):
         data_dict = {
             "api_key1": 1,
             "api_key2": 'toto',
@@ -91,11 +91,11 @@ class TestMapper(unittest.TestCase):
         }
 
         try:
-            mapper.data_from_api_validator(mapping, data_dict)
+            mapper.validate_data_from_api(mapping, data_dict)
         except:
             self.fail("validate_data_from_api raised an error")
 
-    def test_data_from_api_validator_with_invalid_data(self):
+    def test_validate_data_from_api_with_invalid_data(self):
         data_dict = {
             "api_key1": 1,
             "api_key2": 'toto',
@@ -111,4 +111,4 @@ class TestMapper(unittest.TestCase):
             'model_key4': 'api_key4',
         }
 
-        self.assertRaises(InvalidParametersError, mapper.data_from_api_validator, mapping, data_dict)
+        self.assertRaises(InvalidParametersError, mapper.validate_data_from_api, mapping, data_dict)

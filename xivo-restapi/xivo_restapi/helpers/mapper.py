@@ -28,7 +28,7 @@ def map_to_api(mapping, data_dict):
 
 
 def map_to_model(mapping, data_dict):
-    data_from_api_validator(mapping, data_dict)
+    validate_data_from_api(mapping, data_dict)
     res = {}
     for model_key, api_key in mapping.iteritems():
         if api_key in data_dict:
@@ -37,7 +37,7 @@ def map_to_model(mapping, data_dict):
     return res
 
 
-def data_from_api_validator(mapping, data_dict):
+def validate_data_from_api(mapping, data_dict):
     invalid_parameters = []
 
     for api_key in data_dict.iterkeys():
