@@ -270,3 +270,21 @@ Feature: Extensions
         When I delete extension "100"
         Then I get a response with status "204"
         Then the extension "100" no longer exists
+
+    Scenario: Delete an extension still has a link
+        Given I only have the following users:
+            | id | firstname | lastname |
+            | 1  | Clémence  | Dupond   |
+        Given I only have the following lines:
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten | type | typeval |
+            | 100 | default | 1000  | user | 1       |
+        When I create the following links:
+            | user_id | line_id | extension_id | main_line |
+            | 1       | 10      | 100          | True      |
+
+        When I delete extension "100"
+        Then I get a response with status "400"
+        Then I get an error message "error while deleting Extension: extension still has a link"
