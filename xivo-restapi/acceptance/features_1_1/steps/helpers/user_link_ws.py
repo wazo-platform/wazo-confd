@@ -23,3 +23,7 @@ USER_LINK_PATH = 'user_links'
 
 def create_user_link(parameters):
     return ws_utils.rest_post(USER_LINK_PATH, parameters)
+
+
+def delete(userlink_id):
+    return ws_utils.rest_delete('%s/%s' % (USER_LINK_PATH, userlink_id))
