@@ -18,12 +18,14 @@
 import logging
 
 from flask.helpers import make_response
-from xivo_restapi.helpers import serializer
+from functools import wraps
 from werkzeug.exceptions import HTTPException
+
 from xivo_dao.data_handler.exception import MissingParametersError, \
     InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError, \
     ElementCreationError, ElementDeletionError, ElementEditionError, NonexistentParametersError
-from functools import wraps
+from xivo_restapi.helpers import serializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,35 +36,28 @@ def exception_catcher(func):
         generic_errors = (MissingParametersError,
                           InvalidParametersError,
                           NonexistentParametersError,
-                          ElementAlreadyExistsError)
+                          ElementAlreadyExistsError,
+                          ElementCreationError,
+                          ElementEditionError,
+                          ElementDeletionError)
 
         try:
             return func(*args, **kwargs)
         except generic_errors as e:
-            data = serializer.encode([unicode(e)])
-            return make_response(data, 400)
+            return _make_response_encoded(e, 400)
         except ValueError, e:
-            data = serializer.encode(["No parsable data in the request, Be sure to send a valid JSON file"])
-            return make_response(data, 400)
-        except ElementCreationError, e:
-            data = serializer.encode([unicode(e)])
-            logger.error("error during creation: %s", e)
-            return make_response("error during creation: %s" % e, 400)
-        except ElementEditionError, e:
-            data = serializer.encode([unicode(e)])
-            logger.error("error during edition: %s", e)
-            return make_response("error during edition: %s" % e, 400)
-        except ElementDeletionError, e:
-            data = serializer.encode([unicode(e)])
-            logger.error("error during deletion: %s", e)
-            return make_response("error during deletion: %s" % e, 400)
+            data = "No parsable data in the request, Be sure to send a valid JSON file"
+            return _make_response_encoded(data, 400)
         except ElementNotExistsError, e:
-            data = serializer.encode([unicode(e)])
-            logger.error("error element not exist: %s", e)
-            return make_response('', 404)
+            return _make_response_encoded(e, 404)
         except HTTPException:
             raise
         except Exception as e:
-            logger.error("unexpected error during request: %s", e, exc_info=True)
-            return make_response(serializer.encode([unicode(e)]), 500)
+            data = 'unexpected error during request: %s' % e
+            return _make_response_encoded(data, 500, exc_info=True)
     return decorated_func
+
+
+def _make_response_encoded(message, code, exc_info=False):
+    logger.error(message, exc_info=exc_info)
+    return make_response(serializer.encode([unicode(message)]), code)
