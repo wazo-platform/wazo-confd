@@ -15,28 +15,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_restapi.helpers import serializer
+from xivo_dao.data_handler.exception import InvalidParametersError
 
 
-def encode(data):
-    return serializer.encode(data)
-
-
-def encode_list(items):
-    return serializer.encode(process_paginated_data(items))
-
-
-def map_entity(mapping, obj):
+def map_to_api(mapping, data_dict):
     res = {}
-    for obj_attr, mapping_key in mapping.iteritems():
-        if hasattr(obj, obj_attr):
-            res[mapping_key] = getattr(obj, obj_attr)
+    for model_key, api_key in mapping.iteritems():
+        if model_key in data_dict:
+            res[api_key] = data_dict[model_key]
+
     return res
 
 
-def process_paginated_data(items):
-    result = {
-        'total': len(items),
-        'items': items
-    }
-    return result
+def map_to_model(mapping, data_dict):
+    validate_data_from_api(mapping, data_dict)
+    res = {}
+    for model_key, api_key in mapping.iteritems():
+        if api_key in data_dict:
+            res[model_key] = data_dict[api_key]
+
+    return res
+
+
+def validate_data_from_api(mapping, data_dict):
+    invalid_parameters = []
+
+    for api_key in data_dict.iterkeys():
+        if api_key not in mapping.values():
+            invalid_parameters.append(api_key)
+
+    if invalid_parameters:
+        raise InvalidParametersError(invalid_parameters)

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-#
-# Copyright (C) 2012  Avencall
+
+# Copyright (C) 2013 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,14 +14,23 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import json
+import unittest
+
+from xivo_restapi import flask_http_server
+from xivo_restapi.helpers import serializer
 
 
-def encode(data):
-    return json.dumps(data)
+class TestResources(unittest.TestCase):
 
+    def setUp(self):
+        flask_http_server.register_blueprints()
+        flask_http_server.app.testing = True
+        self.app = flask_http_server.app.test_client()
 
-def decode(data):
-    return json.loads(data)
+    def _serialize_encode(self, data):
+        return serializer.encode(data)
+
+    def _serialize_decode(self, data):
+        return serializer.decode(data)

@@ -16,27 +16,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import unittest
-
 from mock import patch
-from xivo_restapi import flask_http_server
-from xivo_restapi.helpers import serializer
+from hamcrest import assert_that, equal_to
+
 from xivo_dao.data_handler.line.model import Line
 from xivo_dao.data_handler.exception import ElementNotExistsError
+from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "/1.1/lines"
 
 
-class TestLineActions(unittest.TestCase):
-
-    def setUp(self):
-        flask_http_server.register_blueprints()
-        flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
+class TestLineActions(TestResources):
 
     @patch('xivo_dao.data_handler.line.services.find_all')
     def test_list_lines_with_no_lines(self, mock_line_services_find_all):
-        status_code = 200
+        expected_status_code = 200
         expected_result = {
             'total': 0,
             'items': []
@@ -45,15 +39,14 @@ class TestLineActions(unittest.TestCase):
         mock_line_services_find_all.return_value = []
 
         result = self.app.get(BASE_URL)
-        decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all.assert_any_call()
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.line.services.find_all')
     def test_list_lines_with_two_lines(self, mock_line_services_find_all):
-        status_code = 200
+        expected_status_code = 200
         expected_result = {
             'total': 2,
             'items': [
@@ -81,88 +74,95 @@ class TestLineActions(unittest.TestCase):
         mock_line_services_find_all.return_value = [line1, line2]
 
         result = self.app.get(BASE_URL)
-        decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all.assert_any_call()
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.line.services.find_all_by_name')
     def test_list_lines_with_search(self, mock_line_services_find_all_by_name):
-        status_code = 200
+        line = Line(id=1,
+                    name='Bob')
+
+        expected_status_code = 200
         search = 'bob'
 
         expected_result = {
-            'total': 1,
+            'total': line.id,
             'items': [
                 {
                     'id': 1,
                     'name': 'Bob',
                     'links': [{
-                        'href': 'http://localhost/1.1/lines/1',
+                        'href': 'http://localhost/1.1/lines/%d' % line.id,
                         'rel': 'lines'
                     }]
                 }
             ]
         }
 
-        line = Line(id=1, name='Bob')
         mock_line_services_find_all_by_name.return_value = [line]
 
         result = self.app.get("%s?q=%s" % (BASE_URL, search))
-        decoded_result = serializer.decode(result.data)
 
         mock_line_services_find_all_by_name.assert_called_once_with(search)
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.line.services.find_all')
     def test_list_lines_error(self, mock_line_services_find_all):
-        status_code = 500
+        expected_status_code = 500
 
         mock_line_services_find_all.side_effect = Exception
 
         result = self.app.get(BASE_URL)
 
         mock_line_services_find_all.assert_any_call()
-        self.assertEqual(status_code, result.status_code)
+        self.assertEqual(expected_status_code, result.status_code)
 
     @patch('xivo_dao.data_handler.line.services.get')
     def test_get(self, mock_line_services_get):
-        status_code = 200
+        line = Line(id=1,
+                    name='test1')
+
+        expected_status_code = 200
         expected_result = {
-            'id': 1,
-            'name': 'test1'
+            'id': line.id,
+            'name': 'test1',
+            'links': [{
+                'href': 'http://localhost/1.1/lines/%d' % line.id,
+                'rel': 'lines'
+            }]
         }
 
-        line = Line(id=1, name='test1')
         mock_line_services_get.return_value = line
 
-        result = self.app.get("%s/1" % BASE_URL)
-        decoded_result = serializer.decode(result.data)
+        result = self.app.get("%s/%d" % (BASE_URL, line.id))
 
-        mock_line_services_get.assert_called_with(1)
-        self.assertEquals(status_code, result.status_code)
-        self.assertEquals(expected_result, decoded_result)
+        mock_line_services_get.assert_called_with(line.id)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.line.services.get')
     def test_get_error(self, mock_line_services_get):
-        status_code = 500
+        line_id = 345
+        expected_status_code = 500
 
         mock_line_services_get.side_effect = Exception
 
-        result = self.app.get("%s/1" % BASE_URL)
+        result = self.app.get("%s/%d" % (BASE_URL, line_id))
 
-        mock_line_services_get.assert_called_with(1)
-        self.assertEquals(status_code, result.status_code)
+        mock_line_services_get.assert_called_with(line_id)
+        assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_dao.data_handler.line.services.get')
     def test_get_not_found(self, mock_line_services_get):
-        status_code = 404
+        line_id = 3453345
+        expected_status_code = 404
 
         mock_line_services_get.side_effect = ElementNotExistsError('line')
 
-        result = self.app.get("%s/1" % BASE_URL)
+        result = self.app.get("%s/%d" % (BASE_URL, line_id))
 
-        mock_line_services_get.assert_called_with(1)
-        self.assertEqual(status_code, result.status_code)
+        mock_line_services_get.assert_called_with(line_id)
+        self.assertEqual(expected_status_code, result.status_code)

@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_restapi.helpers import mapper
 from flask import helpers as flask_helpers
 
-# mapping = {db_field: model_field}
+# mapping = {model_field: api_field}
 MAPPING = {
     'id': 'id',
     'firstname': 'firstname',
@@ -36,15 +35,6 @@ MAPPING = {
 }
 
 
-def encode_list(users):
-    mapped_users = []
-    for user in users:
-        mapped_user = map_user(user)
-        add_links_to_dict(mapped_user, user)
-        mapped_users.append(mapped_user)
-    return mapper.encode_list(mapped_users)
-
-
 def add_links_to_dict(user_dict, user):
     user_location = flask_helpers.url_for('.get', userid=user.id, _external=True)
     user_dict.update({
@@ -55,12 +45,3 @@ def add_links_to_dict(user_dict, user):
             }
         ]
     })
-
-
-def encode_user(user):
-    mapped_user = map_user(user)
-    return mapper.encode(mapped_user)
-
-
-def map_user(user):
-    return mapper.map_entity(MAPPING, user)

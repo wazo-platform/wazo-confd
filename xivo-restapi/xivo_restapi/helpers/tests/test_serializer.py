@@ -22,6 +22,8 @@ from xivo_restapi.helpers import serializer
 class TestSerializer(unittest.TestCase):
 
     def test_encode(self):
+        expected_result = '{"items": [{"lastname": "1", "id": 1, "firstname": "User"}, {"lastname": "2", "id": 2, "firstname": "User"}], "total": 2}'
+
         data = {
             'total': 2,
             'items': [
@@ -37,5 +39,30 @@ class TestSerializer(unittest.TestCase):
                 },
             ]
         }
+
         result = serializer.encode(data)
-        self.assertEqual(serializer.decode(result), data)
+
+        self.assertEqual(result, expected_result)
+
+    def test_decode(self):
+        data = '{"items": [{"lastname": "1", "id": 1, "firstname": "User"}, {"lastname": "2", "id": 2, "firstname": "User"}], "total": 2}'
+
+        expected_result = {
+            'total': 2,
+            'items': [
+                {
+                    "id": 1,
+                    "firstname": "User",
+                    "lastname": "1"
+                },
+                {
+                    "id": 2,
+                    "firstname": "User",
+                    "lastname": "2"
+                },
+            ]
+        }
+
+        result = serializer.decode(data)
+
+        self.assertEqual(result, expected_result)

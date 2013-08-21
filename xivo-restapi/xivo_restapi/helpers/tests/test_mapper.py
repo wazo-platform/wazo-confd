@@ -16,32 +16,99 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from xivo_restapi.resources.users import mapper
-from xivo_dao.data_handler.user.model import User
-from mock import patch
+
+from xivo_restapi.helpers import mapper
+from xivo_dao.data_handler.exception import InvalidParametersError
 
 
 class TestMapper(unittest.TestCase):
 
-    @patch('flask.helpers.url_for')
-    def test_encode_list(self, mock_url_for):
-        obj1 = User(id=1, firstname='User', lastname='1')
-        obj2 = User(id=2, firstname='User', lastname='2')
-        data = [obj1, obj2]
+    def test_map_to_api(self):
+        excpected_result = {
+            "id": 1,
+            "username": 'toto',
+            "device_slot": 1,
+            "provisioning_extension": 123456
+        }
 
-        mock_url_for.return_value = 'http://localhost:50050/1.1/users/1'
+        data_dict = {
+            'id': 1,
+            'username': 'toto',
+            'num': 1,
+            'provisioningid': 123456
+        }
 
-        excpected_result = '{"items": [{"lastname": "1", "links": [{"href": "http://localhost:50050/1.1/users/1", "rel": "users"}], "id": 1, "firstname": "User"}, {"lastname": "2", "links": [{"href": "http://localhost:50050/1.1/users/1", "rel": "users"}], "id": 2, "firstname": "User"}], "total": 2}'
+        mapping_model_to_api = {
+            'id': 'id',
+            'username': 'username',
+            'num': 'device_slot',
+            'provisioningid': 'provisioning_extension',
+        }
 
-        result = mapper.encode_list(data)
+        result = mapper.map_to_api(mapping_model_to_api, data_dict)
 
         self.assertEqual(excpected_result, result)
 
-    def test_encode(self):
-        data = User(id=1, firstname='User', lastname='1')
+    def test_map_to_model(self):
+        excpected_result = {
+            'id': 1,
+            'username': 'toto',
+            'num': 1,
+            'provisioningid': 123456
+        }
 
-        excpected_result = '{"lastname": "1", "id": 1, "firstname": "User"}'
+        data_dict = {
+            "id": 1,
+            "username": 'toto',
+            "device_slot": 1,
+            "provisioning_extension": 123456
+        }
 
-        result = mapper.encode_user(data)
+        mapping_model_to_api = {
+            'id': 'id',
+            'username': 'username',
+            'num': 'device_slot',
+            'provisioningid': 'provisioning_extension',
+        }
+
+        result = mapper.map_to_model(mapping_model_to_api, data_dict)
 
         self.assertEqual(excpected_result, result)
+
+    def test_validate_data_from_api_with_valid_data(self):
+        data_dict = {
+            "api_key1": 1,
+            "api_key2": 'toto',
+            "api_key3": 1,
+            "api_key4": 123456
+        }
+
+        mapping = {
+            'model_key1': 'api_key1',
+            'model_key2': 'api_key2',
+            'model_key3': 'api_key3',
+            'model_key4': 'api_key4',
+        }
+
+        try:
+            mapper.validate_data_from_api(mapping, data_dict)
+        except:
+            self.fail("validate_data_from_api raised an error")
+
+    def test_validate_data_from_api_with_invalid_data(self):
+        data_dict = {
+            "api_key1": 1,
+            "api_key2": 'toto',
+            "api_key3": 1,
+            "api_key4": 123456,
+            "invalid_key": 123456
+        }
+
+        mapping = {
+            'model_key1': 'api_key1',
+            'model_key2': 'api_key2',
+            'model_key3': 'api_key3',
+            'model_key4': 'api_key4',
+        }
+
+        self.assertRaises(InvalidParametersError, mapper.validate_data_from_api, mapping, data_dict)
