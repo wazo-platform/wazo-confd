@@ -128,7 +128,7 @@ Feature: Link user with a line and extension
             | 1  | Salle     | Doctorant |
             | 2  | Greg      | Sanderson |
             | 3  | Roberto   | Da Silva  |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id | main_user |
             | 1       | 10      | 100          | True      |
             | 2       | 10      | 100          | False     |

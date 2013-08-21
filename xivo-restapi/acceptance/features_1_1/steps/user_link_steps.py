@@ -27,11 +27,11 @@ def when_i_create_an_empty_link(step):
     world.response = user_link_ws.create_user_link({})
 
 
-@step(u'When I create a link with the following parameters:')
-def when_i_create_a_link_with_the_following_parameters(step):
-    for data_dict in step.hashes:
-        parameters = _extract_parameters(data_dict)
-        world.response = user_link_ws.create_user_link(parameters)
+@step(u'When I create the following links:')
+def when_i_create_the_following_links(step):
+    for link_info in step.hashes:
+        userlink = _extract_parameters(link_info)
+        world.response = user_link_ws.create_user_link(userlink)
 
 
 @step(u'When I create a link with the following invalid parameters:')
@@ -46,13 +46,6 @@ def then_i_get_the_lines_with_the_following_parameters(step):
         assert_that(world.response.data['items'], has_item(
             has_entries(_extract_parameters(expected_data))
         ))
-
-
-@step(u'When I create the following links:')
-def when_i_create_the_following_links(step):
-    for link_info in step.hashes:
-        userlink = _extract_parameters(link_info)
-        world.response = user_link_ws.create_user_link(userlink)
 
 
 @step(u'When I provision my device with my line_id "([^"]*)" and ip "([^"]*)"')

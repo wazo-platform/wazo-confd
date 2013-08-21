@@ -289,7 +289,7 @@ Feature: Users
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
             | 100 | default | 1000  | user | 1       |
-        When I create a link with the following parameters:
+        When I create the following links:
             | user_id | line_id | extension_id | main_line |
             | 1       | 10      | 100          | True      |
             | 1       | 20      | 100          | False     |
