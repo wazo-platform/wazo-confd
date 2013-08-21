@@ -312,7 +312,7 @@ Feature: Users
             | 1       | 10      | 100          | True      |
             | 1       | 20      | 100          | False     |
         Then I get a response with status "201"
-        
+
         When I get the lines associated to user "1"
         Then I get a response with status "200"
         Then I get the user_links with the following parameters:
