@@ -64,7 +64,7 @@ def create():
 def edit(uleid):
     data = request.data.decode("utf-8")
     ule = ule_services.get(uleid)
-    formatter.to_model_update(data, ule)
+    formatter.update_model(data, ule)
     ule_services.edit(ule)
     return make_response('', 204)
 

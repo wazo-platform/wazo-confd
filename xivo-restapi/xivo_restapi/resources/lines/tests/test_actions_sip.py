@@ -254,7 +254,7 @@ class TestLineSIPActions(TestResources):
 
         result = self.app.put("%s/%d" % (BASE_URL, line.id), data=data_serialized)
 
-        formatter.to_model_update.assert_called_with(data_serialized, line)
+        formatter.update_model.assert_called_with(data_serialized, line)
         mock_line_services_get.assert_called_once_with(line.id)
         line_edited.username = data['username']
         mock_line_services_edit.assert_called_once_with(line_edited)
@@ -277,7 +277,7 @@ class TestLineSIPActions(TestResources):
 
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
-        formatter.to_model_update.assert_called_with(data_serialized, line)
+        formatter.update_model.assert_called_with(data_serialized, line)
         assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_restapi.resources.lines.actions_sip.formatter')

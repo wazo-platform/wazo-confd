@@ -267,7 +267,7 @@ class TestULEActions(TestResources):
 
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
-        formatter.to_model_update.assert_called_with(data_serialized, ule)
+        formatter.update_model.assert_called_with(data_serialized, ule)
         self.assertEqual(expected_status_code, result.status_code)
         self.assertEqual(expected_data, result.data)
 
@@ -289,7 +289,7 @@ class TestULEActions(TestResources):
 
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
-        formatter.to_model_update.assert_called_with(data_serialized, ule)
+        formatter.update_model.assert_called_with(data_serialized, ule)
         self.assertEqual(expected_status_code, result.status_code)
 
     @patch('xivo_restapi.resources.user_links.actions.formatter')

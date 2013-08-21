@@ -64,7 +64,7 @@ def create():
 def edit(lineid):
     data = request.data.decode("utf-8")
     line = line_services.get(lineid)
-    formatter.to_model_update(data, line)
+    formatter.update_model(data, line)
     line_services.edit(line)
     return make_response('', 204)
 

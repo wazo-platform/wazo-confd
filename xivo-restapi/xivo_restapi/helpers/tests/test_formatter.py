@@ -107,7 +107,7 @@ class TestFormatter(unittest.TestCase):
         self._model_class.from_user_data.assert_called_once_with(self._model_data_dict)
 
     @patch('xivo_restapi.helpers.mapper.map_to_model')
-    def test_to_model_update(self, map_to_model):
+    def test_update_model(self, map_to_model):
         my_model = Mock(model_key_1='lol',
                         model_key_2='lol',
                         model_key_3=['lol', 'lol'])
@@ -122,7 +122,7 @@ class TestFormatter(unittest.TestCase):
 
         map_to_model.return_value = self._model_data_dict
 
-        self.formatter.to_model_update(api_data, my_model)
+        self.formatter.update_model(api_data, my_model)
 
         assert_that(my_model, all_of(
             has_property('model_key_1', self._model_data_dict['model_key_1']),

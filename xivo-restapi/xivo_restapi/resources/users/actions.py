@@ -77,7 +77,7 @@ def create():
 def edit(userid):
     data = request.data.decode("utf-8")
     user = user_services.get(userid)
-    formatter.to_model_update(data, user)
+    formatter.update_model(data, user)
     user_services.edit(user)
     return make_response('', 204)
 

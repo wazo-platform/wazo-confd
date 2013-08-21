@@ -68,7 +68,7 @@ def create():
 def edit(extensionid):
     data = request.data.decode("utf-8")
     extension = extension_services.get(extensionid)
-    formatter.to_model_update(data, extension)
+    formatter.update_model(data, extension)
     extension_services.edit(extension)
     return make_response('', 204)
 

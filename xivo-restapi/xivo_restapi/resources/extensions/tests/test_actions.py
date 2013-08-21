@@ -277,7 +277,7 @@ class TestExtensionActions(TestResources):
 
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
-        formatter.to_model_update.assert_called_with(data_serialized, extension)
+        formatter.update_model.assert_called_with(data_serialized, extension)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_data))
 
@@ -300,7 +300,7 @@ class TestExtensionActions(TestResources):
 
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
-        formatter.to_model_update.assert_called_with(data_serialized, extension)
+        formatter.update_model.assert_called_with(data_serialized, extension)
         assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_dao.data_handler.extension.services.get')
