@@ -73,8 +73,9 @@ def _load_module(name):
         components = name.split('.')
         for comp in components[1:]:
             mod = getattr(mod, comp)
-    except ImportError:
+    except ImportError as e:
         logger.error('Module not found %s', name)
+        logger.exception(e)
     else:
         mod.register_blueprints(app)
         logger.debug('Module successfully loaded: %s', name)
