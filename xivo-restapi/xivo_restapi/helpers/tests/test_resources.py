@@ -17,17 +17,40 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import unittest
-
+from functools import wraps
+from mock import Mock
 from xivo_restapi import flask_http_server
+from xivo_restapi.authentication import xivo_realm_digest
 from xivo_restapi.helpers import serializer
+from xivo_restapi.negotiate import flask_negotiate
 
 
 class TestResources(unittest.TestCase):
 
     def setUp(self):
+        self._mock_decorators()
         flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
         self.app = flask_http_server.app.test_client()
+
+    def _mock_decorators(self):
+        def mock_basic_decorator(func):
+            return func
+
+        def mock_parameterized_decorator(string):
+                def decorated(func):
+                    @wraps(func)
+                    def wrapper(*args, **kwargs):
+                        return func(*args, **kwargs)
+                    return wrapper
+                return decorated
+
+        xivo_realm_digest.realmDigest = Mock()
+        xivo_realm_digest.realmDigest.requires_auth.side_effect = mock_basic_decorator
+        flask_negotiate.consumes = Mock()
+        flask_negotiate.consumes.side_effect = mock_parameterized_decorator
+        flask_negotiate.produces = Mock()
+        flask_negotiate.produces.side_effect = mock_parameterized_decorator
 
     def _serialize_encode(self, data):
         return serializer.encode(data)
