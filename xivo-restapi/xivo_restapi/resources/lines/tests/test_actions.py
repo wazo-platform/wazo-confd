@@ -22,6 +22,7 @@ from hamcrest import assert_that, equal_to
 from xivo_dao.data_handler.line.model import Line
 from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
+from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 
 BASE_URL = "/1.1/lines"
 
@@ -118,6 +119,89 @@ class TestLineActions(TestResources):
         result = self.app.get(BASE_URL)
 
         mock_line_services_find_all.assert_any_call()
+        self.assertEqual(expected_status_code, result.status_code)
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_line_id')
+    def test_list_user_links_not_found(self, mock_ule_services_find_all_by_line_id):
+        line_id = 1370
+        expected_status_code = 200
+        expected_result = {
+            'total': 0,
+            'items': []
+        }
+
+        mock_ule_services_find_all_by_line_id.return_value = []
+
+        result = self.app.get("%s/%d/user_links" % (BASE_URL, line_id))
+
+        mock_ule_services_find_all_by_line_id.assert_called_once_with(line_id)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_line_id')
+    def test_list_user_links(self, mock_ule_services_find_all_by_line_id):
+        expected_status_code = 200
+        user_link_id = 83
+        user_id = 14
+        line_id = 42324
+        extension_id = 2132
+
+        expected_result = {
+            "total": 1,
+            "items": [
+                {
+                    "id": user_link_id,
+                    "user_id": user_id,
+                    "line_id": line_id,
+                    "extension_id": extension_id,
+                    "main_user": True,
+                    "main_line": True,
+                    "links": [
+                        {
+                            "rel": "user_links",
+                            "href": "http://localhost/1.1/user_links/%d" % user_link_id
+                        },
+                        {
+                            "rel": "users",
+                            "href": "http://localhost/1.1/users/%d" % user_id
+                        },
+                        {
+                            "rel": "lines",
+                            "href": "http://localhost/1.1/lines/%d" % line_id
+                        },
+                        {
+                            "rel": "extensions",
+                            "href": "http://localhost/1.1/extensions/%d" % extension_id
+                        }
+                    ]
+                }
+            ]
+        }
+
+        mock_ule_services_find_all_by_line_id.return_value = [
+            UserLineExtension(id=user_link_id,
+                              user_id=user_id,
+                              line_id=line_id,
+                              extension_id=extension_id,
+                              main_user=True,
+                              main_line=True)
+        ]
+
+        result = self.app.get("%s/%d/user_links" % (BASE_URL, line_id))
+
+        mock_ule_services_find_all_by_line_id.assert_called_once_with(line_id)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_line_id')
+    def test_list_user_links_error(self, mock_ule_services_find_all_by_line_id):
+        expected_status_code = 500
+
+        mock_ule_services_find_all_by_line_id.side_effect = Exception
+
+        result = self.app.get("%s/%d/user_links" % (BASE_URL, 1))
+
+        mock_ule_services_find_all_by_line_id.assert_called_once_with(1)
         self.assertEqual(expected_status_code, result.status_code)
 
     @patch('xivo_dao.data_handler.line.services.get')
