@@ -23,13 +23,7 @@ CSV_HEADERS = ['Call Date',
                'Caller',
                'Called',
                'Period',
-               'channel',
-               'Flag billing',
-               'Number deposit',
-               'user Field',
-               'context',
-               'Destination channel',
-               'unique identifier']
+               'user Field']
 
 
 def encode_list(call_logs):
@@ -48,5 +42,3 @@ def write_body(csv_file, headers, call_logs):
     writer = csv.DictWriter(csv_file, CSV_HEADERS)
     for call_log in call_logs:
         writer.writerow(call_log)
-
-

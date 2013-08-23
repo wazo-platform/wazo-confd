@@ -46,8 +46,8 @@ class TestCallLogActions(TestResources):
         expected_status_code = 200
         expected_result = textwrap.dedent('''\
             %s\r
-            01/01/2013 00:00:00,source1 (1001),2001,1,,,,,,,\r
-            01/02/2013 00:00:00,source2 (1002),2002,2,,,,userfield,,,\r
+            01/01/2013 00:00:00,source1 (1001),2001,1,\r
+            01/02/2013 00:00:00,source2 (1002),2002,2,userfield\r
             ''' % ','.join(CSV_HEADERS))
         call_log_1 = Mock(date=datetime(2013, 1, 1),
                           source_name='source1',
