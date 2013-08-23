@@ -38,12 +38,12 @@ class TestResources(unittest.TestCase):
             return func
 
         def mock_parameterized_decorator(string):
-                def decorated(func):
-                    @wraps(func)
-                    def wrapper(*args, **kwargs):
-                        return func(*args, **kwargs)
-                    return wrapper
-                return decorated
+            def decorated(func):
+                @wraps(func)
+                def wrapper(*args, **kwargs):
+                    return func(*args, **kwargs)
+                return wrapper
+            return decorated
 
         xivo_realm_digest.realmDigest = Mock()
         xivo_realm_digest.realmDigest.requires_auth.side_effect = mock_basic_decorator
