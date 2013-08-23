@@ -31,7 +31,7 @@ class RouteGenerator(object):
             func = exception_catcher(func)
             func = realmDigest.requires_auth(func)
             func = produces('application/json')(func)
-            func = consumes('application/json')(func)
+            # func = consumes('application/json')(func)  # Blocks requests with no Content-Type, even if not needed
             # MUST BE CALLED AS THE END
             self._blueprint.route(route, *args, **kwargs)(func)
         return decorator
