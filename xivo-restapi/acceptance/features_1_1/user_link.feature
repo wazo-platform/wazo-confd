@@ -332,3 +332,125 @@ Feature: Link user with a line and extension
         Then the device "20" has been provisioned with a configuration:
             | display_name      | number | username | auth_username | password |
             | Gregory Sanderson | 1000   | toto     | toto          | tata     |
+
+    Scenario: Delete a user link that doesn't exist
+        Given I have no link with the following parameters:
+            | id |
+            | 2  |
+        When I delete the following links:
+            | id |
+            | 2  |
+        Then I get a response with status "404"
+        Then I get an error message "UserLineExtension with id=2 does not exist"
+
+    Scenario: Delete secondary user
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | toto     | tata   | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+
+        When I create the following links:
+            | id | user_id | line_id | extension_id |
+            | 1  | 1       | 10      | 100          |
+            | 2  | 2       | 10      | 100          |
+        Then I get a response with status "201"
+
+        When I delete the following links:
+            | id |
+            | 2  |
+        Then I get a response with status "204"
+
+    Scenario: Delete a secondary user after provisioning a device
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | toto     | tata   | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+        Given I only have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
+
+        When I create the following links:
+            | id | user_id | line_id | extension_id |
+            | 1  | 1       | 10      | 100          |
+            | 2  | 2       | 10      | 100          |
+        Then I get a response with status "201"
+
+        When I provision my device with my line_id "10" and ip "10.0.0.1"
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | toto     | toto          | tata     |
+
+        When I delete the following links:
+            | id |
+            | 2  |
+        Then I get a response with status "204"
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | toto     | toto          | tata     |
+
+    Scenario: Delete main user
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | toto     | tata   | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+
+        When I create the following links:
+            | id | user_id | line_id | extension_id |
+            | 1  | 1       | 10      | 100          |
+            | 2  | 2       | 10      | 100          |
+        Then I get a response with status "201"
+
+        When I delete the following links:
+            | id |
+            | 1  |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: There are secondary users associated to this link"
+
+    Scenario: Delete main user after provisioning a device still has a secondary user
+        Given I only have the following users:
+            | id  | firstname | lastname  |
+            | 1   | Greg      | Sanderson |
+            | 2   | Cédric    | Abunar    |
+        Given I only have the following lines:
+            | id | context     | protocol | username | secret | device_slot |
+            | 10 | default     | sip      | toto     | tata   | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+        Given I only have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:00 |
+
+        When I create the following links:
+            | id | user_id | line_id | extension_id |
+            | 1  | 1       | 10      | 100          |
+            | 2  | 2       | 10      | 100          |
+
+        When I provision my device with my line_id "10" and ip "10.0.0.1"
+        Then the device "20" has been provisioned with a configuration:
+            | display_name   | number | username | auth_username | password |
+            | Greg Sanderson | 1000   | toto     | toto          | tata     |
+
+        When I delete the following links:
+            | id |
+            | 1  |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: There are secondary users associated to this link"
