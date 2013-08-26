@@ -46,6 +46,7 @@ def exception_catcher(func):
         except generic_errors as e:
             return _make_response_encoded(e, 400)
         except ValueError, e:
+            logger.exception(e)
             data = "No parsable data in the request, Be sure to send a valid JSON file"
             return _make_response_encoded(data, 400)
         except ElementNotExistsError, e:
