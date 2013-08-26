@@ -21,7 +21,7 @@ def to_api(call_log):
     result['Call Date'] = call_log.date.strftime('%m/%d/%Y %H:%M:%S')
     result['Caller'] = '%s (%s)' % (call_log.source_name, call_log.source_exten)
     result['Called'] = call_log.destination_exten
-    result['Period'] = total_seconds(call_log.duration)
+    result['Period'] = str(total_seconds(call_log.duration))
     result['user Field'] = call_log.user_field
     return result
 

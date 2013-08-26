@@ -22,6 +22,7 @@ from mock import Mock, patch
 from hamcrest import assert_that, equal_to, has_entry
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_restapi.resources.call_logs.serializer import CSV_HEADERS
+from xivo_dao.data_handler.call_log.model import CallLog
 
 BASE_URL = "/1.1/call_logs"
 
@@ -42,37 +43,22 @@ class TestCallLogActions(TestResources):
         assert_that(result.data, equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.call_log.services.find_all')
-    def test_list_call_logs_with_call_logs(self, mock_call_log_services_find_all):
+    @patch('xivo_restapi.resources.call_logs.mapper.to_api')
+    @patch('xivo_restapi.resources.call_logs.serializer.encode_list')
+    def test_list_call_logs_with_call_logs2(self, serialize_encode, mapper_to_api, mock_call_log_services_find_all):
         expected_status_code = 200
-        expected_result = textwrap.dedent('''\
-            %s\r
-            01/01/2013 00:00:00,source1 (1001),2001,1,\r
-            01/02/2013 00:00:00,soùrce2 (1002),2002,2,userfield\r
-            ''' % ','.join(CSV_HEADERS))
-        call_log_1 = Mock(date=datetime(2013, 1, 1),
-                          source_name='source1',
-                          source_exten='1001',
-                          destination_name='',
-                          destination_exten='2001',
-                          user_field='',
-                          answered=True,
-                          duration=timedelta(seconds=1))
-
-        call_log_2 = Mock(date=datetime(2013, 1, 2),
-                          source_name=u'soùrce2',
-                          source_exten='1002',
-                          destination_name='',
-                          destination_exten='2002',
-                          user_field='userfield',
-                          answered=False,
-                          duration=timedelta(seconds=2))
-
-        mock_call_log_services_find_all.return_value = [call_log_1, call_log_2]
+        call_log_1, call_log_2 = mock_call_log_services_find_all.return_value = [Mock(CallLog), Mock(CallLog)]
+        mapped_1, mapped_2 = mapper_to_api.side_effect = [Mock(), Mock()]
+        serialized_data = serialize_encode.return_value = 'field1,field2\r\nvalue1,value2\r\n'
 
         result = self.app.get(BASE_URL)
 
-        mock_call_log_services_find_all.assert_any_call()
+        mock_call_log_services_find_all.assert_called_once_with()
+        mapper_to_api.assert_any_call(call_log_1)
+        mapper_to_api.assert_any_call(call_log_2)
+        assert_that(mapper_to_api.call_count, equal_to(2))
+        serialize_encode.assert_called_once_with([mapped_1, mapped_2])
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_result))
+        assert_that(result.data, equal_to(serialized_data))
         assert_that(result.headers, has_entry('Content-disposition',
                                               'attachment;filename=xivo-call-logs.csv'))
