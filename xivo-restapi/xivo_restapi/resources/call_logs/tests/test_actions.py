@@ -19,7 +19,7 @@
 import textwrap
 from datetime import datetime, timedelta
 from mock import Mock, patch
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, has_entry
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_restapi.resources.call_logs.serializer import CSV_HEADERS
 
@@ -74,3 +74,5 @@ class TestCallLogActions(TestResources):
         mock_call_log_services_find_all.assert_any_call()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_result))
+        assert_that(result.headers, has_entry('Content-disposition',
+                                              'attachment;filename=xivo-call-logs.csv'))

@@ -20,18 +20,22 @@ from flask import Blueprint
 from flask.helpers import make_response
 from xivo_dao.data_handler.call_log import services
 from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
+from xivo_restapi.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.helpers.common import exception_catcher
+from xivo_restapi.negotiate.flask_negotiate import produces
 from xivo_restapi.resources.call_logs import serializer
 from xivo_restapi.resources.call_logs import mapper
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
 
 
-@route('')
+@blueprint.route('')
+@realmDigest.requires_auth
+@produces('text/csv')
+@exception_catcher
 def list():
     call_logs = services.find_all()
     mapped_call_logs = map(mapper.to_api, call_logs)
     response = serializer.encode_list(mapped_call_logs)
-    return make_response(response, 200)
+    return make_response(response, 200, {'Content-disposition': 'attachment;filename=xivo-call-logs.csv'})
