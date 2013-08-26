@@ -49,3 +49,10 @@ class TestCallLogsMapper(TestCase):
             'Period': '1',
             'user Field': ''
         }))
+
+    def test_to_api_user_field_none(self):
+        call_log = Mock(duration=Mock(seconds=0, days=0), user_field=None)
+
+        result = mapper.to_api(call_log)
+
+        assert_that(result, has_entry('user Field', ''))
