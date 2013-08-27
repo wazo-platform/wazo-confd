@@ -27,6 +27,32 @@ Feature: Call logs consultation
         Then I get a response with status code "400"
         Then I get an error message "Missing parameters: start_date"
 
+    Scenario: List call logs in a period with empty start parameter
+        When I get the list of call logs with arguments:
+          | start_date | end_date            |
+          |            | 2013-01-29T00:00:00 |
+        Then I get a response with status code "400"
+        Then I get an error message "Invalid parameters: start_date"
+
+    Scenario: List call logs in a period with empty end parameter
+        When I get the list of call logs with arguments:
+          | start_date          | end_date |
+          | 2013-01-29T00:00:00 |          |
+        Then I get a response with status code "400"
+        Then I get an error message "Invalid parameters: end_date"
+
+    Scenario: List call logs in a period with start greater than end
+        Given there are only the following call logs:
+          | date                | source_name | source_exten | destination_exten | duration | user_field | answered |
+          | 2013-01-29 08:46:20 | Père Noël   |         1009 |              1001 |  0:00:03 |            | True     |
+          | 2013-01-30 11:20:08 | Bob Marley  |         1002 |        4185550155 |  0:00:03 | Père Noël  | True     |
+          | 2013-01-31 11:20:08 | Bob Marley  |         1002 |        4185550155 |  0:00:03 | Père Noël  | True     |
+        When I get the list of call logs with arguments:
+          | start_date          | end_date            |
+          | 2013-01-31T00:00:00 | 2013-01-30T00:00:00 |
+        Then I get the following call logs in CSV format:
+          | Call Date           | Caller            |     Called | Period | user Field |
+
     Scenario: List call logs in a period
         Given there are only the following call logs:
           | date                | source_name | source_exten | destination_exten | duration | user_field | answered |
