@@ -37,7 +37,7 @@ blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config
 @produces('text/csv', response_content_type='text/csv; charset=utf8')
 @exception_catcher
 def list():
-    if 'start_date' in request.args and 'end_date' in request.args:
+    if 'start_date' in request.args or 'end_date' in request.args:
         return _list_period()
     else:
         return _list_all()
@@ -49,10 +49,15 @@ def _list_all():
 
 
 def _list_period():
-    start = _decode_datetime(request.args['start_date'])
-    end = _decode_datetime(request.args['end_date'])
+    start, end = _extract_datetimes(request.args)
     call_logs = services.find_all_in_period(start, end)
     return _list_call_logs(call_logs)
+
+
+def _extract_datetimes(request_args):
+    start = _decode_datetime(request_args['start_date']) if 'start_date' in request_args else None
+    end = _decode_datetime(request_args['end_date']) if 'end_date' in request_args else None
+    return start, end
 
 
 def _list_call_logs(call_logs):
