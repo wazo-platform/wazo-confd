@@ -37,7 +37,7 @@ class TestResources(unittest.TestCase):
         def mock_basic_decorator(func):
             return func
 
-        def mock_parameterized_decorator(string):
+        def mock_parameterized_decorator(string, **decorator_kwargs):
             def decorated(func):
                 @wraps(func)
                 def wrapper(*args, **kwargs):
