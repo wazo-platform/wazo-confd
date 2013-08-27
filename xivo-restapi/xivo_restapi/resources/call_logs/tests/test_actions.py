@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from datetime import datetime
 from mock import Mock, patch
 from hamcrest import assert_that, equal_to, has_entries
 from xivo_restapi.helpers.tests.test_resources import TestResources
@@ -43,7 +44,7 @@ class TestCallLogActions(TestResources):
     @patch('xivo_dao.data_handler.call_log.services.find_all')
     @patch('xivo_restapi.resources.call_logs.mapper.to_api')
     @patch('xivo_restapi.resources.call_logs.serializer.encode_list')
-    def test_list_call_logs_with_call_logs2(self, serialize_encode, mapper_to_api, mock_call_log_services_find_all):
+    def test_list_call_logs_with_call_logs(self, serialize_encode, mapper_to_api, mock_call_log_services_find_all):
         expected_status_code = 200
         call_log_1, call_log_2 = mock_call_log_services_find_all.return_value = [Mock(CallLog), Mock(CallLog)]
         mapped_1, mapped_2 = mapper_to_api.side_effect = [Mock(), Mock()]
@@ -52,6 +53,29 @@ class TestCallLogActions(TestResources):
         result = self.app.get(BASE_URL)
 
         mock_call_log_services_find_all.assert_called_once_with()
+        mapper_to_api.assert_any_call(call_log_1)
+        mapper_to_api.assert_any_call(call_log_2)
+        assert_that(mapper_to_api.call_count, equal_to(2))
+        serialize_encode.assert_called_once_with([mapped_1, mapped_2])
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(serialized_data))
+        assert_that(result.headers, has_entries({
+            'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
+        }))
+
+    @patch('xivo_dao.data_handler.call_log.services.find_all_in_period')
+    @patch('xivo_restapi.resources.call_logs.mapper.to_api')
+    @patch('xivo_restapi.resources.call_logs.serializer.encode_list')
+    def test_list_call_logs_with_call_logs_interval(self, serialize_encode, mapper_to_api, mock_call_log_services_find_period):
+        expected_status_code = 200
+        expected_start, expected_end = datetime(2013, 1, 1), datetime(2013, 1, 2)
+        call_log_1, call_log_2 = mock_call_log_services_find_period.return_value = [Mock(CallLog), Mock(CallLog)]
+        mapped_1, mapped_2 = mapper_to_api.side_effect = [Mock(), Mock()]
+        serialized_data = serialize_encode.return_value = 'field1,field2\r\nvalue1,value2\r\n'
+
+        result = self.app.get(BASE_URL + '?start_date=2013-01-01T00:00:00&end_date=2013-01-02T00:00:00')
+
+        mock_call_log_services_find_period.assert_called_once_with(expected_start, expected_end)
         mapper_to_api.assert_any_call(call_log_1)
         mapper_to_api.assert_any_call(call_log_2)
         assert_that(mapper_to_api.call_count, equal_to(2))

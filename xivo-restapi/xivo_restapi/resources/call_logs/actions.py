@@ -16,7 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
+from datetime import datetime
 from flask import Blueprint
+from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.call_log import services
 from xivo_restapi import config
@@ -35,7 +37,30 @@ blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config
 @produces('text/csv', response_content_type='text/csv; charset=utf8')
 @exception_catcher
 def list():
+    if 'start_date' in request.args and 'end_date' in request.args:
+        return _list_period()
+    else:
+        return _list_all()
+
+
+def _list_all():
     call_logs = services.find_all()
+    return _list_call_logs(call_logs)
+
+
+def _list_period():
+    start = _decode_datetime(request.args['start_date'])
+    end = _decode_datetime(request.args['end_date'])
+    call_logs = services.find_all_in_period(start, end)
+    return _list_call_logs(call_logs)
+
+
+def _list_call_logs(call_logs):
     mapped_call_logs = map(mapper.to_api, call_logs)
     response = serializer.encode_list(mapped_call_logs)
     return make_response(response, 200, {'Content-disposition': 'attachment;filename=xivo-call-logs.csv'})
+
+
+def _decode_datetime(datetime_str):
+    result = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')
+    return result
