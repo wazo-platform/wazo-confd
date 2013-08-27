@@ -32,7 +32,7 @@ blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config
 
 @blueprint.route('')
 @realmDigest.requires_auth
-@produces('text/csv')
+@produces('text/csv', response_content_type='text/csv; charset=utf8')
 @exception_catcher
 def list():
     call_logs = services.find_all()

@@ -21,7 +21,7 @@ def consumes(*content_types):
     return decorated
 
 
-def produces(*content_types):
+def produces(*content_types, **decorator_kwargs):
     def decorated(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -29,10 +29,16 @@ def produces(*content_types):
             requested.discard('*/*')
             logger.debug(str(requested))
             defined = set(content_types)
+
             if len(requested) > 0 and len(requested & defined) == 0:
                 raise NotAcceptable()
+
             result = fn(*args, **kwargs)
+
             result.content_type = content_types[0]
+            if 'response_content_type' in decorator_kwargs:
+                result.content_type = decorator_kwargs['response_content_type']
+
             return result
         return wrapper
     return decorated

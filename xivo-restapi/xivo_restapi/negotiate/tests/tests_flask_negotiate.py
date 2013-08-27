@@ -68,6 +68,18 @@ class TestFlaskNegotiate(unittest.TestCase):
         self.assertEquals('222 UNKNOWN', result.status)
         self.assertEquals("application/json", result.content_type)
 
+    def test_produces_accepted_explicit_response_content_type(self):
+        ctx = self.app.test_request_context('users/', headers={"Accept": "text/csv"})
+        ctx.push()
+
+        @produces("text/csv", response_content_type='text/csv; charset=utf8')
+        def decorated_func():
+            return make_response('', 222)
+
+        result = decorated_func()
+        self.assertEquals('222 UNKNOWN', result.status)
+        self.assertEquals("text/csv; charset=utf8", result.content_type)
+
     def test_produces_rejected(self):
         ctx = self.app.test_request_context('users/', headers={"Accept": "application/json"})
         ctx.push()

@@ -16,10 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import textwrap
-from datetime import datetime, timedelta
 from mock import Mock, patch
-from hamcrest import assert_that, equal_to, has_entry
+from hamcrest import assert_that, equal_to, has_entries
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_restapi.resources.call_logs.serializer import CSV_HEADERS
 from xivo_dao.data_handler.call_log.model import CallLog
@@ -60,5 +58,6 @@ class TestCallLogActions(TestResources):
         serialize_encode.assert_called_once_with([mapped_1, mapped_2])
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(serialized_data))
-        assert_that(result.headers, has_entry('Content-disposition',
-                                              'attachment;filename=xivo-call-logs.csv'))
+        assert_that(result.headers, has_entries({
+            'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
+        }))
