@@ -20,7 +20,7 @@ from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.exception import MissingParametersError, InvalidParametersError
+from xivo_dao.data_handler.exception import NonexistentParametersError, InvalidParametersError
 from xivo_dao.data_handler.device.model import Device
 
 BASE_URL = "1.1/devices"
@@ -30,13 +30,13 @@ class TestDeviceActions(TestResources):
 
     @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.create')
-    def test_create_missing_parameters(self, device_services_create, formatter):
+    def test_create_nonexistent_parameters(self, device_services_create, formatter):
         expected_status_code = 400
-        expected_result = ["Missing parameters: ip,mac"]
+        expected_result = ["Nonexistent parameters: template_id abcd does not exist"]
 
         device = Mock(Device)
 
-        device_services_create.side_effect = MissingParametersError(["ip", "mac"])
+        device_services_create.side_effect = NonexistentParametersError(template_id='abcd')
         formatter.to_model.return_value = device
 
         data = {}
