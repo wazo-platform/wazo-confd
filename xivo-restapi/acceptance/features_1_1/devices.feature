@@ -2,15 +2,22 @@ Feature: Devices
 
     Scenario: Create a device with no parameters
         When I create an empty device
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: "ip, mac"
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "devices" resource
+        Then I get a response with a link to the "devices" resource
 
     Scenario: Create a device with one parameter
         When I create the following devices:
             | ip       |
             | 10.0.0.1 |
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: ip"
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "devices" resource
+        Then I get a response with a link to the "devices" resource
+        Then the created device has the following parameters:
+            | ip       |
+            | 10.0.0.1 |
 
     Scenario: Create a device with an invalid ip address
         When I create the following devices:
@@ -41,7 +48,7 @@ Feature: Devices
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: mac"
 
-    Scenario: Create a device
+    Scenario: Create a device with ip and mac
         When I create the following devices:
             | ip       | mac               |
             | 10.0.0.1 | 00:11:22:33:44:51 |
