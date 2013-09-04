@@ -85,7 +85,7 @@ def _load_module(name):
 def log_requests():
     params = {
         'method': request.method,
-        'path': request.path
+        'path': request.url
     }
     if request.data:
         params.update({'data': request.data})
