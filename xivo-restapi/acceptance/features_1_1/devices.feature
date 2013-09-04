@@ -100,3 +100,21 @@ Feature: Devices
         Then the created device has the following parameters:
             | ip       | mac               | plugin |
             | 10.0.0.1 | 00:11:22:33:44:51 | null   |
+
+    Scenario: Create a device with a config template that doesn't exist
+        When I create a device using the device template id "mysuperduperdevicetemplate"
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: config template with id 'mysuperduperdevicetemplate' does not exist"
+
+    Scenario: Create a device with a config template
+        Given there exists the following device templates:
+            | id       | label        |
+            | abcd1234 | testtemplate |
+        When I create a device using the device template id "abcd1234"
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "devices" resource
+        Then I get a response with a link to the "devices" resource
+        Then the created device has the following parameters:
+            | ip       | mac               | plugin | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:51 | null   | abcd1234    |
