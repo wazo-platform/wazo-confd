@@ -3,7 +3,7 @@ Feature: Devices
     Scenario: Create a device with no parameters
         When I create an empty device
         Then I get a response with status "201"
-        Then I get a response with an id
+        Then I get a response with a device id
         Then I get a header with a location for the "devices" resource
         Then I get a response with a link to the "devices" resource
 
@@ -12,7 +12,7 @@ Feature: Devices
             | ip       |
             | 10.0.0.1 |
         Then I get a response with status "201"
-        Then I get a response with an id
+        Then I get a response with a device id
         Then I get a header with a location for the "devices" resource
         Then I get a response with a link to the "devices" resource
         Then the created device has the following parameters:
@@ -53,7 +53,7 @@ Feature: Devices
             | ip       | mac               |
             | 10.0.0.1 | 00:11:22:33:44:51 |
         Then I get a response with status "201"
-        Then I get a response with an id
+        Then I get a response with a device id
         Then I get a header with a location for the "devices" resource
         Then I get a response with a link to the "devices" resource
         Then the created device has the following parameters:
@@ -94,7 +94,7 @@ Feature: Devices
             | ip       | mac               | plugin |
             | 10.0.0.6 | 00:11:22:33:44:56 | null   |
         Then I get a response with status "201"
-        Then I get a response with an id
+        Then I get a response with a device id
         Then I get a header with a location for the "devices" resource
         Then I get a response with a link to the "devices" resource
         Then the created device has the following parameters:
@@ -112,7 +112,7 @@ Feature: Devices
             | abcd1234 | testtemplate |
         When I create a device using the device template id "abcd1234"
         Then I get a response with status "201"
-        Then I get a response with an id
+        Then I get a response with a device id
         Then I get a header with a location for the "devices" resource
         Then I get a response with a link to the "devices" resource
         Then the created device has the following parameters:
