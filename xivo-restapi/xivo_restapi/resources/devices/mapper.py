@@ -24,6 +24,9 @@ MAPPING = {
     'mac': 'mac',
     'plugin': 'plugin',
     'template_id': 'template_id',
+    'model': 'model',
+    'vendor': 'vendor',
+    'version': 'version',
 }
 
 
