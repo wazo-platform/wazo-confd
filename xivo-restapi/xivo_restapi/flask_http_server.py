@@ -19,6 +19,7 @@
 import logging
 import os
 import pkg_resources
+import urllib
 
 from datetime import timedelta
 from flask import Flask, request
@@ -85,10 +86,10 @@ def _load_module(name):
 def log_requests():
     params = {
         'method': request.method,
-        'path': request.url
+        'url': urllib.unquote(request.url).decode('utf8')
     }
     if request.data:
         params.update({'data': request.data})
-        logger.info("%(method)s %(path)s with data %(data)s", params)
+        logger.info("%(method)s %(url)s with data %(data)s ", params)
     else:
-        logger.info("%(method)s %(path)s", params)
+        logger.info("%(method)s %(url)s", params)
