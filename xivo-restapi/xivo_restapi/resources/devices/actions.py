@@ -35,7 +35,7 @@ route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Device)
 
 
-@route('/<int:deviceid>')
+@route('/<deviceid>')
 def get(deviceid):
     return '', 201
 
