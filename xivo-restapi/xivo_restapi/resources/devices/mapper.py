@@ -32,7 +32,7 @@ def add_links_to_dict(device_dict, device):
     device_dict.update({
         'links': [
             {
-                'rel': 'extensions',
+                'rel': 'devices',
                 'href': device_location
             }
         ]
