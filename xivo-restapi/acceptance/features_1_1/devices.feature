@@ -49,6 +49,7 @@ Feature: Devices
         Then I get an error message "Invalid parameters: mac"
 
     Scenario: Create a device with ip and mac
+        Given there are no devices with mac "00:11:22:33:44:51"
         When I create the following devices:
             | ip       | mac               |
             | 10.0.0.1 | 00:11:22:33:44:51 |
@@ -61,6 +62,7 @@ Feature: Devices
             | 10.0.0.1 | 00:11:22:33:44:51 |        |
 
     Scenario: Create 2 devices with same mac
+        Given there are no devices with mac "00:11:22:33:44:52"
         When I create the following devices:
             | ip       | mac               |
             | 10.0.0.2 | 00:11:22:33:44:52 |
@@ -72,6 +74,8 @@ Feature: Devices
         Then I get an error message "Invalid parameters: mac already exists"
 
     Scenario: Create 2 devices with the same ip address
+        Given there are no devices with mac "00:11:22:33:44:53"
+        Given there are no devices with mac "00:11:22:33:44:54"
         When I create the following devices:
             | ip       | mac               |
             | 10.0.0.4 | 00:11:22:33:44:53 |
@@ -89,6 +93,7 @@ Feature: Devices
         Then I get an error message "Invalid parameters: plugin does not exist"
 
     Scenario: Create a device with a plugin
+        Given there are no devices with mac "00:11:22:33:44:56"
         Given the plugin "null" is installed
         When I create the following devices:
             | ip       | mac               | plugin |
