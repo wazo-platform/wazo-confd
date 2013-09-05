@@ -23,6 +23,7 @@ MAPPING = {
     'ip': 'ip',
     'mac': 'mac',
     'plugin': 'plugin',
+    'template_id': 'template_id',
 }
 
 
