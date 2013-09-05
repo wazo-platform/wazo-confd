@@ -86,6 +86,7 @@ Feature: Devices
         Then I get a response with status "201"
 
     Scenario: Create a device with a plugin that doesn't exist
+        Given there are no devices with mac "00:11:22:33:44:55" 
         When I create the following devices:
             | ip       | mac               | plugin                   |
             | 10.0.0.5 | 00:11:22:33:44:55 | mysuperduperplugin-1.2.3 |
