@@ -20,13 +20,66 @@ from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.exception import NonexistentParametersError, InvalidParametersError
+from xivo_dao.data_handler.exception import NonexistentParametersError, \
+    InvalidParametersError, ElementNotExistsError
 from xivo_dao.data_handler.device.model import Device
 
 BASE_URL = "1.1/devices"
 
 
 class TestDeviceActions(TestResources):
+
+    @patch('xivo_restapi.resources.devices.actions.formatter')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_get_no_device(self, device_services_get, formatter):
+        expected_status_code = 404
+        device_id = '1234567890abcdefghij1234567890ab'
+
+        device_services_get.side_effect = ElementNotExistsError('device')
+
+        result = self.app.get("%s/%s" % (BASE_URL, device_id))
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(formatter.call_count, equal_to(0))
+
+    @patch('xivo_restapi.resources.devices.actions.formatter')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_get_error(self, device_services_get, formatter):
+        expected_status_code = 500
+        device_id = '1234567890abcdefghij1234567890ab'
+
+        device_services_get.side_effect = Exception
+
+        result = self.app.get("%s/%s" % (BASE_URL, device_id))
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(formatter.call_count, equal_to(0))
+
+    @patch('xivo_restapi.resources.devices.actions.formatter')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_get(self, device_services_get, formatter):
+        device_id = '1234567890abcdefghij1234567890ab'
+
+        expected_status_code = 200
+        expected_result = {
+            'id': device_id,
+            'links': [{
+                'href': 'http://localhost/1.1/devices/%s' % device_id,
+                'rel': 'devices'
+            }]
+
+        }
+
+        device = Mock(Device)
+        device_services_get.return_value = device
+        formatter.to_api.return_value = self._serialize_encode(expected_result)
+
+        result = self.app.get("%s/%s" % (BASE_URL, device_id))
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        device_services_get.assert_called_once_with(device_id)
+        formatter.to_api.assert_called_once_with(device)
 
     @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.create')

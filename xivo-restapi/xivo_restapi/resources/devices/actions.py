@@ -37,7 +37,9 @@ formatter = Formatter(mapper, serializer, Device)
 
 @route('/<deviceid>')
 def get(deviceid):
-    return '', 201
+    device = device_services.get(deviceid)
+    result = formatter.to_api(device)
+    return make_response(result, 200)
 
 
 @route('', methods=['POST'])
