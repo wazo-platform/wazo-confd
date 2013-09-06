@@ -153,52 +153,52 @@ Feature: Devices
             | mytemplate | My Template |
         Given the plugin "null" is installed
         Given I have the following devices:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
         When I go get the device with id "1234567890abcdefghij1234567890ab"
         Then I get a response with status "201"
         Then I get a response with a link to the "devices" resource
         Then the device has the following parameters:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
 
     Scenario: Device list with minimum 2 devices
         Given I have the following devices:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         When I access the list of devices
         Then I get a response with status "200"
         Then I get a list containing the following devices:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         Then the list contains the same number of devices as on the provisioning server
 
     Scenario: Sorted device list
         Given I have the following devices:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | AA:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 1234567890abcdefghij1234567890ad | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         When I request a list of devices with the following query parameters:
             | sort | order |
             | ip   | desc  |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ad | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | AA:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
         When I request a list of devices with the following query parameters:
             | sort | order |
             | mac  | asc   |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ad | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | AA:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
 
     Scenario: Paginated device list
         Given I only have 15 devices
@@ -214,17 +214,20 @@ Feature: Devices
         Then I get a list with 5 devices
 
     Scenario: Device list ordered and paginated
-        Given I have at least 30 dummy devices
+        Given there exists the following device templates:
+            | id         | label       |
+            | mytemplate | My Template |
+        Given the plugin "null" is installed
         Given I have the following devices:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | AA:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 1234567890abcdefghij1234567890ad | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         When I request a list of devices with the following query parameters:
             | sort | order  | limit | skip |
             | ip   | desc   | 2     | 1    |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
-            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 1234567890abcdefghij1234567890ac | 10.0.0.2 | AA:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
+            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
