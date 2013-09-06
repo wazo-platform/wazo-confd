@@ -142,3 +142,23 @@ Feature: Devices
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
 
+    Scenario: Get a device that doesn't exist
+        Given there are no devices with id "1234567890abcdefghij1234567890ab"
+        When I go get the device with id "1234567890abcdefghij1234567890ab"
+        Then I get a response with status "404"
+
+    Scenario: Get a device that exists
+        Given there exists the following device templates:
+            | id         | label       |
+            | mytemplate | My Template |
+        Given the plugin "null" is installed
+        Given I have the following devices:
+            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+        When I go get the device with id "1234567890abcdefghij1234567890ab"
+        Then I get a response with status "201"
+        Then I get a response with a link to the "devices" resource
+        Then the device has the following parameters:
+            | id                               | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 1234567890abcdefghij1234567890ab | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+
