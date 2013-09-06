@@ -171,7 +171,7 @@ Feature: Devices
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
             | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-        When I access the list of devices
+        When I request the list of devices
         Then I get a response with status "200"
         Then I get a list containing the following devices:
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
