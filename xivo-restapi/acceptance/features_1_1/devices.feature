@@ -124,3 +124,21 @@ Feature: Devices
         Then the created device has the following parameters:
             | template_id |
             | abcd1234    |
+
+    Scenario: Create a device with all parameters
+        Given there are not devices with mac "00:11:22:33:44:57"
+        Given the plugin "null" is installed
+        Given there exists the following device templates:
+            | id         | label        |
+            | mytemplate | testtemplate |
+        When I create a device with the following parameters:
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+        Then I get a response with status "201"
+        Then I get a response with a device id
+        Then I get a header with a location for the "devices" resource
+        Then I get a response with a link to the "devices" resource
+        Then the created device has the following parameters:
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+
