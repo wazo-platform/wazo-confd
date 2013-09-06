@@ -163,6 +163,10 @@ Feature: Devices
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
 
     Scenario: Device list with minimum 2 devices
+        Given there exists the following device templates:
+            | id         | label       |
+            | mytemplate | My Template |
+        Given the plugin "null" is installed
         Given I have the following devices:
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
@@ -176,6 +180,10 @@ Feature: Devices
         Then the list contains the same number of devices as on the provisioning server
 
     Scenario: Sorted device list
+        Given there exists the following device templates:
+            | id         | label       |
+            | mytemplate | My Template |
+        Given the plugin "null" is installed
         Given I have the following devices:
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
             | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
