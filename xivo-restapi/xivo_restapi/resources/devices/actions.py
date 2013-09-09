@@ -58,3 +58,10 @@ def synchronize(deviceid):
     device = device_services.get(deviceid)
     device_services.synchronize(device)
     return make_response('', 204)
+
+
+@route('/<deviceid>/autoprov')
+def autoprov(deviceid):
+    device = device_services.get(deviceid)
+    device_services.reset_to_autoprov(device)
+    return make_response('', 204)

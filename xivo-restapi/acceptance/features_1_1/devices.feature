@@ -133,4 +133,13 @@ Feature: Devices
           | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
         When I synchronize the device "123" from restapi
         Then I see in the log file device "123" synchronized
+
+    Scenario: Reset to autoprov a device
+        Given there are no devices with id "123"
+        Given there are no devices with mac "00:00:00:00:aa:01"
+        Given I have the following devices:
+          | id  | ip             | mac               |
+          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
+        When I reset the device "123" to autoprov from restapi
+        Then I see in the log file device "123" autoprovisioned
         
