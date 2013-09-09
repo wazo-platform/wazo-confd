@@ -155,8 +155,8 @@ Feature: Devices
         Given I have the following devices:
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
-        When I go get the device with id "1234567890abcdefghij1234567890ab"
-        Then I get a response with status "201"
+        When I go get the device with mac "00:11:22:33:44:55" using its id
+        Then I get a response with status "200"
         Then I get a response with a link to the "devices" resource
         Then the device has the following parameters:
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
