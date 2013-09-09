@@ -124,3 +124,13 @@ Feature: Devices
         Then the created device has the following parameters:
             | template_id |
             | abcd1234    |
+
+    Scenario: Synchronize a device
+        Given there are no devices with id "123"
+        Given there are no devices with mac "00:00:00:00:aa:01"
+        Given I have the following devices:
+          | id  | ip             | mac               |
+          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
+        When I synchronize the device "123" from restapi
+        Then I see in the log file device "123" synchronized
+        

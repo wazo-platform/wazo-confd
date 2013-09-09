@@ -136,3 +136,30 @@ class TestDeviceActions(TestResources):
         formatter.to_api.assert_called_once_with(created_device)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.helpers.provd_connector.device_manager')
+    def test_synchronize(self, mock_device_manager):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        expected_status_code = 204
+        device_manager = Mock()
+        device_manager.synchronize = Mock()
+        mock_device_manager.return_value = device_manager
+
+        result = self.app.get("%s/%s/synchronize" % (BASE_URL, device_id))
+
+        device_manager.synchronize.assert_called_once_with(device_id)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.helpers.provd_connector.device_manager')
+    def test_synchronize_with_error(self, mock_device_manager):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        expected_status_code = 500
+        device_manager = Mock()
+        device_manager.synchronize = Mock()
+        device_manager.synchronize.side_effect = Exception
+        mock_device_manager.return_value = device_manager
+
+        result = self.app.get("%s/%s/synchronize" % (BASE_URL, device_id))
+
+        device_manager.synchronize.assert_called_once_with(device_id)
+        assert_that(result.status_code, equal_to(expected_status_code))

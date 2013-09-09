@@ -27,6 +27,7 @@ from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_dao.data_handler.device.model import Device
 from xivo_dao.data_handler.device import services as device_services
+from xivo_dao.helpers import provd_connector
 
 
 logger = logging.getLogger(__name__)
@@ -51,3 +52,10 @@ def create():
     location = url_for('.get', deviceid=created_device.id)
 
     return make_response(result, 201, {'Location': location})
+
+
+@route('/<deviceid>/synchronize')
+def synchronize(deviceid):
+    provd_device_manager = provd_connector.device_manager()
+    provd_device_manager.synchronize(deviceid)
+    return make_response('', 204)
