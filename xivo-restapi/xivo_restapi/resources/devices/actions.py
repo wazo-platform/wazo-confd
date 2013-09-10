@@ -27,6 +27,7 @@ from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_dao.data_handler.device.model import Device
 from xivo_dao.data_handler.device import services as device_services
+from xivo_dao.data_handler.exception import InvalidParametersError
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,47 @@ formatter = Formatter(mapper, serializer, Device)
 
 @route('/<deviceid>')
 def get(deviceid):
-    return '', 201
+    device = device_services.get(deviceid)
+    result = formatter.to_api(device)
+    return make_response(result, 200)
+
+
+@route('')
+def list():
+    find_parameters = _extract_find_parameters()
+    devices = device_services.find_all(**find_parameters)
+    result = formatter.list_to_api(devices)
+    return make_response(result, 200)
+
+
+def _extract_find_parameters():
+    invalid = []
+    parameters = {}
+
+    if 'limit' in request.args:
+        limit = request.args['limit']
+        if limit.isdigit() and int(limit) > 0:
+            parameters['limit'] = int(limit)
+        else:
+            invalid.append("limit must be a positive number")
+
+    if 'skip' in request.args:
+        skip = request.args['skip']
+        if skip.isdigit() and int(skip) > 0:
+            parameters['skip'] = int(skip)
+        else:
+            invalid.append("skip must be a positive number")
+
+    if 'order' in request.args:
+        parameters['order'] = request.args['order']
+
+    if 'direction' in request.args:
+        parameters['direction'] = request.args['direction']
+
+    if len(invalid) > 0:
+        raise InvalidParametersError(invalid)
+
+    return parameters
 
 
 @route('', methods=['POST'])
