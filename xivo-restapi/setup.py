@@ -36,6 +36,7 @@ setup(
         'xivo_restapi.negotiate',
         'xivo_restapi.resources',
         'xivo_restapi.resources.call_logs',
+        'xivo_restapi.resources.devices',
         'xivo_restapi.resources.extensions',
         'xivo_restapi.resources.lines',
         'xivo_restapi.resources.user_links',

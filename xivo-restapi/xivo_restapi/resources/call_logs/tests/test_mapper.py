@@ -43,7 +43,7 @@ class TestCallLogsMapper(TestCase):
         result = mapper.to_api(call_log)
 
         assert_that(result, has_entries({
-            'Call Date': '01/31/2013 00:00:00',
+            'Call Date': '2013-01-31T00:00:00',
             'Caller': 'source1 (1001)',
             'Called': '2001',
             'Period': '1',

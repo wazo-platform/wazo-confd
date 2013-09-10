@@ -15,17 +15,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from flask.helpers import url_for
 
-def to_api(call_log):
-    result = {}
-    result['Call Date'] = call_log.date.isoformat()
-    result['Caller'] = '%s (%s)' % (call_log.source_name, call_log.source_exten)
-    result['Called'] = call_log.destination_exten
-    result['Period'] = str(total_seconds(call_log.duration))
-    result['user Field'] = call_log.user_field or ''
-    return result
+# mapping = {model_field: api_field}
+MAPPING = {
+    'id': 'id',
+    'ip': 'ip',
+    'mac': 'mac',
+    'plugin': 'plugin',
+    'template_id': 'template_id',
+    'model': 'model',
+    'vendor': 'vendor',
+    'version': 'version',
+}
 
 
-def total_seconds(interval):
-    # timedelta.total_seconds() only exists from 2.7
-    return interval.seconds + interval.days * 24 * 3600
+def add_links_to_dict(device_dict, device):
+    device_location = url_for('.get', deviceid=device.id, _external=True)
+    device_dict.update({
+        'links': [
+            {
+                'rel': 'devices',
+                'href': device_location
+            }
+        ]
+    })
