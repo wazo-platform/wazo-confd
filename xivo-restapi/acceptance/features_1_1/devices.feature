@@ -190,8 +190,8 @@ Feature: Devices
             | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
             | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         When I request a list of devices with the following query parameters:
-            | sort | order |
-            | ip   | desc  |
+            | order | direction |
+            | ip    | desc      |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
@@ -199,8 +199,8 @@ Feature: Devices
             | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
             | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
         When I request a list of devices with the following query parameters:
-            | sort | order |
-            | mac  | asc   |
+            | order | direction |
+            | mac   | asc       |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
@@ -232,8 +232,8 @@ Feature: Devices
             | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
             | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         When I request a list of devices with the following query parameters:
-            | sort | order  | limit | skip |
-            | ip   | desc   | 2     | 1    |
+            | order | direction | limit | skip |
+            | ip    | desc      | 2     | 1    |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
