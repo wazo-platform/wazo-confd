@@ -56,7 +56,6 @@ def _extract_find_parameters():
     parameters = {}
 
     if 'limit' in request.args:
-
         limit = request.args['limit']
         if limit.isdigit() and int(limit) > 0:
             parameters['limit'] = int(limit)
@@ -64,11 +63,11 @@ def _extract_find_parameters():
             invalid.append("limit must be a positive number")
 
     if 'skip' in request.args:
-        page = request.args['page']
-        if page.isdigit() and int(page) > 0:
-            parameters['page'] = int(page)
+        skip = request.args['skip']
+        if skip.isdigit() and int(skip) > 0:
+            parameters['skip'] = int(skip)
         else:
-            invalid.append("page must be a positive number")
+            invalid.append("skip must be a positive number")
 
     if 'order' in request.args:
         parameters['order'] = request.args['order']
