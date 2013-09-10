@@ -92,3 +92,12 @@ def create():
     location = url_for('.get', deviceid=created_device.id)
 
     return make_response(result, 201, {'Location': location})
+
+
+@route('/<deviceid>', methods=['PUT'])
+def edit(deviceid):
+    data = request.data.decode("utf-8")
+    device = device_services.get(deviceid)
+    formatter.update_model(data, device)
+    device_services.edit(device)
+    return make_response('', 204)
