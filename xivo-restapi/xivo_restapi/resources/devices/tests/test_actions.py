@@ -436,3 +436,32 @@ class TestDeviceActions(TestResources):
 
         device_services_synchronize.assert_called_once_with(device)
         assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.device.services.reset_to_autoprov')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_autoprov(self, device_services_get, device_services_reset_to_autoprov):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        expected_status_code = 204
+
+        device = Device(id=device_id)
+        device_services_get.return_value = device
+
+        result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
+
+        device_services_reset_to_autoprov.assert_called_once_with(device)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.device.services.reset_to_autoprov')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_autoprov_with_error(self, device_services_get, device_services_reset_to_autoprov):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        expected_status_code = 500
+
+        device = Device(id=device_id)
+        device_services_get.return_value = device
+        device_services_reset_to_autoprov.side_effect = Exception
+
+        result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
+
+        device_services_reset_to_autoprov.assert_called_once_with(device)
+        assert_that(result.status_code, equal_to(expected_status_code))

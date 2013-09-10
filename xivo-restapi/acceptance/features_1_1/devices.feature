@@ -248,3 +248,12 @@ Feature: Devices
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
             | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
             | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+
+    Scenario: Reset to autoprov a device
+        Given there are no devices with id "123"
+        Given there are no devices with mac "00:00:00:00:aa:01"
+        Given I have the following devices:
+          | id  | ip             | mac               |
+          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
+        When I reset the device "123" to autoprov from restapi
+        Then I see in the log file device "123" autoprovisioned
