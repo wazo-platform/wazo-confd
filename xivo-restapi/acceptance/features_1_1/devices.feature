@@ -209,9 +209,9 @@ Feature: Devices
             | 00:11:22:33:44:56 |
         When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
             | mac               |
-            | aa:11:22:33:44:56 |
+            | 00:11:22:33:44:56 |
         Then I get a response with status "400"
-        Then I get an error message "device 00:11:22:33:44:55 already exists"
+        Then I get an error message "device 00:11:22:33:44:56 already exists"
 
     Scenario: Edit a device with an invalid mac
         Given I have the following devices:
@@ -254,7 +254,7 @@ Feature: Devices
         Then I get a response with status "200"
         Then the device has the following parameters:
             | mac               | template_id   |
-            | aa:11:22:33:44:55 | supertemplate |
+            | 00:11:22:33:44:55 | supertemplate |
 
     Scenario: Edit a device with a plugin that does not exist
         Given I have the following devices:
