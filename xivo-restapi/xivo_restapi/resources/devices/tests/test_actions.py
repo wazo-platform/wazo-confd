@@ -505,3 +505,42 @@ class TestDeviceActions(TestResources):
 
         device_services_associate_line_to_device.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_remove_line(self, device_services_get, device_services_remove_line, line_services_get):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        line_id = 123
+        expected_status_code = 204
+
+        line = Line(id=line_id)
+        device = Device(id=device_id)
+
+        line_services_get.return_value = line
+        device_services_get.return_value = device
+
+        result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
+
+        device_services_remove_line.assert_called_once_with(device, line)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_remove_line_with_error(self, device_services_get, device_services_remove_line, line_services_get):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        line_id = 123
+        expected_status_code = 500
+
+        line = Line(id=line_id)
+        device = Device(id=device_id)
+
+        line_services_get.return_value = line
+        device_services_get.return_value = device
+        device_services_remove_line.side_effect = Exception
+
+        result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
+
+        device_services_remove_line.assert_called_once_with(device, line)
+        assert_that(result.status_code, equal_to(expected_status_code))
