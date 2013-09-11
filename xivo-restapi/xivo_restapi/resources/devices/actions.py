@@ -65,7 +65,7 @@ def _extract_find_parameters():
 
     if 'skip' in request.args:
         skip = request.args['skip']
-        if skip.isdigit() and int(skip) > 0:
+        if skip.isdigit() and int(skip) >= 0:
             parameters['skip'] = int(skip)
         else:
             invalid.append("skip must be a positive number")
