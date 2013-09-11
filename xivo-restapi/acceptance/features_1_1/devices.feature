@@ -447,3 +447,18 @@ Feature: Devices
         When I remove line_id "10" from device "20"
         Then I get a response with status "204"
         Then the device "20" is in autoprov mode
+
+    Scenario: Delete a device
+        Given I only have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:12 |
+        When I delete the device "20" from restapi
+        Then I get a response with status "204"
+        Then I see in the log file device "20" deleted
+        Then the device "20" is no longer exists in provd
+
+    Scenario: Delete a device with error
+        Given there are no devices with id "abcd"
+        When I delete the device "abcd" from restapi
+        Then I get a response with status "404"
+        

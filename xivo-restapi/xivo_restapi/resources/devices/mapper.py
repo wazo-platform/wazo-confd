@@ -22,11 +22,14 @@ MAPPING = {
     'id': 'id',
     'ip': 'ip',
     'mac': 'mac',
+    'sn': 'sn',
     'plugin': 'plugin',
     'template_id': 'template_id',
     'model': 'model',
     'vendor': 'vendor',
     'version': 'version',
+    'status': 'status',
+    'description': 'description'
 }
 
 
