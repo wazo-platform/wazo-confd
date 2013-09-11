@@ -151,6 +151,146 @@ Feature: Devices
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
 
+    Scenario: Edit a device with no parameters
+        Given I have the following devices:
+            | ip       | mac               |
+            | 10.0.0.1 | 00:11:22:33:44:55 |
+        When I edit the device with mac "00:11:22:33:44:55" using no parameters
+        Then I get a response with status "204"
+        When I go get the device with mac "00:11:22:33:44:55" using its id
+        Then I get a response with status "200"
+        Then the device has the following parameters:
+            | ip       | mac               |
+            | 10.0.0.1 | 00:11:22:33:44:55 |
+
+    Scenario: Edit a device with ip and mac
+        Given I have the following devices:
+            | ip       | mac               |
+            | 10.0.0.1 | 00:11:22:33:44:55 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | ip       | mac               |
+            | 10.0.0.2 | 00:11:22:33:44:55 |
+        Then I get a response with status "204"
+        When I go get the device with mac "00:11:22:33:44:55" using its id
+        Then I get a response with status "200"
+        Then the device has the following parameters:
+            | ip | mac               |
+            | 10.0.0.2 | 00:11:22:33:44:55 |
+
+    Scenario: Edit a device by adding new parameters
+        Given the plugin "null" is installed
+        Given there exists the following device templates:
+            | id         | label        |
+            | mytemplate | testtemplate |
+        Given there are no devices with mac "aa:11:22:33:44:55"
+        Given I have the following devices:
+            | mac               |
+            | 00:11:22:33:44:55 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.1.0.1 | aa:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+        Then I get a response with status "204"
+        When I go get the device with mac "aa:11:22:33:44:55" using its id
+        Then I get a response with status "200"
+        Then the device has the following parameters:
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.1.0.1 | aa:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+
+    Scenario: Edit a device with an invalid mac
+        Given I have the following devices:
+            | mac               |
+            | 00:11:22:33:44:55 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | mac               |
+            | ZZ:11:22:33:44:56 |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: mac"
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | mac                |
+            | aa:110:22:33:44:56 |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: mac"
+
+    Scenario: Edit a device with a mac that already exists
+        Given I have the following devices:
+            | mac               |
+            | 00:11:22:33:44:55 |
+            | 00:11:22:33:44:56 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | mac               |
+            | 00:11:22:33:44:56 |
+        Then I get a response with status "400"
+        Then I get an error message "device 00:11:22:33:44:56 already exists"
+
+    Scenario: Edit a device with an invalid mac
+        Given I have the following devices:
+            | mac               | ip       |
+            | 00:11:22:33:44:55 | 10.0.0.1 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | ip        |
+            | 399.0.0.1 |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: ip"
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | ip          |
+            | 10.9999.0.1 |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: ip"
+
+    Scenario: Edit a device with a template that does not exist
+        Given I have the following devices:
+            | mac               |
+            | 00:11:22:33:44:55 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | template_id          |
+            | mysuperdupertemplate |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: template_id mysuperdupertemplate does not exist"
+
+    Scenario: Edit a device with a custom template
+        Given there exists the following device templates:
+            | id            | label          |
+            | testtemplate  | Test Template  |
+            | supertemplate | Super Template |
+        Given I have the following devices:
+            | mac               | template_id  |
+            | 00:11:22:33:44:55 | testtemplate |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | template_id   |
+            | supertemplate |
+        Then I get a response with status "204"
+        When I go get the device with mac "00:11:22:33:44:55" using its id
+        Then I get a response with status "200"
+        Then the device has the following parameters:
+            | mac               | template_id   |
+            | 00:11:22:33:44:55 | supertemplate |
+
+    Scenario: Edit a device with a plugin that does not exist
+        Given I have the following devices:
+            | mac               |
+            | 00:11:22:33:44:55 |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | plugin          |
+            | mysuperplugin   |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: plugin mysuperplugin does not exist"
+
+    Scenario: Edit a device with a plugin
+        Given the plugin "null" is installed
+        Given the plugin "xivo-aastra-switchboard" is installed
+        Given I have the following devices:
+            | mac               | plugin |
+            | 00:11:22:33:44:55 | null   |
+        When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
+            | plugin                  |
+            | xivo-aastra-switchboard |
+        Then I get a response with status "204"
+        When I go get the device with mac "00:11:22:33:44:55" using its id
+        Then I get a response with status "200"
+        Then the device has the following parameters:
+            | mac               | plugin                  |
+            | 00:11:22:33:44:55 | xivo-aastra-switchboard |
+
     Scenario: Get a device that doesn't exist
         Given there are no devices with id "1234567890abcdefghij1234567890ab"
         When I go get the device with id "1234567890abcdefghij1234567890ab"

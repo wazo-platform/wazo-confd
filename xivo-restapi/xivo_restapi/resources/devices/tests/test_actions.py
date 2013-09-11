@@ -464,4 +464,65 @@ class TestDeviceActions(TestResources):
         result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
 
         device_services_reset_to_autoprov.assert_called_once_with(device)
+
+    @patch('xivo_restapi.resources.devices.actions.formatter')
+    @patch('xivo_dao.data_handler.device.services.get')
+    @patch('xivo_dao.data_handler.device.services.edit')
+    def test_edit(self, device_services_edit, device_services_get, formatter):
+        expected_status_code = 204
+        expected_data = ''
+
+        data = {
+            'ip': '10.0.0.1',
+            'mac': '00:11:22:33:44:55',
+        }
+        data_serialized = self._serialize_encode(data)
+
+        device = Mock(Device)
+        device_services_get.return_value = device
+
+        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
+
+        formatter.update_model.assert_called_with(data_serialized, device)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
+
+    @patch('xivo_restapi.resources.devices.actions.formatter')
+    @patch('xivo_dao.data_handler.device.services.get')
+    @patch('xivo_dao.data_handler.device.services.edit')
+    def test_edit_error(self, device_services_edit, device_services_get, formatter):
+        expected_status_code = 500
+
+        data = {
+            'ip': '10.0.0.1',
+            'mac': '00:11:22:33:44:55',
+        }
+        data_serialized = self._serialize_encode(data)
+
+        device = Mock(Device)
+        device_services_get.return_value = device
+
+        device_services_edit.side_effect = Exception
+
+        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
+
+        formatter.update_model.assert_called_with(data_serialized, device)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.device.services.get')
+    @patch('xivo_dao.data_handler.device.services.edit')
+    def test_edit_not_found(self, device_services_edit, device_services_get):
+        expected_status_code = 404
+
+        data = {
+            'ip': '10.0.0.1',
+            'mac': '00:11:22:33:44:55',
+        }
+        data_serialized = self._serialize_encode(data)
+
+        device_services_get.return_value = Mock(Device)
+        device_services_edit.side_effect = ElementNotExistsError('device')
+
+        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
+
         assert_that(result.status_code, equal_to(expected_status_code))

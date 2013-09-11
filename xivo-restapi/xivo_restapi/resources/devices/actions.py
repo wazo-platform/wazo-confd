@@ -94,6 +94,15 @@ def create():
     return make_response(result, 201, {'Location': location})
 
 
+@route('/<deviceid>', methods=['PUT'])
+def edit(deviceid):
+    data = request.data.decode("utf-8")
+    device = device_services.get(deviceid)
+    formatter.update_model(data, device)
+    device_services.edit(device)
+    return make_response('', 204)
+
+
 @route('/<deviceid>/synchronize')
 def synchronize(deviceid):
     device = device_services.get(deviceid)
@@ -105,4 +114,3 @@ def synchronize(deviceid):
 def autoprov(deviceid):
     device = device_services.get(deviceid)
     device_services.reset_to_autoprov(device)
-    return make_response('', 204)
