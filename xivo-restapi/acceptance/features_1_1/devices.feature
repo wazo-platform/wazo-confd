@@ -154,19 +154,19 @@ Feature: Devices
             | ip       | mac               |
             | 10.0.0.1 | 00:11:22:33:44:55 |
 
-    Scenario: Edit a device with a blank parameter
+    Scenario: Edit a device with ip and mac
         Given I have the following devices:
             | ip       | mac               |
             | 10.0.0.1 | 00:11:22:33:44:55 |
         When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
-            | ip | mac               |
-            |    | 00:11:22:33:44:55 |
+            | ip       | mac               |
+            | 10.0.0.2 | 00:11:22:33:44:55 |
         Then I get a response with status "204"
         When I go get the device with mac "00:11:22:33:44:55" using its id
         Then I get a response with status "200"
         Then the device has the following parameters:
             | ip | mac               |
-            |    | 00:11:22:33:44:55 |
+            | 10.0.0.2 | 00:11:22:33:44:55 |
 
     Scenario: Edit a device by adding new parameters
         Given the plugin "null" is installed
