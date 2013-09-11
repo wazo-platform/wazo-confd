@@ -409,6 +409,36 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.device.services.get')
+    @patch('xivo_dao.data_handler.device.services.delete')
+    def test_delete_success(self, mock_device_services_delete, mock_device_services_get):
+        expected_status_code = 204
+        expected_data = ''
+
+        device = Mock(Device)
+        mock_device_services_get.return_value = device
+        mock_device_services_delete.return_value = True
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
+        mock_device_services_delete.assert_called_with(device)
+
+    @patch('xivo_dao.data_handler.device.services.get')
+    @patch('xivo_dao.data_handler.device.services.delete')
+    def test_delete_not_found(self, mock_device_services_delete, mock_device_services_get):
+        expected_status_code = 404
+
+        device = Mock(Device)
+        mock_device_services_get.return_value = device
+        mock_device_services_delete.side_effect = ElementNotExistsError('device')
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        mock_device_services_delete.assert_called_with(device)
+
     @patch('xivo_dao.data_handler.device.services.synchronize')
     @patch('xivo_dao.data_handler.device.services.get')
     def test_synchronize(self, device_services_get, device_services_synchronize):

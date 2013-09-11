@@ -95,6 +95,13 @@ def create():
     return make_response(result, 201, {'Location': location})
 
 
+@route('/<deviceid>', methods=['DELETE'])
+def delete(deviceid):
+    device = device_services.get(deviceid)
+    device_services.delete(device)
+    return make_response('', 204)
+
+
 @route('/<deviceid>/synchronize')
 def synchronize(deviceid):
     device = device_services.get(deviceid)
