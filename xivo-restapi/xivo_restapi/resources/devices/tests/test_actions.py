@@ -23,6 +23,7 @@ from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.exception import NonexistentParametersError, \
     InvalidParametersError, ElementNotExistsError
 from xivo_dao.data_handler.device.model import Device, DeviceOrdering
+from xivo_dao.data_handler.line.model import Line
 
 BASE_URL = "1.1/devices"
 
@@ -464,4 +465,82 @@ class TestDeviceActions(TestResources):
         result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
 
         device_services_reset_to_autoprov.assert_called_once_with(device)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_associate_line(self, device_services_get, device_services_associate_line_to_device, line_services_get):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        line_id = 123
+        expected_status_code = 204
+
+        line = Line(id=line_id)
+        device = Device(id=device_id)
+
+        line_services_get.return_value = line
+        device_services_get.return_value = device
+
+        result = self.app.get('%s/%s/associate_line/%s' % (BASE_URL, device_id, line_id))
+
+        device_services_associate_line_to_device.assert_called_once_with(device, line)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_associate_line_with_error(self, device_services_get, device_services_associate_line_to_device, line_services_get):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        line_id = 123
+        expected_status_code = 500
+
+        line = Line(id=line_id)
+        device = Device(id=device_id)
+
+        line_services_get.return_value = line
+        device_services_get.return_value = device
+        device_services_associate_line_to_device.side_effect = Exception
+
+        result = self.app.get('%s/%s/associate_line/%s' % (BASE_URL, device_id, line_id))
+
+        device_services_associate_line_to_device.assert_called_once_with(device, line)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_remove_line(self, device_services_get, device_services_remove_line, line_services_get):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        line_id = 123
+        expected_status_code = 204
+
+        line = Line(id=line_id)
+        device = Device(id=device_id)
+
+        line_services_get.return_value = line
+        device_services_get.return_value = device
+
+        result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
+
+        device_services_remove_line.assert_called_once_with(device, line)
+        assert_that(result.status_code, equal_to(expected_status_code))
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_remove_line_with_error(self, device_services_get, device_services_remove_line, line_services_get):
+        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        line_id = 123
+        expected_status_code = 500
+
+        line = Line(id=line_id)
+        device = Device(id=device_id)
+
+        line_services_get.return_value = line
+        device_services_get.return_value = device
+        device_services_remove_line.side_effect = Exception
+
+        result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
+
+        device_services_remove_line.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))

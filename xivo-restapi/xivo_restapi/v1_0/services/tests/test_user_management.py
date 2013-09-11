@@ -35,6 +35,7 @@ from xivo_restapi.v1_0.services.utils.sysconfd_connector import SysconfdConnecto
 from xivo_restapi.v1_0.services.voicemail_management import VoicemailManagement
 from xivo_restapi.v1_0.mapping_alchemy_sdm.line_mapping import LineMapping
 from xivo_restapi.v1_0.mapping_alchemy_sdm.user_mapping import UserMapping
+from xivo_dao.data_handler.device.model import Device
 
 
 class TestUserManagement(unittest.TestCase):
@@ -367,10 +368,11 @@ class TestUserManagement(unittest.TestCase):
         mock_line_dao.assert_called_once_with(line_id)
         self._userManager._remove_line.assert_any_call(line)
 
-    def test_remove_line_provd_error(self):
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_remove_line_provd_error(self, device_services_get):
+        device = Device(id='1234')
         line_dao.delete = Mock()
-        device_dao.get_deviceid = Mock()
-        device_dao.get_deviceid.return_value = "abcdef"
+        device_services_get.return_value = device
         self._userManager._provd_remove_line = Mock()
         self._userManager._provd_remove_line.side_effect = URLError("sample error")
 
