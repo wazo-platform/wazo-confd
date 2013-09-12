@@ -93,8 +93,9 @@ class TestDeviceActions(TestResources):
         device_find_all.assert_any_call()
         assert_that(result.status_code, equal_to(expected_status_code))
 
+    @patch('xivo_dao.data_handler.device.services.total')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_no_devices(self, device_find_all):
+    def test_list_no_devices(self, device_find_all, device_total):
         expected_status_code = 200
         expected_result = {
             'total': 0,
@@ -102,15 +103,18 @@ class TestDeviceActions(TestResources):
         }
 
         device_find_all.return_value = []
+        device_total.return_value = 0
 
         result = self.app.get(BASE_URL)
 
         device_find_all.assert_called_once_with()
+        device_total.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.device.services.total')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_two_devices(self, device_find_all):
+    def test_list_devices_with_two_devices(self, device_find_all, device_total):
         device_id_1 = 'abcdefghijklmnopqrstuvwxyz123456'
         device_id_2 = '1234567890abcdefghij1234567890abc'
 
@@ -147,15 +151,18 @@ class TestDeviceActions(TestResources):
         }
 
         device_find_all.return_value = [device1, device2]
+        device_total.return_value = 2
 
         result = self.app.get(BASE_URL)
 
         device_find_all.assert_called_once_with()
+        device_total.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.device.services.total')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_ordered(self, device_find_all):
+    def test_list_devices_ordered(self, device_find_all, device_total):
         device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
                         ip='10.0.0.1',
                         mac='00:11:22:33:44:55')
@@ -177,16 +184,19 @@ class TestDeviceActions(TestResources):
         }
 
         device_find_all.return_value = [device]
+        device_total.return_value = 1
 
         url = "%s?order=ip" % BASE_URL
         result = self.app.get(url)
 
         device_find_all.assert_called_once_with(order=DeviceOrdering.ip)
+        device_total.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.device.services.total')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_ordered_with_a_direction(self, device_find_all):
+    def test_list_devices_ordered_with_a_direction(self, device_find_all, device_total):
         device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
                         ip='10.0.0.1',
                         mac='00:11:22:33:44:55')
@@ -208,11 +218,13 @@ class TestDeviceActions(TestResources):
         }
 
         device_find_all.return_value = [device]
+        device_total.return_value = 1
 
         url = "%s?order=ip&direction=desc" % BASE_URL
         result = self.app.get(url)
 
         device_find_all.assert_called_once_with(order=DeviceOrdering.ip, direction='desc')
+        device_total.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
@@ -227,15 +239,18 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.device.services.total')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_a_limit(self, device_find_all):
+    def test_list_devices_with_a_limit(self, device_find_all, device_total):
         device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
                         ip='10.0.0.1',
                         mac='00:11:22:33:44:55')
 
+        nb_devices = 10
+
         expected_status_code = 200
         expected_result = {
-            'total': 1,
+            'total': nb_devices,
             'items': [
                 {
                     'id': device.id,
@@ -250,11 +265,13 @@ class TestDeviceActions(TestResources):
         }
 
         device_find_all.return_value = [device]
+        device_total.return_value = nb_devices
 
         url = "%s?limit=1" % BASE_URL
         result = self.app.get(url)
 
         device_find_all.assert_called_once_with(limit=1)
+        device_total.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
@@ -269,15 +286,18 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.device.services.total')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_a_skip(self, device_find_all):
+    def test_list_devices_with_a_skip(self, device_find_all, device_total):
         device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
                         ip='10.0.0.1',
                         mac='00:11:22:33:44:55')
 
+        nb_devices = 10
+
         expected_status_code = 200
         expected_result = {
-            'total': 1,
+            'total': nb_devices,
             'items': [
                 {
                     'id': device.id,
@@ -292,11 +312,13 @@ class TestDeviceActions(TestResources):
         }
 
         device_find_all.return_value = [device]
+        device_total.return_value = nb_devices
 
         url = "%s?skip=1" % BASE_URL
         result = self.app.get(url)
 
         device_find_all.assert_called_once_with(skip=1)
+        device_total.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 

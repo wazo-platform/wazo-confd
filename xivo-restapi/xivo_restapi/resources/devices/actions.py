@@ -48,7 +48,8 @@ def get(deviceid):
 def list():
     find_parameters = _extract_find_parameters()
     devices = device_services.find_all(**find_parameters)
-    result = formatter.list_to_api(devices)
+    total = device_services.total()
+    result = formatter.list_to_api(devices, total)
     return make_response(result, 200)
 
 
