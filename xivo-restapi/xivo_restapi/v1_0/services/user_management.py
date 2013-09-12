@@ -19,11 +19,12 @@ import logging
 
 from provd.rest.client.client import new_provisioning_client
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
+from xivo_dao import user_dao, line_dao, voicemail_dao
 from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user_line_extension import dao as user_line_extension_dao
 from xivo_dao.data_handler.user_line_extension import services as user_line_extension_services
+from xivo_dao.data_handler.device import services as device_services
 from xivo_restapi import config
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.utils.exceptions import NoSuchElementException, \
@@ -115,10 +116,10 @@ class UserManagement(object):
     def _remove_line(self, line):
         device = line.device
         line_dao.delete(line.id)
-        deviceid = device_dao.get_deviceid(device)
-        if deviceid is not None:
+        device = device_services.get(device)
+        if device.id is not None:
             try:
-                self._provd_remove_line(deviceid, line.num)
+                self._provd_remove_line(device.id, line.num)
             except URLError as e:
                 raise ProvdError(str(e))
 
