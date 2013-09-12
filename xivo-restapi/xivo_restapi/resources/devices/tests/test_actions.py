@@ -495,6 +495,7 @@ class TestDeviceActions(TestResources):
         result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
 
         device_services_reset_to_autoprov.assert_called_once_with(device)
+        assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.get')

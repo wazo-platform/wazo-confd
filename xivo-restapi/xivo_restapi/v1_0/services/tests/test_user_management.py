@@ -21,7 +21,7 @@ from hamcrest import assert_that, equal_to
 from mock import Mock, call, patch
 from provd.rest.client.client import DeviceManager, ConfigManager
 from urllib2 import URLError
-from xivo_dao import user_dao, line_dao, device_dao, voicemail_dao
+from xivo_dao import user_dao, line_dao, voicemail_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.voicemail import Voicemail

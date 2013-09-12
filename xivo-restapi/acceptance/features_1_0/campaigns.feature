@@ -40,7 +40,7 @@ Feature: Recording campaign management
 
     Scenario: Campaign creation and consultation without dates
         Given there is no campaign
-        When I create a campaign "test_dates" without dates
+        When I create a campaign "test_dates"
         Then the campaign "test_dates" is created with its start date and end date equal to now
 
     Scenario: Campaign creation and consultation with unproprer dates

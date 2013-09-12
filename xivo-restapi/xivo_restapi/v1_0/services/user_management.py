@@ -114,14 +114,15 @@ class UserManagement(object):
         self._remove_line(line)
 
     def _remove_line(self, line):
-        device = line.device
         line_dao.delete(line.id)
-        device = device_services.get(device)
-        if device.id is not None:
-            try:
-                self._provd_remove_line(device.id, line.num)
-            except URLError as e:
-                raise ProvdError(str(e))
+        device_id = line.device
+        if device_id:
+            device = device_services.get(device_id)
+            if device.id is not None:
+                try:
+                    self._provd_remove_line(device.id, line.num)
+                except URLError as e:
+                    raise ProvdError(str(e))
 
     def _provd_remove_line(self, deviceid, linenum):
         config = self.config_manager.get(deviceid)
