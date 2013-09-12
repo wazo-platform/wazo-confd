@@ -77,6 +77,9 @@ def _extract_find_parameters():
     if 'direction' in request.args:
         parameters['direction'] = request.args['direction']
 
+    if 'search' in request.args:
+        parameters['search'] = request.args['search']
+
     if len(invalid) > 0:
         raise InvalidParametersError(invalid)
 
