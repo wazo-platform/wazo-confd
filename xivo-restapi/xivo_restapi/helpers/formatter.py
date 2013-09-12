@@ -25,11 +25,11 @@ class Formatter(object):
         self._serializer = serializer
         self._model_class = model_class
 
-    def list_to_api(self, list_model):
+    def list_to_api(self, list_model, total=None):
         data_list = []
         for model in list_model:
             data_list.append(self._prepare_model_to_api(model))
-        mapped_dict = self._process_paginated_data(data_list)
+        mapped_dict = self._process_paginated_data(data_list, total)
         api_data = self._serializer.encode(mapped_dict)
         return api_data
 
@@ -55,9 +55,9 @@ class Formatter(object):
         self._mapper.add_links_to_dict(mapped_dict, model)
         return mapped_dict
 
-    def _process_paginated_data(self, items):
+    def _process_paginated_data(self, items, total=None):
         result = {
-            'total': len(items),
+            'total': total or len(items),
             'items': items
         }
         return result
