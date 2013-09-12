@@ -79,6 +79,16 @@ class TestFormatter(unittest.TestCase):
 
         assert_that(result, equal_to(expected_result))
 
+    def test_list_to_api_with_total(self):
+        expected_result = '{"items": [{"api_key_1": 1, "api_key_2": "2", "api_key_3": [1, "2"], "links": "links"}, {"api_key_1": 1, "api_key_2": "2", "api_key_3": [1, "2"], "links": "links"}], "total": 10}'
+        total = 10
+
+        list_model = [self.model, self.model]
+
+        result = self.formatter.list_to_api(list_model, total)
+
+        assert_that(result, equal_to(expected_result))
+
     @patch('xivo_restapi.helpers.mapper.map_to_api')
     def test_to_api(self, map_to_api):
         expected_result = '{"api_key_1": 1, "api_key_2": "2", "api_key_3": [1, "2"], "links": "links"}'
