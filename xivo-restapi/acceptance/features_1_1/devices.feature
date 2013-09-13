@@ -334,13 +334,13 @@ Feature: Devices
             | 10.0.0.1 | 00:11:22:33:ab:55 | null   | nullmodel | 1.0     |
             | 10.0.0.2 | 00:11:22:33:cd:56 | null   | nullmodel | 1.0     |
         When I request a list of devices with the following query parameters:
-            | search |
-            | AB:55  |
+            | search   |
+            | 33:AB:55 |
         Then I get a response with status "200"
         Then I get a list containing the following devices:
             | ip       | mac               | plugin | model     | version |
             | 10.0.0.1 | 00:11:22:33:ab:55 | null   | nullmodel | 1.0     |
-        Then I get a list with 1 devices
+        Then I get a list with 1 of 1 devices
 
     Scenario: Search for a device with pagination
         Given I have the following devices:
@@ -357,7 +357,7 @@ Feature: Devices
             | ip       | mac               | plugin | model     | version |
             | 10.1.0.2 | 00:11:22:33:cd:57 | null   | nullmodel | 1.0     |
             | 10.1.0.3 | 00:11:22:33:cd:58 | null   | nullmodel | 1.0     |
-        Then I get a list with 2 devices
+        Then I get a list with 2 of 3 devices
 
     Scenario: Sorted device list
         Given there exists the following device templates:
@@ -399,9 +399,10 @@ Feature: Devices
             | limit | skip |
             | 10    | 10   |
         Then I get a response with status "200"
-        Then I get a list with 5 devices
+        Then I get a list with 5 of 15 devices
 
     Scenario: Device list ordered and paginated
+        Given I only have 15 devices
         Given there exists the following device templates:
             | id         | label       |
             | mytemplate | My Template |
@@ -419,6 +420,7 @@ Feature: Devices
             | ip       | mac               | plugin | model     | vendor     | version | template_id         |
             | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
             | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+        Then I get a list with 2 of 15 devices
 
     Scenario: Reset to autoprov a device
         Given there are no devices with id "123"
