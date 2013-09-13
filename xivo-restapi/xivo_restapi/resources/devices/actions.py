@@ -47,9 +47,8 @@ def get(deviceid):
 @route('')
 def list():
     find_parameters = _extract_find_parameters()
-    devices = device_services.find_all(**find_parameters)
-    total = device_services.total()
-    result = formatter.list_to_api(devices, total)
+    search_result = device_services.find_all(**find_parameters)
+    result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
 
 
