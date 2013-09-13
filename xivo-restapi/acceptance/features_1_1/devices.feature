@@ -328,6 +328,37 @@ Feature: Devices
             | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         Then the list contains the same number of devices as on the provisioning server
 
+    Scenario: Search for a device
+        Given I have the following devices:
+            | ip       | mac               | plugin | model     | version |
+            | 10.0.0.1 | 00:11:22:33:ab:55 | null   | nullmodel | 1.0     |
+            | 10.0.0.2 | 00:11:22:33:cd:56 | null   | nullmodel | 1.0     |
+        When I request a list of devices with the following query parameters:
+            | search |
+            | AB:55  |
+        Then I get a response with status "200"
+        Then I get a list containing the following devices:
+            | ip       | mac               | plugin | model     | version |
+            | 10.0.0.1 | 00:11:22:33:ab:55 | null   | nullmodel | 1.0     |
+        Then I get a list with 1 devices
+
+    Scenario: Search for a device with pagination
+        Given I have the following devices:
+            | ip       | mac               | plugin | model     | version |
+            | 10.1.0.1 | 00:11:22:33:cd:56 | null   | nullmodel | 1.0     |
+            | 10.1.0.2 | 00:11:22:33:cd:57 | null   | nullmodel | 1.0     |
+            | 10.0.0.1 | 00:11:22:33:ab:55 | null   | nullmodel | 1.0     |
+            | 10.1.0.3 | 00:11:22:33:cd:58 | null   | nullmodel | 1.0     |
+        When I request a list of devices with the following query parameters:
+            | search | limit | skip |
+            | 10.1   | 2     | 1    |
+        Then I get a response with status "200"
+        Then I get a list containing the following devices:
+            | ip       | mac               | plugin | model     | version |
+            | 10.1.0.2 | 00:11:22:33:cd:57 | null   | nullmodel | 1.0     |
+            | 10.1.0.3 | 00:11:22:33:cd:58 | null   | nullmodel | 1.0     |
+        Then I get a list with 2 devices
+
     Scenario: Sorted device list
         Given there exists the following device templates:
             | id         | label       |
