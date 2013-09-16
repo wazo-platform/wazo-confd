@@ -1,5 +1,18 @@
 Feature: SIP Lines
 
+    Scenario: Get a SIP line
+        Given I only have the following lines:
+          | id | username | secret | context | protocol | device_slot |
+          | 10 | toto     | abcdef | default | sip      |           1 |
+        When I ask for the line_sip with id "10"
+        Then I get a response with status "200"
+        Then I have a line_sip with the following parameters:
+          | id | username | secret | context |
+          | 10 | toto     | abcdef | default |
+        Then I have a line_sip with the following attributes:
+          | attribute              |
+          | provisioning_extension |
+
     Scenario: Create an empty SIP line
         When I create an empty SIP line
         Then I get a response with status "400"
