@@ -58,7 +58,7 @@ class TestFormatter(unittest.TestCase):
             model_key_2='2',
             model_key_3=[1, '2']
         )
-        self.model.to_data_dict.return_value = self._model_data_dict
+        self.model.to_user_data.return_value = self._model_data_dict
 
         self._model_class = Mock(AbstractModels)
         self._model_class.from_user_data.return_value = self.model
@@ -98,9 +98,10 @@ class TestFormatter(unittest.TestCase):
         result = self.formatter.to_api(self.model)
 
         assert_that(result, equal_to(expected_result))
-        self._serializer.encode.assert_called_once_with(self._api_data_dict)
+        self.model.to_user_data.assert_called_once_with()
         map_to_api.assert_called_once_with(self._mapper.MAPPING, self._model_data_dict)
         self._mapper.add_links_to_dict.assert_called_once_with(self._api_data_dict, self.model)
+        self._serializer.encode.assert_called_once_with(self._api_data_dict)
 
     @patch('xivo_restapi.helpers.mapper.map_to_model')
     def test_to_model(self, map_to_model):

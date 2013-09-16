@@ -50,7 +50,7 @@ class Formatter(object):
         model_to_update.update_from_data(mapped_dict)
 
     def _prepare_model_to_api(self, model):
-        model_dict = model.to_data_dict()
+        model_dict = model.to_user_data()
         mapped_dict = mapper.map_to_api(self._mapper.MAPPING, model_dict)
         self._mapper.add_links_to_dict(mapped_dict, model)
         return mapped_dict
