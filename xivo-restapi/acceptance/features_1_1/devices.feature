@@ -86,7 +86,7 @@ Feature: Devices
         Then I get a response with status "201"
 
     Scenario: Create a device with a plugin that doesn't exist
-        Given there are no devices with mac "00:11:22:33:44:55" 
+        Given there are no devices with mac "00:11:22:33:44:55"
         When I create the following devices:
             | ip       | mac               | plugin                   |
             | 10.0.0.5 | 00:11:22:33:44:55 | mysuperduperplugin-1.2.3 |
@@ -447,7 +447,7 @@ Feature: Devices
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
         Then I get a response with status "201"
-        
+
         When I associate my line_id "10" to the device "20"
         Then the device "20" has been provisioned with a configuration:
             | display_name   | number | username | auth_username | password |
@@ -493,4 +493,3 @@ Feature: Devices
         Given there are no devices with id "abcd"
         When I delete the device "abcd" from restapi
         Then I get a response with status "404"
-        
