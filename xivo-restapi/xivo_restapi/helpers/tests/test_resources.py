@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import unittest
+
 from functools import wraps
 from mock import Mock
 from xivo_restapi import flask_http_server
@@ -27,13 +28,15 @@ from xivo_restapi.negotiate import flask_negotiate
 
 class TestResources(unittest.TestCase):
 
-    def setUp(self):
-        self._mock_decorators()
+    @classmethod
+    def setUpClass(cls):
+        cls._mock_decorators()
         flask_http_server.register_blueprints()
         flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
+        cls.app = flask_http_server.app.test_client()
 
-    def _mock_decorators(self):
+    @classmethod
+    def _mock_decorators(cls):
         def mock_basic_decorator(func):
             return func
 
