@@ -16,30 +16,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import unittest
 
 from mock import patch, Mock
 from xivo_dao.alchemy.agentfeatures import AgentFeatures
-from xivo_restapi import flask_http_server
 from xivo_restapi.v1_0 import rest_encoder
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.agent_management import AgentManagement
+from xivo_restapi.v1_0.rest.tests.test_API import TestAPI
 
 
-class TestAPIAgents(unittest.TestCase):
+class TestAPIAgents(TestAPI):
 
-    def setUp(self):
-        self.patcher_agent = patch("xivo_restapi.v1_0.rest.API_agents.AgentManagement")
-        mock_agent = self.patcher_agent.start()
-        self.instance_agent_management = Mock(AgentManagement)
-        mock_agent.return_value = self.instance_agent_management
-        flask_http_server.app.testing = True
-        flask_http_server.register_blueprints()
-        flask_http_server.app.config['SERVER_NAME'] = None
-        self.app = flask_http_server.app.test_client()
+    @classmethod
+    def setUpClass(cls):
+        cls.patcher_agent = patch("xivo_restapi.v1_0.rest.API_agents.AgentManagement")
+        mock_agent = cls.patcher_agent.start()
+        cls.instance_agent_management = Mock(AgentManagement)
+        mock_agent.return_value = cls.instance_agent_management
 
-    def tearDown(self):
-        self.patcher_agent.stop()
+        TestAPI.setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.patcher_agent.stop()
 
     def test_list_agents(self):
         status = "200 OK"

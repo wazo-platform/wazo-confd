@@ -33,8 +33,7 @@ app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(minutes=5)
 
 
-def register_blueprints():
-    # 1.0 ressources
+def register_blueprints_v1_0():
     from xivo_restapi.v1_0.rest import routing
     routing.create_routes()
     app.register_blueprint(routing.root)
@@ -43,7 +42,8 @@ def register_blueprints():
     app.register_blueprint(routing.users_service)
     app.register_blueprint(routing.voicemails_service)
 
-    # 1.1 ressources
+
+def register_blueprints_v1_1():
     _load_resources()
 
 

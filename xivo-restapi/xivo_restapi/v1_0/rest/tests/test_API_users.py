@@ -16,11 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import unittest
-
 from mock import Mock, patch
 from xivo_dao.alchemy.userfeatures import UserFeatures
-from xivo_restapi import flask_http_server
 from xivo_restapi.v1_0 import rest_encoder
 from xivo_restapi.v1_0.service_data_model.sdm_exception import \
     IncorrectParametersException
@@ -30,30 +27,31 @@ from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.user_management import UserManagement
 from xivo_restapi.v1_0.services.utils.exceptions import NoSuchElementException, \
     ProvdError, VoicemailExistsException, SysconfdError
+from xivo_restapi.v1_0.rest.tests.test_API import TestAPI
 
 BASE_URL = "%s%s" % (RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH, RestAPIConfig.XIVO_USERS_SERVICE_PATH)
 
 
-class TestAPIUsers(unittest.TestCase):
+class TestAPIUsers(TestAPI):
 
-    def setUp(self):
-        self.patcher_users = patch("xivo_restapi.v1_0.rest.API_users.UserManagement")
-        mock_user = self.patcher_users.start()
-        self.instance_user_management = Mock(UserManagement)
-        mock_user.return_value = self.instance_user_management
+    @classmethod
+    def setUpClass(cls):
+        cls.patcher_users = patch("xivo_restapi.v1_0.rest.API_users.UserManagement")
+        mock_user = cls.patcher_users.start()
+        cls.instance_user_management = Mock(UserManagement)
+        mock_user.return_value = cls.instance_user_management
 
-        self.patcher_user_sdm = patch("xivo_restapi.v1_0.rest.API_users.UserSdm")
-        self.mock_user_sdm = self.patcher_user_sdm.start()
-        self.user_sdm = Mock(UserSdm)
-        self.mock_user_sdm.return_value = self.user_sdm
-        flask_http_server.register_blueprints()
-        flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
-        flask_http_server.app.config['SERVER_NAME'] = None
+        cls.patcher_user_sdm = patch("xivo_restapi.v1_0.rest.API_users.UserSdm")
+        cls.mock_user_sdm = cls.patcher_user_sdm.start()
+        cls.user_sdm = Mock(UserSdm)
+        cls.mock_user_sdm.return_value = cls.user_sdm
 
-    def tearDown(self):
-        self.patcher_user_sdm.stop()
-        self.patcher_users.stop()
+        TestAPI.setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.patcher_user_sdm.stop()
+        cls.patcher_users.stop()
 
     def test_list_users(self):
         status = "200 OK"

@@ -31,7 +31,7 @@ class TestResources(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._mock_decorators()
-        flask_http_server.register_blueprints()
+        flask_http_server.register_blueprints_v1_1()
         flask_http_server.app.testing = True
         cls.app = flask_http_server.app.test_client()
 

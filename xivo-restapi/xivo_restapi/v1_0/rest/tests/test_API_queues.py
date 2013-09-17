@@ -16,32 +16,31 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import unittest
 
 from mock import patch, Mock
 from xivo_dao.alchemy.queuefeatures import QueueFeatures
-from xivo_restapi import flask_http_server
 from xivo_restapi.v1_0 import rest_encoder
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.queue_management import QueueManagement
+from xivo_restapi.v1_0.rest.tests.test_API import TestAPI
 
 BASE_URL = "%s%s/" % (RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH, RestAPIConfig.XIVO_QUEUES_SERVICE_PATH)
 
 
-class TestAPIQueues(unittest.TestCase):
+class TestAPIQueues(TestAPI):
 
-    def setUp(self):
-        self.patcher_queue = patch("xivo_restapi.v1_0.rest.API_queues.QueueManagement")
-        mock_queue = self.patcher_queue.start()
-        self.instance_queue_management = Mock(QueueManagement)
-        mock_queue.return_value = self.instance_queue_management
-        flask_http_server.register_blueprints()
-        flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
-        flask_http_server.app.config['SERVER_NAME'] = None
+    @classmethod
+    def setUpClass(cls):
+        cls.patcher_queue = patch("xivo_restapi.v1_0.rest.API_queues.QueueManagement")
+        mock_queue = cls.patcher_queue.start()
+        cls.instance_queue_management = Mock(QueueManagement)
+        mock_queue.return_value = cls.instance_queue_management
 
-    def tearDown(self):
-        self.patcher_queue.stop()
+        TestAPI.setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.patcher_queue.stop()
 
     def test_list_queues(self):
         status = "200 OK"

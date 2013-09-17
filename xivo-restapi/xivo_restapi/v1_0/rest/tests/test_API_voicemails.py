@@ -16,11 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import unittest
 
 from mock import patch, Mock
 from xivo_dao.alchemy.voicemail import Voicemail
-from xivo_restapi import flask_http_server
 from xivo_restapi.v1_0 import rest_encoder
 from xivo_restapi.v1_0.service_data_model.sdm_exception import \
     IncorrectParametersException
@@ -28,27 +26,29 @@ from xivo_restapi.v1_0.service_data_model.voicemail_sdm import VoicemailSdm
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.utils.exceptions import NoSuchElementException
 from xivo_restapi.v1_0.services.voicemail_management import VoicemailManagement
+from xivo_restapi.v1_0.rest.tests.test_API import TestAPI
 
 
-class Test(unittest.TestCase):
+class Test(TestAPI):
 
-    def setUp(self):
-        self.patcher_voicemails = patch("xivo_restapi.v1_0.rest.API_voicemails.VoicemailManagement")
-        mock_voicemail = self.patcher_voicemails.start()
-        self.instance_voicemail_management = Mock(VoicemailManagement)
-        mock_voicemail.return_value = self.instance_voicemail_management
+    @classmethod
+    def setUpClass(cls):
+        cls.patcher_voicemails = patch("xivo_restapi.v1_0.rest.API_voicemails.VoicemailManagement")
+        mock_voicemail = cls.patcher_voicemails.start()
+        cls.instance_voicemail_management = Mock(VoicemailManagement)
+        mock_voicemail.return_value = cls.instance_voicemail_management
 
-        self.patcher_voicemail_sdm = patch("xivo_restapi.v1_0.rest.API_voicemails.VoicemailSdm")
-        mock_voicemail_sdm = self.patcher_voicemail_sdm.start()
-        self.voicemail_sdm = Mock(VoicemailSdm)
-        mock_voicemail_sdm.return_value = self.voicemail_sdm
-        flask_http_server.register_blueprints()
-        flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
+        cls.patcher_voicemail_sdm = patch("xivo_restapi.v1_0.rest.API_voicemails.VoicemailSdm")
+        mock_voicemail_sdm = cls.patcher_voicemail_sdm.start()
+        cls.voicemail_sdm = Mock(VoicemailSdm)
+        mock_voicemail_sdm.return_value = cls.voicemail_sdm
 
-    def tearDown(self):
-        self.patcher_voicemail_sdm.stop()
-        self.patcher_voicemails.stop()
+        TestAPI.setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.patcher_voicemail_sdm.stop()
+        cls.patcher_voicemails.stop()
 
     def test_list_success(self):
         status = "200 OK"

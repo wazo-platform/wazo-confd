@@ -18,42 +18,41 @@
 
 
 import random
-import unittest
 
 from mock import Mock, patch
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy.record_campaigns import RecordCampaigns
-from xivo_restapi import flask_http_server
 from xivo_restapi.v1_0 import rest_encoder
 from xivo_restapi.v1_0.rest.helpers.campaigns_helper import CampaignsHelper
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 from xivo_restapi.v1_0.services.campagne_management import CampagneManagement
 from xivo_restapi.v1_0.services.utils.exceptions import NoSuchElementException, \
     InvalidInputException
+from xivo_restapi.v1_0.rest.tests.test_API import TestAPI
 
 BASE_URL = "%s%s" % (RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH, RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
 
 
-class TestAPICampaigns(unittest.TestCase):
+class TestAPICampaigns(TestAPI):
 
-    def setUp(self):
-        self.patcher_campaigns = patch("xivo_restapi.v1_0.rest.API_campaigns.CampagneManagement")
-        mock_campaign = self.patcher_campaigns.start()
-        self.instance_campaign_management = Mock(CampagneManagement)
-        mock_campaign.return_value = self.instance_campaign_management
+    @classmethod
+    def setUpClass(cls):
+        cls.patcher_campaigns = patch("xivo_restapi.v1_0.rest.API_campaigns.CampagneManagement")
+        mock_campaign = cls.patcher_campaigns.start()
+        cls.instance_campaign_management = Mock(CampagneManagement)
+        mock_campaign.return_value = cls.instance_campaign_management
 
-        self.patch_campaigns_helper = patch("xivo_restapi.v1_0.rest.API_campaigns.CampaignsHelper")
-        mock_campaigns_helper = self.patch_campaigns_helper.start()
-        self.instance_campaigns_helper = Mock(CampaignsHelper)
-        mock_campaigns_helper.return_value = self.instance_campaigns_helper
-        flask_http_server.register_blueprints()
-        flask_http_server.app.testing = True
-        self.app = flask_http_server.app.test_client()
-        flask_http_server.app.config['SERVER_NAME'] = None
+        cls.patch_campaigns_helper = patch("xivo_restapi.v1_0.rest.API_campaigns.CampaignsHelper")
+        mock_campaigns_helper = cls.patch_campaigns_helper.start()
+        cls.instance_campaigns_helper = Mock(CampaignsHelper)
+        mock_campaigns_helper.return_value = cls.instance_campaigns_helper
 
-    def tearDown(self):
-        self.patch_campaigns_helper.stop()
-        self.patcher_campaigns.stop()
+        TestAPI.setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.patch_campaigns_helper.stop()
+        cls.patcher_campaigns.stop()
 
     def test_add_campaign_fail(self):
         status = "500 INTERNAL SERVER ERROR"
