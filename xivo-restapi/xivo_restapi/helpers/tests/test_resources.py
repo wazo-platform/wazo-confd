@@ -19,7 +19,7 @@
 import unittest
 
 from functools import wraps
-from mock import Mock
+from mock import patch
 from xivo_restapi import flask_http_server
 from xivo_restapi.authentication import xivo_realm_digest
 from xivo_restapi.helpers import serializer
@@ -30,17 +30,34 @@ class TestResources(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls._patch_decorators()
         cls._mock_decorators()
         flask_http_server.register_blueprints_v1_1()
         flask_http_server.app.testing = True
         cls.app = flask_http_server.app.test_client()
 
     @classmethod
+    def _patch_decorators(cls):
+        cls.requires_auth_patcher = patch.object(xivo_realm_digest.realmDigest, 'requires_auth')
+        cls.consumes_patcher = patch.object(flask_negotiate, 'produces')
+        cls.produces_patcher = patch.object(flask_negotiate, 'consumes')
+
+        cls.requires_auth = cls.requires_auth_patcher.start()
+        cls.consumes = cls.consumes_patcher.start()
+        cls.produces = cls.produces_patcher.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.requires_auth_patcher.stop()
+        cls.consumes_patcher.stop()
+        cls.produces_patcher.stop()
+
+    @classmethod
     def _mock_decorators(cls):
         def mock_basic_decorator(func):
             return func
 
-        def mock_parameterized_decorator(string, **decorator_kwargs):
+        def mock_parameterized_decorator(*decorator_args, **decorator_kwargs):
             def decorated(func):
                 @wraps(func)
                 def wrapper(*args, **kwargs):
@@ -48,12 +65,9 @@ class TestResources(unittest.TestCase):
                 return wrapper
             return decorated
 
-        xivo_realm_digest.realmDigest = Mock()
-        xivo_realm_digest.realmDigest.requires_auth.side_effect = mock_basic_decorator
-        flask_negotiate.consumes = Mock()
-        flask_negotiate.consumes.side_effect = mock_parameterized_decorator
-        flask_negotiate.produces = Mock()
-        flask_negotiate.produces.side_effect = mock_parameterized_decorator
+        cls.requires_auth.side_effect = mock_basic_decorator
+        cls.consumes.side_effect = mock_parameterized_decorator
+        cls.produces.side_effect = mock_parameterized_decorator
 
     def _serialize_encode(self, data):
         return serializer.encode(data)

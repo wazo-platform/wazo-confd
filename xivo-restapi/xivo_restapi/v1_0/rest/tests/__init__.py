@@ -26,7 +26,7 @@ def mock_basic_decorator(func):
     return func
 
 
-def mock_parameterized_decorator(string):
+def mock_parameterized_decorator(*dargs, **dkwargs):
     def decorated(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
