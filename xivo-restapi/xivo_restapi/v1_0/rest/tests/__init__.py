@@ -18,8 +18,8 @@
 
 from functools import wraps
 from mock import Mock
-from xivo_restapi.authentication import xivo_realm_digest
-from xivo_restapi.negotiate import flask_negotiate
+from xivo_restapi.v1_0.rest.helpers import xivo_realm_digest
+from xivo_restapi.v1_0.rest.helpers import flask_negotiate
 
 
 def mock_basic_decorator(func):
