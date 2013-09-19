@@ -16,122 +16,167 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-
-from datetime import datetime
-from flask.app import Flask
 from mock import Mock
-from werkzeug.exceptions import HTTPException, BadRequest, Unauthorized
-from xivo_restapi.v1_0 import rest_encoder
-from xivo_restapi.v1_0.rest.helpers import global_helper
-from xivo_restapi.v1_0.rest.helpers.global_helper import str_to_datetime, \
-    exception_catcher
-from xivo_restapi.v1_0.services.utils.exceptions import InvalidInputException, \
-    NoSuchElementException
+from werkzeug.exceptions import HTTPException, BadRequest
+from xivo_restapi.helpers.common import exception_catcher
+from xivo_restapi.flask_http_server import app
+from xivo_restapi.helpers import serializer
+
+from xivo_dao.data_handler.exception import ElementNotExistsError, MissingParametersError, \
+    InvalidParametersError, NonexistentParametersError, ElementAlreadyExistsError, \
+    ElementCreationError, ElementEditionError, ElementDeletionError
 
 
-class TestGlobalHelper(unittest.TestCase):
+class TestCommon(unittest.TestCase):
 
-    def setUp(self):
-        self.app = Flask(__name__)
-        ctx = self.app.test_request_context('users/')
-        ctx.push()
+    @classmethod
+    def setUpClass(self):
+        app.testing = True
+        app.test_request_context('').push()
 
-    def test_create_class_instance(self):
-        class SampleClass():
-            def __init__(self):
-                self.att1 = 1
-                self.att2 = None
-                self.att3 = 'foo'
+    def assertResponse(self, response, status_code, result):
+        decoded_response = serializer.decode(response.data)
 
-            def todict(self):
-                return self.__dict__
-
-        dict_data = {'att1': 'foo',
-                     'att2': 12,
-                     'att3': None,
-                     'att4': 'bar'}
-        expected_object = SampleClass()
-        expected_object.att1 = 'foo'
-        expected_object.att2 = 12
-        expected_object.att3 = None
-
-        result = global_helper.create_class_instance(SampleClass, dict_data)
-        self.assertEqual(result.__dict__, expected_object.__dict__)
-
-    def test_create_paginator_fail(self):
-        data = {'param1': 1,
-                'param2': 'valeur'}
-        result = global_helper.create_paginator(data)
-        self.assertEqual(result, (0, 0))
-
-    def test_create_paginator_success(self):
-        data = {'param1': '1',
-                '_page': '2',
-                '_pagesize': '20'}
-        result = global_helper.create_paginator(data)
-        self.assertEqual(result, (2, 20))
-
-    def test_str_to_datetime(self):
-        strDate = "2012-01-01"
-        resultDate = str_to_datetime(strDate)
-        self.assertEqual(resultDate, datetime.strptime(strDate, "%Y-%m-%d"))
-
-        strTime = "2012-01-01 00:00:00"
-        resultTime = str_to_datetime(strTime)
-        self.assertEqual(resultTime, datetime.strptime(strTime, "%Y-%m-%d %H:%M:%S"))
-
-        invalidDateStr = "2012-13-13"
-        self.assertRaises(InvalidInputException, str_to_datetime, invalidDateStr)
-
-        tooShortStr = '2012'
-        self.assertRaises(InvalidInputException, str_to_datetime, tooShortStr)
-
-        invalidTimeStr = '2012-01-01 00:00:99'
-        self.assertRaises(InvalidInputException, str_to_datetime, invalidTimeStr)
-
-        invalidTimeStr = None
-        self.assertRaises(InvalidInputException, str_to_datetime, invalidTimeStr)
-
-        invalidTimeStr = {}
-        self.assertRaises(InvalidInputException, str_to_datetime, invalidTimeStr)
-
-        invalidTimeStr = 2012
-        self.assertRaises(InvalidInputException, str_to_datetime, invalidTimeStr)
+        self.assertEquals(response.status_code, status_code)
+        self.assertEquals(decoded_response, result)
 
     def test_exception_catcher_no_exception(self):
-        function = Mock()
-        function.return_value = 1
+        expected = 1
+        called_with = Mock(return_value=expected)
+
+        def function(*args, **kwargs):
+            return called_with(*args, **kwargs)
+
         decorated_function = exception_catcher(function)
-        self.assertEquals(1, decorated_function("a", 1, {}))
-        function.assert_called_with("a", 1, {})
 
-    def test_exception_catcher_standard_exception(self):
-        def function():
-            raise Exception()
-        decorated_function = exception_catcher(function)
-        self.assertEquals("500 INTERNAL SERVER ERROR", decorated_function().status)
+        result = decorated_function("a", 1, {})
 
-    def test_exception_catcher_HTTP_exception(self):
-        def function():
-            raise BadRequest()
-        decorated_function = exception_catcher(function)
-        self.assertRaises(HTTPException, decorated_function)
+        self.assertEquals(expected, result)
+        called_with.assert_called_with("a", 1, {})
 
-        def function2():
-            raise Unauthorized()
-        decorated_function = exception_catcher(function2)
-        self.assertRaises(HTTPException, decorated_function)
+    def test_exception_catcher_value_error(self):
+        expected_status_code = 400
+        expected_message = ["No parsable data in the request, Be sure to send a valid JSON file"]
 
-    def test_exception_catcher_NoSuchElementException(self):
-        def function():
-            raise NoSuchElementException('')
-        decorated_function = exception_catcher(function)
-        self.assertEquals("404 NOT FOUND", decorated_function().status)
-
-    def test_exception_catcher_ValueError(self):
         def function():
             raise ValueError()
+
         decorated_function = exception_catcher(function)
-        result = decorated_function()
-        self.assertEquals("400 BAD REQUEST", result.status)
-        self.assertEquals(["No parsable data in the request"], rest_encoder.decode(result.data))
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_element_not_exists_error(self):
+        expected_status_code = 404
+        expected_message = ["element with id=1 does not exist"]
+
+        def function():
+            raise ElementNotExistsError('element', id=1)
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_http_exception(self):
+        def function():
+            raise BadRequest()
+
+        decorated_function = exception_catcher(function)
+        self.assertRaises(HTTPException, decorated_function)
+
+    def test_exception_catcher_standard_exception(self):
+        expected_status_code = 500
+        expected_message = ["unexpected error during request: error message"]
+
+        def function():
+            raise Exception("error message")
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_missing_parameters_error(self):
+        expected_status_code = 400
+        expected_message = ["Missing parameters: parameter"]
+
+        def function():
+            raise MissingParametersError(['parameter'])
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_invalid_parameters_error(self):
+        expected_status_code = 400
+        expected_message = ["Invalid parameters: parameter"]
+
+        def function():
+            raise InvalidParametersError(['parameter'])
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_nonexistent_parameters_error(self):
+        expected_status_code = 400
+        expected_message = ["Nonexistent parameters: username johndoe does not exist"]
+
+        def function():
+            raise NonexistentParametersError(username='johndoe')
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_element_already_exists_error(self):
+        expected_status_code = 400
+        expected_message = ["user johndoe already exists"]
+
+        def function():
+            raise ElementAlreadyExistsError('user', 'johndoe')
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_element_creation_error(self):
+        expected_status_code = 400
+        expected_message = ["error while creating user: error message"]
+
+        def function():
+            raise ElementCreationError('user', 'error message')
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_element_edition_error(self):
+        expected_status_code = 400
+        expected_message = ["error while editing user: error message"]
+
+        def function():
+            raise ElementEditionError('user', 'error message')
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_element_deletion_error(self):
+        expected_status_code = 400
+        expected_message = ["error while deleting user: error message"]
+
+        def function():
+            raise ElementDeletionError('user', 'error message')
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
