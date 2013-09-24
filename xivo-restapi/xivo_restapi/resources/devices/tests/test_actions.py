@@ -19,11 +19,11 @@
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
-from xivo_restapi.helpers.tests.test_resources import TestResources
+from xivo_dao.data_handler.device.model import Device, DeviceOrdering, SearchResult
 from xivo_dao.data_handler.exception import NonexistentParametersError, \
     InvalidParametersError, ElementNotExistsError
-from xivo_dao.data_handler.device.model import Device, DeviceOrdering, SearchResult
 from xivo_dao.data_handler.line.model import Line
+from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "1.1/devices"
 
@@ -630,10 +630,11 @@ class TestDeviceActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
 
+    @patch('xivo_restapi.helpers.request_bouncer.request')
     @patch('xivo_dao.data_handler.line.services.get')
     @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
     @patch('xivo_dao.data_handler.device.services.get')
-    def test_associate_line(self, device_services_get, device_services_associate_line_to_device, line_services_get):
+    def test_associate_line(self, device_services_get, device_services_associate_line_to_device, line_services_get, request):
         device_id = '9fae3a621afd4449b006675efc6c01aa'
         line_id = 123
         expected_status_code = 204
@@ -644,15 +645,18 @@ class TestDeviceActions(TestResources):
         line_services_get.return_value = line
         device_services_get.return_value = device
 
+        request.remote_addr = '127.0.0.1'
+
         result = self.app.get('%s/%s/associate_line/%s' % (BASE_URL, device_id, line_id))
 
         device_services_associate_line_to_device.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))
 
+    @patch('xivo_restapi.helpers.request_bouncer.request')
     @patch('xivo_dao.data_handler.line.services.get')
     @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
     @patch('xivo_dao.data_handler.device.services.get')
-    def test_associate_line_with_error(self, device_services_get, device_services_associate_line_to_device, line_services_get):
+    def test_associate_line_with_error(self, device_services_get, device_services_associate_line_to_device, line_services_get, request):
         device_id = '9fae3a621afd4449b006675efc6c01aa'
         line_id = 123
         expected_status_code = 500
@@ -664,15 +668,18 @@ class TestDeviceActions(TestResources):
         device_services_get.return_value = device
         device_services_associate_line_to_device.side_effect = Exception
 
+        request.remote_addr = '127.0.0.1'
+
         result = self.app.get('%s/%s/associate_line/%s' % (BASE_URL, device_id, line_id))
 
         device_services_associate_line_to_device.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))
 
+    @patch('xivo_restapi.helpers.request_bouncer.request')
     @patch('xivo_dao.data_handler.line.services.get')
     @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
     @patch('xivo_dao.data_handler.device.services.get')
-    def test_remove_line(self, device_services_get, device_services_remove_line, line_services_get):
+    def test_remove_line(self, device_services_get, device_services_remove_line, line_services_get, request):
         device_id = '9fae3a621afd4449b006675efc6c01aa'
         line_id = 123
         expected_status_code = 204
@@ -683,15 +690,18 @@ class TestDeviceActions(TestResources):
         line_services_get.return_value = line
         device_services_get.return_value = device
 
+        request.remote_addr = '127.0.0.1'
+
         result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
 
         device_services_remove_line.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))
 
+    @patch('xivo_restapi.helpers.request_bouncer.request')
     @patch('xivo_dao.data_handler.line.services.get')
     @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
     @patch('xivo_dao.data_handler.device.services.get')
-    def test_remove_line_with_error(self, device_services_get, device_services_remove_line, line_services_get):
+    def test_remove_line_with_error(self, device_services_get, device_services_remove_line, line_services_get, request):
         device_id = '9fae3a621afd4449b006675efc6c01aa'
         line_id = 123
         expected_status_code = 500
@@ -702,6 +712,8 @@ class TestDeviceActions(TestResources):
         line_services_get.return_value = line
         device_services_get.return_value = device
         device_services_remove_line.side_effect = Exception
+
+        request.remote_addr = '127.0.0.1'
 
         result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
 

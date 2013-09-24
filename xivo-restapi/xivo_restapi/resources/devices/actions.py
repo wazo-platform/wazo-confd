@@ -25,6 +25,7 @@ from xivo_restapi import config
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
+from xivo_restapi.helpers.request_bouncer import limit_to_localhost
 from xivo_dao.data_handler.device.model import Device
 from xivo_dao.data_handler.device import services as device_services
 from xivo_dao.data_handler.exception import InvalidParametersError
@@ -129,6 +130,7 @@ def autoprov(deviceid):
 
 
 @route('/<deviceid>/associate_line/<int:lineid>')
+@limit_to_localhost
 def associate_line(deviceid, lineid):
     device = device_services.get(deviceid)
     line = line_services.get(lineid)
@@ -137,6 +139,7 @@ def associate_line(deviceid, lineid):
 
 
 @route('/<deviceid>/remove_line/<int:lineid>')
+@limit_to_localhost
 def remove_line(deviceid, lineid):
     device = device_services.get(deviceid)
     line = line_services.get(lineid)
