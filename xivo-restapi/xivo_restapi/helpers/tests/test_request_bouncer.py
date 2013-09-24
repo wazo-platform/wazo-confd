@@ -37,7 +37,7 @@ class TestRequestBouncer(test_resources.TestResources):
 
         self.app.get('users/')
 
-        @limit_to_localhost()
+        @limit_to_localhost
         def decorated_func():
             return make_response('', 200)
 
@@ -48,7 +48,7 @@ class TestRequestBouncer(test_resources.TestResources):
     def test_limit_to_localhost_rejected(self, request):
         request.remote_addr = '42.42.42.42'
 
-        @limit_to_localhost()
+        @limit_to_localhost
         def decorated_func():
             return make_response('', 200)
 

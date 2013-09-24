@@ -19,14 +19,18 @@
 import logging
 
 from flask import request
+from functools import wraps
 from werkzeug.exceptions import Forbidden
 
 logger = logging.getLogger(__name__)
 
+LOCAL_HOSTS = ('127.0.0.1', 'localhost')
+
 
 def limit_to_localhost(fn):
+    @wraps(fn)
     def wrapper(*args, **kwargs):
-        if request.remote_addr != '127.0.0.1':
+        if request.remote_addr not in LOCAL_HOSTS:
             raise Forbidden()
         return fn(*args, **kwargs)
     return wrapper
