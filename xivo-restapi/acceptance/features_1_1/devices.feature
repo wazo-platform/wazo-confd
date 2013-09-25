@@ -125,15 +125,6 @@ Feature: Devices
             | template_id |
             | abcd1234    |
 
-    Scenario: Synchronize a device
-        Given there are no devices with id "123"
-        Given there are no devices with mac "00:00:00:00:aa:01"
-        Given I have the following devices:
-          | id  | ip             | mac               |
-          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
-        When I synchronize the device "123" from restapi
-        Then I see in the log file device "123" synchronized
-
     Scenario: Create a device with all parameters
         Given there are no devices with mac "00:11:22:33:44:55"
         Given the plugin "null" is installed
@@ -150,6 +141,15 @@ Feature: Devices
         Then the device has the following parameters:
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
             | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+
+    Scenario: Synchronize a device
+        Given there are no devices with id "123"
+        Given there are no devices with mac "00:00:00:00:aa:01"
+        Given I have the following devices:
+          | id  | ip             | mac               |
+          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
+        When I synchronize the device "123" from restapi
+        Then I see in the log file device "123" synchronized
 
     Scenario: Edit a device with no parameters
         Given I have the following devices:
@@ -222,7 +222,7 @@ Feature: Devices
         Then I get a response with status "400"
         Then I get an error message "device 00:11:22:33:44:56 already exists"
 
-    Scenario: Edit a device with an invalid mac
+    Scenario: Edit a device with an invalid ip
         Given I have the following devices:
             | mac               | ip       |
             | 00:11:22:33:44:55 | 10.0.0.1 |
@@ -457,7 +457,7 @@ Feature: Devices
         Then I see in the log file device "20" deleted
         Then the device "20" is no longer exists in provd
 
-    Scenario: Delete a device with error
+    Scenario: Delete a device that doesn't exist
         Given there are no devices with id "abcd"
         When I delete the device "abcd" from restapi
         Then I get a response with status "404"
