@@ -20,8 +20,6 @@ from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.exception import NonexistentParametersError, \
-    InvalidParametersError, ElementNotExistsError
 from xivo_dao.data_handler.device.model import Device, DeviceOrdering, SearchResult
 from xivo_dao.data_handler.line.model import Line
 
@@ -29,32 +27,6 @@ BASE_URL = "1.1/devices"
 
 
 class TestDeviceActions(TestResources):
-
-    @patch('xivo_restapi.resources.devices.actions.formatter')
-    @patch('xivo_dao.data_handler.device.services.get')
-    def test_get_no_device(self, device_services_get, formatter):
-        expected_status_code = 404
-        device_id = '1234567890abcdefghij1234567890ab'
-
-        device_services_get.side_effect = ElementNotExistsError('device')
-
-        result = self.app.get("%s/%s" % (BASE_URL, device_id))
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(formatter.call_count, equal_to(0))
-
-    @patch('xivo_restapi.resources.devices.actions.formatter')
-    @patch('xivo_dao.data_handler.device.services.get')
-    def test_get_error(self, device_services_get, formatter):
-        expected_status_code = 500
-        device_id = '1234567890abcdefghij1234567890ab'
-
-        device_services_get.side_effect = Exception
-
-        result = self.app.get("%s/%s" % (BASE_URL, device_id))
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(formatter.call_count, equal_to(0))
 
     @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.get')
@@ -81,17 +53,6 @@ class TestDeviceActions(TestResources):
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
         device_services_get.assert_called_once_with(device_id)
         formatter.to_api.assert_called_once_with(device)
-
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_error(self, device_find_all):
-        expected_status_code = 500
-
-        device_find_all.side_effect = Exception
-
-        result = self.app.get(BASE_URL)
-
-        device_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_dao.data_handler.device.services.find_all')
     def test_list_no_devices(self, device_find_all):
@@ -373,70 +334,6 @@ class TestDeviceActions(TestResources):
 
     @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.create')
-    def test_create_nonexistent_parameters(self, device_services_create, formatter):
-        expected_status_code = 400
-        expected_result = ["Nonexistent parameters: template_id abcd does not exist"]
-
-        device = Mock(Device)
-
-        device_services_create.side_effect = NonexistentParametersError(template_id='abcd')
-        formatter.to_model.return_value = device
-
-        data = {}
-
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        formatter.to_model.assert_called_once_with(data_serialized)
-        device_services_create.assert_called_once_with(device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.devices.actions.formatter')
-    @patch('xivo_dao.data_handler.device.services.create')
-    def test_create_invalid_parameters(self, device_services_create, formatter):
-        expected_status_code = 400
-        expected_result = ["Invalid parameters: mac"]
-
-        device = Mock(Device)
-
-        device_services_create.side_effect = InvalidParametersError(["mac"])
-        formatter.to_model.return_value = device
-
-        data = {'mac': 'asdfghjk'}
-
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        formatter.to_model.assert_called_once_with(data_serialized)
-        device_services_create.assert_called_once_with(device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.devices.actions.formatter')
-    @patch('xivo_dao.data_handler.device.services.create')
-    def test_create_unknown_error(self, device_services_create, formatter):
-        expected_status_code = 500
-
-        device = Mock(Device)
-
-        device_services_create.side_effect = Exception()
-        formatter.to_model.return_value = device
-
-        data = {'mac': '00:11:22:33:44:55', 'ip': '10.0.0.1'}
-
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        formatter.to_model.assert_called_once_with(data_serialized)
-        device_services_create.assert_called_once_with(device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_restapi.resources.devices.actions.formatter')
-    @patch('xivo_dao.data_handler.device.services.create')
     def test_create(self, device_services_create, formatter):
         device_id = 1
         mac = '00:11:22:33:44:55'
@@ -496,20 +393,6 @@ class TestDeviceActions(TestResources):
         assert_that(result.data, equal_to(expected_data))
         mock_device_services_delete.assert_called_with(device)
 
-    @patch('xivo_dao.data_handler.device.services.get')
-    @patch('xivo_dao.data_handler.device.services.delete')
-    def test_delete_not_found(self, mock_device_services_delete, mock_device_services_get):
-        expected_status_code = 404
-
-        device = Mock(Device)
-        mock_device_services_get.return_value = device
-        mock_device_services_delete.side_effect = ElementNotExistsError('device')
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        mock_device_services_delete.assert_called_with(device)
-
     @patch('xivo_dao.data_handler.device.services.synchronize')
     @patch('xivo_dao.data_handler.device.services.get')
     def test_synchronize(self, device_services_get, device_services_synchronize):
@@ -524,21 +407,6 @@ class TestDeviceActions(TestResources):
         device_services_synchronize.assert_called_once_with(device)
         assert_that(result.status_code, equal_to(expected_status_code))
 
-    @patch('xivo_dao.data_handler.device.services.synchronize')
-    @patch('xivo_dao.data_handler.device.services.get')
-    def test_synchronize_with_error(self, device_services_get, device_services_synchronize):
-        device_id = '9fae3a621afd4449b006675efc6c01aa'
-        expected_status_code = 500
-
-        device = Device(id=device_id)
-        device_services_get.return_value = device
-        device_services_synchronize.side_effect = Exception
-
-        result = self.app.get("%s/%s/synchronize" % (BASE_URL, device_id))
-
-        device_services_synchronize.assert_called_once_with(device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
     @patch('xivo_dao.data_handler.device.services.reset_to_autoprov')
     @patch('xivo_dao.data_handler.device.services.get')
     def test_autoprov(self, device_services_get, device_services_reset_to_autoprov):
@@ -547,21 +415,6 @@ class TestDeviceActions(TestResources):
 
         device = Device(id=device_id)
         device_services_get.return_value = device
-
-        result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
-
-        device_services_reset_to_autoprov.assert_called_once_with(device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.device.services.reset_to_autoprov')
-    @patch('xivo_dao.data_handler.device.services.get')
-    def test_autoprov_with_error(self, device_services_get, device_services_reset_to_autoprov):
-        device_id = '9fae3a621afd4449b006675efc6c01aa'
-        expected_status_code = 500
-
-        device = Device(id=device_id)
-        device_services_get.return_value = device
-        device_services_reset_to_autoprov.side_effect = Exception
 
         result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
 
@@ -590,46 +443,6 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_data))
 
-    @patch('xivo_restapi.resources.devices.actions.formatter')
-    @patch('xivo_dao.data_handler.device.services.get')
-    @patch('xivo_dao.data_handler.device.services.edit')
-    def test_edit_error(self, device_services_edit, device_services_get, formatter):
-        expected_status_code = 500
-
-        data = {
-            'ip': '10.0.0.1',
-            'mac': '00:11:22:33:44:55',
-        }
-        data_serialized = self._serialize_encode(data)
-
-        device = Mock(Device)
-        device_services_get.return_value = device
-
-        device_services_edit.side_effect = Exception
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        formatter.update_model.assert_called_with(data_serialized, device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.device.services.get')
-    @patch('xivo_dao.data_handler.device.services.edit')
-    def test_edit_not_found(self, device_services_edit, device_services_get):
-        expected_status_code = 404
-
-        data = {
-            'ip': '10.0.0.1',
-            'mac': '00:11:22:33:44:55',
-        }
-        data_serialized = self._serialize_encode(data)
-
-        device_services_get.return_value = Mock(Device)
-        device_services_edit.side_effect = ElementNotExistsError('device')
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-
     @patch('xivo_dao.data_handler.line.services.get')
     @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
     @patch('xivo_dao.data_handler.device.services.get')
@@ -650,26 +463,6 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
-    @patch('xivo_dao.data_handler.device.services.get')
-    def test_associate_line_with_error(self, device_services_get, device_services_associate_line_to_device, line_services_get):
-        device_id = '9fae3a621afd4449b006675efc6c01aa'
-        line_id = 123
-        expected_status_code = 500
-
-        line = Line(id=line_id)
-        device = Device(id=device_id)
-
-        line_services_get.return_value = line
-        device_services_get.return_value = device
-        device_services_associate_line_to_device.side_effect = Exception
-
-        result = self.app.get('%s/%s/associate_line/%s' % (BASE_URL, device_id, line_id))
-
-        device_services_associate_line_to_device.assert_called_once_with(device, line)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.line.services.get')
     @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
     @patch('xivo_dao.data_handler.device.services.get')
     def test_remove_line(self, device_services_get, device_services_remove_line, line_services_get):
@@ -682,26 +475,6 @@ class TestDeviceActions(TestResources):
 
         line_services_get.return_value = line
         device_services_get.return_value = device
-
-        result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
-
-        device_services_remove_line.assert_called_once_with(device, line)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
-    @patch('xivo_dao.data_handler.device.services.get')
-    def test_remove_line_with_error(self, device_services_get, device_services_remove_line, line_services_get):
-        device_id = '9fae3a621afd4449b006675efc6c01aa'
-        line_id = 123
-        expected_status_code = 500
-
-        line = Line(id=line_id)
-        device = Device(id=device_id)
-
-        line_services_get.return_value = line
-        device_services_get.return_value = device
-        device_services_remove_line.side_effect = Exception
 
         result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
 

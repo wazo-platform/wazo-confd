@@ -20,8 +20,6 @@ from mock import Mock, patch
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.extension.model import Extension
-from xivo_dao.data_handler.exception import MissingParametersError, \
-    ElementNotExistsError, NonexistentParametersError
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 
@@ -115,17 +113,6 @@ class TestExtensionActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.extension.services.find_all')
-    def test_list_extensions_error(self, mock_extension_services_find_all):
-        expected_status_code = 500
-
-        mock_extension_services_find_all.side_effect = Exception
-
-        result = self.app.get(BASE_URL)
-
-        mock_extension_services_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-
     @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_extension_id')
     def test_list_user_links_not_found(self, mock_ule_services_find_all_by_extension_id):
         extension_id = 1370
@@ -198,17 +185,6 @@ class TestExtensionActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_extension_id')
-    def test_list_user_links_error(self, mock_ule_services_find_all_by_extension_id):
-        expected_status_code = 500
-
-        mock_ule_services_find_all_by_extension_id.side_effect = Exception
-
-        result = self.app.get("%s/%d/user_links" % (BASE_URL, 1))
-
-        mock_ule_services_find_all_by_extension_id.assert_called_once_with(1)
-        self.assertEqual(expected_status_code, result.status_code)
-
     @patch('xivo_dao.data_handler.extension.services.get')
     def test_get(self, mock_extension_services_get):
         extension_id = 1
@@ -231,30 +207,6 @@ class TestExtensionActions(TestResources):
         mock_extension_services_get.assert_called_with(extension_id)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.extension.services.get')
-    def test_get_error(self, mock_extension_services_get):
-        extension_id = 1
-        expected_status_code = 500
-
-        mock_extension_services_get.side_effect = Exception
-
-        result = self.app.get("%s/%d" % (BASE_URL, extension_id))
-
-        mock_extension_services_get.assert_called_with(extension_id)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.extension.services.get')
-    def test_get_not_found(self, mock_extension_services_get):
-        extension_id = 1
-        expected_status_code = 404
-
-        mock_extension_services_get.side_effect = ElementNotExistsError('extension')
-
-        result = self.app.get("%s/%d" % (BASE_URL, extension_id))
-
-        mock_extension_services_get.assert_called_with(extension_id)
-        assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_restapi.resources.extensions.actions.formatter')
     @patch('xivo_dao.data_handler.extension.services.create')
@@ -291,60 +243,6 @@ class TestExtensionActions(TestResources):
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_restapi.resources.extensions.actions.formatter')
-    @patch('xivo_dao.data_handler.extension.services.create')
-    def test_create_error(self, mock_extension_services_create, formatter):
-        expected_status_code = 500
-
-        data = {
-            'exten': '1324',
-            'context': 'jd'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        mock_extension_services_create.side_effect = Exception
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_restapi.resources.extensions.actions.formatter')
-    @patch('xivo_dao.data_handler.extension.services.create')
-    def test_create_missing_parameters(self, mock_extension_services_create, formatter):
-        expected_status_code = 400
-        expected_result = ["Missing parameters: lastname"]
-
-        mock_extension_services_create.side_effect = MissingParametersError(["lastname"])
-
-        data = {
-            'exten': '1324'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.extensions.actions.formatter')
-    @patch('xivo_dao.data_handler.extension.services.create')
-    def test_create_nonexistent_parameters(self, mock_extension_services_create, formatter):
-        expected_status_code = 400
-        expected_result = ["Nonexistent parameters: context mycontext does not exist"]
-
-        mock_extension_services_create.side_effect = NonexistentParametersError(context='mycontext')
-
-        data = {
-            'exten': '1324',
-            'context': 'mycontext'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.extensions.actions.formatter')
     @patch('xivo_dao.data_handler.extension.services.get')
     @patch('xivo_dao.data_handler.extension.services.edit')
     def test_edit(self, mock_extension_services_edit, mock_extension_services_get, formatter):
@@ -365,46 +263,6 @@ class TestExtensionActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_data))
 
-    @patch('xivo_restapi.resources.extensions.actions.formatter')
-    @patch('xivo_dao.data_handler.extension.services.get')
-    @patch('xivo_dao.data_handler.extension.services.edit')
-    def test_edit_error(self, mock_extension_services_edit, mock_extension_services_get, formatter):
-        expected_status_code = 500
-
-        data = {
-            'exten': '1324',
-            'context': 'jd',
-            'type': 'user',
-            'typeval': '0'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        mock_extension_services_get.return_value = extension = Mock(Extension)
-        mock_extension_services_edit.side_effect = Exception
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        formatter.update_model.assert_called_with(data_serialized, extension)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.extension.services.get')
-    @patch('xivo_dao.data_handler.extension.services.edit')
-    def test_edit_not_found(self, mock_extension_services_edit, mock_extension_services_get):
-        expected_status_code = 404
-
-        data = {
-            'exten': '1324',
-            'context': 'jd'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        mock_extension_services_get.return_value = Mock(Extension)
-        mock_extension_services_edit.side_effect = ElementNotExistsError('extension')
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-
     @patch('xivo_dao.data_handler.extension.services.get')
     @patch('xivo_dao.data_handler.extension.services.delete')
     def test_delete_success(self, mock_extension_services_delete, mock_extension_services_get):
@@ -419,18 +277,4 @@ class TestExtensionActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_data))
-        mock_extension_services_delete.assert_called_with(extension)
-
-    @patch('xivo_dao.data_handler.extension.services.get')
-    @patch('xivo_dao.data_handler.extension.services.delete')
-    def test_delete_not_found(self, mock_extension_services_delete, mock_extension_services_get):
-        expected_status_code = 404
-
-        extension = Mock(Extension)
-        mock_extension_services_get.return_value = extension
-        mock_extension_services_delete.side_effect = ElementNotExistsError('extension')
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
         mock_extension_services_delete.assert_called_with(extension)
