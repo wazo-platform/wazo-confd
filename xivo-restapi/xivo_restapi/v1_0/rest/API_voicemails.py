@@ -24,8 +24,8 @@ from xivo_restapi.v1_0 import rest_encoder
 from xivo_restapi.v1_0.service_data_model.sdm_exception import \
     IncorrectParametersException
 from xivo_restapi.v1_0.service_data_model.voicemail_sdm import VoicemailSdm
-from xivo_restapi.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.negotiate.flask_negotiate import produces, consumes
+from xivo_restapi.v1_0.rest.helpers.xivo_realm_digest import realmDigest
+from xivo_restapi.v1_0.rest.helpers.flask_negotiate import produces, consumes
 from xivo_restapi.v1_0.services.voicemail_management import VoicemailManagement
 from xivo_restapi.v1_0.rest.helpers.global_helper import exception_catcher
 

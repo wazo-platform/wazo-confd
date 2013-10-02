@@ -24,90 +24,107 @@ from werkzeug.exceptions import UnsupportedMediaType, NotAcceptable
 from xivo_restapi.negotiate.flask_negotiate import consumes, produces
 
 
-class TestFlaskNegotiate(unittest.TestCase):
+class TestNegotiate(unittest.TestCase):
 
     def setUp(self):
         self.app = Flask(__name__)
         self.app.secret_key = 'test'
 
-    def tearDown(self):
-        self.app = None
+    def _mock_headers(self, headers={}, **kwargs):
+        ctx = self.app.test_request_context('', headers=headers, **kwargs)
+        ctx.push()
+
+
+class TestConsumes(TestNegotiate):
 
     def test_consumes_accepted(self):
-        ctx = self.app.test_request_context('users/',
-                                            content_type="application/json")
-        ctx.push()
+        self._mock_headers(content_type='application/json')
+        status_code = 200
 
         @consumes("application/json")
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         result = decorated_func()
-        self.assertEqual('222 UNKNOWN', result.status)
+        self.assertEqual(status_code, result.status_code)
 
     def test_consumes_rejected(self):
-        ctx = self.app.test_request_context('users/',
-                                            content_type="application/json")
-        ctx.push()
+        self._mock_headers(content_type='application/json')
+        status_code = 200
 
         @consumes("application/xml")
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         self.assertRaises(UnsupportedMediaType, decorated_func)
 
+    def test_consumes_no_content_type(self):
+        self._mock_headers()
+        status_code = 200
+
+        @consumes("application/xml")
+        def decorated_func():
+            return make_response('', status_code)
+
+        self.assertRaises(UnsupportedMediaType, decorated_func)
+
+
+class TestProduces(TestNegotiate):
+
     def test_produces_accepted(self):
-        ctx = self.app.test_request_context('users/', headers={"Accept": "application/json"})
-        ctx.push()
+        self._mock_headers({'Accept': 'application/json'})
+        status_code = 200
 
         @produces("application/json")
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         result = decorated_func()
-        self.assertEquals('222 UNKNOWN', result.status)
+        self.assertEquals(status_code, result.status_code)
         self.assertEquals("application/json", result.content_type)
 
     def test_produces_accepted_explicit_response_content_type(self):
-        ctx = self.app.test_request_context('users/', headers={"Accept": "text/csv"})
-        ctx.push()
+        self._mock_headers({'Accept': 'text/csv'})
+        status_code = 200
 
         @produces("text/csv", response_content_type='text/csv; charset=utf8')
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         result = decorated_func()
-        self.assertEquals('222 UNKNOWN', result.status)
+        self.assertEquals(status_code, result.status_code)
         self.assertEquals("text/csv; charset=utf8", result.content_type)
 
     def test_produces_rejected(self):
-        ctx = self.app.test_request_context('users/', headers={"Accept": "application/json"})
-        ctx.push()
+        self._mock_headers({'Accept': 'application/json'})
+        status_code = 200
 
         @produces("application/xml")
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         self.assertRaises(NotAcceptable, decorated_func)
 
     def test_produces_empty_header(self):
-        ctx = self.app.test_request_context('users/')
-        ctx.push()
+        self._mock_headers()
+        status_code = 200
 
         @produces("application/json")
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         result = decorated_func()
-        self.assertEquals('222 UNKNOWN', result.status)
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals("application/json", result.content_type)
 
     def test_produces_accept_all(self):
-        ctx = self.app.test_request_context('users/', headers={"Accept": "*/*"})
-        ctx.push()
+        self._mock_headers({'Accept': '*/*'})
+        status_code = 200
 
         @produces("application/json")
         def decorated_func():
-            return make_response('', 222)
+            return make_response('', status_code)
 
         result = decorated_func()
-        self.assertEquals('222 UNKNOWN', result.status)
+        self.assertEquals(status_code, result.status_code)
+        self.assertEquals("application/json", result.content_type)

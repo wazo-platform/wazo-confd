@@ -20,8 +20,6 @@ from mock import Mock, patch
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.user.model import User
-from xivo_dao.data_handler.exception import MissingParametersError, \
-    ElementNotExistsError
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
@@ -118,17 +116,6 @@ class TestUserActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.user.services.find_all')
-    def test_list_users_error(self, mock_user_services_find_all):
-        expected_status_code = 500
-
-        mock_user_services_find_all.side_effect = Exception
-
-        result = self.app.get(BASE_URL)
-
-        mock_user_services_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get(self, mock_user_services_get):
         user_id = 1
@@ -153,30 +140,6 @@ class TestUserActions(TestResources):
         mock_user_services_get.assert_called_once_with(user_id)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.user.services.get')
-    def test_get_error(self, mock_user_services_get):
-        user_id = 1
-        expected_status_code = 500
-
-        mock_user_services_get.side_effect = Exception
-
-        result = self.app.get("%s/%d" % (BASE_URL, user_id))
-
-        mock_user_services_get.assert_called_once_with(user_id)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_dao.data_handler.user.services.get')
-    def test_get_not_found(self, mock_user_services_get):
-        user_id = 1
-        expected_status_code = 404
-
-        mock_user_services_get.side_effect = ElementNotExistsError('user')
-
-        result = self.app.get("%s/%d" % (BASE_URL, user_id))
-
-        mock_user_services_get.assert_called_once_with(user_id)
-        assert_that(result.status_code, equal_to(expected_status_code))
 
     @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
     def test_list_lines_associated_to_a_user_with_no_lines(self, ule_find_all_by_user_id):
@@ -366,42 +329,6 @@ class TestUserActions(TestResources):
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_restapi.resources.users.actions.formatter')
-    @patch('xivo_dao.data_handler.user.services.create')
-    def test_create_error(self, mock_user_services_create, formatter):
-        expected_status_code = 500
-
-        data = {
-            'firstname': 'André',
-            'lastname': 'Dupond',
-            'description': 'éà":;'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        mock_user_services_create.side_effect = Exception
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_restapi.resources.users.actions.formatter')
-    @patch('xivo_dao.data_handler.user.services.create')
-    def test_create_request_error(self, mock_user_services_create, formatter):
-        expected_status_code = 400
-        expected_result = ['Missing parameters: firstname']
-
-        mock_user_services_create.side_effect = MissingParametersError(['firstname'])
-
-        data = {
-            'lastname': 'Dupond'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.users.actions.formatter')
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.edit')
     def test_edit(self, mock_user_services_edit, mock_user_services_get, formatter):
@@ -423,47 +350,6 @@ class TestUserActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_result))
 
-    @patch('xivo_restapi.resources.users.actions.formatter')
-    @patch('xivo_dao.data_handler.user.services.get')
-    @patch('xivo_dao.data_handler.user.services.edit')
-    def test_edit_error(self, mock_user_services_edit, mock_user_services_get, formatter):
-        expected_status_code = 500
-
-        data = {
-            'firstname': 'André',
-            'lastname': 'Dupond',
-            'description': 'éà":;'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        mock_user_services_get.return_value = user = Mock(User)
-        mock_user_services_edit.side_effect = Exception
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        formatter.update_model.assert_called_with(data_serialized, user)
-        assert_that(result.status_code, equal_to(expected_status_code))
-
-    @patch('xivo_restapi.resources.users.actions.formatter')
-    @patch('xivo_dao.data_handler.user.services.get')
-    @patch('xivo_dao.data_handler.user.services.edit')
-    def test_edit_not_found(self, mock_user_services_edit, mock_user_services_get, formatter):
-        expected_status_code = 404
-
-        data = {
-            'firstname': 'André',
-            'lastname': 'Dupond',
-            'description': 'éà":;'
-        }
-        data_serialized = self._serialize_encode(data)
-
-        mock_user_services_get.return_value = Mock(User)
-        mock_user_services_edit.side_effect = ElementNotExistsError('user')
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
     def test_delete_success(self, mock_user_services_delete, mock_user_services_get):
@@ -479,17 +365,3 @@ class TestUserActions(TestResources):
         mock_user_services_delete.assert_called_with(user)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.user.services.get')
-    @patch('xivo_dao.data_handler.user.services.delete')
-    def test_delete_not_found(self, mock_user_services_delete, mock_user_services_get):
-        expected_status_code = 404
-
-        user = Mock(User)
-        mock_user_services_get.return_value = user
-        mock_user_services_delete.side_effect = ElementNotExistsError('user')
-
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        mock_user_services_delete.assert_called_with(user)
-        assert_that(result.status_code, equal_to(expected_status_code))

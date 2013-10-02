@@ -21,8 +21,8 @@ import logging
 from flask import request
 from flask.helpers import make_response
 from xivo_restapi.v1_0 import rest_encoder
-from xivo_restapi.authentication.xivo_realm_digest import realmDigest
-from xivo_restapi.negotiate.flask_negotiate import produces
+from xivo_restapi.v1_0.rest.helpers.xivo_realm_digest import realmDigest
+from xivo_restapi.v1_0.rest.helpers.flask_negotiate import produces
 from xivo_restapi.v1_0.services.agent_management import AgentManagement
 from xivo_restapi.v1_0.rest.helpers.global_helper import exception_catcher
 
