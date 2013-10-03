@@ -3,10 +3,10 @@ Feature: Voicemails
     Scenario: Get a voicemail that doesn't exist
         Given I have no voicemail with id "10"
         When I request voicemail with id "10"
-        Then I get a reponse with status "404"
+        Then I get a response with status "404"
 
     Scenario: Get a voicemail
-        Given have the following voicemails:
+        Given I have the following voicemails:
             | name            | number | context |
             | Jean-Luc Picard | 1000   | default |
         When I send a request for the voicemail with number "1000", using its id
@@ -18,7 +18,7 @@ Feature: Voicemails
             | Jean-Luc Picard | 1000   | default | false        | false           | false        |
 
     Scenario: Get a voicemail with all parameters
-        Given have the following voicemails:
+        Given I have the following voicemails:
             | name          | number | context | password | email            | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | true         |
         When I send a request for the voicemail with number "1001", using its id
@@ -150,7 +150,7 @@ Feature: Voicemails
         Then I get a list of voicemails in the following order:
             | name         | number | context |
             | Alyssa Ogawa | 2      | default |
-        Then I dot not have the following voicemails in the list:
+        Then I do not have the following voicemails in the list:
             | name               | number | context |
             | Alexander Rozhenko | 1      | default |
 
@@ -170,7 +170,7 @@ Feature: Voicemails
             | name        | number | context |
             | Lwxana Troi | 9998   | default |
             | Guinan      | 9997   | default |
-        Then I dot not have the following voicemails in the list:
+        Then I do not have the following voicemails in the list:
             | name          | number | context |
             | Keiko O'Brien | 9996   | default |
             | Ro Laren      | 9999   | default |
@@ -185,14 +185,14 @@ Feature: Voicemails
             | search | 
             | reg    |
         Then I get a response with status "200"
-        Then I get a list with the following voicemails:
+        Then I get a list containing the following voicemails:
             | name             | number | context | email                           |
             | Reginald Barclay | 1013   | default | reginald.barclay@uss.enterprise |
         When I request the list of voicemails with the following parameters:
             | search     |
             | ENTERPRISE |
         Then I get a response with status "200"
-        Then I get a list with the following voicemails:
+        Then I get a list containing the following voicemails:
             | name             | number | context | email                           |
             | Reginald Barclay | 1013   | default | reginald.barclay@uss.enterprise |
             | Gowron           | 1011   | default | gowron@uss.enterprise           |
@@ -200,7 +200,7 @@ Feature: Voicemails
             | search |
             | 1012   |
         Then I get a response with status "200"
-        Then I get a list with the following voicemails:
+        Then I get a list containing the following voicemails:
             | name             | number | context | email                           |
             | Q                | 1012   | default | q@continuum.universe            |
 
