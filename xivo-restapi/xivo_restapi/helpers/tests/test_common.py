@@ -16,9 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import Mock
+from hamcrest import *
+from mock import Mock, patch
 from werkzeug.exceptions import HTTPException, BadRequest
-from xivo_restapi.helpers.common import exception_catcher
+from xivo_restapi.helpers.common import exception_catcher, \
+    extract_find_parameters
 from xivo_restapi.flask_http_server import app
 from xivo_restapi.helpers import serializer
 
@@ -180,3 +182,120 @@ class TestCommon(unittest.TestCase):
 
         response = decorated_function()
         self.assertResponse(response, expected_status_code, expected_message)
+
+
+class TestExtractFindParameters(unittest.TestCase):
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_invalid_skip(self, mock_request):
+        mock_request.args = {
+            'skip': '-532'
+        }
+
+        self.assertRaises(InvalidParametersError, extract_find_parameters)
+
+        mock_request.args = {
+            'skip': 'toto'
+        }
+
+        self.assertRaises(InvalidParametersError, extract_find_parameters)
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_skip(self, mock_request):
+        expected_result = {
+            'skip': 532
+        }
+        mock_request.args = {
+            'skip': '532'
+        }
+
+        parameters = extract_find_parameters()
+
+        assert_that(parameters, equal_to(expected_result))
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_invalid_limit(self, mock_request):
+        mock_request.args = {
+            'limit': '-532'
+        }
+
+        self.assertRaises(InvalidParametersError, extract_find_parameters)
+
+        mock_request.args = {
+            'limit': 'toto'
+        }
+
+        self.assertRaises(InvalidParametersError, extract_find_parameters)
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_limit(self, mock_request):
+        expected_result = {
+            'limit': 532
+        }
+        mock_request.args = {
+            'limit': '532'
+        }
+
+        parameters = extract_find_parameters()
+
+        assert_that(parameters, equal_to(expected_result))
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_order(self, mock_request):
+        expected_result = {
+            'order': 'toto'
+        }
+        mock_request.args = {
+            'order': 'toto'
+        }
+
+        parameters = extract_find_parameters()
+
+        assert_that(parameters, equal_to(expected_result))
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_direction(self, mock_request):
+        expected_result = {
+            'direction': 'asc'
+        }
+        mock_request.args = {
+            'direction': 'asc'
+        }
+
+        parameters = extract_find_parameters()
+
+        assert_that(parameters, equal_to(expected_result))
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_search(self, mock_request):
+        expected_result = {
+            'search': 'abcd'
+        }
+        mock_request.args = {
+            'search': 'abcd'
+        }
+
+        parameters = extract_find_parameters()
+
+        assert_that(parameters, equal_to(expected_result))
+
+    @patch('xivo_restapi.helpers.common.request')
+    def test_extract_find_parameters_all_args(self, mock_request):
+        expected_result = {
+            'skip': 532,
+            'limit': 5432,
+            'order': 'toto',
+            'direction': 'asc',
+            'search': 'abcd'
+        }
+        mock_request.args = {
+            'skip': '532',
+            'limit': '5432',
+            'order': 'toto',
+            'direction': 'asc',
+            'search': 'abcd'
+        }
+
+        parameters = extract_find_parameters()
+
+        assert_that(parameters, equal_to(expected_result))

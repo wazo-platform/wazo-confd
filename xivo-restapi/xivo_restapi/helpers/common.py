@@ -25,6 +25,7 @@ from xivo_dao.data_handler.exception import MissingParametersError, \
     InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError, \
     ElementCreationError, ElementDeletionError, ElementEditionError, NonexistentParametersError
 from xivo_restapi.helpers import serializer
+from flask.globals import request
 
 
 logger = logging.getLogger(__name__)
@@ -62,3 +63,36 @@ def exception_catcher(func):
 def _make_response_encoded(message, code, exc_info=False):
     logger.error(message, exc_info=exc_info)
     return make_response(serializer.encode([unicode(message)]), code)
+
+
+def extract_find_parameters():
+    invalid = []
+    parameters = {}
+
+    if 'limit' in request.args:
+        limit = request.args['limit']
+        if limit.isdigit() and int(limit) > 0:
+            parameters['limit'] = int(limit)
+        else:
+            invalid.append("limit must be a positive number")
+
+    if 'skip' in request.args:
+        skip = request.args['skip']
+        if skip.isdigit() and int(skip) >= 0:
+            parameters['skip'] = int(skip)
+        else:
+            invalid.append("skip must be a positive number")
+
+    if 'order' in request.args:
+        parameters['order'] = request.args['order']
+
+    if 'direction' in request.args:
+        parameters['direction'] = request.args['direction']
+
+    if 'search' in request.args:
+        parameters['search'] = request.args['search']
+
+    if len(invalid) > 0:
+        raise InvalidParametersError(invalid)
+
+    return parameters
