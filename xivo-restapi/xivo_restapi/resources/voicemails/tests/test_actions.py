@@ -3,7 +3,7 @@
 from mock import patch, Mock
 from hamcrest import *
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.voicemail.model import Voicemail, VoicemailOrdering
+from xivo_dao.data_handler.voicemail.model import Voicemail
 from xivo_dao.helpers.abstract_model import SearchResult
 
 
@@ -127,7 +127,7 @@ class TestVoicemailsAction(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_restapi.helpers.common.extract_find_parameters')
+    @patch('xivo_restapi.resources.voicemails.actions.extract_find_parameters')
     @patch('xivo_dao.data_handler.voicemail.services.find_all')
     def test_list_voicemails_with_parameters(self, voicemail_find_all, extract_find_parameters):
         expected_status_code = 200
@@ -153,6 +153,7 @@ class TestVoicemailsAction(TestResources):
 
         result = self.app.get("%s?%s" % (BASE_URL, query_string))
 
+        extract_find_parameters.assert_called_once_with()
         voicemail_find_all.assert_called_once_with(**request_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
