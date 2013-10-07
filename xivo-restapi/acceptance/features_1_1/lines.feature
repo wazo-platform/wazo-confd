@@ -1,4 +1,4 @@
-Feature: Lines
+Feature: [REST API] Lines
 
     Scenario: Line list with no lines
         Given I have no lines

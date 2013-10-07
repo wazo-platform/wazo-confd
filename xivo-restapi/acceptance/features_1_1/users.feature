@@ -1,4 +1,4 @@
-Feature: Users
+Feature: [REST API] Users
 
     Scenario: User list with no users
         Given I have no users

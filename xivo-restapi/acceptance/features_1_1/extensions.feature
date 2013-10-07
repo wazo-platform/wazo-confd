@@ -1,4 +1,4 @@
-Feature: Extensions
+Feature: [REST API] Extensions
 
     Scenario: Extension list with no extensions
         Given I have no extensions

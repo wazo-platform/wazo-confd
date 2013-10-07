@@ -1,4 +1,4 @@
-Feature: Devices
+Feature: [REST API] Devices
 
     Scenario: Create a device with no parameters
         When I create an empty device

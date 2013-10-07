@@ -1,4 +1,4 @@
-Feature: Call logs consultation
+Feature: [REST API] Call logs consultation
 
     Scenario: List call logs
         Given there are only the following call logs:
