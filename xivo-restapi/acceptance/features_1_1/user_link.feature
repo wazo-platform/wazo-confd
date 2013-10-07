@@ -1,4 +1,4 @@
-Feature: [REST API] Link user with a line and extension
+Feature: REST API Link user with a line and extension
 
     Scenario: Create an empty link
         When I create an empty link
