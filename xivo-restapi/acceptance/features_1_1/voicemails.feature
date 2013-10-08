@@ -1,4 +1,4 @@
-Feature: Voicemails
+Feature: REST API Voicemails
 
     Scenario: Get a voicemail that doesn't exist
         Given I have no voicemail with id "10"
