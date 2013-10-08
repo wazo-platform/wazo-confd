@@ -11,7 +11,6 @@ Feature: REST API Voicemails
             | Jean-Luc Picard | 1000   | default |
         When I send a request for the voicemail with number "1000", using its id
         Then I get a response with status "200"
-        Then I get a header with a location for the "voicemails" resource
         Then I get a response with a link to the "voicemails" resource
         Then the voicemail has the following parameters:
             | name            | number | context | attach_audio | delete_messages | ask_password |
@@ -23,7 +22,6 @@ Feature: REST API Voicemails
             | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | true         |
         When I send a request for the voicemail with number "1001", using its id
         Then I get a response with status "200"
-        Then I get a header with a location for the "voicemails" resource
         Then I get a response with a link to the "voicemails" resource
         Then the voicemail has the following parameters:
             | name          | number | context | password | email            | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
