@@ -41,6 +41,7 @@ setup(
         'xivo_restapi.resources.lines',
         'xivo_restapi.resources.user_links',
         'xivo_restapi.resources.users',
+        'xivo_restapi.resources.voicemails',
         'xivo_restapi.v1_0',
         'xivo_restapi.v1_0.mapping_alchemy_sdm',
         'xivo_restapi.v1_0.rest',
