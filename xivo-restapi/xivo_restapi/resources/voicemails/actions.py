@@ -8,7 +8,7 @@ from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.voicemails import mapper
 from xivo_restapi.helpers import serializer
-from xivo_dao.data_handler.voicemail.model import Voicemail
+from xivo_dao.data_handler.voicemail.model import Voicemail, VoicemailOrder
 from xivo_dao.data_handler.voicemail import services as voicemail_services
 from xivo_restapi.helpers.common import extract_find_parameters
 
@@ -18,10 +18,19 @@ blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % conf
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Voicemail)
 
+order_mapping = {
+    'name': VoicemailOrder.name,
+    'number': VoicemailOrder.number,
+    'context': VoicemailOrder.context,
+    'email': VoicemailOrder.email,
+    'language': VoicemailOrder.language,
+    'timezone': VoicemailOrder.timezone
+}
+
 
 @route('')
 def list():
-    find_parameters = extract_find_parameters()
+    find_parameters = extract_find_parameters(order_mapping)
     search_result = voicemail_services.find_all(**find_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)

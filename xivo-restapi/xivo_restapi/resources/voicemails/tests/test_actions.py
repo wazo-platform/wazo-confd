@@ -3,7 +3,7 @@
 from mock import patch, Mock
 from hamcrest import *
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.voicemail.model import Voicemail
+from xivo_dao.data_handler.voicemail.model import Voicemail, VoicemailOrder
 from xivo_dao.helpers.abstract_model import SearchResult
 
 
@@ -82,11 +82,17 @@ class TestVoicemailsAction(TestResources):
         voicemail1 = Voicemail(id=voicemail_id_1,
                                name='10.0.0.1',
                                number='001122334455',
-                               context='fasdf')
+                               context='fasdf',
+                               attach_audio=False,
+                               delete_messages=False,
+                               ask_password=False)
         voicemail2 = Voicemail(id=voicemail_id_2,
                                name='10.0.0.2',
                                number='001122334456',
-                               context='dsad')
+                               context='dsad',
+                               attach_audio=False,
+                               delete_messages=False,
+                               ask_password=False)
 
         expected_status_code = 200
         expected_result = {
@@ -97,6 +103,14 @@ class TestVoicemailsAction(TestResources):
                     'name': voicemail1.name,
                     'number': voicemail1.number,
                     'context': voicemail1.context,
+                    'language': None,
+                    'password': None,
+                    'email': None,
+                    'timezone': None,
+                    'max_messages': None,
+                    'attach_audio': False,
+                    'delete_messages': False,
+                    'ask_password': False,
                     'links': [{
                         'href': 'http://localhost/1.1/voicemails/%s' % voicemail1.id,
                         'rel': 'voicemails'
@@ -107,6 +121,14 @@ class TestVoicemailsAction(TestResources):
                     'name': voicemail2.name,
                     'number': voicemail2.number,
                     'context': voicemail2.context,
+                    'language': None,
+                    'password': None,
+                    'email': None,
+                    'timezone': None,
+                    'max_messages': None,
+                    'attach_audio': False,
+                    'delete_messages': False,
+                    'ask_password': False,
                     'links': [{
                         'href': 'http://localhost/1.1/voicemails/%s' % voicemail2.id,
                         'rel': 'voicemails'
@@ -153,7 +175,14 @@ class TestVoicemailsAction(TestResources):
 
         result = self.app.get("%s?%s" % (BASE_URL, query_string))
 
-        extract_find_parameters.assert_called_once_with()
+        extract_find_parameters.assert_called_once_with({
+            'name': VoicemailOrder.name,
+            'number': VoicemailOrder.number,
+            'context': VoicemailOrder.context,
+            'email': VoicemailOrder.email,
+            'language': VoicemailOrder.language,
+            'timezone': VoicemailOrder.timezone
+        })
         voicemail_find_all.assert_called_once_with(**request_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))

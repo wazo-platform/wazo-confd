@@ -19,7 +19,7 @@
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
-from xivo_dao.data_handler.device.model import Device
+from xivo_dao.data_handler.device.model import Device, DeviceOrdering
 from xivo_dao.data_handler.line.model import Line
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.helpers.abstract_model import SearchResult
@@ -155,7 +155,16 @@ class TestDeviceActions(TestResources):
         query_url = "search=search&skip=1&limit=2&order=ip&direction=asc"
         result = self.app.get("%s?%s" % (BASE_URL, query_url))
 
-        extract_find_parameters.assert_called_once_with()
+        extract_find_parameters.assert_called_once_with({
+            'id': DeviceOrdering.id,
+            'ip': DeviceOrdering.ip,
+            'mac': DeviceOrdering.mac,
+            'plugin': DeviceOrdering.plugin,
+            'model': DeviceOrdering.model,
+            'vendor': DeviceOrdering.vendor,
+            'version': DeviceOrdering.version,
+        })
+
         device_find_all.assert_called_once_with(**find_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
