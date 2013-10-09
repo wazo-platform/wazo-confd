@@ -65,7 +65,10 @@ def _make_response_encoded(message, code, exc_info=False):
     return make_response(serializer.encode([unicode(message)]), code)
 
 
-def extract_find_parameters():
+DIRECTIONS = ['asc', 'desc']
+
+
+def extract_find_parameters(ordering):
     invalid = []
     parameters = {}
 
@@ -84,10 +87,18 @@ def extract_find_parameters():
             invalid.append("skip must be a positive number")
 
     if 'order' in request.args:
-        parameters['order'] = request.args['order']
+        column_name = request.args['order']
+        if column_name in ordering:
+            parameters['order'] = ordering[column_name]
+        else:
+            invalid.append("ordering %s does not exist" % column_name)
 
     if 'direction' in request.args:
-        parameters['direction'] = request.args['direction']
+        direction = request.args['direction']
+        if direction in DIRECTIONS:
+            parameters['direction'] = direction
+        else:
+            invalid.append("direction %s does not exist" % direction)
 
     if 'search' in request.args:
         parameters['search'] = request.args['search']
