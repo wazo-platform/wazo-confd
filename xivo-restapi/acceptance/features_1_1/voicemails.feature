@@ -102,17 +102,17 @@ Feature: REST API Voicemails
     Scenario: Voicemail list with order and direction
         Given I have the following voicemails:
             | name            | number | context | max_messages | language |
-            | Beverly Crusher | 1006   | default | 15           | en_US    |
-            | Deanna Troi     | 1007   | default | 100          | fr_FR    |
             | Wesley Crusher  | 1008   | default | 50           | es_ES    |
+            | Deanna Troi     | 1007   | default | 100          | fr_FR    |
+            | Beverly Crusher | 1006   | default | 15           | en_US    |
         When I request the list of voicemails with the following parameters:
-            | order        | direction |
-            | max_messages | desc      |
+            | order | direction |
+            | name  | desc      |
         Then I get a response with status "200"
         Then I get a list of voicemails in the following order:
             | name            | number | context | max_messages | language |
-            | Deanna Troi     | 1007   | default | 100          | fr_FR    |
             | Wesley Crusher  | 1008   | default | 50           | es_ES    |
+            | Deanna Troi     | 1007   | default | 100          | fr_FR    |
             | Beverly Crusher | 1006   | default | 15           | en_US    |
         When I request the list of voicemails with the following parameters:
             | order    | direction |
