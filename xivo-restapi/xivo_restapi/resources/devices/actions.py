@@ -38,7 +38,6 @@ route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Device)
 
 order_mapping = {
-    'id': DeviceOrdering.id,
     'ip': DeviceOrdering.ip,
     'mac': DeviceOrdering.mac,
     'plugin': DeviceOrdering.plugin,

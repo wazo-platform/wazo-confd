@@ -156,7 +156,6 @@ class TestDeviceActions(TestResources):
         result = self.app.get("%s?%s" % (BASE_URL, query_url))
 
         extract_find_parameters.assert_called_once_with({
-            'id': DeviceOrdering.id,
             'ip': DeviceOrdering.ip,
             'mac': DeviceOrdering.mac,
             'plugin': DeviceOrdering.plugin,
