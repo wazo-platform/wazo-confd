@@ -44,7 +44,7 @@ Feature: REST API Voicemails
             | order |
             | toto  |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: column 'toto' does not exist"
+        Then I get an error message "Invalid parameters: ordering column 'toto' does not exist"
 
     Scenario: Voicemail list with invalid direction parameter
         When I request the list of voicemails with the following parameters:

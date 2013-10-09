@@ -77,28 +77,28 @@ def extract_find_parameters(ordering):
         if limit.isdigit() and int(limit) > 0:
             parameters['limit'] = int(limit)
         else:
-            invalid.append("limit must be a positive number")
+            invalid.append("limit must be a positive integer")
 
     if 'skip' in request.args:
         skip = request.args['skip']
         if skip.isdigit() and int(skip) >= 0:
             parameters['skip'] = int(skip)
         else:
-            invalid.append("skip must be a positive number")
+            invalid.append("skip must be a positive integer")
 
     if 'order' in request.args:
         column_name = request.args['order']
         if column_name in ordering:
             parameters['order'] = ordering[column_name]
         else:
-            invalid.append("ordering %s does not exist" % column_name)
+            invalid.append("ordering column '%s' does not exist" % column_name)
 
     if 'direction' in request.args:
         direction = request.args['direction']
         if direction in DIRECTIONS:
             parameters['direction'] = direction
         else:
-            invalid.append("direction %s does not exist" % direction)
+            invalid.append("direction must be asc or desc")
 
     if 'search' in request.args:
         parameters['search'] = request.args['search']
