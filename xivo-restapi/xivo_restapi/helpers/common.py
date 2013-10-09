@@ -25,6 +25,7 @@ from xivo_dao.data_handler.exception import MissingParametersError, \
     InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError, \
     ElementCreationError, ElementDeletionError, ElementEditionError, NonexistentParametersError
 from xivo_restapi.helpers import serializer
+from flask.globals import request
 
 
 logger = logging.getLogger(__name__)
@@ -62,3 +63,47 @@ def exception_catcher(func):
 def _make_response_encoded(message, code, exc_info=False):
     logger.error(message, exc_info=exc_info)
     return make_response(serializer.encode([unicode(message)]), code)
+
+
+DIRECTIONS = ['asc', 'desc']
+
+
+def extract_find_parameters(ordering):
+    invalid = []
+    parameters = {}
+
+    if 'limit' in request.args:
+        limit = request.args['limit']
+        if limit.isdigit() and int(limit) > 0:
+            parameters['limit'] = int(limit)
+        else:
+            invalid.append("limit must be a positive integer")
+
+    if 'skip' in request.args:
+        skip = request.args['skip']
+        if skip.isdigit() and int(skip) >= 0:
+            parameters['skip'] = int(skip)
+        else:
+            invalid.append("skip must be a positive integer")
+
+    if 'order' in request.args:
+        column_name = request.args['order']
+        if column_name in ordering:
+            parameters['order'] = ordering[column_name]
+        else:
+            invalid.append("ordering column '%s' does not exist" % column_name)
+
+    if 'direction' in request.args:
+        direction = request.args['direction']
+        if direction in DIRECTIONS:
+            parameters['direction'] = direction
+        else:
+            invalid.append("direction must be asc or desc")
+
+    if 'search' in request.args:
+        parameters['search'] = request.args['search']
+
+    if len(invalid) > 0:
+        raise InvalidParametersError(invalid)
+
+    return parameters

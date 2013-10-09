@@ -19,11 +19,10 @@
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
-from xivo_dao.data_handler.device.model import Device, DeviceOrdering, SearchResult
-from xivo_dao.data_handler.exception import NonexistentParametersError, \
-    InvalidParametersError, ElementNotExistsError
+from xivo_dao.data_handler.device.model import Device, DeviceOrdering
 from xivo_dao.data_handler.line.model import Line
 from xivo_restapi.helpers.tests.test_resources import TestResources
+from xivo_dao.helpers.abstract_model import SearchResult
 
 BASE_URL = "1.1/devices"
 
@@ -128,209 +127,45 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_restapi.resources.devices.actions.extract_find_parameters')
     @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_device_search(self, device_find_all):
-        device_id = 'abcdefghijklmnopqrstuvwxyz123456'
-        total = 1
-
-        device = Device(id=device_id,
-                        ip='10.0.0.1',
-                        mac='00:11:22:33:44:55')
-
+    def test_list_devices_with_parameters(self, device_find_all, extract_find_parameters):
         expected_status_code = 200
         expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': device_id,
-                    'ip': device.ip,
-                    'mac': device.mac,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device_id,
-                        'rel': 'devices'
-                    }]
-                },
-            ]
+            'total': 0,
+            'items': []
         }
 
+        find_parameters = {
+            'search': 'search',
+            'skip': 1,
+            'limit': 2,
+            'order': 'ip',
+            'direction': 'asc'
+        }
+
+        extract_find_parameters.return_value = find_parameters
+
         devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = [device]
+        devices_found.total = 0
+        devices_found.items = []
 
         device_find_all.return_value = devices_found
 
-        result = self.app.get("%s?search=00" % BASE_URL)
+        query_url = "search=search&skip=1&limit=2&order=ip&direction=asc"
+        result = self.app.get("%s?%s" % (BASE_URL, query_url))
 
-        device_find_all.assert_called_once_with(search='00')
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        extract_find_parameters.assert_called_once_with({
+            'id': DeviceOrdering.id,
+            'ip': DeviceOrdering.ip,
+            'mac': DeviceOrdering.mac,
+            'plugin': DeviceOrdering.plugin,
+            'model': DeviceOrdering.model,
+            'vendor': DeviceOrdering.vendor,
+            'version': DeviceOrdering.version,
+        })
 
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_ordered(self, device_find_all):
-        device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
-                        ip='10.0.0.1',
-                        mac='00:11:22:33:44:55')
-        total = 1
-
-        expected_status_code = 200
-        expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': device.id,
-                    'ip': device.ip,
-                    'mac': device.mac,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device.id,
-                        'rel': 'devices'
-                    }]
-                }
-            ]
-        }
-
-        devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = [device]
-
-        device_find_all.return_value = devices_found
-
-        url = "%s?order=ip" % BASE_URL
-        result = self.app.get(url)
-
-        device_find_all.assert_called_once_with(order=DeviceOrdering.ip)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_ordered_with_a_direction(self, device_find_all):
-        device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
-                        ip='10.0.0.1',
-                        mac='00:11:22:33:44:55')
-
-        total = 1
-
-        expected_status_code = 200
-        expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': device.id,
-                    'ip': device.ip,
-                    'mac': device.mac,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device.id,
-                        'rel': 'devices'
-                    }]
-                }
-            ]
-        }
-
-        devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = [device]
-
-        device_find_all.return_value = devices_found
-
-        url = "%s?order=ip&direction=desc" % BASE_URL
-        result = self.app.get(url)
-
-        device_find_all.assert_called_once_with(order=DeviceOrdering.ip, direction='desc')
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_an_invalid_limit(self, device_find_all):
-        expected_status_code = 400
-        expected_result = ["Invalid parameters: limit must be a positive number"]
-
-        url = "%s?limit=-1" % BASE_URL
-        result = self.app.get(url)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_a_limit(self, device_find_all):
-        device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
-                        ip='10.0.0.1',
-                        mac='00:11:22:33:44:55')
-
-        total = 10
-
-        expected_status_code = 200
-        expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': device.id,
-                    'ip': device.ip,
-                    'mac': device.mac,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device.id,
-                        'rel': 'devices'
-                    }]
-                }
-            ]
-        }
-
-        devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = [device]
-
-        device_find_all.return_value = devices_found
-
-        url = "%s?limit=1" % BASE_URL
-        result = self.app.get(url)
-
-        device_find_all.assert_called_once_with(limit=1)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_an_invalid_skip(self, device_find_all):
-        expected_status_code = 400
-        expected_result = ["Invalid parameters: skip must be a positive number"]
-
-        url = "%s?skip=-1" % BASE_URL
-        result = self.app.get(url)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_a_skip(self, device_find_all):
-        device = Device(id='abcdefghijklmnopqrstuvwxyz123456',
-                        ip='10.0.0.1',
-                        mac='00:11:22:33:44:55')
-
-        total = 10
-
-        expected_status_code = 200
-        expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': device.id,
-                    'ip': device.ip,
-                    'mac': device.mac,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device.id,
-                        'rel': 'devices'
-                    }]
-                }
-            ]
-        }
-
-        devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = [device]
-
-        device_find_all.return_value = devices_found
-
-        url = "%s?skip=1" % BASE_URL
-        result = self.app.get(url)
-
-        device_find_all.assert_called_once_with(skip=1)
+        device_find_all.assert_called_once_with(**find_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
