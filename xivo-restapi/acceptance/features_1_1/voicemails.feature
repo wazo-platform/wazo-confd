@@ -233,7 +233,7 @@ Feature: REST API Voicemails
     Scenario: Delete a voicemail associated to nothing
         Given I have the following voicemails:
             | name       | number | context | email                      |
-            | Jadzia Dax | 1030   | default | jadzia.dax@deep.space.nine |
+            | Jadzia Dax | 1031   | default | jadzia.dax@deep.space.nine |
         When I delete voicemail with number "1031" via RESTAPI
         Then I get a response with status "204"
         Then voicemail with number "1031" no longer exists
@@ -258,7 +258,7 @@ Feature: REST API Voicemails
         Given I have the following voicemails:
             | name       | number | context |
             | Jake Sisko | 1034   | default |
-        Given there is an incall "1034" in context "from-extern" to the "Voicemail" "Jake Sisko (1034@default)"
+        Given there is an incall "1034" in context "from-extern" to the "Voicemail" "1034@default"
         When I delete voicemail with number "1034" via RESTAPI
         Then I get a response with status "204"
         Then incall "1034" is associated to nothing
