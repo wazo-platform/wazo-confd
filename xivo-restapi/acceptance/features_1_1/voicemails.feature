@@ -12,7 +12,7 @@ Feature: REST API Voicemails
         When I send a request for the voicemail with number "1000", using its id
         Then I get a response with status "200"
         Then I get a response with a link to the "voicemails" resource
-        Then the voicemail has the following parameters:
+        Then I have the following voicemails via RESTAPI:
             | name            | number | context | attach_audio | delete_messages | ask_password |
             | Jean-Luc Picard | 1000   | default | false        | false           | false        |
 
@@ -23,7 +23,7 @@ Feature: REST API Voicemails
         When I send a request for the voicemail with number "1001", using its id
         Then I get a response with status "200"
         Then I get a response with a link to the "voicemails" resource
-        Then the voicemail has the following parameters:
+        Then I have the following voicemails via RESTAPI:
             | name          | number | context | password | email            | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | true         |
 
@@ -32,46 +32,46 @@ Feature: REST API Voicemails
             | name            | number | context | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | Geordi La Forge | 1002   | default | en_US    | eu-fr    | 100          | true         | false           | true         |
             | Tasha Yar       | 1003   | default | fr_FR    | eu-fr    | 10           | false        | true            | false        |
-        When I request the list of voicemails
+        When I request the list of voicemails via RESTAPI
         Then I get a response with status "200"
-        Then I get a list containing the following voicemails:
+        Then I get a list containing the following voicemails via RESTAPI:
             | name            | number | context | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | Geordi La Forge | 1002   | default | en_US    | eu-fr    | 100          | true         | false           | true         |
             | Tasha Yar       | 1003   | default | fr_FR    | eu-fr    | 10           | false        | true            | false        |
 
     Scenario: Voicemail list with invalid order parameter
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | order |
             | toto  |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: ordering column 'toto' does not exist"
 
     Scenario: Voicemail list with invalid direction parameter
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | direction |
             | toto      |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: direction must be asc or desc"
 
     Scenario: Voicemail list with invalid limit parameter
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | limit |
             | -32   |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: limit must be a positive integer"
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | limit |
             | asdf  |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: limit must be a positive integer"
 
     Scenario: Voicemail list with invalid limit parameter
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | skip |
             | -32  |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: skip must be a positive integer"
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | skip |
             | asdf |
         Then I get a response with status "400"
@@ -82,19 +82,19 @@ Feature: REST API Voicemails
             | name | number | context |
             | Data | 1005   | default |
             | Warf | 1004   | default |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | order  |
             | number |
         Then I get a response with status "200"
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name | number | context |
             | Warf | 1004   | default |
             | Data | 1005   | default |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | order |
             | name  |
         Then I get a response with status "200"
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name | number | context |
             | Data | 1005   | default |
             | Warf | 1004   | default |
@@ -105,20 +105,20 @@ Feature: REST API Voicemails
             | Wesley Crusher  | 1008   | default | 50           | es_ES    |
             | Deanna Troi     | 1007   | default | 100          | fr_FR    |
             | Beverly Crusher | 1006   | default | 15           | en_US    |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | order | direction |
             | name  | desc      |
         Then I get a response with status "200"
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name            | number | context | max_messages | language |
             | Wesley Crusher  | 1008   | default | 50           | es_ES    |
             | Deanna Troi     | 1007   | default | 100          | fr_FR    |
             | Beverly Crusher | 1006   | default | 15           | en_US    |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | order    | direction |
             | language | asc       |
         Then I get a response with status "200"
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name            | number | context | max_messages | language |
             | Beverly Crusher | 1006   | default | 15           | en_US    |
             | Wesley Crusher  | 1008   | default | 50           | es_ES    |
@@ -129,7 +129,7 @@ Feature: REST API Voicemails
             | name  | number | context |
             | Sarek | 1009   | default |
             | Spock | 1010   | default |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | limit |
             | 2     |
         Then I get a response with status "200"
@@ -141,11 +141,11 @@ Feature: REST API Voicemails
             | name               | number | context |
             | Alyssa Ogawa       | 2      | default |
             | Alexander Rozhenko | 1      | default |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | skip | order  | direction |
             | 1    | number | asc       |
         Then I get a response with status "200"
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name         | number | context |
             | Alyssa Ogawa | 2      | default |
         Then I do not have the following voicemails in the list:
@@ -159,12 +159,12 @@ Feature: REST API Voicemails
             | Guinan        | 9997   | default |
             | Lwxana Troi   | 9998   | default |
             | Ro Laren      | 9999   | default |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | limit | skip | order  | direction |
             | 2     | 1    | number | desc      |
         Then I get a response with status "200"
         Then I have a list with 2 results
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name        | number | context |
             | Lwxana Troi | 9998   | default |
             | Guinan      | 9997   | default |
@@ -179,26 +179,26 @@ Feature: REST API Voicemails
             | Gowron           | 1011   | default | gowron@uss.enterprise           |
             | Q                | 1012   | default | q@continuum.universe            |
             | Reginald Barclay | 1013   | default | reginald.barclay@uss.enterprise |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | search | 
             | reg    |
         Then I get a response with status "200"
-        Then I get a list containing the following voicemails:
+        Then I get a list containing the following voicemails via RESTAPI:
             | name             | number | context | email                           |
             | Reginald Barclay | 1013   | default | reginald.barclay@uss.enterprise |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | search     |
             | ENTERPRISE |
         Then I get a response with status "200"
-        Then I get a list containing the following voicemails:
+        Then I get a list containing the following voicemails via RESTAPI:
             | name             | number | context | email                           |
             | Reginald Barclay | 1013   | default | reginald.barclay@uss.enterprise |
             | Gowron           | 1011   | default | gowron@uss.enterprise           |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | search |
             | 1012   |
         Then I get a response with status "200"
-        Then I get a list containing the following voicemails:
+        Then I get a list containing the following voicemails via RESTAPI:
             | name             | number | context | email                           |
             | Q                | 1012   | default | q@continuum.universe            |
 
@@ -210,11 +210,11 @@ Feature: REST API Voicemails
             | Odo            | 1016   | default | odo@deep.space.nine            |
             | Julian Bashir  | 1017   | default | julian.bashir@deep.space.nine  |
             | Worm Hole      | 1018   | default | worm.hole@space.universe       |
-        When I request the list of voicemails with the following parameters:
+        When I request the list of voicemails with the following parameters via RESTAPI:
             | search          | limit | skip | order  | direction |
             | deep.space.nine | 2     | 1    | number | desc      |
         Then I get a response with status "200"
-        Then I get a list of voicemails in the following order:
+        Then I get a list of voicemails in the following order via RESTAPI:
             | name       | number | context | email                      |
             | Odo        | 1016   | default | odo@deep.space.nine        |
             | Kira Nerys | 1015   | default | kira.nerys@deep.space.nine |
@@ -224,3 +224,135 @@ Feature: REST API Voicemails
             | Julian Bashir  | 1017   | default | julian.bashir@deep.space.nine  |
             | Worm Hole      | 1018   | default | worm.hole@space.universe       |
         Then I have a list with 2 of 4 results
+
+    Scenario: Creating an empty voicemail
+        When I create an empty voicemail via RESTAPI:
+        Then I get a response with status "400"
+        Then I get an error message "Missing parameters: name,number,context"
+
+    Scenario: Creating a voicemail with parameters that don't exist
+        When I create the following voicemails via RESTAPI:
+          | unexisting_field |
+          | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Creating a voicemail with a name and parameters that don't exist
+        When I create the following voicemails via RESTAPI:
+          | name       | unexisting_field |
+          | Joe Dahool | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Creating two voicemails with the same number and context
+        Given there is no voicemail with number "1001" and context "default"
+        Given I have the following voicemails:
+            | name      | number | context |
+            | Worm Hole | 1001   | default |
+        When I create the following voicemails via RESTAPI:
+          | name          | number | context |
+          | Roberto Vegas | 1001   | default |
+        Then I get a response with status "400"
+        Then I get an error message "Voicemail 1001@default already exists"
+
+    Scenario: Creating a voicemail with a invalid password
+        Given there is no voicemail with number "1001" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context | password |
+          | Joe Dahool | 1001   | default | toto     |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: password"
+
+    Scenario: Creating a voicemail with a non existent context
+        Given there is no voicemail with number "1001" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context      |
+          | Joe Dahool | 1001   | qwertyasdfgh |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: context qwertyasdfgh does not exist"
+
+    Scenario: Creating a voicemail with a non existent language
+        Given there is no voicemail with number "1001" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context | language |
+          | Joe Dahool | 1001   | default | qq_KK    |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: language qq_KK does not exist"
+
+    Scenario: Creating a voicemail with a non existent timezone
+        Given there is no voicemail with number "1001" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context | timezone |
+          | Joe Dahool | 1001   | default | qq-kk    |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: timezone qq-kk does not exist"
+
+    Scenario: Creating a voicemail with a invalid parameter max_messages
+        Given there is no voicemail with number "1001" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context | max_messages |
+          | Joe Dahool | 1001   | default | zero         |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: max_messages"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context | max_messages |
+          | Joe Dahool | 1001   | default | -4           |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: max_messages"
+
+    Scenario: Creating a voicemail with a invalid parameter number
+        When I create the following voicemails via RESTAPI:
+          | name       | number     | context |
+          | Joe Dahool | mille deux | default |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: number"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context |
+          | Joe Dahool | -54321 | default |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: number"
+
+    Scenario: Creating a voicemail with required fields
+        Given there is no voicemail with number "1000" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context |
+          | Joe Dahool | 1000   | default |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "voicemails" resource
+        Then I get a response with a link to the "voicemails" resource
+        Then I have the following voicemails via RESTAPI:
+          | name       | number | context |
+          | Joe Dahool | 1000   | default |
+
+    Scenario: Creating a voicemail with all fields
+        Given there is no voicemail with number "1000" and context "default"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
+          | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "voicemails" resource
+        Then I get a response with a link to the "voicemails" resource
+        Then I have the following voicemails via RESTAPI:
+          | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
+          | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+          
+    Scenario: Creating two voicemails with the same number but different context
+        Given there is no voicemail with number "1000" and context "default"
+        Given there is no voicemail with number "1000" and context "statscenter"
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context     |
+          | Joe Dahool | 1000   | default     |
+        Then I get a response with status "201"
+        Then I have the following voicemails via RESTAPI:
+          | name       | number | context     |
+          | Joe Dahool | 1000   | default     |
+        When I create the following voicemails via RESTAPI:
+          | name       | number | context     |
+          | Kim Jung   | 1000   | statscenter |
+        Then I get a response with status "201"
+        Then I have the following voicemails via RESTAPI:
+          | name       | number | context     |
+          | Kim Jung   | 1000   | statscenter |
+        
