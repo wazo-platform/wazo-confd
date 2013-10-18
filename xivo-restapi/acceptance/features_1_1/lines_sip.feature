@@ -213,4 +213,4 @@ Feature: REST API SIP Lines
 
         When I delete line sip "10"
         Then I get a response with status "400"
-        Then I get an error message "error while deleting Line: line still has a link"
+        Then I get an error message "Error while deleting Line: line still has a link"

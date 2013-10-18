@@ -287,7 +287,7 @@ Feature: REST API Users
 
         When I delete the user with id "1"
         Then I get a response with status "400"
-        Then I get an error message "error while deleting User: user still has a link"
+        Then I get an error message "Error while deleting User: user still has a link"
 
     Scenario: List the links associated to a user with no links
         Given I only have the following users:

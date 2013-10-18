@@ -334,4 +334,4 @@ Feature: REST API Extensions
 
         When I delete extension "100"
         Then I get a response with status "400"
-        Then I get an error message "error while deleting Extension: extension still has a link"
+        Then I get an error message "Error while deleting Extension: extension still has a link"

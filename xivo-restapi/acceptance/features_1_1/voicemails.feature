@@ -243,16 +243,16 @@ Feature: REST API Voicemails
             | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
             | Miles     | O'Brien  | en_US    | 1032   | default | sip      | Miles O'Brien  | 1032             |
         When I delete voicemail with number "1032" via RESTAPI
-        Then I get a response with status "204"
-        Then I get an error message "Cannot delete a voicemail associated to a user"
+        Then I get a response with status "400"
+        Then I get an error message "Error while deleting voicemail: Cannot delete a voicemail associated to a user"
 
     Scenario: Delete a voicemail associated to a user with a SCCP line
         Given there are users with infos:
             | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
             | Worf      | Klingon  | en_US    | 1033   | default | sccp     | Worf Klingon   | 1033             |
         When I delete voicemail with number "1033" via RESTAPI
-        Then I get a response with status "204"
-        Then I get an error message "Cannot delete a voicemail associated to a user"
+        Then I get a response with status "400"
+        Then I get an error message "Error while deleting voicemail: Cannot delete a voicemail associated to a user"
 
     Scenario: Delete a voicemail associated to an incoming call
         Given I have the following voicemails:
