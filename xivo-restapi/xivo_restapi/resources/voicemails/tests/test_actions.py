@@ -186,3 +186,18 @@ class TestVoicemailsAction(TestResources):
         voicemail_find_all.assert_called_once_with(**request_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.voicemail.services.get')
+    @patch('xivo_dao.data_handler.voicemail.services.delete')
+    def test_delete(self, mock_voicemail_services_delete, mock_voicemail_services_get):
+        expected_status_code = 204
+        expected_data = ''
+
+        voicemail = Mock(Voicemail)
+        mock_voicemail_services_get.return_value = voicemail
+
+        result = self.app.delete("%s/1" % BASE_URL)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
+        mock_voicemail_services_delete.assert_called_with(voicemail)

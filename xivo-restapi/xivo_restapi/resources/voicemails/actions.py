@@ -41,3 +41,10 @@ def get(voicemailid):
     voicemail = voicemail_services.get(voicemailid)
     result = formatter.to_api(voicemail)
     return make_response(result, 200)
+
+
+@route('/<int:voicemailid>', methods=['DELETE'])
+def delete(voicemailid):
+    voicemail = voicemail_services.get(voicemailid)
+    voicemail_services.delete(voicemail)
+    return make_response('', 204)
