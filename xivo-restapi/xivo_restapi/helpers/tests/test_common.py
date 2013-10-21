@@ -149,7 +149,7 @@ class TestCommon(unittest.TestCase):
 
     def test_exception_catcher_element_creation_error(self):
         expected_status_code = 400
-        expected_message = ["error while creating user: error message"]
+        expected_message = ["Error while creating user: error message"]
 
         def function():
             raise ElementCreationError('user', 'error message')
@@ -161,7 +161,7 @@ class TestCommon(unittest.TestCase):
 
     def test_exception_catcher_element_edition_error(self):
         expected_status_code = 400
-        expected_message = ["error while editing user: error message"]
+        expected_message = ["Error while editing user: error message"]
 
         def function():
             raise ElementEditionError('user', 'error message')
@@ -173,7 +173,7 @@ class TestCommon(unittest.TestCase):
 
     def test_exception_catcher_element_deletion_error(self):
         expected_status_code = 400
-        expected_message = ["error while deleting user: error message"]
+        expected_message = ["Error while deleting user: error message"]
 
         def function():
             raise ElementDeletionError('user', 'error message')
