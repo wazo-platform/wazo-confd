@@ -393,3 +393,163 @@ Feature: REST API Voicemails
         When I delete voicemail "1034@default" via RESTAPI
         Then I get a response with status "204"
         Then incall "1034" is associated to nothing
+
+    Scenario: Edit a voicemail that does not exist
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 2345   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "2345@default" via RESTAPI:
+            | name |
+            | toto |
+        Then I get a response with status "404"
+
+    Scenario: Edit a voicemail with parameters that don't exist
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 1031   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "1031@default" via RESTAPI:
+            | unexisting_field |
+            | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Edit a voicemail with a name and parameters that don't exist
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 1031   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "1031@default" via RESTAPI:
+            | name       | unexisting_field |
+            | Joe Dahool | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Edit two voicemails with the same number and context
+        Given I have the following voicemails:
+            | name         | number | context | email                      |
+            | Jadzia Dax   | 1031   | default | jadzia.dax@deep.space.nine |
+            | Kim Jung Hui | 1032   | default | kim.jung@hui.cdn |
+        When I edit voicemail "1031@default" via RESTAPI:
+            | name          | number | context |
+            | Roberto Vegas | 1032   | default |
+        Then I get a response with status "400"
+        Then I get an error message "Voicemail 1032@default already exists"
+
+    Scenario: Edit a voicemail with a invalid password
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 1021   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "1021@default" via RESTAPI:
+            | password |
+            | toto     |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: password"
+
+    Scenario: Edit a voicemail with a non existent context
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 2345   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "2345@default" via RESTAPI:
+            | context      |
+            | qwertyasdfgh |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: context qwertyasdfgh does not exist"
+
+    Scenario: Edit a voicemail with a non existent language
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 6789   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "6789@default" via RESTAPI:
+            | language |
+            | qq_KK    |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: language qq_KK does not exist"
+
+    Scenario: Edit a voicemail with a non existent timezone
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 3987   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "3987@default" via RESTAPI:
+            | timezone |
+            | qq-kk    |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: timezone qq-kk does not exist"
+
+    Scenario: Edit a voicemail with a invalid parameter max_messages
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 2568   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "2568@default" via RESTAPI:
+            | max_messages |
+            | zero         |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: max_messages"
+        When I edit voicemail "2568@default" via RESTAPI:
+            | max_messages |
+            | -5           |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: max_messages"
+
+    Scenario: Edit a voicemail with a invalid parameter number
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 2854   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "2854@default" via RESTAPI:
+            | number     |
+            | mille deux |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: number"
+        When I edit voicemail "2854@default" via RESTAPI:
+            | number |
+            | -54321 |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: number"
+
+    Scenario: Edit a voicemail with required fields
+        Given I have the following voicemails:
+            | name       | number | context | email                      |
+            | Jadzia Dax | 1598   | default | jadzia.dax@deep.space.nine |
+        When I edit voicemail "1598@default" via RESTAPI:
+            | name       | number | context |
+            | Joe Dahool | 1000   | default |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "voicemails" resource
+        Then I get a response with a link to the "voicemails" resource
+        Then I have the following voicemails via RESTAPI:
+            | name       | number | context |
+            | Joe Dahool | 1000   | default |
+
+    Scenario: Edit a voicemail with all fields
+        Given I have the following voicemails:
+            | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
+            | Super Hero | 2000   | default | 4566     | ggd@gfggdd.com | en_US    | eu-fr    | 10           | false        | true            | false        |
+        When I edit voicemail "2000@default" via RESTAPI:
+            | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
+            | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "voicemails" resource
+        Then I get a response with a link to the "voicemails" resource
+        Then I have the following voicemails via RESTAPI:
+            | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
+            | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+          
+    Scenario: Edit two voicemails with the same number but different context
+        Given I have the following voicemails:
+            | name       | number | context     |
+            | Joe Dahool | 1000   | default     |
+            | Joe Dahool | 2000   | statscenter |
+        When I edit voicemail "1000@default" via RESTAPI:
+            | name       | number | context     |
+            | Joe Dahool | 1001   | default     |
+        Then I get a response with status "201"
+        Then I have the following voicemails via RESTAPI:
+            | name       | number | context     |
+            | Joe Dahool | 1001   | default     |
+        When I edit voicemail "2000@statscenter" via RESTAPI:
+            | name       | number | context     |
+            | Kim Jung   | 2001   | statscenter |
+        Then I get a response with status "201"
+        Then I have the following voicemails via RESTAPI:
+            | name       | number | context     |
+            | Kim Jung   | 2001   | statscenter |

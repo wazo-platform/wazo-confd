@@ -56,6 +56,15 @@ def create():
     return make_response(result, 201, {'Location': location})
 
 
+@route('/<int:voicemailid>', methods=['PUT'])
+def edit(voicemailid):
+    data = request.data.decode("utf-8")
+    voicemail = voicemail_services.get(voicemailid)
+    formatter.update_model(data, voicemail)
+    voicemail_services.edit(voicemail)
+    return make_response('', 204)
+
+
 @route('/<int:voicemailid>', methods=['DELETE'])
 def delete(voicemailid):
     voicemail = voicemail_services.get(voicemailid)
