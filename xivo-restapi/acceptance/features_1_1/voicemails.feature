@@ -358,14 +358,14 @@ Feature: REST API Voicemails
 
     Scenario: Delete a voicemail that does not exist
         Given there is no voicemail with number "1030" and context "default"
-        When I delete voicemail with number "1030" via RESTAPI
+        When I delete voicemail "1030@default" via RESTAPI
         Then I get a response with status "404"
 
     Scenario: Delete a voicemail associated to nothing
         Given I have the following voicemails:
             | name       | number | context | email                      |
             | Jadzia Dax | 1031   | default | jadzia.dax@deep.space.nine |
-        When I delete voicemail with number "1031" via RESTAPI
+        When I delete voicemail "1031@default" via RESTAPI
         Then I get a response with status "204"
         Then voicemail with number "1031" no longer exists
 
@@ -373,7 +373,7 @@ Feature: REST API Voicemails
         Given there are users with infos:
             | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
             | Miles     | O'Brien  | en_US    | 1032   | default | sip      | Miles O'Brien  | 1032             |
-        When I delete voicemail with number "1032" via RESTAPI
+        When I delete voicemail "1032@default" via RESTAPI
         Then I get a response with status "400"
         Then I get an error message "Error while deleting voicemail: Cannot delete a voicemail associated to a user"
 
@@ -381,7 +381,7 @@ Feature: REST API Voicemails
         Given there are users with infos:
             | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
             | Worf      | Klingon  | en_US    | 1033   | default | sccp     | Worf Klingon   | 1033             |
-        When I delete voicemail with number "1033" via RESTAPI
+        When I delete voicemail "1033@default" via RESTAPI
         Then I get a response with status "400"
         Then I get an error message "Error while deleting voicemail: Cannot delete a voicemail associated to a user"
 
@@ -390,6 +390,6 @@ Feature: REST API Voicemails
             | name       | number | context |
             | Jake Sisko | 1034   | default |
         Given there is an incall "1034" in context "from-extern" to the "Voicemail" "1034@default"
-        When I delete voicemail with number "1034" via RESTAPI
+        When I delete voicemail "1034@default" via RESTAPI
         Then I get a response with status "204"
         Then incall "1034" is associated to nothing
