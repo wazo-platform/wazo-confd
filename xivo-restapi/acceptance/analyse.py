@@ -44,7 +44,7 @@ def handle_test(f):
 @handle_test
 def test_create_empty_sip_line():
     data = dict()
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     assert(resp['status'] == '400')
 
@@ -52,7 +52,7 @@ def test_create_empty_sip_line():
 @handle_test
 def test_create_line_empty_context():
     data = dict(context="")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     assert(resp['status'] == '400')
 
@@ -60,7 +60,7 @@ def test_create_line_empty_context():
 @handle_test
 def test_create_line_fake_context():
     data = dict(context="superdupercontext")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '400')
@@ -69,7 +69,7 @@ def test_create_line_fake_context():
 @handle_test
 def test_create_line_invalid_params():
     data = dict(context="default", invalidparameter="invalidvalue")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     assert(resp['status'] == '400')
 
@@ -77,7 +77,7 @@ def test_create_line_invalid_params():
 @handle_test
 def test_create_line_with_context():
     data = dict(context="default")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     assert(resp['status'] == '201')
 
@@ -85,7 +85,7 @@ def test_create_line_with_context():
 @handle_test
 def test_create_line_with_context_not_default():
     data = dict(context="statscenter")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '201')
@@ -100,10 +100,10 @@ def test_list_lines():
 @handle_test
 def test_create_2_lines_same_context():
     data = dict(context="default")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     assert(resp['status'] == '201')
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '201')
@@ -112,7 +112,7 @@ def test_create_2_lines_same_context():
 @handle_test
 def test_create_empty_link():
     data = dict()
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '400')
@@ -122,7 +122,7 @@ def test_create_empty_link():
 @handle_test
 def test_create_link_empty_params():
     data = dict(user_id="", extension_id="", line_id="")
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '400')
@@ -131,7 +131,7 @@ def test_create_link_empty_params():
 @handle_test
 def test_create_link_invalid_values():
     data = dict(user_id="asdf", extension_id="1", line_id="2")
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '400')
@@ -140,7 +140,7 @@ def test_create_link_invalid_values():
 @handle_test
 def test_create_link_invalid_params():
     data = dict(user_id="1", extension_id="2", line_id="3", invalid="invalid")
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '400')
@@ -149,7 +149,7 @@ def test_create_link_invalid_params():
 @handle_test
 def test_create_link_missing_lineid():
     data = dict(user_id="1", extension_id="2")
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     assert(resp['status'] == '400')
@@ -158,17 +158,17 @@ def test_create_link_missing_lineid():
 @handle_test
 def test_create_link_unexisting_extension():
     data = dict(firstname="tata")
-    resp_p1, content_p1 = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
+    resp_p1, content_p1 = h.request(URI_BASE + "/users/", "POST", headers=headers, body=dumps(data))
     new_user_id = loads(content_p1)['id']
     _print_result(resp_p1, content_p1)
 
     data = dict(context="default")
-    resp_p2, content_p2 = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp_p2, content_p2 = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     new_line_id = loads(content_p2)['id']
     _print_result(resp_p2, content_p2)
 
     data = dict(user_id=new_user_id, line_id=new_line_id, extension_id="999999999")
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     _delete_user(new_user_id)
@@ -180,17 +180,17 @@ def test_create_link_unexisting_extension():
 @handle_test
 def test_create_link_unexisting_line():
     data = dict(firstname="Greg")
-    resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_user_id = loads(content)['id']
 
     data = dict(exten="1313", context="default")
-    resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_extension_id = loads(content)['id']
 
     data = dict(user_id=new_user_id, line_id="999999999", extension_id=new_extension_id)
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
 
     _delete_user(new_user_id)
@@ -207,22 +207,22 @@ def test_create_link_unexisting_user():
 @handle_test
 def test_create_link_default_context():
     data = dict(firstname="Greg")
-    resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_user_id = loads(content)['id']
 
     data = dict(context="default")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_line_id = loads(content)['id']
 
     data = dict(exten="1313", context="default")
-    resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers, body=dumps(data))
     new_extension_id = loads(content)['id']
     _print_result(resp, content)
 
     data = dict(user_id=new_user_id, line_id=new_line_id, extension_id=new_extension_id)
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     new_link_id = loads(content)['id']
     _print_result(resp, content)
 
@@ -238,22 +238,22 @@ def test_create_link_default_context():
 @handle_test
 def test_create_link_other_context():
     data = dict(firstname="Greg")
-    resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/users/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_user_id = loads(content)['id']
 
     data = dict(context="statscenter")
-    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/lines_sip/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_line_id = loads(content)['id']
 
     data = dict(exten="1313", context="default")
-    resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/extensions/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_extension_id = loads(content)['id']
 
     data = dict(user_id=new_user_id, line_id=new_line_id, extension_id=new_extension_id)
-    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers,  body=dumps(data))
+    resp, content = h.request(URI_BASE + "/user_links/", "POST", headers=headers, body=dumps(data))
     _print_result(resp, content)
     new_link_id = loads(content)['id']
 
@@ -277,19 +277,19 @@ def _print_failed_tests(count):
 
 
 def _delete_link(link_id):
-    resp, content = h.request("%s%s%s" % (URI_BASE, "/user_links/", link_id), "DELETE", headers=headers)
+    h.request("%s%s%s" % (URI_BASE, "/user_links/", link_id), "DELETE", headers=headers)
 
 
 def _delete_user(user_id):
-    resp, content = h.request("%s%s%s" % (URI_BASE, "/users/", user_id), "DELETE", headers=headers)
+    h.request("%s%s%s" % (URI_BASE, "/users/", user_id), "DELETE", headers=headers)
 
 
 def _delete_line(line_id):
-    resp, content = h.request("%s%s%s" % (URI_BASE, "/lines_sip/", line_id), "DELETE", headers=headers)
+    h.request("%s%s%s" % (URI_BASE, "/lines_sip/", line_id), "DELETE", headers=headers)
 
 
 def _delete_extension(extension_id):
-    resp, content = h.request("%s%s%s" % (URI_BASE, "/extensions/", extension_id), "DELETE", headers=headers)
+    h.request("%s%s%s" % (URI_BASE, "/extensions/", extension_id), "DELETE", headers=headers)
 
 
 if __name__ == "__main__":
@@ -302,7 +302,7 @@ if __name__ == "__main__":
     handle_test.failed_tests = 0
     print "Running Acceptance tests on REST API"
 
-    #test_list_lines()
+    # test_list_lines()
     test_create_empty_sip_line()
     test_create_line_empty_context()
     test_create_line_fake_context()
