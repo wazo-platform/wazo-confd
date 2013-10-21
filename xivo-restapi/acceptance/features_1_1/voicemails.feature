@@ -9,7 +9,7 @@ Feature: REST API Voicemails
         Given I have the following voicemails:
             | name            | number | context |
             | Jean-Luc Picard | 1000   | default |
-        When I send a request for the voicemail with number "1000", using its id
+        When I send a request for the voicemail "1000@default", using its id
         Then I get a response with status "200"
         Then I get a response with a link to the "voicemails" resource
         Then I have the following voicemails via RESTAPI:
@@ -20,7 +20,7 @@ Feature: REST API Voicemails
         Given I have the following voicemails:
             | name          | number | context | password | email            | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | true         |
-        When I send a request for the voicemail with number "1001", using its id
+        When I send a request for the voicemail "1001@default", using its id
         Then I get a response with status "200"
         Then I get a response with a link to the "voicemails" resource
         Then I have the following voicemails via RESTAPI:
@@ -204,25 +204,25 @@ Feature: REST API Voicemails
 
     Scenario: Voicemail list with search, pagination and ordering
         Given I have the following voicemails:
-            | name           | number | context | email                          |
-            | Benjamin Sisko | 1014   | default | benjamin.cisco@deep.space.nine |
-            | Kira Nerys     | 1015   | default | kira.nerys@deep.space.nine     |
-            | Odo            | 1016   | default | odo@deep.space.nine            |
-            | Julian Bashir  | 1017   | default | julian.bashir@deep.space.nine  |
-            | Worm Hole      | 1018   | default | worm.hole@space.universe       |
+            | name           | number | context | email                           |
+            | Benjamin Sisko | 1014   | default | benjamin.cisco@deep.qwerty.nine |
+            | Kira Nerys     | 1015   | default | kira.nerys@deep.qwerty.nine     |
+            | Odo            | 1016   | default | odo@deep.qwerty.nine            |
+            | Julian Bashir  | 1017   | default | julian.bashir@deep.qwerty.nine  |
+            | Worm Hole      | 1018   | default | worm.hole@qwerty.universe       |
         When I request the list of voicemails with the following parameters via RESTAPI:
-            | search          | limit | skip | order  | direction |
-            | deep.space.nine | 2     | 1    | number | desc      |
+            | search           | limit | skip | order  | direction |
+            | deep.qwerty.nine | 2     | 1    | number | desc      |
         Then I get a response with status "200"
         Then I get a list of voicemails in the following order via RESTAPI:
-            | name       | number | context | email                      |
-            | Odo        | 1016   | default | odo@deep.space.nine        |
-            | Kira Nerys | 1015   | default | kira.nerys@deep.space.nine |
+            | name       | number | context | email                       |
+            | Odo        | 1016   | default | odo@deep.qwerty.nine        |
+            | Kira Nerys | 1015   | default | kira.nerys@deep.qwerty.nine |
         Then I do not have the following voicemails in the list:
-            | name           | number | context | email                          |
-            | Benjamin Sisko | 1014   | default | benjamin.cisco@deep.space.nine |
-            | Julian Bashir  | 1017   | default | julian.bashir@deep.space.nine  |
-            | Worm Hole      | 1018   | default | worm.hole@space.universe       |
+            | name           | number | context | email                           |
+            | Benjamin Sisko | 1014   | default | benjamin.cisco@deep.qwerty.nine |
+            | Julian Bashir  | 1017   | default | julian.bashir@deep.qwerty.nine  |
+            | Worm Hole      | 1018   | default | worm.hole@qwerty.universe       |
         Then I have a list with 2 of 4 results
 
     Scenario: Creating an empty voicemail
@@ -395,9 +395,7 @@ Feature: REST API Voicemails
         Then incall "1034" is associated to nothing
 
     Scenario: Edit a voicemail that does not exist
-        Given I have the following voicemails:
-            | name       | number | context | email                      |
-            | Jadzia Dax | 2345   | default | jadzia.dax@deep.space.nine |
+        Given there is no voicemail with number "2345" and context "default"
         When I edit voicemail "2345@default" via RESTAPI:
             | name |
             | toto |
@@ -426,13 +424,13 @@ Feature: REST API Voicemails
     Scenario: Edit two voicemails with the same number and context
         Given I have the following voicemails:
             | name         | number | context | email                      |
-            | Jadzia Dax   | 1031   | default | jadzia.dax@deep.space.nine |
-            | Kim Jung Hui | 1032   | default | kim.jung@hui.cdn |
-        When I edit voicemail "1031@default" via RESTAPI:
+            | Jadzia Dax   | 4732   | default | jadzia.dax@deep.space.nine |
+            | Kim Jung Hui | 3796   | default | kim.jung@hui.cdn           |
+        When I edit voicemail "4732@default" via RESTAPI:
             | name          | number | context |
-            | Roberto Vegas | 1032   | default |
+            | Roberto Vegas | 3796   | default |
         Then I get a response with status "400"
-        Then I get an error message "Voicemail 1032@default already exists"
+        Then I get an error message "Voicemail 3796@default already exists"
 
     Scenario: Edit a voicemail with a invalid password
         Given I have the following voicemails:
@@ -505,36 +503,36 @@ Feature: REST API Voicemails
         Then I get an error message "Invalid parameters: number"
 
     Scenario: Edit a voicemail with required fields
+        Given there is no voicemail with number "1000" and context "default"
         Given I have the following voicemails:
             | name       | number | context | email                      |
             | Jadzia Dax | 1598   | default | jadzia.dax@deep.space.nine |
         When I edit voicemail "1598@default" via RESTAPI:
             | name       | number | context |
             | Joe Dahool | 1000   | default |
-        Then I get a response with status "201"
-        Then I get a response with an id
-        Then I get a header with a location for the "voicemails" resource
-        Then I get a response with a link to the "voicemails" resource
+        Then I get a response with status "204"
+        When I send a request for the voicemail "1000@default", using its id
         Then I have the following voicemails via RESTAPI:
-            | name       | number | context |
-            | Joe Dahool | 1000   | default |
+            | name       | number | context | email                      |
+            | Joe Dahool | 1000   | default | jadzia.dax@deep.space.nine |
 
     Scenario: Edit a voicemail with all fields
+        Given there is no voicemail with number "1000" and context "default"
         Given I have the following voicemails:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | Super Hero | 2000   | default | 4566     | ggd@gfggdd.com | en_US    | eu-fr    | 10           | false        | true            | false        |
         When I edit voicemail "2000@default" via RESTAPI:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
-        Then I get a response with status "201"
-        Then I get a response with an id
-        Then I get a header with a location for the "voicemails" resource
-        Then I get a response with a link to the "voicemails" resource
+        Then I get a response with status "204"
+        When I send a request for the voicemail "1000@default", using its id
         Then I have the following voicemails via RESTAPI:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
           
     Scenario: Edit two voicemails with the same number but different context
+        Given there is no voicemail with number "1001" and context "default"
+        Given there is no voicemail with number "2001" and context "statscenter"
         Given I have the following voicemails:
             | name       | number | context     |
             | Joe Dahool | 1000   | default     |
@@ -542,14 +540,16 @@ Feature: REST API Voicemails
         When I edit voicemail "1000@default" via RESTAPI:
             | name       | number | context     |
             | Joe Dahool | 1001   | default     |
-        Then I get a response with status "201"
+        Then I get a response with status "204"
+        When I send a request for the voicemail "1001@default", using its id
         Then I have the following voicemails via RESTAPI:
             | name       | number | context     |
             | Joe Dahool | 1001   | default     |
         When I edit voicemail "2000@statscenter" via RESTAPI:
             | name       | number | context     |
             | Kim Jung   | 2001   | statscenter |
-        Then I get a response with status "201"
+        Then I get a response with status "204"
+        When I send a request for the voicemail "2001@statscenter", using its id
         Then I have the following voicemails via RESTAPI:
             | name       | number | context     |
             | Kim Jung   | 2001   | statscenter |
