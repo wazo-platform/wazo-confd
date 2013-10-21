@@ -187,6 +187,53 @@ class TestVoicemailsAction(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+
+    @patch('xivo_restapi.resources.voicemails.actions.formatter')
+    @patch('xivo_dao.data_handler.voicemail.services.create')
+    def test_create(self, voicemail_services_create, formatter):
+        voicemail_id = 123456
+        name = 'John Montana'
+        number = '10001'
+        context = 'default'
+
+        expected_status_code = 201
+        expected_result = {
+            'id': voicemail_id,
+            'name': name,
+            'number': number,
+            'context': context,
+            'links': [{
+                'href': 'http://localhost/1.1/voicemails/%d' % voicemail_id,
+                'rel': 'voicemails'
+            }]
+        }
+
+        data = {'name': name,
+                'number': number,
+                'context': context}
+
+        data_serialized = self._serialize_encode(data)
+
+        voicemail = Mock(Voicemail)
+        created_voicemail = Mock(Voicemail)
+        created_voicemail.id = voicemail_id
+        created_voicemail.name = name
+        created_voicemail.number = number
+        created_voicemail.context = context
+
+        voicemail_services_create.return_value = created_voicemail
+        formatter.to_model.return_value = voicemail
+        formatter.to_api.return_value = self._serialize_encode(expected_result)
+
+        result = self.app.post(BASE_URL, data=data_serialized)
+
+        formatter.to_model.assert_called_once_with(data_serialized)
+        voicemail_services_create.assert_called_once_with(voicemail)
+        formatter.to_api.assert_called_once_with(created_voicemail)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+
     @patch('xivo_dao.data_handler.voicemail.services.get')
     @patch('xivo_dao.data_handler.voicemail.services.delete')
     def test_delete(self, mock_voicemail_services_delete, mock_voicemail_services_get):
