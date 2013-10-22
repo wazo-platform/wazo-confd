@@ -93,7 +93,7 @@ Feature: REST API Extensions
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: exten,context"
 
-    Scenario: Creating an extension with an empty number:
+    Scenario: Creating an extension with an empty number
         Given I have no extensions
         When I create an extension with the following parameters:
             | exten | context |
@@ -101,7 +101,7 @@ Feature: REST API Extensions
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: Exten required"
 
-    Scenario: Creating an extension with an empty context:
+    Scenario: Creating an extension with an empty context
         Given I have no extensions
         When I create an extension with the following parameters:
             | exten | context |
@@ -153,11 +153,51 @@ Feature: REST API Extensions
         Then I get a header with a location for the "extensions" resource
         Then I get a response with a link to the "extensions" resource
 
-    Scenario: Creating an extension
+    Scenario: Creating an extension in user range
         Given I have no extensions
         When I create an extension with the following parameters:
             | exten | context |
             | 1000  | default |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
+
+    Scenario: Creating an extension in group range
+        Given I have no extensions
+        When I create an extension with the following parameters:
+            | exten | context |
+            | 2000  | default |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
+
+    Scenario: Creating an extension in queue range
+        Given I have no extensions
+        When I create an extension with the following parameters:
+            | exten | context |
+            | 3000  | default |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
+
+    Scenario: Creating an extension in conference room range
+        Given I have no extensions
+        When I create an extension with the following parameters:
+            | exten | context |
+            | 4000  | default |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
+
+    Scenario: Creating an extension in incall range
+        Given I have no extensions
+        When I create an extension with the following parameters:
+            | exten | context     |
+            |  3954 | from-extern |
         Then I get a response with status "201"
         Then I get a response with an id
         Then I get a header with a location for the "extensions" resource
