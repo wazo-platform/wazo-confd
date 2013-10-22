@@ -187,7 +187,6 @@ class TestVoicemailsAction(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-
     @patch('xivo_restapi.resources.voicemails.actions.formatter')
     @patch('xivo_dao.data_handler.voicemail.services.create')
     def test_create(self, voicemail_services_create, formatter):
@@ -233,6 +232,28 @@ class TestVoicemailsAction(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_restapi.resources.voicemails.actions.formatter')
+    @patch('xivo_dao.data_handler.voicemail.services.get')
+    @patch('xivo_dao.data_handler.voicemail.services.edit')
+    def test_edit(self, vociemail_services_edit, voicemail_services_get, formatter):
+        expected_status_code = 204
+        expected_data = ''
+
+        data = {
+            'name': 'toto',
+            'number': '12345',
+            'context': 'default'
+        }
+        data_serialized = self._serialize_encode(data)
+
+        voicemail = Mock(Voicemail)
+        voicemail_services_get.return_value = voicemail
+
+        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
+
+        formatter.update_model.assert_called_with(data_serialized, voicemail)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
 
     @patch('xivo_dao.data_handler.voicemail.services.get')
     @patch('xivo_dao.data_handler.voicemail.services.delete')
