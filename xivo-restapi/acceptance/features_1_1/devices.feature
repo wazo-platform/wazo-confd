@@ -462,3 +462,14 @@ Feature: REST API Devices
         Given there are no devices with id "abcd"
         When I delete the device "abcd" from restapi
         Then I get a response with status "404"
+
+    Scenario: Delete a device associated to a line
+        Given I have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:12 |
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol |            device |
+            | Aayla     | Secura   |   1234 | default | sip      | 00:00:00:00:00:12 |
+        When I delete the device "20" from restapi
+        Then I get a response with status "400"
+        Then I get an error message "Error while deleting device: device is still linked to a line"
