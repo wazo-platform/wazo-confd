@@ -75,6 +75,22 @@ Feature: REST API Link user with a line and extension
         Then I get a response with status "400"
         Then I get an error message "Nonexistent parameters: user_id 1 does not exist"
 
+    Scenario: Create link with an extension outside of context user range
+        Given I only have the following users:
+            | id | firstname | lastname  |
+            | 1  | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id | context | protocol | device_slot |
+            | 10 | default | sip      | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 3000  |
+        When I create the following links:
+            | user_id | line_id | extension_id |
+            | 1       | 10      | 100          |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: Exten 3000 not inside user range of context default"
+
     Scenario: Create a link
         Given I only have the following users:
             | id | firstname | lastname  |
