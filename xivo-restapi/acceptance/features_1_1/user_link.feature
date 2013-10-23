@@ -259,6 +259,27 @@ Feature: REST API Link user with a line and extension
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
+    Scenario: Link an extension already associated to another line
+        Given I only have the following users:
+            | id | firstname | lastname  |
+            | 1  | Greg      | Sanderson |
+            | 2  | Hello     | Dolly     |
+        Given I only have the following lines:
+            | id | context     | protocol | device_slot |
+            | 10 | default     | sip      | 1           |
+            | 20 | default     | sip      | 1           |
+        Given I only have the following extensions:
+            | id  | context | exten |
+            | 100 | default | 1000  |
+        Given the following users, lines, extensions are linked:
+            | user_id | line_id | extension_id |
+            | 1       | 10      | 100          |
+        When I create the following links:
+            | user_id | line_id | extension_id |
+            | 2       | 20      | 100          |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: Extension 1000@default already linked to a line"
+
     Scenario: Provision a device for 2 users
         Given I only have the following users:
             | id  | firstname | lastname  |
