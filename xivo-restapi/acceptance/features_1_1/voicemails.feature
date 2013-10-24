@@ -553,3 +553,25 @@ Feature: REST API Voicemails
         Then I have the following voicemails via RESTAPI:
             | name       | number | context     |
             | Kim Jung   | 2001   | statscenter |
+
+    Scenario: Edit a voicemail associated to a user with a SIP line
+        Given there is no voicemail with number "1051" and context "default"
+        Given there are users with infos:
+            | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
+            | Miles     | O'Brien  | en_US    | 1050   | default | sip      | Miles O'Brien  | 1050             |
+        When I edit voicemail "1050@default" via RESTAPI:
+            | number |
+            | 1051   |
+        Then I get a response with status "400"
+        Then I get an error message "Error while editing voicemail: Cannot edit a voicemail associated to a user"
+
+    Scenario: Edit a voicemail associated to a user with a SCCP line
+        Given there is no voicemail with number "1053" and context "default"
+        Given there are users with infos:
+            | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
+            | Worf      | Klingon  | en_US    | 1052   | default | sccp     | Worf Klingon   | 1052             |
+        When I edit voicemail "1052@default" via RESTAPI:
+            | number |
+            | 1053   |
+        Then I get a response with status "400"
+        Then I get an error message "Error while editing voicemail: Cannot edit a voicemail associated to a user"
