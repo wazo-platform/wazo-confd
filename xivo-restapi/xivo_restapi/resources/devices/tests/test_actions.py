@@ -98,6 +98,14 @@ class TestDeviceActions(TestResources):
                     'id': device_id_1,
                     'ip': device1.ip,
                     'mac': device1.mac,
+                    'status': None,
+                    'vendor': None,
+                    'description': None,
+                    'plugin': None,
+                    'version': None,
+                    'sn': None,
+                    'model': None,
+                    'template_id': None,
                     'links': [{
                         'href': 'http://localhost/1.1/devices/%s' % device_id_1,
                         'rel': 'devices'
@@ -107,6 +115,14 @@ class TestDeviceActions(TestResources):
                     'id': device_id_2,
                     'ip': device2.ip,
                     'mac': device2.mac,
+                    'status': None,
+                    'vendor': None,
+                    'description': None,
+                    'plugin': None,
+                    'version': None,
+                    'sn': None,
+                    'model': None,
+                    'template_id': None,
                     'links': [{
                         'href': 'http://localhost/1.1/devices/%s' % device_id_2,
                         'rel': 'devices'
