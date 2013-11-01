@@ -18,23 +18,23 @@
 import logging
 
 from . import mapper
+
 from ..user_links.actions import formatter as user_link_formatter
 
-from flask import Blueprint, url_for
+from flask import url_for
 from flask.globals import request
 from flask.helpers import make_response
+
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user_line_extension import services as ule_services
 from xivo_dao.data_handler.user.model import User
-from xivo_restapi import config
-from xivo_restapi.helpers import serializer
-from xivo_restapi.helpers.route_generator import RouteGenerator
-from xivo_restapi.helpers.formatter import Formatter
 
+from xivo_restapi.helpers import serializer
+
+from xivo_restapi.helpers.formatter import Formatter
+from xivo_restapi.resources.users.routes import route
 
 logger = logging.getLogger(__name__)
-blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, User)
 
 
