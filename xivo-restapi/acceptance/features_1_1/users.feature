@@ -299,23 +299,26 @@ Feature: REST API Users
     Scenario: List the links associated to a user
         Given I only have the following users:
             | id | firstname | lastname |
-            | 1  | Francisco | Montoya  |
+            |  1 | Jacen     | Solo     |
+            |  2 | Anakin    | Solo     |
         Given I only have the following lines:
             | id | context | protocol | device_slot |
             | 10 | default | sip      | 1           |
             | 20 | default | sip      | 1           |
         Given I only have the following extensions:
             | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
-        When I create the following links:
+            | 100 | default | 1001  | user | 1       |
+            | 200 | default | 1002  | user | 2       |
+        Given the following users, lines, extensions are linked:
             | user_id | line_id | extension_id | main_line |
             | 1       | 10      | 100          | True      |
-            | 1       | 20      | 100          | False     |
-        Then I get a response with status "201"
+            | 2       | 20      | 200          | True      |
 
         When I get the lines associated to user "1"
         Then I get a response with status "200"
         Then I get the user_links with the following parameters:
             | user_id | line_id | extension_id |
             | 1       | 10      | 100          |
-            | 1       | 20      | 100          |
+        Then I do not get the user_links with the following parameters:
+            | user_id | line_id | extension_id |
+            | 2       | 20      | 200          |
