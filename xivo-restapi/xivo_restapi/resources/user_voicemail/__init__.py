@@ -15,16 +15,3 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-from flask import Blueprint
-
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
-
-blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
-
-from . import actions
-
-def register_blueprints(app):
-    app.register_blueprint(blueprint)
