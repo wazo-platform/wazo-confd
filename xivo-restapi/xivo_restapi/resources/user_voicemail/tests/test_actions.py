@@ -37,6 +37,7 @@ class TestUserVoicemailActions(TestResources):
         expected_result = {
             "user_id": user_id,
             "voicemail_id": voicemail_id,
+            "enabled": True,
             "links": [
                 {
                     "rel": "voicemails",
@@ -49,7 +50,7 @@ class TestUserVoicemailActions(TestResources):
             ]
         }
 
-        user_voicemail = UserVoicemail(user_id=user_id, voicemail_id=voicemail_id)
+        user_voicemail = UserVoicemail(user_id=user_id, voicemail_id=voicemail_id, enabled=True)
         user_voicemail_associate.return_value = user_voicemail
 
         formatter.to_model.return_value = user_voicemail

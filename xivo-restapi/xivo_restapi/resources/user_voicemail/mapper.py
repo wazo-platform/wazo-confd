@@ -22,6 +22,7 @@ from flask import url_for
 MAPPING = {
     'voicemail_id': 'voicemail_id',
     'user_id': 'user_id',
+    'enabled': 'enabled',
 }
 
 
