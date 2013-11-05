@@ -18,7 +18,7 @@ Feature: Link a user and a voicemail
             | Chakotay Marquis | 1061   | default |
         When I link user "Chakotay Marquis" with voicemail "1061@default" via RESTAPI
         Then I get a response with status "400"
-        Then I get an error message matching "Invalid parameters: user \d+ has no line"
+        Then I get an error message matching "Invalid parameters: user with id \d+ does not have any line"
 
     Scenario: Link a voicemail with a user that has a SIP line
         Given there are users with infos:
@@ -32,7 +32,7 @@ Feature: Link a user and a voicemail
         Then I get a response with a voicemail id
         Then I get a response with a user id
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
-        Then I get a response with a link to the "voicemails" resource
+        Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
 
     Scenario: Link a voicemail with a user that has an SCCP line
         Given there are users with infos:
@@ -41,12 +41,12 @@ Feature: Link a user and a voicemail
         Given I have the following voicemails:
             | name      | number | context |
             | Tom Paris | 1064   | default |
-        When I link user "Tuvok Vulcan" with voicemail "1064@default" via RESTAPI
+        When I link user "Tom Paris" with voicemail "1064@default" via RESTAPI
         Then I get a response with status "201"
         Then I get a response with a voicemail id
         Then I get a response with a user id
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
-        Then I get a response with a link to the "voicemails" resource
+        Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
 
     Scenario: Link a voicemail with a user that already has one
         Given there are users with infos:
@@ -54,4 +54,5 @@ Feature: Link a user and a voicemail
             | B'Elanna  | Torres   | 1065   | default | sip      | B'Elanna Torres | 1065             |
         When I link user "B'Elanna Torres" with voicemail "1065@default" via RESTAPI
         Then I get a response with status "400"
-        Then I get an error message matching "Invalid parameters: user \d+ already has a voicemail"
+        Then I get an error message matching "Invalid parameters: user with id \d+ already has a voicemail"
+
