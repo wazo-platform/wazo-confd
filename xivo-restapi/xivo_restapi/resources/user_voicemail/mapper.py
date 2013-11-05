@@ -20,13 +20,14 @@ from flask import url_for
 
 
 MAPPING = {
-    'voicemail_id': 'voicemail_id'
+    'voicemail_id': 'voicemail_id',
+    'user_id': 'user_id',
 }
 
 
 def add_links_to_dict(result_dict, user_voicemail):
-    user_location = url_for('users.get', userid=user_voicemail.user_id)
-    voicemail_location = url_for('voicemails.get', voicemaildid=user_voicemail.voicemail_id)
+    user_location = url_for('users.get', userid=user_voicemail.user_id, _external=True)
+    voicemail_location = url_for('voicemails.get', voicemailid=user_voicemail.voicemail_id, _external=True)
     result_dict.update({
         'links': [
             {
