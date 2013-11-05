@@ -26,7 +26,7 @@ MAPPING = {
 
 def add_links_to_dict(result_dict, user_voicemail):
     user_location = url_for('users.get', userid=user_voicemail.user_id)
-    voicemail_location = url_for('voicemails.get', voicemaildid=user_voicemail.voicemail_id)
+    voicemail_location = url_for('voicemails.get', voicemailid=user_voicemail.voicemail_id)
     result_dict.update({
         'links': [
             {

@@ -55,3 +55,12 @@ Feature: Link a user and a voicemail
         When I link user "B'Elanna Torres" with voicemail "1065@default" via RESTAPI
         Then I get a response with status "400"
         Then I get an error message matching "Invalid parameters: user \d+ already has a voicemail"
+
+    Scenario: List link voicemail that doesn't exist
+        Given there are users with infos:
+            |id | firstname | lastname | number | context | protocol |
+            | 1 | Tuvok     | Vulcan   | 1063   | default | sip      |
+        When I send a request for the voicemail link for user "1" via RESTAPI
+        Then I get a response with status "400"
+        Then I get an error message matching "Nonexistent parameters: voicemail \d+ does not exist"
+        
