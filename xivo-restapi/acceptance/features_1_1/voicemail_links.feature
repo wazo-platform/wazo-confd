@@ -48,6 +48,20 @@ Feature: Link a user and a voicemail
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
 
+    Scenario: Link a voicemail with a user that has a custom line
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol |
+            | Harry     | Kim      | 1065   | default | custom   |
+        Given I have the following voicemails:
+            | name      | number | context |
+            | Harry Kim | 1065   | default |
+        When I link user "Harry Kim" with voicemail "1065@default" via RESTAPI
+        Then I get a response with status "201"
+        Then I get a response with a voicemail id
+        Then I get a response with a user id
+        Then I get a header with a location matching "/1.1/users/\d+/voicemail"
+        Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
+
     Scenario: Link a voicemail with a user that already has one
         Given there are users with infos:
             | firstname | lastname | number | context | protocol | voicemail_name  | voicemail_number |
