@@ -1,11 +1,11 @@
 Feature: Link a user and a voicemail
 
     Scenario: Link a user with a voicemail that doesn't exist
-        Given there is no voicemail with number "1060" and context "default"
+        Given I have no voicemail with id "1000"
         Given there are users with infos:
             | firstname | lastname | number | context | protocol |
             | Kathryn   | Janeway  | 1060   | default | sip      |
-        When I link user "Kathryn Janeway" with voicemail "1060@default" via RESTAPI
+        When I link user "Kathryn Janeway" with voicemail id "1000" via RESTAPI
         Then I get a response with status "400"
         Then I get an error message matching "Nonexistent parameters: voicemail \d+ does not exist"
 
