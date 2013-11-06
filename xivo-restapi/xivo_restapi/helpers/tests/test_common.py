@@ -24,9 +24,15 @@ from xivo_restapi.helpers.common import exception_catcher, \
 from xivo_restapi.flask_http_server import app
 from xivo_restapi.helpers import serializer
 
-from xivo_dao.data_handler.exception import ElementNotExistsError, MissingParametersError, \
-    InvalidParametersError, NonexistentParametersError, ElementAlreadyExistsError, \
-    ElementCreationError, ElementEditionError, ElementDeletionError
+from xivo_dao.data_handler.exception import ElementNotExistsError
+from xivo_dao.data_handler.exception import MissingParametersError
+from xivo_dao.data_handler.exception import InvalidParametersError
+from xivo_dao.data_handler.exception import NonexistentParametersError
+from xivo_dao.data_handler.exception import ElementAlreadyExistsError
+from xivo_dao.data_handler.exception import ElementCreationError
+from xivo_dao.data_handler.exception import ElementEditionError
+from xivo_dao.data_handler.exception import ElementDeletionError
+from xivo_dao.data_handler.exception import AssociationNotExistsError
 
 
 class TestCommon(unittest.TestCase):
@@ -177,6 +183,18 @@ class TestCommon(unittest.TestCase):
 
         def function():
             raise ElementDeletionError('user', 'error message')
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_association_not_exists_error(self):
+        expected_status_code = 404
+        expected_message = ["BLABLABLA"]
+
+        def function():
+            raise AssociationNotExistsError("BLABLABLA")
 
         decorated_function = exception_catcher(function)
 
