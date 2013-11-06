@@ -75,18 +75,18 @@ Feature: Link a user and a voicemail
 
     Scenario: Get voicemail link when it doesn't exist
         Given there are users with infos:
-            | id | firstname | lastname | number | context | protocol |
-            | 1  | Tuvok     | Vulcan   | 1063   | default | sip      |
-        When I send a request for the voicemail link for user "1" via RESTAPI
+            | firstname | lastname | number | context | protocol |
+            | Neelix    | Talaxian | 1066   | default | sip      |
+        When I request the voicemail associated to user "Neelix" "Talaxian" via RESTAPI
         Then I get a response with status "404"
-        Then I get an error message matching "Nonexistent parameters: voicemail \d+ does not exist"
+        Then I get an error message matching "User with id=\d+ does not have a voicemail"
 
     Scenario: Get voicemail link when user has a voicemail
         Given there are users with infos:
-            | id | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
-            | 1  | Tuvok     | Vulcan   | 1063   | default | sip      | Tuvok Vulcan   | 1063             |
-        When I send a request for the voicemail link for user "1" via RESTAPI
-        Then I get a response "200"
+            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
+            | Kes       | Ocampan  | 1067   | default | sip      | Kes Ocampan    | 1067             |
+        When I request the voicemail associated to user "Tuvok" "Vulcan" via RESTAPI
+        Then I get a response with status "200"
         Then I get a response with a voicemail id
         Then I get a response with a user id
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
