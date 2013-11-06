@@ -91,3 +91,9 @@ Feature: Link a user and a voicemail
         Then I get a response with a user id
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
         Then I get a response with a link to the "users" resource using the id "user_id"
+
+    Scenario: Get voicemail link when user does not exist
+        Given there are no users with id "9999"
+        When I request the voicemail associated to user with id "9999" via RESTAPI
+        Then I get a response with status "404"
+        Then I get an error message "User with id=9999 does not exist"
