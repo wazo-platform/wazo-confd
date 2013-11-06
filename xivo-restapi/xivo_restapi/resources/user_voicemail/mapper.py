@@ -16,15 +16,28 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
+from flask import url_for
 
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
 
-blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
+MAPPING = {
+    'voicemail_id': 'voicemail_id',
+    'user_id': 'user_id',
+    'enabled': 'enabled',
+}
 
-from . import actions
 
-def register_blueprints(app):
-    app.register_blueprint(blueprint)
+def add_links_to_dict(result_dict, user_voicemail):
+    user_location = url_for('users.get', userid=user_voicemail.user_id, _external=True)
+    voicemail_location = url_for('voicemails.get', voicemailid=user_voicemail.voicemail_id, _external=True)
+    result_dict.update({
+        'links': [
+            {
+                'rel': 'voicemails',
+                'href': voicemail_location
+            },
+            {
+                'rel': 'users',
+                'href': user_location
+            },
+        ]
+    })

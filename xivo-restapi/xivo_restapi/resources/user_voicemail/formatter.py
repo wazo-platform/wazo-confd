@@ -16,15 +16,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
 
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
+from xivo_restapi.resources.user_voicemail import mapper
+from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
+from xivo_restapi.helpers import serializer
 
-blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
+from xivo_restapi.helpers.formatter import Formatter
 
-from . import actions
 
-def register_blueprints(app):
-    app.register_blueprint(blueprint)
+class UserVoicemailFormatter(Formatter):
+
+    def __init__(self):
+        Formatter.__init__(self, mapper, serializer, UserVoicemail)
+
+    def to_model(self, api_data, user_id):
+        model = Formatter.to_model(self, api_data)
+        model.user_id = user_id
+        return model

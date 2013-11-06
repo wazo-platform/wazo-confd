@@ -21,9 +21,16 @@ from flask.helpers import make_response
 from functools import wraps
 from werkzeug.exceptions import HTTPException
 
-from xivo_dao.data_handler.exception import MissingParametersError, \
-    InvalidParametersError, ElementAlreadyExistsError, ElementNotExistsError, \
-    ElementCreationError, ElementDeletionError, ElementEditionError, NonexistentParametersError
+from xivo_dao.data_handler.exception import ElementNotExistsError
+from xivo_dao.data_handler.exception import MissingParametersError
+from xivo_dao.data_handler.exception import InvalidParametersError
+from xivo_dao.data_handler.exception import NonexistentParametersError
+from xivo_dao.data_handler.exception import ElementAlreadyExistsError
+from xivo_dao.data_handler.exception import ElementCreationError
+from xivo_dao.data_handler.exception import ElementEditionError
+from xivo_dao.data_handler.exception import ElementDeletionError
+from xivo_dao.data_handler.exception import AssociationNotExistsError
+
 from xivo_restapi.helpers import serializer
 from flask.globals import request
 
@@ -50,7 +57,7 @@ def exception_catcher(func):
             logger.exception(e)
             data = "No parsable data in the request, Be sure to send a valid JSON file"
             return _make_response_encoded(data, 400)
-        except ElementNotExistsError, e:
+        except (ElementNotExistsError, AssociationNotExistsError) as e:
             return _make_response_encoded(e, 404)
         except HTTPException:
             raise

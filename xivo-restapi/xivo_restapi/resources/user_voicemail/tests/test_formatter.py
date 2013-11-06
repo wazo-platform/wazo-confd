@@ -16,15 +16,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
+import unittest
+import json
+from hamcrest import equal_to, assert_that
+from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
+from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
 
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
 
-blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
+class TestUserVoicemailFormatter(unittest.TestCase):
 
-from . import actions
+    def test_to_model(self):
+        user_id = 1
+        voicemail_id = 2
+        data = {'voicemail_id': voicemail_id}
+        encoded_data = json.dumps(data)
 
-def register_blueprints(app):
-    app.register_blueprint(blueprint)
+        expected = UserVoicemail(user_id=user_id, voicemail_id=voicemail_id)
+
+        formatter = UserVoicemailFormatter()
+        result = formatter.to_model(encoded_data, user_id)
+
+        assert_that(result, equal_to(expected))
