@@ -20,7 +20,6 @@ import logging
 from . import mapper
 
 from ..user_links.actions import formatter as user_link_formatter
-from ..user_voicemail.actions import formatter as user_voicemail_formatter
 
 from flask import url_for
 from flask.globals import request
@@ -28,7 +27,6 @@ from flask.helpers import make_response
 
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user_line_extension import services as ule_services
-from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
 from xivo_dao.data_handler.user.model import User
 
 from xivo_restapi.helpers import serializer
@@ -62,13 +60,6 @@ def get(userid):
 def get_user_links(userid):
     user_links = ule_services.find_all_by_user_id(userid)
     result = user_link_formatter.list_to_api(user_links)
-    return make_response(result, 200)
-
-
-@route('/<int:userid>/voicemail')
-def get_user_voicemail(userid):
-    user_voicemail = user_voicemail_services.get_by_user_id(userid)
-    result = user_voicemail_formatter.to_api(user_voicemail)
     return make_response(result, 200)
 
 

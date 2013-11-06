@@ -15,13 +15,15 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 from flask import request, url_for, make_response
+
+from xivo_dao.data_handler.exception import AssociationNotExistsError
+from xivo_dao.data_handler.user_voicemail.exception import UserVoicemailNotExistsError
 from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
 
-from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
-
-from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
 from xivo_restapi.resources.users.routes import route
+from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
 
 formatter = UserVoicemailFormatter()
 
@@ -35,3 +37,13 @@ def associate_voicemail(userid):
     result = formatter.to_api(created_model)
     location = url_for('.associate_voicemail', userid=userid)
     return make_response(result, 201, {'Location': location})
+
+
+@route('/<int:userid>/voicemail')
+def get_user_voicemail(userid):
+    try:
+        user_voicemail = user_voicemail_services.get_by_user_id(userid)
+    except UserVoicemailNotExistsError:
+        raise AssociationNotExistsError("User with id=%d does not have a voicemail" % userid)
+    result = formatter.to_api(user_voicemail)
+    return make_response(result, 200)
