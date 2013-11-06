@@ -33,6 +33,7 @@ Feature: Link a user and a voicemail
         Then I get a response with a user id
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
+        Then I get a response with a link to the "users" resource using the id "user_id"
 
     Scenario: Link a voicemail with a user that has an SCCP line
         Given there are users with infos:
@@ -47,6 +48,7 @@ Feature: Link a user and a voicemail
         Then I get a response with a user id
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
+        Then I get a response with a link to the "users" resource using the id "user_id"
 
     Scenario: Link a voicemail with a user that has a custom line
         Given there are users with infos:
@@ -61,6 +63,7 @@ Feature: Link a user and a voicemail
         Then I get a response with a user id
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
+        Then I get a response with a link to the "users" resource using the id "user_id"
 
     Scenario: Link a voicemail with a user that already has one
         Given there are users with infos:
