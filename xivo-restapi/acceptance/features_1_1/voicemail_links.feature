@@ -85,7 +85,7 @@ Feature: Link a user and a voicemail
         Given there are users with infos:
             | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
             | Kes       | Ocampan  | 1067   | default | sip      | Kes Ocampan    | 1067             |
-        When I request the voicemail associated to user "Tuvok" "Vulcan" via RESTAPI
+        When I request the voicemail associated to user "Kes" "Ocampan" via RESTAPI
         Then I get a response with status "200"
         Then I get a response with a voicemail id
         Then I get a response with a user id
