@@ -97,3 +97,38 @@ Feature: Link a user and a voicemail
         When I request the voicemail associated to user with id "9999" via RESTAPI
         Then I get a response with status "404"
         Then I get an error message "User with id=9999 does not exist"
+
+    Scenario: Dissociate a user that has a SIP line from his voicemail 
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
+            | Tuvok     | Vulcan   | 1063   | default | sip      | Tuvok Vulcan   | 1063             |
+        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+        Then I get a response with status "204"
+        
+     Scenario: Dissociate a user that has a SCCP line from his voicemail 
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
+            | Tuvok     | Vulcan   | 1063   | default | sccp     | Tuvok Vulcan   | 1063             |
+        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+        Then I get a response with status "204"
+
+    Scenario: Dissociate a user that has a custom line from his voicemail 
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
+            | Tuvok     | Vulcan   | 1063   | default | custom   | Tuvok Vulcan   | 1063             |
+        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+        Then I get a response with status "204"
+        
+    Scenario: Dissociate a voicemail from a user that does not exist
+        Given there are no users with id "9999"
+        When I dissociate user with id "9999" from his voicemail via RESTAPI
+        Then I get a response with status "404"
+        Then I get an error message "User with id=9999 does not exist"
+
+    Scenario: Dissociate a voicemail from a user that has no voicemail
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol |
+            | Tuvok     | Vulcan   | 1063   | default | sip      |
+        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+        Then I get a response with status "404"
+        Then I get an error message matching "User with id=\d+ does not have a voicemail"
