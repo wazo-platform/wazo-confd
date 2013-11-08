@@ -111,3 +111,16 @@ class TestUserVoicemailActions(TestResources):
         print result.data
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user_voicemail.services.dissociate_by_user_id')
+    def test_dissociate_voicemail(self, user_voicemail_dissociate):
+        user_id = 1
+
+        expected_status_code = 204
+        expected_data = ''
+        
+        result = self.app.delete(BASE_URL % user_id)
+
+        user_voicemail_dissociate.assert_called_once_with(user_id)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
