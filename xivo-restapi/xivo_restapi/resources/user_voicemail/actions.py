@@ -50,5 +50,8 @@ def get_user_voicemail(userid):
 
 @route('/<int:userid>/voicemail', methods=['DELETE'])
 def dissociate_voicemail(userid):
-    user_voicemail_services.dissociate_by_user_id(userid)
+    try:
+        user_voicemail_services.dissociate_by_user_id(userid)
+    except UserVoicemailNotExistsError:
+        raise AssociationNotExistsError("User with id=%d does not have a voicemail" % userid)
     return make_response('', 204)
