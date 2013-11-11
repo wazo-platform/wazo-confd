@@ -100,23 +100,23 @@ Feature: Link a user and a voicemail
 
     Scenario: Dissociate a user that has a SIP line from his voicemail 
         Given there are users with infos:
-            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
-            | Tuvok     | Vulcan   | 1063   | default | sip      | Tuvok Vulcan   | 1063             |
-        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+            | firstname | lastname | number | context | protocol | voicemail_name  | voicemail_number |
+            | Doctor    | Hologram | 1068   | default | sip      | Doctor Hologram | 1068             |
+        When I dissociate user "Doctor" "Hologram" from his voicemail via RESTAPI
         Then I get a response with status "204"
         
      Scenario: Dissociate a user that has a SCCP line from his voicemail 
         Given there are users with infos:
             | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
-            | Tuvok     | Vulcan   | 1063   | default | sccp     | Tuvok Vulcan   | 1063             |
-        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+            | Seven     | Of Nine  | 1069   | default | sccp     | Seven Of Nine  | 1069             |
+        When I dissociate user "Seven" "Of Nine" from his voicemail via RESTAPI
         Then I get a response with status "204"
 
     Scenario: Dissociate a user that has a custom line from his voicemail 
         Given there are users with infos:
-            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
-            | Tuvok     | Vulcan   | 1063   | default | custom   | Tuvok Vulcan   | 1063             |
-        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+            | firstname | lastname  | number | context | protocol | voicemail_name  | voicemail_number |
+            | Seska     | Cardacian | 1070   | default | custom   | Seska Cardacian | 1070             |
+        When I dissociate user "Seska" "Cardacian" from his voicemail via RESTAPI
         Then I get a response with status "204"
         
     Scenario: Dissociate a voicemail from a user that does not exist
@@ -128,7 +128,7 @@ Feature: Link a user and a voicemail
     Scenario: Dissociate a voicemail from a user that has no voicemail
         Given there are users with infos:
             | firstname | lastname | number | context | protocol |
-            | Tuvok     | Vulcan   | 1063   | default | sip      |
-        When I dissociate user "Tuvok" "Vulcan" from his voicemail via RESTAPI
+            | Naomi     | Wildman  | 1071   | default | sip      |
+        When I dissociate user "Naomi" "Wildman" from his voicemail via RESTAPI
         Then I get a response with status "404"
         Then I get an error message matching "User with id=\d+ does not have a voicemail"
