@@ -422,6 +422,11 @@ Feature: REST API Devices
             | 255.255.255.252 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         Then I get a list with 2 devices
 
+    Scenario: Search for devices with HTTP_PROXY set
+        Given I set the HTTP_PROXY environment variables to "10.99.99.99"
+        When I request the list of devices
+        Then I get a response with status "200"
+
     Scenario: Reset to autoprov a device
         Given there are no devices with id "123"
         Given there are no devices with mac "00:00:00:00:aa:01"
