@@ -33,44 +33,44 @@ Feature: REST API Extensions
 
     Scenario: User link list by extension_id with 1 user
         Given I only have the following users:
-            | id | firstname | lastname  |
-            | 1  | Greg      | Sanderson |
+            |     id | firstname | lastname  |
+            | 995476 | Greg      | Sanderson |
         Given I only have the following lines:
-            | id | context | protocol | device_slot |
-            | 10 | default | sip      | 1           |
+            |     id | context | protocol | device_slot |
+            | 124689 | default | sip      |           1 |
         Given I only have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+            |     id | context | exten |
+            | 995473 | default |  1000 |
         Given the following users, lines, extensions are linked:
             | user_id | line_id | extension_id |
-            | 1       | 10      | 100          |
-        When I ask for the list of user_links with extension_id "100"
+            |  995476 |  124689 |       995473 |
+        When I ask for the list of user_links with extension_id "995473"
         Then I get a response with status "200"
         Then I get the user_links with the following parameters:
             | user_id | line_id | extension_id |
-            | 1       | 10      | 100          |
+            |  995476 |  124689 |       995473 |
 
     Scenario: User link list by extension_id with 2 users
         Given I only have the following users:
-            | id | firstname | lastname  |
-            | 1  | Greg      | Sanderson |
-            | 2  | Cedric    | Abunar    |
+            |     id | firstname | lastname  |
+            | 132449 | Greg      | Sanderson |
+            | 995441 | Cedric    | Abunar    |
         Given I only have the following lines:
-            | id | context | protocol | device_slot |
-            | 10 | default | sip      | 1           |
+            |     id | context | protocol | device_slot |
+            | 446168 | default | sip      |           1 |
         Given I only have the following extensions:
-            | id  | context | exten |
-            | 100 | default | 1000  |
+            |     id | context | exten |
+            | 995134 | default |  1000 |
         Given the following users, lines, extensions are linked:
             | user_id | line_id | extension_id |
-            | 1       | 10      | 100          |
-            | 2       | 10      | 100          |
-        When I ask for the list of user_links with extension_id "100"
+            |  132449 |  446168 |       995134 |
+            |  995441 |  446168 |       995134 |
+        When I ask for the list of user_links with extension_id "995134"
         Then I get a response with status "200"
         Then I get the user_links with the following parameters:
             | user_id | line_id | extension_id |
-            | 1       | 10      | 100          |
-            | 2       | 10      | 100          |
+            |  132449 |  446168 |       995134 |
+            |  995441 |  446168 |       995134 |
 
     Scenario: Get an extension that does not exist
         Given I have no extensions
@@ -79,13 +79,13 @@ Feature: REST API Extensions
 
     Scenario: Get an extension
         Given I only have the following extensions:
-            | id  | exten | context | type | typeval |
-            | 100 | 1500  | default | user | 1       |
-        When I access the extension with id "100"
+            |     id | exten | context | type | typeval |
+            | 447614 |  1500 | default | user |       1 |
+        When I access the extension with id "447614"
         Then I get a response with status "200"
         Then I have an extension with the following parameters:
             | id  | exten | context |
-            | 100 | 1500  | default |
+            | 447614    | 1500  | default |
 
     Scenario: Creating an empty extension
         Given I have no extensions
@@ -259,9 +259,9 @@ Feature: REST API Extensions
 
     Scenario: Editing an extension with parameters that don't exist
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval |
-          | 100 | 1001  | default | user | 1       |
-        When I update the extension with id "100" using the following parameters:
+          |     id | exten | context | type | typeval |
+          | 449721 |  1001 | default | user |       1 |
+        When I update the extension with id "449721" using the following parameters:
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
@@ -269,22 +269,22 @@ Feature: REST API Extensions
 
     Scenario: Editing the exten of a extension
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval |
-          | 100 | 1001  | default | user | 1       |
-        When I update the extension with id "100" using the following parameters:
+          |     id | exten | context | type | typeval |
+          | 113444 |  1001 | default | user |       1 |
+        When I update the extension with id "113444" using the following parameters:
           | exten |
           | 1003  |
         Then I get a response with status "204"
-        When I ask for the extension with id "100"
+        When I ask for the extension with id "113444"
         Then I have an extension with the following parameters:
-          | id  | exten | context |
-          | 100 | 1003  | default |
+          |     id | exten | context |
+          | 113444 |  1003 | default |
 
     Scenario: Editing an extension with an exten outside of context range
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval |
-          | 100 | 1001  | default | user | 1       |
-        When I update the extension with id "100" using the following parameters:
+          |     id | exten | context | type | typeval |
+          | 443166 |  1001 | default | user |       1 |
+        When I update the extension with id "443166" using the following parameters:
           | exten |
           | 9999  |
       Then I get a response with status "400"
@@ -292,25 +292,25 @@ Feature: REST API Extensions
 
     Scenario: Editing the context of a extension
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval |
-          | 100 | 1001  | default | user | 1       |
+          |     id | exten | context | type | typeval |
+          | 214489 |  1001 | default | user |       1 |
         Given I have the following context:
           | name | numberbeg | numberend |
           | toto | 1000      | 1999      |
-        When I update the extension with id "100" using the following parameters:
+        When I update the extension with id "214489" using the following parameters:
           | context |
           | toto    |
         Then I get a response with status "204"
-        When I ask for the extension with id "100"
+        When I ask for the extension with id "214489"
         Then I have an extension with the following parameters:
           | id  | exten | context |
-          | 100 | 1001  | toto    |
+          | 214489    | 1001  | toto    |
 
     Scenario: Editing the extension with a context that doesn't exist
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval |
-          | 100 | 1001  | default | user | 1       |
-        When I update the extension with id "100" using the following parameters:
+          |     id | exten | context | type | typeval |
+          | 959476 |  1001 | default | user |       1 |
+        When I update the extension with id "959476" using the following parameters:
           | context             |
           | mysuperdupercontext |
         Then I get a response with status "400"
@@ -318,32 +318,32 @@ Feature: REST API Extensions
 
     Scenario: Editing the exten, context of a extension
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval |
-          | 100 | 1001  | default | user | 1       |
+          |     id | exten | context | type | typeval |
+          | 113469 |  1001 | default | user |       1 |
         Given I have the following context:
           | name   | numberbeg | numberend |
           | patate | 1000      | 1999      |
-        When I update the extension with id "100" using the following parameters:
+        When I update the extension with id "113469" using the following parameters:
           | exten | context |
           | 1006  | patate  |
         Then I get a response with status "204"
-        When I ask for the extension with id "100"
+        When I ask for the extension with id "113469"
         Then I have an extension with the following parameters:
           | id  | exten | context |
-          | 100 | 1006  | patate  |
+          | 113469    | 1006  | patate  |
 
     Scenario: Editing a commented extension
         Given I only have the following extensions:
-          | id  | exten | context | type | typeval | commented |
-          | 100 | 1007  | default | user | 1       | true      |
-        When I update the extension with id "100" using the following parameters:
+          |     id | exten | context | type | typeval | commented |
+          | 962441 |  1007 | default | user |       1 | true      |
+        When I update the extension with id "962441" using the following parameters:
           | commented |
           | false     |
         Then I get a response with status "204"
-        When I ask for the extension with id "100"
+        When I ask for the extension with id "962441"
         Then I have an extension with the following parameters:
-          | id  | exten | context | commented |
-          | 100 | 1007  | default | false     |
+          |     id | exten | context | commented |
+          | 962441 |  1007 | default | false     |
 
     Scenario: Delete an extension that doesn't exist
         Given I have no extensions
@@ -352,26 +352,26 @@ Feature: REST API Extensions
 
     Scenario: Delete an extension
         Given I only have the following extensions:
-            | id  | exten | context | type | typeval |
-            | 100 | 1000  | default | user | 1       |
-        When I delete extension "100"
+            |     id | exten | context | type | typeval |
+            | 954147 |  1000 | default | user |       1 |
+        When I delete extension "954147"
         Then I get a response with status "204"
-        Then the extension "100" no longer exists
+        Then the extension "954147" no longer exists
 
     Scenario: Delete an extension still has a link
         Given I only have the following users:
-            | id | firstname | lastname |
-            | 1  | Clémence  | Dupond   |
+            |     id | firstname | lastname |
+            | 954471 | Clémence  | Dupond   |
         Given I only have the following lines:
-            | id | context | protocol | device_slot |
-            | 10 | default | sip      | 1           |
+            |     id | context | protocol | device_slot |
+            | 996547 | default | sip      |           1 |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            |     id | context | exten | type | typeval |
+            | 695447 | default |  1000 | user |  954471 |
         When I create the following links:
             | user_id | line_id | extension_id | main_line |
-            | 1       | 10      | 100          | True      |
+            |  954471 |  996547 |       695447 | True      |
 
-        When I delete extension "100"
+        When I delete extension "695447"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting Extension: extension still has a link"

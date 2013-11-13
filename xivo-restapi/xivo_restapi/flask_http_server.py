@@ -56,7 +56,7 @@ def _load_resources():
 
 def _list_resources():
     try:
-        contents = pkg_resources.resource_listdir(config.RESOURCES_PACKAGE, "")
+        contents = sorted(pkg_resources.resource_listdir(config.RESOURCES_PACKAGE, ""))
     except ImportError:
         return []
     resources = []

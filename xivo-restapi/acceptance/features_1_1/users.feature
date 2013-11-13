@@ -211,9 +211,9 @@ Feature: REST API Users
 
     Scenario: Editing a user with parameters that don't exist
         Given I only have the following users:
-          | id | firstname | lastname |
-          | 1  | Clémence  | Dupond   |
-        When I update the user with id "1" using the following parameters:
+          |     id | firstname | lastname |
+          | 995435 | Clémence  | Dupond   |
+        When I update the user with id "995435" using the following parameters:
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
@@ -221,42 +221,42 @@ Feature: REST API Users
 
     Scenario: Editing the firstname of a user
         Given I only have the following users:
-          | id | firstname | lastname |
-          | 1  | Clémence  | Dupond   |
-        When I update the user with id "1" using the following parameters:
+          |     id | firstname | lastname |
+          | 995414 | Clémence  | Dupond   |
+        When I update the user with id "995414" using the following parameters:
           | firstname |
           | Brézé     |
         Then I get a response with status "204"
-        When I ask for the user with id "1"
+        When I ask for the user with id "995414"
         Then I get a user with the following parameters:
-          | id | firstname | lastname | userfield | callerid       |
-          | 1  | Brézé     | Dupond   |           | "Brézé Dupond" |
+          |     id | firstname | lastname | userfield | callerid       |
+          | 995414 | Brézé     | Dupond   |           | "Brézé Dupond" |
 
     Scenario: Editing the lastname of a user
         Given I only have the following users:
-          | id | firstname | lastname |
-          | 1  | Clémence  | Dupond   |
-        When I update the user with id "1" using the following parameters:
+          |     id | firstname | lastname |
+          | 924465 | Clémence  | Dupond   |
+        When I update the user with id "924465" using the following parameters:
           | lastname      |
           | Argentine     |
         Then I get a response with status "204"
-        When I ask for the user with id "1"
+        When I ask for the user with id "924465"
         Then I get a user with the following parameters:
-          | id | firstname | lastname  | userfield | callerid             |
-          | 1  | Clémence  | Argentine |           | "Clémence Argentine" |
+          |     id | firstname | lastname  | userfield | callerid             |
+          | 924465 | Clémence  | Argentine |           | "Clémence Argentine" |
 
     Scenario: Editing the firstname, lastname and userfield of a user
         Given I only have the following users:
-          | id | firstname | lastname |
-          | 1  | Clémence  | Dupond   |
-        When I update the user with id "1" using the following parameters:
+          |     id | firstname | lastname |
+          | 113549 | Clémence  | Dupond   |
+        When I update the user with id "113549" using the following parameters:
           | firstname | lastname  | userfield  |
           | Claude    | Argentine | customdata |
         Then I get a response with status "204"
-        When I ask for the user with id "1"
+        When I ask for the user with id "113549"
         Then I get a user with the following parameters:
           | id | firstname | lastname  | userfield  | callerid           |
-          | 1  | Claude    | Argentine | customdata | "Claude Argentine" |
+          | 113549   | Claude    | Argentine | customdata | "Claude Argentine" |
 
     Scenario: Deleting a user that doesn't exist
         Given I have no users
@@ -265,60 +265,60 @@ Feature: REST API Users
 
     Scenario: Deleting a user
         Given I only have the following users:
-          | id | firstname | lastname |
-          | 1  | Clémence  | Dupond   |
-        When I delete the user with id "1"
+          |     id | firstname | lastname |
+          | 955135 | Clémence  | Dupond   |
+        When I delete the user with id "955135"
         Then I get a response with status "204"
-        Then the user with id "1" no longer exists
+        Then the user with id "955135" no longer exists
 
     Scenario: Deleting a user still has a link
         Given I only have the following users:
-            | id | firstname | lastname |
-            | 1  | Clémence  | Dupond   |
+            |     id | firstname | lastname |
+            | 956541 | Clémence  | Dupond   |
         Given I only have the following lines:
-            | id | context | protocol | device_slot |
-            | 10 | default | sip      | 1           |
+            |     id | context | protocol | device_slot |
+            | 546216 | default | sip      |           1 |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1000  | user | 1       |
+            |     id | context | exten | type | typeval |
+            | 951654 | default |  1000 | user |  956541 |
         When I create the following links:
             | user_id | line_id | extension_id | main_line |
-            | 1       | 10      | 100          | True      |
+            |  956541 |  546216 |       951654 | True      |
 
-        When I delete the user with id "1"
+        When I delete the user with id "956541"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting User: user still has a link"
 
     Scenario: List the links associated to a user with no links
         Given I only have the following users:
-            | id | firstname | lastname |
-            | 1  | Francisco | Montoya  |
-        When I get the lines associated to user "1"
+            |     id | firstname | lastname |
+            | 989465 | Francisco | Montoya  |
+        When I get the lines associated to user "989465"
         Then I get an empty list
 
     Scenario: List the links associated to a user
         Given I only have the following users:
-            | id | firstname | lastname |
-            |  1 | Jacen     | Solo     |
-            |  2 | Anakin    | Solo     |
+            |     id | firstname | lastname |
+            | 994775 | Jacen     | Solo     |
+            | 112348 | Anakin    | Solo     |
         Given I only have the following lines:
-            | id | context | protocol | device_slot |
-            | 10 | default | sip      | 1           |
-            | 20 | default | sip      | 1           |
+            |     id | context | protocol | device_slot |
+            | 135498 | default | sip      |           1 |
+            | 133364 | default | sip      |           1 |
         Given I only have the following extensions:
-            | id  | context | exten | type | typeval |
-            | 100 | default | 1001  | user | 1       |
-            | 200 | default | 1002  | user | 2       |
+            |     id | context | exten | type | typeval |
+            | 995135 | default |  1001 | user |  994775 |
+            | 132468 | default |  1002 | user |  112348 |
         Given the following users, lines, extensions are linked:
             | user_id | line_id | extension_id | main_line |
-            | 1       | 10      | 100          | True      |
-            | 2       | 20      | 200          | True      |
+            |  994775 |  135498 |       995135 | True      |
+            |  112348 |  133364 |       132468 | True      |
 
-        When I get the lines associated to user "1"
+        When I get the lines associated to user "994775"
         Then I get a response with status "200"
         Then I get the user_links with the following parameters:
             | user_id | line_id | extension_id |
-            | 1       | 10      | 100          |
+            |  994775 |  135498 |       995135 |
         Then I do not get the user_links with the following parameters:
             | user_id | line_id | extension_id |
-            | 2       | 20      | 200          |
+            |  112348 |  133364 |       132468 |
