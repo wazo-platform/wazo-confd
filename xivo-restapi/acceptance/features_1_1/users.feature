@@ -142,6 +142,16 @@ Feature: REST API Users
           | id | firstname | lastname | userfield |
           | 1  | Irène     | Dupont   |           |
 
+    Scenario: Getting a user with all available parameters:
+        Given I only have the following users:
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+        When I ask for the user with id "1"
+        Then I get a response with status "200"
+        Then I get a user with the following parameters:
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+
     Scenario: Creating an empty user
         Given I have no users
         When I create an empty user
@@ -202,6 +212,19 @@ Feature: REST API Users
           | firstname | lastname | description                 | userfield  | callerid       |
           | Irène     | Dupont   | accented description: éà@'; | customdata | "Irène Dupont" |
 
+    Scenario: Creating a user with all available parameters
+        Given I have no users
+        When I create users with the following parameters:
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "users" resource
+        Then I get a response with a link to the "users" resource
+        Then the created user has the following parameters:
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+
     Scenario: Editing a user that doesn't exist
         Given I have no users
         When I update the user with id "1" using the following parameters:
@@ -257,6 +280,21 @@ Feature: REST API Users
         Then I get a user with the following parameters:
           | id | firstname | lastname  | userfield  | callerid           |
           | 113549   | Claude    | Argentine | customdata | "Claude Argentine" |
+
+    Scenario: Editing all available parameters of a user
+        Given I only have the following users:
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+        When I update the user with id "1" using the following parameters:
+            | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
+            | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "users" resource
+        Then I get a response with a link to the "users" resource
+        Then the created user has the following parameters:
+            | id | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
 
     Scenario: Deleting a user that doesn't exist
         Given I have no users
