@@ -258,6 +258,19 @@ Feature: REST API Users
           | id | firstname | lastname  | userfield  | callerid           |
           | 113549   | Claude    | Argentine | customdata | "Claude Argentine" |
 
+    Scenario: Editing a user associated with a voicemail
+        Given there are users with infos:
+            | firstname | lastname  | number | context | protocol | voicemail_name     | voicemail_number |
+            | Francois  | Andouille | 1100   | default | sip      | Francois Andouille | 1100             |
+        When I update user "Francois" "Andouille" with the following parameters:
+            | firstname | lastname |
+            | Pizza     | Poulet   |
+        Then I get a response with status "204"
+        When I send a request for the voicemail "1100@default", using its id
+        Then I have the following voicemails via RESTAPI:
+            | name         | number |
+            | Pizza Poulet | 1100   |
+
     Scenario: Deleting a user that doesn't exist
         Given I have no users
         When I delete the user with id "1"
