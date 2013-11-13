@@ -111,3 +111,34 @@ class TestUserVoicemailActions(TestResources):
         print result.data
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user_voicemail.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user_voicemail.services.dissociate')
+    def test_dissociate_voicemail(self, user_voicemail_dissociate, get_by_user_id):
+        user_voicemail = UserVoicemail(user_id=1, voicemail_id=2)
+        get_by_user_id.return_value = user_voicemail
+
+        expected_status_code = 204
+        expected_data = ''
+
+        result = self.app.delete(BASE_URL % user_voicemail.user_id)
+
+        get_by_user_id.assert_called_once_with(user_voicemail.user_id)
+        user_voicemail_dissociate.assert_called_once_with(user_voicemail)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
+
+    @patch('xivo_dao.data_handler.user_voicemail.services.get_by_user_id')
+    @patch('xivo_dao.data_handler.user_voicemail.services.dissociate')
+    def test_dissociate_voicemail_no_user(self, user_voicemail_dissociate, get_by_user_id):
+        user_id = 1
+
+        expected_status_code = 404
+        expected_result = ['User with id=%s does not have a voicemail' % user_id]
+
+        get_by_user_id.side_effect = UserVoicemailNotExistsError.from_user_id(user_id)
+
+        result = self.app.delete(BASE_URL % user_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
