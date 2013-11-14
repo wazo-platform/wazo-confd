@@ -17,9 +17,19 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from . import actions
-from actions import blueprint as user_link_blueprint
+from xivo_restapi.resources.user_line import mapper
+from xivo_dao.data_handler.user_line.model import UserLine
+from xivo_restapi.helpers import serializer
+
+from xivo_restapi.helpers.formatter import Formatter
 
 
-def register_blueprints(app):
-    app.register_blueprint(user_link_blueprint)
+class UserLineFormatter(Formatter):
+
+    def __init__(self):
+        Formatter.__init__(self, mapper, serializer, UserLine)
+
+    def to_model(self, api_data, user_id):
+        model = Formatter.to_model(self, api_data)
+        model.user_id = user_id
+        return model

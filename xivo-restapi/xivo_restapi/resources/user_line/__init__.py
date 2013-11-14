@@ -15,11 +15,3 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-
-from . import actions
-from actions import blueprint as user_link_blueprint
-
-
-def register_blueprints(app):
-    app.register_blueprint(user_link_blueprint)
