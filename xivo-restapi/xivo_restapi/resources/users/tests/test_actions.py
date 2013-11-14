@@ -22,8 +22,6 @@ from hamcrest import assert_that, equal_to, has_entries
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
-from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "/1.1/users"
 
