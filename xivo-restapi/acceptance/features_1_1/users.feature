@@ -288,11 +288,9 @@ Feature: REST API Users
         When I update the user with id "1" using the following parameters:
             | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
             | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
-        Then I get a response with status "201"
-        Then I get a response with an id
-        Then I get a header with a location for the "users" resource
-        Then I get a response with a link to the "users" resource
-        Then the created user has the following parameters:
+        Then I get a response with status "204"
+        When I ask for the user with id "1"
+        Then I get a user with the following parameters:
             | id | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
             | 1  | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
 
