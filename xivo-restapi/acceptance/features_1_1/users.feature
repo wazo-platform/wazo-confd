@@ -281,6 +281,32 @@ Feature: REST API Users
           | id     | firstname | lastname  | userfield  | caller_id          |
           | 113549 | Claude    | Argentine | customdata | "Claude Argentine" |
 
+    Scenario: Editing the firstname, lastname and caller_id of a user
+        Given I only have the following users:
+            | id | firstname | lastname |
+            | 42 | Clémence  | Dujas    |
+        When I update the user with id "42" using the following parameters:
+            | firstname | lastname       | caller_id         |
+            | Olivia    | Schtroumpfette | La Schtroumpfette |
+        Then I get a response with status "204"
+        When I ask for the user with id "42"
+        Then I get a user with the following parameters:
+            | id | firstname | lastname       | caller_id           |
+            | 42 | Olivia    | Schtroumpfette | "La Schtroumpfette" |
+
+    Scenario: Editing only the caller_id of a user
+        Given I only have the following users:
+            | id | firstname | lastname |
+            | 43 | Benoit    | Thierri  |
+        When I update the user with id "43" using the following parameters:
+            | caller_id        |
+            | Grand Schtroumpf |
+        Then I get a response with status "204"
+        When I ask for the user with id "43"
+        Then I get a user with the following parameters:
+            | id | firstname | lastname | caller_id          |
+            | 43 | Benoit    | Thierri  | "Grand Schtroumpf" |
+
     Scenario: Editing all available parameters of a user
         Given I only have the following users:
             | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
