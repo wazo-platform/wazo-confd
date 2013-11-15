@@ -11,7 +11,7 @@ Feature: REST API Users
           | Clémence  | Dupond   |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | callerid          |
+          | firstname | lastname | userfield | caller_id         |
           | Clémence  | Dupond   |           | "Clémence Dupond" |
 
     Scenario: User list with two users
@@ -21,7 +21,7 @@ Feature: REST API Users
           | Louis     | Martin   |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | callerid          |
+          | firstname | lastname | userfield | caller_id         |
           | Clémence  | Dupond   |           | "Clémence Dupond" |
           | Louis     | Martin   |           | "Louis Martin"    |
 
@@ -34,7 +34,7 @@ Feature: REST API Users
           | Frédéric  | Martin   |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | callerid          |
+          | firstname | lastname | userfield | caller_id         |
           | Albert    | Dupond   |           | "Albert Dupond"   |
           | Clémence  | Dupond   |           | "Clémence Dupond" |
           | Frédéric  | Martin   |           | "Frédéric Martin" |
@@ -51,7 +51,7 @@ Feature: REST API Users
           | George    | Lucas    |
         When I search for the user ""
         Then I get a list with the following users:
-         | firstname | lastname | callerid       |
+         | firstname | lastname | caller_id      |
          | George    | Lucas    | "George Lucas" |
 
     Scenario: User search with a filter that returns nothing
@@ -184,8 +184,8 @@ Feature: REST API Users
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-         | firstname | lastname | userfield | callerid |
-         | Irène     |          |           | "Irène " |
+         | firstname | lastname | userfield | caller_id |
+         | Irène     |          |           | "Irène "  |
 
     Scenario: Creating two users with the same firstname
         Given I have no users
@@ -195,9 +195,9 @@ Feature: REST API Users
           | Lord      |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | callerid |
-          | Lord      |          |           | "Lord "  |
-          | Lord      |          |           | "Lord "  |
+          | firstname | lastname | userfield | caller_id |
+          | Lord      |          |           | "Lord "   |
+          | Lord      |          |           | "Lord "   |
 
     Scenario: Creating a user with a firstname, lastname, description and userfield
         Given I have no users
@@ -209,7 +209,7 @@ Feature: REST API Users
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-          | firstname | lastname | description                 | userfield  | callerid       |
+          | firstname | lastname | description                 | userfield  | caller_id      |
           | Irène     | Dupont   | accented description: éà@'; | customdata | "Irène Dupont" |
 
     Scenario: Creating a user with all available parameters
@@ -252,7 +252,7 @@ Feature: REST API Users
         Then I get a response with status "204"
         When I ask for the user with id "995414"
         Then I get a user with the following parameters:
-          |     id | firstname | lastname | userfield | callerid       |
+          | id     | firstname | lastname | userfield | caller_id      |
           | 995414 | Brézé     | Dupond   |           | "Brézé Dupond" |
 
     Scenario: Editing the lastname of a user
@@ -265,7 +265,7 @@ Feature: REST API Users
         Then I get a response with status "204"
         When I ask for the user with id "924465"
         Then I get a user with the following parameters:
-          |     id | firstname | lastname  | userfield | callerid             |
+          | id     | firstname | lastname  | userfield | caller_id            |
           | 924465 | Clémence  | Argentine |           | "Clémence Argentine" |
 
     Scenario: Editing the firstname, lastname and userfield of a user
@@ -278,8 +278,8 @@ Feature: REST API Users
         Then I get a response with status "204"
         When I ask for the user with id "113549"
         Then I get a user with the following parameters:
-          | id | firstname | lastname  | userfield  | callerid           |
-          | 113549   | Claude    | Argentine | customdata | "Claude Argentine" |
+          | id     | firstname | lastname  | userfield  | caller_id          |
+          | 113549 | Claude    | Argentine | customdata | "Claude Argentine" |
 
     Scenario: Editing all available parameters of a user
         Given I only have the following users:
