@@ -31,7 +31,8 @@ MAPPING = {
     'userfield': 'userfield',
     'timezone': 'timezone',
     'language': 'language',
-    'description': 'description'
+    'description': 'description',
+    'preprocess_subroutine': 'preprocess_subroutine',
 }
 
 

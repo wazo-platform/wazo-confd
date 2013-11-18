@@ -22,8 +22,6 @@ from hamcrest import assert_that, equal_to
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
-from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "/1.1/users"
 
@@ -66,6 +64,7 @@ class TestUserActions(TestResources):
                     'mobilephonenumber': None,
                     'userfield': None,
                     'musiconhold': None,
+                    'preprocess_subroutine': None,
                     'links': [{
                         'href': 'http://localhost/1.1/users/1',
                         'rel': 'users'
@@ -85,6 +84,7 @@ class TestUserActions(TestResources):
                     'mobilephonenumber': None,
                     'userfield': None,
                     'musiconhold': None,
+                    'preprocess_subroutine': None,
                     'links': [{
                         'href': 'http://localhost/1.1/users/2',
                         'rel': 'users'
@@ -127,6 +127,7 @@ class TestUserActions(TestResources):
                     'mobilephonenumber': None,
                     'userfield': None,
                     'musiconhold': None,
+                    'preprocess_subroutine': None,
                     'callerid': '"%s "' % firstname,
                     'links': [{
                         'href': 'http://localhost/1.1/users/%d' % user_id,
@@ -163,6 +164,7 @@ class TestUserActions(TestResources):
             'mobilephonenumber': None,
             'userfield': None,
             'musiconhold': None,
+            'preprocess_subroutine': None,
             'callerid': '"%s "' % firstname,
             'links': [{
                 'href': 'http://localhost/1.1/users/%d' % user_id,
