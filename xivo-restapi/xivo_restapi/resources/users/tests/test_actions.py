@@ -17,13 +17,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from mock import Mock, patch
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, has_entries
 
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.user_line_extension.model import UserLineExtension
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
-from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "/1.1/users"
 
@@ -55,17 +53,18 @@ class TestUserActions(TestResources):
                 {
                     'id': 1,
                     'firstname': 'test1',
-                    'lastname': '',
-                    'callerid': '"test1 "',
+                    'lastname': None,
+                    'caller_id': '"test1 "',
                     'username': None,
                     'password': None,
-                    'outcallerid': None,
+                    'outgoing_caller_id': None,
                     'description': None,
                     'language': None,
                     'timezone': None,
-                    'mobilephonenumber': None,
+                    'mobile_phone_number': None,
                     'userfield': None,
-                    'musiconhold': None,
+                    'music_on_hold': None,
+                    'preprocess_subroutine': None,
                     'links': [{
                         'href': 'http://localhost/1.1/users/1',
                         'rel': 'users'
@@ -74,17 +73,18 @@ class TestUserActions(TestResources):
                 {
                     'id': 2,
                     'firstname': 'test2',
-                    'lastname': '',
-                    'callerid': '"test2 "',
+                    'lastname': None,
+                    'caller_id': '"test2 "',
                     'username': None,
                     'password': None,
-                    'outcallerid': None,
+                    'outgoing_caller_id': None,
                     'description': None,
                     'language': None,
                     'timezone': None,
-                    'mobilephonenumber': None,
+                    'mobile_phone_number': None,
                     'userfield': None,
-                    'musiconhold': None,
+                    'music_on_hold': None,
+                    'preprocess_subroutine': None,
                     'links': [{
                         'href': 'http://localhost/1.1/users/2',
                         'rel': 'users'
@@ -103,7 +103,7 @@ class TestUserActions(TestResources):
 
         mock_user_services_find_all.assert_any_call()
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
 
     @patch('xivo_dao.data_handler.user.services.find_all_by_fullname')
     def test_list_users_with_search(self, mock_user_services_find_all_by_fullname):
@@ -117,17 +117,18 @@ class TestUserActions(TestResources):
                 {
                     'id': user_id,
                     'firstname': firstname,
-                    'lastname': '',
+                    'lastname': None,
                     'username': None,
                     'password': None,
-                    'outcallerid': None,
+                    'outgoing_caller_id': None,
                     'description': None,
                     'language': None,
                     'timezone': None,
-                    'mobilephonenumber': None,
+                    'mobile_phone_number': None,
                     'userfield': None,
-                    'musiconhold': None,
-                    'callerid': '"%s "' % firstname,
+                    'music_on_hold': None,
+                    'preprocess_subroutine': None,
+                    'caller_id': '"%s "' % firstname,
                     'links': [{
                         'href': 'http://localhost/1.1/users/%d' % user_id,
                         'rel': 'users'
@@ -143,7 +144,7 @@ class TestUserActions(TestResources):
 
         mock_user_services_find_all_by_fullname.assert_called_once_with(search)
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
 
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get(self, mock_user_services_get):
@@ -153,17 +154,18 @@ class TestUserActions(TestResources):
         expected_result = {
             'id': user_id,
             'firstname': firstname,
-            'lastname': '',
+            'lastname': None,
             'username': None,
             'password': None,
-            'outcallerid': None,
+            'outgoing_caller_id': None,
             'description': None,
             'language': None,
             'timezone': None,
-            'mobilephonenumber': None,
+            'mobile_phone_number': None,
             'userfield': None,
-            'musiconhold': None,
-            'callerid': '"%s "' % firstname,
+            'music_on_hold': None,
+            'preprocess_subroutine': None,
+            'caller_id': '"%s "' % firstname,
             'links': [{
                 'href': 'http://localhost/1.1/users/%d' % user_id,
                 'rel': 'users'
@@ -177,7 +179,7 @@ class TestUserActions(TestResources):
 
         mock_user_services_get.assert_called_once_with(user_id)
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
 
     @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
     def test_list_lines_associated_to_a_user_with_no_lines(self, ule_find_all_by_user_id):
@@ -247,7 +249,7 @@ class TestUserActions(TestResources):
         result = self.app.get("%s/%d/user_links" % (BASE_URL, user_id))
 
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
 
     @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
     def test_list_lines_associated_to_a_user_with_two_line(self, ule_find_all_by_user_id):
@@ -334,7 +336,7 @@ class TestUserActions(TestResources):
         result = self.app.get("%s/%d/user_links" % (BASE_URL, user_id))
 
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
 
     @patch('xivo_restapi.resources.users.actions.formatter')
     @patch('xivo_dao.data_handler.user.services.create')
@@ -364,7 +366,7 @@ class TestUserActions(TestResources):
         formatter.to_model.assert_called_with(data_serialized)
         formatter.to_api.assert_called_with(user)
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
 
     @patch('xivo_restapi.resources.users.actions.formatter')
     @patch('xivo_dao.data_handler.user.services.get')
