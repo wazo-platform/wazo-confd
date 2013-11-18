@@ -11,7 +11,7 @@ Feature: REST API Users
           | Clémence  | Dupond   |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | caller_id         |
+          | firstname | lastname | userfield | callerid          |
           | Clémence  | Dupond   |           | "Clémence Dupond" |
 
     Scenario: User list with two users
@@ -21,7 +21,7 @@ Feature: REST API Users
           | Louis     | Martin   |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | caller_id         |
+          | firstname | lastname | userfield | callerid          |
           | Clémence  | Dupond   |           | "Clémence Dupond" |
           | Louis     | Martin   |           | "Louis Martin"    |
 
@@ -34,7 +34,7 @@ Feature: REST API Users
           | Frédéric  | Martin   |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | caller_id         |
+          | firstname | lastname | userfield | callerid          |
           | Albert    | Dupond   |           | "Albert Dupond"   |
           | Clémence  | Dupond   |           | "Clémence Dupond" |
           | Frédéric  | Martin   |           | "Frédéric Martin" |
@@ -51,7 +51,7 @@ Feature: REST API Users
           | George    | Lucas    |
         When I search for the user ""
         Then I get a list with the following users:
-         | firstname | lastname | caller_id      |
+         | firstname | lastname | callerid       |
          | George    | Lucas    | "George Lucas" |
 
     Scenario: User search with a filter that returns nothing
@@ -142,16 +142,6 @@ Feature: REST API Users
           | id | firstname | lastname | userfield |
           | 1  | Irène     | Dupont   |           |
 
-    Scenario: Getting a user with all available parameters:
-        Given I only have the following users:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-        When I ask for the user with id "1"
-        Then I get a response with status "200"
-        Then I get a user with the following parameters:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-
     Scenario: Creating an empty user
         Given I have no users
         When I create an empty user
@@ -184,8 +174,8 @@ Feature: REST API Users
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-         | firstname | lastname | userfield | caller_id |
-         | Irène     |          |           | "Irène "  |
+         | firstname | lastname | userfield | callerid |
+         | Irène     |          |           | "Irène " |
 
     Scenario: Creating two users with the same firstname
         Given I have no users
@@ -195,9 +185,9 @@ Feature: REST API Users
           | Lord      |
         When I ask for the list of users
         Then I get a list with the following users:
-          | firstname | lastname | userfield | caller_id |
-          | Lord      |          |           | "Lord "   |
-          | Lord      |          |           | "Lord "   |
+          | firstname | lastname | userfield | callerid |
+          | Lord      |          |           | "Lord "  |
+          | Lord      |          |           | "Lord "  |
 
     Scenario: Creating a user with a firstname, lastname, description and userfield
         Given I have no users
@@ -209,21 +199,8 @@ Feature: REST API Users
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-          | firstname | lastname | description                 | userfield  | caller_id      |
+          | firstname | lastname | description                 | userfield  | callerid       |
           | Irène     | Dupont   | accented description: éà@'; | customdata | "Irène Dupont" |
-
-    Scenario: Creating a user with all available parameters
-        Given I have no users
-        When I create users with the following parameters:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-        Then I get a response with status "201"
-        Then I get a response with an id
-        Then I get a header with a location for the "users" resource
-        Then I get a response with a link to the "users" resource
-        Then the created user has the following parameters:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
 
     Scenario: Editing a user that doesn't exist
         Given I have no users
@@ -252,7 +229,7 @@ Feature: REST API Users
         Then I get a response with status "204"
         When I ask for the user with id "995414"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname | userfield | caller_id      |
+          |     id | firstname | lastname | userfield | callerid       |
           | 995414 | Brézé     | Dupond   |           | "Brézé Dupond" |
 
     Scenario: Editing the lastname of a user
@@ -265,7 +242,7 @@ Feature: REST API Users
         Then I get a response with status "204"
         When I ask for the user with id "924465"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname  | userfield | caller_id            |
+          |     id | firstname | lastname  | userfield | callerid             |
           | 924465 | Clémence  | Argentine |           | "Clémence Argentine" |
 
     Scenario: Editing the firstname, lastname and userfield of a user
@@ -293,45 +270,6 @@ Feature: REST API Users
         Then I have the following voicemails via RESTAPI:
             | name         | number |
             | Pizza Poulet | 1100   |
-
-    Scenario: Editing the firstname, lastname and caller_id of a user
-        Given I only have the following users:
-            | id | firstname | lastname |
-            | 42 | Clémence  | Dujas    |
-        When I update the user with id "42" using the following parameters:
-            | firstname | lastname       | caller_id         |
-            | Olivia    | Schtroumpfette | La Schtroumpfette |
-        Then I get a response with status "204"
-        When I ask for the user with id "42"
-        Then I get a user with the following parameters:
-            | id | firstname | lastname       | caller_id           |
-            | 42 | Olivia    | Schtroumpfette | "La Schtroumpfette" |
-
-    Scenario: Editing only the caller_id of a user
-        Given I only have the following users:
-            | id | firstname | lastname |
-            | 43 | Benoit    | Thierri  |
-        When I update the user with id "43" using the following parameters:
-            | caller_id        |
-            | Grand Schtroumpf |
-        Then I get a response with status "204"
-        When I ask for the user with id "43"
-        Then I get a user with the following parameters:
-            | id | firstname | lastname | caller_id          |
-            | 43 | Benoit    | Thierri  | "Grand Schtroumpf" |
-
-    Scenario: Editing all available parameters of a user
-        Given I only have the following users:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-        When I update the user with id "1" using the following parameters:
-            | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
-            | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
-        Then I get a response with status "204"
-        When I ask for the user with id "1"
-        Then I get a user with the following parameters:
-            | id | firstname | lastname | timezone       | language | description | caller_id   | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | "ALEXANDER" | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
 
     Scenario: Deleting a user that doesn't exist
         Given I have no users

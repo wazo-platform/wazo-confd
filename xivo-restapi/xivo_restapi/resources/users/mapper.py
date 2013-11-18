@@ -22,17 +22,16 @@ MAPPING = {
     'id': 'id',
     'firstname': 'firstname',
     'lastname': 'lastname',
-    'caller_id': 'caller_id',
-    'outgoing_caller_id': 'outgoing_caller_id',
+    'callerid': 'callerid',
+    'outcallerid': 'outcallerid',
     'username': 'username',
     'password': 'password',
-    'music_on_hold': 'music_on_hold',
-    'mobile_phone_number': 'mobile_phone_number',
+    'musiconhold': 'musiconhold',
+    'mobilephonenumber': 'mobilephonenumber',
     'userfield': 'userfield',
     'timezone': 'timezone',
     'language': 'language',
-    'description': 'description',
-    'preprocess_subroutine': 'preprocess_subroutine',
+    'description': 'description'
 }
 
 
