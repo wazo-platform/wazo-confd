@@ -189,18 +189,18 @@ Feature: REST API Users
           | Lord      |          |           | "Lord "  |
           | Lord      |          |           | "Lord "  |
 
-    Scenario: Creating a user with a firstname, lastname, description and userfield
+    Scenario: Creating a user with multiple fields
         Given I have no users
         When I create users with the following parameters:
-          | firstname | lastname | description                 | userfield  |
-          | Irène     | Dupont   | accented description: éà@'; | customdata |
+          | firstname | lastname | description                 | userfield  | musiconhold | preprocess_subroutine |
+          | Irène     | Dupont   | accented description: éà@'; | customdata | folksong    | my_subroutine         |
         Then I get a response with status "201"
         Then I get a response with an id
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-          | firstname | lastname | description                 | userfield  | callerid       |
-          | Irène     | Dupont   | accented description: éà@'; | customdata | "Irène Dupont" |
+          | firstname | lastname | description                 | userfield  | callerid       | musiconhold | preprocess_subroutine |
+          | Irène     | Dupont   | accented description: éà@'; | customdata | "Irène Dupont" | folksong    | my_subroutine         |
 
     Scenario: Editing a user that doesn't exist
         Given I have no users
@@ -245,18 +245,18 @@ Feature: REST API Users
           |     id | firstname | lastname  | userfield | callerid             |
           | 924465 | Clémence  | Argentine |           | "Clémence Argentine" |
 
-    Scenario: Editing the firstname, lastname and userfield of a user
+    Scenario: Editing multiple fields of a user
         Given I only have the following users:
           |     id | firstname | lastname |
           | 113549 | Clémence  | Dupond   |
         When I update the user with id "113549" using the following parameters:
-          | firstname | lastname  | userfield  |
-          | Claude    | Argentine | customdata |
+          | firstname | lastname  | userfield  | musiconhold | preprocess_subroutine |
+          | Claude    | Argentine | customdata | country     | my_subroutine         |
         Then I get a response with status "204"
         When I ask for the user with id "113549"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname  | userfield  | callerid           |
-          | 113549 | Claude    | Argentine | customdata | "Claude Argentine" |
+          | id     | firstname | lastname  | userfield  | callerid           | musiconhold | preprocess_subroutine |
+          | 113549 | Claude    | Argentine | customdata | "Claude Argentine" | country     | my_subroutine         |
 
     Scenario: Editing a user associated with a voicemail
         Given there are users with infos:
