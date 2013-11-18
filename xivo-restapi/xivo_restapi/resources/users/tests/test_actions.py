@@ -53,7 +53,7 @@ class TestUserActions(TestResources):
                 {
                     'id': 1,
                     'firstname': 'test1',
-                    'lastname': '',
+                    'lastname': None,
                     'caller_id': '"test1 "',
                     'username': None,
                     'password': None,
@@ -73,7 +73,7 @@ class TestUserActions(TestResources):
                 {
                     'id': 2,
                     'firstname': 'test2',
-                    'lastname': '',
+                    'lastname': None,
                     'caller_id': '"test2 "',
                     'username': None,
                     'password': None,
@@ -117,7 +117,7 @@ class TestUserActions(TestResources):
                 {
                     'id': user_id,
                     'firstname': firstname,
-                    'lastname': '',
+                    'lastname': None,
                     'username': None,
                     'password': None,
                     'outgoing_caller_id': None,
@@ -154,7 +154,7 @@ class TestUserActions(TestResources):
         expected_result = {
             'id': user_id,
             'firstname': firstname,
-            'lastname': '',
+            'lastname': None,
             'username': None,
             'password': None,
             'outgoing_caller_id': None,
