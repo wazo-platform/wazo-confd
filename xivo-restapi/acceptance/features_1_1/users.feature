@@ -278,7 +278,7 @@ Feature: REST API Users
         Then I get a response with status "204"
         When I ask for the user with id "113549"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname  | userfield  | callerid           |
+          | id     | firstname | lastname  | userfield  | caller_id           |
           | 113549 | Claude    | Argentine | customdata | "Claude Argentine" |
 
     Scenario: Editing a user associated with a voicemail
