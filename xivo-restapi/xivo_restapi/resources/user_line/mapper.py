@@ -28,12 +28,17 @@ MAPPING = {
 
 
 def add_links_to_dict(result_dict, user_line):
+    user_location = url_for('users.get', userid=user_line.user_id, _external=True)
     line_location = url_for('lines.get', lineid=user_line.line_id, _external=True)
     result_dict.update({
         'links': [
             {
                 'rel': 'lines',
                 'href': line_location
+            },
+            {
+                'rel': 'users',
+                'href': user_location
             }
         ]
     })

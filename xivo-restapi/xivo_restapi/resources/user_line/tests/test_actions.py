@@ -23,7 +23,7 @@ from xivo_dao.data_handler.user_line.model import UserLine
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
-BASE_URL = "/1.1/users/%s/lines"
+BASE_URL = '/1.1/users/%s/lines'
 
 
 class TestUserLineActions(TestResources):
@@ -36,11 +36,18 @@ class TestUserLineActions(TestResources):
 
         expected_status_code = 201
         expected_result = {
-            "line_id": line_id,
-            "links": [
+            u'user_id': user_id,
+            u'line_id': line_id,
+            u'main_user': True,
+            u'main_line': True,
+            'links': [
                 {
-                    "rel": "lines",
-                    "href": "http://localhost/1.1/lines/%s" % line_id
+                    'rel': 'lines',
+                    'href': 'http://localhost/1.1/lines/%s' % line_id
+                },
+                {
+                    u'href': u'http://localhost/1.1/users/%d' % user_id,
+                    u'rel': u'users'
                 }
             ]
         }
@@ -87,18 +94,22 @@ class TestUserLineActions(TestResources):
             u'total': 1,
             u'items': [
                 {
+                    u'user_id': user_id,
                     u'line_id': line_id,
-                    u'main_user': None,
-                    u'main_line': None,
+                    u'main_user': True,
+                    u'main_line': True,
                     u'links': [
                         {u'href': u'http://localhost/1.1/lines/%d' % line_id,
-                         u'rel': u'lines'}
+                         u'rel': u'lines'},
+                        {u'href': u'http://localhost/1.1/users/%d' % user_id,
+                         u'rel': u'users'}
                     ]
                 }
             ]
         }
 
-        user_line = UserLine(line_id=line_id)
+        user_line = UserLine(user_id=user_id,
+                             line_id=line_id)
 
         user_line_find_all_by_user_id.return_value = [user_line]
 
