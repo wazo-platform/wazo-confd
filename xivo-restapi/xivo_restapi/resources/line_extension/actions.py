@@ -20,6 +20,7 @@ from flask import request, url_for, make_response
 
 from xivo_dao.data_handler.exception import AssociationNotExistsError
 from xivo_dao.data_handler.line_extension import services as line_extension_services
+from xivo_dao.data_handler.line_extension.exception import LineExtensionNotExistsError
 
 from xivo_restapi.resources.lines.routes import line_route as route
 from xivo_restapi.resources.line_extension.formatter import LineExtensionFormatter
@@ -36,3 +37,13 @@ def associate_extension(lineid):
     result = formatter.to_api(created_model)
     location = url_for('.associate_extension', lineid=lineid)
     return make_response(result, 201, {'Location': location})
+
+
+@route('/<int:lineid>/extension')
+def get_line_extension(lineid):
+    try:
+        line_extension = line_extension_services.get_by_line_id(lineid)
+    except LineExtensionNotExistsError:
+        raise AssociationNotExistsError("Line with id=%d does not have an extension" % lineid)
+    result = formatter.to_api(line_extension)
+    return make_response(result, 200)

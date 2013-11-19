@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, has_entries, contains_inanyorder
 
 from mock import patch
 from xivo_dao.data_handler.line_extension.model import LineExtension
+from xivo_dao.data_handler.line_extension.exception import LineExtensionNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
@@ -68,3 +69,43 @@ class TestLineExtensionActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
+    def test_get_extension_associated_to_a_line_with_no_extension(self, line_extension_get_by_line_id):
+        line_id = 1
+        expected_status_code = 404
+        expected_result = ['Line with id=%s does not have an extension' % line_id]
+
+        line_extension_get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
+
+        result = self.app.get(BASE_URL % line_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
+    def test_get_extension_associated_to_a_line(self, line_extension_get_by_line_id):
+        line_id = 1
+        extension_id = 2
+        expected_status_code = 200
+        expected_result = {
+            u'extension_id': 2,
+            u'line_id': 1,
+            u'links': [
+                {u'href': u'http://localhost/1.1/lines_sip/%d' % line_id,
+                 u'rel': u'lines_sip'},
+                {u'href': u'http://localhost/1.1/extensions/%d' % extension_id,
+                 u'rel': u'extensions'},
+            ]
+        }
+
+        line_extension_link = LineExtension(extension_id=extension_id,
+                                            line_id=line_id)
+
+        line_extension_get_by_line_id.return_value = line_extension_link
+
+        result = self.app.get(BASE_URL % line_id)
+        decoded_result = self._serialize_decode(result.data)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(decoded_result, has_entries(expected_result))
