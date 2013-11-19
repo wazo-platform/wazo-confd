@@ -47,3 +47,13 @@ def get_line_extension(lineid):
         raise AssociationNotExistsError("Line with id=%d does not have an extension" % lineid)
     result = formatter.to_api(line_extension)
     return make_response(result, 200)
+
+
+@route('/<int:lineid>/extension', methods=['DELETE'])
+def dissociate_extension(lineid):
+    try:
+        line_extension = line_extension_services.get_by_line_id(lineid)
+    except LineExtensionNotExistsError:
+        raise AssociationNotExistsError("Line with id=%d does not have a extension" % lineid)
+    line_extension_services.dissociate(line_extension)
+    return make_response('', 204)

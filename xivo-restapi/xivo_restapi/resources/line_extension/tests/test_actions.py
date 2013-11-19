@@ -109,3 +109,34 @@ class TestLineExtensionActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(decoded_result, has_entries(expected_result))
+
+    @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
+    @patch('xivo_dao.data_handler.line_extension.services.dissociate')
+    def test_dissociate_extension(self, line_extension_dissociate, get_by_line_id):
+        line_extension = LineExtension(line_id=1, extension_id=2)
+        get_by_line_id.return_value = line_extension
+
+        expected_status_code = 204
+        expected_data = ''
+
+        result = self.app.delete(BASE_URL % line_extension.line_id)
+
+        get_by_line_id.assert_called_once_with(line_extension.line_id)
+        line_extension_dissociate.assert_called_once_with(line_extension)
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_data))
+
+    @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
+    @patch('xivo_dao.data_handler.line_extension.services.dissociate')
+    def test_dissociate_extension_no_line(self, line_extension_dissociate, get_by_line_id):
+        line_id = 1
+
+        expected_status_code = 404
+        expected_result = ['Line with id=%s does not have a extension' % line_id]
+
+        get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
+
+        result = self.app.delete(BASE_URL % line_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
