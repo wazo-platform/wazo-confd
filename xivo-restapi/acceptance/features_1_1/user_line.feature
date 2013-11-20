@@ -94,24 +94,22 @@ Feature: REST API Link line with a user
             | 2  | Greg      | Sanderson |
             | 3  | Roberto   | Da Silva  |
         When I create the following user_line via RESTAPI:
-            | user_id | line_id | main_user |
-            | 1       | 10      | True      |
+            | user_id | line_id |
+            | 1       | 10      |
+        Then I get a response with status "201"
         When I create the following user_line via RESTAPI:
-            | user_id | line_id | main_user |
-            | 2       | 10      | False     |
+            | user_id | line_id |
+            | 2       | 10      |
+        Then I get a response with status "201"
         When I create the following user_line via RESTAPI:
-            | user_id | line_id | main_user |
-            | 3       | 10      | False     |
+            | user_id | line_id |
+            | 3       | 10      |
         Then I get a response with status "201"
 
         Then I see a user with infos:
-            | fullname        | protocol | context |
-            | Salle Doctorant | sip      | default |
-        Then I see a user with infos:
-            | fullname       | protocol | context |
-            | Greg Sanderson | sip      | default |
-        Then I see a user with infos:
             | fullname         | protocol | context |
+            | Salle Doctorant  | sip      | default |
+            | Greg Sanderson   | sip      | default |
             | Roberto Da Silva | sip      | default |
 
     Scenario: Link a user already associated to a line
@@ -161,7 +159,7 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 2       | 3       |
         Then I get a response with status "404"
-        Then I get an error message "UserLine with user_id=3, line_id=2 does not exist"
+        Then I get an error message "UserLine not exist"
 
     Scenario: Dissociate user_line with main user
         Given I only have the following users:
