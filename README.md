@@ -1,25 +1,29 @@
-XiVO RestAPI
-============
+XiVO REST API
+=============
 
 [![Build Status](https://travis-ci.org/xivo-pbx/xivo-restapi.png?branch=master)](https://travis-ci.org/xivo-pbx/xivo-restapi)
 
-_warning_
+XiVO REST API is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
+service for configuring and managing a XiVO server. Further details on how to use the API can be found on
+the [XiVO documentation web site](http://documentation.xivo.fr/production/api_sdk/rest_api/rest_api.html)
 
-   Be sure to pass all tests before submiting any patch.
+Installing REST API
+-------------------
 
+The server is already provided as a part of [XiVO](http://documentation.xivo.fr).
+Please refer to [the documentation](ttp://documentation.xivo.fr/production/installation/installsystem.html) for
+further details on installing one.
 
-Acceptance Testing
+Running unit tests
 ------------------
 
-WARNING !!! all data will be erased by the acceptance tests use an empty xivo installation.
+1. Install requirements with ```pip install -r requirements.txt```
+2. Run tests with ```nosetests xivo-restapi/xivo_restapi```
 
-- The acceptance tests use xivo_dao to test the database. postgres needs to accept connections from the exterior.
-  On the XiVO under test, add the following lines to the postgres configuration files:
-    - /etc/postgresql/9.1/main/pg_hba.conf : host    all             all             192.168.0.0/16          md5
-    - /etc/postgresql/9.1/main/postgres.conf : listen_addresses = '*'
 
-Now you are ready to start the acceptance tests :
+Running functional tests
+------------------------
 
-    $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/                    # starts all tests 
-    $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/users.feature       # starts user features tests
-    $ PYTHONPATH=.:../../xivo-dao/xivo-dao/ lettuce acceptance/features/users.feature -s 3  # starts the third scenario
+1. Install and configure the [XiVO acceptance](https://github.com/xivo-pbx/xivo-acceptance) library
+2. Go into ```xivo-restapi/acceptance/features_1_1```
+3. Run any of the files with [lettuce](http://lettuce.it)
