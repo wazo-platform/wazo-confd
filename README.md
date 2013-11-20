@@ -1,7 +1,7 @@
 XiVO RestAPI
-************
+============
 
- ..warning:
+_warning_
  
    Be sure to pass all tests before submiting any patch.
 
