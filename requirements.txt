@@ -1,0 +1,11 @@
+svn+https://github.com/xivo-pbx/xivo-dao/trunk/xivo-dao
+-e svn+https://github.com/xivo-pbx/xivo-provisioning/trunk/xivo-provisioning#egg=provd
+svn+https://github.com/xivo-pbx/xivo-lib-python/trunk/xivo-lib-python
+-e svn+https://github.com/xivo-pbx/xivo-bus/trunk/xivo-bus#egg=xivo-bus
+nose
+sqlalchemy
+psycopg2
+mock
+pyhamcrest
+pika
+flask==0.8
