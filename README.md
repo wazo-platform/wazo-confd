@@ -2,23 +2,8 @@ XiVO RestAPI
 ============
 
 _warning_
- 
+
    Be sure to pass all tests before submiting any patch.
-
-
-Dependencies 
-------------
-
-pip install requests
-
-XiVO:
-- xivo-dao
-- lib-python
-
-Other dependencies will be installed by the install script:
-- Flask-0.6-1, Werkzeug-0.6.2-1, 
-
-Packaging info in project squeeze-xivo-skaro
 
 
 Acceptance Testing
