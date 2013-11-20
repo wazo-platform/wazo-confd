@@ -1,6 +1,8 @@
 XiVO RestAPI
 ============
 
+[![Build Status](https://travis-ci.org/xivo-pbx/xivo-restapi.png?branch=master)](https://travis-ci.org/xivo-pbx/xivo-restapi)
+
 _warning_
 
    Be sure to pass all tests before submiting any patch.
