@@ -66,7 +66,6 @@ def get_user_links(extensionid):
 def create():
     data = request.data.decode("utf-8")
     extension = formatter.to_model(data)
-    _normalize_to_model(extension)
     extension = extension_services.create(extension)
     result = formatter.to_api(extension)
     location = url_for('.get', extensionid=extension.id)
@@ -87,11 +86,3 @@ def delete(extensionid):
     extension = extension_services.get(extensionid)
     extension_services.delete(extension)
     return make_response('', 204)
-
-
-def _normalize_to_model(extension):
-    if not hasattr(extension, 'type'):
-        extension.type = 'user'
-
-    if not hasattr(extension, 'typeval'):
-        extension.typeval = '0'
