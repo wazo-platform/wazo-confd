@@ -54,6 +54,6 @@ def get_user_lines(userid):
     try:
         user_line = user_line_services.find_all_by_user_id(userid)
     except UserLineNotExistsError:
-        raise AssociationNotExistsError("UserLine with user_id=%d does not have a line" % userid)
+        raise AssociationNotExistsError("User with id=%d does not have any line" % userid)
     result = formatter.list_to_api(user_line)
     return make_response(result, 200)

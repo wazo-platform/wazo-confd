@@ -149,7 +149,7 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 10      | 1       |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: There are an extension that already associated to this user_line"
+        Then I get an error message "Invalid parameters: There is an extension associated to this line"
 
     Scenario: Dissociate user_line that doesn't exist
         Given I have no user_line with the following parameters:
@@ -159,7 +159,7 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 2       | 3       |
         Then I get a response with status "404"
-        Then I get an error message "UserLine not exist"
+        Then I get an error message "User with id=3 does not have any line"
 
     Scenario: Dissociate user_line with main user
         Given I only have the following users:
@@ -180,7 +180,7 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 10      | 1       |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: There are secondary users associated to this user_line"
+        Then I get an error message "Invalid parameters: There are secondary users associated to this line"
 
     Scenario: Dissociate user_line with secondary user
         Given I only have the following users:
