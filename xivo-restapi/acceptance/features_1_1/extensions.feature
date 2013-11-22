@@ -74,7 +74,7 @@ Feature: REST API Extensions
 
     Scenario: Get an extension that does not exist
         Given I have no extensions
-        When I access the extension with id "100"
+        When I access the extension with id "699324"
         Then I get a response with status "404"
 
     Scenario: Get an extension
@@ -347,7 +347,7 @@ Feature: REST API Extensions
 
     Scenario: Delete an extension that doesn't exist
         Given I have no extensions
-        When I delete extension "100"
+        When I delete extension "892476"
         Then I get a response with status "404"
 
     Scenario: Delete an extension
