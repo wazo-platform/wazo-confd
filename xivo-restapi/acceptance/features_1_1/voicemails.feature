@@ -1,8 +1,8 @@
 Feature: REST API Voicemails
 
     Scenario: Get a voicemail that doesn't exist
-        Given I have no voicemail with id "10"
-        When I request voicemail with id "10"
+        Given I have no voicemail with id "214773"
+        When I request voicemail with id "214773"
         Then I get a response with status "404"
 
     Scenario: Get a voicemail

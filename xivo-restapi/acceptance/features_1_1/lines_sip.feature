@@ -185,7 +185,7 @@ Feature: REST API SIP Lines
 
     Scenario: Delete a line that doesn't exist
         Given I have no lines
-        When I delete line sip "10"
+        When I delete line sip "985462"
         Then I get a response with status "404"
 
     Scenario: Delete a line

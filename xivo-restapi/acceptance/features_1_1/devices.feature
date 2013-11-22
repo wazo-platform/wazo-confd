@@ -438,30 +438,30 @@ Feature: REST API Devices
 
     Scenario: Associate line to a device
         Given I only have the following lines:
-            | id | context | protocol | username | secret | device_slot |
-            | 10 | default | sip      | toto     | tata   | 1           |
+            |     id | context | protocol | username | secret | device_slot |
+            | 523478 | default | sip      | toto     | tata   |           1 |
         Given I only have the following devices:
-            | id | ip       | mac               |
-            | 20 | 10.0.0.1 | 00:00:00:00:00:12 |
-        When I associate my line_id "10" to the device "20"
+            |              id |       ip |               mac |
+            | 658743288432479 | 10.0.0.1 | 00:00:00:00:00:12 |
+        When I associate my line_id "523478" to the device "658743288432479"
         Then I get a response with status "403"
 
     Scenario: Remove line to a device
         Given I only have the following lines:
-            | id | context | protocol | username | secret | device_slot |
-            | 10 | default | sip      | toto     | tata   | 1           |
+            |     id | context | protocol | username | secret | device_slot |
+            | 955473 | default | sip      | toto     | tata   |           1 |
 
-        When I remove line_id "10" from device "20"
+        When I remove line_id "955473" from device "954743217965"
         Then I get a response with status "403"
 
     Scenario: Delete a device
         Given I only have the following devices:
-            | id | ip       | mac               |
-            | 20 | 10.0.0.1 | 00:00:00:00:00:12 |
-        When I delete the device "20" from restapi
+            |            id |       ip |               mac |
+            | 1346771446546 | 10.0.0.1 | 00:00:00:00:00:12 |
+        When I delete the device "1346771446546" from restapi
         Then I get a response with status "204"
-        Then I see in the log file device "20" deleted
-        Then the device "20" is no longer exists in provd
+        Then I see in the log file device "1346771446546" deleted
+        Then the device "1346771446546" is no longer exists in provd
 
     Scenario: Delete a device that doesn't exist
         Given there are no devices with id "abcd"
@@ -470,11 +470,11 @@ Feature: REST API Devices
 
     Scenario: Delete a device associated to a line
         Given I have the following devices:
-            | id | ip       | mac               |
-            | 20 | 10.0.0.1 | 00:00:00:00:00:12 |
+            |            id |       ip |               mac |
+            | 6521879216879 | 10.0.0.1 | 00:00:00:00:00:12 |
         Given there are users with infos:
             | firstname | lastname | number | context | protocol |            device |
             | Aayla     | Secura   |   1234 | default | sip      | 00:00:00:00:00:12 |
-        When I delete the device "20" from restapi
+        When I delete the device "6521879216879" from restapi
         Then I get a response with status "400"
         Then I get an error message "Error while deleting device: device is still linked to a line"

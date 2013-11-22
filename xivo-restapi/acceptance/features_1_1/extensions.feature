@@ -27,7 +27,7 @@ Feature: REST API Extensions
 
     Scenario: User link list by extension_id with no link
         Given I have no extensions
-        When I ask for the list of user_links with extension_id "10"
+        When I ask for the list of user_links with extension_id "965734"
         Then I get a response with status "200"
         Then I get an empty list
 
