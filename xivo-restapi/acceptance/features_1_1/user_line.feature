@@ -111,6 +111,39 @@ Feature: REST API Link line with a user
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
+    Scenario: Get user_line when user does not exist
+        Given there are no users with id "999999"
+        When I request the lines associated to user id "999999" via RESTAPI
+        Then I get a response with status "404"
+        Then I get an error message "User with id=999999 does not exist"
+
+    Scenario: Get user_line when line doesn't exist
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 594383 | Greg      | Sanderson |
+        When I request the lines associated to user id "999999" via RESTAPI
+        Then I get a response with status "404"
+        Then I get an error message "User with id=999999 does not have any lines"
+
+    Scenario: Get user_line
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 293847 | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id     | context | protocol | username | secret | device_slot |
+            | 943875 | default | sip      | toto     | tata   | 1           |
+        When I create the following user_line via RESTAPI:
+            | user_id | line_id |
+            | 293847  | 943875  |
+        Then I get a response with status "201"
+
+        When I request the lines associated to user id "293847"
+        Then I get a response with status "200"
+        Then I get a response with a user id
+        Then I get a response with a line id
+        Then I get a response with a link to the "lines_sip" resource using the id "line_id"
+        Then I get a response with a link to the "users" resource using the id "user_id"
+
     Scenario: Dissociate user_line with extension associated
         Given I only have the following users:
             | id     | firstname | lastname  |
