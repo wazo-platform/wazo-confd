@@ -136,6 +136,9 @@ Feature: REST API Link line with a user
         Given I have no user_line with the following parameters:
             | line_id | user_id |
             | 888252  | 777252  |
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 777252 | Greg      | Sanderson |
         When I dissociate the following user_line via RESTAPI:
             | line_id | user_id |
             | 888252  | 777252  |
