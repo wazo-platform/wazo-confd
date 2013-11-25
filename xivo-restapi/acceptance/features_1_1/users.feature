@@ -292,8 +292,8 @@ Feature: REST API Users
             |     id | context | protocol | device_slot |
             | 546216 | default | sip      |           1 |
         Given I only have the following extensions:
-            |     id | context | exten | type | typeval |
-            | 951654 | default |  1000 | user |  956541 |
+            |     id | context | exten |
+            | 951654 | default |  1000 |
         When I create the following links:
             | user_id | line_id | extension_id | main_line |
             |  956541 |  546216 |       951654 | True      |
@@ -319,9 +319,9 @@ Feature: REST API Users
             | 135498 | default | sip      |           1 |
             | 133364 | default | sip      |           1 |
         Given I only have the following extensions:
-            |     id | context | exten | type | typeval |
-            | 995135 | default |  1001 | user |  994775 |
-            | 132468 | default |  1002 | user |  112348 |
+            |     id | context | exten |
+            | 995135 | default |  1001 |
+            | 132468 | default |  1002 |
         Given the following users, lines, extensions are linked:
             | user_id | line_id | extension_id | main_line |
             |  994775 |  135498 |       995135 | True      |

@@ -205,8 +205,8 @@ Feature: REST API SIP Lines
             |     id | context | protocol | device_slot |
             | 999514 | default | sip      |           1 |
         Given I only have the following extensions:
-            |     id | context | exten | type | typeval |
-            | 995114 | default |  1000 | user |  544795 |
+            |     id | context | exten |
+            | 995114 | default |  1000 |
         When I create the following links:
             | user_id | line_id | extension_id | main_line |
             |  544795 |  999514 |       995114 | True      |
