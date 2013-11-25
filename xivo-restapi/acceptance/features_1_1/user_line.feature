@@ -16,7 +16,7 @@ Feature: REST API Link line with a user
             | user_id | line_id |
             | 384939  | toto    |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: line_id must be integer,main_user must be boolean,main_line must be boolean"
+        Then I get an error message "Invalid parameters: line_id must be integer"
 
     Scenario: Create a user_line with invalid parameters
         Given I only have the following users:
