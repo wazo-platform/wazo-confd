@@ -8,16 +8,6 @@ Feature: REST API Link line with a user
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: line_id"
 
-    Scenario: Create a user_line with empty parameters
-        Given I only have the following users:
-            | id | firstname | lastname  |
-            | 1  | Greg      | Sanderson |
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id | main_user | main_line |
-            | 1       |         |           |           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: line_id must be integer,main_user must be boolean,main_line must be boolean"
-
     Scenario: Create a user_line with invalid values
         Given I only have the following users:
             | id     | firstname | lastname  |
@@ -37,16 +27,6 @@ Feature: REST API Link line with a user
             | 562668  | 999999  | invalid |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: invalid"
-
-    Scenario: Create a user_line with a missing line id
-        Given I only have the following users:
-            | id | firstname | lastname  |
-            | 1  | Greg      | Sanderson |
-        When I create the following user_line via RESTAPI:
-            | user_id | main_user |
-            | 1       | True      |
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: line_id"
 
     Scenario: Create user_line with a line that doesn't exist
         Given I have no lines
