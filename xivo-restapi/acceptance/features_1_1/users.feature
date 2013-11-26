@@ -142,6 +142,16 @@ Feature: REST API Users
           | id | firstname | lastname | userfield |
           | 1  | Irène     | Dupont   |           |
 
+    Scenario: Getting a user with all fields
+        Given I only have the following users:
+          | id | firstname | lastname | callerid | outcallerid | username | password | musiconhold | mobilephonenumber | userfield | timezone | language | description | preprocess_subroutine |
+          | 1  | Kikoku    | Harakiri |          | outcallerid | username | password | musiconhold | 1234567890        | userfield | timezone | language | description | preprocess_subroutine |
+        When I ask for the user with id "1"
+        Then I get a response with status "200"
+        Then I get a user with the following parameters:
+          | id | firstname | lastname | callerid          | outcallerid | username | password | musiconhold | mobilephonenumber | userfield | timezone | language | description | preprocess_subroutine |
+          | 1  | Kikoku    | Harakiri | "Kikoku Harakiri" | outcallerid | username | password | musiconhold | 1234567890        | userfield | timezone | language | description | preprocess_subroutine |
+
     Scenario: Creating an empty user
         Given I have no users
         When I create an empty user
@@ -163,6 +173,22 @@ Feature: REST API Users
           | Joe       | unexisting_value |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Creating a user with a invalid password
+        Given I have no users
+        When I create users with the following parameters:
+          | firstname | password |
+          | Joe       | 123      |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: password"
+
+    Scenario: Creating a user with a invalid mobilephonenumber
+        Given I have no users
+        When I create users with the following parameters:
+          | firstname | mobilephonenumber |
+          | Joe       | mobilephonenumber |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: mobilephonenumber"
 
     Scenario: Creating a user with a firstname
         Given I have no users
