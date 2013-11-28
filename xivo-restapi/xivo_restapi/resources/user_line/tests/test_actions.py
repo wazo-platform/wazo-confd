@@ -16,10 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from hamcrest import *
+from hamcrest import assert_that, equal_to
 
-from mock import patch
+from mock import patch, Mock
 from xivo_dao.data_handler.user_line.model import UserLine
+from xivo_dao.data_handler.user.model import User
+from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
@@ -72,12 +74,27 @@ class TestUserLineActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.user.services.get')
+    def test_get_line_associated_to_a_user_when_user_does_not_exist(self, user_services_get):
+        user_id = 1
+        expected_status_code = 404
+        expected_result = ["User with id=1 does not exist"]
+
+        user_services_get.side_effect = ElementNotExistsError('User', id=user_id)
+
+        result = self.app.get(BASE_URL % user_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user_line.services.find_all_by_user_id')
-    def test_get_line_associated_to_a_user_with_no_line(self, user_line_find_all_by_user_id):
+    def test_get_lines_associated_to_a_user_with_no_line(self, user_line_find_all_by_user_id, user_services_get):
         user_id = 1
         expected_status_code = 200
         expected_result = {u'items': [], u'total': 0}
 
+        user_services_get.return_value = Mock(User, id=user_id)
         user_line_find_all_by_user_id.return_value = []
 
         result = self.app.get(BASE_URL % user_id)
@@ -85,8 +102,9 @@ class TestUserLineActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
+    @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user_line.services.find_all_by_user_id')
-    def test_get_line_associated_to_a_user(self, user_line_find_all_by_user_id):
+    def test_get_lines_associated_to_a_user(self, user_line_find_all_by_user_id, user_services_get):
         user_id = 1
         line_id = 13
         expected_status_code = 200
@@ -111,6 +129,7 @@ class TestUserLineActions(TestResources):
         user_line = UserLine(user_id=user_id,
                              line_id=line_id)
 
+        user_services_get.return_value = Mock(User, id=user_id)
         user_line_find_all_by_user_id.return_value = [user_line]
 
         result = self.app.get(BASE_URL % user_id)

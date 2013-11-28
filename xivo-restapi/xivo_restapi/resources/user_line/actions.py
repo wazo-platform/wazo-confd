@@ -21,6 +21,7 @@ from flask import request, url_for, make_response
 from xivo_dao.data_handler.exception import AssociationNotExistsError
 from xivo_dao.data_handler.user_line.exception import UserLineNotExistsError
 from xivo_dao.data_handler.user_line import services as user_line_services
+from xivo_dao.data_handler.user import services as user_services
 
 from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_line.formatter import UserLineFormatter
@@ -51,9 +52,7 @@ def dissociate_line(userid, lineid):
 
 @route('/<int:userid>/lines')
 def get_user_lines(userid):
-    try:
-        user_line = user_line_services.find_all_by_user_id(userid)
-    except UserLineNotExistsError:
-        raise AssociationNotExistsError("User with id=%d does not have any line" % userid)
-    result = formatter.list_to_api(user_line)
+    user = user_services.get(userid)
+    user_lines = user_line_services.find_all_by_user_id(user.id)
+    result = formatter.list_to_api(user_lines)
     return make_response(result, 200)
