@@ -44,6 +44,9 @@ Feature: Link a line and an extension
         Given I have the following user, line and extension linked together:
             | firstname | lastname | extension | context | line id | protocol |
             | Commander | Spock    | 1504      | default | 841902  | sip      |
+        Given I have the following extensions:
+            | exten | context |
+            | 1505  | default |
         When I link extension "1505@default" with the line of user "Commander" "Spock"
         Then I get a response with status "400"
         Then I get an error message matching "Extension is already associated to a line"
