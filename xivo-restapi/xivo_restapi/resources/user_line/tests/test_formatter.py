@@ -16,10 +16,25 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import unittest
+import json
+from hamcrest import equal_to, assert_that
+from xivo_dao.data_handler.user_line.model import UserLine
+from xivo_restapi.resources.user_line.formatter import UserLineFormatter
 
-from . import actions
-from actions import blueprint as user_link_blueprint
 
+class TestUserLineFormatter(unittest.TestCase):
 
-def register_blueprints(app):
-    app.register_blueprint(user_link_blueprint)
+    def test_to_model(self):
+        user_id = 1
+        line_id = 2
+        data = {'line_id': line_id}
+        encoded_data = json.dumps(data)
+
+        expected = UserLine(user_id=user_id,
+                            line_id=line_id)
+
+        formatter = UserLineFormatter()
+        result = formatter.to_model(encoded_data, user_id)
+
+        assert_that(result, equal_to(expected))

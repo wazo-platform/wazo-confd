@@ -16,10 +16,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
-from . import actions
-from actions import blueprint as user_link_blueprint
+from flask import url_for
 
 
-def register_blueprints(app):
-    app.register_blueprint(user_link_blueprint)
+MAPPING = {
+    'user_id': 'user_id',
+    'line_id': 'line_id',
+    'main_user': 'main_user',
+    'main_line': 'main_line'
+}
+
+
+def add_links_to_dict(result_dict, user_line):
+    user_location = url_for('users.get', userid=user_line.user_id, _external=True)
+    line_location = url_for('lines.get', lineid=user_line.line_id, _external=True)
+    result_dict.update({
+        'links': [
+            {
+                'rel': 'lines',
+                'href': line_location
+            },
+            {
+                'rel': 'users',
+                'href': user_location
+            }
+        ]
+    })
