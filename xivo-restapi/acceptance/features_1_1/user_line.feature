@@ -56,13 +56,13 @@ Feature: REST API Link line with a user
             | 333222 | Greg      | Sanderson |
         Given I only have the following lines:
             | id     | context | protocol | device_slot |
-            | 333222 | default | sip      | 1           |
+            | 390845 | default | sip      | 1           |
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
-            | 687799  | 333222  |
+            | 333222  | 390845  |
         Then I get a response with status "201"
-        Then I get a response with a link to the "lines" resource with id "333222"
-        Then I get a response with a link to the "users" resource with id "687799"
+        Then I get a response with a link to the "lines" resource with id "390845"
+        Then I get a response with a link to the "users" resource with id "333222"
         Then I get a header with a location matching "/1.1/users/\d+/lines"
 
     Scenario: Associate 3 users to the same line
@@ -76,15 +76,15 @@ Feature: REST API Link line with a user
             | 983473 | Roberto   | Da Silva  |
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
-            | 983471  | 238487  |
+            | 983471  | 239487  |
         Then I get a response with status "201"
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
-            | 983472  | 238487  |
+            | 983472  | 239487  |
         Then I get a response with status "201"
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
-            | 983473  | 238487  |
+            | 983473  | 239487  |
         Then I get a response with status "201"
 
         Then I see a user with infos:
