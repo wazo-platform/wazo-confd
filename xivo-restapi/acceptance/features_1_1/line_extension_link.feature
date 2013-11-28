@@ -36,11 +36,9 @@ Feature: Link a line and an extension
         Given line "980133" is linked with user "William" "Shatner"
         When I link extension "1503@default" with line id "980133"
         Then I get a response with status "201"
-        Then I get a response with a line id
-        Then I get a response with an extension id
         Then I get a header with a location matching "/1.1/lines/\d+/extension"
-        Then I get a response with a link to the "lines_sip" resource using the id "line_id"
-        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+        Then the response has a "lines" link using the id "line_id"
+        Then the response has a "extensions" link using the id "extension_id"
 
     Scenario: Link an extension to a line that already has one 
         Given I have the following user, line and extension linked together:
@@ -68,10 +66,8 @@ Feature: Link a line and an extension
             | Leonard   | McCoy    | 1507      | default | 507     | sip      |
         When I request the extension associated to line id "507"
         Then I get a response with status "200"
-        Then I get a response with a line id
-        Then I get a response with an extension id
-        Then I get a response with a link to the "lines_sip" resource using the id "line_id"
-        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+        Then the response has a "lines" link using the id "line_id"
+        Then the response has a "extensions" link using the id "extension_id"
 
     Scenario: Dissociate an extension from a line that doesn't exist
         Given I have no line with id "188404"
