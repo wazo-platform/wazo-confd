@@ -117,13 +117,13 @@ Feature: REST API Link line with a user
         Then I get a response with status "404"
         Then I get an error message "User with id=999999 does not exist"
 
-    Scenario: Get user_line when line doesn't exist
+    Scenario: Get user_line with no lines
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 594383 | Greg      | Sanderson |
-        When I request the lines associated to user id "999999" via RESTAPI
-        Then I get a response with status "404"
-        Then I get an error message "User with id=999999 does not have any lines"
+        When I request the lines associated to user id "594383" via RESTAPI
+        Then I get a response with status "200"
+        Then I get an empty list
 
     Scenario: Get user_line
         Given I only have the following users:
@@ -137,12 +137,10 @@ Feature: REST API Link line with a user
             | 293847  | 943875  |
         Then I get a response with status "201"
 
-        When I request the lines associated to user id "293847"
+        When I request the lines associated to user id "293847" via RESTAPI
         Then I get a response with status "200"
-        Then I get a response with a user id
-        Then I get a response with a line id
-        Then I get a response with a link to the "lines_sip" resource using the id "line_id"
-        Then I get a response with a link to the "users" resource using the id "user_id"
+        Then each item has a "users" link using the id "user_id"
+        Then each item has a "lines" link using the id "line_id"
 
     Scenario: Dissociate user_line with extension associated
         Given I only have the following users:
