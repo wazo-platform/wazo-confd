@@ -174,7 +174,7 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 888252  | 777252  |
         Then I get a response with status "404"
-        Then I get an error message "User with id=777252 does not have any line"
+        Then I get an error message "User with id=777252 is not associated with line id=888252"
 
     Scenario: Dissociate user_line with main user
         Given I only have the following users:

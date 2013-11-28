@@ -45,7 +45,7 @@ def dissociate_line(userid, lineid):
     try:
         user_line = user_line_services.get_by_user_id_and_line_id(userid, lineid)
     except UserLineNotExistsError:
-        raise AssociationNotExistsError("UserLine not exist")
+        raise AssociationNotExistsError("User with id=%s is not associated with line id=%s" % (userid, lineid))
     user_line_services.dissociate(user_line)
     return make_response('', 204)
 
