@@ -39,6 +39,7 @@ setup(
         'xivo_restapi.resources.devices',
         'xivo_restapi.resources.extensions',
         'xivo_restapi.resources.lines',
+        'xivo_restapi.resources.user_line',
         'xivo_restapi.resources.user_links',
         'xivo_restapi.resources.users',
         'xivo_restapi.resources.user_voicemail',
