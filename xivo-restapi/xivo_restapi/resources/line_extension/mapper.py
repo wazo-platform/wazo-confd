@@ -26,12 +26,12 @@ MAPPING = {
 
 
 def add_links_to_dict(result_dict, line_extension):
-    line_location = url_for('lines_sip.get', lineid=line_extension.line_id, _external=True)
+    line_location = url_for('lines.get', lineid=line_extension.line_id, _external=True)
     extension_location = url_for('extensions.get', extensionid=line_extension.extension_id, _external=True)
     result_dict.update({
         'links': [
             {
-                'rel': 'lines_sip',
+                'rel': 'lines',
                 'href': line_location
             },
             {
