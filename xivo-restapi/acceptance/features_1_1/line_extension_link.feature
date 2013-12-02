@@ -91,8 +91,8 @@ Feature: Link a line and an extension
         Then I get a response with status "201"
         When I send a request for the extension associated to line id "835437"
         Then I get a response with status "200"
-        Then the response has a "lines" link using the id "line_id"
-        Then the response has a "extensions" link using the id "extension_id"
+        Then I get a response with a link to the "lines" resource using the id "line_id"
+        Then I get a response with a link to the "extensions" resource using the id "extension_id"
 
     Scenario: Dissociate an extension from a line that doesn't exist
         Given I have no line with id "188404"
