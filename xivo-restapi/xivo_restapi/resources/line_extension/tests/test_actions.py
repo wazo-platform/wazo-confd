@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from hamcrest import assert_that, equal_to, has_entries, contains_inanyorder
+from hamcrest import assert_that, equal_to, has_entries
 
 from mock import patch
 from xivo_dao.data_handler.line_extension.model import LineExtension
@@ -92,8 +92,8 @@ class TestLineExtensionActions(TestResources):
             u'extension_id': 2,
             u'line_id': 1,
             u'links': [
-                {u'href': u'http://localhost/1.1/lines_sip/%d' % line_id,
-                 u'rel': u'lines_sip'},
+                {u'href': u'http://localhost/1.1/lines/%d' % line_id,
+                 u'rel': u'lines'},
                 {u'href': u'http://localhost/1.1/extensions/%d' % extension_id,
                  u'rel': u'extensions'},
             ]
@@ -132,7 +132,7 @@ class TestLineExtensionActions(TestResources):
         line_id = 1
 
         expected_status_code = 404
-        expected_result = ['Line with id=%s does not have a extension' % line_id]
+        expected_result = ['Line with id=%s does not have an extension' % line_id]
 
         get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
 
