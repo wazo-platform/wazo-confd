@@ -54,6 +54,6 @@ def dissociate_extension(lineid):
     try:
         line_extension = line_extension_services.get_by_line_id(lineid)
     except LineExtensionNotExistsError:
-        raise AssociationNotExistsError("Line with id=%d does not have a extension" % lineid)
+        raise AssociationNotExistsError("Line with id=%d does not have an extension" % lineid)
     line_extension_services.dissociate(line_extension)
     return make_response('', 204)
