@@ -69,16 +69,27 @@ Feature: Link a line and an extension
         Then I get an error message "Line with line_id=300596 does not exist"
 
     Scenario: Get the extension associated to a line with no extensions
-        Given I have a SIP line with id "211536"
+        Given I have the following lines:
+            | id     | context | protocol | device_slot |
+            | 211536 | default | sip      | 1           |
         When I send a request for the extension associated to line id "211536"
         Then I get a response with status "404"
         Then I get an error message "Line with id=211536 does not have an extension"
 
     Scenario: Get the extension associated to a line
-        Given I have the following user, line and extension linked together:
-            | firstname | lastname | extension | context | line id | protocol |
-            | Leonard   | McCoy    | 1507      | default | 507     | sip      |
-        When I request the extension associated to line id "507"
+        Given there are users with infos:
+            | firstname | lastname |
+            | Leonard   | McCoy    |
+        Given I have the following extensions:
+            | exten | context |
+            | 1507  | default |
+        Given I have the following lines:
+            | id     | context | protocol | device_slot |
+            | 835437 | default | sip      | 1           |
+        Given line "835437" is linked with user "Leonard" "McCoy"
+        When I link extension "1507@default" with line id "835437"
+        Then I get a response with status "201"
+        When I send a request for the extension associated to line id "835437"
         Then I get a response with status "200"
         Then the response has a "lines" link using the id "line_id"
         Then the response has a "extensions" link using the id "extension_id"
@@ -90,14 +101,25 @@ Feature: Link a line and an extension
         Then I get an error message "Line with line_id=188404 does not exist"
 
     Scenario: Dissociate an extension from a line that doesn't have one
-        Given I have a SIP line with id "116775"
+        Given I have the following lines:
+            | id     | context | protocol | device_slot |
+            | 116775 | default | sip      | 1           |
         When I dissociate the extension associated to line id "116775"
         Then I get a response with status "404"
         Then I get an error message "Line with id=116775 does not have an extension"
 
     Scenario: Dissociate an extension from the line
-        Given I have the following user, line and extension linked together:
-            | firstname  | lastname | extension | context | line id | protocol |
-            | Montgomery | Scotty   | 1509      | default | 509     | sip      |
-        When I dissociate the extension associated to line id "509"
+        Given there are users with infos:
+            | firstname  | lastname |
+            | Montgomery | Scott    |
+        Given I have the following extensions:
+            | exten | context |
+            | 1509  | default |
+        Given I have the following lines:
+            | id     | context | protocol | device_slot |
+            | 834043 | default | sip      | 1           |
+        Given line "834043" is linked with user "Montgomery" "Scott"
+        When I link extension "1509@default" with line id "834043"
+        Then I get a response with status "201"
+        When I dissociate the extension associated to line id "834043"
         Then I get a response with status "204"
