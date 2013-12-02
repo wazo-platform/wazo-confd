@@ -40,8 +40,8 @@ class TestLineExtensionActions(TestResources):
             'extension_id': extension_id,
             'links': [
                 {
-                    "rel": "lines_sip",
-                    "href": "http://localhost/1.1/lines_sip/%s" % line_id,
+                    "rel": "lines",
+                    "href": "http://localhost/1.1/lines/%s" % line_id,
                 },
                 {
                     "rel": "extension",
