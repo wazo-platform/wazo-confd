@@ -60,19 +60,19 @@ Feature: Link a line and an extension
         Then I get a response with status "201"
         When I link extension "1505@default" with line id "841902"
         Then I get a response with status "400"
-        Then I get an error message matching "Extension is already associated to a line"
+        Then I get an error message matching "Invalid parameters: line with id 841902 already has an extension"
 
     Scenario: Get the extension associated to a line that doesn't exist
         Given I have no line with id "300596"
         When I send a request for the extension associated to line id "300596"
         Then I get a response with status "404"
-        Then I get an error message "Line with id=300596 does not exist"
+        Then I get an error message "Line with line_id=300596 does not exist"
 
     Scenario: Get the extension associated to a line with no extensions
         Given I have a SIP line with id "211536"
         When I send a request for the extension associated to line id "211536"
         Then I get a response with status "404"
-        Then I get an error message "Line with id=211536 does not have any extension associated"
+        Then I get an error message "Line with id=211536 does not have an extension"
 
     Scenario: Get the extension associated to a line
         Given I have the following user, line and extension linked together:
@@ -87,7 +87,7 @@ Feature: Link a line and an extension
         Given I have no line with id "188404"
         When I dissociate the extension associated to line id "188404"
         Then I get a response with status "404"
-        Then I get an error message "Line with id=188404 does not exist"
+        Then I get an error message "Line with line_id=188404 does not exist"
 
     Scenario: Dissociate an extension from a line that doesn't have one
         Given I have a SIP line with id "116775"
