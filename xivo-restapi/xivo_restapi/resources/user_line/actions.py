@@ -29,7 +29,7 @@ from xivo_restapi.resources.user_line.formatter import UserLineFormatter
 formatter = UserLineFormatter()
 
 
-#@route('/<int:userid>/lines', methods=['POST'])
+@route('/<int:userid>/lines', methods=['POST'])
 def associate_line(userid):
     data = request.data.decode("utf-8")
     model = formatter.to_model(data, userid)
@@ -40,7 +40,7 @@ def associate_line(userid):
     return make_response(result, 201, {'Location': location})
 
 
-#@route('/<int:userid>/lines/<int:lineid>', methods=['DELETE'])
+@route('/<int:userid>/lines/<int:lineid>', methods=['DELETE'])
 def dissociate_line(userid, lineid):
     try:
         user_line = user_line_services.get_by_user_id_and_line_id(userid, lineid)
@@ -50,7 +50,7 @@ def dissociate_line(userid, lineid):
     return make_response('', 204)
 
 
-#@route('/<int:userid>/lines')
+@route('/<int:userid>/lines')
 def get_user_lines(userid):
     user = user_services.get(userid)
     user_lines = user_line_services.find_all_by_user_id(user.id)
