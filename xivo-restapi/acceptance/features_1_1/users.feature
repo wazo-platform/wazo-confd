@@ -343,7 +343,7 @@ Feature: REST API Users
         Given I only have the following lines:
             |     id | context | protocol | device_slot |
             | 546216 | default | sip      |           1 |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             |     id | context | exten |
             | 951654 | default |  1000 |
         When I create the following links:
@@ -370,7 +370,7 @@ Feature: REST API Users
             |     id | context | protocol | device_slot |
             | 135498 | default | sip      |           1 |
             | 133364 | default | sip      |           1 |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             |     id | context | exten |
             | 995135 | default |  1001 |
             | 132468 | default |  1002 |

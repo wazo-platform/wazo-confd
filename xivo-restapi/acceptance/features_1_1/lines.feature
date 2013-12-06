@@ -18,7 +18,7 @@ Feature: REST API Lines
         Given I only have the following lines:
             |     id | context | protocol | device_slot |
             | 332494 | default | sip      |           1 |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             |     id | context | exten |
             | 133549 | default |  1000 |
         Given the following users, lines, extensions are linked:
@@ -39,7 +39,7 @@ Feature: REST API Lines
             |     id | context | protocol | device_slot |
             | 621654 | default | sip      |           1 |
             | 132497 | default | sip      |           1 |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             |     id | context | exten |
             | 232321 | default |  1000 |
         Given the following users, lines, extensions are linked:
