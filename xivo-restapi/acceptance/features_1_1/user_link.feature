@@ -35,7 +35,7 @@ Feature: REST API Link user with a line and extension
 
     Scenario: Create link with an extension that doesn't exist
         Given I have no extension with id "534478"
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 452483 | Greg      | Sanderson |
         Given I have the following lines:
@@ -49,7 +49,7 @@ Feature: REST API Link user with a line and extension
 
     Scenario: Create link with a line that doesn't exist
         Given I have no line with id "534835"
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 553178 | Greg      | Sanderson |
         Given I have the following extensions:
@@ -62,7 +62,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Nonexistent parameters: line_id 534835 does not exist"
 
     Scenario: Create link with a user that doesn't exist
-        Given I have no users
+        Given there are no users with id "889643"
         Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 839943 | default | sip      |           1 |
@@ -76,7 +76,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Nonexistent parameters: user_id 889643 does not exist"
 
     Scenario: Create link with an extension outside of context user range
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 134684 | Greg      | Sanderson |
         Given I have the following lines:
@@ -92,7 +92,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Invalid parameters: Exten 3000 not inside user range of context default"
 
     Scenario: Create a link
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 542357 | Greg      | Sanderson |
         Given I have the following lines:
@@ -113,7 +113,7 @@ Feature: REST API Link user with a line and extension
         Then I get a header with a location for the "user_links" resource
 
     Scenario: Create a link in another context
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 134697 | Greg      | Sanderson |
         Given I have the following lines:
@@ -139,7 +139,7 @@ Feature: REST API Link user with a line and extension
         Given I have the following extensions:
             |     id | context | exten |
             | 136974 | default |  1000 |
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 659434 | Salle     | Doctorant |
             | 698431 | Greg      | Sanderson |
@@ -176,7 +176,7 @@ Feature: REST API Link user with a line and extension
             | Roberto Da Silva | sip      | default | 1000   |
 
     Scenario: Create a link with a provision device
-        Given I only have the following users:
+        Given I have the following users:
             | id | firstname | lastname  |
             | 995437 | Greg      | Sanderson |
         Given I have the following lines:
@@ -205,7 +205,7 @@ Feature: REST API Link user with a line and extension
             | Greg Sanderson | 1000   | toto     | toto          | tata     |
 
     Scenario: Link 2 users to a line
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 989432 | Greg      | Sanderson |
             | 136549 | Cédric    | Abunar    |
@@ -239,7 +239,7 @@ Feature: REST API Link user with a line and extension
             | extensions | 562168 |
 
     Scenario: Link a user already associated to a line
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 168874 | Greg      | Sanderson |
         Given I have the following lines:
@@ -260,7 +260,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
     Scenario: Link an extension already associated to another line
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 951324 | Greg      | Sanderson |
             | 969517 | Hello     | Dolly     |
@@ -281,7 +281,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Invalid parameters: Extension 1000@default already linked to a line"
 
     Scenario: Provision a device for 2 users
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 696547 | Greg      | Sanderson |
             | 195474 | Cédric    | Abunar    |
@@ -304,7 +304,7 @@ Feature: REST API Link user with a line and extension
             | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
 
     Scenario: Link a second user after provisioning a device
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 523215 | Greg      | Sanderson |
             | 135579 | Cédric    | Abunar    |
@@ -336,7 +336,7 @@ Feature: REST API Link user with a line and extension
             | Greg Sanderson | 1000   | abc123   | abc123        | def456   |
 
     Scenario: Create a link with a provision device and update user callerid
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 954986 | Greg      | Sanderson |
         Given I have the following lines:
@@ -380,7 +380,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "UserLineExtension with id=2 does not exist"
 
     Scenario: Delete secondary user
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 662149 | Greg      | Sanderson |
             | 136624 | Cédric    | Abunar    |
@@ -403,7 +403,7 @@ Feature: REST API Link user with a line and extension
         Then I get a response with status "204"
 
     Scenario: Delete a secondary user after provisioning a device
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 992435 | Greg      | Sanderson |
             | 332169 | Cédric    | Abunar    |
@@ -437,7 +437,7 @@ Feature: REST API Link user with a line and extension
             | Greg Sanderson | 1000   | toto     | toto          | tata     |
 
     Scenario: Delete main user
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 585866 | Greg      | Sanderson |
             | 158479 | Cédric    | Abunar    |
@@ -461,7 +461,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Invalid parameters: There are secondary users associated to this link"
 
     Scenario: Delete main user after provisioning a device still has a secondary user
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 895432 | Greg      | Sanderson |
             | 995462 | Cédric    | Abunar    |

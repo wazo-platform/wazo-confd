@@ -1,17 +1,11 @@
 Feature: REST API Link line with a user
 
     Scenario: Create an empty user_line
-        Given I only have the following users:
-            | id     | firstname | lastname  |
-            | 148384 | Greg      | Sanderson |
         When I create an empty user_line
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: line_id"
 
     Scenario: Create a user_line with invalid values
-        Given I only have the following users:
-            | id     | firstname | lastname  |
-            | 384939 | Greg      | Sanderson |
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
             | 384939  | toto    |
@@ -19,9 +13,6 @@ Feature: REST API Link line with a user
         Then I get an error message "Invalid parameters: line_id must be integer"
 
     Scenario: Create a user_line with invalid parameters
-        Given I only have the following users:
-            | id     | firstname | lastname  |
-            | 562668 | Greg      | Sanderson |
         When I create the following user_line via RESTAPI:
             | user_id | line_id | invalid |
             | 562668  | 999999  | invalid |
@@ -30,7 +21,7 @@ Feature: REST API Link line with a user
 
     Scenario: Create user_line with a line that doesn't exist
         Given I have no line with id "682433"
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 495858 | Greg      | Sanderson |
         When I create the following user_line via RESTAPI:
@@ -40,7 +31,7 @@ Feature: REST API Link line with a user
         Then I get an error message "Nonexistent parameters: line_id 682433 does not exist"
 
     Scenario: Create user_line with a user that doesn't exist
-        Given I have no users
+        Given there are no users with id "195322"
         Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 786225 | default | sip      | 1           |
@@ -51,7 +42,7 @@ Feature: REST API Link line with a user
         Then I get an error message "Nonexistent parameters: user_id 195322 does not exist"
 
     Scenario: Create a user_line
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 333222 | Greg      | Sanderson |
         Given I have the following lines:
@@ -66,7 +57,7 @@ Feature: REST API Link line with a user
         Then I get a header with a location matching "/1.1/users/\d+/lines"
 
     Scenario: Create a user_line with a line that has an extension
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 597172 | Greg      | Sanderson |
         Given I have the following lines:
@@ -88,7 +79,7 @@ Feature: REST API Link line with a user
         Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 239487 | default | sip      | 1           |
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 983471 | Salle     | Doctorant |
             | 983472 | Greg      | Sanderson |
@@ -113,7 +104,7 @@ Feature: REST API Link line with a user
             | Roberto Da Silva | sip      | default |
 
     Scenario: Link a user already associated to a line
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 980123 | Greg      | Sanderson |
         Given I have the following lines:
@@ -130,7 +121,7 @@ Feature: REST API Link line with a user
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
     Scenario: Link a user already associated to a different line
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 176775 | Greg      | Sanderson |
         Given I have the following lines:
@@ -154,7 +145,7 @@ Feature: REST API Link line with a user
         Then I get an error message "User with id=999999 does not exist"
 
     Scenario: Get user_line when line does not exist
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 594383 | Greg      | Sanderson |
         When I request the lines associated to user id "594383" via RESTAPI
@@ -162,7 +153,7 @@ Feature: REST API Link line with a user
         Then I get an empty list
 
     Scenario: Get user_line
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 293847 | Greg      | Sanderson |
         Given I have the following lines:
@@ -175,7 +166,7 @@ Feature: REST API Link line with a user
         Then each item has a "lines" link using the id "line_id"
 
     Scenario: Dissociate user_line with extension associated
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 594831 | Greg      | Sanderson |
         Given I only have the following extensions:
@@ -198,7 +189,7 @@ Feature: REST API Link line with a user
         Given I have no user_line with the following parameters:
             | line_id | user_id |
             | 888252  | 777252  |
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 777252 | Greg      | Sanderson |
         When I dissociate the following user_line via RESTAPI:
@@ -221,7 +212,7 @@ Feature: REST API Link line with a user
         Then I get an error message "User with id=895850 is not associated with line id=484463"
 
     Scenario: Dissociate user_line with extension associated
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 594831 | Greg      | Sanderson |
         Given I have the following lines:
@@ -238,7 +229,7 @@ Feature: REST API Link line with a user
         Then I get a response with status "204"
 
     Scenario: Dissociate user_line main user before secondary user
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 437501 | Greg      | Sanderson |
             | 304832 | Cédric    | Abunar    |
@@ -254,7 +245,7 @@ Feature: REST API Link line with a user
         Then I get an error message "Invalid parameters: There are secondary users associated to this line"
 
     Scenario: Dissociate user_line with secondary user
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname  |
             | 693755 | Greg      | Sanderson |
             | 593820 | Cédric    | Abunar    |
@@ -273,7 +264,7 @@ Feature: REST API Link line with a user
         Then I get a response with status "204"
 
     Scenario: Dissociate user_line when a device is associated
-        Given I only have the following users:
+        Given I have the following users:
             | id     | firstname | lastname    |
             | 477024 | Roger     | Brainsville |
         Given I have the following devices:

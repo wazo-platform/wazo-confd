@@ -198,8 +198,8 @@ Feature: REST API SIP Lines
         Then the line "198447" no longer exists
 
     Scenario: Delete an line still has a link
-        Given I only have the following users:
-            | id | firstname | lastname |
+        Given I have the following users:
+            | id     | firstname | lastname |
             | 544795 | Clémence  | Dupond   |
         Given I have the following lines:
             |     id | context | protocol | device_slot |

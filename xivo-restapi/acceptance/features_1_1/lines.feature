@@ -11,7 +11,7 @@ Feature: REST API Lines
         Then I get an empty list
 
     Scenario: User link list by line_id with 1 user
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 545325 | Greg      | Sanderson |
         Given I have the following lines:
@@ -30,7 +30,7 @@ Feature: REST API Lines
             |  545325 |  332494 |       133549 |
 
     Scenario: User link list by line_id with 2 users
-        Given I only have the following users:
+        Given I have the following users:
             |     id | firstname | lastname  |
             | 565413 | Greg      | Sanderson |
             | 132498 | Cedric    | Abunar    |
