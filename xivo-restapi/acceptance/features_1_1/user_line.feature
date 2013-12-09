@@ -29,7 +29,7 @@ Feature: REST API Link line with a user
         Then I get an error message "Invalid parameters: invalid"
 
     Scenario: Create user_line with a line that doesn't exist
-        Given I have no lines
+        Given I have no line with id "682433"
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 495858 | Greg      | Sanderson |
@@ -41,7 +41,7 @@ Feature: REST API Link line with a user
 
     Scenario: Create user_line with a user that doesn't exist
         Given I have no users
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 786225 | default | sip      | 1           |
         When I create the following user_line via RESTAPI:
@@ -54,7 +54,7 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 333222 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 390845 | default | sip      | 1           |
         When I create the following user_line via RESTAPI:
@@ -69,7 +69,7 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 597172 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 879216 | default | sip      | 1           |
         Given I only have the following extensions:
@@ -85,7 +85,7 @@ Feature: REST API Link line with a user
         Then I get a header with a location matching "/1.1/users/\d+/lines"
 
     Scenario: Associate 3 users to the same line
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 239487 | default | sip      | 1           |
         Given I only have the following users:
@@ -116,7 +116,7 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 980123 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 948671 | default | sip      | 1           |
         When I create the following user_line via RESTAPI:
@@ -133,7 +133,7 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 176775 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 171688 | default | sip      | 1           |
             | 639164 | default | sip      | 1           |
@@ -165,7 +165,7 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 293847 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 943875 | default | sip      | toto     | tata   | 1           |
         Given line "943875" is linked with user id "293847"
@@ -173,6 +173,26 @@ Feature: REST API Link line with a user
         Then I get a response with status "200"
         Then each item has a "users" link using the id "user_id"
         Then each item has a "lines" link using the id "line_id"
+
+    Scenario: Dissociate user_line with extension associated
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 594831 | Greg      | Sanderson |
+        Given I only have the following extensions:
+            | id     | context | exten |
+            | 493820 | default | 1435  |
+        Given I have the following lines:
+            | id     | context | protocol | username | secret | device_slot |
+            | 493837 | default | sip      | toto     | tata   | 1           |
+        When I create the following links:
+            | user_id | line_id | extension_id |
+            | 594831  | 493837  | 493820       |
+        Then I get a response with status "201"
+        When I dissociate the following user_line via RESTAPI:
+            | line_id | user_id |
+            | 493837  | 594831  |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: There is an extension associated to this line"
 
     Scenario: Dissociate user_line when line does not exist
         Given I have no user_line with the following parameters:
@@ -191,7 +211,7 @@ Feature: REST API Link line with a user
         Given I have no user_line with the following parameters:
             | line_id | user_id |
             | 484463  | 895850  |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 484463 | default | sip      | 1           |
         When I dissociate the following user_line via RESTAPI:
@@ -204,7 +224,7 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 594831 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 493837 | default | sip      | toto     | tata   | 1           |
         Given I only have the following extensions:
@@ -222,7 +242,7 @@ Feature: REST API Link line with a user
             | id     | firstname | lastname  |
             | 437501 | Greg      | Sanderson |
             | 304832 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 594399 | default | sip      | toto     | tata   | 1           |
         Given line "594399" is linked with user id "437501"
@@ -238,7 +258,7 @@ Feature: REST API Link line with a user
             | id     | firstname | lastname  |
             | 693755 | Greg      | Sanderson |
             | 593820 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 150349 | default | sip      | toto     | tata   | 1           |
         Given line "150349" is linked with user id "693755"
@@ -259,7 +279,7 @@ Feature: REST API Link line with a user
         Given I have the following devices:
           | id                               | ip             | mac               |
           | 778bb97fee77f390583c463655128033 | 192.168.168.55 | 03:3f:44:aa:4a:2b |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | username | secret   | device_slot | device                           |
             | 889863 | default | sip      | a8b7d45r | 8d8gjh53 | 1           | 778bb97fee77f390583c463655128033 |
         Given line "889863" is linked with user id "477024"

@@ -30,7 +30,7 @@ Feature: REST API Extensions
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 995476 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 124689 | default | sip      |           1 |
         Given I have the following extensions:
@@ -50,7 +50,7 @@ Feature: REST API Extensions
             | id     | firstname | lastname  |
             | 132449 | Greg      | Sanderson |
             | 995441 | Cedric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 446168 | default | sip      |           1 |
         Given I have the following extensions:
@@ -349,7 +349,7 @@ Feature: REST API Extensions
         Given I only have the following users:
             |     id | firstname | lastname |
             | 954471 | Clémence  | Dupond   |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 996547 | default | sip      |           1 |
         Given I have the following extensions:

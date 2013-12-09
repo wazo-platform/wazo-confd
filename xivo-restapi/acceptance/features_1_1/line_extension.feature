@@ -136,7 +136,7 @@ Feature: Link a line and an extension
         Given I have the following devices:
           | id                               | ip             | mac               |
           | 48ff0fbd3a53ad329ca4f248331b72ca | 192.168.167.31 | 04:7f:14:ba:9a:23 |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id     | context | protocol | username | secret   | device_slot | device                           |
             | 719454 | default | sip      | a84nfkj6 | 8vbk3e7w | 1           | 48ff0fbd3a53ad329ca4f248331b72ca |
         Given I have the following extensions:

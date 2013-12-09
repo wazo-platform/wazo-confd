@@ -340,7 +340,7 @@ Feature: REST API Users
         Given I only have the following users:
             |     id | firstname | lastname |
             | 956541 | Clémence  | Dupond   |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 546216 | default | sip      |           1 |
         Given I have the following extensions:
@@ -366,7 +366,7 @@ Feature: REST API Users
             |     id | firstname | lastname |
             | 994775 | Jacen     | Solo     |
             | 112348 | Anakin    | Solo     |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 135498 | default | sip      |           1 |
             | 133364 | default | sip      |           1 |

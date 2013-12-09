@@ -38,7 +38,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 452483 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 954318 | default | sip      |           1 |
         When I create the following links:
@@ -48,7 +48,7 @@ Feature: REST API Link user with a line and extension
         Then I get an error message "Nonexistent parameters: extension_id 534478 does not exist"
 
     Scenario: Create link with a line that doesn't exist
-        Given I have no lines
+        Given I have no line with id "534835"
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 553178 | Greg      | Sanderson |
@@ -63,7 +63,7 @@ Feature: REST API Link user with a line and extension
 
     Scenario: Create link with a user that doesn't exist
         Given I have no users
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 839943 | default | sip      |           1 |
         Given I have the following extensions:
@@ -79,7 +79,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 134684 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 963148 | default | sip      |           1 |
         Given I have the following extensions:
@@ -95,7 +95,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 542357 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 132494 | default | sip      |           1 |
         Given I have the following extensions:
@@ -116,7 +116,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 134697 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context     | protocol | device_slot |
             | 632147 | statscenter | sip      |           1 |
         Given I have the following extensions:
@@ -133,7 +133,7 @@ Feature: REST API Link user with a line and extension
         Then I get a header with a location for the "user_links" resource
 
     Scenario: Associate 3 users to the same line/extension
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 563479 | default | sip      |           1 |
         Given I have the following extensions:
@@ -179,7 +179,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             | id | firstname | lastname  |
             | 995437 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             | id | context | protocol | username | secret | device_slot |
             | 963249 | default | sip      | toto     | tata   | 1           |
         Given I have the following extensions:
@@ -209,7 +209,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 989432 | Greg      | Sanderson |
             | 136549 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 322416 | default | sip      |           1 |
         Given I have the following extensions:
@@ -242,7 +242,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 168874 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 168746 | default | sip      |           1 |
         Given I have the following extensions:
@@ -264,7 +264,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 951324 | Greg      | Sanderson |
             | 969517 | Hello     | Dolly     |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 654324 | default | sip      |           1 |
             | 216587 | default | sip      |           1 |
@@ -285,7 +285,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 696547 | Greg      | Sanderson |
             | 195474 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 443576 | default | sip      | abc123   | def456 |           1 |
         Given I have the following extensions:
@@ -308,7 +308,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 523215 | Greg      | Sanderson |
             | 135579 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 898479 | default | sip      | abc123   | def456 |           1 |
         Given I have the following extensions:
@@ -339,7 +339,7 @@ Feature: REST API Link user with a line and extension
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 954986 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 996247 | default | sip      | toto     | tata   |           1 |
         Given I have the following extensions:
@@ -384,7 +384,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 662149 | Greg      | Sanderson |
             | 136624 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 699734 | default | sip      | toto     | tata   |           1 |
         Given I have the following extensions:
@@ -407,7 +407,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 992435 | Greg      | Sanderson |
             | 332169 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 952416 | default | sip      | toto     | tata   |           1 |
         Given I have the following extensions:
@@ -441,7 +441,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 585866 | Greg      | Sanderson |
             | 158479 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 995434 | default | sip      | toto     | tata   |           1 |
         Given I have the following extensions:
@@ -465,7 +465,7 @@ Feature: REST API Link user with a line and extension
             |     id | firstname | lastname  |
             | 895432 | Greg      | Sanderson |
             | 995462 | Cédric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 995474 | default | sip      | toto     | tata   |           1 |
         Given I have the following extensions:

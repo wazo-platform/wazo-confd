@@ -1,13 +1,12 @@
 Feature: REST API Lines
 
     Scenario: Line list with no lines
-        Given I have no lines
         When I ask for the list of lines
         Then I get an empty list
 
     Scenario: User link list by line_id no line
-        Given I have no lines
-        When I ask for the list of user_links with line_id "10"
+        Given I have no line with id "964135"
+        When I ask for the list of user_links with line_id "964135"
         Then I get a response with status "200"
         Then I get an empty list
 
@@ -15,7 +14,7 @@ Feature: REST API Lines
         Given I only have the following users:
             |     id | firstname | lastname  |
             | 545325 | Greg      | Sanderson |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 332494 | default | sip      |           1 |
         Given I have the following extensions:
@@ -35,7 +34,7 @@ Feature: REST API Lines
             |     id | firstname | lastname  |
             | 565413 | Greg      | Sanderson |
             | 132498 | Cedric    | Abunar    |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 621654 | default | sip      |           1 |
             | 132497 | default | sip      |           1 |
