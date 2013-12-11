@@ -65,6 +65,25 @@ Feature: REST API Link line with a user
         Then I get a response with a link to the "users" resource with id "333222"
         Then I get a header with a location matching "/1.1/users/\d+/lines"
 
+    Scenario: Create a user_line with a line that has an extension
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 597172 | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id     | context | protocol | device_slot |
+            | 879216 | default | sip      | 1           |
+        Given I only have the following extensions:
+            | id     | exten | context |
+            | 146633 | 1983  | default |
+        Given line "879216" is linked with extension "1983@default"
+        When I create the following user_line via RESTAPI:
+            | user_id | line_id |
+            | 597172  | 879216  |
+        Then I get a response with status "201"
+        Then I get a response with a link to the "lines" resource with id "390845"
+        Then I get a response with a link to the "users" resource with id "333222"
+        Then I get a header with a location matching "/1.1/users/\d+/lines"
+
     Scenario: Associate 3 users to the same line
         Given I only have the following lines:
             | id     | context | protocol | device_slot |
@@ -107,6 +126,24 @@ Feature: REST API Link line with a user
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
             | 980123  | 948671  |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: user is already associated to this line"
+
+    Scenario: Link a user already associated to a different line
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 176775 | Greg      | Sanderson |
+        Given I only have the following lines:
+            | id     | context | protocol | device_slot |
+            | 171688 | default | sip      | 1           |
+            | 639164 | default | sip      | 1           |
+        When I create the following user_line via RESTAPI:
+            | user_id | line_id |
+            | 176775  | 171688  |
+        Then I get a response with status "201"
+        When I create the following user_line via RESTAPI:
+            | user_id | line_id |
+            | 176775  | 639164  |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
