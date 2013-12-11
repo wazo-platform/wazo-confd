@@ -174,6 +174,32 @@ Feature: REST API Link line with a user
         Then each item has a "users" link using the id "user_id"
         Then each item has a "lines" link using the id "line_id"
 
+    Scenario: Dissociate user_line when line does not exist
+        Given I have no user_line with the following parameters:
+            | line_id | user_id |
+            | 888252  | 777252  |
+        Given I only have the following users:
+            | id     | firstname | lastname  |
+            | 777252 | Greg      | Sanderson |
+        When I dissociate the following user_line via RESTAPI:
+            | line_id | user_id |
+            | 888252  | 777252  |
+        Then I get a response with status "404"
+        Then I get an error message "User with id=777252 is not associated with line id=888252"
+
+    Scenario: Dissociate user_line when user does not exist
+        Given I have no user_line with the following parameters:
+            | line_id | user_id |
+            | 484463  | 895850  |
+        Given I only have the following lines:
+            | id     | context | protocol | device_slot |
+            | 484463 | default | sip      | 1           |
+        When I dissociate the following user_line via RESTAPI:
+            | line_id | user_id |
+            | 484463  | 895850  |
+        Then I get a response with status "404"
+        Then I get an error message "User with id=895850 is not associated with line id=484463"
+
     Scenario: Dissociate user_line with extension associated
         Given I only have the following users:
             | id     | firstname | lastname  |
@@ -189,21 +215,7 @@ Feature: REST API Link line with a user
         When I dissociate the following user_line via RESTAPI:
             | line_id | user_id |
             | 493837  | 594831  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: There is an extension associated to this line"
-
-    Scenario: Dissociate user_line that doesn't exist
-        Given I have no user_line with the following parameters:
-            | line_id | user_id |
-            | 888252  | 777252  |
-        Given I only have the following users:
-            | id     | firstname | lastname  |
-            | 777252 | Greg      | Sanderson |
-        When I dissociate the following user_line via RESTAPI:
-            | line_id | user_id |
-            | 888252  | 777252  |
-        Then I get a response with status "404"
-        Then I get an error message "User with id=777252 is not associated with line id=888252"
+        Then I get a response with status "204"
 
     Scenario: Dissociate user_line main user before secondary user
         Given I only have the following users:
