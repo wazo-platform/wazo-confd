@@ -100,7 +100,6 @@ Feature: REST API Link line with a user
         Given I only have the following lines:
             | id     | context | protocol | device_slot |
             | 948671 | default | sip      | 1           |
-
         When I create the following user_line via RESTAPI:
             | user_id | line_id |
             | 980123  | 948671  |
@@ -117,7 +116,7 @@ Feature: REST API Link line with a user
         Then I get a response with status "404"
         Then I get an error message "User with id=999999 does not exist"
 
-    Scenario: Get user_line with no lines
+    Scenario: Get user_line when line does not exist
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 594383 | Greg      | Sanderson |
@@ -132,11 +131,7 @@ Feature: REST API Link line with a user
         Given I only have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 943875 | default | sip      | toto     | tata   | 1           |
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 293847  | 943875  |
-        Then I get a response with status "201"
-
+        Given line "943875" is linked with user id "293847"
         When I request the lines associated to user id "293847" via RESTAPI
         Then I get a response with status "200"
         Then each item has a "users" link using the id "user_id"
@@ -152,11 +147,8 @@ Feature: REST API Link line with a user
         Given I only have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 493837 | default | sip      | toto     | tata   | 1           |
-
-        When I create the following links:
-            | user_id | line_id | extension_id |
-            | 594831  | 493837  | 493820       |
-        Then I get a response with status "201"
+        Given line "493820" is linked with user id "594831"
+        Given line "493820" is linked with extension "1435@default"
         When I dissociate the following user_line via RESTAPI:
             | line_id | user_id |
             | 493837  | 594831  |
@@ -176,7 +168,7 @@ Feature: REST API Link line with a user
         Then I get a response with status "404"
         Then I get an error message "User with id=777252 is not associated with line id=888252"
 
-    Scenario: Dissociate user_line with main user
+    Scenario: Dissociate user_line main user before secondary user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 437501 | Greg      | Sanderson |
@@ -184,13 +176,8 @@ Feature: REST API Link line with a user
         Given I only have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 594399 | default | sip      | toto     | tata   | 1           |
-
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 437501  | 594399  |
-            | 304832  | 594399  |
-        Then I get a response with status "201"
-
+        Given line "594399" is linked with user id "437501"
+        Given line "594399" is linked with user id "304832"
         When I dissociate the following user_line via RESTAPI:
             | line_id | user_id |
             | 594399  | 437501  |
@@ -205,14 +192,13 @@ Feature: REST API Link line with a user
         Given I only have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 150349 | default | sip      | toto     | tata   | 1           |
-
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 693755  | 150349  |
-            | 593820  | 150349  |
-        Then I get a response with status "201"
-
+        Given line "150349" is linked with user id "693755"
+        Given line "150349" is linked with user id "593820"
         When I dissociate the following user_line via RESTAPI:
             | user_id | line_id |
             | 593820  | 150349  |
+        Then I get a response with status "204"
+        When I dissociate the following user_line via RESTAPI:
+            | user_id | line_id |
+            | 693755  | 150349  |
         Then I get a response with status "204"
