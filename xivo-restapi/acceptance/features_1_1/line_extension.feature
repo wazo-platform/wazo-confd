@@ -106,7 +106,7 @@ Feature: Link a line and an extension
         Then I get a response with status "404"
         Then I get an error message "Line with id=116775 does not have an extension"
 
-    Scenario: Dissociate an extension from the line
+    Scenario: Dissociate an extension from a line with a user
         Given there are users with infos:
             | firstname  | lastname |
             | Montgomery | Scott    |
@@ -119,4 +119,15 @@ Feature: Link a line and an extension
         Given line "834043" is linked with user "Montgomery" "Scott"
         Given line "834043" is linked with extension "1509@default"
         When I dissociate the extension associated to line id "834043"
+        Then I get a response with status "204"
+
+    Scenario: Dissociate an extension from a line
+        Given I have the following extensions:
+            | exten | context |
+            | 1510  | default |
+        Given I have the following lines:
+            | id     | context | protocol | device_slot |
+            | 832642 | default | sip      | 1           |
+        Given line "832642" is linked with extension "1510@default"
+        When I dissociate the extension associated to line id "832642"
         Then I get a response with status "204"
