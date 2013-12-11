@@ -80,8 +80,8 @@ Feature: REST API Link line with a user
             | user_id | line_id |
             | 597172  | 879216  |
         Then I get a response with status "201"
-        Then I get a response with a link to the "lines" resource with id "390845"
-        Then I get a response with a link to the "users" resource with id "333222"
+        Then I get a response with a link to the "lines" resource with id "879216"
+        Then I get a response with a link to the "users" resource with id "597172"
         Then I get a header with a location matching "/1.1/users/\d+/lines"
 
     Scenario: Associate 3 users to the same line
@@ -204,14 +204,14 @@ Feature: REST API Link line with a user
         Given I only have the following users:
             | id     | firstname | lastname  |
             | 594831 | Greg      | Sanderson |
-        Given I only have the following extensions:
-            | id     | context | exten |
-            | 493820 | default | 1435  |
         Given I only have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 493837 | default | sip      | toto     | tata   | 1           |
-        Given line "493820" is linked with user id "594831"
-        Given line "493820" is linked with extension "1435@default"
+        Given I only have the following extensions:
+            | id     | context | exten |
+            | 493820 | default | 1435  |
+        Given line "493837" is linked with user id "594831"
+        Given line "493837" is linked with extension "1435@default"
         When I dissociate the following user_line via RESTAPI:
             | line_id | user_id |
             | 493837  | 594831  |
