@@ -131,3 +131,18 @@ Feature: Link a line and an extension
         Given line "832642" is linked with extension "1510@default"
         When I dissociate the extension associated to line id "832642"
         Then I get a response with status "204"
+
+    Scenario: Dissociate an extension when a device is associated
+        Given I have the following devices:
+          | id                               | ip             | mac               |
+          | 48ff0fbd3a53ad329ca4f248331b72ca | 192.168.167.31 | 04:7f:14:ba:9a:23 |
+        Given I only have the following lines:
+            | id     | context | protocol | username | secret   | device_slot | device                           |
+            | 719454 | default | sip      | a84nfkj6 | 8vbk3e7w | 1           | 48ff0fbd3a53ad329ca4f248331b72ca |
+        Given I have the following extensions:
+            | exten | context |
+            | 1511  | default |
+        Given line "719454" is linked with extension "1511@default"
+        When I dissociate the extension associated to line id "719454"
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: A device is still associated to the line"

@@ -251,3 +251,20 @@ Feature: REST API Link line with a user
             | user_id | line_id |
             | 693755  | 150349  |
         Then I get a response with status "204"
+
+    Scenario: Dissociate user_line when a device is associated
+        Given I only have the following users:
+            | id     | firstname | lastname    |
+            | 477024 | Roger     | Brainsville |
+        Given I have the following devices:
+          | id                               | ip             | mac               |
+          | 778bb97fee77f390583c463655128033 | 192.168.168.55 | 03:3f:44:aa:4a:2b |
+        Given I only have the following lines:
+            | id     | context | protocol | username | secret   | device_slot | device                           |
+            | 889863 | default | sip      | a8b7d45r | 8d8gjh53 | 1           | 778bb97fee77f390583c463655128033 |
+        Given line "889863" is linked with user id "477024"
+        When I dissociate the following user_line via RESTAPI:
+            | line_id | user_id |
+            | 889863  | 477024  |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: A device is still associated to the line"
