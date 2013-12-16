@@ -566,6 +566,7 @@ Feature: REST API Voicemails
         Then I get an error message "Error while editing voicemail: Cannot edit a voicemail associated to a user"
 
     Scenario: Edit a voicemail associated to a user with a SCCP line
+        Given there is no voicemail with number "1052" and context "default"
         Given there is no voicemail with number "1053" and context "default"
         Given there are users with infos:
             | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
