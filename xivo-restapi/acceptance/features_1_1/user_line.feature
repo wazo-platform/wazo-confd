@@ -165,26 +165,6 @@ Feature: REST API Link line with a user
         Then each item has a "users" link using the id "user_id"
         Then each item has a "lines" link using the id "line_id"
 
-    Scenario: Dissociate user_line with extension associated
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 594831 | Greg      | Sanderson |
-        Given I only have the following extensions:
-            | id     | context | exten |
-            | 493820 | default | 1435  |
-        Given I have the following lines:
-            | id     | context | protocol | username | secret | device_slot |
-            | 493837 | default | sip      | toto     | tata   | 1           |
-        When I create the following links:
-            | user_id | line_id | extension_id |
-            | 594831  | 493837  | 493820       |
-        Then I get a response with status "201"
-        When I dissociate the following user_line via RESTAPI:
-            | line_id | user_id |
-            | 493837  | 594831  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: There is an extension associated to this line"
-
     Scenario: Dissociate user_line when line does not exist
         Given I have no user_line with the following parameters:
             | line_id | user_id |
