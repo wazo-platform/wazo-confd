@@ -16,18 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
-
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
-from xivo_restapi.resources.lines.actions_sip import blueprint as line_sip_blueprint
-
-line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
-line_route = RouteGenerator(line_blueprint)
-
-from xivo_restapi.resources.lines import actions
+from . import actions
+from xivo_restapi.resources.lines.routes import line_blueprint
 
 
 def register_blueprints(app):
     app.register_blueprint(line_blueprint)
-    app.register_blueprint(line_sip_blueprint)

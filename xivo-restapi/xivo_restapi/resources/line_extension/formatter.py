@@ -16,18 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
+from xivo_restapi.resources.line_extension import mapper
+from xivo_dao.data_handler.line_extension.model import LineExtension
+from xivo_restapi.helpers import serializer
 
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
-from xivo_restapi.resources.lines.actions_sip import blueprint as line_sip_blueprint
-
-line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
-line_route = RouteGenerator(line_blueprint)
-
-from xivo_restapi.resources.lines import actions
+from xivo_restapi.helpers.formatter import Formatter
 
 
-def register_blueprints(app):
-    app.register_blueprint(line_blueprint)
-    app.register_blueprint(line_sip_blueprint)
+class LineExtensionFormatter(Formatter):
+
+    def __init__(self):
+        Formatter.__init__(self, mapper, serializer, LineExtension)
+
+    def to_model(self, api_data, line_id):
+        model = Formatter.to_model(self, api_data)
+        model.line_id = line_id
+        return model
