@@ -63,7 +63,7 @@ Feature: REST API Link line with a user
         Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 879216 | default | sip      | 1           |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             | id     | exten | context |
             | 146633 | 1983  | default |
         Given line "879216" is linked with extension "1983@default"
