@@ -380,7 +380,7 @@ Feature: REST API Voicemails
     Scenario: Delete a voicemail associated to a user with a SCCP line
         Given there are users with infos:
             | firstname | lastname | language | number | context | protocol | voicemail_name | voicemail_number |
-            | Worf      | Klingon  | en_US    | 1033   | default | sccp     | Worf Klingon   | 1033             |
+            | Kurn      | Klingon  | en_US    | 1033   | default | sccp     | Kurn Klingon   | 1033             |
         When I delete voicemail "1033@default" via RESTAPI
         Then I get a response with status "400"
         Then I get an error message "Error while deleting voicemail: Cannot delete a voicemail associated to a user"
