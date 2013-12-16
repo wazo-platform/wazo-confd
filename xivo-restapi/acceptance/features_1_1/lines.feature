@@ -1,9 +1,5 @@
 Feature: REST API Lines
 
-    Scenario: Line list with no lines
-        When I ask for the list of lines
-        Then I get an empty list
-
     Scenario: User link list by line_id no line
         Given I have no line with id "964135"
         When I ask for the list of user_links with line_id "964135"
