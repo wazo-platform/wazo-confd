@@ -34,7 +34,7 @@ class RestAPIConfig(object):
     CTI_REST_DEFAULT_CONTENT_TYPE = {"Content-Type": "application/json",
                                      "Accept": "application/json"}
 
-    RECORDING_FILE_ROOT_PATH = "/var/lib/pf-xivo/sounds/campagnes"
+    RECORDING_FILE_ROOT_PATH = "/var/lib/xivo/sounds/campagnes"
     RECORDING_FILENAME_WHEN_NO_AGENTNAME = 'NoNameForAgentWithNumber'
 
     PROVD_URL = "http://localhost:8666/provd"
