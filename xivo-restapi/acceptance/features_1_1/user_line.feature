@@ -198,7 +198,7 @@ Feature: REST API Link line with a user
         Given I have the following lines:
             | id     | context | protocol | username | secret | device_slot |
             | 493837 | default | sip      | toto     | tata   | 1           |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             | id     | context | exten |
             | 493820 | default | 1435  |
         Given line "493837" is linked with user id "594831"
