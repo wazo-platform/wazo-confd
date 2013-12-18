@@ -19,13 +19,11 @@ import logging
 
 from . import mapper
 from .routes import line_route as route
-from ..user_links.actions import formatter as user_link_formatter
 
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.line.model import Line
 from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.user_line_extension import services as ule_services
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.formatter import Formatter
 
@@ -49,11 +47,4 @@ def list():
 def get(lineid):
     line = line_services.get(lineid)
     result = formatter.to_api(line)
-    return make_response(result, 200)
-
-
-@route('/<int:lineid>/user_links')
-def list_user_links(lineid):
-    line = ule_services.find_all_by_line_id(lineid)
-    result = user_link_formatter.list_to_api(line)
     return make_response(result, 200)

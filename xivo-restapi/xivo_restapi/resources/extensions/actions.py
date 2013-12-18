@@ -18,12 +18,10 @@
 import logging
 
 from . import mapper
-from ..user_links.actions import formatter as user_link_formatter
 
 from flask import Blueprint, url_for, request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
-from xivo_dao.data_handler.user_line_extension import services as ule_services
 from xivo_dao.data_handler.extension.model import Extension
 from xivo_restapi import config
 from xivo_restapi.helpers.route_generator import RouteGenerator
@@ -52,13 +50,6 @@ def list():
 def get(extensionid):
     extension = extension_services.get(extensionid)
     result = formatter.to_api(extension)
-    return make_response(result, 200)
-
-
-@route('/<int:extensionid>/user_links')
-def get_user_links(extensionid):
-    user_links = ule_services.find_all_by_extension_id(extensionid)
-    result = user_link_formatter.list_to_api(user_links)
     return make_response(result, 200)
 
 
