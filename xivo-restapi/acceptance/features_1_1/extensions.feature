@@ -262,7 +262,7 @@ Feature: REST API Extensions
           | exten |
           | 1145  |
         Then I get a response with status "204"
-        When I ask for the extension with id "113444"
+        When I access the extension with id "113444"
         Then I have an extension with the following parameters:
           | id     | exten | context |
           | 113444 | 1145  | default |
@@ -288,7 +288,7 @@ Feature: REST API Extensions
           | context |
           | toto    |
         Then I get a response with status "204"
-        When I ask for the extension with id "214489"
+        When I access the extension with id "214489"
         Then I have an extension with the following parameters:
           | id     | exten | context |
           | 214489 | 1833  | toto    |
@@ -314,7 +314,7 @@ Feature: REST API Extensions
           | exten | context |
           | 1996  | patate  |
         Then I get a response with status "204"
-        When I ask for the extension with id "113469"
+        When I access the extension with id "113469"
         Then I have an extension with the following parameters:
           | id     | exten | context |
           | 113469 | 1996  | patate  |
@@ -327,7 +327,7 @@ Feature: REST API Extensions
           | commented |
           | false     |
         Then I get a response with status "204"
-        When I ask for the extension with id "962441"
+        When I access the extension with id "962441"
         Then I have an extension with the following parameters:
           | id     | exten | context | commented |
           | 962441 | 1107  | default | false     |
