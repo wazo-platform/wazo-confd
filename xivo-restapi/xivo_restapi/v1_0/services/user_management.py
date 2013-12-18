@@ -22,8 +22,8 @@ from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, voicemail_dao
 from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.user_line_extension import dao as user_line_extension_dao
-from xivo_dao.data_handler.user_line_extension import services as user_line_extension_services
+from xivo_dao.data_handler.user_line import dao as user_line_dao
+from xivo_dao.data_handler.user_line import services as user_line_services
 from xivo_dao.data_handler.device import services as device_services
 from xivo_restapi import config
 from xivo_restapi.v1_0.restapi_config import RestAPIConfig
@@ -104,12 +104,12 @@ class UserManagement(object):
         user_services.delete(user)
 
     def _remove_lines(self, user):
-        associations = user_line_extension_services.find_all_by_user_id(user.id)
+        associations = user_line_services.find_all_by_user_id(user.id)
         for association in associations:
             self._remove_association(association)
 
     def _remove_association(self, association):
-        user_line_extension_dao.delete(association)
+        user_line_dao.dissociate(association)
         line = line_dao.get(association.line_id)
         self._remove_line(line)
 

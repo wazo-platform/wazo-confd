@@ -327,7 +327,7 @@ class TestUserManagement(unittest.TestCase):
         self._userManager._remove_lines.assert_called_with(user)
         self._userManager._remove_voicemail.assert_called_with(user, True)
 
-    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id', Mock(return_value=[]))
+    @patch('xivo_dao.data_handler.user_line.services.find_all_by_user_id', Mock(return_value=[]))
     def test_remove_lines_no_lines(self):
         user = Mock()
         self._userManager._remove_association = Mock()
@@ -336,7 +336,7 @@ class TestUserManagement(unittest.TestCase):
 
         assert_that(self._userManager._remove_association.call_count, equal_to(0))
 
-    @patch('xivo_dao.data_handler.user_line_extension.services.find_all_by_user_id')
+    @patch('xivo_dao.data_handler.user_line.services.find_all_by_user_id')
     def test_remove_lines_one_lines(self, mock_find_associations):
         user_id = 34
         user = Mock(id=user_id)
@@ -349,15 +349,14 @@ class TestUserManagement(unittest.TestCase):
         mock_find_associations.assert_called_once_with(user_id)
         self._userManager._remove_association.assert_called_once_with(ule)
 
-    @patch('xivo_dao.data_handler.user_line_extension.dao.delete')
+    @patch('xivo_dao.data_handler.user_line.dao.dissociate')
     @patch('xivo_dao.line_dao.get')
     def test_remove_association(self,
                                 mock_line_dao,
                                 mock_ule_delete):
         user_id = 12
         line_id = 23
-        extension_id = 43
-        ule = Mock(user_id=user_id, line_id=line_id, extension_id=extension_id)
+        ule = Mock(user_id=user_id, line_id=line_id)
         line = Mock()
         mock_line_dao.return_value = line
         self._userManager._remove_line = Mock()
