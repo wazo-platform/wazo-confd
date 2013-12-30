@@ -21,11 +21,6 @@ def to_api(call_log):
     result['Call Date'] = call_log.date.isoformat()
     result['Caller'] = '%s (%s)' % (call_log.source_name, call_log.source_exten)
     result['Called'] = call_log.destination_exten
-    result['Period'] = str(total_seconds(call_log.duration))
+    result['Period'] = str(int(call_log.duration.total_seconds()))
     result['user Field'] = call_log.user_field or ''
     return result
-
-
-def total_seconds(interval):
-    # timedelta.total_seconds() only exists from 2.7
-    return interval.seconds + interval.days * 24 * 3600
