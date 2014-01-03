@@ -17,8 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import fnmatch
+import os
 
 from distutils.core import setup
+
+packages = [
+    package for package, _, _ in os.walk('xivo_restapi')
+    if not fnmatch.fnmatch(package, '*tests')
+]
 
 setup(
     name='xivo-restapid',
@@ -28,30 +35,7 @@ setup(
     author_email='xivo-dev@lists.proformatique.com',
     url='http://git.xivo.fr/',
     license='GPLv3',
-    packages=[
-        'xivo_restapi',
-        'xivo_restapi.authentication',
-        'xivo_restapi.authentication.werkzeug',
-        'xivo_restapi.helpers',
-        'xivo_restapi.negotiate',
-        'xivo_restapi.resources',
-        'xivo_restapi.resources.call_logs',
-        'xivo_restapi.resources.devices',
-        'xivo_restapi.resources.extensions',
-        'xivo_restapi.resources.lines',
-        'xivo_restapi.resources.user_line',
-        'xivo_restapi.resources.user_links',
-        'xivo_restapi.resources.users',
-        'xivo_restapi.resources.user_voicemail',
-        'xivo_restapi.resources.voicemails',
-        'xivo_restapi.v1_0',
-        'xivo_restapi.v1_0.mapping_alchemy_sdm',
-        'xivo_restapi.v1_0.rest',
-        'xivo_restapi.v1_0.rest.helpers',
-        'xivo_restapi.v1_0.service_data_model',
-        'xivo_restapi.v1_0.services',
-        'xivo_restapi.v1_0.services.utils',
-    ],
+    packages=packages,
     scripts=[
         'bin/xivo-restapid'
     ],
