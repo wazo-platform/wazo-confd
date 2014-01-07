@@ -51,7 +51,7 @@ class TestCallLogsMapper(TestCase):
         }))
 
     def test_to_api_user_field_none(self):
-        call_log = Mock(duration=Mock(seconds=0, days=0), user_field=None)
+        call_log = Mock(duration=timedelta(seconds=0), user_field=None)
 
         result = mapper.to_api(call_log)
 
