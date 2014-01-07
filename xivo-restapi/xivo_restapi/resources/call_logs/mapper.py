@@ -21,6 +21,10 @@ def to_api(call_log):
     result['Call Date'] = call_log.date.isoformat()
     result['Caller'] = '%s (%s)' % (call_log.source_name, call_log.source_exten)
     result['Called'] = call_log.destination_exten
-    result['Period'] = str(int(call_log.duration.total_seconds()))
+    result['Period'] = _format_duration(call_log.duration)
     result['user Field'] = call_log.user_field or ''
     return result
+
+
+def _format_duration(duration):
+    return str(int(duration.total_seconds()))
