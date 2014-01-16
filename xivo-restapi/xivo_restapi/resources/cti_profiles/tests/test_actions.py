@@ -59,3 +59,23 @@ class TestDeviceActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.cti_profile.services.get')
+    def test_get(self, profile_service_get):
+        expected_status_code = 200
+        expected_result = {
+                    'id': 1,
+                    'name': 'Agent',
+                    'links': [{
+                                    'href': 'http://localhost/1.1/cti_profiles/1',
+                                    'rel': 'cti_profiles'
+                                }]
+                    }
+        profile = CtiProfile(id=1, name="Agent")
+        profile_service_get.return_value = profile
+
+        result = self.app.get('%s/%s' % (BASE_URL, 1))
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        profile_service_get.assert_called_with(1)

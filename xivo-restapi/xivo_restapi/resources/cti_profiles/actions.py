@@ -36,6 +36,8 @@ def find_all():
     result = formatter.list_to_api(profiles)
     return make_response(result, 200)
 
-@route('/<cti_profile_id>', methods=['GET'])
+@route('/<int:cti_profile_id>', methods=['GET'])
 def get(cti_profile_id):
-    pass
+    profile = services.get(cti_profile_id)
+    result = formatter.to_api(profile)
+    return make_response(result, 200)
