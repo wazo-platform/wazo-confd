@@ -21,6 +21,8 @@ from xivo_restapi.resources.user_cti_profile.formatter import UserCtiProfileForm
 from flask.globals import request
 from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
 from flask.helpers import url_for, make_response
+from xivo_dao.data_handler.exception import AssociationNotExistsError
+from xivo_dao.data_handler.user_cti_profile.exceptions import UserCtiProfileNotExistsError
 
 formatter = UserCtiProfileFormatter()
 
@@ -34,3 +36,21 @@ def associate_cti_profile(userid):
     result = formatter.to_api(created_model)
     location = url_for('.associate_cti_profile', userid=userid)
     return make_response(result, 201, {'Location': location})
+
+@route('/<int:userid>/cti_profile', methods=['GET'])
+def get_cti_profile(userid):
+    try:
+        model = user_cti_profile_services.get(userid)
+    except UserCtiProfileNotExistsError:
+        raise AssociationNotExistsError('User with id=%d does not have a CTI profile' % userid)
+    result = formatter.to_api(model)
+    return make_response(result, 200)
+
+@route('/<int:userid>/cti_profile', methods=['DELETE'])
+def dissociate_cti_profile(userid):
+    try:
+        model = user_cti_profile_services.get(userid)
+    except UserCtiProfileNotExistsError:
+        raise AssociationNotExistsError('User with id=%d does not have a CTI profile' % userid)
+    user_cti_profile_services.dissociate(model)
+    return make_response('', 204)
