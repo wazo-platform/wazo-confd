@@ -21,6 +21,7 @@ from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.cti_profile.model import CtiProfile
 from xivo_restapi.helpers.tests.test_resources import TestResources
+from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "1.1/cti_profiles"
 
@@ -79,3 +80,12 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
         profile_service_get.assert_called_with(1)
+
+    @patch('xivo_dao.data_handler.cti_profile.services.get')
+    def test_get_not_found(self, profile_service_get):
+        expected_status_code = 404
+        profile_service_get.side_effect = ElementNotExistsError('cti_profile')
+
+        result = self.app.get('%s/%s' % (BASE_URL, 1))
+
+        assert_that(result.status_code, equal_to(expected_status_code))
