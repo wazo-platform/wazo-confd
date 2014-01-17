@@ -21,6 +21,7 @@ from mock import patch, Mock
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
 from xivo_dao.data_handler.user_cti_profile.exceptions import UserCtiProfileNotExistsError
+from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "/1.1/users/%s/cti_profile"
 
@@ -98,6 +99,20 @@ class TestUserVoicemailActions(TestResources):
         expected_result = ['User with id=%d does not have a CTI profile' % user_id]
 
         user_cti_profile_get.side_effect = UserCtiProfileNotExistsError('user_cti_profile')
+
+        result = self.app.get(BASE_URL % user_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
+    def test_get_cti_profile_association_unexisting_user(self, user_cti_profile_get):
+        user_id = 1
+
+        expected_status_code = 404
+        expected_result = ['user with id=%d does not exist' % user_id]
+
+        user_cti_profile_get.side_effect = ElementNotExistsError('user', id=user_id)
 
         result = self.app.get(BASE_URL % user_id)
 
