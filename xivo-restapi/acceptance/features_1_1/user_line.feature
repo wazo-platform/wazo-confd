@@ -138,13 +138,13 @@ Feature: REST API Link line with a user
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
-    Scenario: Get user_line when user does not exist
+    Scenario: Get user_line associations when user does not exist
         Given there are no users with id "999999"
         When I request the lines associated to user id "999999" via RESTAPI
         Then I get a response with status "404"
         Then I get an error message "User with id=999999 does not exist"
 
-    Scenario: Get user_line when line does not exist
+    Scenario: Get user_line associations when there are no lines associated to a user
         Given I have the following users:
             | id     | firstname | lastname  |
             | 594383 | Greg      | Sanderson |
