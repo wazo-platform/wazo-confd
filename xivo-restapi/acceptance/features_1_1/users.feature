@@ -318,7 +318,7 @@ Feature: REST API Users
         Then I get a response with status "204"
         Then the user with id "955135" no longer exists
 
-    Scenario: Deleting a user still has a link
+    Scenario: Deleting a user when still associated to a line and extension
         Given I have the following users:
             | id     | firstname | lastname |
             | 956541 | Roberto   | Stanzini |
@@ -328,11 +328,8 @@ Feature: REST API Users
         Given I have the following extensions:
             | id     | context | exten |
             | 951654 | default | 1339  |
-
-        When I create the following links:
-            | user_id | line_id | extension_id | main_line |
-            |  956541 |  546216 |       951654 | True      |
-
+        Given line "546216" is linked with user id "956541"
+        Given line "546216" is linked with extension "1339@default"
         When I delete the user with id "956541"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting User: user still has a link"

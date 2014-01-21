@@ -197,7 +197,7 @@ Feature: REST API SIP Lines
         Then the line sip "198447" no longer exists
         Then the line "198447" no longer exists
 
-    Scenario: Delete an line still has a link
+    Scenario: Delete an line when still associated to a user and extension
         Given I have the following users:
             | id     | firstname | lastname |
             | 544795 | Clémence  | Dupond   |
@@ -207,10 +207,8 @@ Feature: REST API SIP Lines
         Given I have the following extensions:
             |     id | context | exten |
             | 995114 | default |  1000 |
-        When I create the following links:
-            | user_id | line_id | extension_id | main_line |
-            |  544795 |  999514 |       995114 | True      |
-
+        Given line "999514" is linked with user id "544795"
+        Given line "999514" is linked with extension "1000@default"
         When I delete line sip "999514"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting Line: line still has a link"
