@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2012  Avencall
+# Copyright (C) 2012-2014  Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,10 +22,13 @@ import os
 
 from distutils.core import setup
 
-packages = [
-    package for package, _, _ in os.walk('xivo_restapi')
-    if not fnmatch.fnmatch(package, '*tests')
-]
+
+def is_package(path):
+    is_svn_dir = fnmatch.fnmatch(path, '*/.svn/*')
+    is_test_module = fnmatch.fnmatch(path, '*tests')
+    return not (is_svn_dir or is_test_module)
+
+packages = [p for p, _, _ in os.walk('xivo_restapi') if is_package(p)]
 
 setup(
     name='xivo-restapid',
