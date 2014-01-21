@@ -20,53 +20,6 @@ Feature: REST API Extensions
             | 1983  | default |
             | 1947  | default |
 
-    Scenario: User link list by extension_id with no link
-        Given I have no extension with id "965734"
-        When I ask for the list of user_links with extension_id "965734"
-        Then I get a response with status "200"
-        Then I get an empty list
-
-    Scenario: User link list by extension_id with 1 user
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 995476 | Greg      | Sanderson |
-        Given I have the following lines:
-            |     id | context | protocol | device_slot |
-            | 124689 | default | sip      |           1 |
-        Given I have the following extensions:
-            | id     | context | exten |
-            | 995473 | default | 1775  |
-        Given the following users, lines, extensions are linked:
-            | user_id | line_id | extension_id |
-            | 995476  | 124689  | 995473       |
-        When I ask for the list of user_links with extension_id "995473"
-        Then I get a response with status "200"
-        Then I get the user_links with the following parameters:
-            | user_id | line_id | extension_id |
-            | 995476  | 124689  | 995473       |
-
-    Scenario: User link list by extension_id with 2 users
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 132449 | Greg      | Sanderson |
-            | 995441 | Cedric    | Abunar    |
-        Given I have the following lines:
-            |     id | context | protocol | device_slot |
-            | 446168 | default | sip      |           1 |
-        Given I have the following extensions:
-            | id     | context | exten |
-            | 995134 | default | 1358  |
-        Given the following users, lines, extensions are linked:
-            | user_id | line_id | extension_id |
-            | 132449  | 446168  | 995134       |
-            | 995441  | 446168  | 995134       |
-        When I ask for the list of user_links with extension_id "995134"
-        Then I get a response with status "200"
-        Then I get the user_links with the following parameters:
-            | user_id | line_id | extension_id |
-            | 132449  | 446168  | 995134       |
-            | 995441  | 446168  | 995134       |
-
     Scenario: Get an extension that does not exist
         Given I have no extension with id "699324"
         When I access the extension with id "699324"
@@ -344,22 +297,3 @@ Feature: REST API Extensions
         When I delete extension "954147"
         Then I get a response with status "204"
         Then the extension "954147" no longer exists
-
-    Scenario: Delete an extension still has a link
-        Given I have the following users:
-            |     id | firstname | lastname |
-            | 954471 | Clémence  | Dupond   |
-        Given I have the following lines:
-            |     id | context | protocol | device_slot |
-            | 996547 | default | sip      |           1 |
-        Given I have the following extensions:
-            | id     | context | exten |
-            | 695447 | default | 1409  |
-        When I create the following links:
-            | user_id | line_id | extension_id | main_line |
-            | 954471  | 996547  | 695447       | True      |
-        Then I get a response with status "201"
-
-        When I delete extension "695447"
-        Then I get a response with status "400"
-        Then I get an error message "Error while deleting Extension: extension still has a link"
