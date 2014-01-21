@@ -1,0 +1,14 @@
+/var/log/xivo-restapid.log {
+    daily
+    rotate 15
+    compress
+    copytruncate
+    missingok
+}
+/var/log/xivo-restapi-data-access.log {
+    daily
+    rotate 15
+    compress
+    copytruncate
+    missingok
+}

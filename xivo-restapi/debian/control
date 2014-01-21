@@ -1,0 +1,29 @@
+Source: xivo-restapi
+Section: python
+Priority: extra
+Maintainer: XiVO Dev Team <dev@avencall.com>
+Uploaders: XiVO Builder Team <release@xivo.fr>
+Build-Depends: debhelper (>= 8), dh-python, python-all (>= 2.7), python-setuptools
+Standards-Version: 3.9.4
+X-Python-Version: >= 2.7
+Homepage: http://wiki.xivo.fr
+
+Package: xivo-restapi
+Architecture: all
+Depends: ${python:Depends}, ${misc:Depends}, xivo-librestapi (>= 13.15)
+Description: XIVO restapi server
+ XIVO is a system based on a powerful IPBX, to bring an easy to
+ install solution for telephony and related services.
+ .
+
+Package: xivo-librestapi
+Architecture: all
+Depends: ${python:Depends}, 
+         ${misc:Depends}, 
+         xivo-libdao (>= 13.02~20130131.124922.ae70e6f-1), 
+         python-flask, 
+         python-flup
+Description: XIVO restapi lib
+ XIVO is a system based on a powerful IPBX, to bring an easy to
+ install solution for telephony and related services.
+ .
