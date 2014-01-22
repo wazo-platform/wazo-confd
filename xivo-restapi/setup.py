@@ -24,7 +24,7 @@ from distutils.core import setup
 
 
 def is_package(path):
-    is_svn_dir = fnmatch.fnmatch(path, '*/.svn/*')
+    is_svn_dir = fnmatch.fnmatch(path, '*/.svn*')
     is_test_module = fnmatch.fnmatch(path, '*tests')
     return not (is_svn_dir or is_test_module)
 
