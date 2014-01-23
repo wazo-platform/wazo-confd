@@ -30,11 +30,13 @@ blueprint = Blueprint('cti_profiles', __name__, url_prefix='/%s/cti_profiles' % 
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, CtiProfile)
 
+
 @route('', methods=['GET'])
 def find_all():
     profiles = services.find_all()
     result = formatter.list_to_api(profiles)
     return make_response(result, 200)
+
 
 @route('/<int:cti_profile_id>', methods=['GET'])
 def get(cti_profile_id):

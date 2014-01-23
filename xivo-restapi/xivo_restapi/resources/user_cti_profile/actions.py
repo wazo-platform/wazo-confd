@@ -37,6 +37,7 @@ def associate_cti_profile(userid):
     location = url_for('.associate_cti_profile', userid=userid)
     return make_response(result, 201, {'Location': location})
 
+
 @route('/<int:userid>/cti_profile', methods=['GET'])
 def get_cti_profile(userid):
     try:
@@ -45,6 +46,7 @@ def get_cti_profile(userid):
         raise AssociationNotExistsError('User with id=%d does not have a CTI profile' % userid)
     result = formatter.to_api(model)
     return make_response(result, 200)
+
 
 @route('/<int:userid>/cti_profile', methods=['DELETE'])
 def dissociate_cti_profile(userid):

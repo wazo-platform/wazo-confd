@@ -51,14 +51,13 @@ Feature: REST API CTI Profiles
         Then I get a response with a link to the "users" resource using the id "user_id"
         Then I get a response with a link to the "cti_profiles" resource using the id "cti_profile_id"
 
-    Scenario: User with no CTI profile
+    Scenario: Get CTI profile from a user who doesn't have one
         Given I only have the following users:
             |     id | firstname | lastname |
             | 987962 |    Marcel |     Aymé |
         When I send request for the CTI profile associated to the user id "987962"
         Then I get a response with status "404"
         Then I get an error message "User with id=987962 does not have a CTI profile"
-
 
     Scenario: Dissociate CTI profile from a user
         Given I only have the following users:
@@ -96,4 +95,3 @@ Feature: REST API CTI Profiles
         When I associate CTI profile "118" with user "987967"
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user with id 987967 already has a CTI profile"
-
