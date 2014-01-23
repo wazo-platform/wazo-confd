@@ -96,3 +96,15 @@ Feature: REST API CTI Profiles
         Then I get a response with status "400"
         Then I get an error message matching "Invalid parameters: user with id \d+ already has a CTI profile"
 
+    Scenario: XiVO Client connection after associating a profile
+        Given there are users with infos:
+            | firstname |   lastname |
+            |     Félix |     Lechat |
+        When I update user "Félix" "Lechat" with the following parameters:
+            | username | password |
+            |  flechat |     1234 |
+        When I activate the CTI client for user "Félix" "Lechat"
+        When I associate CTI profile with name "Client" with user "Félix" "Lechat"
+        When I start the XiVO Client
+        Then I can connect the CTI client of "Félix" "Lechat"
+
