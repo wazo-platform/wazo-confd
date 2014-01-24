@@ -44,8 +44,8 @@ Feature: REST API CTI Profiles
             |  id |      name |
             | 112 | Profil 01 |
         Given the following users, CTI profiles are linked:
-            | user_fullname | cti_profile_id |
-            |  Eric Lerouge |            112 |
+            | firstname | lastname | cti_profile_id |
+            | Eric      | Lerouge  |            112 |
         When I send request for the CTI profile associated to the user "Eric" "Lerouge"
         Then I get a response with status "200"
         Then I get a response with a link to the "users" resource using the id "user_id"
@@ -67,8 +67,8 @@ Feature: REST API CTI Profiles
             |  id |      name |
             | 114 | Profil 03 |
         Given the following users, CTI profiles are linked:
-            | user_fullname | cti_profile_id |
-            |  Marc Desnoix |            114 |
+            | firstname | lastname | cti_profile_id |
+            | Marc      | Desnoix  |            114 |
         When I dissociate the user "Marc" "Desnoix" from its CTI profile
         Then I get a response with status "204"
 
@@ -90,8 +90,8 @@ Feature: REST API CTI Profiles
             | 117 | Profil 06 |
             | 118 | Profil 07 |
         Given the following users, CTI profiles are linked:
-            |   user_fullname | cti_profile_id |
-            |  Gaston Bernard |            117 |
+            | firstname | lastname | cti_profile_id |
+            | Gaston    | Bernard  |            117 |
         When I associate CTI profile "118" with user "Gaston" "Bernard"
         Then I get a response with status "400"
         Then I get an error message matching "Invalid parameters: user with id \d+ already has a CTI profile"
@@ -107,4 +107,3 @@ Feature: REST API CTI Profiles
         When I associate CTI profile with name "Client" with user "Félix" "Lechat"
         When I start the XiVO Client
         Then I can connect the CTI client of "Félix" "Lechat"
-
