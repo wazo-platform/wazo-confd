@@ -1,0 +1,32 @@
+Feature: REST API Configuration
+
+    Scenario: Get live reload status
+        Given a live reload configuration is enable
+        When I ask for the live reload state
+        Then I get a response with status "200"
+        Then I get a response with the following columns:
+            | enabled |
+            |    true |
+
+    Scenario: Disable live reload
+        Given a live reload configuration is enable
+        When I disable the live reload
+        Then I get a response with status "204"
+        When i edit extenfeatures page
+        Then i see no live reload request in daemon log file
+        When I create users with the following parameters:
+            | firstname | lastname |
+            | Joe       |      Doe |
+        Then i see no live reload request in daemon log file
+
+    Scenario: Enable live reload
+        Given a live reload configuration is disable
+        When I enable the live reload
+        Then I get a response with status "204"
+        When i edit extenfeatures page
+        Then i see live reload requests in daemon log file
+        When I create users with the following parameters:
+            | firstname | lastname |
+            | Joe       |      Doe |
+        Then i see live reload request in daemon log file
+
