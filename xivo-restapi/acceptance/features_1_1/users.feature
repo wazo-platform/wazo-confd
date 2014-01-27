@@ -144,13 +144,13 @@ Feature: REST API Users
 
     Scenario: Getting a user with all available parameters:
         Given I only have the following users:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | enable_client |music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | true          | missing      | subroutine            | userfield |
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
         When I ask for the user with id "1"
         Then I get a response with status "200"
         Then I get a user with the following parameters:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | enable_client | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | true          | missing       | subroutine            | userfield |
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
 
     Scenario: Creating an empty user
         Given I have no users
@@ -218,23 +218,15 @@ Feature: REST API Users
     Scenario: Creating a user with all available parameters
         Given I have no users
         When I create users with the following parameters:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | enable_client |music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | true          | missing      | subroutine            | userfield |
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
         Then I get a response with status "201"
         Then I get a response with an id
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | enable_client | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | true          | missing       | subroutine            | userfield |
-
-    Scenario: Creating a user with the CTI client enabled but without username nor password
-        Given I have no users
-        When I create users with the following parameters:
-            | firstname | enable_client |
-            |      Marc |          true |
-        Then I get a response with status "400"
-        Then I get an error message "Cannot enable the CTI client without a username and a password"
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
 
     Scenario: Editing a user that doesn't exist
         Given I have no users
@@ -320,26 +312,16 @@ Feature: REST API Users
 
     Scenario: Editing all available parameters of a user
         Given I only have the following users:
-            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | enable_client |  music_on_hold | preprocess_subroutine | userfield |
-            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | true          |  missing       | subroutine            | userfield |
+            | id | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
         When I update the user with id "1" using the following parameters:
-            | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | enable_client | music_on_hold | preprocess_subroutine | userfield |
-            | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | true          | default       | other_subroutine      | myvalue   |
+            | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
+            | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
         Then I get a response with status "204"
         When I ask for the user with id "1"
         Then I get a user with the following parameters:
-            | id | firstname | lastname | timezone       | language | description | caller_id   | outgoing_caller_id | mobile_phone_number | username  | password | enable_client | music_on_hold | preprocess_subroutine | userfield |
-            | 1  | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | "ALEXANDER" | default            | 1234567890          | alexander | powell   | true      | default       | other_subroutine          | myvalue   |
-
-    Scenario: Enabling the CTI client for a user without username nor password
-        Given I only have the following users:
-            |   id | firstname | lastname |
-            | 7895 |      René |   Albert |
-        When I update the user with id "7895" with the following parameters:
-            | enable_client |
-            |          true |
-        Then I get a response with status "400"
-        Then I get an error message "Cannot enable the CTI client without a username and a password"
+            | id | firstname | lastname | timezone       | language | description | caller_id   | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
+            | 1  | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | "ALEXANDER" | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
 
     Scenario: Deleting a user that doesn't exist
         Given I have no users
