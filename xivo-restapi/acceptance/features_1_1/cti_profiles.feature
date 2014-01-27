@@ -57,19 +57,6 @@ Feature: REST API CTI Profiles
         Then I get a response with status "200"
         Then I get a response with a null CTI profile
 
-    Scenario: Dissociate CTI profile from a user
-        Given there are users with infos:
-            | firstname | lastname |
-            |      Marc |  Desnoix |
-        Given I have the following CTI profiles:
-            |  id |      name |
-            | 114 | Profil 03 |
-        Given the following users, CTI profiles are linked:
-            | firstname | lastname | cti_profile_id |
-            | Marc      | Desnoix  |            114 |
-        When I dissociate the user "Marc" "Desnoix" from its CTI profile
-        Then I get a response with status "204"
-
     Scenario: Associate a user to a CTI profile which does not exist
         Given there are users with infos:
             | firstname | lastname |
@@ -92,12 +79,10 @@ Feature: REST API CTI Profiles
         Then I can connect the CTI client of "Félix" "Lechat"
 
     Scenario: Enabling the CTI client for a user without username nor password
-        Given I only have the following users:
-            |   id | firstname | lastname |
-            | 7895 |      René |   Albert |
-        When I update the user with id "7895" with the following parameters:
-            | enable_client |
-            |          true |
+        Given there are users with infos:
+            | firstname | lastname |
+            |      René |   Albert |
+        When I enable the CTI client for the user "René" "Albert"
         Then I get a response with status "400"
-        Then I get an error message "Cannot enable the CTI client without a username and a password"
+        Then I get an error message matching "Error while editing \d+: the user must have a username and password to enable the CTI"
 
