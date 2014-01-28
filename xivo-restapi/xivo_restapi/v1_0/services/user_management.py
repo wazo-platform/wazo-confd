@@ -22,6 +22,8 @@ from urllib2 import URLError
 from xivo_dao import user_dao, line_dao, voicemail_dao
 from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_dao.data_handler.user import services as user_services
+from xivo_dao.data_handler.line_extension import services as line_extension_services
+from xivo_dao.data_handler.extension import services as extension_services
 from xivo_dao.data_handler.user_line import dao as user_line_dao
 from xivo_dao.data_handler.user_line import services as user_line_services
 from xivo_dao.data_handler.device import services as device_services
@@ -111,6 +113,7 @@ class UserManagement(object):
     def _remove_association(self, association):
         user_line_dao.dissociate(association)
         line = line_dao.get(association.line_id)
+        self._remove_extension(line)
         self._remove_line(line)
 
     def _remove_line(self, line):
@@ -123,6 +126,13 @@ class UserManagement(object):
                     self._provd_remove_line(device.id, line.num)
                 except URLError as e:
                     raise ProvdError(str(e))
+
+    def _remove_extension(self, line):
+        line_extension = line_extension_services.find_by_line_id(line.id)
+        if line_extension:
+            line_extension_services.dissociate(line_extension)
+            extension = extension_services.get(line_extension.extension_id)
+            extension_services.delete(extension)
 
     def _provd_remove_line(self, deviceid, linenum):
         config = self.config_manager.get(deviceid)

@@ -283,14 +283,16 @@ class TestUserManagement(unittest.TestCase):
         mock_user_services.side_effect = ElementNotExistsError('User', id=user_id)
         self.assertRaises(NoSuchElementException, self._userManager.delete_user, user_id)
 
+    @patch('xivo_dao.data_handler.line.dao.get')
     @patch('xivo_dao.data_handler.user.services.get')
     @patch('xivo_dao.data_handler.user.services.delete')
-    def test_delete_user(self, mock_user_delete, mock_user_get):
+    def test_delete_user(self, mock_user_delete, mock_user_get, mock_line_get):
         userid = 1
         user = Mock()
         user.voicemail_id = None
         mock_user_get.return_value = user
         self._userManager._remove_lines = Mock()
+        self._userManager._remove_extension = Mock()
         self._userManager._delete_voicemail = Mock()
 
         self._userManager.delete_user(userid)
@@ -360,6 +362,7 @@ class TestUserManagement(unittest.TestCase):
         line = Mock()
         mock_line_dao.return_value = line
         self._userManager._remove_line = Mock()
+        self._userManager._remove_extension = Mock()
 
         self._userManager._remove_association(ule)
 
