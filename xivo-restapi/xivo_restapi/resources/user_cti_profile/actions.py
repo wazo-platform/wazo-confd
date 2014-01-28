@@ -21,8 +21,6 @@ from xivo_restapi.resources.user_cti_profile.formatter import UserCtiProfileForm
 from flask.globals import request
 from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
 from flask.helpers import make_response
-from xivo_dao.data_handler.exception import AssociationNotExistsError
-from xivo_dao.data_handler.user_cti_profile.exceptions import UserCtiProfileNotExistsError
 
 formatter = UserCtiProfileFormatter()
 
@@ -38,9 +36,6 @@ def edit_cti_configuration(userid):
 
 @route('/<int:userid>/cti', methods=['GET'])
 def get_cti_configuration(userid):
-    try:
-        model = user_cti_profile_services.get(userid)
-    except UserCtiProfileNotExistsError:
-        raise AssociationNotExistsError('User with id=%d does not have a CTI profile' % userid)
+    model = user_cti_profile_services.get(userid)
     result = formatter.to_api(model)
     return make_response(result, 200)
