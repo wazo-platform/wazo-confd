@@ -47,7 +47,7 @@ class TestAPICampaigns(TestAPI):
         cls.instance_campaigns_helper = Mock(CampaignsHelper)
         mock_campaigns_helper.return_value = cls.instance_campaigns_helper
 
-        TestAPI.setUpClass()
+        TestAPI.setUpClass('campaign')
 
     @classmethod
     def tearDownClass(cls):

@@ -46,7 +46,7 @@ class TestAPIUsers(TestAPI):
         cls.user_sdm = Mock(UserSdm)
         cls.mock_user_sdm.return_value = cls.user_sdm
 
-        TestAPI.setUpClass()
+        TestAPI.setUpClass('user')
 
     @classmethod
     def tearDownClass(cls):

@@ -43,7 +43,7 @@ class Test(TestAPI):
         cls.voicemail_sdm = Mock(VoicemailSdm)
         mock_voicemail_sdm.return_value = cls.voicemail_sdm
 
-        TestAPI.setUpClass()
+        TestAPI.setUpClass('voicemail')
 
     @classmethod
     def tearDownClass(cls):
