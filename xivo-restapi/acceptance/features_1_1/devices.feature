@@ -437,7 +437,7 @@ Feature: REST API Devices
         Then I see in the log file device "123" autoprovisioned
 
     Scenario: Associate line to a device
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 523478 | default | sip      | toto     | tata   |           1 |
         Given I only have the following devices:
@@ -447,7 +447,7 @@ Feature: REST API Devices
         Then I get a response with status "403"
 
     Scenario: Remove line to a device
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 955473 | default | sip      | toto     | tata   |           1 |
 

@@ -15,36 +15,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
+from flask.blueprints import Blueprint
 
-from . import mapper
-from .routes import line_route as route
-
-from flask.globals import request
-from flask.helpers import make_response
-from xivo_dao.data_handler.line.model import Line
-from xivo_dao.data_handler.line import services as line_services
+from xivo_restapi import config
+from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers import serializer
+from flask.helpers import make_response
+from xivo_dao.data_handler.cti_profile import services
 from xivo_restapi.helpers.formatter import Formatter
+from xivo_dao.data_handler.cti_profile.model import CtiProfile
+from . import mapper
+
+blueprint = Blueprint('cti_profiles', __name__, url_prefix='/%s/cti_profiles' % config.VERSION_1_1)
+route = RouteGenerator(blueprint)
+formatter = Formatter(mapper, serializer, CtiProfile)
 
 
-logger = logging.getLogger(__name__)
-formatter = Formatter(mapper, serializer, Line)
-
-
-@route('')
-def list():
-    if 'q' in request.args:
-        lines = line_services.find_all_by_name(request.args['q'])
-    else:
-        lines = line_services.find_all()
-
-    result = formatter.list_to_api(lines)
+@route('', methods=['GET'])
+def find_all():
+    profiles = services.find_all()
+    result = formatter.list_to_api(profiles)
     return make_response(result, 200)
 
 
-@route('/<int:lineid>')
-def get(lineid):
-    line = line_services.get(lineid)
-    result = formatter.to_api(line)
+@route('/<int:cti_profile_id>', methods=['GET'])
+def get(cti_profile_id):
+    profile = services.get(cti_profile_id)
+    result = formatter.to_api(profile)
     return make_response(result, 200)

@@ -1,7 +1,7 @@
 Feature: REST API SIP Lines
 
     Scenario: Get a SIP line
-        Given I only have the following lines:
+        Given I have the following lines:
           |     id | username | secret | context | protocol | device_slot |
           | 553215 | toto     | abcdef | default | sip      |           1 |
         When I ask for the line_sip with id "553215"
@@ -93,14 +93,14 @@ Feature: REST API SIP Lines
         Then I get a response with status "201"
 
     Scenario: Editing a line_sip that doesn't exist
-        Given I have no lines
-        When I update the line_sip with id "10" using the following parameters:
+        Given I have no line with id "407558"
+        When I update the line_sip with id "407558" using the following parameters:
           | username |
           | toto     |
         Then I get a response with status "404"
 
     Scenario: Editing a line_sip with parameters that don't exist
-        Given I only have the following lines:
+        Given I have the following lines:
           |     id | username | context | protocol | device_slot |
           | 214697 | toto     | default | sip      |           1 |
         When I update the line_sip with id "214697" using the following parameters:
@@ -110,7 +110,7 @@ Feature: REST API SIP Lines
         Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the username of a line_sip
-        Given I only have the following lines:
+        Given I have the following lines:
           |     id | username | context | protocol | device_slot |
           | 115487 | toto     | default | sip      |           1 |
         When I update the line_sip with id "115487" using the following parameters:
@@ -123,7 +123,7 @@ Feature: REST API SIP Lines
           | 115487 | tata     | default |
 
     Scenario: Editing the context of a line_sip
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | username | context | protocol | device_slot |
             | 858494 | toto     | default | sip      |           1 |
         Given I have the following context:
@@ -139,7 +139,7 @@ Feature: REST API SIP Lines
             | 858494   | toto     | lolo    |
 
     Scenario: Editing a line_sip with a context that doesn't exist
-        Given I only have the following lines:
+        Given I have the following lines:
           |     id | username | context | protocol | device_slot |
           | 744657 | toto     | default | sip      |           1 |
         Given I have the following context:
@@ -152,7 +152,7 @@ Feature: REST API SIP Lines
         Then I get an error message "Invalid parameters: context mysuperdupercontext does not exist"
 
     Scenario: Editing the callerid of a line
-        Given I only have the following lines:
+        Given I have the following lines:
           |     id | username | context | callerid   | protocol | device_slot |
           | 994679 | toto     | default | Super Toto | sip      |           1 |
         Given I have the following context:
@@ -168,7 +168,7 @@ Feature: REST API SIP Lines
           | 994679 | toto     | default | Mega Toto |
 
     Scenario: Editing the username, context, callerid of a line_sip
-        Given I only have the following lines:
+        Given I have the following lines:
           |     id | username | context | callerid   | protocol | device_slot |
           | 552134 | titi     | default | Super Toto | sip      |           1 |
         Given I have the following context:
@@ -184,12 +184,12 @@ Feature: REST API SIP Lines
           | 552134 | titi     | patate  | Petit Toto |
 
     Scenario: Delete a line that doesn't exist
-        Given I have no lines
+        Given I have no line with id "985462"
         When I delete line sip "985462"
         Then I get a response with status "404"
 
     Scenario: Delete a line
-        Given I only have the following lines:
+        Given I have the following lines:
             | id | context | protocol | device_slot |
             | 198447 | default | sip      | 1           |
         When I delete line sip "198447"
@@ -197,20 +197,18 @@ Feature: REST API SIP Lines
         Then the line sip "198447" no longer exists
         Then the line "198447" no longer exists
 
-    Scenario: Delete an line still has a link
-        Given I only have the following users:
-            | id | firstname | lastname |
+    Scenario: Delete an line when still associated to a user and extension
+        Given I have the following users:
+            | id     | firstname | lastname |
             | 544795 | Clémence  | Dupond   |
-        Given I only have the following lines:
+        Given I have the following lines:
             |     id | context | protocol | device_slot |
             | 999514 | default | sip      |           1 |
-        Given I only have the following extensions:
+        Given I have the following extensions:
             |     id | context | exten |
             | 995114 | default |  1000 |
-        When I create the following links:
-            | user_id | line_id | extension_id | main_line |
-            |  544795 |  999514 |       995114 | True      |
-
+        Given line "999514" is linked with user id "544795"
+        Given line "999514" is linked with extension "1000@default"
         When I delete line sip "999514"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting Line: line still has a link"

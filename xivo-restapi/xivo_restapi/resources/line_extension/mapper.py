@@ -16,18 +16,27 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
-
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
-from xivo_restapi.resources.lines.actions_sip import blueprint as line_sip_blueprint
-
-line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
-line_route = RouteGenerator(line_blueprint)
-
-from xivo_restapi.resources.lines import actions
+from flask import url_for
 
 
-def register_blueprints(app):
-    app.register_blueprint(line_blueprint)
-    app.register_blueprint(line_sip_blueprint)
+MAPPING = {
+    'line_id': 'line_id',
+    'extension_id': 'extension_id',
+}
+
+
+def add_links_to_dict(result_dict, line_extension):
+    line_location = url_for('lines.get', lineid=line_extension.line_id, _external=True)
+    extension_location = url_for('extensions.get', extensionid=line_extension.extension_id, _external=True)
+    result_dict.update({
+        'links': [
+            {
+                'rel': 'lines',
+                'href': line_location
+            },
+            {
+                'rel': 'extensions',
+                'href': extension_location
+            },
+        ]
+    })

@@ -16,18 +16,25 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
+import unittest
+import json
+from hamcrest import assert_that, equal_to
 
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
-from xivo_restapi.resources.lines.actions_sip import blueprint as line_sip_blueprint
-
-line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
-line_route = RouteGenerator(line_blueprint)
-
-from xivo_restapi.resources.lines import actions
+from xivo_dao.data_handler.line_extension.model import LineExtension
+from xivo_restapi.resources.line_extension.formatter import LineExtensionFormatter
 
 
-def register_blueprints(app):
-    app.register_blueprint(line_blueprint)
-    app.register_blueprint(line_sip_blueprint)
+class TestLineExtensionFormatter(unittest.TestCase):
+
+    def test_to_model(self):
+        line_id = 1
+        extension_id = 2
+        data = {'extension_id': extension_id}
+        encoded_data = json.dumps(data)
+
+        expected = LineExtension(line_id=line_id, extension_id=extension_id)
+
+        formatter = LineExtensionFormatter()
+        result = formatter.to_model(encoded_data, line_id)
+
+        assert_that(result, equal_to(expected))

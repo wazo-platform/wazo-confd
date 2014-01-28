@@ -16,6 +16,7 @@ Feature: Users management
         Then I receive a response with status "404"
 
     Scenario: Creating a user
+        Given there is no user "Irène" "Dupont"
         When I create a user "Irène Dupont" with description "accented description: éà@';" and with ctiprofileid "1"
         Then I receive a response with status "201"
         Then the user "Irène Dupont" is actually created with ctiprofileid "1" and description "accented description: éà@';"

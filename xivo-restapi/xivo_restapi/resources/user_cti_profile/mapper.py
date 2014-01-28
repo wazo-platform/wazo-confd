@@ -16,18 +16,27 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
-
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
-from xivo_restapi.resources.lines.actions_sip import blueprint as line_sip_blueprint
-
-line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
-line_route = RouteGenerator(line_blueprint)
-
-from xivo_restapi.resources.lines import actions
+from flask import url_for
 
 
-def register_blueprints(app):
-    app.register_blueprint(line_blueprint)
-    app.register_blueprint(line_sip_blueprint)
+MAPPING = {
+    'cti_profile_id': 'cti_profile_id',
+    'user_id': 'user_id'
+}
+
+
+def add_links_to_dict(result_dict, user_cti_profile):
+    user_location = url_for('users.get', userid=user_cti_profile.user_id, _external=True)
+    cti_profile_location = url_for('cti_profiles.get', cti_profile_id=user_cti_profile.cti_profile_id, _external=True)
+    result_dict.update({
+        'links': [
+            {
+                'rel': 'cti_profiles',
+                'href': cti_profile_location
+            },
+            {
+                'rel': 'users',
+                'href': user_location
+            },
+        ]
+    })
