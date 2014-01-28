@@ -43,7 +43,7 @@ class TestAPIRecordings(TestAPI):
         cls.instance_recordings_helper = Mock(RecordingsHelper)
         mock_recordings_helper.return_value = cls.instance_recordings_helper
 
-        TestAPI.setUpClass()
+        TestAPI.setUpClass('recording')
 
     @classmethod
     def tearDownClass(cls):

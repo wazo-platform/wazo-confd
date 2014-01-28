@@ -36,7 +36,7 @@ class TestAPIQueues(TestAPI):
         cls.instance_queue_management = Mock(QueueManagement)
         mock_queue.return_value = cls.instance_queue_management
 
-        TestAPI.setUpClass()
+        TestAPI.setUpClass('queue')
 
     @classmethod
     def tearDownClass(cls):

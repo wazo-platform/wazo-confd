@@ -18,13 +18,18 @@
 
 import unittest
 from xivo_restapi import flask_http_server
+from xivo_restapi.v1_0.rest import routing
 
 
 class TestAPI(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
-        flask_http_server.register_blueprints_v1_0()
-        flask_http_server.app.testing = True
+    def setUpClass(cls, module_name):
+        route = getattr(routing, '_%s_routes' % module_name)
+        route()
+        routes_service = getattr(routing, '%ss_service' % module_name)
+        flask_http_server.app.register_blueprint(routes_service)
+
+        flask_http_server.app.config['TESTING'] = True
         flask_http_server.app.config['SERVER_NAME'] = None
         cls.app = flask_http_server.app.test_client()

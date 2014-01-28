@@ -19,7 +19,6 @@
 import logging
 
 from flask import Blueprint
-from xivo_restapi import config
 from xivo_restapi.v1_0.rest.API_agents import APIAgents
 from xivo_restapi.v1_0.rest.API_campaigns import APICampaigns
 from xivo_restapi.v1_0.rest.API_queues import APIQueues
@@ -30,10 +29,15 @@ from xivo_restapi.v1_0.restapi_config import RestAPIConfig
 
 logger = logging.getLogger(__name__)
 
-root = Blueprint("root_%s" % config.VERSION_1_0,
-                 __name__,
-                 url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
-                 RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
+campaigns_service = Blueprint("campaigns_service",
+                              __name__,
+                              url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                              RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
+
+recordings_service = Blueprint("recordings_service",
+                               __name__,
+                               url_prefix=RestAPIConfig.XIVO_REST_SERVICE_ROOT_PATH +
+                               RestAPIConfig.XIVO_RECORDING_SERVICE_PATH)
 
 queues_service = Blueprint("queues_service",
                            __name__,
@@ -56,50 +60,52 @@ voicemails_service = Blueprint("voicemails_service",
                                RestAPIConfig.XIVO_VOICEMAIL_SERVICE_PATH)
 
 
-def _root_routes():
+def _campaign_routes():
     campaigns = APICampaigns()
+    campaigns_service.add_url_rule("/",
+                                   "get",
+                                   campaigns.get,
+                                   methods=["GET"])
+    campaigns_service.add_url_rule("/<campaign_id>",
+                                   "get",
+                                   campaigns.get,
+                                   methods=["GET"])
+    campaigns_service.add_url_rule('/',
+                                   "add_campaign",
+                                   campaigns.add_campaign,
+                                   methods=['POST'])
+    campaigns_service.add_url_rule('/<campaign_id>',
+                                   "update",
+                                   getattr(APICampaigns(), "update"),
+                                   methods=['PUT'])
+
+    campaigns_service.add_url_rule("/<campaign_id>",
+                                   "delete_campaign",
+                                   campaigns.delete,
+                                   methods=['DELETE'])
+
+
+def _recording_routes():
     recordings = APIRecordings()
-    root.add_url_rule("/",
-                      "get",
-                      campaigns.get,
-                      methods=["GET"])
-    root.add_url_rule("/<campaign_id>",
-                      "get",
-                      campaigns.get,
-                      methods=["GET"])
-    root.add_url_rule('/',
-                      "add_campaign",
-                      campaigns.add_campaign,
-                      methods=['POST'])
-    root.add_url_rule('/<campaign_id>',
-                      "update",
-                      getattr(APICampaigns(), "update"),
-                      methods=['PUT'])
+    recordings_service.add_url_rule("/<campaign_id>/search",
+                                    "search_recording",
+                                    recordings.search,
+                                    methods=["GET"])
 
-    root.add_url_rule("/<campaign_id>",
-                      "delete_campaign",
-                      campaigns.delete,
-                      methods=['DELETE'])
+    recordings_service.add_url_rule("/<campaign_id>/",
+                                    "list_recordings",
+                                    recordings.list_recordings,
+                                    methods=["GET"])
 
-    root.add_url_rule("/<campaign_id>/search",
-                      "search_recording",
-                      recordings.search,
-                      methods=["GET"])
+    recordings_service.add_url_rule("/<campaign_id>/",
+                                    "add_recording",
+                                    recordings.add_recording,
+                                    methods=["POST"])
 
-    root.add_url_rule("/<campaign_id>/",
-                      "list_recordings",
-                      recordings.list_recordings,
-                      methods=["GET"])
-
-    root.add_url_rule("/<campaign_id>/",
-                      "add_recording",
-                      recordings.add_recording,
-                      methods=["POST"])
-
-    root.add_url_rule("/<campaign_id>/<recording_id>",
-                      "delete",
-                      recordings.delete,
-                      methods=["DELETE"])
+    recordings_service.add_url_rule("/<campaign_id>/<recording_id>",
+                                    "delete",
+                                    recordings.delete,
+                                    methods=["DELETE"])
 
 
 def _queue_routes():
@@ -160,7 +166,8 @@ def _voicemail_routes():
 
 
 def create_routes():
-    _root_routes()
+    _campaign_routes()
+    _recording_routes()
     _queue_routes()
     _agent_routes()
     _user_routes()

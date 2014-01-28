@@ -34,7 +34,7 @@ class TestAPIAgents(TestAPI):
         cls.instance_agent_management = Mock(AgentManagement)
         mock_agent.return_value = cls.instance_agent_management
 
-        TestAPI.setUpClass()
+        TestAPI.setUpClass('agent')
 
     @classmethod
     def tearDownClass(cls):
