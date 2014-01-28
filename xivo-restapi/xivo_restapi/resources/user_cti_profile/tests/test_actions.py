@@ -17,53 +17,35 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 from hamcrest import assert_that, equal_to
 
-from mock import patch, Mock
+from mock import patch
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
-from xivo_dao.data_handler.user_cti_profile.exceptions import UserCtiProfileNotExistsError
 from xivo_dao.data_handler.exception import ElementNotExistsError
 
-BASE_URL = "/1.1/users/%s/cti_profile"
+BASE_URL = "/1.1/users/%s/cti"
 
 
 class TestUserVoicemailActions(TestResources):
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.associate')
-    def test_associate_cti_profile(self, user_cti_profile_associate):
+    @patch('xivo_dao.data_handler.user_cti_profile.services.edit')
+    def test_update_cti_configuration(self, user_cti_profile_edit):
         user_id = 1
         cti_profile_id = 2
 
-        expected_status_code = 201
-        expected_result = {
-            "user_id": user_id,
-            "cti_profile_id": cti_profile_id,
-            "links": [
-                {
-                    "rel": "cti_profiles",
-                    "href": "http://localhost/1.1/cti_profiles/%s" % cti_profile_id
-                },
-                {
-                    "rel": "users",
-                    "href": "http://localhost/1.1/users/%s" % user_id
-                }
-            ]
-        }
-
-        user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id)
-        user_cti_profile_associate.return_value = user_cti_profile
+        expected_status_code = 204
 
         data = {
-            'cti_profile_id': cti_profile_id
+            'cti_profile_id': cti_profile_id,
+            'enabled': True
         }
         data_serialized = self._serialize_encode(data)
 
-        result = self.app.post(BASE_URL % user_id, data=data_serialized)
+        result = self.app.put(BASE_URL % user_id, data=data_serialized)
 
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_profile_association(self, user_cti_profile_get):
+    def test_get_cti_configuration(self, user_cti_profile_get):
         user_id = 1
         cti_profile_id = 2
 
@@ -71,19 +53,20 @@ class TestUserVoicemailActions(TestResources):
         expected_result = {
             "user_id": user_id,
             "cti_profile_id": cti_profile_id,
+            "enabled": True,
             "links": [
-                {
-                    "rel": "cti_profiles",
-                    "href": "http://localhost/1.1/cti_profiles/%s" % cti_profile_id
-                },
                 {
                     "rel": "users",
                     "href": "http://localhost/1.1/users/%s" % user_id
+                },
+                {
+                    "rel": "cti_profiles",
+                    "href": "http://localhost/1.1/cti_profiles/%s" % cti_profile_id
                 }
             ]
         }
 
-        user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id)
+        user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id, enabled=True)
         user_cti_profile_get.return_value = user_cti_profile
 
         result = self.app.get(BASE_URL % user_id)
@@ -95,10 +78,21 @@ class TestUserVoicemailActions(TestResources):
     def test_get_cti_profile_association_not_exists(self, user_cti_profile_get):
         user_id = 1
 
-        expected_status_code = 404
-        expected_result = ['User with id=%d does not have a CTI profile' % user_id]
+        expected_status_code = 200
+        expected_result = {
+            "user_id": user_id,
+            "cti_profile_id": None,
+            "enabled": False,
+            "links": [
+                {
+                    "rel": "users",
+                    "href": "http://localhost/1.1/users/%s" % user_id
+                }
+            ]
+        }
 
-        user_cti_profile_get.side_effect = UserCtiProfileNotExistsError('user_cti_profile')
+        user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=None, enabled=False)
+        user_cti_profile_get.return_value = user_cti_profile
 
         result = self.app.get(BASE_URL % user_id)
 
@@ -118,17 +112,3 @@ class TestUserVoicemailActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.user_cti_profile.services.dissociate')
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_dissociate_cti_profile(self, user_cti_profile_get, user_cti_profile_dissociate):
-        user_id = 1
-        user_cti_profile = Mock(UserCtiProfile)
-        expected_status_code = 204
-        user_cti_profile_get.return_value = user_cti_profile
-
-        result = self.app.delete(BASE_URL % user_id)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        user_cti_profile_get.assert_called_with(user_id)
-        user_cti_profile_dissociate.assert_called_with(user_cti_profile)

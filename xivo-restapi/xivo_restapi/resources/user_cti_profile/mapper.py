@@ -21,22 +21,24 @@ from flask import url_for
 
 MAPPING = {
     'cti_profile_id': 'cti_profile_id',
-    'user_id': 'user_id'
+    'user_id': 'user_id',
+    'enabled': 'enabled'
 }
 
 
 def add_links_to_dict(result_dict, user_cti_profile):
+    links = []
     user_location = url_for('users.get', userid=user_cti_profile.user_id, _external=True)
-    cti_profile_location = url_for('cti_profiles.get', cti_profile_id=user_cti_profile.cti_profile_id, _external=True)
-    result_dict.update({
-        'links': [
-            {
-                'rel': 'cti_profiles',
-                'href': cti_profile_location
-            },
-            {
+    links.append({
                 'rel': 'users',
                 'href': user_location
-            },
-        ]
+            })
+    if user_cti_profile.cti_profile_id:
+        cti_profile_location = url_for('cti_profiles.get', cti_profile_id=user_cti_profile.cti_profile_id, _external=True)
+        links.append({
+                'rel': 'cti_profiles',
+                'href': cti_profile_location
+            })
+    result_dict.update({
+        'links': links
     })
