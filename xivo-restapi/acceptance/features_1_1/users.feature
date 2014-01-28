@@ -48,9 +48,9 @@ Feature: REST API Users
         Given I have the following users:
           | firstname | lastname |
           | Andreï    | Bélier   |
-        When I search for the user "bob"
+        When I search for the user "6kmsdRxV"
         Then I get an empty list
-        When I search for the user "rei"
+        When I search for the user "u5L3riyk"
         Then I get an empty list
 
     Scenario: User search using the firstname
