@@ -18,11 +18,10 @@ from xivo_restapi.resources.configuration.routes import blueprint
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_dao.data_handler.configuration import services
 from flask.helpers import make_response
-from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.helpers import serializer
+from flask.globals import request
 
 route = RouteGenerator(blueprint)
-formatter = Formatter(None, serializer, None)
 
 
 @route('/live_reload', methods=['GET'])
@@ -30,3 +29,11 @@ def get_live_reload():
     enabled = services.get_live_reload_status()
     result = serializer.encode({'enabled': enabled})
     return make_response(result, 200)
+
+
+@route('/live_reload', methods=['PUT'])
+def set_live_reload():
+    json = request.data.decode("utf-8")
+    data = serializer.decode(json)
+    services.set_live_reload_status(data)
+    return make_response('', 204)

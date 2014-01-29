@@ -40,3 +40,16 @@ class TestConfigurationActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
         get_live_reload_status.assert_called_once_with()
+
+    @patch('xivo_dao.data_handler.configuration.services.set_live_reload_status')
+    def test_edit_live_reload_status(self, set_live_reload_status):
+        expected_status_code = 204
+        data = {
+            'enabled': False
+        }
+        data_serialized = self._serialize_encode(data)
+
+        result = self.app.put('%s/live_reload' % BASE_URL, data=data_serialized)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        set_live_reload_status.assert_called_once_with(data)
