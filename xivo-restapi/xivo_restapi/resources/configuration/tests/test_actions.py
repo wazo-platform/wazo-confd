@@ -33,7 +33,9 @@ class TestConfigurationActions(TestResources):
             'enabled': True
         }
 
-        get_live_reload_status.return_value = True
+        get_live_reload_status.return_value = {
+            'enabled': True
+        }
 
         result = self.app.get('%s/live_reload' % BASE_URL)
 

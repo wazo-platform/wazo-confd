@@ -26,9 +26,8 @@ route = RouteGenerator(blueprint)
 
 @route('/live_reload', methods=['GET'])
 def get_live_reload():
-    enabled = services.get_live_reload_status()
-    result = serializer.encode({'enabled': enabled})
-    return make_response(result, 200)
+    result = services.get_live_reload_status()
+    return make_response(serializer.encode(result), 200)
 
 
 @route('/live_reload', methods=['PUT'])
