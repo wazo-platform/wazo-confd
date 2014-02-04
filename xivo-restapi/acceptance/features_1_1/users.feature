@@ -65,7 +65,7 @@ Feature: REST API Users
         Then I get a list containing the following users:
           | firstname | lastname |
           | Andreï    | Bélier   |
-        When I search for the user "andou"
+        When I search for the user "andreii"
         Then I get an empty list
 
     Scenario: User search using the lastname
