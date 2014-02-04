@@ -332,4 +332,4 @@ Feature: REST API Users
         Given line "546216" is linked with extension "1339@default"
         When I delete the user with id "956541"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting User: user still has a link"
+        Then I get an error message "Error while deleting User: user still associated to a line"
