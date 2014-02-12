@@ -168,7 +168,7 @@ Feature: REST API Voicemails
             | Q                | 1012   | default | q@continuum.universe            |
             | Reginald Barclay | 1013   | default | reginald.barclay@uss.enterprise |
         When I request the list of voicemails with the following parameters via RESTAPI:
-            | search | 
+            | search |
             | reg    |
         Then I get a response with status "200"
         Then I get a list containing the following voicemails via RESTAPI:
@@ -325,7 +325,7 @@ Feature: REST API Voicemails
         Then I have the following voicemails via RESTAPI:
           | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
           | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
-          
+
     Scenario: Creating two voicemails with the same number but different context
         Given there is no voicemail with number "1000" and context "default"
         Given there is no voicemail with number "1000" and context "statscenter"
@@ -517,7 +517,7 @@ Feature: REST API Voicemails
         Then I have the following voicemails via RESTAPI:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
             | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
-          
+
     Scenario: Edit two voicemails with the same number but different context
         Given there is no voicemail with number "1001" and context "default"
         Given there is no voicemail with number "2001" and context "statscenter"
