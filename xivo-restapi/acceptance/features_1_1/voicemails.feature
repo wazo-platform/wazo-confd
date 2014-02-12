@@ -65,18 +65,6 @@ Feature: REST API Voicemails
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: limit must be a positive integer"
 
-    Scenario: Voicemail list with invalid limit parameter
-        When I request the list of voicemails with the following parameters via RESTAPI:
-            | skip |
-            | -32  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: skip must be a positive integer"
-        When I request the list of voicemails with the following parameters via RESTAPI:
-            | skip |
-            | asdf |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: skip must be a positive integer"
-
     Scenario: Voicemail list with order
         Given I have the following voicemails:
             | name | number | context |
