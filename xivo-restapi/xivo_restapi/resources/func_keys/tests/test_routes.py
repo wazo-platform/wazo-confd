@@ -17,6 +17,7 @@
 
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
+from flask import Response
 from mock import patch
 from hamcrest import assert_that, equal_to
 
@@ -35,7 +36,7 @@ class TestFuncKeyActions(TestResources):
         expected_response = {'total': 1,
                              'items': [expected_item]}
 
-        list_action.return_value = self._serialize_encode(expected_response)
+        list_action.return_value = Response(self._serialize_encode(expected_response))
 
         response = self.app.get(BASE_URL)
 
