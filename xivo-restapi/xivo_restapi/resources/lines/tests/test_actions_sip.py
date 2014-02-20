@@ -102,12 +102,24 @@ class TestLineSIPActions(TestResources):
     @patch('xivo_dao.data_handler.line.services.get')
     def test_get(self, mock_line_services_get, formatter):
         line = LineSIP(id=1,
-                       username='test1')
+                       context='default',
+                       username='test1',
+                       secret='secret',
+                       provisioning_extension=123456,
+                       device_slot=1,
+                       device_id="b054de13b8b73d5683815929c20033ad",
+                       callerid='"John Doe" <1000>')
 
         expected_status_code = 200
         expected_result = {
             'id': line.id,
+            'context': line.context,
             'username': line.username,
+            'secret': line.secret,
+            'provisioning_extension': line.provisioning_extension,
+            'device_slot': line.device_slot,
+            'device_id': line.device_id,
+            'callerid': line.callerid,
             'links': [{
                 'href': 'http://localhost/1.1/lines_sip/%d' % line.id,
                 'rel': 'lines_sip'
