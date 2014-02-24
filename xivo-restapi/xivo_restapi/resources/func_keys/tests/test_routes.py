@@ -71,3 +71,25 @@ class TestFuncKeyActions(TestResources):
         get_action.assert_called_once_with(func_key_id)
         self.assert_response(response, expected_status, expected_response)
 
+    @patch('xivo_restapi.resources.func_keys.actions.create')
+    def test_create_func_key(self, create_action):
+        expected_status = 201
+        expected_response = {'id': 1,
+                             'type': 'speeddial',
+                             'destination': 'user',
+                             'destination_id': 2,
+                             'links': [{
+                                 'href': 'http://localhost/1.1/func_keys/1',
+                                 'rel': 'func_keys'
+                             }]}
+
+        func_key_parameters = {'type': 'speeddial',
+                               'destination': 'user',
+                               'destination_id': 2}
+
+        create_action.return_value = Response(self._serialize_encode(expected_response), status=201)
+
+        response = self.app.post(BASE_URL, self._serialize_encode(func_key_parameters))
+
+        create_action.assert_called_once_with()
+        self.assert_response(response, expected_status, expected_response)
