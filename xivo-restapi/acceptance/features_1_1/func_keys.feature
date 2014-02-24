@@ -50,3 +50,70 @@ Feature: REST API Function keys
         Then I get a response with a link to the "func_keys" resource
         Then I get a func key of type "speeddial"
         Then I get a func key with a destination id for user "Fodé" "Sanderson"
+
+    Scenario: Creating a func key with invalid parameters
+        When I create an empty func key via RESTAPI:
+        Then I get a response with status "400"
+        Then I get an error message "Missing parameters: type,destination,destination_id"
+
+        When I create the following func keys via RESTAPI:
+            | unexisting_field |
+            | unexisting_value |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: unexisting_field"
+
+    Scenario: Creating a func key with a type that doesn't exist
+        Given I have the following users:
+            | id     | firstname | lastname |
+            | 478009 | Lord      | Fodé     |
+        When I create the following func keys via RESTAPI:
+            | type      | destination | destination_id |
+            | supertype | user        | 478009         |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: type supertype does not exist"
+
+    Scenario: Creating a func key with a destination that doesn't exist
+        Given I have the following users:
+            | id     | firstname | lastname |
+            | 848966 | Maestro   | Fodé     |
+        When I create the following func keys via RESTAPI:
+            | type      | destination      | destination_id |
+            | speeddial | superdestination | 848966         |
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: destination superdestination does not exist"
+
+    Scenario: Creating a func key with a destination id that doesn't exist
+        Given there are no users with id "168110"
+        When I create the following func keys via RESTAPI:
+            | type      | destination | destination_id |
+            | speeddial | user        | 168110         |
+        Then I get a response with status "400"
+        Then I get an error message "Nonexistent parameters: user with id=168110 does not exist"
+
+    Scenario: Creating a func key with a destination for a user
+        Given I have the following users:
+            | id     | firstname | lastname |
+            | 922545 | Ba        | Fodé     |
+        When I create the following func keys via RESTAPI:
+            | type      | destination | destination_id |
+            | speeddial | user        | 922545         |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "func_keys" resource
+        Then I get a response with a link to the "func_keys" resource
+        Then I have the following func keys via RESTAPI:
+            | type      | destination | destination_id |
+            | speeddial | user        | 922545         |
+
+    Scenario: Creating 2 func keys with same destination
+        Given I have the following users:
+            | id     | firstname | lastname |
+            | 389369 | Fodé      | Enzo     |
+        When I create the following func keys via RESTAPI:
+            | type      | destination | destination_id |
+            | speeddial | user        | 389369         |
+        Then I get a response with status "201"
+        When I create the following func keys via RESTAPI:
+            | type      | destination | destination_id |
+            | speeddial | user        | 389369         |
+        Then I get a response with status "201"
