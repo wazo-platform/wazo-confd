@@ -26,6 +26,10 @@ BASE_URL = "/1.1/func_keys"
 
 class TestFuncKeyActions(TestResources):
 
+    def assert_response(self, response, status_code, result):
+        assert_that(status_code, equal_to(response.status_code))
+        assert_that(self._serialize_decode(response.data), equal_to(result))
+
     @patch('xivo_restapi.resources.func_keys.actions.list')
     def test_list_func_keys(self, list_action):
         expected_status = 200
@@ -67,6 +71,3 @@ class TestFuncKeyActions(TestResources):
         get_action.assert_called_once_with(func_key_id)
         self.assert_response(response, expected_status, expected_response)
 
-    def assert_response(self, response, status_code, result):
-        assert_that(status_code, equal_to(response.status_code))
-        assert_that(self._serialize_decode(response.data), equal_to(result))
