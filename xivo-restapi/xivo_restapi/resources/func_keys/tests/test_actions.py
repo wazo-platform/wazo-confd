@@ -18,6 +18,7 @@ import unittest
 
 from xivo_restapi.resources.func_keys import actions
 from xivo_dao.helpers.abstract_model import SearchResult
+from xivo_dao.data_handler.func_key.model import FuncKey
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
@@ -40,4 +41,21 @@ class TestFuncKeyActions(unittest.TestCase):
         func_key_search.assert_called_once_with(**find_parameters)
         list_to_api.assert_called_once_with(search_result.items, search_result.total)
         make_response.assert_called_once_with(formatted_list, 200)
+        assert_that(result, equal_to(response))
+
+    @patch('xivo_restapi.resources.func_keys.actions.make_response')
+    @patch('xivo_restapi.resources.func_keys.actions.formatter.to_api')
+    @patch('xivo_dao.data_handler.func_key.services.get')
+    def test_get(self, func_key_get, formatter_to_api, make_response):
+        func_key_id = 1
+
+        func_key = func_key_get.return_value = Mock(FuncKey)
+        formatted_func_key = formatter_to_api.return_value = Mock()
+        response = make_response.return_value = Mock()
+
+        result = actions.get(func_key_id)
+
+        func_key_get.assert_called_once_with(func_key_id)
+        formatter_to_api.assert_called_once_with(func_key)
+        make_response.assert_called_once_with(formatted_func_key, 200)
         assert_that(result, equal_to(response))

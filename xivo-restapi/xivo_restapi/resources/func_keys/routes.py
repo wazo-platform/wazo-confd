@@ -34,7 +34,7 @@ def list():
 
 @route('/<int:funckeyid>')
 def get(funckeyid):
-    raise NotImplementedError()
+    return actions.get(funckeyid)
 
 
 def register_blueprints(app):
