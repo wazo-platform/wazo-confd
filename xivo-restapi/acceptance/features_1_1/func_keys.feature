@@ -34,3 +34,19 @@ Feature: REST API Function keys
             | 1     |
         Then I get a response with status "200"
         Then I have a list with 1 results
+
+    Scenario: Get a func key that does not exist
+        Given there is no func key with id "725437"
+        When I request the func key with id "725437" via RESTAPI
+        Then I get a response with status "404"
+
+    Scenario: Get a func key
+        Given there are users with infos:
+            | firstname | lastname  | number | context |
+            | Fodé      | Sanderson | 1348   | default |
+        Given I have a speeddial func key for user "Fodé" "Sanderson"
+        When I request the funckey with a destination for user "Fodé" "Sanderson"
+        Then I get a response with status "200"
+        Then I get a response with a link to the "func_keys" resource
+        Then I get a func key of type "speeddial"
+        Then I get a func key with a destination id for user "Fodé" "Sanderson"
