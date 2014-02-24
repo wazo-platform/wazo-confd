@@ -32,7 +32,11 @@ class TestFuncKeyActions(TestResources):
         expected_item = {'id': 1,
                          'type': 'speeddial',
                          'destination': 'user',
-                         'destination_id': 2}
+                         'destination_id': 2,
+                         'links': [{
+                             'href': 'http://localhost/1.1/func_keys/1',
+                             'rel': 'func_keys'
+                         }]}
         expected_response = {'total': 1,
                              'items': [expected_item]}
 
@@ -50,7 +54,11 @@ class TestFuncKeyActions(TestResources):
         expected_response = {'id': func_key_id,
                              'type': 'speeddial',
                              'destination': 'user',
-                             'destination_id': 2}
+                             'destination_id': 2,
+                             'links': [{
+                                 'href': 'http://localhost/1.1/func_keys/%s' % func_key_id,
+                                 'rel': 'func_keys'
+                             }]}
 
         get_action.return_value = Response(self._serialize_encode(expected_response))
 
