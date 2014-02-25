@@ -80,7 +80,7 @@ Feature: REST API Function keys
             | type      | destination      | destination_id |
             | speeddial | superdestination | 848966         |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: destination superdestination does not exist"
+        Then I get an error message "Invalid parameters: destination of type superdestination does not exist"
 
     Scenario: Creating a func key with a destination id that doesn't exist
         Given there are no users with id "168110"
@@ -88,7 +88,7 @@ Feature: REST API Function keys
             | type      | destination | destination_id |
             | speeddial | user        | 168110         |
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: user with id=168110 does not exist"
+        Then I get an error message "Nonexistent parameters: user 168110 does not exist"
 
     Scenario: Creating a func key with a destination for a user
         Given I have the following users:
