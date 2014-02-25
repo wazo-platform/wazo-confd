@@ -1,4 +1,4 @@
-: REST API SIP Lines
+Feature: REST API SIP Lines
 
     Scenario: Get a SIP line
         Given I have the following lines:
