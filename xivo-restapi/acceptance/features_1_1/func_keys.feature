@@ -101,7 +101,7 @@ Feature: REST API Function keys
         Then I get a response with an id
         Then I get a header with a location for the "func_keys" resource
         Then I get a response with a link to the "func_keys" resource
-        Then I have the following func keys via RESTAPI:
+        Then I have the following func key via RESTAPI:
             | type      | destination | destination_id |
             | speeddial | user        | 922545         |
 
