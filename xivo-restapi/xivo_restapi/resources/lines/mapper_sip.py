@@ -25,7 +25,6 @@ MAPPING = {
     'context': 'context',
     'interface': 'interface',
     'device_slot': 'device_slot',
-    'device_id': 'device_id',
     'provisioning_extension': 'provisioning_extension',
     'commented': 'commented',
     'description': 'description',

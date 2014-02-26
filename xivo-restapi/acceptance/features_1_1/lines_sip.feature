@@ -2,13 +2,13 @@ Feature: REST API SIP Lines
 
     Scenario: Get a SIP line
         Given I have the following lines:
-          | id     | username | secret | context | protocol | device_slot | device_id                        |
-          | 553215 | toto     | abcdef | default | sip      | 1           | b054de13b8b73d5683815929c20033ad |
+          | id     | username | secret | context | protocol | device_slot |
+          | 553215 | toto     | abcdef | default | sip      | 1           |
         When I ask for the line_sip with id "553215"
         Then I get a response with status "200"
         Then I have a line_sip with the following parameters:
-          | id     | username | secret | context | device_id                        |
-          | 553215 | toto     | abcdef | default | b054de13b8b73d5683815929c20033ad |
+          | id     | username | secret | context |
+          | 553215 | toto     | abcdef | default |
         Then I have a line_sip with the following attributes:
           | attribute              |
           | provisioning_extension |
