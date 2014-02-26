@@ -37,5 +37,10 @@ def get(funckeyid):
     return actions.get(funckeyid)
 
 
+@route('', methods=['POST'])
+def create():
+    return actions.create()
+
+
 def register_blueprints(app):
     app.register_blueprint(blueprint)

@@ -1,5 +1,6 @@
 import logging
 
+from flask import request, url_for
 from flask.helpers import make_response
 
 from xivo_restapi.helpers.formatter import Formatter
@@ -30,3 +31,12 @@ def get(func_key_id):
     func_key = func_key_services.get(func_key_id)
     result = formatter.to_api(func_key)
     return make_response(result, 200)
+
+
+def create():
+    data = request.data.decode("utf-8")
+    converted_func_key = formatter.to_model(data)
+    func_key = func_key_services.create(converted_func_key)
+    formatted_func_key = formatter.to_api(func_key)
+    location = url_for('.get', funckeyid=func_key.id)
+    return make_response(formatted_func_key, 201, {'Location': location})
