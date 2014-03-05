@@ -17,7 +17,6 @@ Feature: REST API Function keys
         Given there are users with infos:
             | firstname | lastname | number | context |
             | Fodé      | Bangoura | 1833   | default |
-        Given I have a speeddial func key for user "Fodé" "Bangoura"
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
         Then the list contains a speeddial func key for user "Fodé" "Bangoura"
@@ -27,8 +26,6 @@ Feature: REST API Function keys
             | firstname | lastname | number | context |
             | Fodé      | Bangoura | 1749   | default |
             | Bountrabi | Sylla    | 1750   | default |
-        Given I have a speeddial func key for user "Fodé" "Bangoura"
-        Given I have a speeddial func key for user "Bountrabi" "Sylla"
         When I request the list of func keys with the following parameters via RESTAPI:
             | limit |
             | 1     |
