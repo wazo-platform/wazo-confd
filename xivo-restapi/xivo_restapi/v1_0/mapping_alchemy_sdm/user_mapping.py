@@ -54,15 +54,13 @@ class UserMapping(AbstractMapping):
                               'ringgroup': '',
                               'ringforward': '',
                               'rightcallcode': '',
-                              'description': ''
-                            }
+                              'description': ''}
 
     alchemy_types = {
-                    'enableclient': int,
-                     }
+        'enableclient': int,
+    }
 
     sdm_types = {'enableclient': bool}
-
 
     def __init__(self):
         self.sdm_class = UserSdm

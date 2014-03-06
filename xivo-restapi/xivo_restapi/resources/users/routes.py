@@ -26,5 +26,6 @@ route = RouteGenerator(blueprint)
 
 from . import actions
 
+
 def register_blueprints(app):
     app.register_blueprint(blueprint)

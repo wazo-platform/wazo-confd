@@ -81,9 +81,3 @@ class TestVoicemailMapping(unittest.TestCase):
         voicemail_dict_sdm['notExistingKey'] = deletevoicemail
 
         self.assertRaises(AttributeError, self.voicemail_mapping.sdm_to_alchemy_dict, voicemail_dict_sdm)
-
-
-
-
-
-

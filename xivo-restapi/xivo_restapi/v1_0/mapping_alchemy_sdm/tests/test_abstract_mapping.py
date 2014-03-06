@@ -45,8 +45,8 @@ class TestAbstractMapping(unittest.TestCase):
                           'prop4_your': "c'est vache"
                           }
         cast = {
-                'prop0_your': int
-                }
+            'prop0_your': int
+        }
         my_mapping = ConcreteMapping()
         my_mapping.map_attributes(object_from, object_to, mapping, cast, default_values)
         self.assertEquals(object_from.prop1_my, object_to.prop1_your)

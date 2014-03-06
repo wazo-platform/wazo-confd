@@ -32,26 +32,26 @@ class TestDeviceActions(TestResources):
     def test_list(self, profile_service_list):
         expected_status_code = 200
         expected_result = {
-                    'total': 2,
-                    'items': [
-                        {
-                            'id': 1,
-                            'name': 'Client',
-                            'links': [{
-                                            'href': 'http://localhost/1.1/cti_profiles/1',
-                                            'rel': 'cti_profiles'
-                                        }]
-                        },
-                        {
-                            "id": 2,
-                            "name": "Agent",
-                            'links': [{
-                                            'href': 'http://localhost/1.1/cti_profiles/2',
-                                            'rel': 'cti_profiles'
-                                        }]
-                        }
-                    ]
+            'total': 2,
+            'items': [
+                {
+                    'id': 1,
+                    'name': 'Client',
+                    'links': [{
+                            'href': 'http://localhost/1.1/cti_profiles/1',
+                            'rel': 'cti_profiles'
+                    }]
+                },
+                {
+                    "id": 2,
+                    "name": "Agent",
+                    'links': [{
+                            'href': 'http://localhost/1.1/cti_profiles/2',
+                            'rel': 'cti_profiles'
+                    }]
                 }
+            ]
+        }
         profile1 = CtiProfile(id=1, name="Client")
         profile2 = CtiProfile(id=2, name="Agent")
         profile_service_list.return_value = [profile1, profile2]
@@ -65,13 +65,13 @@ class TestDeviceActions(TestResources):
     def test_get(self, profile_service_get):
         expected_status_code = 200
         expected_result = {
-                    'id': 1,
-                    'name': 'Agent',
-                    'links': [{
-                                    'href': 'http://localhost/1.1/cti_profiles/1',
-                                    'rel': 'cti_profiles'
-                                }]
-                    }
+            'id': 1,
+            'name': 'Agent',
+            'links': [{
+                    'href': 'http://localhost/1.1/cti_profiles/1',
+                    'rel': 'cti_profiles'
+            }]
+        }
         profile = CtiProfile(id=1, name="Agent")
         profile_service_get.return_value = profile
 

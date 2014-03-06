@@ -68,14 +68,14 @@ def _parse_args():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-f",
-                        '--foreground',
-                        action='store_true',
-                        default=False,
-                        help="Foreground, don't daemonize. Not use with <dev_mode>. Default: %(default)s")
+                       '--foreground',
+                       action='store_true',
+                       default=False,
+                       help="Foreground, don't daemonize. Not use with <dev_mode>. Default: %(default)s")
     group.add_argument('--dev_mode',
-                        action='store_true',
-                        default=False,
-                        help="Launch Flask in dev mode, not use wsgi. Default: %(default)s")
+                       action='store_true',
+                       default=False,
+                       help="Launch Flask in dev mode, not use wsgi. Default: %(default)s")
     parser.add_argument('-d',
                         '--debug',
                         action='store_true',

@@ -39,16 +39,16 @@ class VoicemailMapping(AbstractMapping):
                               'tz': 'eu-fr'}
 
     alchemy_types = {
-                       'attach': int,
-                       'skipcheckpass': int,
-                       'deletevoicemail': int
-                     }
+        'attach': int,
+        'skipcheckpass': int,
+        'deletevoicemail': int
+    }
 
     sdm_types = {
-                'attach': bool,
-                'skipcheckpass': bool,
-                'deleteaftersend': bool
-                 }
+        'attach': bool,
+        'skipcheckpass': bool,
+        'deleteaftersend': bool
+    }
 
     def __init__(self):
         self.sdm_class = VoicemailSdm

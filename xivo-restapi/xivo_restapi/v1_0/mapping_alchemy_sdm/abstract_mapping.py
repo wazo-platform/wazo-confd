@@ -25,17 +25,17 @@ class AbstractMapping(object):
     def alchemy_to_sdm(self, alchemy_instance):
         sdm_instance = self.sdm_class()
         return self.map_attributes(alchemy_instance,
-                                             sdm_instance,
-                                             self.mapping,
-                                             self.sdm_types)
+                                   sdm_instance,
+                                   self.mapping,
+                                   self.sdm_types)
 
     def sdm_to_alchemy(self, sdm_instance):
         alchemy_instance = self.alchemy_class()
         return self.map_attributes(sdm_instance,
-                                             alchemy_instance,
-                                             self.reverse_mapping,
-                                             self.alchemy_types,
-                                             self.alchemy_default_values)
+                                   alchemy_instance,
+                                   self.reverse_mapping,
+                                   self.alchemy_types,
+                                   self.alchemy_default_values)
 
     def sdm_to_alchemy_dict(self, user_dict):
         result = {}

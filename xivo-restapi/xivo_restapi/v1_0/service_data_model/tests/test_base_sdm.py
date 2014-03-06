@@ -66,4 +66,3 @@ class TestBaseSdm(unittest.TestCase):
             return
 
         self.assertTrue(False, 'Exception not raised!')
-
