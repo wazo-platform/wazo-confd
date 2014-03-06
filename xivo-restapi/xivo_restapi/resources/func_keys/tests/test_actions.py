@@ -59,26 +59,3 @@ class TestFuncKeyActions(unittest.TestCase):
         formatter_to_api.assert_called_once_with(func_key)
         make_response.assert_called_once_with(formatted_func_key, 200)
         assert_that(result, equal_to(response))
-
-    @patch('xivo_restapi.resources.func_keys.actions.url_for')
-    @patch('xivo_restapi.resources.func_keys.actions.make_response')
-    @patch('xivo_dao.data_handler.func_key.services.create')
-    @patch('xivo_restapi.resources.func_keys.actions.formatter')
-    @patch('xivo_restapi.resources.func_keys.actions.request')
-    def test_create(self, request, formatter, services_create, make_response, url_for):
-        data = request.data = Mock()
-        json_func_key = data.decode.return_value = Mock()
-        converted_func_key = formatter.to_model.return_value = Mock()
-        created_func_key = services_create.return_value = Mock()
-        formatted_func_key = formatter.to_api.return_value = Mock()
-        encoded_func_key = make_response.return_value = Mock()
-        url = url_for.return_value = Mock()
-
-        result = actions.create()
-
-        data.decode.assert_called_once_with('utf-8')
-        formatter.to_model.assert_called_once_with(json_func_key)
-        services_create.assert_called_once_with(converted_func_key)
-        formatter.to_api.assert_called_once_with(created_func_key)
-        make_response.assert_called_once_with(formatted_func_key, 201, {'Location': url})
-        assert_that(result, equal_to(encoded_func_key))
