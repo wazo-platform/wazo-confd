@@ -32,6 +32,25 @@ Feature: REST API Function keys
         Then I get a response with status "200"
         Then I have a list with 1 results
 
+    Scenario: Creating a user adds a func key to the list
+        Given there is no user "Ninè" "Bangoura"
+        When I create users with the following parameters:
+            | firstname | lastname |
+            | Ninè      | Bangoura |
+        Then I get a response with status "201"
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list contains a speeddial func key for user "Ninè" "Bangoura"
+
+    Scenario: Deleting a user removes a func key from the list
+        Given I have the following users:
+            | firstname | lastname |
+            | Moko      | Bangoura |
+        When I delete the user with name "Moko" "Bangoura"
+        Then I get a response with status "204"
+        When I request the list of func keys via RESTAPI
+        Then the list does not contain a speeddial func key for user "Moko" "Bangoura"
+
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"
         When I request the func key with id "725437" via RESTAPI
