@@ -108,7 +108,6 @@ class TestUserVoicemailActions(TestResources):
 
         result = self.app.get(BASE_URL % user_id)
 
-        print result.data
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
