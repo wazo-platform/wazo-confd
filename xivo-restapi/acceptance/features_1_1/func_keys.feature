@@ -14,18 +14,18 @@ Feature: REST API Function keys
         Then I get an error message "Invalid parameters: limit must be a positive integer"
 
     Scenario: List of Function keys
-        Given there are users with infos:
-            | firstname | lastname | number | context |
-            | Fodé      | Bangoura | 1833   | default |
+        Given I have the following users:
+            | firstname | lastname |
+            | Fodé      | Bangoura |
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
         Then the list contains a speeddial func key for user "Fodé" "Bangoura"
 
     Scenario: List of Function keys with limit
-        Given there are users with infos:
-            | firstname | lastname | number | context |
-            | Fodé      | Bangoura | 1749   | default |
-            | Bountrabi | Sylla    | 1750   | default |
+        Given I have the following users:
+            | firstname | lastname |
+            | Fodé      | Bangoura |
+            | Bountrabi | Sylla    |
         When I request the list of func keys with the following parameters via RESTAPI:
             | limit |
             | 1     |
@@ -57,9 +57,9 @@ Feature: REST API Function keys
         Then I get a response with status "404"
 
     Scenario: Get a func key
-        Given there are users with infos:
-            | firstname | lastname  | number | context |
-            | Fodé      | Sanderson | 1348   | default |
+        Given I have the following users:
+            | firstname | lastname  |
+            | Fodé      | Sanderson |
         When I request the funckey with a destination for user "Fodé" "Sanderson"
         Then I get a response with status "200"
         Then I get a response with a link to the "func_keys" resource
