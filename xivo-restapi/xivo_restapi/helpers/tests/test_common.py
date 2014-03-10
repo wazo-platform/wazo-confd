@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from hamcrest import *
+from hamcrest import assert_that, equal_to
 from mock import Mock, patch
 from werkzeug.exceptions import HTTPException, BadRequest
 from xivo_restapi.helpers.common import exception_catcher, \
@@ -38,7 +38,7 @@ from xivo_dao.data_handler.exception import AssociationNotExistsError
 class TestCommon(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         app.testing = True
         app.test_request_context('').push()
 

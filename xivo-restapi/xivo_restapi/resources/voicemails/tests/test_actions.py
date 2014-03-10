@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from mock import patch, Mock
-from hamcrest import *
+from hamcrest import assert_that, equal_to
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.voicemail.model import Voicemail, VoicemailOrder
 from xivo_dao.helpers.abstract_model import SearchResult
@@ -235,7 +235,7 @@ class TestVoicemailsAction(TestResources):
     @patch('xivo_restapi.resources.voicemails.actions.formatter')
     @patch('xivo_dao.data_handler.voicemail.services.get')
     @patch('xivo_dao.data_handler.voicemail.services.edit')
-    def test_edit(self, vociemail_services_edit, voicemail_services_get, formatter):
+    def test_edit(self, voicemail_services_edit, voicemail_services_get, formatter):
         expected_status_code = 204
         expected_data = ''
 
@@ -252,6 +252,7 @@ class TestVoicemailsAction(TestResources):
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
         formatter.update_model.assert_called_with(data_serialized, voicemail)
+        voicemail_services_edit.assert_called_once_with(voicemail)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_data))
 
