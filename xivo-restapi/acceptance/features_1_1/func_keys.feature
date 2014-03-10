@@ -57,6 +57,23 @@ Feature: REST API Function keys
             | type      | destination | destination name |
             | speeddial | user        | Moko Bangoura    |
 
+    Scenario: Creating a group adds a func key to the list
+        Given there is no group "guineeallstars"
+        When I create a group "guineeallstars" with number "2968"
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | group       | guineeallstars   |
+
+    Scenario: Deleting a group removes a func key from the list
+        Given there is a group "salifkeita" with extension "2548@default"
+        When I remove the group "salifkeita"
+        When I request the list of func keys via RESTAPI
+        Then the list does not contain the following func keys:
+            | type      | destination | destination name |
+            | speeddial | group       | salifkeita       |
+
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"
         When I request the func key with id "725437" via RESTAPI
