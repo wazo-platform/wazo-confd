@@ -19,7 +19,9 @@ Feature: REST API Function keys
             | Fodé      | Bangoura |
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
-        Then the list contains a speeddial func key for user "Fodé" "Bangoura"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Fodé Bangoura    |
 
     Scenario: List of Function keys with limit
         Given I have the following users:
@@ -40,7 +42,9 @@ Feature: REST API Function keys
         Then I get a response with status "201"
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
-        Then the list contains a speeddial func key for user "Ninè" "Bangoura"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Ninè Bangoura    |
 
     Scenario: Deleting a user removes a func key from the list
         Given I have the following users:
@@ -49,7 +53,9 @@ Feature: REST API Function keys
         When I delete the user with name "Moko" "Bangoura"
         Then I get a response with status "204"
         When I request the list of func keys via RESTAPI
-        Then the list does not contain a speeddial func key for user "Moko" "Bangoura"
+        Then the list does not contain the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Moko Bangoura    |
 
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"
