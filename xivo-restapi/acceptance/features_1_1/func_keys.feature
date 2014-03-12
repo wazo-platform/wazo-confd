@@ -53,19 +53,15 @@ Feature: REST API Function keys
 
         When I request the list of func keys with the following parameters via RESTAPI:
             | limit | order       |
-            | 1     | destination |
+            | 1     | id          |
         Then I have a list with 1 results
-        Then the list contains the following func keys:
-            | type      | destination | destination name  |
-            | speeddial | group       | danseurscorontine |
 
+        When I memorize the first entry in the list
         When I request the list of func keys with the following parameters via RESTAPI:
             | limit | skip | order       |
-            | 1     | 1    | destination |
+            | 1     | 1    | id          |
         Then I have a list with 1 results
-        Then the list contains the following func keys:
-            | type      | destination | destination name |
-            | speeddial | user        | Bountrabi Sylla  |
+        Then the memorized entry is not in the list
 
     Scenario: Creating a user adds a func key to the list
         Given there is no user "Ninè" "Bangoura"
