@@ -19,18 +19,49 @@ Feature: REST API Function keys
             | Fodé      | Bangoura |
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
-        Then the list contains a speeddial func key for user "Fodé" "Bangoura"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Fodé Bangoura    |
 
-    Scenario: List of Function keys with limit
+    Scenario: List of Function keys with order and direction
+        Given there is a group "balletnational" with extension "2392@default"
         Given I have the following users:
             | firstname | lastname |
-            | Fodé      | Bangoura |
-            | Bountrabi | Sylla    |
+            | Mao       | Abdoulai |
+
         When I request the list of func keys with the following parameters via RESTAPI:
-            | limit |
-            | 1     |
-        Then I get a response with status "200"
+            | order       | direction |
+            | destination | asc       |
+        Then the list contains the following func keys in the right order:
+            | type      | destination | destination name |
+            | speeddial | group       | balletnational   |
+            | speeddial | user        | Mao Abdoulai     |
+
+        When I request the list of func keys with the following parameters via RESTAPI:
+            | order       | direction  |
+            | destination | desc       |
+        Then the list contains the following func keys in the right order:
+            | type      | destination | destination name |
+            | speeddial | user        | Mao Abdoulai     |
+            | speeddial | group       | balletnational   |
+
+    Scenario: List of Function keys with limit and skip
+        Given there is a group "danseurscorontine" with extension "2744@default"
+        Given I have the following users:
+            | firstname | lastname |
+            | Bountrabi | Sylla    |
+
+        When I request the list of func keys with the following parameters via RESTAPI:
+            | limit | order       |
+            | 1     | id          |
         Then I have a list with 1 results
+
+        When I memorize the first entry in the list
+        When I request the list of func keys with the following parameters via RESTAPI:
+            | limit | skip | order       |
+            | 1     | 1    | id          |
+        Then I have a list with 1 results
+        Then the memorized entry is not in the list
 
     Scenario: Creating a user adds a func key to the list
         Given there is no user "Ninè" "Bangoura"
@@ -40,7 +71,9 @@ Feature: REST API Function keys
         Then I get a response with status "201"
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
-        Then the list contains a speeddial func key for user "Ninè" "Bangoura"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Ninè Bangoura    |
 
     Scenario: Deleting a user removes a func key from the list
         Given I have the following users:
@@ -49,7 +82,26 @@ Feature: REST API Function keys
         When I delete the user with name "Moko" "Bangoura"
         Then I get a response with status "204"
         When I request the list of func keys via RESTAPI
-        Then the list does not contain a speeddial func key for user "Moko" "Bangoura"
+        Then the list does not contain the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Moko Bangoura    |
+
+    Scenario: Creating a group adds a func key to the list
+        Given there is no group "guineeallstars"
+        When I create a group "guineeallstars" with number "2968"
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | group       | guineeallstars   |
+
+    Scenario: Deleting a group removes a func key from the list
+        Given there is a group "salifkeita" with extension "2548@default"
+        When I remove the group "salifkeita"
+        When I request the list of func keys via RESTAPI
+        Then the list does not contain the following func keys:
+            | type      | destination | destination name |
+            | speeddial | group       | salifkeita       |
 
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"

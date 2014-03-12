@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, FuncKey)
 
 order_mapping = {
+    'id': FuncKeyOrder.id,
     'type': FuncKeyOrder.type,
     'destination': FuncKeyOrder.destination,
 }
