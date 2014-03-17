@@ -207,6 +207,7 @@ class TestLineSIPActions(TestResources):
         result = self.app.post(BASE_URL, data=data_serialized)
 
         assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(formatter.call_count, equal_to(0))
 
     @patch('xivo_restapi.resources.lines.actions_sip.formatter')
     @patch('xivo_dao.data_handler.line.services.create')
@@ -225,6 +226,7 @@ class TestLineSIPActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(formatter.call_count, equal_to(0))
 
     @patch('xivo_restapi.resources.lines.actions_sip.formatter')
     @patch('xivo_dao.data_handler.line.services.create')
@@ -243,6 +245,7 @@ class TestLineSIPActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(formatter.call_count, equal_to(0))
 
     @patch('xivo_restapi.resources.lines.actions_sip.formatter')
     @patch('xivo_dao.data_handler.line.services.get')

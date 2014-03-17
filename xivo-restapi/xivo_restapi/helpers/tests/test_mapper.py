@@ -90,10 +90,9 @@ class TestMapper(unittest.TestCase):
             'model_key4': 'api_key4',
         }
 
-        try:
-            mapper.validate_data_from_api(mapping, data_dict)
-        except:
-            self.fail("validate_data_from_api raised an error")
+        mapper.validate_data_from_api(mapping, data_dict)
+
+        # No exception raised
 
     def test_validate_data_from_api_with_invalid_data(self):
         data_dict = {

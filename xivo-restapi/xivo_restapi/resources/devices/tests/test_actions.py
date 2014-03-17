@@ -291,7 +291,8 @@ class TestDeviceActions(TestResources):
 
         result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
 
-        formatter.update_model.assert_called_with(data_serialized, device)
+        device_services_edit.assert_called_once_with(device)
+        formatter.update_model.assert_called_once_with(data_serialized, device)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_data))
 

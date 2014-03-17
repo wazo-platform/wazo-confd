@@ -30,7 +30,9 @@ class TestNegotiate(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.secret_key = 'test'
 
-    def _mock_headers(self, headers={}, **kwargs):
+    def _mock_headers(self, headers=None, **kwargs):
+        if headers is None:
+            headers = {}
         ctx = self.app.test_request_context('', headers=headers, **kwargs)
         ctx.push()
 

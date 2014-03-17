@@ -67,7 +67,7 @@ class TestFormatter(unittest.TestCase):
                                    self._serializer,
                                    self._model_class)
 
-    def add_links_to_dict(self, data_dict, obj):
+    def add_links_to_dict(self, data_dict, _):
         data_dict.update({'links': 'links'})
 
     def test_list_to_api(self):
