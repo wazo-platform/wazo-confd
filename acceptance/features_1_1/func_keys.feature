@@ -124,6 +124,28 @@ Feature: REST API Function keys
             | type      | destination | destination name |
             | speeddial | group       | salifkeita       |
 
+    Scenario: Creating a queue adds a func key to the list
+        Given there is no queue with number "3658"
+        When I create the following queues:
+            | name    | display name | number | context |
+            | lafoire | La Foire     | 3658   | default |
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | queue       | lafoire          |
+
+    Scenario: Deleting a queue removes a func key from the list
+        Given there are queues with infos:
+            | name    | display name | number | context |
+            | cellcom | Cell Com     | 3288   | default |
+        When I delete the queue with number "3288"
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list does not contain the following func keys:
+            | type      | destination | destination name |
+            | speeddial | queue       | cellcom          |
+
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"
         When I request the func key with id "725437" via RESTAPI
