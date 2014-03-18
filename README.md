@@ -19,12 +19,12 @@ Running unit tests
 ------------------
 
 1. Install requirements with ```pip install -r requirements.txt```
-2. Run tests with ```nosetests xivo-restapi/xivo_restapi```
+2. Run tests with ```nosetests xivo_restapi```
 
 
 Running functional tests
 ------------------------
 
 1. Install and configure the [XiVO acceptance](https://github.com/xivo-pbx/xivo-acceptance) library
-2. Go into ```xivo-restapi/acceptance/features_1_1```
+2. Go into ```acceptance/features_1_1```
 3. Run any of the files with [lettuce](http://lettuce.it)
