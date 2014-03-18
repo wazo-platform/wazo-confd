@@ -119,6 +119,7 @@ Feature: REST API Function keys
         Given there is a group "salifkeita" with extension "2548@default"
         When I remove the group "salifkeita"
         When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
         Then the list does not contain the following func keys:
             | type      | destination | destination name |
             | speeddial | group       | salifkeita       |
