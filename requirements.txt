@@ -1,7 +1,7 @@
-svn+https://github.com/xivo-pbx/xivo-dao/trunk/xivo-dao
--e svn+https://github.com/xivo-pbx/xivo-provisioning/trunk/xivo-provisioning#egg=provd
-svn+https://github.com/xivo-pbx/xivo-lib-python/trunk/xivo-lib-python
--e svn+https://github.com/xivo-pbx/xivo-bus/trunk/xivo-bus#egg=xivo-bus
+git+https://github.com/xivo-pbx/xivo-dao.git
+git+https://github.com/xivo-pbx/xivo-provisioning.git
+git+https://github.com/xivo-pbx/xivo-lib-python.git
+git+https://github.com/xivo-pbx/xivo-bus.git
 nose
 sqlalchemy
 psycopg2
