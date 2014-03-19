@@ -23,6 +23,26 @@ Feature: REST API Function keys
             | type      | destination | destination name |
             | speeddial | user        | Fodé Bangoura    |
 
+    Scenario: List of Function keys with search
+        Given there is a group "balletnational" with extension "2392@default"
+        Given I have the following users:
+            | firstname | lastname |
+            | Mao       | Abdoulai |
+
+        When I request the list of func keys with the following parameters via RESTAPI:
+            | search |
+            | user   |
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | user        | Mao Abdoulai     |
+
+        When I request the list of func keys with the following parameters via RESTAPI:
+            | search |
+            | group  |
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | group       | balletnational   |
+
     Scenario: List of Function keys with order and direction
         Given there is a group "balletnational" with extension "2392@default"
         Given I have the following users:
