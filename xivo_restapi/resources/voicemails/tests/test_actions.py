@@ -54,8 +54,8 @@ class TestVoicemailsAction(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.voicemail.services.find_all')
-    def test_list_voicemails_with_no_voicemails(self, mock_voicemail_services_find_all):
+    @patch('xivo_dao.data_handler.voicemail.services.search')
+    def test_list_voicemails_with_no_voicemails(self, mock_voicemail_services_search):
         expected_status_code = 200
         expected_result = {
             'total': 0,
@@ -65,16 +65,16 @@ class TestVoicemailsAction(TestResources):
         voicemails_found = Mock(SearchResult)
         voicemails_found.total = 0
         voicemails_found.items = []
-        mock_voicemail_services_find_all.return_value = voicemails_found
+        mock_voicemail_services_search.return_value = voicemails_found
 
         result = self.app.get(BASE_URL)
 
-        mock_voicemail_services_find_all.assert_any_call()
+        mock_voicemail_services_search.assert_any_call()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.voicemail.services.find_all')
-    def test_list_voicemails_with_two_voicemails(self, voicemail_find_all):
+    @patch('xivo_dao.data_handler.voicemail.services.search')
+    def test_list_voicemails_with_two_voicemails(self, voicemail_search):
         voicemail_id_1 = 123421
         voicemail_id_2 = 235235
         total = 2
@@ -141,17 +141,17 @@ class TestVoicemailsAction(TestResources):
         voicemails_found.total = total
         voicemails_found.items = [voicemail1, voicemail2]
 
-        voicemail_find_all.return_value = voicemails_found
+        voicemail_search.return_value = voicemails_found
 
         result = self.app.get(BASE_URL)
 
-        voicemail_find_all.assert_called_once_with()
+        voicemail_search.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_restapi.resources.voicemails.actions.extract_find_parameters')
-    @patch('xivo_dao.data_handler.voicemail.services.find_all')
-    def test_list_voicemails_with_parameters(self, voicemail_find_all, extract_find_parameters):
+    @patch('xivo_dao.data_handler.voicemail.services.search')
+    def test_list_voicemails_with_parameters(self, voicemail_search, extract_find_parameters):
         expected_status_code = 200
         expected_result = {
             'total': 0,
@@ -171,7 +171,7 @@ class TestVoicemailsAction(TestResources):
         voicemails_found.total = 0
         voicemails_found.items = []
 
-        voicemail_find_all.return_value = voicemails_found
+        voicemail_search.return_value = voicemails_found
 
         result = self.app.get("%s?%s" % (BASE_URL, query_string))
 
@@ -183,7 +183,7 @@ class TestVoicemailsAction(TestResources):
             'language': VoicemailOrder.language,
             'timezone': VoicemailOrder.timezone
         })
-        voicemail_find_all.assert_called_once_with(**request_parameters)
+        voicemail_search.assert_called_once_with(**request_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
