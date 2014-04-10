@@ -19,19 +19,16 @@ import logging
 
 from . import mapper
 
-from flask import Blueprint, url_for, request
+from flask import url_for, request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
 from xivo_dao.data_handler.extension.model import Extension
-from xivo_restapi import config
-from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.formatter import Formatter
+from xivo_restapi.resources.extensions.routes import extension_route as route
 
 
 logger = logging.getLogger(__name__)
-blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Extension)
 
 

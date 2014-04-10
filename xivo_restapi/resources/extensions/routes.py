@@ -16,8 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import Blueprint
 
-from actions import blueprint as extension_blueprint
+from xivo_restapi import config
+from xivo_restapi.helpers.route_generator import RouteGenerator
+
+extension_blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.VERSION_1_1)
+extension_route = RouteGenerator(extension_blueprint)
+
+from xivo_restapi.resources.extensions import actions
 
 
 def register_blueprints(app):
