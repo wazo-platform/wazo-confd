@@ -18,7 +18,9 @@
 
 from . import actions
 from xivo_restapi.resources.lines.routes import line_blueprint
+from xivo_restapi.resources.extensions.routes import extension_blueprint
 
 
 def register_blueprints(app):
     app.register_blueprint(line_blueprint)
+    app.register_blueprint(extension_blueprint)

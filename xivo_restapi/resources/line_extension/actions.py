@@ -22,13 +22,15 @@ from xivo_dao.data_handler.exception import AssociationNotExistsError
 from xivo_dao.data_handler.line_extension import services as line_extension_services
 from xivo_dao.data_handler.line_extension.exception import LineExtensionNotExistsError
 
-from xivo_restapi.resources.lines.routes import line_route as route
+from xivo_restapi.resources.lines.routes import line_route
+from xivo_restapi.resources.extensions.routes import extension_route
+
 from xivo_restapi.resources.line_extension.formatter import LineExtensionFormatter
 
 formatter = LineExtensionFormatter()
 
 
-@route('/<int:lineid>/extension', methods=['POST'])
+@line_route('/<int:lineid>/extension', methods=['POST'])
 def associate_extension(lineid):
     data = request.data.decode("utf-8")
     model = formatter.to_model(data, lineid)
@@ -39,8 +41,8 @@ def associate_extension(lineid):
     return make_response(result, 201, {'Location': location})
 
 
-@route('/<int:lineid>/extension')
-def get_line_extension(lineid):
+@line_route('/<int:lineid>/extension')
+def get_extension_from_line(lineid):
     try:
         line_extension = line_extension_services.get_by_line_id(lineid)
     except LineExtensionNotExistsError:
@@ -49,7 +51,17 @@ def get_line_extension(lineid):
     return make_response(result, 200)
 
 
-@route('/<int:lineid>/extension', methods=['DELETE'])
+@extension_route('/<int:extensionid>/line')
+def get_line_from_extension(extensionid):
+    try:
+        line_extension = line_extension_services.get_by_extension_id(extensionid)
+    except LineExtensionNotExistsError:
+        raise AssociationNotExistsError("Extension with id=%d does not have a line" % extensionid)
+    result = formatter.to_api(line_extension)
+    return make_response(result, 200)
+
+
+@line_route('/<int:lineid>/extension', methods=['DELETE'])
 def dissociate_extension(lineid):
     try:
         line_extension = line_extension_services.get_by_line_id(lineid)

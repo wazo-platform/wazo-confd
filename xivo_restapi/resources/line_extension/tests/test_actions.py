@@ -23,7 +23,8 @@ from xivo_dao.data_handler.line_extension.exception import LineExtensionNotExist
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
-BASE_URL = "/1.1/lines/%s/extension"
+LINE_URL = "/1.1/lines/%s/extension"
+EXTENSION_URL = "/1.1/extensions/%s/line"
 
 
 class TestLineExtensionActions(TestResources):
@@ -61,7 +62,7 @@ class TestLineExtensionActions(TestResources):
         }
         data_serialized = self._serialize_encode(data)
 
-        result = self.app.post(BASE_URL % line_id, data=data_serialized)
+        result = self.app.post(LINE_URL % line_id, data=data_serialized)
 
         formatter.to_model.assert_called_once_with(data_serialized, line_id)
         line_extension_associate.assert_called_once_with(line_extension)
@@ -78,7 +79,7 @@ class TestLineExtensionActions(TestResources):
 
         line_extension_get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
 
-        result = self.app.get(BASE_URL % line_id)
+        result = self.app.get(LINE_URL % line_id)
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
@@ -104,7 +105,47 @@ class TestLineExtensionActions(TestResources):
 
         line_extension_get_by_line_id.return_value = line_extension_link
 
-        result = self.app.get(BASE_URL % line_id)
+        result = self.app.get(LINE_URL % line_id)
+        decoded_result = self._serialize_decode(result.data)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(decoded_result, has_entries(expected_result))
+
+    @patch('xivo_dao.data_handler.line_extension.services.get_by_extension_id')
+    def test_get_line_associated_to_an_extension_with_no_line(self, line_extension_get_by_extension_id):
+        extension_id = 1
+        expected_status_code = 404
+        expected_result = ['Extension with id=%s does not have a line' % extension_id]
+
+        line_extension_get_by_extension_id.side_effect = LineExtensionNotExistsError.from_extension_id(extension_id)
+
+        result = self.app.get(EXTENSION_URL % extension_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.line_extension.services.get_by_extension_id')
+    def test_get_line_associated_to_an_extension(self, line_extension_get_by_extension_id):
+        line_id = 1
+        extension_id = 2
+        expected_status_code = 200
+        expected_result = {
+            u'extension_id': 2,
+            u'line_id': 1,
+            u'links': [
+                {u'href': u'http://localhost/1.1/lines/%d' % line_id,
+                 u'rel': u'lines'},
+                {u'href': u'http://localhost/1.1/extensions/%d' % extension_id,
+                 u'rel': u'extensions'},
+            ]
+        }
+
+        line_extension_link = LineExtension(extension_id=extension_id,
+                                            line_id=line_id)
+
+        line_extension_get_by_extension_id.return_value = line_extension_link
+
+        result = self.app.get(EXTENSION_URL % extension_id)
         decoded_result = self._serialize_decode(result.data)
 
         assert_that(result.status_code, equal_to(expected_status_code))
@@ -119,7 +160,7 @@ class TestLineExtensionActions(TestResources):
         expected_status_code = 204
         expected_data = ''
 
-        result = self.app.delete(BASE_URL % line_extension.line_id)
+        result = self.app.delete(LINE_URL % line_extension.line_id)
 
         get_by_line_id.assert_called_once_with(line_extension.line_id)
         line_extension_dissociate.assert_called_once_with(line_extension)
@@ -136,7 +177,7 @@ class TestLineExtensionActions(TestResources):
 
         get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
 
-        result = self.app.delete(BASE_URL % line_id)
+        result = self.app.delete(LINE_URL % line_id)
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
