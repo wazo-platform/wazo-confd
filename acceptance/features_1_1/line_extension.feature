@@ -92,6 +92,32 @@ Feature: Link a line and an extension
         Then I get a response with a link to the "lines" resource using the id "line_id"
         Then I get a response with a link to the "extensions" resource using the id "extension_id"
 
+    Scenario: Get the line associated to a extension that doesn't exist
+        When I send a request for the line associated to a fake extension
+        Then I get a response with status "404"
+        Then I get an error message matching "Extension with extension_id=\d+ does not exist"
+
+    Scenario: Get the line associated to an extension with no lines
+        Given I have the following extensions:
+            | exten | context |
+            | 1844  | default |
+        When I send a request for the line associated to extension with exten "1844@default"
+        Then I get a response with status "404"
+        Then I get an error message matching "Extension with id=\d+ does not have a line"
+
+    Scenario: Get the line associated to an extension
+        Given I have the following extensions:
+            | exten | context |
+            | 1749  | default |
+        Given I have the following lines:
+            | id     | context | protocol | device_slot |
+            | 835437 | default | sip      | 1           |
+        Given line "835437" is linked with extension "1749@default"
+        When I send a request for the line associated to extension with exten "1749@default"
+        Then I get a response with status "200"
+        Then I get a response with a link to the "lines" resource using the id "line_id"
+        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+
     Scenario: Dissociate an extension from a line that doesn't exist
         Given I have no line with id "188404"
         When I dissociate the extension associated to line id "188404"
