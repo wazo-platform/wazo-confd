@@ -2,11 +2,9 @@ git+https://github.com/xivo-pbx/xivo-dao.git
 git+https://github.com/xivo-pbx/xivo-provisioning.git
 git+https://github.com/xivo-pbx/xivo-lib-python.git
 git+https://github.com/xivo-pbx/xivo-bus.git
-nose
 sqlalchemy
 psycopg2
 mock
 pyhamcrest
 pika
 flask==0.8
-lettuce
