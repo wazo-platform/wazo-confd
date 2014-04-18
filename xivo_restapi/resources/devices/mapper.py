@@ -29,7 +29,8 @@ MAPPING = {
     'vendor': 'vendor',
     'version': 'version',
     'status': 'status',
-    'description': 'description'
+    'description': 'description',
+    'options': 'options',
 }
 
 
