@@ -18,6 +18,8 @@
 
 import unittest
 
+from hamcrest import assert_that, equal_to
+
 from functools import wraps
 from mock import patch
 from xivo_restapi import flask_http_server
@@ -74,3 +76,7 @@ class TestResources(unittest.TestCase):
 
     def _serialize_decode(self, data):
         return serializer.decode(data)
+
+    def assert_response(self, response, status_code, result):
+        assert_that(status_code, equal_to(response.status_code))
+        assert_that(self._serialize_decode(response.data), equal_to(result))
