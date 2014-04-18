@@ -132,15 +132,15 @@ Feature: REST API Devices
             | id         | label        |
             | mytemplate | testtemplate |
         When I create the following devices:
-            | ip       | mac               | sn | plugin | model     | vendor     | version | description | template_id |
-            | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | mytemplate  |
+            | ip       | mac               | sn | plugin | model     | vendor     | version | description | options               | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | {"switchboard": True} | mytemplate  |
         Then I get a response with status "201"
         Then I get a response with a device id
         Then I get a header with a location for the "devices" resource
         Then I get a response with a link to the "devices" resource
         Then the device has the following parameters:
-            | ip       | mac               | sn | plugin | model     | vendor     | version | description | template_id |
-            | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | mytemplate  |
+            | ip       | mac               | sn | plugin | model     | vendor     | version | description | options               | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | {"switchboard": True} | mytemplate  |
 
     Scenario: Synchronize a device
         Given there are no devices with id "123"
