@@ -208,6 +208,7 @@ Feature: REST API Extensions
         Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the exten of a extension
+        Given I have no extension with exten "1145@default"
         Given I have the following extensions:
           | id     | exten | context |
           | 113444 | 1045  | default |
@@ -231,6 +232,7 @@ Feature: REST API Extensions
       Then I get an error message "Invalid parameters: exten 9999 not inside range of context default"
 
     Scenario: Editing the context of a extension
+        Given I have no extension with exten "1833@toto"
         Given I have the following extensions:
           | id     | exten | context |
           | 214489 | 1833  | default |
@@ -257,6 +259,7 @@ Feature: REST API Extensions
         Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
 
     Scenario: Editing the exten, context of a extension
+        Given I have no extension with exten "1996@patate"
         Given I have the following extensions:
           | id     | exten | context |
           | 113469 | 1292  | default |
