@@ -106,6 +106,7 @@ class TestDeviceActions(TestResources):
                     'sn': None,
                     'model': None,
                     'template_id': None,
+                    'options': None,
                     'links': [{
                         'href': 'http://localhost/1.1/devices/%s' % device_id_1,
                         'rel': 'devices'
@@ -123,6 +124,7 @@ class TestDeviceActions(TestResources):
                     'sn': None,
                     'model': None,
                     'template_id': None,
+                    'options': None,
                     'links': [{
                         'href': 'http://localhost/1.1/devices/%s' % device_id_2,
                         'rel': 'devices'
