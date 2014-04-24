@@ -95,7 +95,7 @@ Feature: Link a line and an extension
     Scenario: Get the line associated to a extension that doesn't exist
         When I send a request for the line associated to a fake extension
         Then I get a response with status "404"
-        Then I get an error message matching "Extension with extension_id=\d+ does not exist"
+        Then I get an error message matching "Extension with id=\d+ does not exist"
 
     Scenario: Get the line associated to an extension with no lines
         Given I have the following extensions:
