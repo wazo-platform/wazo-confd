@@ -277,19 +277,19 @@ Feature: REST API Devices
 
     Scenario: Edit a device with a plugin
         Given the plugin "null" is installed
-        Given the plugin "xivo-aastra-switchboard" is installed
+        Given the plugin "zero" is installed
         Given I have the following devices:
             | mac               | plugin |
             | 00:11:22:33:44:55 | null   |
         When I edit the device with mac "00:11:22:33:44:55" using the following parameters:
-            | plugin                  |
-            | xivo-aastra-switchboard |
+            | plugin |
+            | zero   |
         Then I get a response with status "204"
         When I go get the device with mac "00:11:22:33:44:55" using its id
         Then I get a response with status "200"
         Then the device has the following parameters:
-            | mac               | plugin                  |
-            | 00:11:22:33:44:55 | xivo-aastra-switchboard |
+            | mac               | plugin |
+            | 00:11:22:33:44:55 | zero   |
 
     Scenario: Get a device that doesn't exist
         Given there are no devices with id "1234567890abcdefghij1234567890ab"
