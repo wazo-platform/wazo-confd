@@ -23,6 +23,12 @@ from xivo_restapi.resources.line_extension_collection.formatter import LineExten
 formatter = LineExtensionFormatter()
 
 
+def associate_extension(line_id, parameters):
+    model = formatter.to_model(line_id, parameters)
+    created_model = line_extension_services.associate(model)
+    return formatter.to_api(created_model)
+
+
 def list_extensions(line_id):
     line_extensions = line_extension_services.get_all_by_line_id(line_id)
     return formatter.list_to_api(line_extensions)

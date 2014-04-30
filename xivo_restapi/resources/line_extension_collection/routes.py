@@ -28,5 +28,13 @@ def list_extensions(lineid):
     return make_response(response, 200)
 
 
+@line_route('/<int:lineid>/extensions', methods=['POST'])
+def associate_line_extension(lineid):
+    parameters = request.data.decode("utf-8")
+    response = actions.associate_extension(lineid, parameters)
+    location = url_for('.list_extensions', lineid=lineid)
+    return make_response(response, 201, {'Location': location})
+
+
 def register_blueprints(app):
     app.register_blueprint(line_blueprint)
