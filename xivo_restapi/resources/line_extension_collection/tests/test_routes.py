@@ -72,3 +72,14 @@ class TestLineExtensionCollectionRoutes(TestResources):
 
         associate_extension.assert_called_once_with(LINE_ID, parameters)
         self.assert_response(response, status, expected_response)
+
+    @patch('xivo_restapi.resources.line_extension_collection.actions.dissociate_extension')
+    def test_dissociate_extension(self, dissociate_extension):
+        status = 204
+        expected_response = dissociate_extension.return_value = ''
+
+        response = self.app.delete(DELETE_URL % (LINE_ID, EXTENSION_ID))
+
+        dissociate_extension.assert_called_once_with(LINE_ID, EXTENSION_ID)
+        assert_that(response.status_code, equal_to(status))
+        assert_that(response.data, equal_to(expected_response))

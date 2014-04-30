@@ -53,3 +53,13 @@ class TestLineExtensionCollectionActions(unittest.TestCase):
         associate.assert_called_once_with(model)
         formatter.to_api.assert_callled_once_with(created_model)
         assert_that(result, equal_to(formatted_model))
+
+    @patch('xivo_dao.data_handler.line_extension.services.dissociate')
+    def test_dissociate_extension(self, dissociate, formatter):
+        model = formatter.model_from_ids.return_value = Mock()
+
+        result = actions.dissociate_extension(LINE_ID, EXTENSION_ID)
+
+        dissociate.assert_called_once_with(model)
+        formatter.model_from_ids.assert_callled_once_with(LINE_ID, EXTENSION_ID)
+        assert_that(result, equal_to(''))

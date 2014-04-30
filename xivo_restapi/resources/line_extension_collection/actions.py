@@ -29,6 +29,12 @@ def associate_extension(line_id, parameters):
     return formatter.to_api(created_model)
 
 
+def dissociate_extension(line_id, extension_id):
+    model = formatter.model_from_ids(line_id, extension_id)
+    line_extension_services.dissociate(model)
+    return ''
+
+
 def list_extensions(line_id):
     line_extensions = line_extension_services.get_all_by_line_id(line_id)
     return formatter.list_to_api(line_extensions)

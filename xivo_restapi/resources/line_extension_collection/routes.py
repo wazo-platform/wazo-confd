@@ -36,5 +36,11 @@ def associate_line_extension(lineid):
     return make_response(response, 201, {'Location': location})
 
 
+@line_route('/<int:lineid>/extensions/<int:extensionid>', methods=['DELETE'])
+def dissociate_line_extension(lineid, extensionid):
+    response = actions.dissociate_extension(lineid, extensionid)
+    return make_response(response, 204)
+
+
 def register_blueprints(app):
     app.register_blueprint(line_blueprint)
