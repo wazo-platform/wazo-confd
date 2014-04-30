@@ -155,7 +155,7 @@ Feature: REST API Function keys
         Then I get a response with status "200"
         Then the list contains the following func keys:
             | type      | destination | destination name   |
-            | speeddial | meetme      | jekyll_island_club |
+            | speeddial | conf        | jekyll_island_club |
 
     Scenario: Deleting a conf removes a func key from the list
         Given there is no conf with number "4242"
@@ -167,7 +167,7 @@ Feature: REST API Function keys
         Then I get a response with status "200"
         Then the list does not contain the following func keys:
             | type      | destination | destination name   |
-            | speeddial | meetme      | jekyll_island_club |
+            | speeddial | conf        | jekyll_island_club |
 
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"
