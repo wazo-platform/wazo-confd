@@ -158,3 +158,72 @@ Feature: Link a line and an extension
         When I associate extension "1505@default" to SIP line "dominic"
         Then I get a response with status "400"
         Then I get an error message matching "Invalid parameters: line already associated with a context of type 'internal'"
+
+    Scenario: Dissociate an extension from a SIP line with no associations
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | fode     | sip      | default | 1           |
+        When I dissociate a fake extension from SIP line "fode"
+        Then I get a response with status "404"
+        Then I get an error message matching "Line \(id=\d+\) is not assocaited with extension \(id=\d+\)"
+
+    Scenario: Dissociate an extension from a SIP line with a user
+        Given I have the following lines:
+            | username  | protocol | context | device_slot |
+            | duranteau | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context |
+            | 1650  | default |
+        Given I have the following users:
+            | firstname | lastname  |
+            | Mohammed  | Duranteau |
+        Given SIP line "duranteau" is associated to user "Mohammed" "Duranteau"
+        Given extension "1650@default" is associated to SIP line "duranteau"
+        When I dissociate extension "1650@default" from SIP line "duranteau"
+        Then I get a response with status "204"
+
+    Scenario: Dissociate an extension from a line
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | ibrahim  | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context |
+            | 1744  | default |
+        Given extension "1744@default" is associated to SIP line "ibrahim"
+        When I dissociate extension "1744@default" from SIP line "ibrahim"
+        Then I get a response with status "204"
+
+    Scenario: Dissociate an incoming call from a line
+        Given I have the following lines:
+            | username  | protocol | context | device_slot |
+            | abdoulaye | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context     |
+            | 1510  | from-extern |
+        Given I have the following users:
+            | firstname | lastname  |
+            | Mao       | Abdoulaye |
+        Given SIP line "abdoulaye" is associated to user "Mao" "Abdoulaye"
+        Given extension "1510@from-extern" is associated to SIP line "abdoulaye"
+        When I dissociate extension "1510@from-extern" from SIP line "abdoulaye"
+        Then I get a response with status "204"
+
+    Scenario: Dissociate an extension from a line with a device
+        Given I have the following devices:
+            | ip             | mac               |
+            | 192.168.167.31 | 04:7f:14:ba:9a:23 |
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | moussa   | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context |
+            | 1401  | default |
+        Given I have the following users:
+            | firstname | lastname |
+            | Moussa    | Oury     |
+        Given SIP line "moussa" is associated to user "Moussa" "Oury"
+        Given extension "1401@default" is associated to SIP line "moussa"
+        Given device with ip "192.168.167.31" is provisionned with SIP line "moussa"
+        When I dissociate extension "1401@default" from SIP line "moussa"
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: A device is still associated to the line"
