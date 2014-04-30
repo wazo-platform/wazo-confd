@@ -68,3 +68,93 @@ Feature: Link a line and an extension
         Then I get a response with status "200"
         Then I get a response with a link to the "lines" resource using the id "line_id"
         Then I get a response with a link to the "extensions" resource using the id "extension_id"
+
+    Scenario: Associate an extension with a line that does not exist
+        Given I have the following extensions:
+            | exten | context |
+            | 1500  | default |
+        When I associate the extension "1500@default" with a fake line
+        Then I get a response with status "400"
+        Then I get an error message matching "Nonexistent parameters: line_id \d+ does not exist"
+
+    Scenario: Associate an extension that does not exist with a line
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | cheikh   | sip      | default | 1           |
+        When I associate a fake extension to SIP line "cheikh"
+        Then I get a response with status "400"
+        Then I get an error message matching "Nonexistent parameters: extension_id \d+ does not exist"
+
+    Scenario: Associate an extension with a SIP line
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | mamadou  | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context |
+            | 1343  | default |
+        When I associate extension "1343@default" to SIP line "mamadou"
+        Then I get a response with status "201"
+        Then I get a header with a location matching "/1.1/lines/\d+/extension"
+        Then I get a response with a link to the "lines" resource using the id "line_id"
+        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+
+    Scenario: Associate an extension with a SIP line associated to a user
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | william  | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context |
+            | 1885  | default |
+        Given I have the following users:
+            | firstname | lastname |
+            | William   | Shatner  |
+        Given SIP line "william" is associated to user "William" "Shatner"
+        When I associate extension "1503@default" to SIP line "william"
+        Then I get a response with status "201"
+        Then I get a header with a location matching "/1.1/lines/\d+/extension"
+        Then I get a response with a link to the "lines" resource using the id "line_id"
+        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+
+    Scenario: Associate an incoming call to a SIP line without a user
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | bambara  | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context     |
+            | 1084  | from-extern |
+        When I associate extension "1084@from-extern" to SIP line "bambara"
+        Then I get a response with status "400"
+        Then I get an error message matching "line is not associated with a user"
+
+    Scenario: Associate an incoming call to a SIP line
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | seitika  | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context     |
+            | 1229  | from-extern |
+        Given I have the following users:
+            | firstname | lastname |
+            | Seitika   | Bambara  |
+        When I associate extension "1229@from-extern" to SIP line "seitika"
+        Then I get a response with status "201"
+        Then I get a header with a location matching "/1.1/lines/\d+/extension"
+        Then I get a response with a link to the "lines" resource using the id "line_id"
+        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+
+    Scenario: Associate an extension with a SIP line already associated
+        Given I have the following lines:
+            | username | protocol | context | device_slot |
+            | dominic  | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context |
+            | 1504  | default |
+            | 1505  | default |
+        Given I have the following users:
+            | firstname | lastname |
+            | Dominic   | Djembe   |
+        Given SIP line "dominic" is associated to user "Dominic" "Djembe"
+        Given extension "1504@default" is associated to SIP line "dominic"
+        When I associate extension "1505@default" to SIP line "dominic"
+        Then I get a response with status "400"
+        Then I get an error message matching "Invalid parameters: line already associated with a context of type 'internal'"
