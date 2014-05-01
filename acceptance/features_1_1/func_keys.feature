@@ -146,8 +146,8 @@ Feature: REST API Function keys
             | type      | destination | destination name |
             | speeddial | queue       | cellcom          |
 
-    Scenario: Creating a conf adds a func key to the list
-        Given there is no conf with number "4242"
+    Scenario: Creating a conference adds a func key to the list
+        Given there is no conference with number "4242"
         When I add the following conference rooms:
             | name               | number | context |
             | jekyll_island_club | 4242   | default |
@@ -155,10 +155,10 @@ Feature: REST API Function keys
         Then I get a response with status "200"
         Then the list contains the following func keys:
             | type      | destination | destination name   |
-            | speeddial | conf        | jekyll_island_club |
+            | speeddial | conference        | jekyll_island_club |
 
-    Scenario: Deleting a conf removes a func key from the list
-        Given there is no conf with number "4242"
+    Scenario: Deleting a conference removes a func key from the list
+        Given there is no conference with number "4242"
         When I add the following conference rooms:
             | name               | number | context |
             | jekyll_island_club | 4242   | default |
@@ -167,7 +167,7 @@ Feature: REST API Function keys
         Then I get a response with status "200"
         Then the list does not contain the following func keys:
             | type      | destination | destination name   |
-            | speeddial | conf        | jekyll_island_club |
+            | speeddial | conference        | jekyll_island_club |
 
     Scenario: Get a func key that does not exist
         Given there is no func key with id "725437"
