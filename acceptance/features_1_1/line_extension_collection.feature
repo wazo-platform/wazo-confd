@@ -35,6 +35,10 @@ Feature: Link a line and an extension
             | exten | context     |
             | 1665  | default     |
             | 1889  | from-extern |
+        Given I have the following users:
+            | firstname | lastname |
+            | Ousmane   | Keita    |
+        Given SIP line "ousmane" is associated to user "Ousmane" "Keita"
         Given extension "1665@default" is associated to SIP line "ousmane"
         Given extension "1889@from-extern" is associated to SIP line "ousmane"
         When I get the list of extensions associated to SIP line "ousmane"
@@ -136,6 +140,7 @@ Feature: Link a line and an extension
         Given I have the following users:
             | firstname | lastname |
             | Seitika   | Bambara  |
+        Given SIP line "seitika" is associated to user "Seitika" "Bambara"
         When I associate extension "1229@from-extern" to SIP line "seitika"
         Then I get a response with status "201"
         Then I get a header with a location matching "/1.1/lines/\d+/extension"
