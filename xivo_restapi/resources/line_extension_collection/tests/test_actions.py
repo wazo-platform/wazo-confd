@@ -20,6 +20,7 @@ import unittest
 from hamcrest import assert_that, equal_to
 from mock import patch, Mock
 
+from xivo_dao.data_handler.exception import NonexistentParametersError, AssociationNotExistsError
 from xivo_restapi.resources.line_extension_collection import actions
 
 LINE_ID = 1
@@ -63,3 +64,15 @@ class TestLineExtensionCollectionActions(unittest.TestCase):
         dissociate.assert_called_once_with(model)
         formatter.model_from_ids.assert_callled_once_with(LINE_ID, EXTENSION_ID)
         assert_that(result, equal_to(''))
+
+    @patch('xivo_dao.data_handler.line_extension.services.dissociate')
+    def test_dissociate_extension_when_ids_do_not_exist(self, dissociate, formatter):
+        dissociate.side_effect = NonexistentParametersError()
+        model = formatter.model_from_ids.return_value = Mock()
+
+        self.assertRaises(AssociationNotExistsError,
+                          actions.dissociate_extension,
+                          LINE_ID, EXTENSION_ID)
+
+        dissociate.assert_called_once_with(model)
+        formatter.model_from_ids.assert_callled_once_with(LINE_ID, EXTENSION_ID)
