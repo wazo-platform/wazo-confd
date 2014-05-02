@@ -128,7 +128,7 @@ Feature: Link a line and an extension
             | 1084  | from-extern |
         When I associate extension "1084@from-extern" to SIP line "bambara"
         Then I get a response with status "400"
-        Then I get an error message matching "line is not associated with a user"
+        Then I get an error message matching "line with id \d+ is not associated to a user"
 
     Scenario: Associate an incoming call to a SIP line
         Given I have the following lines:
@@ -162,7 +162,7 @@ Feature: Link a line and an extension
         Given extension "1504@default" is associated to SIP line "dominic"
         When I associate extension "1505@default" to SIP line "dominic"
         Then I get a response with status "400"
-        Then I get an error message matching "Invalid parameters: line already associated with a context of type 'internal'"
+        Then I get an error message matching "Invalid parameters: line with id \d+ already has an extension with a context of type 'internal'"
 
     Scenario: Dissociate an extension from a SIP line with no associations
         Given I have the following lines:
@@ -170,7 +170,7 @@ Feature: Link a line and an extension
             | fode     | sip      | default | 1           |
         When I dissociate a fake extension from SIP line "fode"
         Then I get a response with status "404"
-        Then I get an error message matching "Line \(id=\d+\) is not assocaited with extension \(id=\d+\)"
+        Then I get an error message matching "Nonexistent parameters: extension_id \d+ does not exist"
 
     Scenario: Dissociate an extension from a SIP line with a user
         Given I have the following lines:
