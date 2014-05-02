@@ -69,14 +69,14 @@ Feature: REST API Voicemails
         Given I have the following voicemails:
             | name | number | context |
             | Data | 1005   | default |
-            | Warf | 1004   | default |
+            | Worf | 1004   | default |
         When I request the list of voicemails with the following parameters via RESTAPI:
             | order  |
             | number |
         Then I get a response with status "200"
         Then I get a list of voicemails in the following order via RESTAPI:
             | name | number | context |
-            | Warf | 1004   | default |
+            | Worf | 1004   | default |
             | Data | 1005   | default |
         When I request the list of voicemails with the following parameters via RESTAPI:
             | order |
@@ -85,7 +85,7 @@ Feature: REST API Voicemails
         Then I get a list of voicemails in the following order via RESTAPI:
             | name | number | context |
             | Data | 1005   | default |
-            | Warf | 1004   | default |
+            | Worf | 1004   | default |
 
     Scenario: Voicemail list with order and direction
         Given I have the following voicemails:
