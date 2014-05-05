@@ -158,8 +158,7 @@ Feature: REST API Function keys
             | speeddial | conference        | jekyll_island_club |
 
     Scenario: Deleting a conference removes a func key from the list
-        Given there is no conference with number "4242"
-        When I add the following conference rooms:
+        Given there are the following conference rooms:
             | name               | number | context |
             | jekyll_island_club | 4242   | default |
         When I delete the conference room with number "4242"
