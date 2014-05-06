@@ -26,5 +26,4 @@ DATA_ACCESS_LOGFILENAME = '/var/log/xivo-restapi-data-access.log'
 DATA_ACCESS_LOGGERNAME = 'data-access'
 RESOURCES_PACKAGE = 'xivo_restapi.resources'
 
-VERSION_1_0 = '1.0'
 VERSION_1_1 = '1.1'

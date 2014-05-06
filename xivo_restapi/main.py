@@ -39,7 +39,6 @@ def main():
         config.DEBUG = True
         flask_http_server.app.debug = True
 
-    flask_http_server.register_blueprints_v1_0()
     flask_http_server.register_blueprints_v1_1()
 
     if parsed_args.dev_mode:
