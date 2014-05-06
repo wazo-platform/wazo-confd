@@ -28,7 +28,6 @@ from xivo_restapi import config
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.debug = config.DEBUG
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(minutes=5)
 

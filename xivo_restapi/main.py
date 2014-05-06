@@ -36,7 +36,6 @@ def main():
 
     if parsed_args.debug:
         logger.info("Debug mode enabled.")
-        config.DEBUG = True
         flask_http_server.app.debug = True
 
     flask_http_server.register_blueprints_v1_1()
@@ -103,17 +102,7 @@ def _port_number(value):
 def _init_logging(parsed_args):
     formatter = logging.Formatter('%%(asctime)s %s[%%(process)d] (%%(levelname)s) (%%(name)s): %%(message)s'
                                   % DAEMONNAME)
-    _init_data_access_logger(formatter)
     _init_root_logger(formatter, parsed_args)
-
-
-def _init_data_access_logger(formatter):
-    handler = logging.FileHandler(config.DATA_ACCESS_LOGFILENAME)
-    handler.setFormatter(formatter)
-
-    data_access_logger = logging.getLogger(config.DATA_ACCESS_LOGGERNAME)
-    data_access_logger.addHandler(handler)
-    data_access_logger.setLevel(logging.INFO)
 
 
 def _init_root_logger(formatter, parsed_args):
