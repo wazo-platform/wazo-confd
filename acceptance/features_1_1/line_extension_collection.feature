@@ -113,7 +113,7 @@ Feature: Link a line and an extension
             | firstname | lastname |
             | William   | Shatner  |
         Given SIP line "william" is associated to user "William" "Shatner"
-        When I associate extension "1503@default" to SIP line "william"
+        When I associate extension "1885@default" to SIP line "william"
         Then I get a response with status "201"
         Then I get a header with a location matching "/1.1/lines/\d+/extension"
         Then I get a response with a link to the "lines" resource using the id "line_id"
