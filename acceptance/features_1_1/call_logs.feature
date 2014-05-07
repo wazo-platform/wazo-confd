@@ -30,28 +30,28 @@ Feature: REST API Call logs consultation
         When I get the list of call logs with arguments:
           | start_date            |
           | 2013-01-29T00:00:00   |
-        Then I get a response with status code "400"
+        Then I get a response with status "400"
         Then I get an error message "Missing parameters: end_date"
 
     Scenario: List call logs in a period with missing start parameters
         When I get the list of call logs with arguments:
           | end_date            |
           | 2013-01-29T00:00:00 |
-        Then I get a response with status code "400"
+        Then I get a response with status "400"
         Then I get an error message "Missing parameters: start_date"
 
     Scenario: List call logs in a period with empty start parameter
         When I get the list of call logs with arguments:
           | start_date | end_date            |
           |            | 2013-01-29T00:00:00 |
-        Then I get a response with status code "400"
+        Then I get a response with status "400"
         Then I get an error message "Invalid parameters: start_date"
 
     Scenario: List call logs in a period with empty end parameter
         When I get the list of call logs with arguments:
           | start_date          | end_date |
           | 2013-01-29T00:00:00 |          |
-        Then I get a response with status code "400"
+        Then I get a response with status "400"
         Then I get an error message "Invalid parameters: end_date"
 
     Scenario: List call logs in a period with start greater than end
