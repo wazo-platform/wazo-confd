@@ -20,12 +20,14 @@ from hamcrest import assert_that, equal_to
 
 from mock import patch, Mock
 from xivo_dao.data_handler.user_line.model import UserLine
+from xivo_dao.data_handler.user_line.exception import UserLineNotExistsError
 from xivo_dao.data_handler.user.model import User
 from xivo_dao.data_handler.exception import ElementNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
 BASE_URL = '/1.1/users/%s/lines'
+DISSOCIATE_URL = BASE_URL + '/%s'
 
 
 class TestUserLineActions(TestResources):
@@ -73,6 +75,40 @@ class TestUserLineActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+    @patch('xivo_dao.data_handler.user_line.services.get_by_user_id_and_line_id')
+    @patch('xivo_dao.data_handler.user_line.services.dissociate')
+    def test_dissociate_line(self, user_line_dissociate, get_by_user_id_and_line_id):
+        expected_status_code = 204
+
+        user_id = 1
+        line_id = 2
+        get_by_user_id_and_line_id.return_value = user_line = UserLine(user_id=user_id, line_id=line_id)
+
+        result = self.app.delete(DISSOCIATE_URL % (user_id, line_id))
+
+        user_line_dissociate.assert_called_once_with(user_line)
+        get_by_user_id_and_line_id.assert_called_once_with(user_id, line_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(""))
+
+    @patch('xivo_dao.data_handler.user_line.services.get_by_user_id_and_line_id')
+    def test_dissociate_line_when_user_line_does_not_exist(self, get_by_user_id_and_line_id):
+        user_id = 1
+        line_id = 2
+
+        expected_status_code = 404
+        expected_response = ['User with id=%s is not associated with line id=%s' % (user_id, line_id)]
+
+        get_by_user_id_and_line_id.side_effect = UserLineNotExistsError.from_user_id(user_id)
+
+        result = self.app.delete(DISSOCIATE_URL % (user_id, line_id))
+
+        get_by_user_id_and_line_id.assert_called_once_with(user_id, line_id)
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(self._serialize_decode(result.data), equal_to(expected_response))
 
     @patch('xivo_dao.data_handler.user.services.get')
     def test_get_line_associated_to_a_user_when_user_does_not_exist(self, user_services_get):
