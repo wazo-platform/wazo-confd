@@ -85,3 +85,12 @@ class TestCallLogActions(TestResources):
         assert_that(result.headers, has_entries({
             'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
         }))
+
+    def test_list_call_logs_with_wrongly_formatted_date(self):
+        expected_status_code = 400
+        expected_message = '["Invalid parameters: start_date"]'
+
+        result = self.app.get(BASE_URL + '?start_date=20AB-12-14')
+
+        assert_that(result.status_code, equal_to(expected_status_code))
+        assert_that(result.data, equal_to(expected_message))
