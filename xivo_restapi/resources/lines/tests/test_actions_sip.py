@@ -98,9 +98,8 @@ class TestLineSIPActions(TestResources):
         mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
         assert_that(result.status_code, equal_to(expected_status_code))
 
-    @patch('xivo_restapi.resources.lines.actions_sip.formatter')
     @patch('xivo_dao.data_handler.line.services.get')
-    def test_get(self, mock_line_services_get, formatter):
+    def test_get(self, mock_line_services_get):
         line = LineSIP(id=1,
                        context='default',
                        username='test1',
@@ -124,7 +123,6 @@ class TestLineSIPActions(TestResources):
             }]
         }
 
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
         mock_line_services_get.return_value = line
 
         result = self.app.get("%s/%d" % (BASE_URL, line.id))

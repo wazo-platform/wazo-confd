@@ -28,7 +28,8 @@ MAPPING = {
     'provisioning_extension': 'provisioning_extension',
     'commented': 'commented',
     'description': 'description',
-    'callerid': 'callerid'
+    'callerid': 'callerid',
+    'username': 'username',
 }
 
 
