@@ -40,7 +40,7 @@ Feature: Filter resources
         | users      |
 
     Scenario Outline: Search a list
-        Given I have the the following "<resource>":
+        Given I have the following "<resource>":
             | item          |
             | <first item>  |
             | <second item> |
@@ -132,13 +132,14 @@ Feature: Filter resources
             | <first item>  |
             | <second item> |
         When I request a list for "<resource>" using parameters:
-            | name  | value    |
-            | skip  | 1        |
-            | order | <column> |
+            | name   | value    |
+            | skip   | 1        |
+            | order  | <column> |
+            | search | <search> |
         Then I get a list containing the following items:
             | item          |
             | <second item> |
-        Then I do not have the following items in the list:
+        Then I get a list that does not contain the following items:
             | item         |
             | <first item> |
 
