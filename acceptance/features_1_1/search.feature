@@ -1,34 +1,34 @@
 Feature: Filter resources
 
     Scenario Outline: Pass invalid parameters
-        When I request a list for "<resource>" using the following parameters:
-            | order |
-            | toto  |
+        When I request a list for "<resource>" using parameters:
+            | name  | value |
+            | order | toto  |
         Then I get a response 400 matching "Invalid parameters: ordering column 'toto' does not exist"
 
-        When I request a list for "<resource>" using the following parameters:
-            | direction |
-            | toto      |
+        When I request a list for "<resource>" using parameters:
+            | name      | value |
+            | direction | toto  |
         Then I get a response 400 matching "Invalid parameters: direction must be asc or desc"
 
-        When I request a list for "<resource>" using the following parameters:
-            | limit |
-            | -32   |
+        When I request a list for "<resource>" using parameters:
+            | name  | value |
+            | limit | -32   |
         Then I get a response 400 matching "Invalid parameters: limit must be a positive integer"
 
-        When I request a list for "<resource>" using the following parameters:
-            | limit |
-            | asdf  |
+        When I request a list for "<resource>" using parameters:
+            | name  | value |
+            | limit | asdf  |
         Then I get a response 400 matching "Invalid parameters: limit must be a positive integer"
 
-        When I request a list for "<resource>" using the following parameters:
-            | skip |
-            | -42  |
+        When I request a list for "<resource>" using parameters:
+            | name | value |
+            | skip | asdf  |
         Then I get a response 400 matching "Invalid parameters: skip must be a positive integer"
 
-        When I request a list for "<resource>" using the following parameters:
-            | skip |
-            | asdf |
+        When I request a list for "<resource>" using parameters:
+            | name | value |
+            | skip | -32   |
         Then I get a response 400 matching "Invalid parameters: skip must be a positive integer"
 
     Examples:
@@ -40,20 +40,22 @@ Feature: Filter resources
         | users      |
 
     Scenario Outline: Search a list
-        Given I have created the following "<resource>":
+        Given I have the the following "<resource>":
             | item          |
             | <first item>  |
             | <second item> |
 
-        When I search "<resource>" for "<generic search>"
-        Then I get a response with status "200"
+        When I request a list for "<resource>" using parameters:
+            | name   | value            |
+            | search | <generic search> |
         Then I get a list containing the following items:
             | item          |
             | <first item>  |
             | <second item> |
 
-        When I search "<resource>" for "<specific search>"
-        Then I get a response with status "200"
+        When I request a list for "<resource>" using parameters:
+            | name   | value             |
+            | search | <specific search> |
         Then I get a list containing the following items:
             | item         |
             | <first item> |
@@ -73,24 +75,24 @@ Feature: Filter resources
         | users      | {"firstname": "Fode", "lastname": "Bangourabe"} | {"firstname": "Jean", "lastname": "Bangoura"}  | bangoura       | bangourabe      |
 
     Scenario Outline: Sort a list using an order and direction
-        Given I have created the following "<resource>":
+        Given I have the following "<resource>":
             | item          |
             | <first item>  |
             | <second item> |
 
-        When I request a list for "<resource>" using the following parameters:
-            | order    | direction |
-            | <column> | asc       |
-        Then I get a response with status "200"
+        When I request a list for "<resource>" using parameters:
+            | name      | value    |
+            | order     | <column> |
+            | direction | asc      |
         Then I get a list of items in the following order:
             | item          |
             | <first item>  |
             | <second item> |
 
-        When I request a list for "<resource>" using the following parameters:
-            | order    | direction |
-            | <column> | desc      |
-        Then I get a response with status "200"
+        When I request a list for "<resource>" using parameters:
+            | name      | value    |
+            | order     | <column> |
+            | direction | desc     |
         Then I get a list of items in the following order:
             | item          |
             | <second item> |
@@ -108,14 +110,13 @@ Feature: Filter resources
         | users      | {"firstname": "Richard", "lastname": "Anderson"} | {"firstname": "Elmer", "lastname": "Charles"}  | lastname  |
 
     Scenario Outline: Limit a list
-        Given I have created the following "<resource>":
+        Given I have the following "<resource>":
             | item          |
             | <first item>  |
             | <second item> |
-        When I request a list for "<resource>" using the following parameters:
-            | limit |
-            | 1     |
-        Then I get a response with status "200"
+        When I request a list for "<resource>" using parameters:
+            | name  | value |
+            | limit | 1     |
         Then I have a list with 1 results
 
     Examples:
@@ -126,13 +127,14 @@ Feature: Filter resources
         | users      | {"firstname": "Daphne", "lastname": "Richards"} | {"firstname": "Tom", "lastname": "Hilgers"}    |
 
     Scenario Outline: Skip items in a list
-        Given I have created the following "<resource>":
+        Given I have the following "<resource>":
             | item          |
             | <first item>  |
             | <second item> |
-        When I request a list for "<resource>" using the following parameters:
-            | skip | order    |
-            | 1    | <column> |
+        When I request a list for "<resource>" using parameters:
+            | name  | value    |
+            | skip  | 1        |
+            | order | <column> |
         Then I get a list containing the following items:
             | item          |
             | <second item> |
