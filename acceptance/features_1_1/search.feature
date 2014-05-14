@@ -69,8 +69,8 @@ Feature: Filter resources
         | extensions | {"exten": "1200", "context": "default"}         | {"exten": "1200", "context": "from-extern"}    | e              | default         |
         | voicemails | {"number": "1000", "context": "default"}        | {"number": "1001", "context": "default"}       | 100            | 1001            |
         | voicemails | {"number": "1000", "context": "default"}        | {"number": "1001", "context": "from-extern"}   | e              | default         |
-        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1" } | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | 11             | 00:11           |
-        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1" } | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | 10             | 10.0            |
+        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}  | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | 11             | 00:11           |
+        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}  | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | 10             | 10.0            |
         | users      | {"firstname": "Johnny", "lastname": "Depp"}     | {"firstname": "John", "lastname": "Meiers"}    | john           | Johnny          |
         | users      | {"firstname": "Fode", "lastname": "Bangourabe"} | {"firstname": "Jean", "lastname": "Bangoura"}  | bangoura       | bangourabe      |
 
@@ -104,8 +104,8 @@ Feature: Filter resources
         | extensions | {"exten": "1100", "context": "default"}          | {"exten": "1101", "context": "from-extern"}    | context   |
         | voicemails | {"number": "1000", "context": "default"}         | {"number": "1001", "context": "default"}       | exten     |
         | voicemails | {"number": "1100", "context": "default"}         | {"number": "1101", "context": "from-extern"}   | context   |
-        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1" }  | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | mac       |
-        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1" }  | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | ip        |
+        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}   | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | mac       |
+        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}   | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | ip        |
         | users      | {"firstname": "Anne", "lastname": "Depp"}        | {"firstname": "Bob", "lastname": "Meiers"}     | firstname |
         | users      | {"firstname": "Richard", "lastname": "Anderson"} | {"firstname": "Elmer", "lastname": "Charles"}  | lastname  |
 
@@ -123,7 +123,7 @@ Feature: Filter resources
         | resource   | first item                                      | second item                                    |
         | extensions | {"exten": "1300", "context": "default"}         | {"exten": "1001", "context": "from-extern"}    |
         | voicemails | {"number": "1300", "context": "default"}        | {"number": "1001", "context": "default"}       |
-        | devices    | {"mac": "aa:11:22:33:44:55", "ip": "10.0.0.1" } | {"mac": "bb:aa:11:bb:22:cc", "ip": "10.1.0.1"} |
+        | devices    | {"mac": "aa:11:22:33:44:55", "ip": "10.0.0.1"}  | {"mac": "bb:aa:11:bb:22:cc", "ip": "10.1.0.1"} |
         | users      | {"firstname": "Daphne", "lastname": "Richards"} | {"firstname": "Tom", "lastname": "Hilgers"}    |
 
     Scenario Outline: Skip items in a list
@@ -146,5 +146,5 @@ Feature: Filter resources
         | resource   | first item                                       | second item                                    | column    |
         | extensions | {"exten": "1000", "context": "default"}          | {"exten": "1001", "context": "from-extern"}    | exten     |
         | voicemails | {"number": "1000", "context": "default"}         | {"number": "1001", "context": "default"}       | exten     |
-        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1" }  | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | mac       |
+        | devices    | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}   | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"} | mac       |
         | users      | {"firstname": "Aaaaaaaaaaa", "lastname": "Depp"} | {"firstname": "Bob", "lastname": "Meiers"}     | firstname |
