@@ -55,8 +55,8 @@ class TestDeviceActions(TestResources):
         device_services_get.assert_called_once_with(device_id)
         formatter.to_api.assert_called_once_with(device)
 
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_no_devices(self, device_find_all):
+    @patch('xivo_dao.data_handler.device.services.search')
+    def test_list_no_devices(self, device_search):
         total = 0
 
         expected_status_code = 200
@@ -69,16 +69,16 @@ class TestDeviceActions(TestResources):
         devices_found.total = total
         devices_found.items = []
 
-        device_find_all.return_value = devices_found
+        device_search.return_value = devices_found
 
         result = self.app.get(BASE_URL)
 
-        device_find_all.assert_called_once_with()
+        device_search.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_two_devices(self, device_find_all):
+    @patch('xivo_dao.data_handler.device.services.search')
+    def test_list_devices_with_two_devices(self, device_search):
         device_id_1 = 'abcdefghijklmnopqrstuvwxyz123456'
         device_id_2 = '1234567890abcdefghij1234567890abc'
         total = 2
@@ -137,17 +137,17 @@ class TestDeviceActions(TestResources):
         devices_found.total = total
         devices_found.items = [device1, device2]
 
-        device_find_all.return_value = devices_found
+        device_search.return_value = devices_found
 
         result = self.app.get(BASE_URL)
 
-        device_find_all.assert_called_once_with()
+        device_search.assert_called_once_with()
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_restapi.resources.devices.actions.extract_find_parameters')
-    @patch('xivo_dao.data_handler.device.services.find_all')
-    def test_list_devices_with_parameters(self, device_find_all, extract_find_parameters):
+    @patch('xivo_dao.data_handler.device.services.search')
+    def test_list_devices_with_parameters(self, device_search, extract_find_parameters):
         expected_status_code = 200
         expected_result = {
             'total': 0,
@@ -168,7 +168,7 @@ class TestDeviceActions(TestResources):
         devices_found.total = 0
         devices_found.items = []
 
-        device_find_all.return_value = devices_found
+        device_search.return_value = devices_found
 
         query_url = "search=search&skip=1&limit=2&order=ip&direction=asc"
         result = self.app.get("%s?%s" % (BASE_URL, query_url))
@@ -182,7 +182,7 @@ class TestDeviceActions(TestResources):
             'version': DeviceOrdering.version,
         })
 
-        device_find_all.assert_called_once_with(**find_parameters)
+        device_search.assert_called_once_with(**find_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
