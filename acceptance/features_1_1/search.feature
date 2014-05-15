@@ -137,5 +137,35 @@ Feature: Filter resources
 
     Examples:
         | resource   | column    | search | first item                                               | second item                                              |
+        #| extensions | exten     | 100    | {"exten": "1000", "context": "default"}                  | {"exten": "1001", "context": "from-extern"}              |
         | voicemails | number    | 100    | {"number": "1000", "context": "default", "name": "1000"} | {"number": "1001", "context": "default", "name": "1001"} |
         | devices    | mac       | 00:    | {"mac": "00:00:00:00:00:00", "ip": "10.0.0.1"}           | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}           |
+        #| users      | firstname | aaaaa  | {"firstname": "aaaaabc", "lastname": "Depp"}             | {"firstname": "aaaaade", "lastname": "Meiers"}           |
+
+    Scenario Outline: Paginated Search
+        Given I have the following "<resource>":
+            | item           |
+            | <first item>   |
+            | <second item>  |
+            | <skipped item> |
+            | <missing item> |
+        When I request a list for "<resource>" using parameters:
+            | name      | value    |
+            | search    | <search> |
+            | skip      | 1        |
+            | limit     | 2        |
+            | order     | <column> |
+            | direction | desc     |
+        Then I get a list containing the following items:
+            | item          |
+            | <second item> |
+            | <first item>  |
+        Then I get a list that does not contain the following items:
+            | item           |
+            | <missing item> |
+            | <skipped item> |
+
+    Examples:
+        | resource   | search | column | first item                                               | second item                                              | skipped item                                             | missing item                                             |
+        | voicemails | 123    | number | {"number": "1231", "context": "default", "name": "1231"} | {"number": "1232", "context": "default", "name": "1232"} | {"number": "1233", "context": "default", "name": "1233"} | {"number": "1412", "context": "default", "name": "1412"} |
+        | devices    | 00:ff  | mac    | {"mac": "00:ff:01:00:00:00"}                             | {"mac": "00:ff:02:00:00:00"}                             | {"mac": "00:ff:03:00:00:00"}                             | {"mac": "00:f1:00:00:00:00"}                             |
