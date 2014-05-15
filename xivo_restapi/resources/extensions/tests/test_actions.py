@@ -84,6 +84,22 @@ class TestExtensionActions(TestResources):
         extension_search.assert_called_once_with(search=search)
         self.assert_response_for_get(response, expected_response)
 
+    @patch('xivo_dao.data_handler.extension.services.search')
+    def test_list_extensions_with_search(self, extension_search):
+        expected_response = {'total': 1,
+                             'items': [self.build_item(self.extension)]}
+
+        extension_search.return_value = SearchResult(1, [self.extension])
+
+        query_string = "search=toto&order=exten&direction=desc&skip=1&limit=2"
+        response = self.app.get("%s?%s" % (BASE_URL, query_string))
+
+        extension_search.assert_called_once_with(search='toto',
+                                                 order=ExtensionOrdering.exten,
+                                                 direction='desc',
+                                                 skip=1,
+                                                 limit=2)
+        self.assert_response_for_get(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.get')
     def test_get(self, mock_extension_services_get):

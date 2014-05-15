@@ -22,8 +22,9 @@ from . import mapper
 from flask import url_for, request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
-from xivo_dao.data_handler.extension.model import Extension
+from xivo_dao.data_handler.extension.model import Extension, ExtensionOrdering
 from xivo_restapi.helpers import serializer
+from xivo_restapi.helpers.common import extract_find_parameters
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.extensions.routes import extension_route as route
 
@@ -32,14 +33,19 @@ logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, Extension)
 
 
+order_mapping = {'exten': ExtensionOrdering.exten,
+                 'context': ExtensionOrdering.context}
+
+
 @route('')
 def list():
     if 'q' in request.args:
-        extensions = extension_services.find_by_exten(request.args['q'])
+        parameters = {'search': request.args['q']}
     else:
-        extensions = extension_services.find_all()
+        parameters = extract_find_parameters(order_mapping)
 
-    result = formatter.list_to_api(extensions)
+    search_result = extension_services.search(**parameters)
+    result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
 
 
