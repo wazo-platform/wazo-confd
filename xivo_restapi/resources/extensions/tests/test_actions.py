@@ -16,10 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from mock import Mock, patch
-from hamcrest import assert_that, equal_to
+from mock import patch
 
-from xivo_dao.data_handler.extension.model import Extension
+from xivo_dao.data_handler.extension.model import Extension, ExtensionOrdering
+from xivo_dao.helpers.abstract_model import SearchResult
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "/1.1/extensions"
@@ -27,194 +27,108 @@ BASE_URL = "/1.1/extensions"
 
 class TestExtensionActions(TestResources):
 
-    @patch('xivo_dao.data_handler.extension.services.find_all')
-    def test_list_extensions_with_no_extensions(self, mock_extension_services_find_all):
-        expected_status_code = 200
-        expected_result = {
-            'total': 0,
-            'items': []
-        }
+    def setUp(self):
+        super(TestResources, self).setUp()
+        self.extension = Extension(id=1, exten='1234', context='default')
 
-        mock_extension_services_find_all.return_value = []
+    def build_item(self, extension):
+        links = [{'href': 'http://localhost/1.1/extensions/%d' % extension.id,
+                  'rel': 'extensions'}]
 
-        result = self.app.get(BASE_URL)
+        item = {'id': extension.id,
+                'exten': extension.exten,
+                'context': extension.context,
+                'commented': extension.commented,
+                'links': links}
 
-        mock_extension_services_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        return item
 
-    @patch('xivo_dao.data_handler.extension.services.find_all')
-    def test_list_extensions_with_two_extensions(self, mock_extension_services_find_all):
-        extension_id_1 = 42
-        extension_id_2 = 22
-        expected_status_code = 200
-        expected_result = {
-            'total': 2,
-            'items': [
-                {
-                    'id': extension_id_1,
-                    'exten': '1324',
-                    'context': 'default',
-                    'commented': False,
-                    'links': [{
-                        'href': 'http://localhost/1.1/extensions/%d' % extension_id_1,
-                        'rel': 'extensions'
-                    }]
-                },
-                {
-                    'id': extension_id_2,
-                    'exten': '1325',
-                    'context': 'default',
-                    'commented': False,
-                    'links': [{
-                        'href': 'http://localhost/1.1/extensions/%d' % extension_id_2,
-                        'rel': 'extensions'
-                    }]
-                }
-            ]
-        }
+    @patch('xivo_dao.data_handler.extension.services.search')
+    def test_list_extensions_with_no_extensions(self, mock_extension_services_search):
+        expected_response = {'total': 0,
+                             'items': []}
 
-        extension1 = Extension(id=extension_id_1,
-                               exten='1324',
-                               context='default')
-        extension2 = Extension(id=extension_id_2,
-                               exten='1325',
-                               context='default')
-        mock_extension_services_find_all.return_value = [extension1, extension2]
+        mock_extension_services_search.return_value = SearchResult(0, [])
 
-        result = self.app.get(BASE_URL)
+        response = self.app.get(BASE_URL)
 
-        mock_extension_services_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        mock_extension_services_search.assert_any_call()
+        self.assert_response_for_get(response, expected_response)
 
-    @patch('xivo_dao.data_handler.extension.services.find_by_exten')
-    def test_list_extensions_with_search(self, mock_extension_services_find_by_exten):
-        extension_id = 9987
-        search = 'bob'
-        expected_status_code = 200
+    @patch('xivo_dao.data_handler.extension.services.search')
+    def test_list_extensions_with_two_extensions(self, mock_extension_services_search):
+        extension1 = Extension(id=1, exten='1324', context='default')
+        extension2 = Extension(id=2, exten='1325', context='default')
 
-        expected_result = {
-            'total': 1,
-            'items': [
-                {
-                    'id': extension_id,
-                    'exten': '1324',
-                    'context': 'default',
-                    'commented': False,
-                    'links': [{
-                        'href': 'http://localhost/1.1/extensions/%d' % extension_id,
-                        'rel': 'extensions'
-                    }]
-                }
-            ]
-        }
+        expected_response = {'total': 2,
+                             'items': [self.build_item(extension1),
+                                       self.build_item(extension2)]}
 
-        extension = Extension(id=extension_id,
-                              exten='1324',
-                              context='default')
-        mock_extension_services_find_by_exten.return_value = [extension]
+        mock_extension_services_search.return_value = SearchResult(2, [extension1, extension2])
 
-        result = self.app.get("%s?q=%s" % (BASE_URL, search))
+        response = self.app.get(BASE_URL)
 
-        mock_extension_services_find_by_exten.assert_called_once_with(search)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        mock_extension_services_search.assert_any_call()
+        self.assert_response_for_get(response, expected_response)
+
+    @patch('xivo_dao.data_handler.extension.services.search')
+    def test_list_extensions_with_search(self, extension_search):
+        expected_response = {'total': 1,
+                             'items': [self.build_item(self.extension)]}
+
+        extension_search.return_value = SearchResult(1, [self.extension])
+
+        query_string = "search=toto&order=exten&direction=desc&skip=1&limit=2"
+        response = self.app.get("%s?%s" % (BASE_URL, query_string))
+
+        extension_search.assert_called_once_with(search='toto',
+                                                 order=ExtensionOrdering.exten,
+                                                 direction='desc',
+                                                 skip=1,
+                                                 limit=2)
+        self.assert_response_for_get(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.get')
     def test_get(self, mock_extension_services_get):
-        extension_id = 1
-        expected_status_code = 200
-        expected_result = {
-            'id': extension_id,
-            'exten': '1324',
-            'commented': False,
-            'context': 'default',
-            'links': [{
-                'href': 'http://localhost/1.1/extensions/%d' % extension_id,
-                'rel': 'extensions'
-            }]
-        }
+        expected_response = self.build_item(self.extension)
 
-        extension = Extension(id=extension_id,
-                              exten='1324',
-                              context='default')
+        mock_extension_services_get.return_value = self.extension
 
-        mock_extension_services_get.return_value = extension
+        response = self.app.get("%s/%d" % (BASE_URL, self.extension.id))
 
-        result = self.app.get("%s/%d" % (BASE_URL, extension_id))
+        mock_extension_services_get.assert_called_with(self.extension.id)
+        self.assert_response_for_get(response, expected_response)
 
-        mock_extension_services_get.assert_called_with(extension_id)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.extensions.actions.formatter')
     @patch('xivo_dao.data_handler.extension.services.create')
-    def test_create(self, mock_extension_services_create, formatter):
-        extension_id = 1
-        expected_status_code = 201
-        expected_result = {
-            'id': extension_id,
-            'links': [
-                {
-                    'rel': 'extensions',
-                    'href': 'http://localhost/1.1/extensions/%d' % extension_id,
-                }
-            ]
-        }
+    def test_create(self, mock_extension_services_create):
+        expected_response = self.build_item(self.extension)
 
-        extension = Mock(Extension)
-        extension.id = extension_id
+        mock_extension_services_create.return_value = self.extension
 
-        mock_extension_services_create.return_value = extension
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
-
-        data = {
-            u'exten': u'1324',
-            u'context': u'jd'
-        }
+        data = {u'exten': u'1324', u'context': u'default'}
         data_serialized = self._serialize_encode(data)
+        response = self.app.post(BASE_URL, data=data_serialized)
 
-        result = self.app.post(BASE_URL, data=data_serialized)
+        self.assert_response_for_create(response, expected_response)
 
-        formatter.to_model.assert_called_with(data_serialized)
-        formatter.to_api.assert_called_with(extension)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_restapi.resources.extensions.actions.formatter')
     @patch('xivo_dao.data_handler.extension.services.get')
     @patch('xivo_dao.data_handler.extension.services.edit')
-    def test_edit(self, mock_extension_services_edit, mock_extension_services_get, formatter):
-        expected_status_code = 204
-        expected_data = ''
+    def test_edit(self, mock_extension_services_edit, mock_extension_services_get):
+        mock_extension_services_get.return_value = self.extension
 
-        data = {
-            'exten': '1324',
-            'context': 'jd'
-        }
+        data = {'exten': '1324', 'context': 'default'}
         data_serialized = self._serialize_encode(data)
+        response = self.app.put("%s/%d" % (BASE_URL, self.extension.id), data=data_serialized)
 
-        mock_extension_services_get.return_value = extension = Mock(Extension)
-
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        formatter.update_model.assert_called_with(data_serialized, extension)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
+        self.assert_response_for_update(response)
+        mock_extension_services_edit.assert_called_once_with(self.extension)
 
     @patch('xivo_dao.data_handler.extension.services.get')
     @patch('xivo_dao.data_handler.extension.services.delete')
     def test_delete_success(self, mock_extension_services_delete, mock_extension_services_get):
-        expected_status_code = 204
-        expected_data = ''
+        mock_extension_services_get.return_value = self.extension
 
-        extension = Mock(Extension)
-        mock_extension_services_get.return_value = extension
-        mock_extension_services_delete.return_value = True
+        response = self.app.delete("%s/%d" % (BASE_URL, self.extension.id))
 
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
-        mock_extension_services_delete.assert_called_with(extension)
+        self.assert_response_for_delete(response)
+        mock_extension_services_delete.assert_called_with(self.extension)

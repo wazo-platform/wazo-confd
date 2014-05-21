@@ -77,6 +77,22 @@ class TestResources(unittest.TestCase):
     def _serialize_decode(self, data):
         return serializer.decode(data)
 
-    def assert_response(self, response, status_code, result):
+    def assert_response(self, response, status_code, expected_response):
         assert_that(status_code, equal_to(response.status_code))
-        assert_that(self._serialize_decode(response.data), equal_to(result))
+        assert_that(self._serialize_decode(response.data), equal_to(expected_response))
+
+    def assert_response_for_get(self, response, expected_response):
+        assert_that(response.status_code, equal_to(200))
+        assert_that(self._serialize_decode(response.data), equal_to(expected_response))
+
+    def assert_response_for_create(self, response, expected_response):
+        assert_that(response.status_code, equal_to(201))
+        assert_that(self._serialize_decode(response.data), equal_to(expected_response))
+
+    def assert_response_for_update(self, response):
+        assert_that(response.status_code, equal_to(204))
+        assert_that(response.data, equal_to(''))
+
+    def assert_response_for_delete(self, response):
+        assert_that(response.status_code, equal_to(204))
+        assert_that(response.data, equal_to(''))
