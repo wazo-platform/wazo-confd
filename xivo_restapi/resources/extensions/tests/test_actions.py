@@ -53,7 +53,7 @@ class TestExtensionActions(TestResources):
         response = self.app.get(BASE_URL)
 
         mock_extension_services_search.assert_any_call()
-        self.assert_response_for_get(response, expected_response)
+        self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.search')
     def test_list_extensions_with_two_extensions(self, mock_extension_services_search):
@@ -69,7 +69,7 @@ class TestExtensionActions(TestResources):
         response = self.app.get(BASE_URL)
 
         mock_extension_services_search.assert_any_call()
-        self.assert_response_for_get(response, expected_response)
+        self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.search')
     def test_list_extensions_with_search(self, extension_search):
@@ -86,7 +86,7 @@ class TestExtensionActions(TestResources):
                                                  direction='desc',
                                                  skip=1,
                                                  limit=2)
-        self.assert_response_for_get(response, expected_response)
+        self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.get')
     def test_get(self, mock_extension_services_get):
@@ -97,7 +97,7 @@ class TestExtensionActions(TestResources):
         response = self.app.get("%s/%d" % (BASE_URL, self.extension.id))
 
         mock_extension_services_get.assert_called_with(self.extension.id)
-        self.assert_response_for_get(response, expected_response)
+        self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.create')
     def test_create(self, mock_extension_services_create):

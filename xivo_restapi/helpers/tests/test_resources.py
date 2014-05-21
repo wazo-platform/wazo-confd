@@ -18,7 +18,7 @@
 
 import unittest
 
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, has_entries
 
 from functools import wraps
 from mock import patch
@@ -72,7 +72,7 @@ class TestResources(unittest.TestCase):
         cls.produces.side_effect = mock_parameterized_decorator
 
     def _serialize_encode(self, data):
-        return serializer.encode(data)
+        return serializer.encode(data).encode('utf8')
 
     def _serialize_decode(self, data):
         return serializer.decode(data)
@@ -81,13 +81,17 @@ class TestResources(unittest.TestCase):
         assert_that(status_code, equal_to(response.status_code))
         assert_that(self._serialize_decode(response.data), equal_to(expected_response))
 
-    def assert_response_for_get(self, response, expected_response):
+    def assert_response_for_list(self, response, expected_response):
         assert_that(response.status_code, equal_to(200))
         assert_that(self._serialize_decode(response.data), equal_to(expected_response))
 
+    def assert_response_for_get(self, response, expected_response):
+        assert_that(response.status_code, equal_to(200))
+        assert_that(self._serialize_decode(response.data), has_entries(expected_response))
+
     def assert_response_for_create(self, response, expected_response):
         assert_that(response.status_code, equal_to(201))
-        assert_that(self._serialize_decode(response.data), equal_to(expected_response))
+        assert_that(self._serialize_decode(response.data), has_entries(expected_response))
 
     def assert_response_for_update(self, response):
         assert_that(response.status_code, equal_to(204))
