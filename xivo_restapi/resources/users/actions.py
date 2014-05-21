@@ -27,7 +27,7 @@ from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User
 
 from xivo_restapi.helpers import serializer
-
+from xivo_restapi.helpers.common import extract_search_parameters
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.users.routes import route
 
@@ -38,11 +38,15 @@ formatter = Formatter(mapper, serializer, User)
 @route('')
 def list():
     if 'q' in request.args:
-        users = user_services.find_all_by_fullname(request.args['q'])
+        items = user_services.find_all_by_fullname(request.args['q'])
+        total = len(items)
     else:
-        users = user_services.find_all()
+        parameters = extract_search_parameters(request.args)
+        search_result = user_services.search(**parameters)
+        items = search_result.items
+        total = search_result.total
 
-    result = formatter.list_to_api(users)
+    result = formatter.list_to_api(items, total)
     return make_response(result, 200)
 
 

@@ -37,6 +37,7 @@ Feature: Filter resources
         | voicemails |
         | devices    |
         | func_keys  |
+        | users      |
 
     Scenario Outline: Search a list
         Given I have the following "<resource>":
@@ -71,6 +72,8 @@ Feature: Filter resources
         | voicemails | example.com    | a@example.com   | {"number": "1000", "context": "default", "name": "abcd", "email": "a@example.com"} | {"number": "1001", "context": "from-extern", "name": "abc", "email": "b@example.com"} |
         | devices    | 11             | 00:11           | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}                                     | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}                                        |
         | devices    | 10             | 10.0            | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}                                     | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}                                        |
+        | users      | john           | Johnny          | {"firstname": "Johnny", "lastname": "Depp"}                                        | {"firstname": "John", "lastname": "Meiers"}                                           |
+        | users      | bangoura       | bangourabe      | {"firstname": "Fode", "lastname": "Bangourabe"}                                    | {"firstname": "Jean", "lastname": "Bangoura"}                                         |
 
     Scenario Outline: Sort a list using an order and direction
         Given I have the following "<resource>":
@@ -107,6 +110,8 @@ Feature: Filter resources
         | voicemails | language  | {"number": "1000", "context": "default", "name": "abc", "language": "en_US"}      | {"number": "1001", "context": "default", "name": "def", "language": "fr_FR"}      |
         | devices    | mac       | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}                                    | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}                                    |
         | devices    | ip        | {"mac": "00:11:22:33:44:55", "ip": "10.0.0.1"}                                    | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}                                    |
+        | users      | firstname | {"firstname": "Anne", "lastname": "Depp"}                                         | {"firstname": "Bob", "lastname": "Meiers"}                                        |
+        | users      | lastname  | {"firstname": "Richard", "lastname": "Anderson"}                                  | {"firstname": "Elmer", "lastname": "Charles"}                                     |
 
     Scenario Outline: Limit a list
         Given I have the following "<resource>":
@@ -123,6 +128,7 @@ Feature: Filter resources
         | extensions | {"exten": "1300", "context": "default"}                  | {"exten": "1001", "context": "from-extern"}              |
         | voicemails | {"number": "1300", "context": "default", "name": "1300"} | {"number": "1001", "context": "default", "name": "1001"} |
         | devices    | {"mac": "aa:11:22:33:44:55", "ip": "10.0.0.1"}           | {"mac": "bb:aa:11:bb:22:cc", "ip": "10.1.0.1"}           |
+        | users      | {"firstname": "Daphne", "lastname": "Richards"}          | {"firstname": "Tom", "lastname": "Hilgers"}              |
 
     Scenario Outline: Skip items in a list
         Given I have the following "<resource>":
@@ -146,4 +152,4 @@ Feature: Filter resources
         | extensions | exten     | 499    | {"exten": "4998", "context": "default"}                  | {"exten": "4999", "context": "from-extern"}              |
         | voicemails | number    | 999    | {"number": "9998", "context": "default", "name": "9998"} | {"number": "9999", "context": "default", "name": "9999"} |
         | devices    | mac       | 00:    | {"mac": "00:00:00:00:00:00", "ip": "10.0.0.1"}           | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}           |
-        #| users      | firstname | aaaaa  | {"firstname": "aaaaabc", "lastname": "Depp"}             | {"firstname": "aaaaade", "lastname": "Meiers"}           |
+        | users      | firstname | aaaaa  | {"firstname": "aaaaabc", "lastname": "Depp"}             | {"firstname": "aaaaade", "lastname": "Meiers"}           |

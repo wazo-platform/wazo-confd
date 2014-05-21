@@ -19,6 +19,7 @@
 from mock import patch
 
 from xivo_dao.data_handler.user.model import User
+from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "/1.1/users"
@@ -48,19 +49,19 @@ class TestUserActions(TestResources):
             }]
         }
 
-    @patch('xivo_dao.data_handler.user.services.find_all')
-    def test_list_users_with_no_users(self, mock_user_services_find_all):
+    @patch('xivo_dao.data_handler.user.services.search')
+    def test_list_users_with_no_users(self, user_search):
         expected_response = {'total': 0, 'items': []}
 
-        mock_user_services_find_all.return_value = []
+        user_search.return_value = SearchResult(0, [])
 
         response = self.app.get(BASE_URL)
 
-        mock_user_services_find_all.assert_any_call()
+        user_search.assert_any_call()
         self.assert_response_for_list(response, expected_response)
 
-    @patch('xivo_dao.data_handler.user.services.find_all')
-    def test_list_users_with_two_users(self, mock_user_services_find_all):
+    @patch('xivo_dao.data_handler.user.services.search')
+    def test_list_users_with_two_users(self, user_search):
         user1 = User(id=1,
                      firstname=u'test1',
                      caller_id=u'"test1 "')
@@ -72,15 +73,15 @@ class TestUserActions(TestResources):
                              'items': [self.build_item(user1),
                                        self.build_item(user2)]}
 
-        mock_user_services_find_all.return_value = [user1, user2]
+        user_search.return_value = SearchResult(2, [user1, user2])
 
         response = self.app.get(BASE_URL)
 
-        mock_user_services_find_all.assert_any_call()
+        user_search.assert_any_call()
         self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.user.services.find_all_by_fullname')
-    def test_list_users_with_search(self, mock_user_services_find_all_by_fullname):
+    def test_list_users_with_old_search(self, user_find):
         search = 'bob'
         user = User(id=1,
                     firstname=u'Bob',
@@ -89,11 +90,32 @@ class TestUserActions(TestResources):
         expected_response = {'total': 1,
                              'items': [self.build_item(user)]}
 
-        mock_user_services_find_all_by_fullname.return_value = [user]
+        user_find.return_value = [user]
 
         response = self.app.get("%s?q=%s" % (BASE_URL, search))
 
-        mock_user_services_find_all_by_fullname.assert_called_once_with(search)
+        user_find.assert_called_once_with(search)
+        self.assert_response_for_list(response, expected_response)
+
+    @patch('xivo_dao.data_handler.user.services.search')
+    def test_list_users_with_new_search(self, user_search):
+        user = User(id=1,
+                    firstname=u'Bob',
+                    caller_id=u'"Bob "')
+
+        expected_response = {'total': 1,
+                             'items': [self.build_item(user)]}
+
+        user_search.return_value = SearchResult(1, [user])
+
+        url = "%s?search=bob&order=firstname&direction=desc&limit=1&skip=2"
+        response = self.app.get(url % BASE_URL)
+
+        user_search.assert_called_once_with(search='bob',
+                                            order='firstname',
+                                            direction='desc',
+                                            limit=1,
+                                            skip=2)
         self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.user.services.get')
