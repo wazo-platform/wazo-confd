@@ -39,10 +39,9 @@ order_mapping = {'exten': ExtensionOrdering.exten,
 
 @route('')
 def list():
+    parameters = extract_find_parameters(order_mapping)
     if 'q' in request.args:
-        parameters = {'search': request.args['q']}
-    else:
-        parameters = extract_find_parameters(order_mapping)
+        parameters['search'] = request.args['q']
 
     search_result = extension_services.search(**parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
