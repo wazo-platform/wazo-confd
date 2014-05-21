@@ -72,19 +72,6 @@ class TestExtensionActions(TestResources):
         self.assert_response_for_get(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.search')
-    def test_list_extensions_with_old_search(self, extension_search):
-        expected_response = {'total': 1,
-                             'items': [self.build_item(self.extension)]}
-
-        extension_search.return_value = SearchResult(1, [self.extension])
-
-        search = '1234'
-        response = self.app.get("%s?q=%s" % (BASE_URL, search))
-
-        extension_search.assert_called_once_with(search=search)
-        self.assert_response_for_get(response, expected_response)
-
-    @patch('xivo_dao.data_handler.extension.services.search')
     def test_list_extensions_with_search(self, extension_search):
         expected_response = {'total': 1,
                              'items': [self.build_item(self.extension)]}
