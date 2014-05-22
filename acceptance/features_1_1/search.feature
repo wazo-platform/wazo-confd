@@ -144,6 +144,6 @@ Feature: Filter resources
     Examples:
         | resource   | column    | search | first item                                               | second item                                              |
         | extensions | exten     | 100    | {"exten": "1000", "context": "default"}                  | {"exten": "1001", "context": "from-extern"}              |
-        | voicemails | number    | 100    | {"number": "1000", "context": "default", "name": "1000"} | {"number": "1001", "context": "default", "name": "1001"} |
+        | voicemails | number    | 999    | {"number": "9998", "context": "default", "name": "9998"} | {"number": "9999", "context": "default", "name": "9999"} |
         | devices    | mac       | 00:    | {"mac": "00:00:00:00:00:00", "ip": "10.0.0.1"}           | {"mac": "00:aa:11:bb:22:cc", "ip": "10.1.0.1"}           |
         #| users      | firstname | aaaaa  | {"firstname": "aaaaabc", "lastname": "Depp"}             | {"firstname": "aaaaade", "lastname": "Meiers"}           |
