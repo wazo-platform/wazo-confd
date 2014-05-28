@@ -17,7 +17,7 @@
 import unittest
 
 from xivo_restapi.resources.func_keys import actions
-from xivo_dao.helpers.abstract_model import SearchResult
+from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_dao.data_handler.func_key.model import FuncKey
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to

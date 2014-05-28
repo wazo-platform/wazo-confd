@@ -4,7 +4,7 @@ from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.voicemail.model import Voicemail, VoicemailOrder
-from xivo_dao.helpers.abstract_model import SearchResult
+from xivo_dao.data_handler.utils.search import SearchResult
 
 
 BASE_URL = "/1.1/voicemails"

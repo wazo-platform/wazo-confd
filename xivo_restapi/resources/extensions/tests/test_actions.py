@@ -19,7 +19,7 @@
 from mock import patch
 
 from xivo_dao.data_handler.extension.model import Extension, ExtensionOrdering
-from xivo_dao.helpers.abstract_model import SearchResult
+from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "/1.1/extensions"

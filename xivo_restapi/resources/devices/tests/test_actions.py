@@ -22,7 +22,7 @@ from hamcrest import assert_that, equal_to
 from xivo_dao.data_handler.device.model import Device, DeviceOrdering
 from xivo_dao.data_handler.line.model import Line
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.helpers.abstract_model import SearchResult
+from xivo_dao.data_handler.utils.search import SearchResult
 
 BASE_URL = "1.1/devices"
 
