@@ -18,7 +18,7 @@
 
 from mock import patch
 
-from xivo_dao.data_handler.extension.model import Extension, ExtensionOrdering
+from xivo_dao.data_handler.extension.model import Extension
 from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
@@ -82,7 +82,7 @@ class TestExtensionActions(TestResources):
         response = self.app.get("%s?%s" % (BASE_URL, query_string))
 
         extension_search.assert_called_once_with(search='toto',
-                                                 order=ExtensionOrdering.exten,
+                                                 order='exten',
                                                  direction='desc',
                                                  skip=1,
                                                  limit=2)
