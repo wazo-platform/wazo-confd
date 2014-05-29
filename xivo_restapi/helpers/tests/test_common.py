@@ -294,15 +294,14 @@ class TestExtractFindParameters(unittest.TestCase):
 
     @patch('xivo_restapi.helpers.common.request')
     def test_extract_find_parameters_all_args(self, mock_request):
-        order_column = Mock()
         ordering = {
-            'toto': order_column
+            'toto': 'toto',
         }
 
         expected_result = {
             'skip': 532,
             'limit': 5432,
-            'order': order_column,
+            'order': 'toto',
             'direction': 'asc',
             'search': 'abcd'
         }
@@ -320,18 +319,16 @@ class TestExtractFindParameters(unittest.TestCase):
 
     @patch('xivo_restapi.helpers.common.request')
     def test_extract_find_parameters_with_ordering(self, mock_request):
-        order_column = Mock()
-
         mock_request.args = {
             'order': 'column_name'
         }
 
         expected_result = {
-            'order': order_column
+            'order': 'column_name'
         }
 
         ordering = {
-            'column_name': order_column
+            'column_name': 'column_name',
         }
 
         parameters = extract_find_parameters(ordering=ordering)
