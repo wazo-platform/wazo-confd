@@ -28,17 +28,17 @@ class TestFuncKeyActions(unittest.TestCase):
     @patch('xivo_restapi.resources.func_keys.actions.make_response')
     @patch('xivo_restapi.resources.func_keys.actions.formatter.list_to_api')
     @patch('xivo_dao.data_handler.func_key.services.search')
-    @patch('xivo_restapi.resources.func_keys.actions.extract_find_parameters')
-    def test_list(self, extract_find_parameters, func_key_search, list_to_api, make_response):
-        find_parameters = extract_find_parameters.return_value = {'limit': 1}
+    @patch('xivo_restapi.resources.func_keys.actions.extract_search_parameters')
+    def test_list(self, extract_search_parameters, func_key_search, list_to_api, make_response):
+        search_parameters = extract_search_parameters.return_value = {'limit': 1}
         search_result = func_key_search.return_value = Mock(SearchResult)
         formatted_list = list_to_api.return_value = Mock()
         response = make_response.return_value = Mock()
 
         result = actions.list()
 
-        extract_find_parameters.assert_called_once_with(actions.order_mapping)
-        func_key_search.assert_called_once_with(**find_parameters)
+        extract_search_parameters.assert_called_once_with(actions.sort_columns)
+        func_key_search.assert_called_once_with(**search_parameters)
         list_to_api.assert_called_once_with(search_result.items, search_result.total)
         make_response.assert_called_once_with(formatted_list, 200)
         assert_that(result, equal_to(response))
