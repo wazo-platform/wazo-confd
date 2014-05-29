@@ -76,6 +76,10 @@ DIRECTIONS = ['asc', 'desc']
 
 
 def extract_find_parameters(ordering):
+    return extract_search_parameters(ordering.keys())
+
+
+def extract_search_parameters(ordering):
     invalid = []
     parameters = {}
 
@@ -96,7 +100,7 @@ def extract_find_parameters(ordering):
     if 'order' in request.args:
         column_name = request.args['order']
         if column_name in ordering:
-            parameters['order'] = ordering[column_name]
+            parameters['order'] = column_name
         else:
             invalid.append("ordering column '%s' does not exist" % column_name)
 
