@@ -32,7 +32,6 @@ from xivo_dao.data_handler.exception import ElementDeletionError
 from xivo_dao.data_handler.exception import AssociationNotExistsError
 
 from xivo_restapi.helpers import serializer
-from flask.globals import request
 
 
 logger = logging.getLogger(__name__)
@@ -72,49 +71,61 @@ def _make_response_encoded(message, code, exc_info=False):
     return make_response(serializer.encode([unicode(message)]), code)
 
 
-DIRECTIONS = ['asc', 'desc']
+class ParameterExtractor(object):
+
+    NUMERIC = ('limit', 'skip')
+    DIRECTIONS = ('asc', 'desc')
+
+    def __init__(self, columns=None):
+        self.columns = columns or []
+
+    def extract(self, arguments):
+        self._reset()
+
+        for name in self.NUMERIC:
+            self._extract_numeric(name, arguments)
+        self._extract_direction(arguments)
+        self._extract_order(arguments)
+        self._extract_search(arguments)
+
+        self._check_invalid()
+        return self.extracted
+
+    def _reset(self):
+        self.invalid = []
+        self.extracted = {}
+
+    def _extract_numeric(self, name, arguments):
+        value = arguments.get(name, None)
+        if value:
+            if value.isdigit() and int(value) > 0:
+                self.extracted[name] = int(value)
+            else:
+                self.invalid.append("%s must be a postive integer" % name)
+
+    def _extract_direction(self, arguments):
+        if 'direction' in arguments:
+            if arguments['direction'] in self.DIRECTIONS:
+                self.extracted['direction'] = arguments['direction']
+            else:
+                self.invalid.append("direction must be asc or desc")
+
+    def _extract_order(self, arguments):
+        column_name = arguments.get('order', None)
+        if column_name:
+            if column_name in self.columns:
+                self.extracted['order'] = column_name
+            else:
+                self.invalid.append("ordering column '%s' does not exist" % column_name)
+
+    def _extract_search(self, arguments):
+        if 'search' in arguments:
+            self.extracted['search'] = arguments['search']
+
+    def _check_invalid(self):
+        if self.invalid:
+            raise InvalidParametersError(self.invalid)
 
 
-def extract_find_parameters(ordering):
-    return extract_search_parameters(ordering.keys())
-
-
-def extract_search_parameters(ordering):
-    invalid = []
-    parameters = {}
-
-    if 'limit' in request.args:
-        limit = request.args['limit']
-        if limit.isdigit() and int(limit) > 0:
-            parameters['limit'] = int(limit)
-        else:
-            invalid.append("limit must be a positive integer")
-
-    if 'skip' in request.args:
-        skip = request.args['skip']
-        if skip.isdigit() and int(skip) >= 0:
-            parameters['skip'] = int(skip)
-        else:
-            invalid.append("skip must be a positive integer")
-
-    if 'order' in request.args:
-        column_name = request.args['order']
-        if column_name in ordering:
-            parameters['order'] = column_name
-        else:
-            invalid.append("ordering column '%s' does not exist" % column_name)
-
-    if 'direction' in request.args:
-        direction = request.args['direction']
-        if direction in DIRECTIONS:
-            parameters['direction'] = direction
-        else:
-            invalid.append("direction must be asc or desc")
-
-    if 'search' in request.args:
-        parameters['search'] = request.args['search']
-
-    if len(invalid) > 0:
-        raise InvalidParametersError(invalid)
-
-    return parameters
+def extract_search_parameters(arguments, columns=None):
+    return ParameterExtractor(columns).extract(arguments)
