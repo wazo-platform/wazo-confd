@@ -1,6 +1,6 @@
 import logging
 
-from flask.helpers import make_response
+from flask import request, make_response
 
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.func_keys import mapper
@@ -17,7 +17,7 @@ sort_columns = ['id', 'type', 'destination']
 
 
 def list():
-    search_parameters = extract_search_parameters(sort_columns)
+    search_parameters = extract_search_parameters(request.args, sort_columns)
     search_result = func_key_services.search(**search_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)

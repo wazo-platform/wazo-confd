@@ -42,7 +42,7 @@ sort_columns = search_config.sort_columns()
 
 @route('')
 def list():
-    search_parameters = extract_search_parameters(sort_columns)
+    search_parameters = extract_search_parameters(request.args, sort_columns)
     search_result = voicemail_services.search(**search_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)

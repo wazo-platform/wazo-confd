@@ -39,7 +39,7 @@ sort_columns = search_config.sort_columns()
 
 @route('')
 def list():
-    parameters = extract_search_parameters(sort_columns)
+    parameters = extract_search_parameters(request.args, sort_columns)
     search_result = extension_services.search(**parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
