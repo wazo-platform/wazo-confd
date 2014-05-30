@@ -26,25 +26,17 @@ from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.helpers.request_bouncer import limit_to_localhost
-from xivo_dao.data_handler.device.model import Device, DeviceOrdering
+from xivo_dao.data_handler.device.model import Device
 from xivo_dao.data_handler.device import services as device_services
 from xivo_dao.data_handler.line import services as line_services
-from xivo_restapi.helpers.common import extract_find_parameters
+from xivo_restapi.helpers.common import extract_search_parameters
 
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Device)
-
-order_mapping = {
-    'ip': DeviceOrdering.ip,
-    'mac': DeviceOrdering.mac,
-    'plugin': DeviceOrdering.plugin,
-    'model': DeviceOrdering.model,
-    'vendor': DeviceOrdering.vendor,
-    'version': DeviceOrdering.version,
-}
+sort_columns = ['ip', 'mac', 'plugin', 'model', 'vendor', 'version']
 
 
 @route('/<deviceid>')
@@ -56,8 +48,8 @@ def get(deviceid):
 
 @route('')
 def list():
-    find_parameters = extract_find_parameters(order_mapping)
-    search_result = device_services.search(**find_parameters)
+    search_parameters = extract_search_parameters(sort_columns)
+    search_result = device_services.search(**search_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
 

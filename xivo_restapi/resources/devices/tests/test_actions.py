@@ -19,7 +19,7 @@
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
-from xivo_dao.data_handler.device.model import Device, DeviceOrdering
+from xivo_dao.data_handler.device.model import Device
 from xivo_dao.data_handler.line.model import Line
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.utils.search import SearchResult
@@ -145,24 +145,21 @@ class TestDeviceActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_restapi.resources.devices.actions.extract_find_parameters')
     @patch('xivo_dao.data_handler.device.services.search')
-    def test_list_devices_with_parameters(self, device_search, extract_find_parameters):
+    def test_list_devices_with_parameters(self, device_search):
         expected_status_code = 200
         expected_result = {
             'total': 0,
             'items': []
         }
 
-        find_parameters = {
+        search_parameters = {
             'search': 'search',
             'skip': 1,
             'limit': 2,
             'order': 'ip',
             'direction': 'asc'
         }
-
-        extract_find_parameters.return_value = find_parameters
 
         devices_found = Mock(SearchResult)
         devices_found.total = 0
@@ -173,16 +170,7 @@ class TestDeviceActions(TestResources):
         query_url = "search=search&skip=1&limit=2&order=ip&direction=asc"
         result = self.app.get("%s?%s" % (BASE_URL, query_url))
 
-        extract_find_parameters.assert_called_once_with({
-            'ip': DeviceOrdering.ip,
-            'mac': DeviceOrdering.mac,
-            'plugin': DeviceOrdering.plugin,
-            'model': DeviceOrdering.model,
-            'vendor': DeviceOrdering.vendor,
-            'version': DeviceOrdering.version,
-        })
-
-        device_search.assert_called_once_with(**find_parameters)
+        device_search.assert_called_once_with(**search_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
