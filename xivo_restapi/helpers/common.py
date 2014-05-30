@@ -76,12 +76,17 @@ class ParameterExtractor(object):
     PARAMETERS = ('search', 'direction', 'order')
     NUMERIC = ('limit', 'skip')
 
+    def __init__(self, extra):
+        self.extra = extra
+
     def extract(self, arguments):
         self._reset()
 
         for name in self.NUMERIC:
             self._extract_numeric(name, arguments)
-        for parameter in self.PARAMETERS:
+
+        all_parameters = self.PARAMETERS + tuple(self.extra)
+        for parameter in all_parameters:
             self._extract_parameter(parameter, arguments)
 
         self._check_invalid()
@@ -108,5 +113,6 @@ class ParameterExtractor(object):
             raise InvalidParametersError(self.invalid)
 
 
-def extract_search_parameters(arguments):
-    return ParameterExtractor().extract(arguments)
+def extract_search_parameters(arguments, extra=None):
+    extra = extra or []
+    return ParameterExtractor(extra).extract(arguments)
