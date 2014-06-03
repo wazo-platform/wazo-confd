@@ -205,9 +205,6 @@ class TestCommon(unittest.TestCase):
 class TestExtractSearchParameters(unittest.TestCase):
 
     def test_given_invalid_skip_then_raises_error(self):
-        args = {'skip': '-532'}
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
-
         args = {'skip': 'toto'}
         self.assertRaises(InvalidParametersError, extract_search_parameters, args)
 
@@ -220,9 +217,6 @@ class TestExtractSearchParameters(unittest.TestCase):
         assert_that(parameters, equal_to(expected_result))
 
     def test_given_invalid_limit_then_raises_error(self):
-        args = {'limit': '-532'}
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
-
         args = {'limit': 'toto'}
         self.assertRaises(InvalidParametersError, extract_search_parameters, args)
 

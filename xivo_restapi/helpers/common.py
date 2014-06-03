@@ -94,10 +94,10 @@ class ParameterExtractor(object):
     def _extract_numeric(self, name, arguments):
         value = arguments.get(name, None)
         if value:
-            if value.isdigit() and int(value) > 0:
+            if value.isdigit():
                 self.extracted[name] = int(value)
             else:
-                self.invalid.append("%s must be a postive integer" % name)
+                self.invalid.append("%s must be only digits" % name)
 
     def _extract_parameter(self, name, arguments):
         if name in arguments:
