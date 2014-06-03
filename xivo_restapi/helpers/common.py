@@ -73,20 +73,16 @@ def _make_response_encoded(message, code, exc_info=False):
 
 class ParameterExtractor(object):
 
+    PARAMETERS = ('search', 'direction', 'order')
     NUMERIC = ('limit', 'skip')
-    DIRECTIONS = ('asc', 'desc')
-
-    def __init__(self, columns=None):
-        self.columns = columns or []
 
     def extract(self, arguments):
         self._reset()
 
         for name in self.NUMERIC:
             self._extract_numeric(name, arguments)
-        self._extract_direction(arguments)
-        self._extract_order(arguments)
-        self._extract_search(arguments)
+        for parameter in self.PARAMETERS:
+            self._extract_parameter(parameter, arguments)
 
         self._check_invalid()
         return self.extracted
@@ -103,29 +99,14 @@ class ParameterExtractor(object):
             else:
                 self.invalid.append("%s must be a postive integer" % name)
 
-    def _extract_direction(self, arguments):
-        if 'direction' in arguments:
-            if arguments['direction'] in self.DIRECTIONS:
-                self.extracted['direction'] = arguments['direction']
-            else:
-                self.invalid.append("direction must be asc or desc")
-
-    def _extract_order(self, arguments):
-        column_name = arguments.get('order', None)
-        if column_name:
-            if column_name in self.columns:
-                self.extracted['order'] = column_name
-            else:
-                self.invalid.append("ordering column '%s' does not exist" % column_name)
-
-    def _extract_search(self, arguments):
-        if 'search' in arguments:
-            self.extracted['search'] = arguments['search']
+    def _extract_parameter(self, name, arguments):
+        if name in arguments:
+            self.extracted[name] = arguments[name]
 
     def _check_invalid(self):
         if self.invalid:
             raise InvalidParametersError(self.invalid)
 
 
-def extract_search_parameters(arguments, columns=None):
-    return ParameterExtractor(columns).extract(arguments)
+def extract_search_parameters(arguments):
+    return ParameterExtractor().extract(arguments)

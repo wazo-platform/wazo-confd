@@ -234,11 +234,6 @@ class TestExtractSearchParameters(unittest.TestCase):
 
         assert_that(parameters, equal_to(expected_result))
 
-    def test_given_invalid_direction_then_raises_error(self):
-        args = {'direction': 'toto'}
-
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
-
     def test_given_direction_parameter_then_extracts_direction(self):
         expected_result = {'direction': 'asc'}
         args = {'direction': 'asc'}
@@ -255,25 +250,13 @@ class TestExtractSearchParameters(unittest.TestCase):
 
         assert_that(parameters, equal_to(expected_result))
 
-    def test_given_order_without_columns_configured_then_raises_error(self):
-        args = {'order': 'column_name'}
-
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
-
-    def test_given_order_in_column_list_then_extracts_order_parameter(self):
+    def test_given_order_parameter_then_extracts_order_parameter(self):
         expected_result = {'order': 'column_name'}
         args = {'order': 'column_name'}
-        columns = ['column_name']
 
-        parameters = extract_search_parameters(args, columns)
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
-
-    def test_given_order_column_that_does_not_exist_then_raises_error(self):
-        args = {'order': 'toto'}
-        columns = ['column']
-
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args, columns)
 
     def test_given_all_search_parameters_then_extracts_all_parameters(self):
         expected_result = {
@@ -292,8 +275,6 @@ class TestExtractSearchParameters(unittest.TestCase):
             'search': 'abcd'
         }
 
-        columns = ['toto']
-
-        parameters = extract_search_parameters(args, columns)
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
