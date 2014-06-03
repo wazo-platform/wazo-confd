@@ -29,7 +29,6 @@ from xivo_restapi.resources.voicemails import mapper
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.common import extract_search_parameters
 from xivo_dao.data_handler.voicemail.model import Voicemail
-from xivo_dao.data_handler.voicemail.search import config as search_config
 from xivo_dao.data_handler.voicemail import services as voicemail_services
 
 
@@ -37,12 +36,11 @@ logger = logging.getLogger(__name__)
 blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Voicemail)
-sort_columns = search_config.sort_columns()
 
 
 @route('')
 def list():
-    search_parameters = extract_search_parameters(request.args, sort_columns)
+    search_parameters = extract_search_parameters(request.args)
     search_result = voicemail_services.search(**search_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)

@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Device)
-sort_columns = ['ip', 'mac', 'plugin', 'model', 'vendor', 'version']
 
 
 @route('/<deviceid>')
@@ -48,7 +47,7 @@ def get(deviceid):
 
 @route('')
 def list():
-    search_parameters = extract_search_parameters(request.args, sort_columns)
+    search_parameters = extract_search_parameters(request.args)
     search_result = device_services.search(**search_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)

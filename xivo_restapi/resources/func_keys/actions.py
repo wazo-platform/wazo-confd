@@ -13,11 +13,9 @@ from xivo_dao.data_handler.func_key import services as func_key_services
 logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, FuncKey)
 
-sort_columns = ['id', 'type', 'destination']
-
 
 def list():
-    search_parameters = extract_search_parameters(request.args, sort_columns)
+    search_parameters = extract_search_parameters(request.args)
     search_result = func_key_services.search(**search_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
