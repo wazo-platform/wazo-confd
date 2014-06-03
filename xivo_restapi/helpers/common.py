@@ -32,7 +32,6 @@ from xivo_dao.data_handler.exception import ElementDeletionError
 from xivo_dao.data_handler.exception import AssociationNotExistsError
 
 from xivo_restapi.helpers import serializer
-from flask.globals import request
 
 
 logger = logging.getLogger(__name__)
@@ -72,45 +71,42 @@ def _make_response_encoded(message, code, exc_info=False):
     return make_response(serializer.encode([unicode(message)]), code)
 
 
-DIRECTIONS = ['asc', 'desc']
+class ParameterExtractor(object):
+
+    PARAMETERS = ('search', 'direction', 'order')
+    NUMERIC = ('limit', 'skip')
+
+    def extract(self, arguments):
+        self._reset()
+
+        for name in self.NUMERIC:
+            self._extract_numeric(name, arguments)
+        for parameter in self.PARAMETERS:
+            self._extract_parameter(parameter, arguments)
+
+        self._check_invalid()
+        return self.extracted
+
+    def _reset(self):
+        self.invalid = []
+        self.extracted = {}
+
+    def _extract_numeric(self, name, arguments):
+        value = arguments.get(name, None)
+        if value:
+            if value.isdigit():
+                self.extracted[name] = int(value)
+            else:
+                self.invalid.append("%s must be only digits" % name)
+
+    def _extract_parameter(self, name, arguments):
+        if name in arguments:
+            self.extracted[name] = arguments[name]
+
+    def _check_invalid(self):
+        if self.invalid:
+            raise InvalidParametersError(self.invalid)
 
 
-def extract_find_parameters(ordering):
-    invalid = []
-    parameters = {}
-
-    if 'limit' in request.args:
-        limit = request.args['limit']
-        if limit.isdigit() and int(limit) > 0:
-            parameters['limit'] = int(limit)
-        else:
-            invalid.append("limit must be a positive integer")
-
-    if 'skip' in request.args:
-        skip = request.args['skip']
-        if skip.isdigit() and int(skip) >= 0:
-            parameters['skip'] = int(skip)
-        else:
-            invalid.append("skip must be a positive integer")
-
-    if 'order' in request.args:
-        column_name = request.args['order']
-        if column_name in ordering:
-            parameters['order'] = ordering[column_name]
-        else:
-            invalid.append("ordering column '%s' does not exist" % column_name)
-
-    if 'direction' in request.args:
-        direction = request.args['direction']
-        if direction in DIRECTIONS:
-            parameters['direction'] = direction
-        else:
-            invalid.append("direction must be asc or desc")
-
-    if 'search' in request.args:
-        parameters['search'] = request.args['search']
-
-    if len(invalid) > 0:
-        raise InvalidParametersError(invalid)
-
-    return parameters
+def extract_search_parameters(arguments):
+    return ParameterExtractor().extract(arguments)

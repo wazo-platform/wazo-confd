@@ -3,8 +3,8 @@
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.voicemail.model import Voicemail, VoicemailOrder
-from xivo_dao.helpers.abstract_model import SearchResult
+from xivo_dao.data_handler.voicemail.model import Voicemail
+from xivo_dao.data_handler.utils.search import SearchResult
 
 
 BASE_URL = "/1.1/voicemails"
@@ -149,40 +149,27 @@ class TestVoicemailsAction(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_restapi.resources.voicemails.actions.extract_find_parameters')
     @patch('xivo_dao.data_handler.voicemail.services.search')
-    def test_list_voicemails_with_parameters(self, voicemail_search, extract_find_parameters):
+    def test_list_voicemails_with_parameters(self, voicemail_search):
         expected_status_code = 200
         expected_result = {
             'total': 0,
             'items': []
         }
-        query_string = 'skip=532&limit=5432&order=toto&direction=asc&search=abcd'
+        query_string = 'skip=532&limit=5432&order=email&direction=asc&search=abcd'
         request_parameters = {
             'skip': 532,
             'limit': 5432,
-            'order': 'toto',
+            'order': 'email',
             'direction': 'asc',
             'search': 'abcd'
         }
-        extract_find_parameters.return_value = request_parameters
 
-        voicemails_found = Mock(SearchResult)
-        voicemails_found.total = 0
-        voicemails_found.items = []
-
+        voicemails_found = SearchResult(total=0, items=[])
         voicemail_search.return_value = voicemails_found
 
         result = self.app.get("%s?%s" % (BASE_URL, query_string))
 
-        extract_find_parameters.assert_called_once_with({
-            'name': VoicemailOrder.name,
-            'number': VoicemailOrder.number,
-            'context': VoicemailOrder.context,
-            'email': VoicemailOrder.email,
-            'language': VoicemailOrder.language,
-            'timezone': VoicemailOrder.timezone
-        })
         voicemail_search.assert_called_once_with(**request_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))

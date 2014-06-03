@@ -17,10 +17,10 @@
 
 import unittest
 from hamcrest import assert_that, equal_to
-from mock import Mock, patch
+from mock import Mock
 from werkzeug.exceptions import HTTPException, BadRequest
 from xivo_restapi.helpers.common import exception_catcher, \
-    extract_find_parameters
+    extract_search_parameters
 from xivo_restapi.flask_http_server import app
 from xivo_restapi.helpers import serializer
 
@@ -202,111 +202,66 @@ class TestCommon(unittest.TestCase):
         self.assertResponse(response, expected_status_code, expected_message)
 
 
-class TestExtractFindParameters(unittest.TestCase):
+class TestExtractSearchParameters(unittest.TestCase):
 
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_invalid_skip(self, mock_request):
-        mock_request.args = {
-            'skip': '-532'
-        }
+    def test_given_invalid_skip_then_raises_error(self):
+        args = {'skip': 'toto'}
+        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
 
-        self.assertRaises(InvalidParametersError, extract_find_parameters, {})
+    def test_given_skip_parameter_then_extracts_skip(self):
+        expected_result = {'skip': 532}
+        args = {'skip': '532'}
 
-        mock_request.args = {
-            'skip': 'toto'
-        }
-
-        self.assertRaises(InvalidParametersError, extract_find_parameters, {})
-
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_skip(self, mock_request):
-        expected_result = {
-            'skip': 532
-        }
-        mock_request.args = {
-            'skip': '532'
-        }
-
-        parameters = extract_find_parameters({})
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
 
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_invalid_limit(self, mock_request):
-        mock_request.args = {
-            'limit': '-532'
-        }
+    def test_given_invalid_limit_then_raises_error(self):
+        args = {'limit': 'toto'}
+        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
 
-        self.assertRaises(InvalidParametersError, extract_find_parameters, {})
+    def test_given_limit_parameter_then_extracts_limit(self):
+        expected_result = {'limit': 532}
+        args = {'limit': '532'}
 
-        mock_request.args = {
-            'limit': 'toto'
-        }
-
-        self.assertRaises(InvalidParametersError, extract_find_parameters, {})
-
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_limit(self, mock_request):
-        expected_result = {
-            'limit': 532
-        }
-        mock_request.args = {
-            'limit': '532'
-        }
-
-        parameters = extract_find_parameters({})
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
 
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_direction(self, mock_request):
-        expected_result = {
-            'direction': 'asc'
-        }
-        mock_request.args = {
-            'direction': 'asc'
-        }
+    def test_given_direction_parameter_then_extracts_direction(self):
+        expected_result = {'direction': 'asc'}
+        args = {'direction': 'asc'}
 
-        parameters = extract_find_parameters({})
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
 
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_with_invalid_direction(self, mock_request):
-        mock_request.args = {
-            'direction': 'toto'
-        }
+    def test_given_search_parameter_then_extracts_search_term(self):
+        expected_result = {'search': 'abcd'}
+        args = {'search': 'abcd'}
 
-        self.assertRaises(InvalidParametersError, extract_find_parameters, {})
-
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_search(self, mock_request):
-        expected_result = {
-            'search': 'abcd'
-        }
-        mock_request.args = {
-            'search': 'abcd'
-        }
-
-        parameters = extract_find_parameters({})
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
 
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_all_args(self, mock_request):
-        order_column = Mock()
-        ordering = {
-            'toto': order_column
-        }
+    def test_given_order_parameter_then_extracts_order_parameter(self):
+        expected_result = {'order': 'column_name'}
+        args = {'order': 'column_name'}
 
+        parameters = extract_search_parameters(args)
+
+        assert_that(parameters, equal_to(expected_result))
+
+    def test_given_all_search_parameters_then_extracts_all_parameters(self):
         expected_result = {
             'skip': 532,
             'limit': 5432,
-            'order': order_column,
+            'order': 'toto',
             'direction': 'asc',
             'search': 'abcd'
         }
-        mock_request.args = {
+
+        args = {
             'skip': '532',
             'limit': '5432',
             'order': 'toto',
@@ -314,40 +269,6 @@ class TestExtractFindParameters(unittest.TestCase):
             'search': 'abcd'
         }
 
-        parameters = extract_find_parameters(ordering)
+        parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
-
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_with_ordering(self, mock_request):
-        order_column = Mock()
-
-        mock_request.args = {
-            'order': 'column_name'
-        }
-
-        expected_result = {
-            'order': order_column
-        }
-
-        ordering = {
-            'column_name': order_column
-        }
-
-        parameters = extract_find_parameters(ordering=ordering)
-
-        assert_that(parameters, equal_to(expected_result))
-
-    @patch('xivo_restapi.helpers.common.request')
-    def test_extract_find_parameters_with_invalid_ordering(self, mock_request):
-        order_column = Mock()
-
-        mock_request.args = {
-            'order': 'toto'
-        }
-
-        ordering = {
-            'column_name': order_column
-        }
-
-        self.assertRaises(InvalidParametersError, extract_find_parameters, ordering)
