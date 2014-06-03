@@ -96,12 +96,11 @@ Feature: REST API Link line with a user
             | user_id | line_id |
             | 983473  | 239487  |
         Then I get a response with status "201"
-
         Then I see a user with infos:
-            | fullname         | protocol | context |
-            | Salle Doctorant  | sip      | default |
-            | Greg Sanderson   | sip      | default |
-            | Roberto Da Silva | sip      | default |
+            | fullname         | protocol |
+            | Salle Doctorant  | sip      |
+            | Greg Sanderson   | sip      |
+            | Roberto Da Silva | sip      |
 
     Scenario: Link a user already associated to a line
         Given I have the following users:
