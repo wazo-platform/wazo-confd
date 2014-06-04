@@ -88,6 +88,19 @@ class TestExtensionActions(TestResources):
                                                  limit=2)
         self.assert_response_for_list(response, expected_response)
 
+    @patch('xivo_dao.data_handler.extension.services.search')
+    def test_list_extensions_with_type(self, extension_search):
+        expected_response = {'total': 1,
+                             'items': [self.build_item(self.extension)]}
+
+        extension_search.return_value = SearchResult(1, [self.extension])
+
+        query_string = "type=incall"
+        response = self.app.get("%s?%s" % (BASE_URL, query_string))
+
+        extension_search.assert_called_once_with(type='incall')
+        self.assert_response_for_list(response, expected_response)
+
     @patch('xivo_dao.data_handler.extension.services.get')
     def test_get(self, mock_extension_services_get):
         expected_response = self.build_item(self.extension)

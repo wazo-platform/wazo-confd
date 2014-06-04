@@ -252,6 +252,15 @@ class TestExtractSearchParameters(unittest.TestCase):
 
         assert_that(parameters, equal_to(expected_result))
 
+    def test_given_extra_parameters_then_extracts_extra_parameters(self):
+        expected_result = {'extra': 'extravalue'}
+        args = {'extra': 'extravalue'}
+        extra_parameters = ['extra']
+
+        parameters = extract_search_parameters(args, extra=extra_parameters)
+
+        assert_that(parameters, equal_to(expected_result))
+
     def test_given_all_search_parameters_then_extracts_all_parameters(self):
         expected_result = {
             'skip': 532,

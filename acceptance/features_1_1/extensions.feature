@@ -20,6 +20,34 @@ Feature: REST API Extensions
             | 1983  | default |
             | 1947  | default |
 
+    Scenario: Filter extension by type
+        Given I have the following extensions:
+            | exten | context     |
+            | 1036  | default     |
+            | 1936  | from-extern |
+
+        When I access the list of extensions using the following parameters:
+            | name | value    |
+            | type | internal |
+        Then I get a response with status "200"
+        Then I get a list containing the following extensions:
+            | exten | context |
+            | 1036  | default |
+        Then I get a list that does not contain the following extensions:
+            | exten | context     |
+            | 1936  | from-extern |
+
+        When I access the list of extensions using the following parameters:
+            | name | value  |
+            | type | incall |
+        Then I get a response with status "200"
+        Then I get a list containing the following extensions:
+            | exten | context     |
+            | 1936  | from-extern |
+        Then I get a list that does not contain the following extensions:
+            | exten | context |
+            | 1036  | default |
+
     Scenario: Get an extension that does not exist
         Given I have no extension with id "699324"
         When I access the extension with id "699324"

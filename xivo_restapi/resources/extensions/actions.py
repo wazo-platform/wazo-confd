@@ -31,11 +31,12 @@ from xivo_restapi.resources.extensions.routes import extension_route as route
 
 logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, Extension)
+extra_parameters = ['type']
 
 
 @route('')
 def list():
-    parameters = extract_search_parameters(request.args)
+    parameters = extract_search_parameters(request.args, extra_parameters)
     search_result = extension_services.search(**parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
