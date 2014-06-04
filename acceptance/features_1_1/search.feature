@@ -9,27 +9,27 @@ Feature: Filter resources
         When I request a list for "<resource>" using parameters:
             | name      | value |
             | direction | toto  |
-        Then I get a response 400 matching "Invalid parameters: direction must be asc or desc"
+        Then I get a response 400 matching "Invalid parameters: direction must be 'asc' or 'desc'"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | limit | -32   |
-        Then I get a response 400 matching "Invalid parameters: limit must be a positive integer"
+        Then I get a response 400 matching "Invalid parameters: limit must be only digits"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | limit | asdf  |
-        Then I get a response 400 matching "Invalid parameters: limit must be a positive integer"
+        Then I get a response 400 matching "Invalid parameters: limit must be only digits"
 
         When I request a list for "<resource>" using parameters:
             | name | value |
             | skip | asdf  |
-        Then I get a response 400 matching "Invalid parameters: skip must be a positive integer"
+        Then I get a response 400 matching "Invalid parameters: skip must be only digits"
 
         When I request a list for "<resource>" using parameters:
             | name | value |
             | skip | -32   |
-        Then I get a response 400 matching "Invalid parameters: skip must be a positive integer"
+        Then I get a response 400 matching "Invalid parameters: skip must be only digits"
 
     Examples:
         | resource   |
