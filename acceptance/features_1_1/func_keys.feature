@@ -5,13 +5,13 @@ Feature: REST API Function keys
             | limit |
             | -32   |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: limit must be a positive integer"
+        Then I get an error message "Invalid parameters: limit must be only digits"
 
         When I request the list of func keys with the following parameters via RESTAPI:
             | limit |
             | asdf  |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: limit must be a positive integer"
+        Then I get an error message "Invalid parameters: limit must be only digits"
 
     Scenario: List of Function keys
         Given I have the following users:
