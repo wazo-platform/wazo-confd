@@ -175,6 +175,24 @@ Feature: REST API Users
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: mobile_phone_number"
 
+    Scenario: Creating a user with a valid mobile_phone_number
+        When I create users with the following parameters:
+            | firstname | mobile_phone_number |
+            | Joe       | 5551234567          |
+        Then I get a response with status "201"
+        Then the created user has the following parameters:
+            | firstname | mobile_phone_number |
+            | Joe       | 5551234567          |
+
+    Scenario: Creating a user with an international mobile_phone_number
+        When I create users with the following parameters:
+            | firstname | mobile_phone_number  |
+            | Joe       | +011224563958*78#445 |
+        Then I get a response with status "201"
+        Then the created user has the following parameters:
+            | firstname | mobile_phone_number  |
+            | Joe       | +011224563958*78#445 |
+
     Scenario: Creating a user with a firstname
         When I create users with the following parameters:
           | firstname |
