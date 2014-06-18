@@ -148,7 +148,7 @@ Feature: REST API Function keys
         Given there are queues with infos:
             | name    | display name | number | context |
             | cellcom | Cell Com     | 3288   | default |
-        When I delete the queue with number "3288"
+        When I delete the queue with extension "3288@default"
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
         Then the list does not contain the following func keys:
