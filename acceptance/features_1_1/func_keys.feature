@@ -26,7 +26,6 @@ Feature: REST API Function keys
     Scenario: List of Function keys destinations contains voicemail services
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
-        Then the list only contains "3" func keys destination "service"
         Then the list contains the following func keys:
             | type      | destination | destination name |
             | speeddial | service     | vmusermsg        |
