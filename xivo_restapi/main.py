@@ -19,6 +19,7 @@ import argparse
 import logging
 
 from xivo import daemonize
+from xivo.xivo_logging import setup_logging
 from xivo_restapi import flask_http_server
 from xivo_restapi import config
 
@@ -32,7 +33,7 @@ logger = logging.getLogger(__name__)
 def main():
     parsed_args = _parse_args()
 
-    _init_logging(parsed_args)
+    setup_logging(LOGFILENAME, parsed_args.foreground, parsed_args.debug)
 
     if parsed_args.debug:
         logger.info("Debug mode enabled.")
@@ -97,28 +98,6 @@ def _port_number(value):
     if port < 1 or port > 65535:
         raise argparse.ArgumentTypeError('%r is not a valid port number' % value)
     return port
-
-
-def _init_logging(parsed_args):
-    formatter = logging.Formatter('%%(asctime)s %s[%%(process)d] (%%(levelname)s) (%%(name)s): %%(message)s'
-                                  % DAEMONNAME)
-    _init_root_logger(formatter, parsed_args)
-
-
-def _init_root_logger(formatter, parsed_args):
-    handler = logging.FileHandler(LOGFILENAME)
-    handler.setFormatter(formatter)
-
-    root_logger = logging.getLogger()
-    root_logger.addHandler(handler)
-    if parsed_args.foreground or parsed_args.dev_mode:
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        root_logger.addHandler(handler)
-    if parsed_args.debug:
-        root_logger.setLevel(logging.DEBUG)
-    else:
-        root_logger.setLevel(logging.INFO)
 
 
 def _daemonize():
