@@ -73,6 +73,25 @@ Feature: Link a line and an extension
         Then I get a response with a link to the "lines" resource using the id "line_id"
         Then I get a response with a link to the "extensions" resource using the id "extension_id"
 
+    Scenario: Get the line associated to an incall
+        Given I have the following lines:
+            | username  | protocol | context | device_slot |
+            | abdoulaye | sip      | default | 1           |
+        Given I have the following extensions:
+            | exten | context     |
+            | 1284  | default     |
+            | 1284  | from-extern |
+        Given I have the following users:
+            | firstname | lastname |
+            | Abdoulaye | Bhoye    |
+        Given SIP line "abdoulaye" is associated to user "Abdoulaye" "Bhoye"
+        Given extension "1284@default" is associated to SIP line "abdoulaye"
+        Given extension "1284@from-extern" is associated to SIP line "abdoulaye"
+        When I get the line associated to extension "1284@from-extern"
+        Then I get a response with status "200"
+        Then I get a response with a link to the "lines" resource using the id "line_id"
+        Then I get a response with a link to the "extensions" resource using the id "extension_id"
+
     Scenario: Associate an extension with a line that does not exist
         Given I have the following extensions:
             | exten | context |
