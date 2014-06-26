@@ -60,7 +60,7 @@ Feature: Link a line and an extension
         Then I get a response with status "404"
         Then I get an error message matching "Extension with id=\d+ does not have a line"
 
-    Scenario: Get the line associated to an an extension
+    Scenario: Get the line associated to an extension
         Given I have the following lines:
             | username | protocol | context | device_slot |
             | boubacar | sip      | default | 1           |
