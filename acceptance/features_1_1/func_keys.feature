@@ -23,7 +23,7 @@ Feature: REST API Function keys
             | type      | destination | destination name |
             | speeddial | user        | Fodé Bangoura    |
 
-    Scenario: List of Function keys destinations contains voicemail services
+    Scenario: List of service function keys
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
         Then the list contains the following func keys:
@@ -31,6 +31,14 @@ Feature: REST API Function keys
             | speeddial | service     | vmusermsg        |
             | speeddial | service     | enablevm         |
             | speeddial | service     | vmuserpurge      |
+            | speeddial | service     | phonestatus      |
+            | speeddial | service     | recsnd           |
+            | speeddial | service     | calllistening    |
+            | speeddial | service     | fwdundoall       |
+            | speeddial | service     | pickup           |
+            | speeddial | service     | callrecord       |
+            | speeddial | service     | incallfilter     |
+            | speeddial | service     | enablednd        |
 
     Scenario: List of Function keys with search
         Given there is a group "balletnational" with extension "2392@default"
