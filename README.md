@@ -5,14 +5,14 @@ XiVO REST API
 
 XiVO REST API is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
 service for configuring and managing a XiVO server. Further details on how to use the API can be found on
-the [XiVO documentation web site](http://documentation.xivo.fr/production/api_sdk/rest_api/rest_api.html)
+the [XiVO documentation web site](http://documentation.xivo.io/production/api_sdk/rest_api/rest_api.html)
 
 
 Installing REST API
 -------------------
 
-The server is already provided as a part of [XiVO](http://documentation.xivo.fr).
-Please refer to [the documentation](ttp://documentation.xivo.fr/production/installation/installsystem.html) for
+The server is already provided as a part of [XiVO](http://documentation.xivo.io).
+Please refer to [the documentation](ttp://documentation.xivo.io/production/installation/installsystem.html) for
 further details on installing one.
 
 Running unit tests
