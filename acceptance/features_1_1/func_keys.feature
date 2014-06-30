@@ -23,6 +23,15 @@ Feature: REST API Function keys
             | type      | destination | destination name |
             | speeddial | user        | Fodé Bangoura    |
 
+    Scenario: List of Function keys destinations contains voicemail services
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list contains the following func keys:
+            | type      | destination | destination name |
+            | speeddial | service     | vmusermsg        |
+            | speeddial | service     | enablevm         |
+            | speeddial | service     | vmuserpurge      |
+
     Scenario: List of Function keys with search
         Given there is a group "balletnational" with extension "2392@default"
         Given I have the following users:
@@ -139,7 +148,7 @@ Feature: REST API Function keys
         Given there are queues with infos:
             | name    | display name | number | context |
             | cellcom | Cell Com     | 3288   | default |
-        When I delete the queue with number "3288"
+        When I delete the queue with extension "3288@default"
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
         Then the list does not contain the following func keys:
