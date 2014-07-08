@@ -173,6 +173,19 @@ Feature: REST API Extensions
         Then I get a header with a location for the "extensions" resource
         Then I get a response with a link to the "extensions" resource
 
+    Scenario: Creating an extenion in incall range with DID length
+        Given there are contexts with infos:
+            | type   | name   | range_start | range_end  | entity_name | didlength |
+            | incall | quebec | 4185550000  | 4185559999 | xivo_entity | 4         |
+        Given I have no extension with exten "1111@quebec"
+        When I create an extension with the following parameters:
+            | exten | context |
+            | 1111  | quebec  |
+        Then I get a response with status "201"
+        Then I get a response with an id
+        Then I get a header with a location for the "extensions" resource
+        Then I get a response with a link to the "extensions" resource
+
     Scenario: Creating an alphanumeric extension
         When I create an extension with the following parameters:
             | exten  | context |
