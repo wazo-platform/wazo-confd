@@ -9,6 +9,14 @@ Feature: Associate a user and a voicemail
         Then I get a response with status "400"
         Then I get an error message matching "Nonexistent parameters: voicemail \d+ does not exist"
 
+    Scenario: Associate a user that doesn't exist with a voicemail
+        Given I have the following voicemails:
+            | name             | number | context |
+            | Samantha Wildman | 1071   | default |
+        When I associate a fake user with with voicemail "1071@default" via RESTAPI
+        Then I get a response with status "404"
+        Then I get an error message matching "Nonexistent parameters: user with \d+ does not exist"
+
     Scenario: Associate a voicemail with a user that has no line
         Given there are users with infos:
             | firstname | lastname |
