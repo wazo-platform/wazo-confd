@@ -17,59 +17,29 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import unittest
+from flask.testing import FlaskClient
 
 from hamcrest import assert_that, equal_to, has_entries
 
-from functools import wraps
-from mock import patch
 from xivo_restapi import flask_http_server
-from xivo_restapi.authentication import xivo_realm_digest
 from xivo_restapi.helpers import serializer
-from xivo_restapi.negotiate import flask_negotiate
+
+
+class TestClient(FlaskClient):
+
+    def open(self, *args, **kwargs):
+        kwargs.setdefault('environ_base', {})['REMOTE_ADDR'] = '127.0.0.1'
+        return super(FlaskClient, self).open(*args, **kwargs)
 
 
 class TestResources(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls._patch_decorators()
-        cls._mock_decorators()
         flask_http_server.register_blueprints_v1_1()
         flask_http_server.app.testing = True
+        flask_http_server.app.test_client_class = TestClient
         cls.app = flask_http_server.app.test_client()
-
-    @classmethod
-    def _patch_decorators(cls):
-        cls.requires_auth_patcher = patch.object(xivo_realm_digest.realmDigest, 'requires_auth')
-        cls.consumes_patcher = patch.object(flask_negotiate, 'produces')
-        cls.produces_patcher = patch.object(flask_negotiate, 'consumes')
-
-        cls.requires_auth = cls.requires_auth_patcher.start()
-        cls.consumes = cls.consumes_patcher.start()
-        cls.produces = cls.produces_patcher.start()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.requires_auth_patcher.stop()
-        cls.consumes_patcher.stop()
-        cls.produces_patcher.stop()
-
-    @classmethod
-    def _mock_decorators(cls):
-        def mock_basic_decorator(func):
-            return func
-
-        def mock_parameterized_decorator(*decorator_args, **decorator_kwargs):
-            def decorated(func):
-                @wraps(func)
-                def wrapper(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return wrapper
-            return decorated
-
-        cls.requires_auth.side_effect = mock_basic_decorator
-        cls.consumes.side_effect = mock_parameterized_decorator
-        cls.produces.side_effect = mock_parameterized_decorator
 
     def _serialize_encode(self, data):
         return serializer.encode(data).encode('utf8')
