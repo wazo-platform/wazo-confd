@@ -14,18 +14,18 @@ Feature: REST API Voicemails
         Then I get a response with a link to the "voicemails" resource
         Then I have the following voicemails via RESTAPI:
             | name            | number | context | attach_audio | delete_messages | ask_password |
-            | Jean-Luc Picard | 1000   | default | false        | false           | false        |
+            | Jean-Luc Picard | 1000   | default | false        | false           | true         |
 
     Scenario: Get a voicemail with all parameters
         Given I have the following voicemails:
             | name          | number | context | password | email            | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-            | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | true         |
+            | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | false        |
         When I send a request for the voicemail "1001@default", using its id
         Then I get a response with status "200"
         Then I get a response with a link to the "voicemails" resource
         Then I have the following voicemails via RESTAPI:
             | name          | number | context | password | email            | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-            | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | true         |
+            | William Riker | 1001   | default | 1234     | test@example.com | en_US    | eu-fr    | 100          | true         | false           | false        |
 
     Scenario: Voicemail list
         Given I have the following voicemails:
@@ -143,14 +143,14 @@ Feature: REST API Voicemails
         Given there is no voicemail with number "1000" and context "default"
         When I create the following voicemails via RESTAPI:
           | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-          | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+          | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | false        |
         Then I get a response with status "201"
         Then I get a response with an id
         Then I get a header with a location for the "voicemails" resource
         Then I get a response with a link to the "voicemails" resource
         Then I have the following voicemails via RESTAPI:
           | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-          | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+          | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | false        |
 
     Scenario: Creating two voicemails with the same number but different context
         Given there is no voicemail with number "1000" and context "default"
@@ -334,15 +334,15 @@ Feature: REST API Voicemails
         Given there is no voicemail with number "1000" and context "default"
         Given I have the following voicemails:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-            | Super Hero | 2000   | default | 4566     | ggd@gfggdd.com | en_US    | eu-fr    | 10           | false        | true            | false        |
+            | Super Hero | 2000   | default | 4566     | ggd@gfggdd.com | en_US    | eu-fr    | 10           | false        | true            | true         |
         When I edit voicemail "2000@default" via RESTAPI:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-            | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+            | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | false        |
         Then I get a response with status "204"
         When I send a request for the voicemail "1000@default", using its id
         Then I have the following voicemails via RESTAPI:
             | name       | number | context | password | email          | language | timezone | max_messages | attach_audio | delete_messages | ask_password |
-            | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | true         |
+            | Joe Dahool | 1000   | default | 1234     | joe@dahool.com | fr_FR    | eu-fr    | 50           | true         | false           | false        |
 
     Scenario: Edit two voicemails with the same number but different context
         Given there is no voicemail with number "1001" and context "default"
