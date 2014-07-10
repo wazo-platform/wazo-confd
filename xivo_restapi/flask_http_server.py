@@ -24,6 +24,7 @@ import urllib
 from datetime import timedelta
 from flask import Flask, request
 from xivo_restapi import config
+from xivo_restapi.helpers.common import make_error_response
 
 logger = logging.getLogger(__name__)
 
@@ -82,3 +83,8 @@ def log_requests():
         logger.info("%(method)s %(url)s with data %(data)s ", params)
     else:
         logger.info("%(method)s %(url)s", params)
+
+
+@app.errorhandler(Exception)
+def error_handler(error):
+    return make_error_response(error)

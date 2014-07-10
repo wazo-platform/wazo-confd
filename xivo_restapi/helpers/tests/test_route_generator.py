@@ -29,8 +29,7 @@ class TestRouteGenerator(unittest.TestCase):
     @patch('xivo_restapi.helpers.route_generator.consumes')
     @patch('xivo_restapi.helpers.route_generator.produces')
     @patch('xivo_restapi.helpers.route_generator.auth')
-    @patch('xivo_restapi.helpers.route_generator.exception_catcher')
-    def test_route_generator(self, exception_catcher, auth, produces, consumes):
+    def test_route_generator(self, auth, produces, consumes):
         # WARNING : You are not expected to understand this the first time.
         # Go read up on how parameterized decorators work in python
         #
@@ -46,16 +45,13 @@ class TestRouteGenerator(unittest.TestCase):
 
         route_generator = RouteGenerator(blueprint)
 
-        decorated_exception_catcher = exception_catcher.return_value = Mock()
         decorated_login_required = auth.login_required.return_value = Mock()
         parameterized_produces = produces.return_value = Mock()
         decorated_produces = parameterized_produces.return_value = Mock()
 
         route_generator('')(action)
 
-        exception_catcher.assert_called_once_with(action)
-
-        auth.login_required.assert_called_once_with(decorated_exception_catcher)
+        auth.login_required.assert_called_once_with(action)
 
         produces.assert_called_once_with('application/json')
         parameterized_produces.assert_called_once_with(decorated_login_required)
