@@ -18,7 +18,6 @@
 import logging
 
 from flask.helpers import make_response
-from functools import wraps
 from werkzeug.exceptions import HTTPException
 
 from xivo_dao.data_handler.exception import ElementNotExistsError
@@ -36,34 +35,33 @@ from xivo_restapi.helpers import serializer
 
 logger = logging.getLogger(__name__)
 
+DIRECTIONS = ['asc', 'desc']
 
-def exception_catcher(func):
-    @wraps(func)
-    def decorated_func(*args, **kwargs):
-        generic_errors = (MissingParametersError,
-                          InvalidParametersError,
-                          NonexistentParametersError,
-                          ElementAlreadyExistsError,
-                          ElementCreationError,
-                          ElementEditionError,
-                          ElementDeletionError)
+GENERIC_ERRORS = (MissingParametersError,
+                  InvalidParametersError,
+                  NonexistentParametersError,
+                  ElementAlreadyExistsError,
+                  ElementCreationError,
+                  ElementEditionError,
+                  ElementDeletionError)
 
-        try:
-            return func(*args, **kwargs)
-        except generic_errors as e:
-            return _make_response_encoded(e, 400)
-        except ValueError, e:
-            logger.exception(e)
-            data = "No parsable data in the request, Be sure to send a valid JSON file"
-            return _make_response_encoded(data, 400)
-        except (ElementNotExistsError, AssociationNotExistsError) as e:
-            return _make_response_encoded(e, 404)
-        except HTTPException:
-            raise
-        except Exception as e:
-            data = 'unexpected error during request: %s' % e
-            return _make_response_encoded(data, 500, exc_info=True)
-    return decorated_func
+NOT_FOUND_ERRORS = (ElementNotExistsError,
+                    AssociationNotExistsError)
+
+
+def make_error_response(error):
+    if isinstance(error, GENERIC_ERRORS):
+        return _make_response_encoded(error, 400)
+    elif isinstance(error, NOT_FOUND_ERRORS):
+        return _make_response_encoded(error, 404)
+    elif isinstance(error, ValueError):
+        message = "No parsable data in the request, Be sure to send a valid JSON file"
+        return _make_response_encoded(message, 400)
+    elif isinstance(error, HTTPException):
+        raise error
+    else:
+        message = 'unexpected error during request: %s' % error
+        return _make_response_encoded(message, 500, exc_info=True)
 
 
 def _make_response_encoded(message, code, exc_info=False):
