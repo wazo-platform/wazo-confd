@@ -23,7 +23,7 @@ from flask.helpers import make_response
 from xivo_dao.data_handler.call_log import services
 from xivo_dao.data_handler.exception import InvalidParametersError
 from xivo_restapi import config
-from xivo_restapi.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.authentication import auth
 from xivo_restapi.helpers.common import exception_catcher
 from xivo_restapi.negotiate.flask_negotiate import produces
 from xivo_restapi.resources.call_logs import serializer
@@ -34,8 +34,8 @@ blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config
 
 
 @blueprint.route('')
-@realmDigest.requires_auth
 @produces('text/csv', response_content_type='text/csv; charset=utf8')
+@auth.login_required
 @exception_catcher
 def list():
     if 'start_date' in request.args or 'end_date' in request.args:

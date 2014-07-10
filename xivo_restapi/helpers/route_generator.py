@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_restapi.helpers.common import exception_catcher
-from xivo_restapi.authentication.xivo_realm_digest import realmDigest
+from xivo_restapi.authentication import auth
 from xivo_restapi.negotiate.flask_negotiate import produces, consumes
 
 
@@ -29,7 +29,7 @@ class RouteGenerator(object):
     def __call__(self, route, *args, **kwargs):
         def decorator(func):
             func = exception_catcher(func)
-            func = realmDigest.requires_auth(func)
+            func = auth.login_required(func)
             func = produces('application/json')(func)
             # func = consumes('application/json')(func)  # Blocks requests with no Content-Type, even if not needed
             # MUST BE CALLED AS THE END
