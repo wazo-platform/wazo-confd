@@ -18,10 +18,11 @@ Description: XIVO restapi server
 
 Package: xivo-librestapi
 Architecture: all
-Depends: ${python:Depends}, 
-         ${misc:Depends}, 
-         xivo-libdao (>= 13.02~20130131.124922.ae70e6f-1), 
-         python-flask, 
+Depends: ${python:Depends},
+         ${misc:Depends},
+         xivo-libdao (>= 13.02~20130131.124922.ae70e6f-1),
+         python-flask,
+         python-flask-httpauth,
          python-flup
 Description: XIVO restapi lib
  XIVO is a system based on a powerful IPBX, to bring an easy to
