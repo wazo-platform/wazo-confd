@@ -8,3 +8,4 @@ mock
 pyhamcrest
 pika
 flask==0.8
+flask-httpauth
