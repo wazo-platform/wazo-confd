@@ -33,9 +33,8 @@ class TestRouteGenerator(unittest.TestCase):
         # WARNING : You are not expected to understand this the first time.
         # Go read up on how parameterized decorators work in python
         #
-        # This test checks that an action is wrapped in 3 decorators
-        # (exception_catcher, requires_auth, produces) and the order in
-        # which the decorators are called.
+        # This test checks that an action is wrapped in multiple decorators and
+        # the order in which the decorators are called.
 
         def action():
             pass

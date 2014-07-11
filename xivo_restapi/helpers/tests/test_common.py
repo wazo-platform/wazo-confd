@@ -63,7 +63,7 @@ class TestMakeErrorResponse(TestCommon):
 
         self.assertRaises(HTTPException, make_error_response, exception)
 
-    def test_when_genereic_exception_is_raised(self):
+    def test_when_generic_exception_is_raised(self):
         expected_status_code = 500
         expected_message = ["unexpected error during request: error message"]
         exception = Exception("error message")
