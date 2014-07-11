@@ -25,7 +25,7 @@ from xivo_restapi.authentication.restapi_auth import RestApiAuth
 
 
 @patch('xivo_dao.accesswebservice_dao.get_allowed_hosts')
-class TestRestApiAuth(unittest.TestCase):
+class TestRestApiAuthAllowedHosts(unittest.TestCase):
 
     def setUp(self):
         self.app = Flask('testapp')
@@ -56,6 +56,28 @@ class TestRestApiAuth(unittest.TestCase):
         assert_that(response.status_code, equal_to(200))
         assert_that(response.data, equal_to('called'))
 
+
+@patch('xivo_dao.accesswebservice_dao.get_allowed_hosts')
+class TestRestApiAuthCredentials(unittest.TestCase):
+
+    def setUp(self):
+        self.get_password = patch('xivo_dao.accesswebservice_dao.get_password').start()
+
+        self.auth = RestApiAuth()
+
+        self.app = Flask('testapp')
+        self.app.secret_key = os.urandom(24)
+
+        @self.app.route('/')
+        @self.auth.login_required
+        def action():
+            return 'called'
+
+        self.client = self.app.test_client()
+
+    def tearDown(self):
+        patch.stopall()
+
     def test_when_request_not_from_allowed_host_then_returns_401(self, get_allowed_hosts):
         get_allowed_hosts.return_value = []
 
@@ -63,8 +85,7 @@ class TestRestApiAuth(unittest.TestCase):
 
         assert_that(response.status_code, equal_to(401))
 
-    @patch('xivo_dao.accesswebservice_dao.get_password')
-    def test_when_request_authenticated_then_calls_action(self, get_password, get_allowed_hosts):
+    def test_when_request_authenticated_then_calls_action(self, get_allowed_hosts):
         get_allowed_hosts.return_value = []
         auth = 'Digest username="username",realm="realm",nonce="nonce",uri="/",response="response",opaque="opaque"'
 
