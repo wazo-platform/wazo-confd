@@ -44,5 +44,7 @@ class RestApiAuth(HTTPDigestAuth):
         return decorated
 
     def _remote_address_allowed(self):
-        hosts = accesswebservice_dao.get_allowed_hosts() + self.ALLOWED_HOSTS
-        return request.remote_addr in hosts
+        # check localhost first to avoid accessing the database for nothing
+        if request.remote_addr in self.ALLOWED_HOSTS:
+            return True
+        return request.remote_addr in accesswebservice_dao.get_allowed_hosts()
