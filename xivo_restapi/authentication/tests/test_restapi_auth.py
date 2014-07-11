@@ -28,7 +28,7 @@ from xivo_restapi.authentication.restapi_auth import RestApiAuth
 class TestRestApiAuthAllowedHosts(unittest.TestCase):
 
     def setUp(self):
-        self.app = Flask('testapp')
+        self.app = Flask(__name__)
         self.app.secret_key = os.urandom(24)
 
         self.auth = RestApiAuth()
@@ -65,7 +65,7 @@ class TestRestApiAuthCredentials(unittest.TestCase):
 
         self.auth = RestApiAuth()
 
-        self.app = Flask('testapp')
+        self.app = Flask(__name__)
         self.app.secret_key = os.urandom(24)
 
         @self.app.route('/')
