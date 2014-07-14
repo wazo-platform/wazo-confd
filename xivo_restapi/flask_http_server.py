@@ -25,12 +25,15 @@ from datetime import timedelta
 from flask import Flask, request
 from xivo_restapi import config
 from xivo_restapi.helpers.common import make_error_response
+from xivo_restapi.helpers.premacop import parser as premacop_parser
 
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(minutes=5)
+
+content_parser = premacop_parser()
 
 
 def register_blueprints_v1_1():
