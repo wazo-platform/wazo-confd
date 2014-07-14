@@ -27,13 +27,16 @@ class Required(object):
 
 class Length(object):
 
-    def __init__(self, minimum=0, maximum=0):
+    def __init__(self, minimum=0, maximum=0, size=0):
         self.minimum = minimum
         self.maximum = maximum
+        self.size = size
 
     def __call__(self, value):
         if value is None:
             return
+        if self.size and len(value) != self.size:
+            raise ValidationError("length must be exactly {}".format(self.size))
         if self.minimum and len(value) < self.minimum:
             raise ValidationError("minimum length is {}".format(self.minimum))
         if self.maximum and len(value) > self.maximum:
