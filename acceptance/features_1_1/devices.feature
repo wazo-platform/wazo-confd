@@ -347,7 +347,7 @@ Feature: REST API Devices
         Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 523478 | default | sip      | toto     | tata   |           1 |
-        Given I only have the following devices:
+        Given I have the following devices:
             |              id |       ip |               mac |
             | 658743288432479 | 10.0.0.1 | 00:00:00:00:00:12 |
         When I associate my line_id "523478" to the device "658743288432479"
@@ -362,7 +362,7 @@ Feature: REST API Devices
         Then I get a response with status "403"
 
     Scenario: Delete a device
-        Given I only have the following devices:
+        Given I have the following devices:
             |            id |       ip |               mac |
             | 1346771446546 | 10.0.0.1 | 00:00:00:00:00:12 |
         When I delete the device "1346771446546" from restapi
