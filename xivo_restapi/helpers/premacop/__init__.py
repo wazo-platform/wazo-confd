@@ -14,4 +14,4 @@ def parser():
 
 
 def parse_json(content, document):
-    return json.loads(content)
+    return json.loads(content.decode('utf8'))
