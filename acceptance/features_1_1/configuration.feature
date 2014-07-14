@@ -14,7 +14,7 @@ Feature: REST API Configuration
         When I create users with the following parameters:
             | firstname | lastname |
             | Joe       |      Doe |
-        Then i see no live reload request in daemon log file
+        Then i see no live reload request in sysconfd log file
 
     Scenario: Enable live reload
         Given live reload is disabled
@@ -24,5 +24,4 @@ Feature: REST API Configuration
         When I create users with the following parameters:
             | firstname | lastname |
             | Joe       |      Doe |
-        Then i see live reload request in daemon log file
-
+        Then i see live reload request in sysconfd log file
