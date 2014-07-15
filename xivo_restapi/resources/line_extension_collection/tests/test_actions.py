@@ -43,14 +43,14 @@ class TestLineExtensionCollectionActions(unittest.TestCase):
 
     @patch('xivo_dao.data_handler.line_extension.services.associate')
     def test_associate_extension(self, associate, formatter):
-        model = formatter.to_model.return_value = Mock()
+        model = formatter.dict_to_model.return_value = Mock()
         created_model = associate.return_value = Mock()
         formatted_model = formatter.to_api.return_value = Mock()
         parameters = Mock()
 
         result = actions.associate_extension(LINE_ID, parameters)
 
-        formatter.to_model.assert_called_once_with(LINE_ID, parameters)
+        formatter.dict_to_model.assert_called_once_with(LINE_ID, parameters)
         associate.assert_called_once_with(model)
         formatter.to_api.assert_callled_once_with(created_model)
         assert_that(result, equal_to(formatted_model))

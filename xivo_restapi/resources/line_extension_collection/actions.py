@@ -26,7 +26,7 @@ formatter = LineExtensionFormatter()
 
 
 def associate_extension(line_id, parameters):
-    model = formatter.to_model(line_id, parameters)
+    model = formatter.dict_to_model(line_id, parameters)
     created_model = line_extension_services.associate(model)
     return formatter.to_api(created_model)
 
