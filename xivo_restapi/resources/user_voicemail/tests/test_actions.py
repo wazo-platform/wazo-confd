@@ -28,48 +28,39 @@ BASE_URL = "/1.1/users/%s/voicemail"
 
 class TestUserVoicemailActions(TestResources):
 
-    @patch('xivo_restapi.resources.user_voicemail.actions.formatter')
-    @patch('xivo_dao.data_handler.user_voicemail.services.associate')
-    def test_associate_voicemail(self, user_voicemail_associate, formatter):
-        user_id = 1
-        voicemail_id = 2
-
-        expected_status_code = 201
-        expected_result = {
-            "user_id": user_id,
-            "voicemail_id": voicemail_id,
-            "enabled": True,
+    def build_item(self, user_voicemail):
+        item = {
+            "user_id": user_voicemail.user_id,
+            "voicemail_id": user_voicemail.voicemail_id,
+            "enabled": user_voicemail.enabled,
             "links": [
                 {
                     "rel": "voicemails",
-                    "href": "http://localhost/1.1/voicemails/%s" % voicemail_id
+                    "href": "http://localhost/1.1/voicemails/%s" % user_voicemail.voicemail_id
                 },
                 {
                     "rel": "users",
-                    "href": "http://localhost/1.1/users/%s" % user_id
+                    "href": "http://localhost/1.1/users/%s" % user_voicemail.user_id
                 }
             ]
         }
 
-        user_voicemail = UserVoicemail(user_id=user_id, voicemail_id=voicemail_id, enabled=True)
+        return item
+
+    @patch('xivo_dao.data_handler.user_voicemail.services.associate')
+    def test_associate_voicemail(self, user_voicemail_associate):
+        user_voicemail = UserVoicemail(user_id=1, voicemail_id=2, enabled=True)
         user_voicemail_associate.return_value = user_voicemail
 
-        formatter.to_model.return_value = user_voicemail
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
+        expected_result = self.build_item(user_voicemail)
 
-        data = {
-            'voicemail_id': voicemail_id
-        }
+        data = {'voicemail_id': user_voicemail.voicemail_id}
         data_serialized = self._serialize_encode(data)
 
-        result = self.app.post(BASE_URL % user_id, data=data_serialized)
+        result = self.app.post(BASE_URL % user_voicemail.user_id, data=data_serialized)
 
-        formatter.to_model.assert_called_once_with(data_serialized, user_id)
+        self.assert_response_for_create(result, expected_result)
         user_voicemail_associate.assert_called_once_with(user_voicemail)
-        formatter.to_api.assert_called_once_with(user_voicemail)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.user_voicemail.services.get_by_user_id')
     def test_get_voicemail_associated_to_a_user_with_no_voicemail(self, user_voicemail_get_by_user_id):
@@ -86,30 +77,15 @@ class TestUserVoicemailActions(TestResources):
 
     @patch('xivo_dao.data_handler.user_voicemail.services.get_by_user_id')
     def test_get_voicemail_associated_to_a_user(self, user_voicemail_get_by_user_id):
-        user_id = 1
-        voicemail_id = 13
-        expected_status_code = 200
-        expected_result = {
-            u'voicemail_id': 13,
-            u'user_id': 1,
-            u'enabled': True,
-            u'links': [
-                {u'href': u'http://localhost/1.1/voicemails/%d' % voicemail_id,
-                 u'rel': u'voicemails'},
-                {u'href': u'http://localhost/1.1/users/%d' % user_id,
-                 u'rel': u'users'}
-            ]
-        }
+        user_voicemail = UserVoicemail(voicemail_id=1,
+                                       user_id=2)
+        user_voicemail_get_by_user_id.return_value = user_voicemail
 
-        user_voicemail_link = UserVoicemail(voicemail_id=voicemail_id,
-                                            user_id=user_id)
+        expected_result = self.build_item(user_voicemail)
 
-        user_voicemail_get_by_user_id.return_value = user_voicemail_link
+        result = self.app.get(BASE_URL % user_voicemail.user_id)
 
-        result = self.app.get(BASE_URL % user_id)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        self.assert_response_for_get(result, expected_result)
 
     @patch('xivo_dao.data_handler.user_voicemail.services.get_by_user_id')
     @patch('xivo_dao.data_handler.user_voicemail.services.dissociate')
@@ -117,15 +93,11 @@ class TestUserVoicemailActions(TestResources):
         user_voicemail = UserVoicemail(user_id=1, voicemail_id=2)
         get_by_user_id.return_value = user_voicemail
 
-        expected_status_code = 204
-        expected_data = ''
-
         result = self.app.delete(BASE_URL % user_voicemail.user_id)
 
+        self.assert_response_for_delete(result)
         get_by_user_id.assert_called_once_with(user_voicemail.user_id)
         user_voicemail_dissociate.assert_called_once_with(user_voicemail)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
 
     @patch('xivo_dao.data_handler.user_voicemail.services.get_by_user_id')
     @patch('xivo_dao.data_handler.user_voicemail.services.dissociate')
