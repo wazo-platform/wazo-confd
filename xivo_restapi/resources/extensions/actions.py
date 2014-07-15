@@ -28,10 +28,20 @@ from xivo_restapi.helpers.common import extract_search_parameters
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.extensions.routes import extension_route as route
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int, Unicode, Boolean
+
 
 logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, Extension)
 extra_parameters = ['type']
+
+document = content_parser.document(
+    Field('id', Int()),
+    Field('exten', Unicode()),
+    Field('context', Unicode()),
+    Field('commented', Boolean())
+)
 
 
 @route('')
@@ -51,8 +61,8 @@ def get(extensionid):
 
 @route('', methods=['POST'])
 def create():
-    data = request.data.decode("utf-8")
-    extension = formatter.to_model(data)
+    data = document.parse(request)
+    extension = formatter.dict_to_model(data)
     extension = extension_services.create(extension)
     result = formatter.to_api(extension)
     location = url_for('.get', extensionid=extension.id)
@@ -61,9 +71,9 @@ def create():
 
 @route('/<int:extensionid>', methods=['PUT'])
 def edit(extensionid):
-    data = request.data.decode("utf-8")
+    data = document.parse(request)
     extension = extension_services.get(extensionid)
-    formatter.update_model(data, extension)
+    formatter.update_dict_model(data, extension)
     extension_services.edit(extension)
     return make_response('', 204)
 
