@@ -27,13 +27,21 @@ from xivo_restapi.resources.extensions.routes import extension_route
 
 from xivo_restapi.resources.line_extension.formatter import LineExtensionFormatter
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int
+
 formatter = LineExtensionFormatter()
+
+document = content_parser.document(
+    Field('line_id', Int()),
+    Field('extension_id', Int())
+)
 
 
 @line_route('/<int:lineid>/extension', methods=['POST'])
 def associate_extension(lineid):
-    data = request.data.decode("utf-8")
-    model = formatter.to_model(data, lineid)
+    data = document.parse(request)
+    model = formatter.dict_to_model(data, lineid)
     created_model = line_extension_services.associate(model)
 
     result = formatter.to_api(created_model)
