@@ -4,6 +4,8 @@ from parser import Parser
 from registry import ParserRegistry
 from field import Field
 from document import Document
+from types import *
+from validators import *
 
 
 def parser():
