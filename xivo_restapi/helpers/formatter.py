@@ -40,12 +40,18 @@ class Formatter(object):
 
     def to_model(self, api_data):
         data_dict = self._serializer.decode(api_data)
+        return self.dict_to_model(data_dict)
+
+    def dict_to_model(self, data_dict):
         mapped_dict = mapper.map_to_model(self._mapper.MAPPING, data_dict)
         model_class = self._model_class.from_user_data(mapped_dict)
         return model_class
 
     def update_model(self, api_data, model_to_update):
         data_dict = self._serializer.decode(api_data)
+        return self.update_dict_model(data_dict, model_to_update)
+
+    def update_dict_model(self, data_dict, model_to_update):
         mapped_dict = mapper.map_to_model(self._mapper.MAPPING, data_dict)
         model_to_update.update_from_data(mapped_dict)
 
