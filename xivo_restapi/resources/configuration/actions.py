@@ -15,18 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 from xivo_restapi.resources.configuration.routes import blueprint
-from xivo_restapi.flask_http_server import content_parser
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers import serializer
-from xivo_restapi.helpers.premacop import Field, types
 
 from xivo_dao.data_handler.configuration import services
 from flask.helpers import make_response
 from flask.globals import request
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Boolean
+
 route = RouteGenerator(blueprint)
 
-config_document = content_parser.document(Field('enabled', types.Boolean()))
+document = content_parser.document(Field('enabled', Boolean()))
 
 
 @route('/live_reload', methods=['GET'])
@@ -37,6 +38,6 @@ def get_live_reload():
 
 @route('/live_reload', methods=['PUT'])
 def set_live_reload():
-    data = config_document.parse(request)
+    data = document.parse(request)
     services.set_live_reload_status(data)
     return make_response('', 204)
