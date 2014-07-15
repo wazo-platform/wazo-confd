@@ -23,11 +23,8 @@ MAPPING = {
     'name': 'username',
     'secret': 'secret',
     'context': 'context',
-    'interface': 'interface',
     'device_slot': 'device_slot',
     'provisioning_extension': 'provisioning_extension',
-    'commented': 'commented',
-    'description': 'description',
     'callerid': 'callerid',
     'username': 'username',
 }
