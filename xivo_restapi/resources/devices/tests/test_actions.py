@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from mock import patch, Mock
+from mock import patch
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.device.model import Device
@@ -29,129 +29,83 @@ BASE_URL = "1.1/devices"
 
 class TestDeviceActions(TestResources):
 
-    @patch('xivo_restapi.resources.devices.actions.formatter')
+    def setUp(self):
+        super(TestDeviceActions, self).setUp()
+        self.device = Device(id='1234567890abcdefghij1234567890ab',
+                             ip='10.0.0.1',
+                             mac='00:11:22:33:44:55',
+                             plugin='zero')
+
+    def build_item(self, device):
+        links = [{'href': 'http://localhost/1.1/devices/%s' % device.id,
+                  'rel': 'devices'}]
+
+        item = {'id': device.id,
+                'ip': device.ip,
+                'mac': device.mac,
+                'sn': device.sn,
+                'plugin': device.plugin,
+                'vendor': device.vendor,
+                'model': device.model,
+                'version': device.version,
+                'description': device.description,
+                'status': device.status,
+                'options': device.options,
+                'template_id': device.template_id,
+                'links': links}
+
+        return item
+
     @patch('xivo_dao.data_handler.device.services.get')
-    def test_get(self, device_services_get, formatter):
-        device_id = '1234567890abcdefghij1234567890ab'
+    def test_get(self, device_services_get):
+        device_services_get.return_value = self.device
 
-        expected_status_code = 200
-        expected_result = {
-            'id': device_id,
-            'links': [{
-                'href': 'http://localhost/1.1/devices/%s' % device_id,
-                'rel': 'devices'
-            }]
+        expected_result = self.build_item(self.device)
 
-        }
+        result = self.app.get("%s/%s" % (BASE_URL, self.device.id))
 
-        device = Mock(Device)
-        device_services_get.return_value = device
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
-
-        result = self.app.get("%s/%s" % (BASE_URL, device_id))
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-        device_services_get.assert_called_once_with(device_id)
-        formatter.to_api.assert_called_once_with(device)
+        self.assert_response_for_get(result, expected_result)
+        device_services_get.assert_called_once_with(self.device.id)
 
     @patch('xivo_dao.data_handler.device.services.search')
     def test_list_no_devices(self, device_search):
-        total = 0
+        device_search.return_value = SearchResult(total=0, items=[])
 
-        expected_status_code = 200
-        expected_result = {
-            'total': total,
-            'items': []
-        }
-
-        devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = []
-
-        device_search.return_value = devices_found
+        expected_result = {'total': 0, 'items': []}
 
         result = self.app.get(BASE_URL)
 
+        self.assert_response_for_list(result, expected_result)
         device_search.assert_called_once_with()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.device.services.search')
     def test_list_devices_with_two_devices(self, device_search):
-        device_id_1 = 'abcdefghijklmnopqrstuvwxyz123456'
-        device_id_2 = '1234567890abcdefghij1234567890abc'
-        total = 2
-
-        device1 = Device(id=device_id_1,
+        device1 = Device(id='abcdefghijklmnopqrstuvwxyz123456',
                          ip='10.0.0.1',
                          mac='00:11:22:33:44:55')
-        device2 = Device(id=device_id_2,
+        device2 = Device(id='1234567890abcdefghij1234567890abc',
                          ip='10.0.0.2',
                          mac='00:11:22:33:44:56')
 
-        expected_status_code = 200
+        device_search.return_value = SearchResult(total=2,
+                                                  items=[device1, device2])
+
         expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': device_id_1,
-                    'ip': device1.ip,
-                    'mac': device1.mac,
-                    'status': None,
-                    'vendor': None,
-                    'description': None,
-                    'plugin': None,
-                    'version': None,
-                    'sn': None,
-                    'model': None,
-                    'template_id': None,
-                    'options': None,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device_id_1,
-                        'rel': 'devices'
-                    }]
-                },
-                {
-                    'id': device_id_2,
-                    'ip': device2.ip,
-                    'mac': device2.mac,
-                    'status': None,
-                    'vendor': None,
-                    'description': None,
-                    'plugin': None,
-                    'version': None,
-                    'sn': None,
-                    'model': None,
-                    'template_id': None,
-                    'options': None,
-                    'links': [{
-                        'href': 'http://localhost/1.1/devices/%s' % device_id_2,
-                        'rel': 'devices'
-                    }]
-                }
-            ]
+            'total': 2,
+            'items': [self.build_item(device1),
+                      self.build_item(device2)]
         }
-
-        devices_found = Mock(SearchResult)
-        devices_found.total = total
-        devices_found.items = [device1, device2]
-
-        device_search.return_value = devices_found
 
         result = self.app.get(BASE_URL)
 
+        self.assert_response_for_list(result, expected_result)
         device_search.assert_called_once_with()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.device.services.search')
-    def test_list_devices_with_parameters(self, device_search):
-        expected_status_code = 200
-        expected_result = {
-            'total': 0,
-            'items': []
-        }
+    def test_search_devices_with_parameters(self, device_search):
+        device_search.return_value = SearchResult(total=0, items=[])
+
+        expected_result = {'total': 0, 'items': []}
 
         search_parameters = {
             'search': 'search',
@@ -161,130 +115,85 @@ class TestDeviceActions(TestResources):
             'direction': 'asc'
         }
 
-        devices_found = Mock(SearchResult)
-        devices_found.total = 0
-        devices_found.items = []
-
-        device_search.return_value = devices_found
-
         query_url = "search=search&skip=1&limit=2&order=ip&direction=asc"
         result = self.app.get("%s?%s" % (BASE_URL, query_url))
 
+        self.assert_response_for_list(result, expected_result)
         device_search.assert_called_once_with(**search_parameters)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.create')
-    def test_create(self, device_services_create, formatter):
-        device_id = 1
-        mac = '00:11:22:33:44:55'
-        ip = '10.0.0.1'
-        plugin = 'null'
+    def test_create(self, device_services_create):
+        device_services_create.return_value = self.device
 
-        expected_status_code = 201
-        expected_result = {
-            'id': device_id,
-            'mac': mac,
-            'ip': ip,
-            'plugin': plugin,
-            'links': [{
-                'href': 'http://localhost/1.1/devices/%d' % device_id,
-                'rel': 'devices'
-            }]
-        }
+        new_device = Device(mac=self.device.mac,
+                            ip=self.device.ip,
+                            plugin=self.device.plugin)
 
-        data = {'mac': mac,
-                'ip': ip,
-                'plugin': plugin}
+        request_body = {'mac': self.device.mac,
+                        'ip': self.device.ip,
+                        'plugin': self.device.plugin}
 
-        data_serialized = self._serialize_encode(data)
+        expected_result = self.build_item(self.device)
 
-        device = Mock(Device)
-        created_device = Mock(Device)
-        created_device.id = device_id
-        created_device.ip = ip
-        created_device.mac = mac
-        created_device.plugin = plugin
+        result = self.app.post(BASE_URL, data=self._serialize_encode(request_body))
 
-        device_services_create.return_value = created_device
-        formatter.to_model.return_value = device
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
-
-        result = self.app.post(BASE_URL, data=data_serialized)
-
-        formatter.to_model.assert_called_once_with(data_serialized)
-        device_services_create.assert_called_once_with(device)
-        formatter.to_api.assert_called_once_with(created_device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        self.assert_response_for_create(result, expected_result)
+        device_services_create.assert_called_once_with(new_device)
 
     @patch('xivo_dao.data_handler.device.services.get')
     @patch('xivo_dao.data_handler.device.services.delete')
-    def test_delete_success(self, mock_device_services_delete, mock_device_services_get):
-        expected_status_code = 204
-        expected_data = ''
+    def test_delete(self, mock_device_services_delete, mock_device_services_get):
+        mock_device_services_get.return_value = self.device
 
-        device = Mock(Device)
-        mock_device_services_get.return_value = device
-        mock_device_services_delete.return_value = True
+        result = self.app.delete("%s/%s" % (BASE_URL, self.device.id))
 
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
-        mock_device_services_delete.assert_called_with(device)
+        self.assert_response_for_delete(result)
+        mock_device_services_get.assert_called_once_with(self.device.id)
+        mock_device_services_delete.assert_called_with(self.device)
 
     @patch('xivo_dao.data_handler.device.services.synchronize')
     @patch('xivo_dao.data_handler.device.services.get')
     def test_synchronize(self, device_services_get, device_services_synchronize):
-        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        device_services_get.return_value = self.device
         expected_status_code = 204
 
-        device = Device(id=device_id)
-        device_services_get.return_value = device
+        result = self.app.get("%s/%s/synchronize" % (BASE_URL, self.device.id))
 
-        result = self.app.get("%s/%s/synchronize" % (BASE_URL, device_id))
-
-        device_services_synchronize.assert_called_once_with(device)
         assert_that(result.status_code, equal_to(expected_status_code))
+        device_services_synchronize.assert_called_once_with(self.device)
 
     @patch('xivo_dao.data_handler.device.services.reset_to_autoprov')
     @patch('xivo_dao.data_handler.device.services.get')
     def test_autoprov(self, device_services_get, device_services_reset_to_autoprov):
-        device_id = '9fae3a621afd4449b006675efc6c01aa'
+        device_services_get.return_value = self.device
         expected_status_code = 204
 
-        device = Device(id=device_id)
-        device_services_get.return_value = device
+        result = self.app.get("%s/%s/autoprov" % (BASE_URL, self.device.id))
 
-        result = self.app.get("%s/%s/autoprov" % (BASE_URL, device_id))
-
-        device_services_reset_to_autoprov.assert_called_once_with(device)
         assert_that(result.status_code, equal_to(expected_status_code))
+        device_services_reset_to_autoprov.assert_called_once_with(self.device)
 
-    @patch('xivo_restapi.resources.devices.actions.formatter')
     @patch('xivo_dao.data_handler.device.services.get')
     @patch('xivo_dao.data_handler.device.services.edit')
-    def test_edit(self, device_services_edit, device_services_get, formatter):
-        expected_status_code = 204
-        expected_data = ''
+    def test_edit(self, device_services_edit, device_services_get):
+        device_services_get.return_value = self.device
 
-        data = {
-            'ip': '10.0.0.1',
-            'mac': '00:11:22:33:44:55',
+        updated_device = Device(id=self.device.id,
+                                ip='192.168.0.1',
+                                mac='55:44:33:22:11:00',
+                                plugin=self.device.plugin)
+
+        request_body = {
+            'ip': updated_device.ip,
+            'mac': updated_device.mac
         }
-        data_serialized = self._serialize_encode(data)
 
-        device = Mock(Device)
-        device_services_get.return_value = device
+        result = self.app.put("%s/%s" % (BASE_URL, self.device.id),
+                              data=self._serialize_encode(request_body))
 
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        device_services_edit.assert_called_once_with(device)
-        formatter.update_model.assert_called_once_with(data_serialized, device)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
+        self.assert_response_for_update(result)
+        device_services_get.assert_called_once_with(self.device.id)
+        device_services_edit.assert_called_once_with(updated_device)
 
     @patch('xivo_restapi.helpers.request_bouncer.request')
     @patch('xivo_dao.data_handler.line.services.get')
@@ -305,8 +214,8 @@ class TestDeviceActions(TestResources):
 
         result = self.app.get('%s/%s/associate_line/%s' % (BASE_URL, device_id, line_id))
 
-        device_services_associate_line_to_device.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))
+        device_services_associate_line_to_device.assert_called_once_with(device, line)
 
     @patch('xivo_restapi.helpers.request_bouncer.request')
     @patch('xivo_dao.data_handler.line.services.get')
@@ -327,5 +236,5 @@ class TestDeviceActions(TestResources):
 
         result = self.app.get('%s/%s/remove_line/%s' % (BASE_URL, device_id, line_id))
 
-        device_services_remove_line.assert_called_once_with(device, line)
         assert_that(result.status_code, equal_to(expected_status_code))
+        device_services_remove_line.assert_called_once_with(device, line)
