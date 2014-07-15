@@ -22,13 +22,22 @@ from flask.globals import request
 from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
 from flask.helpers import make_response
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int, Boolean
+
 formatter = UserCtiProfileFormatter()
+
+document = content_parser.document(
+    Field('user_id', Int()),
+    Field('cti_profile_id', Int()),
+    Field('enabled', Boolean())
+)
 
 
 @route('/<int:userid>/cti', methods=['PUT'])
 def edit_cti_configuration(userid):
-    data = request.data.decode("utf-8")
-    model = formatter.to_model(data, userid)
+    data = document.parse(request)
+    model = formatter.dict_to_model(data, userid)
     user_cti_profile_services.edit(model)
 
     return make_response('', 204)
