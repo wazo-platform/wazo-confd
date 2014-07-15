@@ -29,7 +29,7 @@ class UserVoicemailFormatter(Formatter):
     def __init__(self):
         Formatter.__init__(self, mapper, serializer, UserVoicemail)
 
-    def to_model(self, api_data, user_id):
-        model = Formatter.to_model(self, api_data)
+    def dict_to_model(self, api_data, user_id):
+        model = Formatter.dict_to_model(self, api_data)
         model.user_id = user_id
         return model
