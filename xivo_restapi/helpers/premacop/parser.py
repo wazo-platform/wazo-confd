@@ -23,19 +23,12 @@ class Parser(object):
 
     def __init__(self, registry):
         self.registry = registry
-        self.error_handler_callback = self._default_error_handler
-
-    def _default_error_handler(self, error):
-        raise error
 
     def parse(self, request, document, action=None):
-        try:
-            content, content_type = self._extract_from_request(request)
-            content = self.registry.parse(content, content_type, document)
-            document.validate(content, action)
-            return content
-        except Exception as e:
-            self.error_handler_callback(e)
+        content, content_type = self._extract_from_request(request)
+        content = self.registry.parse(content, content_type, document)
+        document.validate(content, action)
+        return content
 
     def _extract_from_request(self, request):
         content_type = request.headers.get('Content-Type')
@@ -49,10 +42,6 @@ class Parser(object):
     def document(self, *fields):
         document = Document(fields)
         return DocumentProxy(self, document)
-
-    def error_handler(self, func):
-        self.error_handler_callback = func
-        return func
 
     def content_parser(self, content_type):
         def wrapper(func):

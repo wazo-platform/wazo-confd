@@ -68,17 +68,6 @@ class TestParser(unittest.TestCase):
         assert_that(result, instance_of(DocumentProxy))
         assert_that(result.document.fields, contains(field1, field2))
 
-    def test_given_a_custom_error_handler_when_registered_then_error_handler_called(self):
-        error = ValueError()
-        error_handler = Mock()
-        self.registry.parse.side_effect = error
-
-        self.parser.error_handler(error_handler)
-
-        self.parser.parse(Mock(), Mock())
-
-        error_handler.assert_called_once_with(error)
-
     def test_given_a_custom_content_parser_when_registered_then_added_to_the_registry(self):
         content_parser = Mock()
 
