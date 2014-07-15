@@ -31,8 +31,28 @@ from xivo_restapi.helpers.common import extract_search_parameters
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.users.routes import route
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Unicode, Int
+
 logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, User)
+
+document = content_parser.document(
+    Field('id', Int()),
+    Field('firstname', Unicode()),
+    Field('lastname', Unicode()),
+    Field('caller_id', Unicode()),
+    Field('outgoing_caller_id', Unicode()),
+    Field('username', Unicode()),
+    Field('password', Unicode()),
+    Field('music_on_hold', Unicode()),
+    Field('mobile_phone_number', Unicode()),
+    Field('userfield', Unicode()),
+    Field('timezone', Unicode()),
+    Field('language', Unicode()),
+    Field('description', Unicode()),
+    Field('preprocess_subroutine', Unicode()),
+)
 
 
 @route('')
@@ -59,8 +79,8 @@ def get(userid):
 
 @route('', methods=['POST'])
 def create():
-    data = request.data.decode("utf-8")
-    user = formatter.to_model(data)
+    data = document.parse(request)
+    user = formatter.dict_to_model(data)
     user = user_services.create(user)
     result = formatter.to_api(user)
     location = url_for('.get', userid=user.id)
@@ -69,9 +89,9 @@ def create():
 
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):
-    data = request.data.decode("utf-8")
+    data = document.parse(request)
     user = user_services.get(userid)
-    formatter.update_model(data, user)
+    formatter.update_dict_model(data, user)
     user_services.edit(user)
     return make_response('', 204)
 
