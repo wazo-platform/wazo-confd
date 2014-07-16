@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from mock import patch, Mock
-from hamcrest import assert_that, equal_to
+from mock import patch
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.voicemail.model import Voicemail
 from xivo_dao.data_handler.utils.search import SearchResult
@@ -12,81 +11,75 @@ BASE_URL = "/1.1/voicemails"
 
 class TestVoicemailsAction(TestResources):
 
-    @patch('xivo_dao.data_handler.voicemail.services.get')
-    def test_get(self, mock_voicemail_services_get):
-        voicemail_id = 3425
-        expected_status_code = 200
-        expected_result = {
-            'id': voicemail_id,
-            'name': 'totto',
-            'number': '1234',
-            'context': 'default',
-            'password': '1234passwd',
-            'email': 'xivo@avencall.com',
-            'language': 'fr_FR',
-            'timezone': 'eu-fr',
-            'max_messages': 2,
-            'attach_audio': True,
-            'delete_messages': False,
-            'ask_password': False,
+    def setUp(self):
+        super(TestVoicemailsAction, self).setUp()
+        self.voicemail = Voicemail(id=3245,
+                                   name='myvoicemail',
+                                   number='1234',
+                                   context='default',
+                                   password='1234passwd',
+                                   email='xivo@avencall.com',
+                                   language='fr_FR',
+                                   timezone='eu-fr',
+                                   max_messages=2,
+                                   attach_audio=False,
+                                   delete_messages=False,
+                                   ask_password=True)
+
+    def build_item(self, voicemail):
+        item = {
+            'id': voicemail.id,
+            'name': voicemail.name,
+            'number': voicemail.number,
+            'context': voicemail.context,
+            'password': voicemail.password,
+            'email': voicemail.email,
+            'language': voicemail.language,
+            'timezone': voicemail.timezone,
+            'max_messages': voicemail.max_messages,
+            'attach_audio': voicemail.attach_audio,
+            'delete_messages': voicemail.delete_messages,
+            'ask_password': voicemail.ask_password,
             'links': [{
-                'href': 'http://localhost/1.1/voicemails/%d' % voicemail_id,
+                'href': 'http://localhost/1.1/voicemails/%d' % voicemail.id,
                 'rel': 'voicemails'
             }]
         }
-        voicemail = Voicemail(id=voicemail_id,
-                              name=expected_result['name'],
-                              number=expected_result['number'],
-                              context=expected_result['context'],
-                              password=expected_result['password'],
-                              email=expected_result['email'],
-                              language=expected_result['language'],
-                              timezone=expected_result['timezone'],
-                              max_messages=expected_result['max_messages'],
-                              attach_audio=expected_result['attach_audio'],
-                              delete_messages=expected_result['delete_messages'],
-                              ask_password=expected_result['ask_password'])
-        mock_voicemail_services_get.return_value = voicemail
 
-        result = self.app.get("%s/%d" % (BASE_URL, voicemail_id))
+        return item
 
-        mock_voicemail_services_get.assert_called_once_with(voicemail_id)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+    @patch('xivo_dao.data_handler.voicemail.services.get')
+    def test_get(self, mock_voicemail_services_get):
+        mock_voicemail_services_get.return_value = self.voicemail
+
+        expected_result = self.build_item(self.voicemail)
+
+        result = self.app.get("%s/%d" % (BASE_URL, self.voicemail.id))
+
+        self.assert_response_for_get(result, expected_result)
+        mock_voicemail_services_get.assert_called_once_with(self.voicemail.id)
 
     @patch('xivo_dao.data_handler.voicemail.services.search')
     def test_list_voicemails_with_no_voicemails(self, mock_voicemail_services_search):
-        expected_status_code = 200
-        expected_result = {
-            'total': 0,
-            'items': []
-        }
+        mock_voicemail_services_search.return_value = SearchResult(total=0, items=[])
 
-        voicemails_found = Mock(SearchResult)
-        voicemails_found.total = 0
-        voicemails_found.items = []
-        mock_voicemail_services_search.return_value = voicemails_found
+        expected_result = {'total': 0, 'items': []}
 
         result = self.app.get(BASE_URL)
 
+        self.assert_response_for_list(result, expected_result)
         mock_voicemail_services_search.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.voicemail.services.search')
     def test_list_voicemails_with_two_voicemails(self, voicemail_search):
-        voicemail_id_1 = 123421
-        voicemail_id_2 = 235235
-        total = 2
-
-        voicemail1 = Voicemail(id=voicemail_id_1,
+        voicemail1 = Voicemail(id=123421,
                                name='10.0.0.1',
                                number='001122334455',
                                context='fasdf',
                                attach_audio=False,
                                delete_messages=False,
                                ask_password=False)
-        voicemail2 = Voicemail(id=voicemail_id_2,
+        voicemail2 = Voicemail(id=235235,
                                name='10.0.0.2',
                                number='001122334456',
                                context='dsad',
@@ -94,68 +87,22 @@ class TestVoicemailsAction(TestResources):
                                delete_messages=False,
                                ask_password=False)
 
-        expected_status_code = 200
-        expected_result = {
-            'total': total,
-            'items': [
-                {
-                    'id': voicemail1.id,
-                    'name': voicemail1.name,
-                    'number': voicemail1.number,
-                    'context': voicemail1.context,
-                    'language': None,
-                    'password': None,
-                    'email': None,
-                    'timezone': None,
-                    'max_messages': None,
-                    'attach_audio': False,
-                    'delete_messages': False,
-                    'ask_password': False,
-                    'links': [{
-                        'href': 'http://localhost/1.1/voicemails/%s' % voicemail1.id,
-                        'rel': 'voicemails'
-                    }]
-                },
-                {
-                    'id': voicemail2.id,
-                    'name': voicemail2.name,
-                    'number': voicemail2.number,
-                    'context': voicemail2.context,
-                    'language': None,
-                    'password': None,
-                    'email': None,
-                    'timezone': None,
-                    'max_messages': None,
-                    'attach_audio': False,
-                    'delete_messages': False,
-                    'ask_password': False,
-                    'links': [{
-                        'href': 'http://localhost/1.1/voicemails/%s' % voicemail2.id,
-                        'rel': 'voicemails'
-                    }]
-                }
-            ]
-        }
+        voicemail_search.return_value = SearchResult(total=2, items=[voicemail1, voicemail2])
 
-        voicemails_found = Mock(SearchResult)
-        voicemails_found.total = total
-        voicemails_found.items = [voicemail1, voicemail2]
-
-        voicemail_search.return_value = voicemails_found
+        expected_result = {'total': 2, 'items': [self.build_item(voicemail1),
+                                                 self.build_item(voicemail2)]}
 
         result = self.app.get(BASE_URL)
 
+        self.assert_response_for_list(result, expected_result)
         voicemail_search.assert_called_once_with()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
     @patch('xivo_dao.data_handler.voicemail.services.search')
     def test_list_voicemails_with_parameters(self, voicemail_search):
-        expected_status_code = 200
-        expected_result = {
-            'total': 0,
-            'items': []
-        }
+        voicemail_search.return_value = SearchResult(total=0, items=[])
+
+        expected_result = {'total': 0, 'items': []}
+
         query_string = 'skip=532&limit=5432&order=email&direction=asc&search=abcd'
         request_parameters = {
             'skip': 532,
@@ -165,95 +112,69 @@ class TestVoicemailsAction(TestResources):
             'search': 'abcd'
         }
 
-        voicemails_found = SearchResult(total=0, items=[])
-        voicemail_search.return_value = voicemails_found
-
         result = self.app.get("%s?%s" % (BASE_URL, query_string))
 
+        self.assert_response_for_list(result, expected_result)
         voicemail_search.assert_called_once_with(**request_parameters)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_restapi.resources.voicemails.actions.formatter')
     @patch('xivo_dao.data_handler.voicemail.services.create')
-    def test_create(self, voicemail_services_create, formatter):
-        voicemail_id = 123456
-        name = 'John Montana'
-        number = '10001'
-        context = 'default'
+    def test_create(self, voicemail_services_create):
+        voicemail_services_create.return_value = self.voicemail
 
-        expected_status_code = 201
-        expected_result = {
-            'id': voicemail_id,
-            'name': name,
-            'number': number,
-            'context': context,
-            'links': [{
-                'href': 'http://localhost/1.1/voicemails/%d' % voicemail_id,
-                'rel': 'voicemails'
-            }]
-        }
+        expected_result = self.build_item(self.voicemail)
 
-        data = {'name': name,
-                'number': number,
-                'context': context}
+        created_voicemail = Voicemail(name=self.voicemail.name,
+                                      number=self.voicemail.number,
+                                      context=self.voicemail.context)
 
+        data = {'name': self.voicemail.name,
+                'number': self.voicemail.number,
+                'context': self.voicemail.context}
         data_serialized = self._serialize_encode(data)
-
-        voicemail = Mock(Voicemail)
-        created_voicemail = Mock(Voicemail)
-        created_voicemail.id = voicemail_id
-        created_voicemail.name = name
-        created_voicemail.number = number
-        created_voicemail.context = context
-
-        voicemail_services_create.return_value = created_voicemail
-        formatter.to_model.return_value = voicemail
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
 
         result = self.app.post(BASE_URL, data=data_serialized)
 
-        formatter.to_model.assert_called_once_with(data_serialized)
-        voicemail_services_create.assert_called_once_with(voicemail)
-        formatter.to_api.assert_called_once_with(created_voicemail)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        self.assert_response_for_create(result, expected_result)
+        voicemail_services_create.assert_called_once_with(created_voicemail)
 
-    @patch('xivo_restapi.resources.voicemails.actions.formatter')
     @patch('xivo_dao.data_handler.voicemail.services.get')
     @patch('xivo_dao.data_handler.voicemail.services.edit')
-    def test_edit(self, voicemail_services_edit, voicemail_services_get, formatter):
-        expected_status_code = 204
-        expected_data = ''
+    def test_edit(self, voicemail_services_edit, voicemail_services_get):
+        voicemail_services_get.return_value = self.voicemail
 
+        updated_voicemail = Voicemail(id=3245,
+                                      name='toto',
+                                      number='12345',
+                                      context='mycontext',
+                                      password='1234passwd',
+                                      email='xivo@avencall.com',
+                                      language='fr_FR',
+                                      timezone='eu-fr',
+                                      max_messages=2,
+                                      attach_audio=False,
+                                      delete_messages=False,
+                                      ask_password=True)
         data = {
             'name': 'toto',
             'number': '12345',
-            'context': 'default'
+            'context': 'mycontext'
         }
         data_serialized = self._serialize_encode(data)
 
-        voicemail = Mock(Voicemail)
-        voicemail_services_get.return_value = voicemail
+        result = self.app.put("%s/%s" % (BASE_URL, self.voicemail.id),
+                              data=data_serialized)
 
-        result = self.app.put("%s/1" % BASE_URL, data=data_serialized)
-
-        formatter.update_model.assert_called_with(data_serialized, voicemail)
-        voicemail_services_edit.assert_called_once_with(voicemail)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
+        self.assert_response_for_update(result)
+        voicemail_services_get.assert_called_once_with(self.voicemail.id)
+        voicemail_services_edit.assert_called_once_with(updated_voicemail)
 
     @patch('xivo_dao.data_handler.voicemail.services.get')
     @patch('xivo_dao.data_handler.voicemail.services.delete')
     def test_delete(self, mock_voicemail_services_delete, mock_voicemail_services_get):
-        expected_status_code = 204
-        expected_data = ''
+        mock_voicemail_services_get.return_value = self.voicemail
 
-        voicemail = Mock(Voicemail)
-        mock_voicemail_services_get.return_value = voicemail
+        result = self.app.delete("%s/%s" % (BASE_URL, self.voicemail.id))
 
-        result = self.app.delete("%s/1" % BASE_URL)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
-        mock_voicemail_services_delete.assert_called_with(voicemail)
+        self.assert_response_for_delete(result)
+        mock_voicemail_services_get.assert_called_once_with(self.voicemail.id)
+        mock_voicemail_services_delete.assert_called_with(self.voicemail)
