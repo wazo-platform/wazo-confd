@@ -31,11 +31,29 @@ from xivo_restapi.helpers.common import extract_search_parameters
 from xivo_dao.data_handler.voicemail.model import Voicemail
 from xivo_dao.data_handler.voicemail import services as voicemail_services
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Unicode, Int, Boolean
+
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Voicemail)
+
+document = content_parser.document(
+    Field('id', Int()),
+    Field('name', Unicode()),
+    Field('number', Unicode()),
+    Field('context', Unicode()),
+    Field('password', Unicode()),
+    Field('email', Unicode()),
+    Field('language', Unicode()),
+    Field('timezone', Unicode()),
+    Field('max_messages', Int()),
+    Field('attach_audio', Boolean()),
+    Field('delete_messages', Boolean()),
+    Field('ask_password', Boolean())
+)
 
 
 @route('')
@@ -55,8 +73,8 @@ def get(voicemailid):
 
 @route('', methods=['POST'])
 def create():
-    data = request.data.decode("utf-8")
-    voicemail = formatter.to_model(data)
+    data = document.parse(request)
+    voicemail = formatter.dict_to_model(data)
     voicemail = voicemail_services.create(voicemail)
     result = formatter.to_api(voicemail)
     location = url_for('.get', voicemailid=voicemail.id)
@@ -65,9 +83,9 @@ def create():
 
 @route('/<int:voicemailid>', methods=['PUT'])
 def edit(voicemailid):
-    data = request.data.decode("utf-8")
+    data = document.parse(request)
     voicemail = voicemail_services.get(voicemailid)
-    formatter.update_model(data, voicemail)
+    formatter.update_dict_model(data, voicemail)
     voicemail_services.edit(voicemail)
     return make_response('', 204)
 
