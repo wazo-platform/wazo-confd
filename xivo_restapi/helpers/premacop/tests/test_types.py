@@ -30,11 +30,11 @@ class TestIntFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'foo' is not a numeric integer",
+        self.assertRaisesRegexp(ValidationError, "'foo' is not an integer",
                                 self.field_type.validate, "foo")
 
     def test_given_bool_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'True' is not a numeric integer",
+        self.assertRaisesRegexp(ValidationError, "'True' is not an integer",
                                 self.field_type.validate, True)
 
     def test_given_int_then_passes(self):
@@ -82,7 +82,7 @@ class TestFloatFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'1' is not a numeric float",
+        self.assertRaisesRegexp(ValidationError, "'1' is not a float",
                                 self.field_type.validate, 1)
 
     def test_given_bool_then_passes(self):

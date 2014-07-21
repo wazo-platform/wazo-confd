@@ -22,7 +22,7 @@ class FieldType(object):
 class Int(FieldType):
 
     type_class = int
-    error_message = "'{value}' is not a numeric integer"
+    error_message = "'{value}' is not an integer"
 
     def validate(self, value):
         if isinstance(value, bool):
@@ -45,7 +45,7 @@ class Unicode(FieldType):
 class Float(FieldType):
 
     type_class = float
-    error_message = "'{value}' is not a numeric float"
+    error_message = "'{value}' is not a float"
 
 
 class Array(FieldType):
