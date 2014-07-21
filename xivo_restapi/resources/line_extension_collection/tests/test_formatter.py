@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-import json
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.line_extension.model import LineExtension
@@ -32,13 +31,12 @@ class TestLineExtensionFormatter(unittest.TestCase):
     def setUp(self):
         self.formatter = LineExtensionFormatter()
 
-    def test_to_model(self):
+    def test_dict_to_model(self):
         data = {'extension_id': EXTENSION_ID}
-        encoded_data = json.dumps(data)
 
         expected = LineExtension(line_id=LINE_ID, extension_id=EXTENSION_ID)
 
-        result = self.formatter.to_model(LINE_ID, encoded_data)
+        result = self.formatter.dict_to_model(LINE_ID, data)
 
         assert_that(result, equal_to(expected))
 
