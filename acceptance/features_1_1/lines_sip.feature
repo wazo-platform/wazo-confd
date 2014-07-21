@@ -18,50 +18,12 @@ Feature: REST API SIP Lines
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: context,device_slot"
 
-    Scenario: Create a line with an empty context
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            |         | 1           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: context cannot be empty"
-
-    Scenario: Create a line with an empty device_slot
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default |             |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be numeric"
-
-    Scenario: Create a line with an invalid device_slot
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default | toto        |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be numeric"
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default | 0           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be greater than 0"
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default | -1          |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be greater than 0"
-
     Scenario: Create a line with a context that doesn't exist
         When I create a line_sip with the following parameters:
             | context           | device_slot |
             | superdupercontext | 1           |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: context superdupercontext does not exist"
-
-    Scenario: Create a line with invalid parameters
-        When I create a line_sip with the following parameters:
-            | context | invalidparameter |
-            | default | invalidvalue     |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: invalidparameter"
 
     Scenario: Create a line with a context
         When I create a line_sip with the following parameters:

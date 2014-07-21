@@ -1,24 +1,5 @@
 Feature: REST API Link line with a user
 
-    Scenario: Create an empty user_line
-        When I create an empty user_line
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: line_id"
-
-    Scenario: Create a user_line with invalid values
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 384939  | toto    |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: line_id must be integer"
-
-    Scenario: Create a user_line with invalid parameters
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id | invalid |
-            | 562668  | 999999  | invalid |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: invalid"
-
     Scenario: Create user_line with a line that doesn't exist
         Given I have no line with id "682433"
         Given I have the following users:
