@@ -101,19 +101,6 @@ Feature: REST API Voicemails
         Then I get a response with status "400"
         Then I get an error message "Nonexistent parameters: timezone qq-kk does not exist"
 
-    Scenario: Creating a voicemail with a invalid parameter max_messages
-        Given there is no voicemail with number "1001" and context "default"
-        When I create the following voicemails via RESTAPI:
-          | name       | number | context | max_messages |
-          | Joe Dahool | 1001   | default | zero         |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: max_messages"
-        When I create the following voicemails via RESTAPI:
-          | name       | number | context | max_messages |
-          | Joe Dahool | 1001   | default | -4           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: max_messages"
-
     Scenario: Creating a voicemail with a invalid parameter number
         When I create the following voicemails via RESTAPI:
           | name       | number     | context |
@@ -293,13 +280,11 @@ Feature: REST API Voicemails
         When I edit voicemail "2568@default" via RESTAPI:
             | max_messages |
             | zero         |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: max_messages"
+        Then I get a response 400 matching "Error while validating field 'max_messages': 'zero' is not an integer"
         When I edit voicemail "2568@default" via RESTAPI:
             | max_messages |
             | -5           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: max_messages"
+        Then I get a response 400 matching "Error while validating field 'max_messages': '-5' is not an integer"
 
     Scenario: Edit a voicemail with a invalid parameter number
         Given I have the following voicemails:
