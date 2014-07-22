@@ -65,6 +65,11 @@ class TestLengthValidator(unittest.TestCase):
         validator = validators.Length(maximum=2)
         validator("a")
 
+    def test_given_value_is_longer_than_maximum_0_then_raises_error(self):
+        validator = validators.Length(maximum=0)
+        self.assertRaisesRegexp(ValidationError, "maximum length is 0",
+                                validator, "a")
+
     def test_given_value_is_shorter_than_size_then_raises_error(self):
         validator = validators.Length(size=1)
         self.assertRaisesRegexp(ValidationError, "length must be exactly 1",
@@ -78,6 +83,11 @@ class TestLengthValidator(unittest.TestCase):
     def test_given_value_is_exact_size_then_validation_passes(self):
         validator = validators.Length(size=1)
         validator("a")
+
+    def test_given_value_is_different_from_size_0_then_raises_error(self):
+        validator = validators.Length(size=0)
+        self.assertRaisesRegexp(ValidationError, "length must be exactly 0",
+                                validator, "a")
 
 
 class TestPositiveValidator(unittest.TestCase):
