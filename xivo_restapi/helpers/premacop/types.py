@@ -45,7 +45,7 @@ class Unicode(FieldType):
 class Float(FieldType):
 
     type_class = float
-    error_message = "'{value}' is not a float"
+    error_message = "'{value}' is not a floating-point number"
 
 
 class Array(FieldType):

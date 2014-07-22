@@ -82,7 +82,7 @@ class TestFloatFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'1' is not a float",
+        self.assertRaisesRegexp(ValidationError, "'1' is not a floating-point number",
                                 self.field_type.validate, 1)
 
     def test_given_bool_then_passes(self):
