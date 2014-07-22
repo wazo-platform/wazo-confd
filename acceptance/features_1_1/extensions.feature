@@ -352,4 +352,12 @@ Feature: REST API Extensions
         Given line "299568" is linked with extension "1226@default"
         When I delete extension with id "328785"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting Extension: extension still has a link"
+        Then I get an error message "Invalid parameters: extension is associated to a line"
+
+    Scenario: Delete an extension associated to a queue
+        Given there are queues with infos:
+            | name     | number | context |
+            | ex-queue | 3198   | default |
+        When I delete extension "3198@default"
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: extension is associated to a queue"
