@@ -26,9 +26,10 @@ class Parser(object):
 
     def parse(self, request, document, action=None):
         content, content_type = self._extract_from_request(request)
-        content = self.registry.parse(content, content_type, document)
-        document.validate(content, action)
-        return content
+        parser = self.registry.parser_for_content_type(content_type)
+        parsed = parser(content, document)
+        document.validate(parsed, action)
+        return parsed
 
     def _extract_from_request(self, request):
         content_type = request.headers.get('Content-Type')

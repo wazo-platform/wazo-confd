@@ -34,14 +34,16 @@ class TestParser(unittest.TestCase):
 
     def test_given_a_request_then_extracts_and_returns_parsed_content(self):
         content_type = 'application/json'
-        request = Mock(headers={'Content-Type': content_type},
-                       data=Mock())
+        request = Mock(headers={'Content-Type': content_type})
+        content = request.data = Mock()
         document = Mock(Document)
-        parsed_content = self.registry.parse.return_value
+        parser = self.registry.parser_for_content_type.return_value = Mock()
+        parsed_content = parser.return_value
 
         result = self.parser.parse(request, document)
 
-        self.registry.parse.assert_called_once_with(request.data, content_type, document)
+        self.registry.parser_for_content_type.assert_called_once_with(content_type)
+        parser.assert_called_once_with(content, document)
 
         assert_that(result, equal_to(parsed_content))
 
@@ -53,7 +55,8 @@ class TestParser(unittest.TestCase):
     def test_given_a_document_and_action_then_validates_document(self):
         request = Mock()
         document = Mock(Document)
-        parsed_content = self.registry.parse.return_value
+        parser = self.registry.parser_for_content_type.return_value = Mock()
+        parsed_content = parser.return_value
         action = 'action'
 
         self.parser.parse(request, document, action)

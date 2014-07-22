@@ -30,25 +30,20 @@ class TestParserRegistry(unittest.TestCase):
         self.registry = ParserRegistry()
 
     def test_given_no_parsers_registered_then_raises_error(self):
-        self.assertRaises(ContentTypeError, self.registry.parse, Mock(), 'content/type', Mock())
+        self.assertRaises(ContentTypeError, self.registry.parser_for_content_type, 'content/type')
 
     def test_given_wrong_content_type_then_raises_error(self):
         registry = ParserRegistry()
         registry.register('application/json', Mock())
 
-        self.assertRaises(ContentTypeError, self.registry.parse, Mock(), 'content/type', Mock())
+        self.assertRaises(ContentTypeError, self.registry.parser_for_content_type, 'content/type')
 
-    def test_given_one_parser_registered_then_calls_parser(self):
-        content = Mock()
+    def test_given_one_parser_registered_then_return_parser(self):
         content_type = 'application/json'
-        document = Mock(Document)
         parser = Mock()
-
-        parsed_content = parser.return_value
 
         self.registry.register('application/json', parser)
 
-        result = self.registry.parse(content, content_type, document)
+        result = self.registry.parser_for_content_type(content_type)
 
-        assert_that(result, equal_to(parsed_content))
-        parser.assert_called_once_with(content, document)
+        assert_that(result, equal_to(parser))

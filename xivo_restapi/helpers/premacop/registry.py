@@ -23,11 +23,7 @@ class ParserRegistry(object):
     def __init__(self):
         self.parsers = {}
 
-    def parse(self, content, content_type, document):
-        parser = self._parser_for_content_type(content_type)
-        return parser(content, document)
-
-    def _parser_for_content_type(self, content_type):
+    def parser_for_content_type(self, content_type):
         parser = self.parsers.get(content_type)
         if not parser:
             supported = ', '.join(self.parsers.keys())
