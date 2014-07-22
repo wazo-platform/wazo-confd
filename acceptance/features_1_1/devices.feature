@@ -141,6 +141,14 @@ Feature: REST API Devices
         Then the device has the following parameters:
             | ip       | mac               | sn | plugin | model     | vendor     | version | description | options               | template_id |
             | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | {"switchboard": True} | mytemplate  |
+            
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol |            device |
+            | Aayla     | Secura   |   1234 | default | sip      | 00:11:22:33:44:55 |
+        Then I get a response with a link to the "devices" resource
+        Then the device has the following parameters:
+            | ip       | mac               | sn | plugin | model     | vendor     | version | description | options               | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | {"switchboard": True} | mytemplate  |
 
     Scenario: Synchronize a device
         Given there are no devices with id "123"
@@ -194,7 +202,7 @@ Feature: REST API Devices
         Then I get a response with status "200"
         Then the device has the following parameters:
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
-            | 10.1.0.1 | aa:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+            | 10.1.0.1 | aa:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | None        |
 
     Scenario: Edit a device with an invalid mac
         Given I have the following devices:
@@ -262,8 +270,8 @@ Feature: REST API Devices
         When I go get the device with mac "00:11:22:33:44:55" using its id
         Then I get a response with status "200"
         Then the device has the following parameters:
-            | mac               | template_id   |
-            | 00:11:22:33:44:55 | supertemplate |
+            | mac               | template_id |
+            | 00:11:22:33:44:55 | None        |
 
     Scenario: Edit a device with a plugin that does not exist
         Given I have the following devices:
@@ -309,7 +317,7 @@ Feature: REST API Devices
         Then I get a response with a link to the "devices" resource
         Then the device has the following parameters:
             | ip       | mac               | plugin | model     | vendor     | version | template_id |
-            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate  |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | None        |
 
     Scenario: Device list with minimum 2 devices
         Given there exists the following device templates:
@@ -323,9 +331,9 @@ Feature: REST API Devices
         When I request the list of devices
         Then I get a response with status "200"
         Then I get a list containing the following devices:
-            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip       | mac               | plugin | model     | vendor     | version | template_id |
+            | 10.0.0.1 | 00:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | None        |
+            | 10.0.0.2 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | None        |
         Then the list contains the same number of devices as on the provisioning server
 
 
