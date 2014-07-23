@@ -54,6 +54,33 @@ Feature: REST API SIP Lines
             | default | 1           |
         Then I get a response with status "201"
 
+    Scenario Outline: Create a resource with invalid parameter type
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
+
+    Examples:
+        | url        | document                | field       | message    |
+        | /lines_sip | {"device_slot": ""}     | device_slot | an integer |
+        | /lines_sip | {"device_slot": "toto"} | device_slot | an integer |
+
+    Scenario Outline: Create a resource with invalid parameters
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Invalid parameters: <message>"
+
+    Examples:
+        | url        | document                                  | message                            |
+        | /lines_sip | {"device_slot": 0, "context": "default"}  | device_slot must be greater than 0 |
+        | /lines_sip | {"device_slot": -1, "context": "default"} | device_slot must be greater than 0 |
+        | /lines_sip | {"device_slot": 1, "context": ""}         | context cannot be empty            |
+        | /lines_sip | {"invalid": "invalid"}                    | invalid                            |
+
+
     Scenario: Editing a line_sip that doesn't exist
         Given I have no line with id "407558"
         When I update the line_sip with id "407558" using the following parameters:

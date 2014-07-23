@@ -118,6 +118,40 @@ Feature: REST API Link line with a user
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user is already associated to this line"
 
+    Scenario Outline: Create a resource with missing parameters
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Missing parameters: <parameters>"
+
+    Examples:
+        | url            | document | parameters |
+        | /users/1/lines | {}       | line_id    |
+
+    Scenario Outline: Create a resource with invalid parameter type
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
+
+    Examples:
+        | url            | document            | field   | message    |
+        | /users/1/lines | {"line_id": "toto"} | line_id | an integer |
+
+    Scenario Outline: Create a resource with invalid parameters
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Invalid parameters: <message>"
+
+    Examples:
+        | url            | document               | message |
+        | /users/1/lines | {"invalid": "invalid"} | invalid |
+
+
     Scenario: Get user_line associations when user does not exist
         Given there are no users with id "999999"
         When I request the lines associated to user id "999999" via RESTAPI

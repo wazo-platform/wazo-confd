@@ -157,6 +157,29 @@ Feature: REST API Voicemails
           | name       | number | context     |
           | Kim Jung   | 1000   | statscenter |
 
+    Scenario Outline: Create a resource with invalid parameter type
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
+
+    Examples:
+        | url         | document                 | field        | message    |
+        | /voicemails | {"max_messages": "zero"} | max_messages | an integer |
+
+    Scenario Outline: Create a resource with invalid parameters
+        When I POST the following content at url "<url>":
+            """
+            <document>
+            """
+        Then I get a response 400 matching "Invalid parameters: <message>"
+
+    Examples:
+        | url         | document                                                                          | message      |
+        | /voicemails | {"name": "voicemail", "number": "1000", "context": "default", "max_messages": -4} | max_messages |
+
+
     Scenario: Delete a voicemail that does not exist
         Given there is no voicemail with number "1030" and context "default"
         When I delete voicemail "1030@default" via RESTAPI
