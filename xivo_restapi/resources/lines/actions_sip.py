@@ -29,11 +29,24 @@ from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int, Unicode
+
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('lines_sip', __name__, url_prefix='/%s/lines_sip' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper_sip, serializer, LineSIP)
+
+document = content_parser.document(
+    Field('id', Int()),
+    Field('username', Unicode()),
+    Field('secret', Unicode()),
+    Field('callerid', Unicode()),
+    Field('provisioning_extension', Unicode()),
+    Field('device_slot', Int()),
+    Field('context', Unicode()),
+)
 
 
 @route('')
@@ -52,8 +65,8 @@ def get(lineid):
 
 @route('', methods=['POST'])
 def create():
-    data = request.data.decode("utf-8")
-    line = formatter.to_model(data)
+    data = document.parse(request)
+    line = formatter.dict_to_model(data)
     line = line_services.create(line)
     result = formatter.to_api(line)
     location = url_for('.get', lineid=line.id)
@@ -62,9 +75,9 @@ def create():
 
 @route('/<int:lineid>', methods=['PUT'])
 def edit(lineid):
-    data = request.data.decode("utf-8")
+    data = document.parse(request)
     line = line_services.get(lineid)
-    formatter.update_model(data, line)
+    formatter.update_dict_model(data, line)
     line_services.edit(line)
     return make_response('', 204)
 

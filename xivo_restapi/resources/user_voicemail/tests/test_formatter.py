@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-import json
 from hamcrest import equal_to, assert_that
 from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
 from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
@@ -25,15 +24,14 @@ from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatt
 
 class TestUserVoicemailFormatter(unittest.TestCase):
 
-    def test_to_model(self):
+    def test_dict_to_model(self):
         user_id = 1
         voicemail_id = 2
         data = {'voicemail_id': voicemail_id}
-        encoded_data = json.dumps(data)
 
         expected = UserVoicemail(user_id=user_id, voicemail_id=voicemail_id)
 
         formatter = UserVoicemailFormatter()
-        result = formatter.to_model(encoded_data, user_id)
+        result = formatter.dict_to_model(data, user_id)
 
         assert_that(result, equal_to(expected))

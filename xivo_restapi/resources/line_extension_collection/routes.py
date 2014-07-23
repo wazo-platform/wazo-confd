@@ -21,6 +21,14 @@ from flask import request, url_for, make_response
 from . import actions
 from xivo_restapi.resources.lines.routes import line_blueprint, line_route
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int
+
+document = content_parser.document(
+    Field('line_id', Int()),
+    Field('extension_id', Int())
+)
+
 
 @line_route('/<int:lineid>/extensions')
 def list_extensions(lineid):
@@ -30,7 +38,7 @@ def list_extensions(lineid):
 
 @line_route('/<int:lineid>/extensions', methods=['POST'])
 def associate_line_extension(lineid):
-    parameters = request.data.decode("utf-8")
+    parameters = document.parse(request)
     response = actions.associate_extension(lineid, parameters)
     location = url_for('.list_extensions', lineid=lineid)
     return make_response(response, 201, {'Location': location})

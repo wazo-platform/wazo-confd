@@ -31,6 +31,23 @@ from xivo_dao.data_handler.device import services as device_services
 from xivo_dao.data_handler.line import services as line_services
 from xivo_restapi.helpers.common import extract_search_parameters
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Unicode
+
+document = content_parser.document(
+    Field('id', Unicode()),
+    Field('ip', Unicode()),
+    Field('mac', Unicode()),
+    Field('sn', Unicode()),
+    Field('plugin', Unicode()),
+    Field('vendor', Unicode()),
+    Field('model', Unicode()),
+    Field('version', Unicode()),
+    Field('description', Unicode()),
+    Field('status', Unicode()),
+    Field('template_id', Unicode())
+)
+
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.VERSION_1_1)
@@ -55,8 +72,8 @@ def list():
 
 @route('', methods=['POST'])
 def create():
-    data = request.data.decode("utf-8")
-    device = formatter.to_model(data)
+    data = document.parse(request)
+    device = formatter.dict_to_model(data)
 
     created_device = device_services.create(device)
 
@@ -68,9 +85,9 @@ def create():
 
 @route('/<deviceid>', methods=['PUT'])
 def edit(deviceid):
-    data = request.data.decode("utf-8")
+    data = document.parse(request)
     device = device_services.get(deviceid)
-    formatter.update_model(data, device)
+    formatter.update_dict_model(data, device)
     device_services.edit(device)
     return make_response('', 204)
 

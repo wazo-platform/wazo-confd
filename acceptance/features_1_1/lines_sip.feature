@@ -18,50 +18,12 @@ Feature: REST API SIP Lines
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: context,device_slot"
 
-    Scenario: Create a line with an empty context
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            |         | 1           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: context cannot be empty"
-
-    Scenario: Create a line with an empty device_slot
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default |             |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be numeric"
-
-    Scenario: Create a line with an invalid device_slot
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default | toto        |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be numeric"
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default | 0           |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be greater than 0"
-        When I create a line_sip with the following parameters:
-            | context | device_slot |
-            | default | -1          |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: device_slot must be greater than 0"
-
     Scenario: Create a line with a context that doesn't exist
         When I create a line_sip with the following parameters:
             | context           | device_slot |
             | superdupercontext | 1           |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: context superdupercontext does not exist"
-
-    Scenario: Create a line with invalid parameters
-        When I create a line_sip with the following parameters:
-            | context | invalidparameter |
-            | default | invalidvalue     |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: invalidparameter"
 
     Scenario: Create a line with a context
         When I create a line_sip with the following parameters:
@@ -91,6 +53,31 @@ Feature: REST API SIP Lines
             | context | device_slot |
             | default | 1           |
         Then I get a response with status "201"
+
+    Scenario Outline: Create a resource with invalid parameter type
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
+        Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
+
+    Examples:
+        | url        | document                | field       | message    |
+        | /lines_sip | {"device_slot": ""}     | device_slot | an integer |
+        | /lines_sip | {"device_slot": "toto"} | device_slot | an integer |
+
+    Scenario Outline: Create a resource with invalid parameters
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
+        Then I get a response 400 matching "Invalid parameters: <message>"
+
+    Examples:
+        | url        | document                                  | message                            |
+        | /lines_sip | {"device_slot": 0, "context": "default"}  | device_slot must be greater than 0 |
+        | /lines_sip | {"device_slot": -1, "context": "default"} | device_slot must be greater than 0 |
+        | /lines_sip | {"device_slot": 1, "context": ""}         | context cannot be empty            |
+        | /lines_sip | {"invalid": "invalid"}                    | invalid                            |
+
 
     Scenario: Editing a line_sip that doesn't exist
         Given I have no line with id "407558"

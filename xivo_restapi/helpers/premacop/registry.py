@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2014 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,27 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask.helpers import url_for
-
-# mapping = {model_field: api_field}
-MAPPING = {
-    'id': 'id',
-    'name': 'name',
-    'protocol': 'protocol',
-    'context': 'context',
-    'device_slot': 'device_slot',
-    'device_id': 'device_id',
-    'provisioning_extension': 'provisioning_extension',
-}
+from errors import ContentTypeError
 
 
-def add_links_to_dict(line_dict, line):
-    line_location = url_for('.get', lineid=line.id, _external=True)
-    line_dict.update({
-        'links': [
-            {
-                'rel': 'lines',
-                'href': line_location
-            }
-        ]
-    })
+class ParserRegistry(object):
+
+    def __init__(self):
+        self.parsers = {}
+
+    def parser_for_content_type(self, content_type):
+        parser = self.parsers.get(content_type)
+        if not parser:
+            supported = ', '.join(self.parsers.keys())
+            msg = 'Supported Content-Types: {}'.format(supported)
+            raise ContentTypeError(msg)
+        return parser
+
+    def register(self, content_type, parser):
+        self.parsers[content_type] = parser

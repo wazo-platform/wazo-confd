@@ -17,9 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from mock import patch
-from hamcrest import assert_that, equal_to
 
-from xivo_dao.data_handler.line.model import Line
+from xivo_dao.data_handler.line.model import LineSIP
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 BASE_URL = "/1.1/lines"
@@ -27,116 +26,106 @@ BASE_URL = "/1.1/lines"
 
 class TestLineActions(TestResources):
 
-    @patch('xivo_dao.data_handler.line.services.find_all')
-    def test_list_lines_with_no_lines(self, mock_line_services_find_all):
-        expected_status_code = 200
-        expected_result = {
-            'total': 0,
-            'items': []
+    def setUp(self):
+        super(TestLineActions, self).setUp()
+        self.line = self.build_line(id=1,
+                                    protocol='sip',
+                                    context='default',
+                                    name='test1',
+                                    provisioning_extension=123456,
+                                    device_slot=1,
+                                    device_id="b054de13b8b73d5683815929c20033ad")
+
+    def build_line(self, **kwargs):
+        params = {
+            'id': None,
+            'name': None,
+            'number': None,
+            'context': None,
+            'protocol': None,
+            'protocolid': None,
+            'callerid': None,
+            'device_id': None,
+            'provisioning_extension': None,
+            'configregistrar': None,
+            'device_slot': None,
+            'username': None,
+            'secret': None,
         }
+        params.update(kwargs)
 
-        mock_line_services_find_all.return_value = []
+        line = LineSIP()
+        for name, value in params.iteritems():
+            setattr(line, name, value)
 
-        result = self.app.get(BASE_URL)
+        return line
 
-        mock_line_services_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.line.services.find_all')
-    def test_list_lines_with_two_lines(self, mock_line_services_find_all):
-        expected_status_code = 200
-        expected_result = {
-            'total': 2,
-            'items': [
-                {
-                    'id': 1,
-                    'name': 'test1',
-                    'links': [{
-                            'href': 'http://localhost/1.1/lines/1',
-                            'rel': 'lines'
-                    }]},
-                {
-                    'id': 2,
-                    'name': 'test2',
-                    'links': [{
-                            'href': 'http://localhost/1.1/lines/2',
-                            'rel': 'lines'
-                    }]}
-            ]
-        }
-
-        line1 = Line(id=1,
-                     name='test1')
-        line2 = Line(id=2,
-                     name='test2')
-        mock_line_services_find_all.return_value = [line1, line2]
-
-        result = self.app.get(BASE_URL)
-
-        mock_line_services_find_all.assert_any_call()
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.line.services.find_all_by_name')
-    def test_list_lines_with_search(self, mock_line_services_find_all_by_name):
-        line = Line(id=1,
-                    name='Bob')
-
-        expected_status_code = 200
-        search = 'bob'
-
-        expected_result = {
-            'total': line.id,
-            'items': [
-                {
-                    'id': 1,
-                    'name': 'Bob',
-                    'links': [{
-                        'href': 'http://localhost/1.1/lines/%d' % line.id,
-                        'rel': 'lines'
-                    }]
-                }
-            ]
-        }
-
-        mock_line_services_find_all_by_name.return_value = [line]
-
-        result = self.app.get("%s?q=%s" % (BASE_URL, search))
-
-        mock_line_services_find_all_by_name.assert_called_once_with(search)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    def test_get(self, mock_line_services_get):
-        line = Line(id=1,
-                    protocol='sip',
-                    context='default',
-                    name='test1',
-                    provisioning_extension=123456,
-                    device_slot=1,
-                    device_id="b054de13b8b73d5683815929c20033ad")
-
-        expected_status_code = 200
-        expected_result = {
+    def build_item(self, line):
+        item = {
             'id': line.id,
-            'context': line.context,
             'name': line.name,
             'protocol': line.protocol,
-            'provisioning_extension': line.provisioning_extension,
+            'context': line.context,
             'device_slot': line.device_slot,
             'device_id': line.device_id,
+            'provisioning_extension': line.provisioning_extension,
             'links': [{
                 'href': 'http://localhost/1.1/lines/%d' % line.id,
                 'rel': 'lines'
             }]
         }
 
-        mock_line_services_get.return_value = line
+        return item
 
-        result = self.app.get("%s/%d" % (BASE_URL, line.id))
+    @patch('xivo_dao.data_handler.line.services.find_all')
+    def test_list_lines_with_no_lines(self, mock_line_services_find_all):
+        mock_line_services_find_all.return_value = []
 
-        mock_line_services_get.assert_called_with(line.id)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        expected_result = {'total': 0, 'items': []}
+
+        result = self.app.get(BASE_URL)
+
+        self.assert_response_for_get(result, expected_result)
+        mock_line_services_find_all.assert_any_call()
+
+    @patch('xivo_dao.data_handler.line.services.find_all')
+    def test_list_lines_with_two_lines(self, mock_line_services_find_all):
+        line1 = self.build_line(id=1, name='test1')
+        line2 = self.build_line(id=2, name='test2')
+
+        mock_line_services_find_all.return_value = [line1, line2]
+
+        expected_result = {
+            'total': 2,
+            'items': [self.build_item(line1),
+                      self.build_item(line2)]
+        }
+
+        result = self.app.get(BASE_URL)
+
+        self.assert_response_for_list(result, expected_result)
+        mock_line_services_find_all.assert_any_call()
+
+    @patch('xivo_dao.data_handler.line.services.find_all_by_name')
+    def test_list_lines_with_search(self, mock_line_services_find_all_by_name):
+        mock_line_services_find_all_by_name.return_value = [self.line]
+
+        search = 'bob'
+
+        expected_result = {'total': 1, 'items': [self.build_item(self.line)]}
+
+        result = self.app.get("%s?q=%s" % (BASE_URL, search))
+
+        self.assert_response_for_list(result, expected_result)
+        mock_line_services_find_all_by_name.assert_called_once_with(search)
+
+    @patch('xivo_dao.data_handler.line.services.get')
+    def test_get(self, mock_line_services_get):
+        mock_line_services_get.return_value = self.line
+
+        expected_result = self.build_item(self.line)
+
+        result = self.app.get("%s/%d" % (BASE_URL, self.line.id))
+
+        self.assert_response_for_get(result, expected_result)
+        mock_line_services_get.assert_called_with(self.line.id)

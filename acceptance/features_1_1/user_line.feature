@@ -1,24 +1,5 @@
 Feature: REST API Link line with a user
 
-    Scenario: Create an empty user_line
-        When I create an empty user_line
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: line_id"
-
-    Scenario: Create a user_line with invalid values
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 384939  | toto    |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: line_id must be integer"
-
-    Scenario: Create a user_line with invalid parameters
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id | invalid |
-            | 562668  | 999999  | invalid |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: invalid"
-
     Scenario: Create user_line with a line that doesn't exist
         Given I have no line with id "682433"
         Given I have the following users:
@@ -136,6 +117,37 @@ Feature: REST API Link line with a user
             | 176775  | 639164  |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: user is already associated to this line"
+
+    Scenario Outline: Create a resource with missing parameters
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
+        Then I get a response 400 matching "Missing parameters: <parameters>"
+
+    Examples:
+        | url            | document | parameters |
+        | /users/1/lines | {}       | line_id    |
+
+    Scenario Outline: Create a resource with invalid parameter type
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
+        Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
+
+    Examples:
+        | url            | document            | field   | message    |
+        | /users/1/lines | {"line_id": "toto"} | line_id | an integer |
+
+    Scenario Outline: Create a resource with invalid parameters
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
+        Then I get a response 400 matching "Invalid parameters: <message>"
+
+    Examples:
+        | url            | document               | message |
+        | /users/1/lines | {"invalid": "invalid"} | invalid |
+
 
     Scenario: Get user_line associations when user does not exist
         Given there are no users with id "999999"

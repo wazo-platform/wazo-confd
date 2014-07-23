@@ -31,6 +31,14 @@ class TestClient(FlaskClient):
         kwargs.setdefault('environ_base', {})['REMOTE_ADDR'] = '127.0.0.1'
         return super(FlaskClient, self).open(*args, **kwargs)
 
+    def put(self, *args, **kwargs):
+        kwargs.setdefault('content_type', 'application/json')
+        return super(FlaskClient, self).put(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        kwargs.setdefault('content_type', 'application/json')
+        return super(FlaskClient, self).post(*args, **kwargs)
+
 
 class TestResources(unittest.TestCase):
 

@@ -55,7 +55,8 @@ class TestLineExtensionCollectionRoutes(TestResources):
 
     @patch('xivo_restapi.resources.line_extension_collection.actions.associate_extension')
     def test_associate_extension(self, associate_extension):
-        parameters = self._serialize_encode({'extension_id': EXTENSION_ID})
+        parameters = {'extension_id': EXTENSION_ID}
+        encoded_parameters = self._serialize_encode(parameters)
 
         status = 201
         expected_response = {'line_id': LINE_ID,
@@ -68,7 +69,7 @@ class TestLineExtensionCollectionRoutes(TestResources):
                              ]}
         associate_extension.return_value = self._serialize_encode(expected_response)
 
-        response = self.app.post(BASE_URL % LINE_ID, data=parameters)
+        response = self.app.post(BASE_URL % LINE_ID, data=encoded_parameters)
 
         associate_extension.assert_called_once_with(LINE_ID, parameters)
         self.assert_response(response, status, expected_response)

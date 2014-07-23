@@ -29,7 +29,7 @@ class UserCtiProfileFormatter(Formatter):
     def __init__(self):
         Formatter.__init__(self, mapper, serializer, UserCtiProfile)
 
-    def to_model(self, data, user_id):
-        model = Formatter.to_model(self, data)
+    def dict_to_model(self, data, user_id):
+        model = Formatter.dict_to_model(self, data)
         model.user_id = user_id
         return model

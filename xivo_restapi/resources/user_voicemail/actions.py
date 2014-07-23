@@ -25,13 +25,22 @@ from xivo_dao.data_handler.user_voicemail import services as user_voicemail_serv
 from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int, Boolean
+
 formatter = UserVoicemailFormatter()
+
+document = content_parser.document(
+    Field('user_id', Int()),
+    Field('voicemail_id', Int()),
+    Field('enabled', Boolean())
+)
 
 
 @route('/<int:userid>/voicemail', methods=['POST'])
 def associate_voicemail(userid):
-    data = request.data.decode("utf-8")
-    model = formatter.to_model(data, userid)
+    data = document.parse(request)
+    model = formatter.dict_to_model(data, userid)
     created_model = user_voicemail_services.associate(model)
 
     result = formatter.to_api(created_model)

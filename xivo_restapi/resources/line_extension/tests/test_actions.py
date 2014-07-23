@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from hamcrest import assert_that, equal_to, has_entries
+from hamcrest import assert_that, equal_to
 
 from mock import patch
 from xivo_dao.data_handler.line_extension.model import LineExtension
@@ -29,47 +29,35 @@ EXTENSION_URL = "/1.1/extensions/%s/line"
 
 class TestLineExtensionActions(TestResources):
 
-    @patch('xivo_restapi.resources.line_extension.actions.formatter')
+    def setUp(self):
+        super(TestLineExtensionActions, self).setUp()
+        self.line_extension = LineExtension(line_id=1,
+                                            extension_id=2)
+
+    def build_item(self, line_extension):
+        line_link = {"rel": "lines",
+                     "href": "http://localhost/1.1/lines/%s" % line_extension.line_id}
+
+        extension_link = {"rel": "extensions",
+                          "href": "http://localhost/1.1/extensions/%s" % line_extension.extension_id}
+
+        return {'line_id': line_extension.line_id,
+                'extension_id': line_extension.extension_id,
+                'links': [line_link, extension_link]}
+
     @patch('xivo_dao.data_handler.line_extension.services.associate')
-    def test_associate_extension(self, line_extension_associate, formatter):
-        line_id = 1
-        extension_id = 2
+    def test_associate_extension(self, line_extension_associate):
+        line_extension_associate.return_value = self.line_extension
 
-        expected_status_code = 201
-        expected_result = {
-            'line_id': line_id,
-            'extension_id': extension_id,
-            'links': [
-                {
-                    "rel": "lines",
-                    "href": "http://localhost/1.1/lines/%s" % line_id,
-                },
-                {
-                    "rel": "extension",
-                    "href": "http://localhost/1.1/extensions/%s" % extension_id,
-                }
-            ]
-        }
+        expected_result = self.build_item(self.line_extension)
 
-        line_extension = LineExtension(line_id=line_id, extension_id=extension_id)
-        line_extension_associate.return_value = line_extension
+        data = {'extension_id': self.line_extension.extension_id}
 
-        formatter.to_model.return_value = line_extension
-        formatter.to_api.return_value = self._serialize_encode(expected_result)
+        result = self.app.post(LINE_URL % self.line_extension.line_id,
+                               data=self._serialize_encode(data))
 
-        data = {
-            'extension_id': extension_id
-        }
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.post(LINE_URL % line_id, data=data_serialized)
-
-        formatter.to_model.assert_called_once_with(data_serialized, line_id)
-        line_extension_associate.assert_called_once_with(line_extension)
-        formatter.to_api.assert_called_once_with(line_extension)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        self.assert_response_for_create(result, expected_result)
+        line_extension_associate.assert_called_once_with(self.line_extension)
 
     @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
     def test_get_extension_associated_to_a_line_with_no_extension(self, line_extension_get_by_line_id):
@@ -86,30 +74,14 @@ class TestLineExtensionActions(TestResources):
 
     @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
     def test_get_extension_associated_to_a_line(self, line_extension_get_by_line_id):
-        line_id = 1
-        extension_id = 2
-        expected_status_code = 200
-        expected_result = {
-            u'extension_id': 2,
-            u'line_id': 1,
-            u'links': [
-                {u'href': u'http://localhost/1.1/lines/%d' % line_id,
-                 u'rel': u'lines'},
-                {u'href': u'http://localhost/1.1/extensions/%d' % extension_id,
-                 u'rel': u'extensions'},
-            ]
-        }
+        line_extension_get_by_line_id.return_value = self.line_extension
 
-        line_extension_link = LineExtension(extension_id=extension_id,
-                                            line_id=line_id)
+        expected_result = self.build_item(self.line_extension)
 
-        line_extension_get_by_line_id.return_value = line_extension_link
+        result = self.app.get(LINE_URL % self.line_extension.line_id)
 
-        result = self.app.get(LINE_URL % line_id)
-        decoded_result = self._serialize_decode(result.data)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(decoded_result, has_entries(expected_result))
+        self.assert_response_for_get(result, expected_result)
+        line_extension_get_by_line_id.assert_called_once_with(self.line_extension.line_id)
 
     @patch('xivo_dao.data_handler.line_extension.services.get_by_extension_id')
     def test_get_line_associated_to_an_extension_with_no_line(self, line_extension_get_by_extension_id):
@@ -126,46 +98,25 @@ class TestLineExtensionActions(TestResources):
 
     @patch('xivo_dao.data_handler.line_extension.services.get_by_extension_id')
     def test_get_line_associated_to_an_extension(self, line_extension_get_by_extension_id):
-        line_id = 1
-        extension_id = 2
-        expected_status_code = 200
-        expected_result = {
-            u'extension_id': 2,
-            u'line_id': 1,
-            u'links': [
-                {u'href': u'http://localhost/1.1/lines/%d' % line_id,
-                 u'rel': u'lines'},
-                {u'href': u'http://localhost/1.1/extensions/%d' % extension_id,
-                 u'rel': u'extensions'},
-            ]
-        }
+        line_extension_get_by_extension_id.return_value = self.line_extension
 
-        line_extension_link = LineExtension(extension_id=extension_id,
-                                            line_id=line_id)
+        expected_result = self.build_item(self.line_extension)
 
-        line_extension_get_by_extension_id.return_value = line_extension_link
+        result = self.app.get(EXTENSION_URL % self.line_extension.extension_id)
 
-        result = self.app.get(EXTENSION_URL % extension_id)
-        decoded_result = self._serialize_decode(result.data)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(decoded_result, has_entries(expected_result))
+        self.assert_response_for_get(result, expected_result)
+        line_extension_get_by_extension_id.assert_called_once_with(self.line_extension.extension_id)
 
     @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
     @patch('xivo_dao.data_handler.line_extension.services.dissociate')
     def test_dissociate_extension(self, line_extension_dissociate, get_by_line_id):
-        line_extension = LineExtension(line_id=1, extension_id=2)
-        get_by_line_id.return_value = line_extension
+        get_by_line_id.return_value = self.line_extension
 
-        expected_status_code = 204
-        expected_data = ''
+        result = self.app.delete(LINE_URL % self.line_extension.line_id)
 
-        result = self.app.delete(LINE_URL % line_extension.line_id)
-
-        get_by_line_id.assert_called_once_with(line_extension.line_id)
-        line_extension_dissociate.assert_called_once_with(line_extension)
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(result.data, equal_to(expected_data))
+        self.assert_response_for_delete(result)
+        get_by_line_id.assert_called_once_with(self.line_extension.line_id)
+        line_extension_dissociate.assert_called_once_with(self.line_extension)
 
     @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
     @patch('xivo_dao.data_handler.line_extension.services.dissociate')

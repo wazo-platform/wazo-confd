@@ -26,13 +26,21 @@ from xivo_dao.data_handler.user import services as user_services
 from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_line.formatter import UserLineFormatter
 
+from xivo_restapi.flask_http_server import content_parser
+from xivo_restapi.helpers.premacop import Field, Int
+
 formatter = UserLineFormatter()
+
+document = content_parser.document(
+    Field('user_id', Int()),
+    Field('line_id', Int())
+)
 
 
 @route('/<int:userid>/lines', methods=['POST'])
 def associate_line(userid):
-    data = request.data.decode("utf-8")
-    model = formatter.to_model(data, userid)
+    data = document.parse(request)
+    model = formatter.dict_to_model(data, userid)
     created_model = user_line_services.associate(model)
 
     result = formatter.to_api(created_model)

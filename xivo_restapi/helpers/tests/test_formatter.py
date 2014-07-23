@@ -118,6 +118,19 @@ class TestFormatter(unittest.TestCase):
         self._model_class.from_user_data.assert_called_once_with(self._model_data_dict)
 
     @patch('xivo_restapi.helpers.mapper.map_to_model')
+    def test_dict_to_model(self, map_to_model):
+        expected_result = self.model
+        dict_data = {"api_key_1": 1, "api_key_2": "2", "api_key_3": [1, "2"]}
+
+        map_to_model.return_value = self._model_data_dict
+
+        result = self.formatter.dict_to_model(dict_data)
+
+        assert_that(result, equal_to(expected_result))
+        map_to_model.assert_called_once_with(self._mapper.MAPPING, self._api_data_dict)
+        self._model_class.from_user_data.assert_called_once_with(self._model_data_dict)
+
+    @patch('xivo_restapi.helpers.mapper.map_to_model')
     def test_update_model(self, map_to_model):
         my_model = Mock(model_key_1='lol',
                         model_key_2='lol',
@@ -134,6 +147,32 @@ class TestFormatter(unittest.TestCase):
         map_to_model.return_value = self._model_data_dict
 
         self.formatter.update_model(api_data, my_model)
+
+        assert_that(my_model, all_of(
+            has_property('model_key_1', self._model_data_dict['model_key_1']),
+            has_property('model_key_2', self._model_data_dict['model_key_2']),
+            has_property('model_key_3', self._model_data_dict['model_key_3'])
+        ))
+        map_to_model.assert_called_once_with(self._mapper.MAPPING, self._api_data_dict)
+        my_model.update_from_data.assert_called_once_with(self._model_data_dict)
+
+    @patch('xivo_restapi.helpers.mapper.map_to_model')
+    def test_update_dict_model(self, map_to_model):
+        my_model = Mock(model_key_1='lol',
+                        model_key_2='lol',
+                        model_key_3=['lol', 'lol'])
+
+        def update_from_data(data_dict):
+            for key, val in data_dict.iteritems():
+                setattr(my_model, key, val)
+
+        my_model.update_from_data.side_effect = update_from_data
+
+        data_dict = {"api_key_1": 1, "api_key_2": "2", "api_key_3": [1, "2"]}
+
+        map_to_model.return_value = self._model_data_dict
+
+        self.formatter.update_dict_model(data_dict, my_model)
 
         assert_that(my_model, all_of(
             has_property('model_key_1', self._model_data_dict['model_key_1']),

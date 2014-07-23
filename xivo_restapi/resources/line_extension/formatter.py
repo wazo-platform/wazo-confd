@@ -28,7 +28,7 @@ class LineExtensionFormatter(Formatter):
     def __init__(self):
         Formatter.__init__(self, mapper, serializer, LineExtension)
 
-    def to_model(self, api_data, line_id):
-        model = Formatter.to_model(self, api_data)
+    def dict_to_model(self, dict_data, line_id):
+        model = Formatter.dict_to_model(self, dict_data)
         model.line_id = line_id
         return model
