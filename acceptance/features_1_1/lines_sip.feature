@@ -55,10 +55,9 @@ Feature: REST API SIP Lines
         Then I get a response with status "201"
 
     Scenario Outline: Create a resource with invalid parameter type
-        When I POST the following content at url "<url>":
-            """
-            <document>
-            """
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
         Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
 
     Examples:
@@ -67,10 +66,9 @@ Feature: REST API SIP Lines
         | /lines_sip | {"device_slot": "toto"} | device_slot | an integer |
 
     Scenario Outline: Create a resource with invalid parameters
-        When I POST the following content at url "<url>":
-            """
-            <document>
-            """
+        When the client sends a POST request:
+            | url   | document   |
+            | <url> | <document> |
         Then I get a response 400 matching "Invalid parameters: <message>"
 
     Examples:
