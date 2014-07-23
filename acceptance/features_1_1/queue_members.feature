@@ -13,10 +13,10 @@ Feature: REST API Manipulate queue members
             | 5       |
 
     Scenario: Get agent-queue association on non-existing queue
-        Given there is no queue "mississipi"
-        When I request the queue member information for the queue "mississipi" and the agent "2404"
+        Given there is no queue with id "4876"
+        When I request the queue member information for the queue with id "4876" and the agent with id "5200"
         Then I get a response with status "404"
-        Then I get an error message matching "Queue with id=\d+ does not exist"
+        Then I get an error message "Queue with id=4876 does not exist"
 
     Scenario: Get agent-queue association on non-associated agent
         Given there is a agent "John" "2404" with extension "2404@default"
@@ -38,8 +38,8 @@ Feature: REST API Manipulate queue members
         Then the penalty is "7" for queue "superqueue" and agent "2404"
 
     Scenario: Editing agent-queue association on non-existing queue
-        Given there is no queue "mississipi"
-        When I edit the member information for the queue "superqueue" and the agent "2404" with the penalty "7"
+        Given there is no queue with id "4876"
+        When I edit the member information for the queue with id "4876" and the agent with id "5200" with the penalty "7"
         Then I get a response with status "404"
         Then I get an error message matching "Queue with id=\d+ does not exist"
 
