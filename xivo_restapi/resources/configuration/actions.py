@@ -23,7 +23,7 @@ from flask.helpers import make_response
 from flask.globals import request
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Boolean
+from xivo_restapi.helpers.mooltiparse import Field, Boolean
 
 route = RouteGenerator(blueprint)
 

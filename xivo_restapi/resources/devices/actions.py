@@ -32,7 +32,7 @@ from xivo_dao.data_handler.line import services as line_services
 from xivo_restapi.helpers.common import extract_search_parameters
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Unicode
+from xivo_restapi.helpers.mooltiparse import Field, Unicode
 
 document = content_parser.document(
     Field('id', Unicode()),

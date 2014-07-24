@@ -26,7 +26,7 @@ from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Int, Boolean
+from xivo_restapi.helpers.mooltiparse import Field, Int, Boolean
 
 formatter = UserVoicemailFormatter()
 

@@ -18,9 +18,9 @@
 import unittest
 from mock import Mock
 
-from xivo_restapi.helpers.premacop.field import Field
-from xivo_restapi.helpers.premacop.types import FieldType
-from xivo_restapi.helpers.premacop.errors import ValidationError
+from xivo_restapi.helpers.mooltiparse.field import Field
+from xivo_restapi.helpers.mooltiparse.types import FieldType
+from xivo_restapi.helpers.mooltiparse.errors import ValidationError
 
 
 class TestField(unittest.TestCase):

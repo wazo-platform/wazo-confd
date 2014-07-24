@@ -32,7 +32,7 @@ from xivo_dao.data_handler.voicemail.model import Voicemail
 from xivo_dao.data_handler.voicemail import services as voicemail_services
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Unicode, Int, Boolean
+from xivo_restapi.helpers.mooltiparse import Field, Unicode, Int, Boolean
 
 
 logger = logging.getLogger(__name__)

@@ -30,7 +30,7 @@ from xivo_dao.data_handler.exception import ElementEditionError
 from xivo_dao.data_handler.exception import ElementDeletionError
 from xivo_dao.data_handler.exception import AssociationNotExistsError
 
-from xivo_restapi.helpers.premacop.errors import ValidationError, ContentTypeError
+from xivo_restapi.helpers.mooltiparse.errors import ValidationError, ContentTypeError
 
 from xivo_restapi.helpers import serializer
 

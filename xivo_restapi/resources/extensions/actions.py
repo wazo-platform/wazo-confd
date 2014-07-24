@@ -29,7 +29,7 @@ from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.extensions.routes import extension_route as route
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Int, Unicode, Boolean
+from xivo_restapi.helpers.mooltiparse import Field, Int, Unicode, Boolean
 
 
 logger = logging.getLogger(__name__)

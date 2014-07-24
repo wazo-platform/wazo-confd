@@ -30,7 +30,7 @@ from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Int, Unicode
+from xivo_restapi.helpers.mooltiparse import Field, Int, Unicode
 
 
 logger = logging.getLogger(__name__)

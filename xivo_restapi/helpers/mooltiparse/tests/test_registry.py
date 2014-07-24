@@ -19,9 +19,9 @@ import unittest
 from hamcrest import assert_that, equal_to
 from mock import Mock
 
-from xivo_restapi.helpers.premacop.registry import ParserRegistry
-from xivo_restapi.helpers.premacop.document import Document
-from xivo_restapi.helpers.premacop.errors import ContentTypeError
+from xivo_restapi.helpers.mooltiparse.registry import ParserRegistry
+from xivo_restapi.helpers.mooltiparse.document import Document
+from xivo_restapi.helpers.mooltiparse.errors import ContentTypeError
 
 
 class TestParserRegistry(unittest.TestCase):

@@ -19,8 +19,8 @@ import unittest
 from mock import Mock
 from hamcrest import assert_that, equal_to
 
-from xivo_restapi.helpers.premacop.field import Field
-from xivo_restapi.helpers.premacop.document import Document, DocumentProxy
+from xivo_restapi.helpers.mooltiparse.field import Field
+from xivo_restapi.helpers.mooltiparse.document import Document, DocumentProxy
 
 
 class TestDocument(unittest.TestCase):

@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from xivo_restapi.helpers.premacop import validators
-from xivo_restapi.helpers.premacop.errors import ValidationError
+from xivo_restapi.helpers.mooltiparse import validators
+from xivo_restapi.helpers.mooltiparse.errors import ValidationError
 
 
 class TestRequiredValidator(unittest.TestCase):

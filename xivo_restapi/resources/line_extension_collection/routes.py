@@ -22,7 +22,7 @@ from . import actions
 from xivo_restapi.resources.lines.routes import line_blueprint, line_route
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Int
+from xivo_restapi.helpers.mooltiparse import Field, Int
 
 document = content_parser.document(
     Field('line_id', Int()),

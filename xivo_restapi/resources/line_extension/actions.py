@@ -28,7 +28,7 @@ from xivo_restapi.resources.extensions.routes import extension_route
 from xivo_restapi.resources.line_extension.formatter import LineExtensionFormatter
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Int
+from xivo_restapi.helpers.mooltiparse import Field, Int
 
 formatter = LineExtensionFormatter()
 

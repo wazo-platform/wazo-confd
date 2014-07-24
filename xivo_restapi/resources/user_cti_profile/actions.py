@@ -23,7 +23,7 @@ from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_
 from flask.helpers import make_response
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Int, Boolean
+from xivo_restapi.helpers.mooltiparse import Field, Int, Boolean
 
 formatter = UserCtiProfileFormatter()
 

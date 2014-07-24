@@ -32,7 +32,7 @@ from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.resources.users.routes import route
 
 from xivo_restapi.flask_http_server import content_parser
-from xivo_restapi.helpers.premacop import Field, Unicode, Int
+from xivo_restapi.helpers.mooltiparse import Field, Unicode, Int
 
 logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, User)
