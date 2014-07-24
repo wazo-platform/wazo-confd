@@ -25,7 +25,7 @@ Feature: REST API Manipulate queue members
             | superqueue | SuperQueue   | 3007   | default |
         When I request the queue member information for the queue "superqueue" and the agent "2404"
         Then I get a response with status "404"
-        Then I get an error message matching "QueueMember with agent_id=\d+ and queue_id=\d+ does not exist"
+        Then I get an error message matching "QueueMember with agent_id=\d+ queue_id=\d+ does not exist"
 
     Scenario: Editing an agent-queue association
         Given there is a agent "John" "2404" with extension "2404@default"
@@ -50,5 +50,5 @@ Feature: REST API Manipulate queue members
             | superqueue | SuperQueue   | 3007   | default |
         When I edit the member information for the queue "superqueue" and the agent "2404" with the penalty "7"
         Then I get a response with status "404"
-        Then I get an error message matching "QueueMember with agent_id=\d+ and queue_id=\d+ does not exist"
+        Then I get an error message matching "QueueMember with agent_id=\d+ queue_id=\d+ does not exist"
 
