@@ -331,14 +331,14 @@ Feature: REST API Extensions
 
     Scenario: Delete an extension that doesn't exist
         Given I have no extension with id "892476"
-        When I delete extension "892476"
+        When I delete extension with id "892476"
         Then I get a response with status "404"
 
     Scenario: Delete an extension
         Given I have the following extensions:
             | id     | exten | context |
             | 954147 | 1846  | default |
-        When I delete extension "954147"
+        When I delete extension with id "954147"
         Then I get a response with status "204"
         Then the extension "954147" no longer exists
 
@@ -350,6 +350,14 @@ Feature: REST API Extensions
             | id     | exten | context |
             | 328785 | 1226  | default |
         Given line "299568" is linked with extension "1226@default"
-        When I delete extension "328785"
+        When I delete extension with id "328785"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting Extension: extension still has a link"
+        Then I get an error message "Invalid parameters: extension is associated to a line"
+
+    Scenario: Delete an extension associated to a queue
+        Given there are queues with infos:
+            | name     | number | context |
+            | ex-queue | 3198   | default |
+        When I delete extension "3198@default"
+        Then I get a response with status "400"
+        Then I get an error message "Invalid parameters: extension is associated to a queue"
