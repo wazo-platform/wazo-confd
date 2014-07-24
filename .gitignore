@@ -1,1 +1,2 @@
 xivo-restapi/acceptance/config.ini.local
+*.pyc
