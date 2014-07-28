@@ -16,8 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from hamcrest.core import assert_that
-from hamcrest.core.core.isequal import equal_to
+from hamcrest import assert_that, equal_to
 from mock import patch
 
 from xivo_dao.data_handler.queue_members.exception import QueueNotExistsError, \

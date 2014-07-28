@@ -22,8 +22,7 @@ from xivo_dao.data_handler.queue_members.model import QueueMember
 from xivo_restapi.flask_http_server import content_parser
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.formatter import Formatter
-from xivo_restapi.helpers.premacop.field import Field
-from xivo_restapi.helpers.premacop.types import Int
+from xivo_restapi.helpers.premacop import Field, Int
 from xivo_restapi.resources.queue_members import mapper
 from xivo_restapi.resources.queue_members.routes import queue_route
 
