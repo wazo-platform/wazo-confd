@@ -24,7 +24,7 @@ from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.formatter import Formatter
 from xivo_restapi.helpers.premacop import Field, Int
 from xivo_restapi.resources.queue_members import mapper
-from xivo_restapi.resources.queue_members.routes import queue_route
+from xivo_restapi.resources.queues.routes import queue_route
 
 
 formatter = Formatter(mapper, serializer, QueueMember)

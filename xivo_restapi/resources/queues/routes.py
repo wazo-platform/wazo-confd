@@ -15,9 +15,14 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+from flask.blueprints import Blueprint
 
-from . import actions
-from xivo_restapi.resources.queues.routes import blueprint
+from xivo_restapi import config
+from xivo_restapi.helpers.route_generator import RouteGenerator
+
+
+blueprint = Blueprint('queues', __name__, url_prefix='/%s/queues' % config.VERSION_1_1)
+queue_route = RouteGenerator(blueprint)
 
 
 def register_blueprints(app):
