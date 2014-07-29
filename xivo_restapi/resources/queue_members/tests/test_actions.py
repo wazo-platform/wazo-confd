@@ -19,10 +19,10 @@
 from hamcrest import assert_that, equal_to
 from mock import patch
 
-from xivo_dao.data_handler.queue_members.exception import QueueNotExistsError, \
-    QueueMemberNotExistsError
-from xivo_dao.data_handler.queue_members.model import QueueMember
+from xivo_dao.data_handler.queue_members.exception import QueueMemberNotExistsError
+from xivo_dao.data_handler.queues.exception import QueueNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
+from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 
 
 BASE_URL = '/1.1/queues/%s/memberships/agents/%s'
@@ -32,7 +32,7 @@ class TestQueueMemberActions(TestResources):
 
     def setUp(self):
         super(TestQueueMemberActions, self).setUp()
-        self.queue_member = QueueMember(agent_id=12, queue_id=3, penalty=5)
+        self.queue_member = QueueMemberAgent(agent_id=12, queue_id=3, penalty=5)
 
     @patch('xivo_dao.data_handler.queue_members.services.get_by_queue_id_and_agent_id')
     def test_get_agent_queue_association(self, get_by_queue_id_and_agent_id):

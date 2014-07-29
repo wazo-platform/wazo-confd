@@ -17,8 +17,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import request, make_response
+
 from xivo_dao.data_handler.queue_members import services
-from xivo_dao.data_handler.queue_members.model import QueueMember
+from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 from xivo_restapi.flask_http_server import content_parser
 from xivo_restapi.helpers import serializer
 from xivo_restapi.helpers.formatter import Formatter
@@ -27,7 +28,7 @@ from xivo_restapi.resources.queue_members import mapper
 from xivo_restapi.resources.queues.routes import queue_route
 
 
-formatter = Formatter(mapper, serializer, QueueMember)
+formatter = Formatter(mapper, serializer, QueueMemberAgent)
 document = content_parser.document(
     Field('penalty', Int())
 )
