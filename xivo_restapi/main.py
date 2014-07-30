@@ -18,7 +18,7 @@
 import argparse
 import logging
 
-from xivo import daemonize
+from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
 from xivo_restapi import flask_http_server
 from xivo_restapi import config
@@ -54,13 +54,13 @@ def main():
             logger.info("Starting xivo-restapid in foreground mode.")
         else:
             logger.info("Starting xivo-restapid in standard mode.")
-            _daemonize()
 
-        WSGIServer(flask_http_server.app,
-                   bindAddress='/var/www/restws-fcgi.sock',
-                   multithreaded=False,
-                   multiprocess=True,
-                   debug=False).run()
+        with pidfile_context(PIDFILE, parsed_args.foreground):
+            WSGIServer(flask_http_server.app,
+                       bindAddress='/var/www/restws-fcgi.sock',
+                       multithreaded=False,
+                       multiprocess=True,
+                       debug=False).run()
 
 
 def _parse_args():
@@ -98,11 +98,6 @@ def _port_number(value):
     if port < 1 or port > 65535:
         raise argparse.ArgumentTypeError('%r is not a valid port number' % value)
     return port
-
-
-def _daemonize():
-    daemonize.daemonize()
-    daemonize.lock_pidfile_or_die(PIDFILE)
 
 
 if __name__ == '__main__':
