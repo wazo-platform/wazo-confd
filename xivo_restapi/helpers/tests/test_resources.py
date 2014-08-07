@@ -19,7 +19,7 @@
 import unittest
 from flask.testing import FlaskClient
 
-from hamcrest import assert_that, equal_to, has_entries
+from hamcrest import assert_that, equal_to, has_entries, is_in
 
 from xivo_restapi import flask_http_server
 from xivo_restapi.helpers import serializer
@@ -78,3 +78,8 @@ class TestResources(unittest.TestCase):
     def assert_response_for_delete(self, response):
         assert_that(response.status_code, equal_to(204))
         assert_that(response.data, equal_to(''))
+
+    def assert_error(self, response, regex, statuses=None):
+        statuses = statuses or (400, 404)
+        assert_that(response.status_code, is_in(statuses))
+        assert_that(regex.search(response.data), response.data)
