@@ -19,9 +19,11 @@
 from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_cti_profile.formatter import UserCtiProfileFormatter
 from flask.globals import request
+
 from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
 from flask.helpers import make_response
 
+from xivo_restapi.helpers import url
 from xivo_restapi.flask_http_server import content_parser
 from xivo_restapi.helpers.mooltiparse import Field, Int, Boolean
 
@@ -36,6 +38,7 @@ document = content_parser.document(
 
 @route('/<int:userid>/cti', methods=['PUT'])
 def edit_cti_configuration(userid):
+    url.check_user_exists(userid)
     data = document.parse(request)
     model = formatter.dict_to_model(data, userid)
     user_cti_profile_services.edit(model)
@@ -45,6 +48,7 @@ def edit_cti_configuration(userid):
 
 @route('/<int:userid>/cti', methods=['GET'])
 def get_cti_configuration(userid):
+    url.check_user_exists(userid)
     model = user_cti_profile_services.get(userid)
     result = formatter.to_api(model)
     return make_response(result, 200)
