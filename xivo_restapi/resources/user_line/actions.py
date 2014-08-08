@@ -18,11 +18,9 @@
 
 from flask import request, url_for, make_response
 
-from xivo_dao.data_handler.exception import AssociationNotExistsError
-from xivo_dao.data_handler.user_line.exception import UserLineNotExistsError
 from xivo_dao.data_handler.user_line import services as user_line_services
-from xivo_dao.data_handler.user import services as user_services
 
+from xivo_restapi.helpers import url
 from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_line.formatter import UserLineFormatter
 
@@ -39,6 +37,7 @@ document = content_parser.document(
 
 @route('/<int:userid>/lines', methods=['POST'])
 def associate_line(userid):
+    url.check_user_exists(userid)
     data = document.parse(request)
     model = formatter.dict_to_model(data, userid)
     created_model = user_line_services.associate(model)
@@ -50,17 +49,15 @@ def associate_line(userid):
 
 @route('/<int:userid>/lines/<int:lineid>', methods=['DELETE'])
 def dissociate_line(userid, lineid):
-    try:
-        user_line = user_line_services.get_by_user_id_and_line_id(userid, lineid)
-    except UserLineNotExistsError:
-        raise AssociationNotExistsError("User with id=%s is not associated with line id=%s" % (userid, lineid))
+    url.check_user_exists(userid)
+    user_line = user_line_services.get_by_user_id_and_line_id(userid, lineid)
     user_line_services.dissociate(user_line)
     return make_response('', 204)
 
 
 @route('/<int:userid>/lines')
 def get_user_lines(userid):
-    user = user_services.get(userid)
-    user_lines = user_line_services.find_all_by_user_id(user.id)
+    url.check_user_exists(userid)
+    user_lines = user_line_services.find_all_by_user_id(userid)
     result = formatter.list_to_api(user_lines)
     return make_response(result, 200)
