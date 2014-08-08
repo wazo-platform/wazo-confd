@@ -79,7 +79,8 @@ class TestResources(unittest.TestCase):
         assert_that(response.status_code, equal_to(204))
         assert_that(response.data, equal_to(''))
 
-    def assert_error(self, response, regex, statuses=None):
+    def assert_error(self, response, regex=None, statuses=None):
         statuses = statuses or (400, 404)
         assert_that(response.status_code, is_in(statuses))
-        assert_that(regex.search(response.data), response.data)
+        if regex:
+            assert_that(regex.search(response.data), response.data)
