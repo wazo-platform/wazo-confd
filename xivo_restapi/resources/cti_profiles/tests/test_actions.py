@@ -17,75 +17,47 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from mock import patch
-from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.cti_profile.model import CtiProfile
 from xivo_restapi.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "1.1/cti_profiles"
 
 
-class TestDeviceActions(TestResources):
+class TestCtiProfileActions(TestResources):
+
+    def build_item(self, profile):
+        return {'id': profile.id,
+                'name': profile.name,
+                'links': [{
+                    'href': 'http://localhost/1.1/cti_profiles/%d' % profile.id,
+                    'rel': 'cti_profiles'
+                }]}
 
     @patch('xivo_dao.data_handler.cti_profile.services.find_all')
     def test_list(self, profile_service_list):
-        expected_status_code = 200
-        expected_result = {
-            'total': 2,
-            'items': [
-                {
-                    'id': 1,
-                    'name': 'Client',
-                    'links': [{
-                            'href': 'http://localhost/1.1/cti_profiles/1',
-                            'rel': 'cti_profiles'
-                    }]
-                },
-                {
-                    "id": 2,
-                    "name": "Agent",
-                    'links': [{
-                            'href': 'http://localhost/1.1/cti_profiles/2',
-                            'rel': 'cti_profiles'
-                    }]
-                }
-            ]
-        }
         profile1 = CtiProfile(id=1, name="Client")
         profile2 = CtiProfile(id=2, name="Agent")
+
+        expected_result = {'total': 2,
+                           'items': [self.build_item(profile1),
+                                     self.build_item(profile2)]
+                           }
+
         profile_service_list.return_value = [profile1, profile2]
 
         result = self.app.get(BASE_URL)
 
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        self.assert_response_for_get(result, expected_result)
 
     @patch('xivo_dao.data_handler.cti_profile.services.get')
     def test_get(self, profile_service_get):
-        expected_status_code = 200
-        expected_result = {
-            'id': 1,
-            'name': 'Agent',
-            'links': [{
-                    'href': 'http://localhost/1.1/cti_profiles/1',
-                    'rel': 'cti_profiles'
-            }]
-        }
         profile = CtiProfile(id=1, name="Agent")
         profile_service_get.return_value = profile
 
+        expected_result = self.build_item(profile)
+
         result = self.app.get('%s/%s' % (BASE_URL, 1))
 
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        self.assert_response_for_get(result, expected_result)
         profile_service_get.assert_called_with(1)
-
-    @patch('xivo_dao.data_handler.cti_profile.services.get')
-    def test_get_not_found(self, profile_service_get):
-        expected_status_code = 404
-        profile_service_get.side_effect = ElementNotExistsError('cti_profile')
-
-        result = self.app.get('%s/%s' % (BASE_URL, 1))
-
-        assert_that(result.status_code, equal_to(expected_status_code))
