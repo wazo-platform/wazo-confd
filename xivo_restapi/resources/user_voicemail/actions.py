@@ -18,10 +18,10 @@
 
 from flask import request, url_for, make_response
 
-from xivo_dao.data_handler.exception import AssociationNotExistsError
-from xivo_dao.data_handler.user_voicemail.exception import UserVoicemailNotExistsError
+
 from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
 
+from xivo_restapi.helpers import url
 from xivo_restapi.resources.users.routes import route
 from xivo_restapi.resources.user_voicemail.formatter import UserVoicemailFormatter
 
@@ -39,6 +39,7 @@ document = content_parser.document(
 
 @route('/<int:userid>/voicemail', methods=['POST'])
 def associate_voicemail(userid):
+    url.check_user_exists(userid)
     data = document.parse(request)
     model = formatter.dict_to_model(data, userid)
     created_model = user_voicemail_services.associate(model)
@@ -50,19 +51,15 @@ def associate_voicemail(userid):
 
 @route('/<int:userid>/voicemail')
 def get_user_voicemail(userid):
-    try:
-        user_voicemail = user_voicemail_services.get_by_user_id(userid)
-    except UserVoicemailNotExistsError:
-        raise AssociationNotExistsError("User with id=%d does not have a voicemail" % userid)
+    url.check_user_exists(userid)
+    user_voicemail = user_voicemail_services.get_by_user_id(userid)
     result = formatter.to_api(user_voicemail)
     return make_response(result, 200)
 
 
 @route('/<int:userid>/voicemail', methods=['DELETE'])
 def dissociate_voicemail(userid):
-    try:
-        user_voicemail = user_voicemail_services.get_by_user_id(userid)
-    except UserVoicemailNotExistsError:
-        raise AssociationNotExistsError("User with id=%d does not have a voicemail" % userid)
+    url.check_user_exists(userid)
+    user_voicemail = user_voicemail_services.get_by_user_id(userid)
     user_voicemail_services.dissociate(user_voicemail)
     return make_response('', 204)
