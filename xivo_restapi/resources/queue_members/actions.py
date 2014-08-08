@@ -42,9 +42,8 @@ def get_agent_queue_association(queueid, agentid):
 
 @queue_route('/<int:queueid>/memberships/agents/<int:agentid>', methods=['PUT'])
 def edit_agent_queue_association(queueid, agentid):
+    queue_member = services.get_by_queue_id_and_agent_id(queueid, agentid)
     data = document.parse(request)
-    data['agent_id'] = agentid
-    data['queue_id'] = queueid
-    model = formatter.dict_to_model(data)
-    services.edit_agent_queue_association(model)
+    queue_member.penalty = data['penalty']
+    services.edit_agent_queue_association(queue_member)
     return make_response('', 204)

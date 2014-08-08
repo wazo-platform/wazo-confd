@@ -16,13 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from hamcrest import assert_that, equal_to
 from mock import patch
 
-from xivo_dao.data_handler.agents.exception import AgentNotExistsError
-from xivo_dao.data_handler.queue_members.exception import QueueMemberNotExistsError
 from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
-from xivo_dao.data_handler.queues.exception import QueueNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
@@ -46,75 +42,19 @@ class TestQueueMemberActions(TestResources):
         }
 
         result = self.app.get(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
+
         self.assert_response_for_list(result, expected_result)
+        get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
 
     @patch('xivo_dao.data_handler.queue_members.services.get_by_queue_id_and_agent_id')
-    def test_get_agent_queue_association_no_such_queue(self, get_by_queue_id_and_agent_id):
-        get_by_queue_id_and_agent_id.side_effect = QueueNotExistsError('Queue', id=self.queue_member.queue_id)
-        expected_result = ['Queue with id=%s does not exist' % self.queue_member.queue_id]
-
-        result = self.app.get(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
-        assert_that(result.status_code, equal_to(404))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.queue_members.services.get_by_queue_id_and_agent_id')
-    def test_get_agent_queue_association_no_such_agent(self, get_by_queue_id_and_agent_id):
-        get_by_queue_id_and_agent_id.side_effect = AgentNotExistsError('Agent', id=self.queue_member.agent_id)
-        expected_result = ['Agent with id=%s does not exist' % self.queue_member.agent_id]
-
-        result = self.app.get(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
-        assert_that(result.status_code, equal_to(404))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.queue_members.services.get_by_queue_id_and_agent_id')
-    def test_get_agent_queue_association_no_such_member(self, get_by_queue_id_and_agent_id):
-        get_by_queue_id_and_agent_id.side_effect = QueueMemberNotExistsError('QueueMember', queue_id=self.queue_member.queue_id,
-                                                                                            agent_id=self.queue_member.agent_id)
-        expected_result = ['QueueMember with agent_id=%s queue_id=%s does not exist' % (self.queue_member.agent_id, self.queue_member.queue_id)]
-
-        result = self.app.get(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
-        assert_that(result.status_code, equal_to(404))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
     @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')
-    def test_edit_agent_queue_association(self, edit_agent_queue_association):
-        data = {'penalty': self.queue_member.penalty}
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.put(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
-        assert_that(result.status_code, equal_to(204))
-
-    @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')
-    def test_edit_agent_queue_association_no_such_queue(self, edit_agent_queue_association):
-        edit_agent_queue_association.side_effect = QueueNotExistsError('Queue', id=self.queue_member.queue_id)
-        expected_result = ['Queue with id=%s does not exist' % self.queue_member.queue_id]
-        data = {'penalty': self.queue_member.penalty}
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.put(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
-        assert_that(result.status_code, equal_to(404))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')
-    def test_edit_agent_queue_association_no_such_agent(self, edit_agent_queue_association):
-        edit_agent_queue_association.side_effect = AgentNotExistsError('Agent', id=self.queue_member.agent_id)
-        expected_result = ['Agent with id=%s does not exist' % self.queue_member.agent_id]
-        data = {'penalty': self.queue_member.penalty}
-        data_serialized = self._serialize_encode(data)
-
-        result = self.app.put(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
-        assert_that(result.status_code, equal_to(404))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')
-    def test_edit_agent_queue_association_no_such_member(self, edit_agent_queue_association):
-        edit_agent_queue_association.side_effect = QueueMemberNotExistsError('QueueMember', queue_id=self.queue_member.queue_id,
-                                                                                            agent_id=self.queue_member.agent_id)
-        expected_result = ['QueueMember with agent_id=%s queue_id=%s does not exist' % (self.queue_member.agent_id, self.queue_member.queue_id)]
+    def test_edit_agent_queue_association(self, edit_agent_queue_association, get_by_queue_id_and_agent_id):
+        get_by_queue_id_and_agent_id.return_value = self.queue_member
 
         data = {'penalty': self.queue_member.penalty}
         data_serialized = self._serialize_encode(data)
-
         result = self.app.put(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
-        assert_that(result.status_code, equal_to(404))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+
+        self.assert_response_for_update(result)
+        get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
+        edit_agent_queue_association.assert_called_once_with(self.queue_member)
