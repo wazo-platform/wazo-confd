@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from hamcrest import assert_that, equal_to
 
 from mock import patch
 from xivo_dao.data_handler.line_extension.model import LineExtension
-from xivo_dao.data_handler.line_extension.exception import LineExtensionNotExistsError
 from xivo_restapi.helpers.tests.test_resources import TestResources
 
 
@@ -45,8 +43,9 @@ class TestLineExtensionActions(TestResources):
                 'extension_id': line_extension.extension_id,
                 'links': [line_link, extension_link]}
 
+    @patch('xivo_restapi.helpers.url.check_line_exists')
     @patch('xivo_dao.data_handler.line_extension.services.associate')
-    def test_associate_extension(self, line_extension_associate):
+    def test_associate_extension(self, line_extension_associate, line_exists):
         line_extension_associate.return_value = self.line_extension
 
         expected_result = self.build_item(self.line_extension)
@@ -57,23 +56,12 @@ class TestLineExtensionActions(TestResources):
                                data=self._serialize_encode(data))
 
         self.assert_response_for_create(result, expected_result)
+        line_exists.assert_called_once_with(self.line_extension.line_id)
         line_extension_associate.assert_called_once_with(self.line_extension)
 
+    @patch('xivo_restapi.helpers.url.check_line_exists')
     @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
-    def test_get_extension_associated_to_a_line_with_no_extension(self, line_extension_get_by_line_id):
-        line_id = 1
-        expected_status_code = 404
-        expected_result = ['Line with id=%s does not have an extension' % line_id]
-
-        line_extension_get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
-
-        result = self.app.get(LINE_URL % line_id)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
-    def test_get_extension_associated_to_a_line(self, line_extension_get_by_line_id):
+    def test_get_extension_associated_to_a_line(self, line_extension_get_by_line_id, line_exists):
         line_extension_get_by_line_id.return_value = self.line_extension
 
         expected_result = self.build_item(self.line_extension)
@@ -81,23 +69,12 @@ class TestLineExtensionActions(TestResources):
         result = self.app.get(LINE_URL % self.line_extension.line_id)
 
         self.assert_response_for_get(result, expected_result)
+        line_exists.assert_called_once_with(self.line_extension.line_id)
         line_extension_get_by_line_id.assert_called_once_with(self.line_extension.line_id)
 
+    @patch('xivo_restapi.helpers.url.check_extension_exists')
     @patch('xivo_dao.data_handler.line_extension.services.get_by_extension_id')
-    def test_get_line_associated_to_an_extension_with_no_line(self, line_extension_get_by_extension_id):
-        extension_id = 1
-        expected_status_code = 404
-        expected_result = ['Extension with id=%s does not have a line' % extension_id]
-
-        line_extension_get_by_extension_id.side_effect = LineExtensionNotExistsError.from_extension_id(extension_id)
-
-        result = self.app.get(EXTENSION_URL % extension_id)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.line_extension.services.get_by_extension_id')
-    def test_get_line_associated_to_an_extension(self, line_extension_get_by_extension_id):
+    def test_get_line_associated_to_an_extension(self, line_extension_get_by_extension_id, extension_exists):
         line_extension_get_by_extension_id.return_value = self.line_extension
 
         expected_result = self.build_item(self.line_extension)
@@ -105,30 +82,18 @@ class TestLineExtensionActions(TestResources):
         result = self.app.get(EXTENSION_URL % self.line_extension.extension_id)
 
         self.assert_response_for_get(result, expected_result)
+        extension_exists.assert_called_once_with(self.line_extension.extension_id)
         line_extension_get_by_extension_id.assert_called_once_with(self.line_extension.extension_id)
 
+    @patch('xivo_restapi.helpers.url.check_line_exists')
     @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
     @patch('xivo_dao.data_handler.line_extension.services.dissociate')
-    def test_dissociate_extension(self, line_extension_dissociate, get_by_line_id):
+    def test_dissociate_extension(self, line_extension_dissociate, get_by_line_id, line_exists):
         get_by_line_id.return_value = self.line_extension
 
         result = self.app.delete(LINE_URL % self.line_extension.line_id)
 
         self.assert_response_for_delete(result)
+        line_exists.assert_called_once_with(self.line_extension.line_id)
         get_by_line_id.assert_called_once_with(self.line_extension.line_id)
         line_extension_dissociate.assert_called_once_with(self.line_extension)
-
-    @patch('xivo_dao.data_handler.line_extension.services.get_by_line_id')
-    @patch('xivo_dao.data_handler.line_extension.services.dissociate')
-    def test_dissociate_extension_no_line(self, line_extension_dissociate, get_by_line_id):
-        line_id = 1
-
-        expected_status_code = 404
-        expected_result = ['Line with id=%s does not have an extension' % line_id]
-
-        get_by_line_id.side_effect = LineExtensionNotExistsError.from_line_id(line_id)
-
-        result = self.app.delete(LINE_URL % line_id)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))

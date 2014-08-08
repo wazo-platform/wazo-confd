@@ -18,10 +18,9 @@
 
 from flask import request, url_for, make_response
 
-from xivo_dao.data_handler.exception import AssociationNotExistsError
 from xivo_dao.data_handler.line_extension import services as line_extension_services
-from xivo_dao.data_handler.line_extension.exception import LineExtensionNotExistsError
 
+from xivo_restapi.helpers import url
 from xivo_restapi.resources.lines.routes import line_route
 from xivo_restapi.resources.extensions.routes import extension_route
 
@@ -40,6 +39,7 @@ document = content_parser.document(
 
 @line_route('/<int:lineid>/extension', methods=['POST'])
 def associate_extension(lineid):
+    url.check_line_exists(lineid)
     data = document.parse(request)
     model = formatter.dict_to_model(data, lineid)
     created_model = line_extension_services.associate(model)
@@ -51,29 +51,23 @@ def associate_extension(lineid):
 
 @line_route('/<int:lineid>/extension')
 def get_extension_from_line(lineid):
-    try:
-        line_extension = line_extension_services.get_by_line_id(lineid)
-    except LineExtensionNotExistsError:
-        raise AssociationNotExistsError("Line with id=%d does not have an extension" % lineid)
+    url.check_line_exists(lineid)
+    line_extension = line_extension_services.get_by_line_id(lineid)
     result = formatter.to_api(line_extension)
     return make_response(result, 200)
 
 
 @extension_route('/<int:extensionid>/line')
 def get_line_from_extension(extensionid):
-    try:
-        line_extension = line_extension_services.get_by_extension_id(extensionid)
-    except LineExtensionNotExistsError:
-        raise AssociationNotExistsError("Extension with id=%d does not have a line" % extensionid)
+    url.check_extension_exists(extensionid)
+    line_extension = line_extension_services.get_by_extension_id(extensionid)
     result = formatter.to_api(line_extension)
     return make_response(result, 200)
 
 
 @line_route('/<int:lineid>/extension', methods=['DELETE'])
 def dissociate_extension(lineid):
-    try:
-        line_extension = line_extension_services.get_by_line_id(lineid)
-    except LineExtensionNotExistsError:
-        raise AssociationNotExistsError("Line with id=%d does not have an extension" % lineid)
+    url.check_line_exists(lineid)
+    line_extension = line_extension_services.get_by_line_id(lineid)
     line_extension_services.dissociate(line_extension)
     return make_response('', 204)
