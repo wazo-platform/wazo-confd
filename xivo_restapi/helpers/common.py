@@ -83,7 +83,7 @@ class ParameterExtractor(object):
         value = arguments.get(name, None)
         if value:
             if not value.isdigit():
-                raise errors.wrong_type(name, '')
+                raise errors.wrong_type(name, 'positive number')
             self.extracted[name] = int(value)
 
     def _extract_parameter(self, name, arguments):
