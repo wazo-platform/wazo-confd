@@ -117,11 +117,6 @@ Feature: REST API Users
           | firstname | lastname |
           | Remy      | Licorne  |
 
-    Scenario: Getting a user that doesn't exist
-        Given there are no users with id "309484"
-        When I ask for the user with id "309484"
-        Then I get a response with status "404"
-
     Scenario: Getting a user that exists
         Given I have the following users:
           | id     | firstname | lastname |
@@ -141,39 +136,6 @@ Feature: REST API Users
         Then I get a user with the following parameters:
             | id     | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
             | 766763 | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-
-    Scenario: Creating an empty user
-        When I create an empty user
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: firstname"
-
-    Scenario: Creating a user with paramters that don't exist
-        When I create users with the following parameters:
-          | unexisting_field |
-          | unexisting_value |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: unexisting_field"
-
-    Scenario: Creating a user with a firstname and parameters that don't exist
-        When I create users with the following parameters:
-          | firstname | unexisting_field |
-          | Joe       | unexisting_value |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: unexisting_field"
-
-    Scenario: Creating a user with a invalid password
-        When I create users with the following parameters:
-          | firstname | password |
-          | Joe       | 123      |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: password"
-
-    Scenario: Creating a user with a invalid mobile_phone_number
-        When I create users with the following parameters:
-          | firstname | mobile_phone_number |
-          | Joe       | mobile_phone_number |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: mobile_phone_number"
 
     Scenario: Creating a user with a valid mobile_phone_number
         When I create users with the following parameters:
@@ -227,23 +189,6 @@ Feature: REST API Users
         Then the created user has the following parameters:
             | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
             | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-
-    Scenario: Editing a user that doesn't exist
-        Given there are no users with id "444257"
-        When I update the user with id "444257" using the following parameters:
-          | firstname |
-          | Bob       |
-        Then I get a response with status "404"
-
-    Scenario: Editing a user with parameters that don't exist
-        Given I have the following users:
-          | id     | firstname | lastname |
-          | 995435 | Clémence  | Dupond   |
-        When I update the user with id "995435" using the following parameters:
-          | unexisting_field |
-          | unexisting value |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the firstname of a user
         Given I have the following users:
@@ -323,11 +268,6 @@ Feature: REST API Users
             | id     | firstname | lastname | timezone       | language | description | caller_id   | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
             | 140270 | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | "ALEXANDER" | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
 
-    Scenario: Deleting a user that doesn't exist
-        Given there are no users with id "869049"
-        When I delete the user with id "869049"
-        Then I get a response with status "404"
-
     Scenario: Deleting a user
         Given I have the following users:
           | id     | firstname | lastname |
@@ -335,27 +275,3 @@ Feature: REST API Users
         When I delete the user with id "955135"
         Then I get a response with status "204"
         Then the user with id "955135" no longer exists
-
-    Scenario: Deleting a user when still associated to a line and extension
-        Given I have the following users:
-            | id     | firstname | lastname |
-            | 956541 | Roberto   | Stanzini |
-        Given I have the following lines:
-            | id     | context | protocol | device_slot |
-            | 546216 | default | sip      | 1           |
-        Given I have the following extensions:
-            | id     | context | exten |
-            | 951654 | default | 1339  |
-        Given line "546216" is linked with user id "956541"
-        Given line "546216" is linked with extension "1339@default"
-        When I delete the user with id "956541"
-        Then I get a response with status "400"
-        Then I get an error message "Error while deleting User: user still associated to a line"
-
-    Scenario: Deleting a user when still associated to a voicemail
-        Given there are users with infos:
-            | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
-            | Ringo     | Sylla    | 1349   | default | sip      | Ringo Sylla    | 1349             |
-        When I delete the user with name "Ringo" "Sylla"
-        Then I get a response with status "400"
-        Then I get an error message "Error while deleting User: user still associated to a voicemail"

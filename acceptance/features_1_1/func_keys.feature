@@ -1,18 +1,5 @@
 Feature: REST API Function keys
 
-    Scenario: List of function keys with invalid parameters
-        When I request the list of func keys with the following parameters via RESTAPI:
-            | limit |
-            | -32   |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: limit must be only digits"
-
-        When I request the list of func keys with the following parameters via RESTAPI:
-            | limit |
-            | asdf  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: limit must be only digits"
-
     Scenario: List of Function keys
         Given I have the following users:
             | firstname | lastname |
@@ -184,11 +171,6 @@ Feature: REST API Function keys
         Then the list does not contain the following func keys:
             | type      | destination | destination name   |
             | speeddial | conference        | jekyll_island_club |
-
-    Scenario: Get a func key that does not exist
-        Given there is no func key with id "725437"
-        When I request the func key with id "725437" via RESTAPI
-        Then I get a response with status "404"
 
     Scenario: Get a func key
         Given I have the following users:

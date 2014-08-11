@@ -48,11 +48,6 @@ Feature: REST API Extensions
             | exten | context |
             | 1036  | default |
 
-    Scenario: Get an extension that does not exist
-        Given I have no extension with id "699324"
-        When I access the extension with id "699324"
-        Then I get a response with status "404"
-
     Scenario: Get an extension
         Given I have the following extensions:
             | id     | exten | context |
@@ -62,46 +57,6 @@ Feature: REST API Extensions
         Then I have an extension with the following parameters:
             | id     | exten | context |
             | 447614 | 1599  | default |
-
-    Scenario: Creating an empty extension
-        When I create an empty extension
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: exten,context"
-
-    Scenario: Creating an extension with an empty number
-        When I create an extension with the following parameters:
-            | exten | context |
-            |       | default |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: Exten required"
-
-    Scenario: Creating an extension with an empty context
-        When I create an extension with the following parameters:
-            | exten | context |
-            | 1000  |         |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: Context required"
-
-    Scenario: Creating an extension with only the number
-        When I create an extension with the following parameters:
-            | exten |
-            | 1000  |
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: context"
-
-    Scenario: Creating an extension with only the context
-        When I create an extension with the following parameters:
-            | context |
-            | default |
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: exten"
-
-    Scenario: Creating an extension with invalid parameters
-        When I create an extension with the following parameters:
-            | toto |
-            | tata |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: toto"
 
     Scenario: Creating a commented extension
         Given I have no extension with exten "1883@default"
@@ -186,25 +141,6 @@ Feature: REST API Extensions
         Then I get a header with a location for the "extensions" resource
         Then I get a response with a link to the "extensions" resource
 
-    Scenario: Creating an alphanumeric extension
-        When I create an extension with the following parameters:
-            | exten  | context |
-            | ABC123 | default |
-        Then I get a response with status "400"
-        Then i get an error message "Invalid parameters: Alphanumeric extensions are not supported"
-
-    Scenario: Creating twice the same extension
-        Given I have no extension with exten "1454@default"
-        When I create an extension with the following parameters:
-            | exten | context |
-            | 1454  | default |
-        Then I get a response with status "201"
-        When I create an extension with the following parameters:
-            | exten | context |
-            | 1454  | default |
-        Then I get a response with status "400"
-        Then I get an error message "Extension 1454@default already exists"
-
     Scenario: Creating two extensions in different contexts
         Given I have no extension with exten "1119@default"
         Given I have no extension with exten "1119@from-extern"
@@ -216,37 +152,6 @@ Feature: REST API Extensions
             | exten | context     |
             | 1119  | from-extern |
         Then I get a response with status "201"
-
-    Scenario: Creating an extension with a context that doesn't exist
-        When I create an extension with the following parameters:
-            | exten | context             |
-            | 1000  | mysuperdupercontext |
-        Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
-
-    Scenario: Creating an extension outside of context range
-        When I create an extension with the following parameters:
-            | exten | context |
-            | 99999 | default |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: exten 99999 not inside range of context default"
-
-    Scenario: Editing an extension that doesn't exist
-        Given I have no extension with id "9999"
-        When I update the extension with id "9999" using the following parameters:
-          | exten |
-          | 1001  |
-        Then I get a response with status "404"
-
-    Scenario: Editing an extension with parameters that don't exist
-        Given I have the following extensions:
-          | id     | exten | context |
-          | 449721 | 1358  | default |
-        When I update the extension with id "449721" using the following parameters:
-          | unexisting_field |
-          | unexisting value |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the exten of a extension
         Given I have no extension with exten "1145@default"
@@ -261,16 +166,6 @@ Feature: REST API Extensions
         Then I have an extension with the following parameters:
           | id     | exten | context |
           | 113444 | 1145  | default |
-
-    Scenario: Editing an extension with an exten outside of context range
-        Given I have the following extensions:
-          | id     | exten | context |
-          | 443166 | 1453  | default |
-        When I update the extension with id "443166" using the following parameters:
-          | exten |
-          | 9999  |
-      Then I get a response with status "400"
-      Then I get an error message "Invalid parameters: exten 9999 not inside range of context default"
 
     Scenario: Editing the context of a extension
         Given I have no extension with exten "1833@toto"
@@ -288,16 +183,6 @@ Feature: REST API Extensions
         Then I have an extension with the following parameters:
           | id     | exten | context |
           | 214489 | 1833  | toto    |
-
-    Scenario: Editing the extension with a context that doesn't exist
-        Given I have the following extensions:
-          | id     | exten | context |
-          | 959476 | 1665  | default |
-        When I update the extension with id "959476" using the following parameters:
-          | context             |
-          | mysuperdupercontext |
-        Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
 
     Scenario: Editing the exten, context of a extension
         Given I have no extension with exten "1996@patate"
@@ -329,11 +214,6 @@ Feature: REST API Extensions
           | id     | exten | context | commented |
           | 962441 | 1107  | default | false     |
 
-    Scenario: Delete an extension that doesn't exist
-        Given I have no extension with id "892476"
-        When I delete extension with id "892476"
-        Then I get a response with status "404"
-
     Scenario: Delete an extension
         Given I have the following extensions:
             | id     | exten | context |
@@ -352,7 +232,7 @@ Feature: REST API Extensions
         Given line "299568" is linked with extension "1226@default"
         When I delete extension with id "328785"
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: extension is associated to a line"
+        Then I get an error message matching "Resource Error - Extension is associated with a Line"
 
     Scenario: Delete an extension associated to a queue
         Given there are queues with infos:
@@ -360,4 +240,4 @@ Feature: REST API Extensions
             | ex-queue | 3198   | default |
         When I delete extension "3198@default"
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: extension is associated to a queue"
+        Then I get an error message matching "Resource Error - Extension is associated with a queue"

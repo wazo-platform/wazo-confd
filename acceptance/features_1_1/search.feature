@@ -4,32 +4,32 @@ Feature: Filter resources
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | order | toto  |
-        Then I get a response 400 matching "Invalid parameters: ordering column 'toto' does not exist"
+        Then I get a response 400 matching "Input Error - Ordering column 'toto' was not found"
 
         When I request a list for "<resource>" using parameters:
             | name      | value |
             | direction | toto  |
-        Then I get a response 400 matching "Invalid parameters: direction must be 'asc' or 'desc'"
+        Then I get a response 400 matching "Input Error \- Direction 'toto' invalid \(must be 'asc' or 'desc'\)"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | limit | -32   |
-        Then I get a response 400 matching "Invalid parameters: limit must be only digits"
+        Then I get a response 400 matching "Input Error - Wrong type for 'limit'. Expecting a positive number"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | limit | asdf  |
-        Then I get a response 400 matching "Invalid parameters: limit must be only digits"
+        Then I get a response 400 matching "Input Error - Wrong type for 'limit'. Expecting a positive number"
 
         When I request a list for "<resource>" using parameters:
             | name | value |
             | skip | asdf  |
-        Then I get a response 400 matching "Invalid parameters: skip must be only digits"
+        Then I get a response 400 matching "Input Error - Wrong type for 'skip'. Expecting a positive number"
 
         When I request a list for "<resource>" using parameters:
             | name | value |
             | skip | -32   |
-        Then I get a response 400 matching "Invalid parameters: skip must be only digits"
+        Then I get a response 400 matching "Input Error - Wrong type for 'skip'. Expecting a positive number"
 
     Examples:
         | resource   |
