@@ -5,7 +5,7 @@ from errors import ValidationError
 
 class FieldType(object):
 
-    error_message = "'{value}' is not valid"
+    error_message = "'{value}' is wrong type"
     type_class = None
 
     def validate(self, value):
@@ -22,7 +22,7 @@ class FieldType(object):
 class Int(FieldType):
 
     type_class = int
-    error_message = "'{value}' is not an integer"
+    error_message = "wrong type. Should be an integer"
 
     def validate(self, value):
         if isinstance(value, bool):
@@ -33,24 +33,24 @@ class Int(FieldType):
 class Boolean(FieldType):
 
     type_class = bool
-    error_message = "'{value}' is not a boolean"
+    error_message = "wrong type. Should be a boolean"
 
 
 class Unicode(FieldType):
 
     type_class = unicode
-    error_message = "'{value}' is not a unicode string"
+    error_message = "wrong type. Should be a unicode string"
 
 
 class Float(FieldType):
 
     type_class = float
-    error_message = "'{value}' is not a floating-point number"
+    error_message = "wrong type. Should be a floating-point number"
 
 
 class Array(FieldType):
 
-    error_message = "'{value}' is not an array-like sequence'"
+    error_message = "wrong type. Should be an array-like sequence'"
 
     def __init__(self, field_type, *validators):
         self.field_type = field_type

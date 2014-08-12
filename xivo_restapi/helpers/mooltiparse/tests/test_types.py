@@ -30,11 +30,11 @@ class TestIntFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'foo' is not an integer",
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be an integer",
                                 self.field_type.validate, "foo")
 
     def test_given_bool_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'True' is not an integer",
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be an integer",
                                 self.field_type.validate, True)
 
     def test_given_int_then_passes(self):
@@ -50,7 +50,7 @@ class TestBooleanFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'foo' is not a boolean",
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be a boolean",
                                 self.field_type.validate, "foo")
 
     def test_given_bool_then_passes(self):
@@ -66,7 +66,7 @@ class TestUnicodeFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'1' is not a unicode string",
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be a unicode string",
                                 self.field_type.validate, 1)
 
     def test_given_bool_then_passes(self):
@@ -82,7 +82,7 @@ class TestFloatFieldType(unittest.TestCase):
         self.field_type.validate(None)
 
     def test_given_wrong_type_then_raises_error(self):
-        self.assertRaisesRegexp(ValidationError, "'1' is not a floating-point number",
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be a floating-point number",
                                 self.field_type.validate, 1)
 
     def test_given_bool_then_passes(self):
@@ -97,7 +97,7 @@ class TestArrayFieldType(unittest.TestCase):
 
     def test_given_not_an_iterable_then_raises_error(self):
         field_type = types.Array(Mock())
-        self.assertRaisesRegexp(ValidationError, "'1' is not an array-like sequence",
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be an array-like sequence",
                                 field_type.validate, 1)
 
     def test_given_field_type_when_validated_then_calls_field_type_validator_for_each_element(self):

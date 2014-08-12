@@ -81,5 +81,5 @@ class TestField(unittest.TestCase):
 
         field = Field('name', field_type)
 
-        self.assertRaisesRegexp(ValidationError, "Error while validating field 'name': message",
+        self.assertRaisesRegexp(ValidationError, "Input Error - field 'name': message",
                                 field.validate, value)

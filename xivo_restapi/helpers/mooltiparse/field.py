@@ -22,7 +22,7 @@ from errors import ValidationError
 
 class Field(object):
 
-    error_message = "Error while validating field '{name}': {message}"
+    error_message = "Input Error - field '{name}': {message}"
 
     def __init__(self, name, field_type, *validators, **actions):
         self.name = name
