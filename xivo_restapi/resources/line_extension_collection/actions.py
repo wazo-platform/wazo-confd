@@ -33,6 +33,7 @@ def associate_extension(line_id, parameters):
 
 def dissociate_extension(line_id, extension_id):
     url.check_line_exists(line_id)
+    url.check_extension_exists(extension_id)
     model = formatter.model_from_ids(line_id, extension_id)
     line_extension_services.dissociate(model)
     return ''

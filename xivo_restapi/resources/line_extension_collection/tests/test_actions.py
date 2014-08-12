@@ -69,12 +69,14 @@ class TestLineExtensionCollectionRoutes(TestResources):
         line_exists.assert_called_once_with(LINE_ID)
         associate.assert_called_once_with(line_extension)
 
+    @patch('xivo_restapi.helpers.url.check_extension_exists')
     @patch('xivo_dao.data_handler.line_extension.services.dissociate')
-    def test_dissociate_extension(self, dissociate, line_exists):
+    def test_dissociate_extension(self, dissociate, extension_exists, line_exists):
         line_extension = LineExtension(line_id=LINE_ID, extension_id=EXTENSION_ID)
 
         response = self.app.delete(DELETE_URL % (LINE_ID, EXTENSION_ID))
 
         self.assert_response_for_delete(response)
         line_exists.assert_called_once_with(LINE_ID)
+        extension_exists.assert_called_once_with(EXTENSION_ID)
         dissociate.assert_called_once_with(line_extension)
