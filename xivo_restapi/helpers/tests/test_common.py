@@ -18,7 +18,7 @@
 import unittest
 from hamcrest import assert_that, equal_to
 from werkzeug.exceptions import HTTPException, BadRequest
-from xivo_restapi.helpers.common import extract_search_parameters, make_error_response
+from xivo_restapi.helpers.common import extract_search_parameters, handle_error
 from xivo_restapi.flask_http_server import app
 from xivo_restapi.helpers import serializer
 
@@ -44,14 +44,14 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(decoded_response, result)
 
 
-class TestMakeErrorResponse(TestCommon):
+class TestHandleError(TestCommon):
 
     def test_when_not_found_error_is_raised(self):
         expected_status_code = 404
         expected_message = ["not found error"]
         exception = NotFoundError("not found error")
 
-        response = make_error_response(exception)
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -60,7 +60,7 @@ class TestMakeErrorResponse(TestCommon):
         expected_message = ["service error"]
         exception = ServiceError("service error")
 
-        response = make_error_response(exception)
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -69,7 +69,7 @@ class TestMakeErrorResponse(TestCommon):
         expected_message = ["validation error"]
         exception = ValidationError("validation error")
 
-        response = make_error_response(exception)
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -78,21 +78,21 @@ class TestMakeErrorResponse(TestCommon):
         expected_message = ["content type error"]
         exception = ContentTypeError("content type error")
 
-        response = make_error_response(exception)
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 
     def test_when_bad_request_is_raised(self):
         exception = BadRequest()
 
-        self.assertRaises(HTTPException, make_error_response, exception)
+        self.assertRaises(HTTPException, handle_error, exception)
 
     def test_when_generic_exception_is_raised(self):
         expected_status_code = 500
         expected_message = ["Unexpected error: error message"]
         exception = Exception("error message")
 
-        response = make_error_response(exception)
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 

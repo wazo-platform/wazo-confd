@@ -39,21 +39,21 @@ GENERIC_ERRORS = (ServiceError,
 NOT_FOUND_ERRORS = (NotFoundError,)
 
 
-def make_error_response(error):
+def handle_error(error):
     if isinstance(error, NOT_FOUND_ERRORS):
-        return _make_response_encoded(error, 404)
+        return error_response(error, 404)
     elif isinstance(error, GENERIC_ERRORS):
-        return _make_response_encoded(error, 400)
+        return error_response(error, 400)
     elif isinstance(error, HTTPException):
         raise error
     else:
         message = 'Unexpected error: %s' % error
-        return _make_response_encoded(message, 500, exc_info=True)
+        return error_response(message, 500, exc_info=True)
 
 
-def _make_response_encoded(message, code, exc_info=False):
-    logger.error(message, exc_info=exc_info)
-    return make_response(serializer.encode([unicode(message)]), code)
+def error_response(error, code, exc_info=False):
+    logger.error(error, exc_info=exc_info)
+    return make_response(serializer.encode([unicode(error)]), code)
 
 
 class ParameterExtractor(object):
