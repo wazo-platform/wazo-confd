@@ -67,9 +67,10 @@ class TestUserLineActions(TestResources):
         self.assert_response_for_create(result, expected_result)
         user_line_associate.assert_called_once_with(self.user_line)
 
+    @patch('xivo_restapi.helpers.url.check_line_exists')
     @patch('xivo_dao.data_handler.user_line.services.get_by_user_id_and_line_id')
     @patch('xivo_dao.data_handler.user_line.services.dissociate')
-    def test_dissociate_line(self, user_line_dissociate, get_by_user_id_and_line_id, user_exists):
+    def test_dissociate_line(self, user_line_dissociate, get_by_user_id_and_line_id, line_exists, user_exists):
         get_by_user_id_and_line_id.return_value = self.user_line
 
         result = self.app.delete(DISSOCIATE_URL % (self.user_line.user_id,
@@ -77,6 +78,7 @@ class TestUserLineActions(TestResources):
 
         self.assert_response_for_delete(result)
         user_exists.assert_called_once_with(self.user_line.user_id)
+        line_exists.assert_called_once_with(self.user_line.line_id)
         get_by_user_id_and_line_id.assert_called_once_with(self.user_line.user_id, self.user_line.line_id)
         user_line_dissociate.assert_called_once_with(self.user_line)
 

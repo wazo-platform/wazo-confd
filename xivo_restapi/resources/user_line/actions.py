@@ -50,6 +50,7 @@ def associate_line(userid):
 @route('/<int:userid>/lines/<int:lineid>', methods=['DELETE'])
 def dissociate_line(userid, lineid):
     url.check_user_exists(userid)
+    url.check_line_exists(lineid)
     user_line = user_line_services.get_by_user_id_and_line_id(userid, lineid)
     user_line_services.dissociate(user_line)
     return make_response('', 204)
