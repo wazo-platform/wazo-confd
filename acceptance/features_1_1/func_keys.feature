@@ -172,6 +172,23 @@ Feature: REST API Function keys
             | type      | destination | destination name   |
             | speeddial | conference        | jekyll_island_club |
 
+    Scenario: Adding a forward to a user adds a func key to the list
+        Given I have the following users:
+            | firstname | lastname |
+            | Oumou     | Daffe    |
+        Given user "Oumou" "Daffe" has the following function keys:
+            | Key | Type                                      | Destination | Label         | Supervision |
+            | 1   | Enable / Disable forwarding on no answer  | 1234        | togglefwdna   | Enabled     |
+            | 2   | Enable / Disable forwarding on busy       | 1234        | togglefwdbusy | Enabled     |
+            | 3   | Enable / Disable forwarding unconditional | 1234        | togglefwdunc  | Enabled     |
+        When I request the list of func keys via RESTAPI
+        Then I get a response with status "200"
+        Then the list contains the following func keys:
+            | type      | destination | destination_name |
+            | speeddial | service     | fwdrna           |
+            | speeddial | service     | fwdbusy          |
+            | speeddial | service     | fwdunc           |
+
     Scenario: Get a func key
         Given I have the following users:
             | firstname | lastname  |
