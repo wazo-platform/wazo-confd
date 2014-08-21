@@ -4,12 +4,12 @@ Feature: Filter resources
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | order | toto  |
-        Then I get a response 400 matching "Input Error - Ordering column 'toto' was not found"
+        Then I get a response 400 matching "Input Error - order: column 'toto' was not found"
 
         When I request a list for "<resource>" using parameters:
             | name      | value |
             | direction | toto  |
-        Then I get a response 400 matching "Input Error \- Direction 'toto' invalid \(must be 'asc' or 'desc'\)"
+        Then I get a response 400 matching "Input Error - Direction 'toto' invalid \(must be 'asc' or 'desc'\)"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
