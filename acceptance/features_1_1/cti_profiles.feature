@@ -19,11 +19,6 @@ Feature: REST API CTI Profiles
             |  id |      name |
             | 111 | Profil 00 |
 
-    Scenario: Get a CTI profile that does not exist
-        Given there is no CTI profile with id "215"
-        When I ask for the CTI profile with id "215"
-        Then I get a response with status "404"
-
     Scenario: Associate CTI profile to user
         Given there are users with infos:
             | firstname | lastname |
@@ -57,15 +52,6 @@ Feature: REST API CTI Profiles
         Then I get a response with status "200"
         Then I get a response with a null CTI profile
 
-    Scenario: Associate a user to a CTI profile which does not exist
-        Given there are users with infos:
-            | firstname | lastname |
-            |    Cécile |   Durand |
-        Given there is no CTI profile with id "117"
-        When I associate CTI profile "117" with user "Cécile" "Durand"
-        Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: cti_profile 117 does not exist"
-
     Scenario: XiVO Client connection after associating a profile
         Given there are users with infos:
             | firstname |   lastname |
@@ -77,12 +63,3 @@ Feature: REST API CTI Profiles
         When I associate CTI profile with name "Client" with user "Félix" "Lechat"
         When I start the XiVO Client
         Then I can connect the CTI client of "Félix" "Lechat"
-
-    Scenario: Enabling the CTI client for a user without username nor password
-        Given there are users with infos:
-            | firstname | lastname |
-            |      René |   Albert |
-        When I enable the CTI client for the user "René" "Albert"
-        Then I get a response with status "400"
-        Then I get an error message matching "Error while editing \d+: the user must have a username and password to enable the CTI"
-

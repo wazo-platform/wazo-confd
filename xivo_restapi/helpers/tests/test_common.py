@@ -18,19 +18,16 @@
 import unittest
 from hamcrest import assert_that, equal_to
 from werkzeug.exceptions import HTTPException, BadRequest
-from xivo_restapi.helpers.common import extract_search_parameters, make_error_response
+from xivo_restapi.helpers.common import extract_search_parameters, handle_error
 from xivo_restapi.flask_http_server import app
 from xivo_restapi.helpers import serializer
 
-from xivo_dao.data_handler.exception import ElementNotExistsError
-from xivo_dao.data_handler.exception import MissingParametersError
-from xivo_dao.data_handler.exception import InvalidParametersError
-from xivo_dao.data_handler.exception import NonexistentParametersError
-from xivo_dao.data_handler.exception import ElementAlreadyExistsError
-from xivo_dao.data_handler.exception import ElementCreationError
-from xivo_dao.data_handler.exception import ElementEditionError
-from xivo_dao.data_handler.exception import ElementDeletionError
-from xivo_dao.data_handler.exception import AssociationNotExistsError
+from xivo_dao.data_handler.exception import ServiceError
+from xivo_dao.data_handler.exception import InputError
+from xivo_dao.data_handler.exception import NotFoundError
+
+from xivo_restapi.helpers.mooltiparse.errors import ValidationError
+from xivo_restapi.helpers.mooltiparse.errors import ContentTypeError
 
 
 class TestCommon(unittest.TestCase):
@@ -47,100 +44,55 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(decoded_response, result)
 
 
-class TestMakeErrorResponse(TestCommon):
+class TestHandleError(TestCommon):
 
-    def test_when_element_not_exists_is_raised(self):
+    def test_when_not_found_error_is_raised(self):
         expected_status_code = 404
-        expected_message = ["element with id=1 does not exist"]
-        exception = ElementNotExistsError('element', id=1)
+        expected_message = ["not found error"]
+        exception = NotFoundError("not found error")
 
-        response = make_error_response(exception)
+        response = handle_error(exception)
+
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_when_service_error_is_raised(self):
+        expected_status_code = 400
+        expected_message = ["service error"]
+        exception = ServiceError("service error")
+
+        response = handle_error(exception)
+
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_when_validation_error_is_raised(self):
+        expected_status_code = 400
+        expected_message = ["validation error"]
+        exception = ValidationError("validation error")
+
+        response = handle_error(exception)
+
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_when_content_type_error_is_raised(self):
+        expected_status_code = 400
+        expected_message = ["content type error"]
+        exception = ContentTypeError("content type error")
+
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 
     def test_when_bad_request_is_raised(self):
         exception = BadRequest()
 
-        self.assertRaises(HTTPException, make_error_response, exception)
+        self.assertRaises(HTTPException, handle_error, exception)
 
     def test_when_generic_exception_is_raised(self):
         expected_status_code = 500
-        expected_message = ["unexpected error during request: error message"]
+        expected_message = ["Unexpected error: error message"]
         exception = Exception("error message")
 
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_missing_parameters_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["Missing parameters: parameter"]
-        exception = MissingParametersError(['parameter'])
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_invalid_parameters_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["Invalid parameters: parameter"]
-        exception = InvalidParametersError(['parameter'])
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_nonexistent_parameters_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["Nonexistent parameters: username johndoe does not exist"]
-        exception = NonexistentParametersError(username='johndoe')
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_element_already_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["user johndoe already exists"]
-        exception = ElementAlreadyExistsError('user', 'johndoe')
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_element_creation_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["Error while creating user: error message"]
-        exception = ElementCreationError('user', 'error message')
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_element_edition_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["Error while editing user: error message"]
-        exception = ElementEditionError('user', 'error message')
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_element_deletion_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["Error while deleting user: error message"]
-        exception = ElementDeletionError('user', 'error message')
-
-        response = make_error_response(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_association_not_exists_error_is_raised(self):
-        expected_status_code = 404
-        expected_message = ["association error"]
-        exception = AssociationNotExistsError("association error")
-
-        response = make_error_response(exception)
+        response = handle_error(exception)
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -149,7 +101,7 @@ class TestExtractSearchParameters(unittest.TestCase):
 
     def test_given_invalid_skip_then_raises_error(self):
         args = {'skip': 'toto'}
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
+        self.assertRaises(InputError, extract_search_parameters, args)
 
     def test_given_skip_parameter_then_extracts_skip(self):
         expected_result = {'skip': 532}
@@ -161,7 +113,7 @@ class TestExtractSearchParameters(unittest.TestCase):
 
     def test_given_invalid_limit_then_raises_error(self):
         args = {'limit': 'toto'}
-        self.assertRaises(InvalidParametersError, extract_search_parameters, args)
+        self.assertRaises(InputError, extract_search_parameters, args)
 
     def test_given_limit_parameter_then_extracts_limit(self):
         expected_result = {'limit': 532}

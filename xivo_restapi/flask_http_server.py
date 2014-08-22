@@ -24,7 +24,7 @@ import urllib
 from datetime import timedelta
 from flask import Flask, request
 from xivo_restapi import config
-from xivo_restapi.helpers.common import make_error_response
+from xivo_restapi.helpers.common import handle_error
 from xivo_restapi.helpers.mooltiparse import parser as mooltiparse_parser
 
 logger = logging.getLogger(__name__)
@@ -90,4 +90,4 @@ def log_requests():
 
 @app.errorhandler(Exception)
 def error_handler(error):
-    return make_error_response(error)
+    return handle_error(error)

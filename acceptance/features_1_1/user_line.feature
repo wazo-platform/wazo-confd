@@ -1,27 +1,5 @@
 Feature: REST API Link line with a user
 
-    Scenario: Create user_line with a line that doesn't exist
-        Given I have no line with id "682433"
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 495858 | Greg      | Sanderson |
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 495858  | 682433  |
-        Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: line_id 682433 does not exist"
-
-    Scenario: Create user_line with a user that doesn't exist
-        Given there are no users with id "195322"
-        Given I have the following lines:
-            | id     | context | protocol | device_slot |
-            | 786225 | default | sip      | 1           |
-        When I create the following user_line via RESTAPI:
-            | line_id | user_id |
-            | 786225  | 195322  |
-        Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: user_id 195322 does not exist"
-
     Scenario: Create a user_line
         Given I have the following users:
             | id     | firstname | lastname  |
@@ -83,78 +61,6 @@ Feature: REST API Link line with a user
             | Greg Sanderson   | sip      |
             | Roberto Da Silva | sip      |
 
-    Scenario: Link a user already associated to a line
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 980123 | Greg      | Sanderson |
-        Given I have the following lines:
-            | id     | context | protocol | device_slot |
-            | 948671 | default | sip      | 1           |
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 980123  | 948671  |
-        Then I get a response with status "201"
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 980123  | 948671  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: user is already associated to this line"
-
-    Scenario: Link a user already associated to a different line
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 176775 | Greg      | Sanderson |
-        Given I have the following lines:
-            | id     | context | protocol | device_slot |
-            | 171688 | default | sip      | 1           |
-            | 639164 | default | sip      | 1           |
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 176775  | 171688  |
-        Then I get a response with status "201"
-        When I create the following user_line via RESTAPI:
-            | user_id | line_id |
-            | 176775  | 639164  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: user is already associated to this line"
-
-    Scenario Outline: Create a resource with missing parameters
-        When the client sends a POST request:
-            | url   | document   |
-            | <url> | <document> |
-        Then I get a response 400 matching "Missing parameters: <parameters>"
-
-    Examples:
-        | url            | document | parameters |
-        | /users/1/lines | {}       | line_id    |
-
-    Scenario Outline: Create a resource with invalid parameter type
-        When the client sends a POST request:
-            | url   | document   |
-            | <url> | <document> |
-        Then I get a response 400 matching "Error while validating field '<field>': '\w*' is not <message>"
-
-    Examples:
-        | url            | document            | field   | message    |
-        | /users/1/lines | {"line_id": "toto"} | line_id | an integer |
-
-    Scenario Outline: Create a resource with invalid parameters
-        When the client sends a POST request:
-            | url   | document   |
-            | <url> | <document> |
-        Then I get a response 400 matching "Invalid parameters: <message>"
-
-    Examples:
-        | url            | document               | message |
-        | /users/1/lines | {"invalid": "invalid"} | invalid |
-
-
-    Scenario: Get user_line associations when user does not exist
-        Given there are no users with id "999999"
-        When I request the lines associated to user id "999999" via RESTAPI
-        Then I get a response with status "404"
-        Then I get an error message "User with id=999999 does not exist"
-
     Scenario: Get user_line associations when there are no lines associated to a user
         Given I have the following users:
             | id     | firstname | lastname  |
@@ -176,32 +82,6 @@ Feature: REST API Link line with a user
         Then each item has a "users" link using the id "user_id"
         Then each item has a "lines" link using the id "line_id"
 
-    Scenario: Dissociate user_line when line does not exist
-        Given I have no user_line with the following parameters:
-            | line_id | user_id |
-            | 888252  | 777252  |
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 777252 | Greg      | Sanderson |
-        When I dissociate the following user_line via RESTAPI:
-            | line_id | user_id |
-            | 888252  | 777252  |
-        Then I get a response with status "404"
-        Then I get an error message "User with id=777252 is not associated with line id=888252"
-
-    Scenario: Dissociate user_line when user does not exist
-        Given I have no user_line with the following parameters:
-            | line_id | user_id |
-            | 484463  | 895850  |
-        Given I have the following lines:
-            | id     | context | protocol | device_slot |
-            | 484463 | default | sip      | 1           |
-        When I dissociate the following user_line via RESTAPI:
-            | line_id | user_id |
-            | 484463  | 895850  |
-        Then I get a response with status "404"
-        Then I get an error message "User with id=895850 is not associated with line id=484463"
-
     Scenario: Dissociate user_line with extension associated
         Given I have the following users:
             | id     | firstname | lastname  |
@@ -218,22 +98,6 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 493837  | 594831  |
         Then I get a response with status "204"
-
-    Scenario: Dissociate user_line main user before secondary user
-        Given I have the following users:
-            | id     | firstname | lastname  |
-            | 437501 | Greg      | Sanderson |
-            | 304832 | Cédric    | Abunar    |
-        Given I have the following lines:
-            | id     | context | protocol | username | secret | device_slot |
-            | 594399 | default | sip      | toto     | tata   | 1           |
-        Given line "594399" is linked with user id "437501"
-        Given line "594399" is linked with user id "304832"
-        When I dissociate the following user_line via RESTAPI:
-            | line_id | user_id |
-            | 594399  | 437501  |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: There are secondary users associated to this line"
 
     Scenario: Dissociate user_line with secondary user
         Given I have the following users:
@@ -269,4 +133,4 @@ Feature: REST API Link line with a user
             | line_id | user_id |
             | 889863  | 477024  |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: A device is still associated to the line"
+        Then I get an error message matching "Resource Error - Line is associated with a Device"

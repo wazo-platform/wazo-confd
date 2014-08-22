@@ -15,64 +15,68 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import unittest
+from mock import patch
 
-from hamcrest import assert_that, equal_to
-from mock import patch, Mock
+from xivo_restapi.helpers.tests.test_resources import TestResources
+from xivo_dao.data_handler.line_extension.model import LineExtension
 
-from xivo_dao.data_handler.exception import NonexistentParametersError, AssociationNotExistsError
-from xivo_restapi.resources.line_extension_collection import actions
 
 LINE_ID = 1
 EXTENSION_ID = 2
 
+BASE_URL = "/1.1/lines/%d/extensions"
+DELETE_URL = BASE_URL + "/%d"
 
-@patch('xivo_restapi.resources.line_extension_collection.actions.formatter')
-class TestLineExtensionCollectionActions(unittest.TestCase):
+
+@patch('xivo_restapi.helpers.url.check_line_exists')
+class TestLineExtensionCollectionRoutes(TestResources):
+
+    def build_item(self, line_extension):
+        return {'line_id': line_extension.line_id,
+                'extension_id': line_extension.extension_id,
+                'links': [
+                    {'rel': 'lines',
+                     'href': 'http://localhost/1.1/lines/%d' % line_extension.line_id},
+                    {'rel': 'extensions',
+                     'href': 'http://localhost/1.1/extensions/%d' % line_extension.extension_id}
+                ]}
 
     @patch('xivo_dao.data_handler.line_extension.services.get_all_by_line_id')
-    def test_list_extensions(self, get_all_by_line_id, formatter):
-        model_list = get_all_by_line_id.return_value = [Mock()]
-        formatted_list = formatter.list_to_api.return_value = Mock()
+    def test_list_extensions(self, get_all_by_line_id, line_exists):
+        line_extension = LineExtension(line_id=LINE_ID, extension_id=EXTENSION_ID)
+        get_all_by_line_id.return_value = [line_extension]
 
-        result = actions.list_extensions(LINE_ID)
+        expected = {'total': 1,
+                    'items': [self.build_item(line_extension)]}
 
+        response = self.app.get(BASE_URL % LINE_ID)
+
+        self.assert_response_for_get(response, expected)
+        line_exists.assert_called_once_with(LINE_ID)
         get_all_by_line_id.assert_called_once_with(LINE_ID)
-        formatter.list_to_api.assert_called_once_with(model_list)
-        assert_that(result, equal_to(formatted_list))
 
     @patch('xivo_dao.data_handler.line_extension.services.associate')
-    def test_associate_extension(self, associate, formatter):
-        model = formatter.dict_to_model.return_value = Mock()
-        created_model = associate.return_value = Mock()
-        formatted_model = formatter.to_api.return_value = Mock()
-        parameters = Mock()
+    def test_associate_extension(self, associate, line_exists):
+        line_extension = LineExtension(line_id=LINE_ID, extension_id=EXTENSION_ID)
+        associate.return_value = line_extension
 
-        result = actions.associate_extension(LINE_ID, parameters)
+        expected = self.build_item(line_extension)
 
-        formatter.dict_to_model.assert_called_once_with(LINE_ID, parameters)
-        associate.assert_called_once_with(model)
-        formatter.to_api.assert_callled_once_with(created_model)
-        assert_that(result, equal_to(formatted_model))
+        parameters = {'extension_id': EXTENSION_ID}
+        response = self.app.post(BASE_URL % LINE_ID, data=self._serialize_encode(parameters))
 
+        self.assert_response_for_create(response, expected)
+        line_exists.assert_called_once_with(LINE_ID)
+        associate.assert_called_once_with(line_extension)
+
+    @patch('xivo_restapi.helpers.url.check_extension_exists')
     @patch('xivo_dao.data_handler.line_extension.services.dissociate')
-    def test_dissociate_extension(self, dissociate, formatter):
-        model = formatter.model_from_ids.return_value = Mock()
+    def test_dissociate_extension(self, dissociate, extension_exists, line_exists):
+        line_extension = LineExtension(line_id=LINE_ID, extension_id=EXTENSION_ID)
 
-        result = actions.dissociate_extension(LINE_ID, EXTENSION_ID)
+        response = self.app.delete(DELETE_URL % (LINE_ID, EXTENSION_ID))
 
-        dissociate.assert_called_once_with(model)
-        formatter.model_from_ids.assert_callled_once_with(LINE_ID, EXTENSION_ID)
-        assert_that(result, equal_to(''))
-
-    @patch('xivo_dao.data_handler.line_extension.services.dissociate')
-    def test_dissociate_extension_when_ids_do_not_exist(self, dissociate, formatter):
-        dissociate.side_effect = NonexistentParametersError()
-        model = formatter.model_from_ids.return_value = Mock()
-
-        self.assertRaises(AssociationNotExistsError,
-                          actions.dissociate_extension,
-                          LINE_ID, EXTENSION_ID)
-
-        dissociate.assert_called_once_with(model)
-        formatter.model_from_ids.assert_callled_once_with(LINE_ID, EXTENSION_ID)
+        self.assert_response_for_delete(response)
+        line_exists.assert_called_once_with(LINE_ID)
+        extension_exists.assert_called_once_with(EXTENSION_ID)
+        dissociate.assert_called_once_with(line_extension)

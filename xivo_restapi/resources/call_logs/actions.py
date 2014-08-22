@@ -21,7 +21,7 @@ from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.call_log import services
-from xivo_dao.data_handler.exception import InvalidParametersError
+from xivo_dao.data_handler import errors
 from xivo_restapi import config
 from xivo_restapi.authentication import auth
 from xivo_restapi.negotiate.flask_negotiate import produces
@@ -54,22 +54,18 @@ def _list_period():
 
 
 def _extract_datetimes(request_args):
-    invalid_parameters = []
-    start = _extract_datetime('start_date', request_args, invalid_parameters)
-    end = _extract_datetime('end_date', request_args, invalid_parameters)
-    if invalid_parameters:
-        raise InvalidParametersError(invalid_parameters)
+    start = _extract_datetime('start_date', request_args)
+    end = _extract_datetime('end_date', request_args)
     return start, end
 
 
-def _extract_datetime(datetime_key, request_args, invalid_parameters):
+def _extract_datetime(datetime_key, request_args):
     if datetime_key in request_args:
         try:
             return _decode_datetime(request_args[datetime_key])
         except ValueError:
-            invalid_parameters.append(datetime_key)
-    else:
-        return None
+            raise errors.wrong_type(datetime_key, 'datetime')
+    raise errors.missing(datetime_key)
 
 
 def _list_call_logs(call_logs):

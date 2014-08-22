@@ -1,10 +1,5 @@
 Feature: Link a line and an extension
 
-    Scenario: List the extensions associated to a line that does not exist
-        When I get the list of extensions associated to a fake line
-        Then I get a response with status "404"
-        Then I get an error message matching "Line with line_id=\d+ does not exist"
-
     Scenario: List the extensions associated to a line with no extensions associated
         Given I have the following lines:
             | username | protocol | context | device_slot |
@@ -47,19 +42,6 @@ Feature: Link a line and an extension
         Then each item has a "lines" link using the id "line_id"
         Then each item has a "extensions" link using the id "extension_id"
 
-    Scenario: Get the line associated to an extension that does not exist
-        When I get the line associated to a fake extension
-        Then I get a response with status "404"
-        Then I get an error message matching "Extension with id=\d+ does not exist"
-
-    Scenario: Get the line associated to an an extension with no lines associated
-        Given I have the following extensions:
-            | exten | context |
-            | 1289  | default |
-        When I get the line associated to extension "1289@default"
-        Then I get a response with status "404"
-        Then I get an error message matching "Extension with id=\d+ does not have a line"
-
     Scenario: Get the line associated to an extension
         Given I have the following lines:
             | username | protocol | context | device_slot |
@@ -92,22 +74,6 @@ Feature: Link a line and an extension
         Then I get a response with a link to the "lines" resource using the id "line_id"
         Then I get a response with a link to the "extensions" resource using the id "extension_id"
 
-    Scenario: Associate an extension with a line that does not exist
-        Given I have the following extensions:
-            | exten | context |
-            | 1500  | default |
-        When I associate the extension "1500@default" with a fake line
-        Then I get a response with status "400"
-        Then I get an error message matching "Nonexistent parameters: line_id \d+ does not exist"
-
-    Scenario: Associate an extension that does not exist with a line
-        Given I have the following lines:
-            | username | protocol | context | device_slot |
-            | cheikh   | sip      | default | 1           |
-        When I associate a fake extension to SIP line "cheikh"
-        Then I get a response with status "400"
-        Then I get an error message matching "Nonexistent parameters: extension_id \d+ does not exist"
-
     Scenario: Associate an extension already associated with a queue
         Given there are queues with infos:
             | name    | number | context |
@@ -117,7 +83,7 @@ Feature: Link a line and an extension
             | zohkaro  | sip      | default | 1           |
         When I associate extension "3442@default" to sip line "zohkaro"
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: extension is associated to a queue"
+        Then I get an error message matching "Resource Error - Extension is associated with a queue"
 
     Scenario: Associate an extension with a SIP line
         Given I have the following lines:
@@ -149,17 +115,6 @@ Feature: Link a line and an extension
         Then I get a response with a link to the "lines" resource using the id "line_id"
         Then I get a response with a link to the "extensions" resource using the id "extension_id"
 
-    Scenario: Associate an incoming call to a SIP line without a user
-        Given I have the following lines:
-            | username | protocol | context | device_slot |
-            | bambara  | sip      | default | 1           |
-        Given I have the following extensions:
-            | exten | context     |
-            | 1084  | from-extern |
-        When I associate extension "1084@from-extern" to SIP line "bambara"
-        Then I get a response with status "400"
-        Then I get an error message matching "line with id \d+ is not associated to a user"
-
     Scenario: Associate an incoming call to a SIP line
         Given I have the following lines:
             | username | protocol | context | device_slot |
@@ -176,31 +131,6 @@ Feature: Link a line and an extension
         Then I get a header with a location matching "/1.1/lines/\d+/extension"
         Then I get a response with a link to the "lines" resource using the id "line_id"
         Then I get a response with a link to the "extensions" resource using the id "extension_id"
-
-    Scenario: Associate an extension with a SIP line already associated
-        Given I have the following lines:
-            | username | protocol | context | device_slot |
-            | dominic  | sip      | default | 1           |
-        Given I have the following extensions:
-            | exten | context |
-            | 1504  | default |
-            | 1505  | default |
-        Given I have the following users:
-            | firstname | lastname |
-            | Dominic   | Djembe   |
-        Given SIP line "dominic" is associated to user "Dominic" "Djembe"
-        Given extension "1504@default" is associated to SIP line "dominic"
-        When I associate extension "1505@default" to SIP line "dominic"
-        Then I get a response with status "400"
-        Then I get an error message matching "Invalid parameters: line with id \d+ already has an extension with a context of type 'internal'"
-
-    Scenario: Dissociate an extension from a SIP line with no associations
-        Given I have the following lines:
-            | username | protocol | context | device_slot |
-            | fode     | sip      | default | 1           |
-        When I dissociate a fake extension from SIP line "fode"
-        Then I get a response with status "404"
-        Then I get an error message matching "Nonexistent parameters: extension_id \d+ does not exist"
 
     Scenario: Dissociate an extension from a SIP line with a user
         Given I have the following lines:
@@ -261,4 +191,4 @@ Feature: Link a line and an extension
         Given device with ip "192.168.167.31" is provisionned with SIP line "moussa"
         When I dissociate extension "1401@default" from SIP line "moussa"
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: A device is still associated to the line"
+        Then I get an error message matching "Resource Error - Line is associated with a Device"

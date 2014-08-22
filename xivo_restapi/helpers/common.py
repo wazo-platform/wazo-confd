@@ -20,57 +20,40 @@ import logging
 from flask.helpers import make_response
 from werkzeug.exceptions import HTTPException
 
-from xivo_dao.data_handler.exception import ElementNotExistsError
-from xivo_dao.data_handler.exception import MissingParametersError
-from xivo_dao.data_handler.exception import InvalidParametersError
-from xivo_dao.data_handler.exception import NonexistentParametersError
-from xivo_dao.data_handler.exception import ElementAlreadyExistsError
-from xivo_dao.data_handler.exception import ElementCreationError
-from xivo_dao.data_handler.exception import ElementEditionError
-from xivo_dao.data_handler.exception import ElementDeletionError
-from xivo_dao.data_handler.exception import AssociationNotExistsError
+from xivo_dao.data_handler import errors
+from xivo_dao.data_handler.exception import ServiceError
+from xivo_dao.data_handler.exception import NotFoundError
 
-from xivo_restapi.helpers.mooltiparse.errors import ValidationError, ContentTypeError
+from xivo_restapi.helpers.mooltiparse.errors import ValidationError
+from xivo_restapi.helpers.mooltiparse.errors import ContentTypeError
 
 from xivo_restapi.helpers import serializer
 
 
 logger = logging.getLogger(__name__)
 
-DIRECTIONS = ['asc', 'desc']
-
-GENERIC_ERRORS = (MissingParametersError,
-                  InvalidParametersError,
-                  NonexistentParametersError,
-                  ElementAlreadyExistsError,
-                  ElementCreationError,
-                  ElementEditionError,
-                  ElementDeletionError,
+GENERIC_ERRORS = (ServiceError,
                   ValidationError,
                   ContentTypeError)
 
-NOT_FOUND_ERRORS = (ElementNotExistsError,
-                    AssociationNotExistsError)
+NOT_FOUND_ERRORS = (NotFoundError,)
 
 
-def make_error_response(error):
-    if isinstance(error, GENERIC_ERRORS):
-        return _make_response_encoded(error, 400)
-    elif isinstance(error, NOT_FOUND_ERRORS):
-        return _make_response_encoded(error, 404)
-    elif isinstance(error, ValueError):
-        message = "No parsable data in the request, Be sure to send a valid JSON file"
-        return _make_response_encoded(message, 400)
+def handle_error(error):
+    if isinstance(error, NOT_FOUND_ERRORS):
+        return error_response(error, 404)
+    elif isinstance(error, GENERIC_ERRORS):
+        return error_response(error, 400)
     elif isinstance(error, HTTPException):
         raise error
     else:
-        message = 'unexpected error during request: %s' % error
-        return _make_response_encoded(message, 500, exc_info=True)
+        message = 'Unexpected error: %s' % error
+        return error_response(message, 500, exc_info=True)
 
 
-def _make_response_encoded(message, code, exc_info=False):
-    logger.error(message, exc_info=exc_info)
-    return make_response(serializer.encode([unicode(message)]), code)
+def error_response(error, code, exc_info=False):
+    logger.error(error, exc_info=exc_info)
+    return make_response(serializer.encode([unicode(error)]), code)
 
 
 class ParameterExtractor(object):
@@ -91,28 +74,21 @@ class ParameterExtractor(object):
         for parameter in all_parameters:
             self._extract_parameter(parameter, arguments)
 
-        self._check_invalid()
         return self.extracted
 
     def _reset(self):
-        self.invalid = []
         self.extracted = {}
 
     def _extract_numeric(self, name, arguments):
         value = arguments.get(name, None)
         if value:
-            if value.isdigit():
-                self.extracted[name] = int(value)
-            else:
-                self.invalid.append("%s must be only digits" % name)
+            if not value.isdigit():
+                raise errors.wrong_type(name, 'positive number')
+            self.extracted[name] = int(value)
 
     def _extract_parameter(self, name, arguments):
         if name in arguments:
             self.extracted[name] = arguments[name]
-
-    def _check_invalid(self):
-        if self.invalid:
-            raise InvalidParametersError(self.invalid)
 
 
 def extract_search_parameters(arguments, extra=None):

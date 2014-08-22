@@ -26,34 +26,6 @@ Feature: REST API Call logs consultation
           | 2013-01-30T11:03:47 | Bob, Marley (1002) | 4185550155 |      0 |            |
           | 2013-01-30T11:20:08 | Bob, Marley (1002) | 4185550155 |      3 | Père Noël  |
 
-    Scenario: List call logs in a period with missing end parameters
-        When I get the list of call logs with arguments:
-          | start_date            |
-          | 2013-01-29T00:00:00   |
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: end_date"
-
-    Scenario: List call logs in a period with missing start parameters
-        When I get the list of call logs with arguments:
-          | end_date            |
-          | 2013-01-29T00:00:00 |
-        Then I get a response with status "400"
-        Then I get an error message "Missing parameters: start_date"
-
-    Scenario: List call logs in a period with empty start parameter
-        When I get the list of call logs with arguments:
-          | start_date | end_date            |
-          |            | 2013-01-29T00:00:00 |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: start_date"
-
-    Scenario: List call logs in a period with empty end parameter
-        When I get the list of call logs with arguments:
-          | start_date          | end_date |
-          | 2013-01-29T00:00:00 |          |
-        Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: end_date"
-
     Scenario: List call logs in a period with start greater than end
         Given there are only the following call logs:
           | date                | source_name | source_exten | destination_exten | duration | user_field | answered |

@@ -20,15 +20,15 @@ from hamcrest import assert_that, equal_to
 from mock import patch
 from xivo_restapi.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
-from xivo_dao.data_handler.exception import ElementNotExistsError
 
 BASE_URL = "/1.1/users/%s/cti"
 
 
+@patch('xivo_restapi.helpers.url.check_user_exists')
 class TestUserVoicemailActions(TestResources):
 
     @patch('xivo_dao.data_handler.user_cti_profile.services.edit')
-    def test_update_cti_configuration(self, user_cti_profile_edit):
+    def test_update_cti_configuration(self, user_cti_profile_edit, user_exists):
         user_id = 1
         cti_profile_id = 2
 
@@ -43,9 +43,10 @@ class TestUserVoicemailActions(TestResources):
         result = self.app.put(BASE_URL % user_id, data=data_serialized)
 
         assert_that(result.status_code, equal_to(expected_status_code))
+        user_exists.assert_called_once_with(user_id)
 
     @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_configuration(self, user_cti_profile_get):
+    def test_get_cti_configuration(self, user_cti_profile_get, user_exists):
         user_id = 1
         cti_profile_id = 2
 
@@ -73,9 +74,10 @@ class TestUserVoicemailActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        user_exists.assert_called_once_with(user_id)
 
     @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_profile_association_not_exists(self, user_cti_profile_get):
+    def test_get_cti_profile_association_not_exists(self, user_cti_profile_get, user_exists):
         user_id = 1
 
         expected_status_code = 200
@@ -98,17 +100,4 @@ class TestUserVoicemailActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
-
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_profile_association_unexisting_user(self, user_cti_profile_get):
-        user_id = 1
-
-        expected_status_code = 404
-        expected_result = ['user with id=%d does not exist' % user_id]
-
-        user_cti_profile_get.side_effect = ElementNotExistsError('user', id=user_id)
-
-        result = self.app.get(BASE_URL % user_id)
-
-        assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        user_exists.assert_called_once_with(user_id)

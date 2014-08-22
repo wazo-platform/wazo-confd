@@ -18,7 +18,7 @@
 import unittest
 
 from xivo_restapi.helpers import mapper
-from xivo_dao.data_handler.exception import InvalidParametersError
+from xivo_dao.data_handler.exception import InputError
 
 
 class TestMapper(unittest.TestCase):
@@ -110,4 +110,4 @@ class TestMapper(unittest.TestCase):
             'model_key4': 'api_key4',
         }
 
-        self.assertRaises(InvalidParametersError, mapper.validate_data_from_api, mapping, data_dict)
+        self.assertRaises(InputError, mapper.validate_data_from_api, mapping, data_dict)

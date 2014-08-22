@@ -20,7 +20,7 @@ Feature: REST API Manipulate queue members
             | queue_id | agent_id |
             | 4876     | 5200     |
         Then I get a response with status "404"
-        Then I get an error message "Queue with id=4876 does not exist"
+        Then I get an error message matching "Resource Not Found - Queue was not found"
 
     Scenario: Get agent-queue association on non-existing agent
         Given there are queues with infos:
@@ -31,7 +31,7 @@ Feature: REST API Manipulate queue members
             | queue_name | agent_id |
             | superqueue | 4856     |
         Then I get a response with status "404"
-        Then I get an error message "Agent with id=4856 does not exist"
+        Then I get an error message matching "Resource Not Found - Agent was not found"
 
     Scenario: Get agent-queue association on non-associated agent
         Given there is a agent "John" "2404" with extension "2404@default"
@@ -42,7 +42,7 @@ Feature: REST API Manipulate queue members
             | queue_name | agent_number |
             | superqueue | 2404         |
         Then I get a response with status "404"
-        Then I get an error message matching "QueueMember with agent_id=\d+ queue_id=\d+ does not exist"
+        Then I get an error message matching "Resource Not Found - QueueMember was not found"
 
     Scenario: Editing an agent-queue association
         Given there is a agent "John" "2404" with extension "2404@default"
@@ -62,7 +62,7 @@ Feature: REST API Manipulate queue members
             | queue_id | agent_id | penalty |
             | 4876     | 5200     | 7       |
         Then I get a response with status "404"
-        Then I get an error message matching "Queue with id=\d+ does not exist"
+        Then I get an error message matching "Resource Not Found - Queue was not found"
 
     Scenario: Editing agent-queue association on non-existing agent
         Given there are queues with infos:
@@ -73,7 +73,7 @@ Feature: REST API Manipulate queue members
             | queue_name | agent_id | penalty |
             | superqueue | 4856     | 7       |
         Then I get a response with status "404"
-        Then I get an error message "Agent with id=4856 does not exist"
+        Then I get an error message matching "Resource Not Found - Agent was not found"
 
     Scenario: Editing agent-queue association on non-associated agent
         Given there is a agent "John" "2404" with extension "2404@default"
@@ -84,4 +84,4 @@ Feature: REST API Manipulate queue members
             | queue_name | agent_number | penalty |
             | superqueue | 2404         | 7       |
         Then I get a response with status "404"
-        Then I get an error message matching "QueueMember with agent_id=\d+ queue_id=\d+ does not exist"
+        Then I get an error message matching "Resource Not Found - QueueMember was not found"

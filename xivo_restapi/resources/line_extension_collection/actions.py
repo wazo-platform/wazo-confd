@@ -17,29 +17,29 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao.data_handler.line_extension import services as line_extension_services
-from xivo_dao.data_handler.exception import NonexistentParametersError
-from xivo_dao.data_handler.exception import AssociationNotExistsError
 
+from xivo_restapi.helpers import url
 from xivo_restapi.resources.line_extension_collection.formatter import LineExtensionFormatter
 
 formatter = LineExtensionFormatter()
 
 
 def associate_extension(line_id, parameters):
+    url.check_line_exists(line_id)
     model = formatter.dict_to_model(line_id, parameters)
     created_model = line_extension_services.associate(model)
     return formatter.to_api(created_model)
 
 
 def dissociate_extension(line_id, extension_id):
+    url.check_line_exists(line_id)
+    url.check_extension_exists(extension_id)
     model = formatter.model_from_ids(line_id, extension_id)
-    try:
-        line_extension_services.dissociate(model)
-    except NonexistentParametersError as e:
-        raise AssociationNotExistsError(str(e))
+    line_extension_services.dissociate(model)
     return ''
 
 
 def list_extensions(line_id):
+    url.check_line_exists(line_id)
     line_extensions = line_extension_services.get_all_by_line_id(line_id)
     return formatter.list_to_api(line_extensions)
