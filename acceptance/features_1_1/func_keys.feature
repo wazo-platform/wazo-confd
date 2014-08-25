@@ -184,10 +184,10 @@ Feature: REST API Function keys
         When I request the list of func keys via RESTAPI
         Then I get a response with status "200"
         Then the list contains the following func keys:
-            | type      | destination | destination_name |
-            | speeddial | service     | fwdrna           |
-            | speeddial | service     | fwdbusy          |
-            | speeddial | service     | fwdunc           |
+            | type      | destination | destination name |
+            | speeddial | forward     | fwdrna           |
+            | speeddial | forward     | fwdbusy          |
+            | speeddial | forward     | fwdunc           |
 
     Scenario: Get a func key
         Given I have the following users:
