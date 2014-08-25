@@ -170,7 +170,7 @@ Feature: REST API Function keys
         Then I get a response with status "200"
         Then the list does not contain the following func keys:
             | type      | destination | destination name   |
-            | speeddial | conference        | jekyll_island_club |
+            | speeddial | conference  | jekyll_island_club |
 
     Scenario: Adding a forward to a user adds a func key to the list
         Given I have the following users:
