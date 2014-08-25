@@ -9,27 +9,27 @@ Feature: Filter resources
         When I request a list for "<resource>" using parameters:
             | name      | value |
             | direction | toto  |
-        Then I get a response 400 matching "Input Error - Direction 'toto' invalid \(must be 'asc' or 'desc'\)"
+        Then I get a response 400 matching "Input Error - direction: must be 'asc' or 'desc'"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | limit | -32   |
-        Then I get a response 400 matching "Input Error - Wrong type for 'limit'. Expecting a positive number"
+        Then I get a response 400 matching "Input Error - field 'limit': wrong type. Should be a positive number"
 
         When I request a list for "<resource>" using parameters:
             | name  | value |
             | limit | asdf  |
-        Then I get a response 400 matching "Input Error - Wrong type for 'limit'. Expecting a positive number"
+        Then I get a response 400 matching "Input Error - field 'limit': wrong type. Should be a positive number"
 
         When I request a list for "<resource>" using parameters:
             | name | value |
             | skip | asdf  |
-        Then I get a response 400 matching "Input Error - Wrong type for 'skip'. Expecting a positive number"
+        Then I get a response 400 matching "Input Error - field 'skip': wrong type. Should be a positive number"
 
         When I request a list for "<resource>" using parameters:
             | name | value |
             | skip | -32   |
-        Then I get a response 400 matching "Input Error - Wrong type for 'skip'. Expecting a positive number"
+        Then I get a response 400 matching "Input Error - field 'skip': wrong type. Should be a positive number"
 
     Examples:
         | resource   |
