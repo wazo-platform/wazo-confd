@@ -119,7 +119,6 @@ Feature: Link a line and an extension
         Given I have the following lines:
             | username | protocol | context | device_slot |
             | seitika  | sip      | default | 1           |
-        Given there is no incall "1229" in context "from-extern"
         Given I have the following extensions:
             | exten | context     |
             | 1229  | from-extern |
