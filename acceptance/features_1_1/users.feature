@@ -225,7 +225,7 @@ Feature: REST API Users
             | Pizza     | Poulet   |
         Then I get a response with status "204"
         When I send a request for the voicemail "1100@default", using its id
-        Then I have the following voicemails via RESTAPI:
+        Then I have the following voicemails via CONFD:
             | name         | number |
             | Pizza Poulet | 1100   |
 

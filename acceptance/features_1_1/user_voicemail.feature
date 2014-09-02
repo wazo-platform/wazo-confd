@@ -7,7 +7,7 @@ Feature: Associate a user and a voicemail
         Given I have the following voicemails:
             | name            | number | context |
             | Tuvok Vulcan    | 1063   | default |
-        When I associate user "Tuvok Vulcan" with voicemail "1063@default" via RESTAPI
+        When I associate user "Tuvok Vulcan" with voicemail "1063@default" via CONFD
         Then I get a response with status "201"
         Then I get a response with a voicemail id
         Then I get a response with a user id
@@ -22,7 +22,7 @@ Feature: Associate a user and a voicemail
         Given I have the following voicemails:
             | name      | number | context |
             | Tom Paris | 1064   | default |
-        When I associate user "Tom Paris" with voicemail "1064@default" via RESTAPI
+        When I associate user "Tom Paris" with voicemail "1064@default" via CONFD
         Then I get a response with status "201"
         Then I get a response with a voicemail id
         Then I get a response with a user id
@@ -37,7 +37,7 @@ Feature: Associate a user and a voicemail
         Given I have the following voicemails:
             | name      | number | context |
             | Harry Kim | 1065   | default |
-        When I associate user "Harry Kim" with voicemail "1065@default" via RESTAPI
+        When I associate user "Harry Kim" with voicemail "1065@default" via CONFD
         Then I get a response with status "201"
         Then I get a response with a voicemail id
         Then I get a response with a user id
@@ -49,7 +49,7 @@ Feature: Associate a user and a voicemail
         Given there are users with infos:
             | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
             | Kes       | Ocampan  | 1067   | default | sip      | Kes Ocampan    | 1067             |
-        When I request the voicemail associated to user "Kes" "Ocampan" via RESTAPI
+        When I request the voicemail associated to user "Kes" "Ocampan" via CONFD
         Then I get a response with status "200"
         Then I get a response with a voicemail id
         Then I get a response with a user id
@@ -60,19 +60,19 @@ Feature: Associate a user and a voicemail
         Given there are users with infos:
             | firstname | lastname | number | context | protocol | voicemail_name  | voicemail_number |
             | Doctor    | Hologram | 1068   | default | sip      | Doctor Hologram | 1068             |
-        When I dissociate user "Doctor" "Hologram" from his voicemail via RESTAPI
+        When I dissociate user "Doctor" "Hologram" from his voicemail via CONFD
         Then I get a response with status "204"
 
      Scenario: Dissociate a user that has a SCCP line from his voicemail
         Given there are users with infos:
             | firstname | lastname | number | context | protocol | voicemail_name | voicemail_number |
             | Seven     | Of Nine  | 1069   | default | sccp     | Seven Of Nine  | 1069             |
-        When I dissociate user "Seven" "Of Nine" from his voicemail via RESTAPI
+        When I dissociate user "Seven" "Of Nine" from his voicemail via CONFD
         Then I get a response with status "204"
 
     Scenario: Dissociate a user that has a custom line from his voicemail
         Given there are users with infos:
             | firstname | lastname  | number | context | protocol | voicemail_name  | voicemail_number |
             | Seska     | Cardacian | 1070   | default | custom   | Seska Cardacian | 1070             |
-        When I dissociate user "Seska" "Cardacian" from his voicemail via RESTAPI
+        When I dissociate user "Seska" "Cardacian" from his voicemail via CONFD
         Then I get a response with status "204"
