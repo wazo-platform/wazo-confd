@@ -28,18 +28,18 @@ def is_package(path):
     is_test_module = fnmatch.fnmatch(path, '*tests')
     return not (is_svn_dir or is_test_module)
 
-packages = [p for p, _, _ in os.walk('xivo_restapi') if is_package(p)]
+packages = [p for p, _, _ in os.walk('xivo_confd') if is_package(p)]
 
 setup(
-    name='xivo-restapid',
+    name='xivo-confd',
     version='0.1',
-    description='XIVO REST API daemon',
+    description='XIVO CONFD daemon',
     author='Avencall',
     author_email='xivo-dev@lists.proformatique.com',
     url='http://git.xivo.io/',
     license='GPLv3',
     packages=packages,
     scripts=[
-        'bin/xivo-restapid'
+        'bin/xivo-confd'
     ],
 )

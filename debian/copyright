@@ -1,6 +1,6 @@
 Format: http://dep.debian.net/deps/dep5
-Upstream-Name: xivo-restapi
-Source: git://git.xivo.io/official/xivo-restapi.git
+Upstream-Name: xivo-confd
+Source: https://github.com/xivo-pbx/xivo-confd.git
 
 Files: *
 Copyright: 2012 Avencall
