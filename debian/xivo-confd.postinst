@@ -16,6 +16,8 @@ case "$1" in
         if [ -f "/var/log/xivo-restapid.log" ]; then
             rename -f 's/restapid/confd/g' /var/log/xivo-restapid.*
         fi
+
+		invoke-rc.d nginx reload
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
     
