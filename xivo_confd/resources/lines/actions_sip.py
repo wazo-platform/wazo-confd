@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-xivo_confdfrom . import mapper_sip
+from . import mapper_sip
 
 from flask import Blueprint, url_for
 from flask.globals import request

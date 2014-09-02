@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-xivo_confdfrom . import mapper
-from xivo_confd import line_route as route
+from . import mapper
+from .routes import line_route as route
 
 from flask.globals import request
 from flask.helpers import make_response

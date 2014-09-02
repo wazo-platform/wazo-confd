@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import Blueprint
-xivo_confdfrom . import actions
+from . import actions
 
 from xivo_confd import config
 from xivo_confd.helpers.route_generator import RouteGenerator

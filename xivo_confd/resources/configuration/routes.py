@@ -23,7 +23,7 @@ from xivo_confd.helpers.route_generator import RouteGenerator
 
 blueprint = Blueprint('configuration', __name__, url_prefix='/%s/configuration' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
-xivo_confdfrom . import actions
+from . import actions
 
 
 def register_blueprints(app):

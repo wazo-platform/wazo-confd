@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import request, url_for, make_response
-xivo_confdfrom . import actions
+from . import actions
 from xivo_confd.resources.lines.routes import line_blueprint, line_route
 
 from xivo_confd.flask_http_server import content_parser

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-xivo_confdfrom . import mapper
+from . import mapper
 
 from flask import url_for, request
 from flask.helpers import make_response

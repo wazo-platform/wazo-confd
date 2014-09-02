@@ -23,7 +23,8 @@ from xivo_confd.helpers import serializer
 from flask.helpers import make_response
 from xivo_dao.data_handler.cti_profile import services
 from xivo_confd.helpers.formatter import Formatter
-from xivo_dao.data_handler.cti_profile.model import CtiProfilexivo_confdfrom . import mapper
+from xivo_dao.data_handler.cti_profile.model import CtiProfile
+from . import mapper
 
 blueprint = Blueprint('cti_profiles', __name__, url_prefix='/%s/cti_profiles' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
