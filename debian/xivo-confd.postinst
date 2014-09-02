@@ -3,13 +3,18 @@
 #
 # see: dh_installdeb(1)
 
-CRON_FILE="/etc/cron.d/xivo-confd"
+CRON_FILE="/etc/cron.d/xivo-restapi"
 
 case "$1" in
     configure)
         # remove old cron file
         if [ -f $CRON_FILE ]; then
             rm $CRON_FILE
+        fi
+        
+        # move old log files
+        if [ -f "/var/log/xivo-restapid.log" ]; then
+            rename -f 's/restapid/confd/g' /var/log/xivo-restapid.*
         fi
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
