@@ -22,7 +22,7 @@ from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 from xivo_confd.helpers.tests.test_resources import TestResources
 
 
-BASE_URL = '/1.1/queues/%s/memberships/agents/%s'
+BASE_URL = '/1.1/queues/%s/members/agents/%s'
 
 
 class TestQueueMemberActions(TestResources):

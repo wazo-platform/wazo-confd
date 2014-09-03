@@ -34,13 +34,13 @@ document = content_parser.document(
 )
 
 
-@queue_route('/<int:queueid>/memberships/agents/<int:agentid>')
+@queue_route('/<int:queueid>/members/agents/<int:agentid>')
 def get_agent_queue_association(queueid, agentid):
     result = services.get_by_queue_id_and_agent_id(queueid, agentid)
     return make_response(formatter.to_api(result), 200)
 
 
-@queue_route('/<int:queueid>/memberships/agents/<int:agentid>', methods=['PUT'])
+@queue_route('/<int:queueid>/members/agents/<int:agentid>', methods=['PUT'])
 def edit_agent_queue_association(queueid, agentid):
     queue_member = services.get_by_queue_id_and_agent_id(queueid, agentid)
     data = document.parse(request)
