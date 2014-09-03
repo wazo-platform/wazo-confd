@@ -23,6 +23,7 @@ from xivo_confd.helpers.tests.test_resources import TestResources
 
 
 BASE_URL = '/1.1/queues/%s/members/agents/%s'
+BASE_URL2 = '/1.1/queues/%s/members/agents'
 
 
 class TestQueueMemberActions(TestResources):
@@ -58,3 +59,20 @@ class TestQueueMemberActions(TestResources):
         self.assert_response_for_update(result)
         get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
         edit_agent_queue_association.assert_called_once_with(self.queue_member)
+
+    @patch('xivo_dao.data_handler.queue_members.services.associate_agent_to_queue')
+    def test_associate_agent_to_queue(self,associate_agent_to_queue):
+        associate_agent_to_queue.return_value = self.queue_member
+
+        expected_result = {
+            u'agent_id': self.queue_member.agent_id,
+            u'queue_id': self.queue_member.queue_id,
+            u'penalty': self.queue_member.penalty
+        }
+
+        data = {'agent_id': self.queue_member.agent_id, 'penalty': self.queue_member.penalty}
+        data_serialized = self._serialize_encode(data)
+        result = self.app.post(BASE_URL2 % (self.queue_member.queue_id), data=data_serialized)
+        self.assert_response_for_create(result,expected_result)
+
+        associate_agent_to_queue.assert_called_once_with(self.queue_member)

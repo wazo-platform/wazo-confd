@@ -85,3 +85,14 @@ Feature: REST API Manipulate queue members
             | superqueue | 2404         | 7       |
         Then I get a response with status "404"
         Then I get an error message matching "Resource Not Found - QueueMember was not found"
+
+    Scenario: Associate an agent to a queue
+        Given there is a agent "Bob" "2407" with extension "2407@default"
+        Given there are queues with infos:
+            | name       | display name | number | context |
+            | bluesky    | BlueSky      | 3012   | default |
+        When I associate the following agent:
+            | queue_name | agent_number | penalty |
+            | bluesky    | 2407         | 5       |
+        Then I get a response with status "201"
+        Then the penalty is "5" for queue "bluesky" and agent "2407"

@@ -47,3 +47,10 @@ def edit_agent_queue_association(queueid, agentid):
     queue_member.penalty = data['penalty']
     services.edit_agent_queue_association(queue_member)
     return make_response('', 204)
+
+@queue_route('/<int:queueid>/members/agents', methods=['POST'])
+def associate_agent_to_queue(queueid):
+    data = document.parse(request)
+    queue_member = QueueMemberAgent(agent_id= data['agent_id'], queue_id=queueid, penalty= data['penalty'])
+    result = services.associate_agent_to_queue(queue_member)
+    return make_response(formatter.to_api(result), 201)
