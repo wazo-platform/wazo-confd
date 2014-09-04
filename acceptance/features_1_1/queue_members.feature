@@ -96,3 +96,23 @@ Feature: REST API Manipulate queue members
             | bluesky    | 2407         | 5       |
         Then I get a response with status "201"
         Then the penalty is "5" for queue "bluesky" and agent "2407"
+
+    Scenario: Associate an agent to a non-existing queue
+        Given there is a agent "Boy" "2406" with extension "2406@default"
+        Given there is no queue with id "4877"
+        When I associate the following agent:
+            | queue_id | agent_number | penalty |
+            | 4877     | 2406     | 4       |
+        Then I get a response with status "404"
+        Then I get an error message matching "Resource Not Found - Queue was not found"
+
+    Scenario: Associate an non existing agent to a queue
+        Given there is no agent with id "4859"
+        Given there are queues with infos:
+            | name       | display name | number | context |
+            | bluesky    | BlueSky      | 3012   | default |
+        When I associate the following agent:
+            | queue_name | agent_id     | penalty |
+            | bluesky    | 4859         | 5       |
+        Then I get a response with status "400"
+        Then I get an error message matching "Input Error - field 'agent_id': Agent was not found"
