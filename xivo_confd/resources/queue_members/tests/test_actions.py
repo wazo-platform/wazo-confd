@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+from hamcrest import assert_that, equal_to
 
 from mock import patch
 
@@ -22,8 +23,8 @@ from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 from xivo_confd.helpers.tests.test_resources import TestResources
 
 
-BASE_URL = '/1.1/queues/%s/members/agents/%s'
-BASE_URL2 = '/1.1/queues/%s/members/agents'
+BASE_URL = '/1.1/queues/%s/members/agents'
+EDIT_URL = BASE_URL + '/%s'
 
 
 class TestQueueMemberActions(TestResources):
@@ -42,7 +43,7 @@ class TestQueueMemberActions(TestResources):
             u'penalty': self.queue_member.penalty
         }
 
-        result = self.app.get(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
+        result = self.app.get(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
 
         self.assert_response_for_list(result, expected_result)
         get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
@@ -54,7 +55,7 @@ class TestQueueMemberActions(TestResources):
 
         data = {'penalty': self.queue_member.penalty}
         data_serialized = self._serialize_encode(data)
-        result = self.app.put(BASE_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
+        result = self.app.put(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
 
         self.assert_response_for_update(result)
         get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
@@ -72,7 +73,10 @@ class TestQueueMemberActions(TestResources):
 
         data = {'agent_id': self.queue_member.agent_id, 'penalty': self.queue_member.penalty}
         data_serialized = self._serialize_encode(data)
-        result = self.app.post(BASE_URL2 % (self.queue_member.queue_id), data=data_serialized)
+        result = self.app.post(BASE_URL % (self.queue_member.queue_id), data=data_serialized)
         self.assert_response_for_create(result,expected_result)
 
+        location = result.headers['location']
+
+        assert_that(location,equal_to('http://localhost/1.1/queues/3/members/agents/12'))
         associate_agent_to_queue.assert_called_once_with(self.queue_member)

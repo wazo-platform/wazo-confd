@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, make_response
+from flask import request, make_response, url_for
 
 from xivo_dao.data_handler.queue_members import services
 from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
@@ -53,4 +53,5 @@ def associate_agent_to_queue(queueid):
     data = document.parse(request)
     queue_member = QueueMemberAgent(agent_id= data['agent_id'], queue_id=queueid, penalty= data['penalty'])
     result = services.associate_agent_to_queue(queue_member)
-    return make_response(formatter.to_api(result), 201)
+    location = url_for('.get_agent_queue_association', queueid=queueid, agentid = queue_member.agent_id)
+    return make_response(formatter.to_api(result), 201,{'Location': location})
