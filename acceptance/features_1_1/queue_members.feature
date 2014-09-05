@@ -116,3 +116,14 @@ Feature: REST API Manipulate queue members
             | bluesky    | 4859         | 5       |
         Then I get a response with status "400"
         Then I get an error message matching "Input Error - field 'agent_id': Agent was not found"
+
+    Scenario: Associate an agent to a queue already associated
+        Given there is a agent "Bob" "2407" with extension "2407@default"
+        Given there are queues with infos:
+            | name       | display name | number | context | agents_number |
+            | bluesky    | BlueSky      | 3012   | default | 2407          |
+        When I associate the following agent:
+            | queue_name | agent_number | penalty |
+            | bluesky    | 2407         | 5       |
+        Then I get a response with status "400"
+        Then I get an error message matching "Resource Error - Agent is associated with a Queue"
