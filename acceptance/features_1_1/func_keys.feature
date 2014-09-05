@@ -181,7 +181,7 @@ Feature: REST API Function keys
             | 1   | Enable / Disable forwarding on no answer  | 1234        | togglefwdna   | Enabled     |
             | 2   | Enable / Disable forwarding on busy       | 1234        | togglefwdbusy | Enabled     |
             | 3   | Enable / Disable forwarding unconditional | 1234        | togglefwdunc  | Enabled     |
-        When I request the list of func keys via RESTAPI
+        When I request the list of func keys via CONFD
         Then I get a response with status "200"
         Then the list contains the following func keys:
             | type      | destination | destination name |
