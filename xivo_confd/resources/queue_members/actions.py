@@ -50,10 +50,17 @@ def edit_agent_queue_association(queueid, agentid):
     services.edit_agent_queue_association(queue_member)
     return make_response('', 204)
 
+
 @queue_route('/<int:queueid>/members/agents', methods=['POST'])
 def associate_agent_to_queue(queueid):
     data = document.parse(request)
-    queue_member = QueueMemberAgent(agent_id= data['agent_id'], queue_id=queueid, penalty= data['penalty'])
+    queue_member = QueueMemberAgent(agent_id=data['agent_id'], queue_id=queueid, penalty=data['penalty'])
     result = services.associate_agent_to_queue(queue_member)
-    location = url_for('.get_agent_queue_association', queueid=queueid, agentid = queue_member.agent_id)
-    return make_response(formatter.to_api(result), 201,{'Location': location})
+    location = url_for('.get_agent_queue_association', queueid=queueid, agentid=queue_member.agent_id)
+    return make_response(formatter.to_api(result), 201, {'Location': location})
+
+
+@queue_route('/<int:queueid>/members/agents/<int:agentid>', methods=['DELETE'])
+def remove_agent_from_queue(agentid, queueid):
+    services.remove_agent_from_queue(agentid, queueid)
+    return make_response('', 204)

@@ -28,7 +28,6 @@ EDIT_URL = BASE_URL + '/%s'
 
 
 class TestQueueMemberActions(TestResources):
-
     def setUp(self):
         super(TestQueueMemberActions, self).setUp()
         self.queue_member = QueueMemberAgent(agent_id=12, queue_id=3, penalty=5)
@@ -62,7 +61,7 @@ class TestQueueMemberActions(TestResources):
         edit_agent_queue_association.assert_called_once_with(self.queue_member)
 
     @patch('xivo_dao.data_handler.queue_members.services.associate_agent_to_queue')
-    def test_associate_agent_to_queue(self,associate_agent_to_queue):
+    def test_associate_agent_to_queue(self, associate_agent_to_queue):
         associate_agent_to_queue.return_value = self.queue_member
 
         expected_result = {
@@ -74,9 +73,16 @@ class TestQueueMemberActions(TestResources):
         data = {'agent_id': self.queue_member.agent_id, 'penalty': self.queue_member.penalty}
         data_serialized = self._serialize_encode(data)
         result = self.app.post(BASE_URL % (self.queue_member.queue_id), data=data_serialized)
-        self.assert_response_for_create(result,expected_result)
+        self.assert_response_for_create(result, expected_result)
 
         location = result.headers['location']
 
-        assert_that(location,equal_to('http://localhost/1.1/queues/3/members/agents/12'))
+        assert_that(location, equal_to('http://localhost/1.1/queues/3/members/agents/12'))
         associate_agent_to_queue.assert_called_once_with(self.queue_member)
+
+    @patch('xivo_dao.data_handler.queue_members.services.remove_agent_from_queue')
+    def test_remove_agent_from_queue(self, remove_agent_from_queue):
+        result = self.app.delete(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
+
+        remove_agent_from_queue.assert_called_once_with(self.queue_member.agent_id, self.queue_member.queue_id)
+        self.assert_response_for_delete(result)
