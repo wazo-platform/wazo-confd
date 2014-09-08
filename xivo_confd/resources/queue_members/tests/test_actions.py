@@ -47,17 +47,13 @@ class TestQueueMemberActions(TestResources):
         self.assert_response_for_list(result, expected_result)
         get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
 
-    @patch('xivo_dao.data_handler.queue_members.services.get_by_queue_id_and_agent_id')
     @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')
-    def test_edit_agent_queue_association(self, edit_agent_queue_association, get_by_queue_id_and_agent_id):
-        get_by_queue_id_and_agent_id.return_value = self.queue_member
-
+    def test_edit_agent_queue_association(self, edit_agent_queue_association):
         data = {'penalty': self.queue_member.penalty}
         data_serialized = self._serialize_encode(data)
         result = self.app.put(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
 
         self.assert_response_for_update(result)
-        get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
         edit_agent_queue_association.assert_called_once_with(self.queue_member)
 
     @patch('xivo_dao.data_handler.queue_members.services.associate_agent_to_queue')
