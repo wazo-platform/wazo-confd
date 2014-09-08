@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, make_response
+from flask import request, make_response, url_for
 
 from xivo_dao.data_handler.queue_members import services
 from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
@@ -34,16 +34,33 @@ document = content_parser.document(
 )
 
 
-@queue_route('/<int:queueid>/memberships/agents/<int:agentid>')
+@queue_route('/<int:queueid>/members/agents/<int:agentid>')
 def get_agent_queue_association(queueid, agentid):
     result = services.get_by_queue_id_and_agent_id(queueid, agentid)
     return make_response(formatter.to_api(result), 200)
 
 
-@queue_route('/<int:queueid>/memberships/agents/<int:agentid>', methods=['PUT'])
+@queue_route('/<int:queueid>/members/agents/<int:agentid>', methods=['PUT'])
 def edit_agent_queue_association(queueid, agentid):
-    queue_member = services.get_by_queue_id_and_agent_id(queueid, agentid)
     data = document.parse(request)
+    queue_member = QueueMemberAgent()
     queue_member.penalty = data['penalty']
+    queue_member.agent_id = agentid
+    queue_member.queue_id = queueid
     services.edit_agent_queue_association(queue_member)
+    return make_response('', 204)
+
+
+@queue_route('/<int:queueid>/members/agents', methods=['POST'])
+def associate_agent_to_queue(queueid):
+    data = document.parse(request)
+    queue_member = QueueMemberAgent(agent_id=data['agent_id'], queue_id=queueid, penalty=data['penalty'])
+    result = services.associate_agent_to_queue(queue_member)
+    location = url_for('.get_agent_queue_association', queueid=queueid, agentid=queue_member.agent_id)
+    return make_response(formatter.to_api(result), 201, {'Location': location})
+
+
+@queue_route('/<int:queueid>/members/agents/<int:agentid>', methods=['DELETE'])
+def remove_agent_from_queue(agentid, queueid):
+    services.remove_agent_from_queue(agentid, queueid)
     return make_response('', 204)
