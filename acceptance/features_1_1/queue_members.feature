@@ -85,3 +85,87 @@ Feature: REST API Manipulate queue members
             | superqueue | 2404         | 7       |
         Then I get a response with status "404"
         Then I get an error message matching "Resource Not Found - QueueMember was not found"
+
+    Scenario: Associate an agent to a queue
+        Given there is a agent "Bob" "2407" with extension "2407@default"
+        Given there are queues with infos:
+            | name       | display name | number | context |
+            | bluesky    | BlueSky      | 3012   | default |
+        When I associate the following agent:
+            | queue_name | agent_number | penalty |
+            | bluesky    | 2407         | 5       |
+        Then I get a response with status "201"
+        Then the penalty is "5" for queue "bluesky" and agent "2407"
+
+    Scenario: Associate an agent to a non-existing queue
+        Given there is a agent "Boy" "2406" with extension "2406@default"
+        Given there is no queue with id "4877"
+        When I associate the following agent:
+            | queue_id | agent_number | penalty |
+            | 4877     | 2406     | 4       |
+        Then I get a response with status "404"
+        Then I get an error message matching "Resource Not Found - Queue was not found"
+
+    Scenario: Associate an non existing agent to a queue
+        Given there is no agent with id "4859"
+        Given there are queues with infos:
+            | name       | display name | number | context |
+            | bluesky    | BlueSky      | 3012   | default |
+        When I associate the following agent:
+            | queue_name | agent_id     | penalty |
+            | bluesky    | 4859         | 5       |
+        Then I get a response with status "400"
+        Then I get an error message matching "Input Error - field 'agent_id': Agent was not found"
+
+    Scenario: Associate an agent to a queue already associated
+        Given there is a agent "Bob" "2407" with extension "2407@default"
+        Given there are queues with infos:
+            | name       | display name | number | context | agents_number |
+            | bluesky    | BlueSky      | 3012   | default | 2407          |
+        When I associate the following agent:
+            | queue_name | agent_number | penalty |
+            | bluesky    | 2407         | 5       |
+        Then I get a response with status "400"
+        Then I get an error message matching "Resource Error - Agent is associated with a Queue"
+
+    Scenario: Remove agent from a queue
+        Given there is a agent "Jack" "2437" with extension "2437@default"
+        Given there are queues with infos:
+            | name       | display name | number | context | agents_number |
+            | redtown    | RedTown      | 3015   | default | 2437          |
+        When I remove the following agent from a queue:
+            | queue_name | agent_number | penalty |
+            | redtown    | 2437         | 5       |
+        Then I get a response with status "204"
+        Then the agent "2437" is not associated to queue "redtown"
+
+    Scenario: Remove agent from a queue on non-associated agent
+        Given there is a agent "John" "2404" with extension "2404@default"
+        Given there are queues with infos:
+            | name       | display name | number | context |
+            | superqueue | SuperQueue   | 3007   | default |
+        When I remove the following agent from a queue:
+            | queue_name | agent_number |
+            | superqueue | 2404         |
+        Then I get a response with status "404"
+        Then I get an error message matching "Resource Not Found - QueueMember was not found"
+
+    Scenario: Remove agent from a non existing queue
+        Given there is a agent "John" "2404" with extension "2404@default"
+        Given there is no queue with id "4876"
+        When I remove the following agent from a queue:
+            | queue_id | agent_number |
+            | 4876 | 2404         |
+        Then I get a response with status "404"
+        Then I get an error message matching "Resource Not Found - Queue was not found"
+
+    Scenario: Remove non existing agent from a queue
+        Given there is no agent with id "2405"
+        Given there are queues with infos:
+            | name       | display name | number | context |
+            | bluesky    | BlueSky      | 3012   | default |
+        When I remove the following agent from a queue:
+            | queue_name | agent_id |
+            | bluesky    | 2405     |
+        Then I get a response with status "404"
+        Then I get an error message matching "Resource Not Found - Agent was not found"

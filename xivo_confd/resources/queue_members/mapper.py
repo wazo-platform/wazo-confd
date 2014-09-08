@@ -20,7 +20,7 @@ MAPPING = {
     'queue_id': 'queue_id',
     'agent_id': 'agent_id',
     'penalty': 'penalty'
-    }
+}
 
 
 def add_links_to_dict(result_dict, queue_member):
