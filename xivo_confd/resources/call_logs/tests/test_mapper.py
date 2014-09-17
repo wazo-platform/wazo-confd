@@ -38,7 +38,7 @@ class TestCallLogsMapper(TestCase):
                         destination_exten='2001',
                         user_field='',
                         answered=True,
-                        duration=timedelta(seconds=1))
+                        duration=timedelta(seconds=2.95))
 
         result = mapper.to_api(call_log)
 
@@ -46,7 +46,7 @@ class TestCallLogsMapper(TestCase):
             'Call Date': '2013-01-31T00:00:00',
             'Caller': 'source1 (1001)',
             'Called': '2001',
-            'Period': '1',
+            'Period': '3',
             'user Field': ''
         }))
 

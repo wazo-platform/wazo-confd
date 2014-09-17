@@ -27,4 +27,4 @@ def to_api(call_log):
 
 
 def _format_duration(duration):
-    return str(int(duration.total_seconds()))
+    return str(int(round(duration.total_seconds())))
