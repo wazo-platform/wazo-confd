@@ -51,6 +51,6 @@ RUN echo "root:xivo" | chpasswd
 # Clean
 RUN apt-get clean
 
-EXPOSE 50051
+EXPOSE 9486
 
 CMD /root/xivo-confd-service

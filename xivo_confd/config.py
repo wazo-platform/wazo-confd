@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 HOST = '0.0.0.0'
-PORT = 50050
+PORT = 9487
 
 RESOURCES_PACKAGE = 'xivo_confd.resources'
 

@@ -1,4 +1,6 @@
 server {
+    listen 9486 ssl;
+    listen 127.0.0.1:9487;
     listen 127.0.0.1:50050;
     listen 50051 ssl;
 
