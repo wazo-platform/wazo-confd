@@ -85,7 +85,7 @@ def _parse_args():
                         help="Listen on address <listen_addr> instead of %(default)s")
     parser.add_argument("--listen-port",
                         type=_port_number,
-                        default=50050,
+                        default=9487,
                         help="Listen on port <listen_port> instead of %(default)s")
     return parser.parse_args()
 
