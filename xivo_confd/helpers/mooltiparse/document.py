@@ -17,3 +17,10 @@ class DocumentProxy(object):
 
     def parse(self, request, action=None):
         return self.parser.parse(request, self.document, action)
+
+    @property
+    def mapping(self):
+        res = {}
+        for field in self.document.fields:
+            res.update({field.name: field.name})
+        return res

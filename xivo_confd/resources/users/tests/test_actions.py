@@ -16,11 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from hamcrest import *
 from mock import patch
 
-from xivo_dao.data_handler.user.model import User
+from xivo_dao.data_handler.user.model import User, UserDirectoryView
 from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_confd.helpers.tests.test_resources import TestResources
+from xivo_confd.helpers import serializer
 
 BASE_URL = "/1.1/users"
 
@@ -48,6 +50,28 @@ class TestUserActions(TestResources):
                 'rel': 'users'
             }]
         }
+
+    def build_item_for_view(self, data):
+        res = {
+            'id': data.id,
+            'firstname': data.firstname,
+            'lastname': data.lastname,
+            'line_id': data.line_id,
+            'agent_id': data.agent_id,
+            'exten': data.exten,
+            'mobile_phone_number': data.mobile_phone_number,
+            'links': [{
+                'href': 'http://localhost/1.1/users/%d' % data.id,
+                'rel': 'users'
+            }]
+        }
+
+        if data.line_id:
+            res['links'].append({
+                'href': 'http://localhost/1.1/lines/%d' % data.line_id,
+                'rel': 'lines'
+            })
+        return res
 
     @patch('xivo_dao.data_handler.user.services.search')
     def test_list_users_with_no_users(self, user_search):
@@ -116,6 +140,52 @@ class TestUserActions(TestResources):
                                             direction='desc',
                                             limit=1,
                                             skip=2)
+        self.assert_response_for_list(response, expected_response)
+
+    @patch('xivo_dao.data_handler.user.services.find_all_by_view_directory')
+    def test_list_users_by_view_with_invalid_view(self, find_all_by_view_directory):
+        view = 'viewnotexist'
+
+        response = self.app.get("%s?view=%s" % (BASE_URL, view))
+
+        assert_that(find_all_by_view_directory.call_count, equal_to(0))
+        self.assert_error(response)
+
+    @patch('xivo_dao.data_handler.user.services.find_all_by_view_directory')
+    def test_list_users_by_view_with_no_users(self, find_all_by_view_directory):
+        view = 'directory'
+        expected_response = {'total': 0, 'items': []}
+
+        find_all_by_view_directory.return_value = []
+
+        response = self.app.get("%s?view=%s" % (BASE_URL, view))
+
+        find_all_by_view_directory.assert_any_call()
+        self.assert_response_for_list(response, expected_response)
+
+    @patch('xivo_dao.data_handler.user.services.find_all_by_view_directory')
+    def test_list_users_by_view(self, find_all_by_view_directory):
+        view = 'directory'
+        user1 = UserDirectoryView(id=1,
+                                  firstname=u'test1')
+        user2 = UserDirectoryView(id=2,
+                                  firstname=u'test2',
+                                  line_id=22,
+                                  exten='2222')
+        user3 = UserDirectoryView(id=3,
+                                  firstname=u'test3',
+                                  agent_id=333)
+
+        expected_response = {'total': 3,
+                             'items': [self.build_item_for_view(user1),
+                                       self.build_item_for_view(user2),
+                                       self.build_item_for_view(user3)]}
+
+        find_all_by_view_directory.return_value = [user1, user2, user3]
+
+        response = self.app.get("%s?view=%s" % (BASE_URL, view))
+
+        find_all_by_view_directory.assert_any_call()
         self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.user.services.get')
