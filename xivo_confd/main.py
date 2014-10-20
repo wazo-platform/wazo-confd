@@ -22,10 +22,12 @@ from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
 from xivo_confd import flask_http_server
 from xivo_confd import config
+from xivo.user_rights import change_user
 
 DAEMONNAME = 'xivo-confd'
-LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
-PIDFILE = '/var/run/%s.pid' % DAEMONNAME
+LOGFILENAME = '/var/log/{}.log'.format(DAEMONNAME)
+PID_FILENAME = '/var/run/{daemon}/{daemon}.pid'.format(daemon=DAEMONNAME)
+SOCKET_FILENAME = '/tmp/{daemon}/{daemon}.sock'.format(daemon=DAEMONNAME)
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +37,8 @@ def main():
 
     setup_logging(LOGFILENAME, parsed_args.foreground, parsed_args.debug)
 
+    if parsed_args.user:
+        change_user(parsed_args.user)
     if parsed_args.debug:
         logger.info("Debug mode enabled.")
         flask_http_server.app.debug = True
@@ -55,11 +59,11 @@ def main():
         else:
             logger.info("Starting xivo-confd in standard mode.")
 
-        with pidfile_context(PIDFILE, parsed_args.foreground):
+        with pidfile_context(PID_FILENAME, parsed_args.foreground):
             WSGIServer(flask_http_server.app,
-                       bindAddress='/var/www/restws-fcgi.sock',
-                       multithreaded=False,
-                       multiprocess=True,
+                       bindAddress=SOCKET_FILENAME,
+                       multithreaded=True,
+                       multiprocess=False,
                        debug=False).run()
 
 
@@ -82,11 +86,16 @@ def _parse_args():
                         help="Activate debug message. Default: %(default)s")
     parser.add_argument("--listen-addr",
                         default='0.0.0.0',
-                        help="Listen on address <listen_addr> instead of %(default)s")
+                        help="Listen on address <listen_addr>. Default: %(default)s")
     parser.add_argument("--listen-port",
                         type=_port_number,
                         default=9487,
-                        help="Listen on port <listen_port> instead of %(default)s")
+                        help="Listen on port <listen_port>. Default: %(default)s")
+    parser.add_argument('-u',
+                        '--user',
+                        default='www-data',
+                        action='store',
+                        help="The owner of the process. Default: %(default)s")
     return parser.parse_args()
 
 
