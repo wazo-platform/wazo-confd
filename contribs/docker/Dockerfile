@@ -32,9 +32,7 @@ RUN touch /var/log/xivo-confd.log
 RUN cp debian/xivo-confd.init /etc/init.d/xivo-confd
 RUN mkdir -p /etc/xivo/xivo-confd
 RUN mkdir /var/run/xivo-confd
-RUN mkdir /var/www
 RUN chown www-data: /var/log/xivo-confd.log
-RUN chown www-data: /var/www
 RUN chown www-data: /var/run/xivo-confd
 
 # Configure nginx

@@ -12,6 +12,6 @@ server {
          include fastcgi_params;
          fastcgi_param PATH_INFO $fastcgi_script_name;
          fastcgi_param SCRIPT_NAME "";
-         fastcgi_pass unix:/var/www/restws-fcgi.sock;
+         fastcgi_pass unix:/var/run/xivo-confd/xivo-confd.sock;
     }
 }

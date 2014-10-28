@@ -24,8 +24,9 @@ from xivo_confd import flask_http_server
 from xivo_confd import config
 
 DAEMONNAME = 'xivo-confd'
-LOGFILENAME = '/var/log/%s.log' % DAEMONNAME
-PIDFILE = '/var/run/%s.pid' % DAEMONNAME
+LOGFILENAME = '/var/log/{}.log'.format(DAEMONNAME)
+PID_FILENAME = '/var/run/{daemon}/{daemon}.pid'.format(daemon=DAEMONNAME)
+SOCKET_FILENAME = '/var/run/{daemon}/{daemon}.sock'.format(daemon=DAEMONNAME)
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +56,9 @@ def main():
         else:
             logger.info("Starting xivo-confd in standard mode.")
 
-        with pidfile_context(PIDFILE, parsed_args.foreground):
+        with pidfile_context(PID_FILENAME, parsed_args.foreground):
             WSGIServer(flask_http_server.app,
-                       bindAddress='/var/www/restws-fcgi.sock',
+                       bindAddress=SOCKET_FILENAME,
                        multithreaded=False,
                        multiprocess=True,
                        debug=False).run()
