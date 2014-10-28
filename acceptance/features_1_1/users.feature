@@ -117,6 +117,42 @@ Feature: REST API Users
           | firstname | lastname |
           | Remy      | Licorne  |
 
+    Scenario: User list with directory view
+        Given I have the following users:
+            | id | firstname | lastname  | mobile_phone_number |
+            | 11 | Albert    | Montoya   |                     |
+            | 22 | Roberto   | Rodriguez |                     |
+            | 33 | Greg      | Sanderson | +14184765458        |
+            | 44 | Bob       | Marley    | +12345678910        |
+        Given I have the following lines:
+            | id  | context | protocol | device_slot |
+            | 222 | default | sip      | 1           |
+            | 333 | default | sip      | 1           |
+            | 444 | default | sip      | 1           |
+        Given I have the following extensions:
+            | id   | exten | context |
+            | 3333 | 1103  | default |
+            | 4444 | 1104  | default |
+        Given line "333" is linked with extension "1103@default"
+        Given line "444" is linked with extension "1104@default"
+        When I create the following user_line via CONFD:
+            | user_id | line_id |
+            | 22      | 222     |
+            | 33      | 333     |
+            | 44      | 444     |
+            
+        Given there is a agent "Il" "buono" with extension "24001@default"
+        Given user_id "44" has an agent with number "24001"
+
+        When I ask for the list of users with view "directory"
+        Then I get a list containing the following users:
+            | id | firstname | lastname  | exten | mobile_phone_number| line_id |
+            | 11 | Albert    | Montoya   | None  |                    | None    |
+            | 22 | Roberto   | Rodriguez | None  |                    | 222     |
+            | 33 | Greg      | Sanderson | 1103  | +14184765458       | 333     |
+            | 44 | Bob       | Marley    | 1104  | +12345678910       | 444     |
+        Then the agent "24001" has user_id "44"
+
     Scenario: Getting a user that exists
         Given I have the following users:
           | id     | firstname | lastname |
