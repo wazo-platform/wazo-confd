@@ -14,6 +14,8 @@
 set -e
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
+USER=www-data
+GROUP=$USER
 DAEMONNAME=xivo-confd
 DAEMON_ARGS=$2
 DAEMON=/usr/bin/$DAEMONNAME
