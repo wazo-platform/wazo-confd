@@ -13,23 +13,23 @@ case "$1" in
         if [ -f $CRON_FILE ]; then
             rm $CRON_FILE
         fi
-        
+
         # move old log files
         if [ -f "/var/log/xivo-restapid.log" ]; then
             rename -f 's/restapid/confd/g' /var/log/xivo-restapid.*
         fi
 
-		if [ ! -e "$LOG_FILENAME" ]; then
-			touch "$LOG_FILENAME"
-		fi
+        if [ ! -e "$LOG_FILENAME" ]; then
+            touch "$LOG_FILENAME"
+        fi
 
-		chown www-data: "$LOG_FILENAME"
-		chown www-data: "$PID_DIRNAME"
+        chown www-data: "$LOG_FILENAME"
+        chown www-data: "$PID_DIRNAME"
 
-		invoke-rc.d nginx reload
+        invoke-rc.d nginx reload
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
-    
+
     ;;
 
     *)
