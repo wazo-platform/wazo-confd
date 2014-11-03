@@ -6,7 +6,6 @@
 CRON_FILE='/etc/cron.d/xivo-restapi'
 LOG_FILENAME='/var/log/xivo-confd.log'
 PID_DIRNAME='/var/run/xivo-confd'
-TMP_DIRNAME='/tmp/xivo-confd'
 
 case "$1" in
     configure)
@@ -26,7 +25,6 @@ case "$1" in
 
 		chown www-data: "$LOG_FILENAME"
 		chown www-data: "$PID_DIRNAME"
-		chown www-data: "$TMP_DIRNAME"
 
 		invoke-rc.d nginx reload
     ;;
