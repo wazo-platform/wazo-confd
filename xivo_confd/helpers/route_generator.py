@@ -27,8 +27,7 @@ class RouteGenerator(object):
 
     def __call__(self, route, *args, **kwargs):
         def decorator(func):
-            ########################################################################
-            # func = auth.login_required(func)
+            func = auth.login_required(func)
             func = produces('application/json')(func)
             # func = consumes('application/json')(func)  # Blocks requests with no Content-Type, even if not needed
             # MUST BE CALLED AS THE END
