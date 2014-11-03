@@ -19,7 +19,7 @@ from flask import helpers as flask_helpers
 
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
-from xivo.rest_api.mooltiparse.errors import ValidationError
+from xivo_confd.helpers.mooltiparse.errors import ValidationError
 
 
 class ErrorViewNotExist(ValidationError):
