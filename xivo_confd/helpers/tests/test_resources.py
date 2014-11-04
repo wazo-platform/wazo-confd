@@ -16,9 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+import logging
+import sys
 import unittest
-from flask.testing import FlaskClient
 
+from flask.testing import FlaskClient
 from hamcrest import assert_that, equal_to, has_entries, is_in
 
 from xivo_confd import flask_http_server
@@ -44,6 +46,7 @@ class TestResources(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
         flask_http_server.register_blueprints_v1_1()
         flask_http_server.app.testing = True
         flask_http_server.app.test_client_class = TestClient
