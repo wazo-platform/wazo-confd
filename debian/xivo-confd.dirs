@@ -1,5 +1,4 @@
 etc/xivo/xivo-confd
-tmp/xivo-confd
 usr/share/xivo-confd
 var/lib/xivo-confd
 var/run/xivo-confd
