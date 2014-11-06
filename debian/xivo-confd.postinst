@@ -19,6 +19,7 @@ case "$1" in
             rename -f 's/restapid/confd/g' /var/log/xivo-restapid.*
         fi
 
+<<<<<<< HEAD
         if [ ! -e "$LOG_FILENAME" ]; then
             touch "$LOG_FILENAME"
         fi
@@ -27,6 +28,16 @@ case "$1" in
         chown www-data: "$PID_DIRNAME"
 
         invoke-rc.d nginx reload
+=======
+		if [ ! -e "$LOG_FILENAME" ]; then
+			touch "$LOG_FILENAME"
+		fi
+
+		chown www-data: "$LOG_FILENAME"
+		chown www-data: "$PID_DIRNAME"
+
+		invoke-rc.d nginx reload
+>>>>>>> master
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
 

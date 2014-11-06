@@ -1,6 +1,6 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012  Avencall
+# Copyright (C) 2014 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,4 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import xivo_steps
+
+from actions import blueprint as infos_blueprint
+
+
+def register_blueprints(app):
+    app.register_blueprint(infos_blueprint)

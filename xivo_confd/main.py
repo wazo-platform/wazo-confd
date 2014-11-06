@@ -15,19 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import argparse
 import logging
 
+import argparse
+
 from xivo.daemonize import pidfile_context
-from xivo.xivo_logging import setup_logging
-from xivo_confd import flask_http_server
-from xivo_confd import config
 from xivo.user_rights import change_user
+from xivo.xivo_logging import setup_logging
+from xivo_confd import config
+from xivo_confd import flask_http_server
+
 
 DAEMONNAME = 'xivo-confd'
 LOGFILENAME = '/var/log/{}.log'.format(DAEMONNAME)
 PID_FILENAME = '/var/run/{daemon}/{daemon}.pid'.format(daemon=DAEMONNAME)
-SOCKET_FILENAME = '/tmp/{daemon}/{daemon}.sock'.format(daemon=DAEMONNAME)
+SOCKET_FILENAME = '/var/run/{daemon}/{daemon}.sock'.format(daemon=DAEMONNAME)
 
 logger = logging.getLogger(__name__)
 
