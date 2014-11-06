@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import argparse
 import logging
 
+import argparse
+
 from xivo.daemonize import pidfile_context
+from xivo.user_rights import change_user
 from xivo.xivo_logging import setup_logging
-from xivo_confd import flask_http_server
 from xivo_confd import config
+from xivo_confd import flask_http_server
+
 
 DAEMONNAME = 'xivo-confd'
 LOGFILENAME = '/var/log/{}.log'.format(DAEMONNAME)
@@ -36,6 +39,8 @@ def main():
 
     setup_logging(LOGFILENAME, parsed_args.foreground, parsed_args.debug)
 
+    if parsed_args.user:
+        change_user(parsed_args.user)
     if parsed_args.debug:
         logger.info("Debug mode enabled.")
         flask_http_server.app.debug = True
@@ -59,8 +64,8 @@ def main():
         with pidfile_context(PID_FILENAME, parsed_args.foreground):
             WSGIServer(flask_http_server.app,
                        bindAddress=SOCKET_FILENAME,
-                       multithreaded=False,
-                       multiprocess=True,
+                       multithreaded=True,
+                       multiprocess=False,
                        debug=False).run()
 
 
@@ -83,11 +88,16 @@ def _parse_args():
                         help="Activate debug message. Default: %(default)s")
     parser.add_argument("--listen-addr",
                         default='0.0.0.0',
-                        help="Listen on address <listen_addr> instead of %(default)s")
+                        help="Listen on address <listen_addr>. Default: %(default)s")
     parser.add_argument("--listen-port",
                         type=_port_number,
                         default=9487,
-                        help="Listen on port <listen_port> instead of %(default)s")
+                        help="Listen on port <listen_port>. Default: %(default)s")
+    parser.add_argument('-u',
+                        '--user',
+                        default='www-data',
+                        action='store',
+                        help="The owner of the process. Default: %(default)s")
     return parser.parse_args()
 
 

@@ -16,81 +16,83 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-from . import mapper
 
 from flask import url_for
 from flask.globals import request
 from flask.helpers import make_response
 
 from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.user.model import User
-
+from xivo_dao.data_handler.user.model import User, UserDirectoryView
 from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import extract_search_parameters
-from xivo_confd.helpers.formatter import Formatter
-from xivo_confd.resources.users.routes import route
+from xivo_confd.helpers.formatter import NewFormatter
 
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
+from .routes import route
+from . import views
+from xivo_dao.data_handler import errors
+
 
 logger = logging.getLogger(__name__)
-formatter = Formatter(mapper, serializer, User)
 
-document = content_parser.document(
-    Field('id', Int()),
-    Field('firstname', Unicode()),
-    Field('lastname', Unicode()),
-    Field('caller_id', Unicode()),
-    Field('outgoing_caller_id', Unicode()),
-    Field('username', Unicode()),
-    Field('password', Unicode()),
-    Field('music_on_hold', Unicode()),
-    Field('mobile_phone_number', Unicode()),
-    Field('userfield', Unicode()),
-    Field('timezone', Unicode()),
-    Field('language', Unicode()),
-    Field('description', Unicode()),
-    Field('preprocess_subroutine', Unicode()),
-)
+user_formatter = NewFormatter(view_document=views.user_document,
+                              serializer=serializer,
+                              model_class=User,
+                              links_func=views.user_location)
+user_directory_formatter = NewFormatter(view_document=views.user_directory_document,
+                                        serializer=serializer,
+                                        model_class=UserDirectoryView,
+                                        links_func=views.user_directory_location)
 
 
 @route('')
 def list():
-    if 'q' in request.args:
-        items = user_services.find_all_by_fullname(request.args['q'])
-        total = len(items)
+    if 'view' in request.args:
+        result = _find_all_by_view(request.args['view'])
     else:
-        parameters = extract_search_parameters(request.args)
-        search_result = user_services.search(**parameters)
-        items = search_result.items
-        total = search_result.total
-
-    result = formatter.list_to_api(items, total)
+        if 'q' in request.args:
+            items = user_services.find_all_by_fullname(request.args['q'])
+            total = len(items)
+        else:
+            parameters = extract_search_parameters(request.args)
+            search_result = user_services.search(**parameters)
+            items = search_result.items
+            total = search_result.total
+        result = user_formatter.list_to_api(items, total)
     return make_response(result, 200)
+
+
+def _find_all_by_view(view):
+    result = None
+    if view == 'directory':
+        items = user_services.find_all_by_view_directory()
+        result = user_directory_formatter.list_to_api(items, len(items))
+    else:
+        raise errors.invalid_query_parameter('view', view)
+    return result
 
 
 @route('/<int:userid>')
 def get(userid):
     user = user_services.get(userid)
-    result = formatter.to_api(user)
+    result = user_formatter.to_api(user)
     return make_response(result, 200)
 
 
 @route('', methods=['POST'])
 def create():
-    data = document.parse(request)
-    user = formatter.dict_to_model(data)
+    data = views.user_document.parse(request)
+    user = user_formatter.dict_to_model(data)
     user = user_services.create(user)
-    result = formatter.to_api(user)
+    result = user_formatter.to_api(user)
     location = url_for('.get', userid=user.id)
     return make_response(result, 201, {'Location': location})
 
 
 @route('/<int:userid>', methods=['PUT'])
 def edit(userid):
-    data = document.parse(request)
+    data = views.user_document.parse(request)
     user = user_services.get(userid)
-    formatter.update_dict_model(data, user)
+    user_formatter.update_dict_model(data, user)
     user_services.edit(user)
     return make_response('', 204)
 
