@@ -138,7 +138,7 @@ class Converter(object):
     def decode(self, request):
         parsed_request = self.parser.parse(request)
         mapped_request = self.mapper.for_decoding(parsed_request)
-        return self.model(mapped_request)
+        return self.model(**mapped_request)
 
     @classmethod
     def for_document(cls, document, model, resource_name=None):

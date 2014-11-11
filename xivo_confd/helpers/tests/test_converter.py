@@ -32,6 +32,8 @@ class TestConverter(unittest.TestCase):
 
     def setUp(self):
         self.mapper = Mock(Mapper)
+        self.mapper.for_decoding.return_value = {'foo': 'bar'}
+
         self.serializer = Mock(Serializer)
         self.parser = Mock(Parser)
         self.model = Mock()
@@ -107,13 +109,13 @@ class TestConverter(unittest.TestCase):
     def test_when_decoding_then_creates_model_with_mapped_request(self):
         request = Mock()
 
-        mapped_request = self.mapper.for_decoding.return_value
+        mapped_request = self.mapper.for_decoding.return_value = {'foo': 'bar'}
         created_model = self.model.return_value
 
         result = self.converter.decode(request)
 
         assert_that(result, equal_to(created_model))
-        self.model.assert_called_once_with(mapped_request)
+        self.model.assert_called_once_with(**mapped_request)
 
     def test_for_document_creates_document_converter(self):
         document = Mock()
