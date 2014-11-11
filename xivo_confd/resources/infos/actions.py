@@ -20,21 +20,24 @@ import logging
 from flask import make_response, Blueprint
 
 from xivo_confd import config
-from xivo_confd.helpers import serializer
-from xivo_confd.helpers.formatter import Formatter
 from xivo_confd.helpers.route_generator import RouteGenerator
 from xivo_dao.data_handler.infos import services as infos_services
 from xivo_dao.data_handler.infos.model import Infos
 
-from . import mapper
+from xivo_confd.flask_http_server import content_parser
+from xivo_confd.helpers.mooltiparse import Field, Unicode
 
+from xivo_confd.helpers.converter import Converter
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('infos', __name__, url_prefix='/%s/infos' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
-formatter = Formatter(mapper, serializer, Infos)
+
+document = content_parser.document(Field('uuid', Unicode()))
+
+converter = Converter.for_document(document, Infos, 'infos', 'uuid')
 
 
 @route('')
 def get():
-    return make_response(formatter.to_api(infos_services.get()), 200)
+    return make_response(converter.encode(infos_services.get()), 200)
