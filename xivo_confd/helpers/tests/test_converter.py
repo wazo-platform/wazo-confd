@@ -117,6 +117,17 @@ class TestConverter(unittest.TestCase):
         assert_that(result, equal_to(created_model))
         self.model.assert_called_once_with(**mapped_request)
 
+    def test_when_updating_then_updates_mapped_fields_on_model(self):
+        request = Mock()
+        model = Mock()
+        model.field1 = 'value1'
+
+        self.mapper.for_decoding.return_value = {'field1': 'value2'}
+
+        self.converter.update(request, model)
+
+        assert_that(model.field1, equal_to('value2'))
+
     def test_for_document_creates_document_converter(self):
         document = Mock()
 

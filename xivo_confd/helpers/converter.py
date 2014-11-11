@@ -140,6 +140,12 @@ class Converter(object):
         mapped_request = self.mapper.for_decoding(parsed_request)
         return self.model(**mapped_request)
 
+    def update(self, request, model):
+        parsed_mapping = self.parser.parse(request)
+        mapped_model = self.mapper.for_decoding(parsed_mapping)
+        for name, value in mapped_model.iteritems():
+            setattr(model, name, value)
+
     @classmethod
     def for_document(cls, document, model, resource_name=None):
         parser = DocumentParser(document)
