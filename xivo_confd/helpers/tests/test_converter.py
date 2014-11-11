@@ -142,15 +142,15 @@ class TestConverter(unittest.TestCase):
         assert_that(converter.serializer, instance_of(JsonSerializer))
         assert_that(converter.serializer.resources, has_entry('models', 'id'))
 
-    def test_for_document_replaces_resource_name(self):
+    def test_for_document_replaces_resource_name_and_resource_id(self):
         document = Mock()
 
         class Model(object):
             pass
 
-        converter = Converter.for_document(document, Model, 'resource_name')
+        converter = Converter.for_document(document, Model, 'resource_name', 'resource_id')
 
-        assert_that(converter.serializer.resources, has_entry('resource_name', 'id'))
+        assert_that(converter.serializer.resources, has_entry('resource_name', 'resource_id'))
 
     def test_for_document_creates_association_converter(self):
         document = Mock()

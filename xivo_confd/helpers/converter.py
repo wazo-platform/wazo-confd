@@ -147,11 +147,12 @@ class Converter(object):
             setattr(model, name, value)
 
     @classmethod
-    def for_document(cls, document, model, resource_name=None):
+    def for_document(cls, document, model, resource_name=None, resource_id=None):
         parser = DocumentParser(document)
         mapper = DocumentMapper(document)
         resource_name = resource_name or model.__name__.lower() + 's'
-        serializer = JsonSerializer({resource_name: 'id'})
+        resource_id = resource_id or 'id'
+        serializer = JsonSerializer({resource_name: resource_id})
         return cls(model, parser, mapper, serializer)
 
     @classmethod
