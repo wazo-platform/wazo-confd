@@ -183,6 +183,13 @@ class TestDocumentMapper(unittest.TestCase):
 
         assert_that(result, has_entries({'field1': 'value1', 'field2': 'value2'}))
 
+    def test_given_document_when_decoding_then_ignores_fields_not_in_mapping(self):
+        mapping = {'field1': 'value1'}
+
+        result = self.mapper.for_decoding(mapping)
+
+        assert_that(result, has_entries({'field1': 'value1'}))
+
 
 class TestDocumentParser(unittest.TestCase):
 

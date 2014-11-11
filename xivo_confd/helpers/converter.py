@@ -65,7 +65,9 @@ class DocumentMapper(Mapper):
         return {name: getattr(model, name) for name in self.document.field_names()}
 
     def for_decoding(self, mapping):
-        return {name: mapping[name] for name in self.document.field_names()}
+        return {name: mapping[name]
+                for name in self.document.field_names()
+                if name in mapping}
 
 
 class DocumentParser(Parser):
