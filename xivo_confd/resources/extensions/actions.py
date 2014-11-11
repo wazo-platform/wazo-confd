@@ -16,23 +16,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-from . import mapper
 
 from flask import url_for, request
 from flask.helpers import make_response
 from xivo_dao.data_handler.extension import services as extension_services
 from xivo_dao.data_handler.extension.model import Extension
-from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import extract_search_parameters
-from xivo_confd.helpers.formatter import Formatter
 from xivo_confd.resources.extensions.routes import extension_route as route
 
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
 
+from xivo_confd.helpers.converter import Converter
+
 
 logger = logging.getLogger(__name__)
-formatter = Formatter(mapper, serializer, Extension)
 extra_parameters = ['type']
 
 document = content_parser.document(
@@ -42,43 +40,44 @@ document = content_parser.document(
     Field('commented', Boolean())
 )
 
+converter = Converter.for_document(document, Extension)
+
 
 @route('')
 def list():
     parameters = extract_search_parameters(request.args, extra_parameters)
     search_result = extension_services.search(**parameters)
-    result = formatter.list_to_api(search_result.items, search_result.total)
-    return make_response(result, 200)
+    items = converter.encode_list(search_result.items, search_result.total)
+    return make_response(items, 200)
 
 
-@route('/<int:extensionid>')
-def get(extensionid):
-    extension = extension_services.get(extensionid)
-    result = formatter.to_api(extension)
-    return make_response(result, 200)
+@route('/<int:resource_id>')
+def get(resource_id):
+    extension = extension_services.get(resource_id)
+    encoded_extension = converter.encode(extension)
+    return make_response(encoded_extension, 200)
 
 
 @route('', methods=['POST'])
 def create():
-    data = document.parse(request)
-    extension = formatter.dict_to_model(data)
-    extension = extension_services.create(extension)
-    result = formatter.to_api(extension)
-    location = url_for('.get', extensionid=extension.id)
-    return make_response(result, 201, {'Location': location})
+    extension = converter.decode(request)
+    created_extension = extension_services.create(extension)
+    encoded_extension = converter.encode(created_extension)
+    location = url_for('.get', resource_id=created_extension.id)
+
+    return make_response(encoded_extension, 201, {'Location': location})
 
 
-@route('/<int:extensionid>', methods=['PUT'])
-def edit(extensionid):
-    data = document.parse(request)
-    extension = extension_services.get(extensionid)
-    formatter.update_dict_model(data, extension)
+@route('/<int:resource_id>', methods=['PUT'])
+def edit(resource_id):
+    extension = extension_services.get(resource_id)
+    converter.update(request, extension)
     extension_services.edit(extension)
     return make_response('', 204)
 
 
-@route('/<int:extensionid>', methods=['DELETE'])
-def delete(extensionid):
-    extension = extension_services.get(extensionid)
+@route('/<int:resource_id>', methods=['DELETE'])
+def delete(resource_id):
+    extension = extension_services.get(resource_id)
     extension_services.delete(extension)
     return make_response('', 204)
