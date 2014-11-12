@@ -15,29 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask import helpers as flask_helpers
-
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
-from xivo_confd.helpers.mooltiparse.errors import ValidationError
+from xivo_confd.helpers.converter import Converter
+from xivo_dao.data_handler.user.model import User, UserDirectoryView
 
-
-class ErrorViewNotExist(ValidationError):
-
-    def __init__(self, error):
-        Exception.__init__(self, error)
-        self.error = error
-
-
-def user_location(model):
-    return {
-        'links': [
-            {
-                'rel': 'users',
-                'href': flask_helpers.url_for('users.get', userid=model.id, _external=True)
-            }
-        ]
-    }
 
 user_document = content_parser.document(
     Field('id', Int()),
@@ -57,18 +39,7 @@ user_document = content_parser.document(
 )
 
 
-def user_directory_location(model):
-    res = user_location(model)
-    if model.line_id:
-        res['links'].append(
-            {
-                'rel': 'lines',
-                'href': flask_helpers.url_for('lines.get', lineid=model.line_id, _external=True)
-            }
-        )
-    return res
-
-user_directory_document = content_parser.document(
+directory_document = content_parser.document(
     Field('id', Int()),
     Field('line_id', Int()),
     Field('agent_id', Int()),
@@ -77,3 +48,7 @@ user_directory_document = content_parser.document(
     Field('exten', Unicode()),
     Field('mobile_phone_number', Unicode())
 )
+
+user_converter = Converter.for_resource(user_document, User)
+
+directory_converter = Converter.for_request(directory_document, UserDirectoryView)

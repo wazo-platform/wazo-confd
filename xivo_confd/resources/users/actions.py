@@ -17,88 +17,70 @@
 
 import logging
 
-from flask import url_for
-from flask.globals import request
-from flask.helpers import make_response
+from flask import url_for, request, make_response
 
 from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.user.model import User, UserDirectoryView
-from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import extract_search_parameters
-from xivo_confd.helpers.formatter import NewFormatter
 
 from .routes import route
-from . import views
+from .converter import user_converter, directory_converter
+
 from xivo_dao.data_handler import errors
 
 
 logger = logging.getLogger(__name__)
 
-user_formatter = NewFormatter(view_document=views.user_document,
-                              serializer=serializer,
-                              model_class=User,
-                              links_func=views.user_location)
-user_directory_formatter = NewFormatter(view_document=views.user_directory_document,
-                                        serializer=serializer,
-                                        model_class=UserDirectoryView,
-                                        links_func=views.user_directory_location)
-
 
 @route('')
 def list():
     if 'view' in request.args:
-        result = _find_all_by_view(request.args['view'])
-    else:
-        if 'q' in request.args:
-            items = user_services.find_all_by_fullname(request.args['q'])
-            total = len(items)
-        else:
-            parameters = extract_search_parameters(request.args)
-            search_result = user_services.search(**parameters)
-            items = search_result.items
-            total = search_result.total
-        result = user_formatter.list_to_api(items, total)
-    return make_response(result, 200)
+        items = _find_all_by_view(request.args['view'])
+        return make_response(items, 200)
+
+    if 'q' in request.args:
+        items = user_services.find_all_by_fullname(request.args['q'])
+        encoded_items = user_converter.encode_list(items)
+        return make_response(encoded_items, 200)
+
+    parameters = extract_search_parameters(request.args)
+    search_result = user_services.search(**parameters)
+    encoded_result = user_converter.encode_list(search_result.items, search_result.total)
+    return make_response(encoded_result, 200)
 
 
 def _find_all_by_view(view):
-    result = None
     if view == 'directory':
         items = user_services.find_all_by_view_directory()
-        result = user_directory_formatter.list_to_api(items, len(items))
-    else:
-        raise errors.invalid_query_parameter('view', view)
-    return result
+        return directory_converter.encode_list(items)
+    raise errors.invalid_query_parameter('view', view)
 
 
-@route('/<int:userid>')
-def get(userid):
-    user = user_services.get(userid)
-    result = user_formatter.to_api(user)
-    return make_response(result, 200)
+@route('/<int:resource_id>')
+def get(resource_id):
+    user = user_services.get(resource_id)
+    encoded_user = user_converter.encode(user)
+    return make_response(encoded_user, 200)
 
 
 @route('', methods=['POST'])
 def create():
-    data = views.user_document.parse(request)
-    user = user_formatter.dict_to_model(data)
-    user = user_services.create(user)
-    result = user_formatter.to_api(user)
-    location = url_for('.get', userid=user.id)
-    return make_response(result, 201, {'Location': location})
+    user = user_converter.decode(request)
+    created_user = user_services.create(user)
+    encoded_user = user_converter.encode(created_user)
+    location = url_for('.get', resource_id=created_user.id)
+    return make_response(encoded_user, 201, {'Location': location})
 
 
-@route('/<int:userid>', methods=['PUT'])
-def edit(userid):
-    data = views.user_document.parse(request)
-    user = user_services.get(userid)
-    user_formatter.update_dict_model(data, user)
+@route('/<int:resource_id>', methods=['PUT'])
+def edit(resource_id):
+    user = user_services.get(resource_id)
+    user_converter.update(request, user)
     user_services.edit(user)
     return make_response('', 204)
 
 
-@route('/<int:userid>', methods=['DELETE'])
-def delete(userid):
-    user = user_services.get(userid)
+@route('/<int:resource_id>', methods=['DELETE'])
+def delete(resource_id):
+    user = user_services.get(resource_id)
     user_services.delete(user)
     return make_response('', 204)
