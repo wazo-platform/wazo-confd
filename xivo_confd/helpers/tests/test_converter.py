@@ -19,7 +19,7 @@ import unittest
 import json
 
 from mock import Mock, patch
-from hamcrest import assert_that, equal_to, has_entries, instance_of, has_items, has_entry
+from hamcrest import assert_that, equal_to, has_entries, instance_of, has_items, has_entry, contains
 
 from xivo_confd.helpers.converter import Converter, Mapper, Serializer, Parser
 from xivo_confd.helpers.converter import DocumentMapper, DocumentParser, ResourceSerializer, RequestParser
@@ -259,6 +259,18 @@ class TestResourceSerializer(unittest.TestCase):
 
         assert_that(decoded_result, has_entries(mapping))
         assert_that(decoded_result['links'], has_items(user_link, line_link))
+
+    def test_given_resource_id_is_none_then_does_not_add_link(self):
+        serializer = ResourceSerializer({'users': 'user_id'})
+
+        mapping = {'user_id': None}
+
+        result = serializer.serialize(mapping)
+
+        decoded_result = json.loads(result)
+
+        assert_that(decoded_result, has_entries(mapping))
+        assert_that(decoded_result['links'], contains())
 
     def test_given_list_of_items_then_adds_total(self):
         mapping = Mock()

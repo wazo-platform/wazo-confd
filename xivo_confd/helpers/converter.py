@@ -104,7 +104,8 @@ class ResourceSerializer(Serializer):
 
     def _map_item(self, mapping):
         mapping['links'] = [self._generate_link(resource, mapping[resource_id])
-                            for resource, resource_id in self.resources.iteritems()]
+                            for resource, resource_id in self.resources.iteritems()
+                            if mapping.get(resource_id) is not None]
         return mapping
 
     def _generate_link(self, resource, resource_id):
