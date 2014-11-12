@@ -19,55 +19,54 @@
 from flask import request, url_for, make_response
 
 from xivo_dao.data_handler.line_extension import services as line_extension_services
+from xivo_dao.data_handler.line_extension.model import LineExtension
 
 from xivo_confd.helpers import url
 from xivo_confd.resources.lines.routes import line_route
 from xivo_confd.resources.extensions.routes import extension_route
 
-from xivo_confd.resources.line_extension.formatter import LineExtensionFormatter
-
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Int
 
-formatter = LineExtensionFormatter()
+from xivo_confd.helpers.converter import Converter
 
 document = content_parser.document(
     Field('line_id', Int()),
     Field('extension_id', Int())
 )
 
-
-@line_route('/<int:lineid>/extension', methods=['POST'])
-def associate_extension(lineid):
-    url.check_line_exists(lineid)
-    data = document.parse(request)
-    model = formatter.dict_to_model(data, lineid)
-    created_model = line_extension_services.associate(model)
-
-    result = formatter.to_api(created_model)
-    location = url_for('.associate_extension', lineid=lineid)
-    return make_response(result, 201, {'Location': location})
+converter = Converter.for_association(document, LineExtension, {'lines': 'line_id', 'extensions': 'extension_id'})
 
 
-@line_route('/<int:lineid>/extension')
-def get_extension_from_line(lineid):
-    url.check_line_exists(lineid)
-    line_extension = line_extension_services.get_by_line_id(lineid)
-    result = formatter.to_api(line_extension)
-    return make_response(result, 200)
+@line_route('/<int:line_id>/extension', methods=['POST'])
+def associate_extension(line_id):
+    url.check_line_exists(line_id)
+    line_extension = converter.decode(request)
+    created_line_extension = line_extension_services.associate(line_extension)
+    encoded_line_extension = converter.encode(created_line_extension)
+    location = url_for('.associate_extension', line_id=line_id)
+    return make_response(encoded_line_extension, 201, {'Location': location})
 
 
-@extension_route('/<int:extensionid>/line')
-def get_line_from_extension(extensionid):
-    url.check_extension_exists(extensionid)
-    line_extension = line_extension_services.get_by_extension_id(extensionid)
-    result = formatter.to_api(line_extension)
-    return make_response(result, 200)
+@line_route('/<int:line_id>/extension')
+def get_extension_from_line(line_id):
+    url.check_line_exists(line_id)
+    line_extension = line_extension_services.get_by_line_id(line_id)
+    encoded_line_extension = converter.encode(line_extension)
+    return make_response(encoded_line_extension, 200)
 
 
-@line_route('/<int:lineid>/extension', methods=['DELETE'])
-def dissociate_extension(lineid):
-    url.check_line_exists(lineid)
-    line_extension = line_extension_services.get_by_line_id(lineid)
+@extension_route('/<int:extension_id>/line')
+def get_line_from_extension(extension_id):
+    url.check_extension_exists(extension_id)
+    line_extension = line_extension_services.get_by_extension_id(extension_id)
+    encoded_line_extension = converter.encode(line_extension)
+    return make_response(encoded_line_extension, 200)
+
+
+@line_route('/<int:line_id>/extension', methods=['DELETE'])
+def dissociate_extension(line_id):
+    url.check_line_exists(line_id)
+    line_extension = line_extension_services.get_by_line_id(line_id)
     line_extension_services.dissociate(line_extension)
     return make_response('', 204)
