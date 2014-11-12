@@ -86,9 +86,9 @@ class AssociationParser(Parser):
 
     def parse(self, request):
         mapping = self.document.parse(request)
-        mapping.update({name: request.args[name]
+        mapping.update({name: request.view_args[name]
                         for name in self.document.field_names()
-                        if name in request.args})
+                        if name in request.view_args})
         self.document.validate(mapping)
         return mapping
 

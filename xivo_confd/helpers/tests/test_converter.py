@@ -223,7 +223,7 @@ class TestAssociationParser(unittest.TestCase):
 
     def test_given_document_when_parsing_then_parses_data_from_post_and_get(self):
         request = Mock()
-        request.args = {'line_id': 2, 'extrafield': 'extravalue'}
+        request.view_args = {'line_id': 2, 'extrafield': 'extravalue'}
 
         document = Mock(DocumentProxy)
         document.field_names.return_value = ['user_id', 'line_id']
