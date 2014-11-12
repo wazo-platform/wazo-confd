@@ -24,21 +24,19 @@ from flask.helpers import make_response, url_for
 
 from xivo_confd import config
 from xivo_confd.helpers.route_generator import RouteGenerator
-from xivo_confd.helpers.formatter import Formatter
-from xivo_confd.resources.voicemails import mapper
-from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import extract_search_parameters
+
 from xivo_dao.data_handler.voicemail.model import Voicemail
 from xivo_dao.data_handler.voicemail import services as voicemail_services
 
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
+from xivo_confd.helpers.converter import Converter
 
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.VERSION_1_1)
 route = RouteGenerator(blueprint)
-formatter = Formatter(mapper, serializer, Voicemail)
 
 document = content_parser.document(
     Field('id', Int()),
@@ -55,43 +53,43 @@ document = content_parser.document(
     Field('ask_password', Boolean())
 )
 
+converter = Converter.for_resource(document, Voicemail)
+
 
 @route('')
 def list():
     search_parameters = extract_search_parameters(request.args)
     search_result = voicemail_services.search(**search_parameters)
-    result = formatter.list_to_api(search_result.items, search_result.total)
-    return make_response(result, 200)
+    encoded_result = converter.encode_list(search_result.items, search_result.total)
+    return make_response(encoded_result, 200)
 
 
-@route('/<int:voicemailid>')
-def get(voicemailid):
-    voicemail = voicemail_services.get(voicemailid)
-    result = formatter.to_api(voicemail)
-    return make_response(result, 200)
+@route('/<int:resource_id>')
+def get(resource_id):
+    voicemail = voicemail_services.get(resource_id)
+    encoded_voicemail = converter.encode(voicemail)
+    return make_response(encoded_voicemail, 200)
 
 
 @route('', methods=['POST'])
 def create():
-    data = document.parse(request)
-    voicemail = formatter.dict_to_model(data)
-    voicemail = voicemail_services.create(voicemail)
-    result = formatter.to_api(voicemail)
-    location = url_for('.get', voicemailid=voicemail.id)
-    return make_response(result, 201, {'Location': location})
+    voicemail = converter.decode(request)
+    created_voicemail = voicemail_services.create(voicemail)
+    encoded_voicemail = converter.encode(created_voicemail)
+    location = url_for('.get', resource_id=created_voicemail.id)
+    return make_response(encoded_voicemail, 201, {'Location': location})
 
 
-@route('/<int:voicemailid>', methods=['PUT'])
-def edit(voicemailid):
-    data = document.parse(request)
-    voicemail = voicemail_services.get(voicemailid)
-    formatter.update_dict_model(data, voicemail)
+@route('/<int:resource_id>', methods=['PUT'])
+def edit(resource_id):
+    voicemail = voicemail_services.get(resource_id)
+    converter.update(request, voicemail)
     voicemail_services.edit(voicemail)
     return make_response('', 204)
 
 
-@route('/<int:voicemailid>', methods=['DELETE'])
-def delete(voicemailid):
-    voicemail = voicemail_services.get(voicemailid)
+@route('/<int:resource_id>', methods=['DELETE'])
+def delete(resource_id):
+    voicemail = voicemail_services.get(resource_id)
     voicemail_services.delete(voicemail)
     return make_response('', 204)
