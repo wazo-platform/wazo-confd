@@ -46,7 +46,7 @@ document = content_parser.document(
     Field('options', Dict())
 )
 
-converter = Converter.for_document(document, Device)
+converter = Converter.for_resource(document, Device)
 
 
 logger = logging.getLogger(__name__)

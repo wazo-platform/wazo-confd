@@ -35,7 +35,7 @@ document = content_parser.document(
     Field('extension_id', Int())
 )
 
-converter = Converter.for_association(document, LineExtension, {'lines': 'line_id', 'extensions': 'extension_id'})
+converter = Converter.for_request(document, LineExtension, {'lines': 'line_id', 'extensions': 'extension_id'})
 
 
 @line_route('/<int:line_id>/extension', methods=['POST'])

@@ -44,7 +44,7 @@ document = content_parser.document(
     Field('callerid', Unicode()),
 )
 
-converter = Converter.for_document(document, LineSIP, 'lines_sip')
+converter = Converter.for_resource(document, LineSIP, 'lines_sip')
 
 
 @route('')

@@ -35,7 +35,7 @@ route = RouteGenerator(blueprint)
 
 document = content_parser.document(Field('uuid', Unicode()))
 
-converter = Converter.for_document(document, Infos, 'infos', 'uuid')
+converter = Converter.for_resource(document, Infos, 'infos', 'uuid')
 
 
 @route('')

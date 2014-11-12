@@ -37,7 +37,7 @@ document = content_parser.document(
     Field('name', Unicode())
 )
 
-converter = Converter.for_document(document, CtiProfile, 'cti_profiles')
+converter = Converter.for_resource(document, CtiProfile, 'cti_profiles')
 
 
 @route('', methods=['GET'])

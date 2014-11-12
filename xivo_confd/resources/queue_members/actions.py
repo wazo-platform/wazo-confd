@@ -20,7 +20,20 @@ from flask import request, make_response, url_for
 
 from xivo_dao.data_handler.queue_members import services
 from xivo_confd.resources.queues.routes import queue_route
-from xivo_confd.resources.queue_members.converter import converter
+
+from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
+
+from xivo_confd.helpers.converter import Converter
+from xivo_confd.flask_http_server import content_parser
+from xivo_confd.helpers.mooltiparse import Field, Int
+
+document = content_parser.document(
+    Field('queue_id', Int()),
+    Field('agent_id', Int()),
+    Field('penalty', Int())
+)
+
+converter = Converter.for_request(document, QueueMemberAgent)
 
 
 @queue_route('/<int:queue_id>/members/agents/<int:agent_id>')

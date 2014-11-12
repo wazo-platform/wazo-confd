@@ -22,7 +22,7 @@ from mock import Mock, patch
 from hamcrest import assert_that, equal_to, has_entries, instance_of, has_items, has_entry
 
 from xivo_confd.helpers.converter import Converter, Mapper, Serializer, Parser
-from xivo_confd.helpers.converter import DocumentMapper, DocumentParser, JsonSerializer, AssociationParser
+from xivo_confd.helpers.converter import DocumentMapper, DocumentParser, ResourceSerializer, RequestParser
 from xivo_confd.helpers.mooltiparse.document import Document, DocumentProxy
 from xivo_confd.helpers.mooltiparse.field import Field
 from xivo_confd.helpers.mooltiparse.types import Unicode
@@ -128,43 +128,43 @@ class TestConverter(unittest.TestCase):
 
         assert_that(model.field1, equal_to('value2'))
 
-    def test_for_document_creates_document_converter(self):
+    def test_for_resource_creates_resource_converter(self):
         document = Mock()
 
         class Model(object):
             pass
 
-        converter = Converter.for_document(document, Model)
+        converter = Converter.for_resource(document, Model)
 
         assert_that(converter.model, equal_to(Model))
         assert_that(converter.parser, instance_of(DocumentParser))
         assert_that(converter.mapper, instance_of(DocumentMapper))
-        assert_that(converter.serializer, instance_of(JsonSerializer))
+        assert_that(converter.serializer, instance_of(ResourceSerializer))
         assert_that(converter.serializer.resources, has_entry('models', 'id'))
 
-    def test_for_document_replaces_resource_name_and_resource_id(self):
+    def test_for_resource_replaces_resource_name_and_resource_id(self):
         document = Mock()
 
         class Model(object):
             pass
 
-        converter = Converter.for_document(document, Model, 'resource_name', 'resource_id')
+        converter = Converter.for_resource(document, Model, 'resource_name', 'resource_id')
 
         assert_that(converter.serializer.resources, has_entry('resource_name', 'resource_id'))
 
-    def test_for_document_creates_association_converter(self):
+    def test_for_request_creates_request_converter(self):
         document = Mock()
 
         class Model(object):
             pass
 
         links = {'users': 'user_id', 'lines': 'line_id'}
-        converter = Converter.for_association(document, Model, links)
+        converter = Converter.for_request(document, Model, links)
 
         assert_that(converter.model, equal_to(Model))
-        assert_that(converter.parser, instance_of(AssociationParser))
+        assert_that(converter.parser, instance_of(RequestParser))
         assert_that(converter.mapper, instance_of(DocumentMapper))
-        assert_that(converter.serializer, instance_of(JsonSerializer))
+        assert_that(converter.serializer, instance_of(ResourceSerializer))
         assert_that(converter.serializer.resources, has_entries(links))
 
 
@@ -219,7 +219,7 @@ class TestDocumentParser(unittest.TestCase):
         assert_that(result, equal_to(parsed_request))
 
 
-class TestAssociationParser(unittest.TestCase):
+class TestRequestParser(unittest.TestCase):
 
     def test_given_document_when_parsing_then_parses_data_from_post_and_get(self):
         request = Mock()
@@ -229,7 +229,7 @@ class TestAssociationParser(unittest.TestCase):
         document.field_names.return_value = ['user_id', 'line_id']
         document.parse.return_value = {'user_id': 1}
 
-        parser = AssociationParser(document)
+        parser = RequestParser(document)
 
         result = parser.parse(request)
 
@@ -239,15 +239,15 @@ class TestAssociationParser(unittest.TestCase):
         document.validate.assert_called_once_with(expected_entries)
 
 
-class TestJsonSerializer(unittest.TestCase):
+class TestResourceSerializer(unittest.TestCase):
 
     def setUp(self):
-        self.serializer = JsonSerializer({'resources': 'id'})
+        self.serializer = ResourceSerializer({'resources': 'id'})
 
     @patch('flask.helpers.url_for')
     def test_given_mapping_then_generates_all_links(self, url_for):
         url_for.side_effect = lambda r, resource_id, _external: 'http://localhost/{}/{}'.format(r.split('.')[0], resource_id)
-        serializer = JsonSerializer({'users': 'user_id', 'lines': 'line_id'})
+        serializer = ResourceSerializer({'users': 'user_id', 'lines': 'line_id'})
 
         mapping = {'user_id': 1, 'line_id': 2}
         user_link = {'rel': 'users', 'href': 'http://localhost/users/1'}

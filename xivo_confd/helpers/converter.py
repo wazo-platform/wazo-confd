@@ -79,7 +79,7 @@ class DocumentParser(Parser):
         return self.document.parse(request)
 
 
-class AssociationParser(Parser):
+class RequestParser(Parser):
 
     def __init__(self, document):
         self.document = document
@@ -93,7 +93,7 @@ class AssociationParser(Parser):
         return mapping
 
 
-class JsonSerializer(Serializer):
+class ResourceSerializer(Serializer):
 
     def __init__(self, resources):
         self.resources = resources
@@ -147,19 +147,20 @@ class Converter(object):
             setattr(model, name, value)
 
     @classmethod
-    def for_document(cls, document, model, resource_name=None, resource_id=None):
+    def for_request(cls, document, model, links=None):
+        links = links or {}
+        parser = RequestParser(document)
+        mapper = DocumentMapper(document)
+        serializer = ResourceSerializer(links)
+        return cls(model, parser, mapper, serializer)
+
+    @classmethod
+    def for_resource(cls, document, model, resource_name=None, resource_id=None):
         resource_name = resource_name or model.__name__.lower() + 's'
         resource_id = resource_id or 'id'
         links = {resource_name: resource_id}
 
         parser = DocumentParser(document)
         mapper = DocumentMapper(document)
-        serializer = JsonSerializer(links)
-        return cls(model, parser, mapper, serializer)
-
-    @classmethod
-    def for_association(cls, document, model, links):
-        parser = AssociationParser(document)
-        mapper = DocumentMapper(document)
-        serializer = JsonSerializer(links)
+        serializer = ResourceSerializer(links)
         return cls(model, parser, mapper, serializer)

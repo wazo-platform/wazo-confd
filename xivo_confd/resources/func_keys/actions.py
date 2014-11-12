@@ -21,7 +21,7 @@ document = content_parser.document(
     Field('destination_id', Unicode()),
 )
 
-converter = Converter.for_document(document, FuncKey)
+converter = Converter.for_resource(document, FuncKey)
 
 
 def list():

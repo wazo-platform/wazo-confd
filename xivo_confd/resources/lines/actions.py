@@ -39,7 +39,7 @@ document = content_parser.document(
     Field('device_id', Unicode()),
 )
 
-converter = Converter.for_document(document, Line)
+converter = Converter.for_resource(document, Line)
 
 
 @route('')

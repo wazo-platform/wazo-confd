@@ -40,7 +40,7 @@ document = content_parser.document(
     Field('commented', Boolean())
 )
 
-converter = Converter.for_document(document, Extension)
+converter = Converter.for_resource(document, Extension)
 
 
 @route('')
