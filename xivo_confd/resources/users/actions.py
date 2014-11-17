@@ -33,19 +33,23 @@ logger = logging.getLogger(__name__)
 
 @route('')
 def list():
-    if 'view' in request.args:
-        items = _find_all_by_view(request.args['view'])
-        return make_response(items, 200)
-
     if 'q' in request.args:
         items = user_services.find_all_by_fullname(request.args['q'])
         encoded_items = user_converter.encode_list(items)
         return make_response(encoded_items, 200)
 
-    parameters = extract_search_parameters(request.args)
+    parameters = extract_search_parameters(request.args, ['view'])
     search_result = user_services.search(**parameters)
-    encoded_result = user_converter.encode_list(search_result.items, search_result.total)
+
+    converter = _find_converter()
+    encoded_result = converter.encode_list(search_result.items, search_result.total)
     return make_response(encoded_result, 200)
+
+
+def _find_converter():
+    if request.args.get('view') == 'directory':
+        return directory_converter
+    return user_converter
 
 
 def _find_all_by_view(view):
