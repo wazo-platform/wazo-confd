@@ -16,18 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import request
+from flask.helpers import make_response
+
 from xivo_confd.resources.users.routes import route
-from xivo_confd.resources.user_cti_profile.formatter import UserCtiProfileFormatter
-from flask.globals import request
 
 from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
-from flask.helpers import make_response
+from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
 
 from xivo_confd.helpers import url
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
+from xivo_confd.helpers.converter import Converter
 
-formatter = UserCtiProfileFormatter()
 
 document = content_parser.document(
     Field('user_id', Int()),
@@ -35,20 +36,21 @@ document = content_parser.document(
     Field('enabled', Boolean())
 )
 
+converter = Converter.for_request(document, UserCtiProfile, {'users': 'user_id',
+                                                             'cti_profiles': 'cti_profile_id'})
 
-@route('/<int:userid>/cti', methods=['PUT'])
-def edit_cti_configuration(userid):
-    url.check_user_exists(userid)
-    data = document.parse(request)
-    model = formatter.dict_to_model(data, userid)
-    user_cti_profile_services.edit(model)
 
+@route('/<int:user_id>/cti', methods=['PUT'])
+def edit_cti_configuration(user_id):
+    url.check_user_exists(user_id)
+    user_cti_profile = converter.decode(request)
+    user_cti_profile_services.edit(user_cti_profile)
     return make_response('', 204)
 
 
-@route('/<int:userid>/cti', methods=['GET'])
-def get_cti_configuration(userid):
-    url.check_user_exists(userid)
-    model = user_cti_profile_services.get(userid)
-    result = formatter.to_api(model)
-    return make_response(result, 200)
+@route('/<int:user_id>/cti', methods=['GET'])
+def get_cti_configuration(user_id):
+    url.check_user_exists(user_id)
+    user_cti_profile = user_cti_profile_services.get(user_id)
+    encoded_profile = converter.encode(user_cti_profile)
+    return make_response(encoded_profile, 200)

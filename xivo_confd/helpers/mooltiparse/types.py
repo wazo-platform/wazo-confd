@@ -48,6 +48,12 @@ class Float(FieldType):
     error_message = "wrong type. Should be a floating-point number"
 
 
+class Dict(FieldType):
+
+    type_class = dict
+    error_message = "wrong type. Should be a dict-like structure"
+
+
 class Array(FieldType):
 
     error_message = "wrong type. Should be an array-like sequence'"

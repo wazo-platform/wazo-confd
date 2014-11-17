@@ -21,7 +21,7 @@ import sys
 import unittest
 
 from flask.testing import FlaskClient
-from hamcrest import assert_that, equal_to, has_entries, is_in
+from hamcrest import assert_that, equal_to, has_entries, is_in, has_items, has_key, contains
 
 from xivo_confd import flask_http_server
 from xivo_confd.helpers import serializer
@@ -58,21 +58,27 @@ class TestResources(unittest.TestCase):
     def _serialize_decode(self, data):
         return serializer.decode(data)
 
-    def assert_response(self, response, status_code, expected_response):
+    def assert_response(self, response, status_code, expected):
         assert_that(status_code, equal_to(response.status_code))
-        assert_that(self._serialize_decode(response.data), equal_to(expected_response))
+        assert_that(self._serialize_decode(response.data), equal_to(expected))
 
-    def assert_response_for_list(self, response, expected_response):
+    def assert_response_for_list(self, response, expected):
         assert_that(response.status_code, equal_to(200))
-        assert_that(self._serialize_decode(response.data), equal_to(expected_response))
 
-    def assert_response_for_get(self, response, expected_response):
+        data = self._serialize_decode(response.data)
+        assert_that(data, has_key('total'))
+        assert_that(data, has_key('items'))
+
+        list_assertion = contains(*(self._build_assertion(i) for i in data['items']))
+        assert_that(data['items'], list_assertion)
+
+    def assert_response_for_get(self, response, expected):
         assert_that(response.status_code, equal_to(200))
-        assert_that(self._serialize_decode(response.data), has_entries(expected_response))
+        assert_that(self._serialize_decode(response.data), self._build_assertion(expected))
 
-    def assert_response_for_create(self, response, expected_response):
+    def assert_response_for_create(self, response, expected):
         assert_that(response.status_code, equal_to(201))
-        assert_that(self._serialize_decode(response.data), has_entries(expected_response))
+        assert_that(self._serialize_decode(response.data), self._build_assertion(expected))
 
     def assert_response_for_update(self, response):
         assert_that(response.status_code, equal_to(204))
@@ -87,3 +93,9 @@ class TestResources(unittest.TestCase):
         assert_that(response.status_code, is_in(statuses))
         if regex:
             assert_that(regex.search(response.data), response.data)
+
+    def _build_assertion(self, item):
+        assertion = dict(item)
+        if 'links' in assertion:
+            assertion['links'] = has_items(*(l for l in assertion['links']))
+        return has_entries(assertion)

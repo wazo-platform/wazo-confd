@@ -16,19 +16,30 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-from . import mapper
 from .routes import line_route as route
 
-from flask.globals import request
+from flask import request
 from flask.helpers import make_response
 from xivo_dao.data_handler.line.model import Line
 from xivo_dao.data_handler.line import services as line_services
-from xivo_confd.helpers import serializer
-from xivo_confd.helpers.formatter import Formatter
 
+from xivo_confd.flask_http_server import content_parser
+from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
+from xivo_confd.helpers.converter import Converter
 
 logger = logging.getLogger(__name__)
-formatter = Formatter(mapper, serializer, Line)
+
+document = content_parser.document(
+    Field('id', Int()),
+    Field('context', Unicode()),
+    Field('name', Unicode()),
+    Field('protocol', Unicode()),
+    Field('provisioning_extension', Unicode()),
+    Field('device_slot', Int()),
+    Field('device_id', Unicode()),
+)
+
+converter = Converter.for_resource(document, Line)
 
 
 @route('')
@@ -38,12 +49,12 @@ def list():
     else:
         lines = line_services.find_all()
 
-    result = formatter.list_to_api(lines)
-    return make_response(result, 200)
+    items = converter.encode_list(lines)
+    return make_response(items, 200)
 
 
-@route('/<int:lineid>')
-def get(lineid):
-    line = line_services.get(lineid)
-    result = formatter.to_api(line)
-    return make_response(result, 200)
+@route('/<int:resource_id>')
+def get(resource_id):
+    line = line_services.get(resource_id)
+    encoded_line = converter.encode(line)
+    return make_response(encoded_line, 200)

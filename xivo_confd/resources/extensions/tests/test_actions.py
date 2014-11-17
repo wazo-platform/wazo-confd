@@ -110,7 +110,7 @@ class TestExtensionActions(TestResources):
         response = self.app.get("%s/%d" % (BASE_URL, self.extension.id))
 
         mock_extension_services_get.assert_called_with(self.extension.id)
-        self.assert_response_for_list(response, expected_response)
+        self.assert_response_for_get(response, expected_response)
 
     @patch('xivo_dao.data_handler.extension.services.create')
     def test_create(self, mock_extension_services_create):

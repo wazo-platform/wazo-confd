@@ -119,3 +119,23 @@ class TestArrayFieldType(unittest.TestCase):
 
         validator1.assert_any_call(element1)
         validator2.assert_any_call(element2)
+
+
+class TestDictFieldType(unittest.TestCase):
+
+    def setUp(self):
+        self.field_type = types.Dict()
+
+    def test_given_none_then_passes(self):
+        self.field_type.validate(None)
+
+    def test_given_wrong_type_then_raises_error(self):
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be a dict-like structure",
+                                self.field_type.validate, "foo")
+
+    def test_given_bool_then_raises_error(self):
+        self.assertRaisesRegexp(ValidationError, "wrong type. Should be a dict-like structure",
+                                self.field_type.validate, True)
+
+    def test_given_int_then_passes(self):
+        self.field_type.validate({'foo': 'bar'})

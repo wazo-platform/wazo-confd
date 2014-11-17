@@ -17,7 +17,7 @@
 
 import unittest
 from mock import Mock
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, contains
 
 from xivo_confd.helpers.mooltiparse.field import Field
 from xivo_confd.helpers.mooltiparse.document import Document, DocumentProxy
@@ -51,6 +51,17 @@ class TestDocument(unittest.TestCase):
 
         field1.validate.assert_called_with('value1', 'action')
 
+    def test_given_a_document_then_returns_a_list_of_field_names(self):
+        field1 = Mock(Field)
+        field1.name = 'field1'
+
+        field2 = Mock(Field)
+        field2.name = 'field2'
+
+        document = Document([field1, field2])
+
+        assert_that(document.field_names(), contains('field1', 'field2'))
+
 
 class TestDocumentProxy(unittest.TestCase):
 
@@ -66,3 +77,24 @@ class TestDocumentProxy(unittest.TestCase):
 
         assert_that(result, equal_to(content))
         parser.parse.assert_called_once_with(request, document, 'action')
+
+    def test_document_proxy_proxies_call_to_field_names(self):
+        document = Mock()
+
+        proxy = DocumentProxy(Mock(), document)
+
+        result = proxy.field_names()
+
+        assert_that(result, equal_to(document.field_names.return_value))
+        document.field_names.assert_called_once_with()
+
+    def test_document_proxy_proxies_call_to_validate(self):
+        document = Mock()
+        content = Mock()
+        action = Mock()
+
+        proxy = DocumentProxy(Mock(), document)
+
+        proxy.validate(content, action)
+
+        document.validate.assert_called_once_with(content, action)

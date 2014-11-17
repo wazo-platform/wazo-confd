@@ -51,7 +51,7 @@ class TestLineExtensionCollectionRoutes(TestResources):
 
         response = self.app.get(BASE_URL % LINE_ID)
 
-        self.assert_response_for_get(response, expected)
+        self.assert_response_for_list(response, expected)
         line_exists.assert_called_once_with(LINE_ID)
         get_all_by_line_id.assert_called_once_with(LINE_ID)
 

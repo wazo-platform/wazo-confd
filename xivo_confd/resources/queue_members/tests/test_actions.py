@@ -44,7 +44,7 @@ class TestQueueMemberActions(TestResources):
 
         result = self.app.get(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
 
-        self.assert_response_for_list(result, expected_result)
+        self.assert_response_for_get(result, expected_result)
         get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
 
     @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')

@@ -20,15 +20,14 @@ from flask import request, url_for, make_response
 
 
 from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
+from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
 
 from xivo_confd.helpers import url
 from xivo_confd.resources.users.routes import route
-from xivo_confd.resources.user_voicemail.formatter import UserVoicemailFormatter
 
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
-
-formatter = UserVoicemailFormatter()
+from xivo_confd.helpers.converter import Converter
 
 document = content_parser.document(
     Field('user_id', Int()),
@@ -36,30 +35,32 @@ document = content_parser.document(
     Field('enabled', Boolean())
 )
 
+converter = Converter.for_request(document, UserVoicemail, {'users': 'user_id',
+                                                            'voicemails': 'voicemail_id'})
 
-@route('/<int:userid>/voicemail', methods=['POST'])
-def associate_voicemail(userid):
-    url.check_user_exists(userid)
-    data = document.parse(request)
-    model = formatter.dict_to_model(data, userid)
+
+@route('/<int:user_id>/voicemail', methods=['POST'])
+def associate_voicemail(user_id):
+    url.check_user_exists(user_id)
+    model = converter.decode(request)
     created_model = user_voicemail_services.associate(model)
+    encoded_model = converter.encode(created_model)
 
-    result = formatter.to_api(created_model)
-    location = url_for('.associate_voicemail', userid=userid)
-    return make_response(result, 201, {'Location': location})
-
-
-@route('/<int:userid>/voicemail')
-def get_user_voicemail(userid):
-    url.check_user_exists(userid)
-    user_voicemail = user_voicemail_services.get_by_user_id(userid)
-    result = formatter.to_api(user_voicemail)
-    return make_response(result, 200)
+    location = url_for('.associate_voicemail', user_id=user_id)
+    return make_response(encoded_model, 201, {'Location': location})
 
 
-@route('/<int:userid>/voicemail', methods=['DELETE'])
-def dissociate_voicemail(userid):
-    url.check_user_exists(userid)
-    user_voicemail = user_voicemail_services.get_by_user_id(userid)
+@route('/<int:user_id>/voicemail')
+def get_user_voicemail(user_id):
+    url.check_user_exists(user_id)
+    user_voicemail = user_voicemail_services.get_by_user_id(user_id)
+    encoded_user_voicemail = converter.encode(user_voicemail)
+    return make_response(encoded_user_voicemail, 200)
+
+
+@route('/<int:user_id>/voicemail', methods=['DELETE'])
+def dissociate_voicemail(user_id):
+    url.check_user_exists(user_id)
+    user_voicemail = user_voicemail_services.get_by_user_id(user_id)
     user_voicemail_services.dissociate(user_voicemail)
     return make_response('', 204)

@@ -16,37 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, url_for, make_response
+
+from xivo_confd.resources.lines.routes import line_blueprint
+
 from . import actions
-from xivo_confd.resources.lines.routes import line_blueprint, line_route
-
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Int
-
-document = content_parser.document(
-    Field('line_id', Int()),
-    Field('extension_id', Int())
-)
-
-
-@line_route('/<int:lineid>/extensions')
-def list_extensions(lineid):
-    response = actions.list_extensions(lineid)
-    return make_response(response, 200)
-
-
-@line_route('/<int:lineid>/extensions', methods=['POST'])
-def associate_line_extension(lineid):
-    parameters = document.parse(request)
-    response = actions.associate_extension(lineid, parameters)
-    location = url_for('.list_extensions', lineid=lineid)
-    return make_response(response, 201, {'Location': location})
-
-
-@line_route('/<int:lineid>/extensions/<int:extensionid>', methods=['DELETE'])
-def dissociate_line_extension(lineid, extensionid):
-    response = actions.dissociate_extension(lineid, extensionid)
-    return make_response(response, 204)
 
 
 def register_blueprints(app):
