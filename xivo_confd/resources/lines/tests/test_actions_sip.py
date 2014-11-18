@@ -124,11 +124,12 @@ class TestLineSIPActions(TestResources):
 
         expected_result = self.build_item(self.line)
 
-        created_line = LineSIP(context=self.line.context,
-                               name=self.line.username,
-                               provisioning_extension=self.line.provisioning_extension,
-                               device_slot=self.line.device_slot,
-                               username=self.line.username)
+        created_line = self.build_line(context=self.line.context,
+                                       name=self.line.username,
+                                       provisioning_extension=self.line.provisioning_extension,
+                                       device_slot=self.line.device_slot,
+                                       username=self.line.username,
+                                       protocol='sip')
 
         data = {
             'context': self.line.context,
