@@ -21,6 +21,7 @@ from hamcrest import assert_that, equal_to, contains
 
 from xivo_confd.helpers.mooltiparse.field import Field
 from xivo_confd.helpers.mooltiparse.document import Document, DocumentProxy
+from xivo_dao.data_handler.exception import InputError
 
 
 class TestDocument(unittest.TestCase):
@@ -61,6 +62,16 @@ class TestDocument(unittest.TestCase):
         document = Document([field1, field2])
 
         assert_that(document.field_names(), contains('field1', 'field2'))
+
+    def test_given_a_document_when_content_contains_unknown_field_then_raises_error(self):
+        field1 = Mock(Field)
+        field1.name = 'field1'
+
+        content = {'invalidfield': 'invalidvalue'}
+
+        document = Document([field1])
+
+        self.assertRaises(InputError, document.validate, content)
 
 
 class TestDocumentProxy(unittest.TestCase):
