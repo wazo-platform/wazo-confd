@@ -64,6 +64,7 @@ def get(resource_id):
 @route('', methods=['POST'])
 def create():
     line = converter.decode(request)
+    _fix_line(line)
     line.name = line.username
 
     created_line = line_services.create(line)
@@ -75,6 +76,7 @@ def create():
 @route('/<int:resource_id>', methods=['PUT'])
 def edit(resource_id):
     line = line_services.get(resource_id)
+
     converter.update(request, line)
     line.name = line.username
 
@@ -87,3 +89,9 @@ def delete(resource_id):
     line = line_services.get(resource_id)
     line_services.delete(line)
     return make_response('', 204)
+
+
+def _fix_line(line):
+    for field in line._MAPPING.values():
+        if not hasattr(line, field):
+            setattr(line, field, None)
