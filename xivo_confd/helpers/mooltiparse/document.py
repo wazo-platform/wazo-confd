@@ -24,6 +24,17 @@ class Document(object):
         self.fields = fields
 
     def validate(self, content, action=None):
+        self._validate_unknown_fields(content)
+        self._validate_fields(content, action)
+
+    def _validate_unknown_fields(self, content):
+        fields = content.keys()
+        valid_fields = self.field_names()
+        invalid_fields = set(fields) - set(valid_fields)
+        if invalid_fields:
+            raise errors.unknown(*invalid_fields)
+
+    def _validate_fields(self, content, action):
         for field in self.fields:
             value = content.get(field.name)
             field.validate(value, action)
