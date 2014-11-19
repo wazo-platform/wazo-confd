@@ -15,10 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import json
+
 from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
-from xivo_confd.helpers.converter import Converter
-from xivo_dao.data_handler.user.model import User, UserDirectoryView
+from xivo_confd.helpers.converter import Converter, Serializer, DocumentParser, DocumentMapper
+from xivo_dao.data_handler.user.model import User, UserDirectory
+
+
+class DirectorySerializer(Serializer):
+
+    def serialize(self, item):
+        return json.dumps(item)
+
+    def serialize_list(self, items, total=None):
+        return json.dumps({'total': total or len(items),
+                           'items': items})
 
 
 user_document = content_parser.document(
@@ -51,4 +63,7 @@ directory_document = content_parser.document(
 
 user_converter = Converter.for_resource(user_document, User)
 
-directory_converter = Converter.for_request(directory_document, UserDirectoryView)
+directory_converter = Converter(parser=DocumentParser(directory_document),
+                                mapper=DocumentMapper(directory_document),
+                                serializer=DirectorySerializer(),
+                                model=UserDirectory)

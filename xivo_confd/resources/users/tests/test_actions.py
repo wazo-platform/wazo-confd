@@ -19,10 +19,9 @@
 from hamcrest import *
 from mock import patch
 
-from xivo_dao.data_handler.user.model import User, UserDirectoryView
+from xivo_dao.data_handler.user.model import User, UserDirectory
 from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_confd.helpers.tests.test_resources import TestResources
-from xivo_confd.helpers import serializer
 
 BASE_URL = "/1.1/users"
 
@@ -142,50 +141,53 @@ class TestUserActions(TestResources):
                                             skip=2)
         self.assert_response_for_list(response, expected_response)
 
-    @patch('xivo_dao.data_handler.user.services.find_all_by_view_directory')
-    def test_list_users_by_view_with_invalid_view(self, find_all_by_view_directory):
-        view = 'viewnotexist'
-
-        response = self.app.get("%s?view=%s" % (BASE_URL, view))
-
-        assert_that(find_all_by_view_directory.call_count, equal_to(0))
-        self.assert_error(response)
-
-    @patch('xivo_dao.data_handler.user.services.find_all_by_view_directory')
-    def test_list_users_by_view_with_no_users(self, find_all_by_view_directory):
+    @patch('xivo_dao.data_handler.user.services.search')
+    def test_list_users_by_view_with_no_users(self, user_search):
         view = 'directory'
         expected_response = {'total': 0, 'items': []}
 
-        find_all_by_view_directory.return_value = []
+        user_search.return_value = SearchResult(total=0, items=[])
 
         response = self.app.get("%s?view=%s" % (BASE_URL, view))
 
-        find_all_by_view_directory.assert_any_call()
+        user_search.assert_any_call(view='directory')
         self.assert_response_for_list(response, expected_response)
 
-    @patch('xivo_dao.data_handler.user.services.find_all_by_view_directory')
-    def test_list_users_by_view(self, find_all_by_view_directory):
+    @patch('xivo_dao.data_handler.user.services.search')
+    def test_list_users_by_view(self, user_search):
         view = 'directory'
-        user1 = UserDirectoryView(id=1,
-                                  firstname=u'test1')
-        user2 = UserDirectoryView(id=2,
-                                  firstname=u'test2',
-                                  line_id=22,
-                                  exten='2222')
-        user3 = UserDirectoryView(id=3,
-                                  firstname=u'test3',
-                                  agent_id=333)
+        user1 = UserDirectory(id=1,
+                              firstname=u'test1',
+                              lastname=None,
+                              line_id=None,
+                              agent_id=None,
+                              exten=None,
+                              mobile_phone_number=None)
+        user2 = UserDirectory(id=2,
+                              firstname=u'test2',
+                              lastname=None,
+                              line_id=22,
+                              agent_id=None,
+                              exten='2222',
+                              mobile_phone_number=None)
+        user3 = UserDirectory(id=3,
+                              firstname=u'test3',
+                              lastname=None,
+                              line_id=None,
+                              agent_id=333,
+                              exten=None,
+                              mobile_phone_number=None)
 
         expected_response = {'total': 3,
                              'items': [self.build_item_for_view(user1),
                                        self.build_item_for_view(user2),
                                        self.build_item_for_view(user3)]}
 
-        find_all_by_view_directory.return_value = [user1, user2, user3]
+        user_search.return_value = SearchResult(total=3, items=[user1, user2, user3])
 
         response = self.app.get("%s?view=%s" % (BASE_URL, view))
 
-        find_all_by_view_directory.assert_any_call()
+        user_search.assert_any_call(view='directory')
         self.assert_response_for_list(response, expected_response)
 
     @patch('xivo_dao.data_handler.user.services.get')
