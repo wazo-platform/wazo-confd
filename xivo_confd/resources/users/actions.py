@@ -19,13 +19,11 @@ import logging
 
 from flask import url_for, request, make_response
 
-from xivo_dao.data_handler.user import services as user_services
 from xivo_confd.helpers.common import extract_search_parameters
+from xivo_dao.data_handler.user import services as user_services
 
-from .routes import route
 from .converter import user_converter, directory_converter
-
-from xivo_dao.data_handler import errors
+from .routes import route
 
 
 logger = logging.getLogger(__name__)
@@ -50,13 +48,6 @@ def _find_converter():
     if request.args.get('view') == 'directory':
         return directory_converter
     return user_converter
-
-
-def _find_all_by_view(view):
-    if view == 'directory':
-        items = user_services.find_all_by_view_directory()
-        return directory_converter.encode_list(items)
-    raise errors.invalid_query_parameter('view', view)
 
 
 @route('/<int:resource_id>')
