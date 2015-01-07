@@ -1,6 +1,5 @@
 server {
     listen 9486 ssl;
-    listen 127.0.0.1:9487;
     listen 127.0.0.1:50050;
     listen 50051 ssl;
 
@@ -9,9 +8,6 @@ server {
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
     location / {
-         include fastcgi_params;
-         fastcgi_param PATH_INFO $fastcgi_script_name;
-         fastcgi_param SCRIPT_NAME "";
-         fastcgi_pass unix:/var/run/xivo-confd/xivo-confd.sock;
+         proxy_pass http://localhost:9487;
     }
 }

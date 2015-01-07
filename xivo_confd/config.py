@@ -16,9 +16,69 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-HOST = '0.0.0.0'
-PORT = 9487
+import argparse
+
+from xivo.config_helper import parse_config_file
+from xivo.xivo_logging import get_log_level_by_name
 
 RESOURCES_PACKAGE = 'xivo_confd.resources'
-
 VERSION_1_1 = '1.1'
+
+
+def load(argv):
+    default_config = {
+        'foreground': False,
+        'debug': False,
+        'user': 'www-data',
+        'log_level': 'info',
+        'config_file': '/etc/xivo-confd/config.yml',
+        'log_filename': '/var/log/xivo-confd.log',
+        'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
+        'rest_api': {
+            'listen': '127.0.0.1',
+            'port': 9487
+        }
+    }
+    config = dict(default_config)
+
+    config.update(_parse_cli_args(argv, default_config))
+    config.update(parse_config_file(config['config_file']))
+    _interpret_raw_values(config)
+
+    return config
+
+
+def _parse_cli_args(argv, default_config):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c',
+                        '--config-file',
+                        action='store',
+                        default=default_config['config_file'],
+                        help="The path where is the config file. Default: %(default)s")
+    parser.add_argument('-d',
+                        '--debug',
+                        action='store_true',
+                        default=default_config['debug'],
+                        help="Log debug messages. Overrides log_level. Default: %(default)s")
+    parser.add_argument('-f',
+                        '--foreground',
+                        action='store_true',
+                        default=default_config['foreground'],
+                        help="Foreground, don't daemonize. Default: %(default)s")
+    parser.add_argument('-l',
+                        '--log-level',
+                        action='store',
+                        default='INFO',
+                        help="Logs messages with LOG_LEVEL details. Must be one of:\n"
+                             "critical, error, warning, info, debug. Default: %(default)s")
+    parser.add_argument('-u',
+                        '--user',
+                        action='store',
+                        default=default_config['user'],
+                        help="The owner of the process.")
+    parsed_args = parser.parse_args(argv)
+    return vars(parsed_args)
+
+
+def _interpret_raw_values(config):
+    config['log_level'] = get_log_level_by_name(config['log_level'])

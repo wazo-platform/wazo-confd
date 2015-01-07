@@ -17,34 +17,28 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import logging
-import os
-import pkg_resources
-import urllib
 
-from datetime import timedelta
-from flask import Flask, request
+import pkg_resources
+
 from xivo_confd import config
-from xivo_confd.helpers.common import handle_error
+
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 
-logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-app.secret_key = os.urandom(24)
-app.permanent_session_lifetime = timedelta(minutes=5)
+logger = logging.getLogger(__name__)
 
 content_parser = mooltiparse_parser()
 
 
-def register_blueprints_v1_1():
-    _load_resources()
+def register_blueprints_v1_1(app):
+    _load_resources(app)
 
 
-def _load_resources():
+def _load_resources(app):
     resources = _list_resources()
     for resource in resources:
         pkg_resource = '%s.%s' % (config.RESOURCES_PACKAGE, resource)
-        _load_module('%s.routes' % pkg_resource)
+        _load_module('%s.routes' % pkg_resource, app)
 
 
 def _list_resources():
@@ -61,7 +55,7 @@ def _list_resources():
     return resources
 
 
-def _load_module(name):
+def _load_module(name, app):
     try:
         mod = __import__(name)
         components = name.split('.')
@@ -73,21 +67,3 @@ def _load_module(name):
     else:
         mod.register_blueprints(app)
         logger.debug('Module successfully loaded: %s', name)
-
-
-@app.before_request
-def log_requests():
-    params = {
-        'method': request.method,
-        'url': urllib.unquote(request.url).decode('utf8')
-    }
-    if request.data:
-        params.update({'data': request.data})
-        logger.info("%(method)s %(url)s with data %(data)s ", params)
-    else:
-        logger.info("%(method)s %(url)s", params)
-
-
-@app.errorhandler(Exception)
-def error_handler(error):
-    return handle_error(error)

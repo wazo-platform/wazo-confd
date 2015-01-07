@@ -18,9 +18,10 @@
 
 from mock import patch
 
+from xivo_confd.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.extension.model import Extension
 from xivo_dao.data_handler.utils.search import SearchResult
-from xivo_confd.helpers.tests.test_resources import TestResources
+
 
 BASE_URL = "/1.1/extensions"
 
@@ -28,7 +29,7 @@ BASE_URL = "/1.1/extensions"
 class TestExtensionActions(TestResources):
 
     def setUp(self):
-        super(TestResources, self).setUp()
+        super(TestExtensionActions, self).setUp()
         self.extension = Extension(id=1, exten='1234', context='default')
 
     def build_item(self, extension):

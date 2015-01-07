@@ -15,18 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
 from datetime import datetime
+import logging
+
 from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
-from xivo_dao.data_handler.call_log import services
-from xivo_dao.data_handler import errors
+
 from xivo_confd import config
 from xivo_confd.authentication import auth
 from xivo_confd.negotiate.flask_negotiate import produces
-from xivo_confd.resources.call_logs import serializer
 from xivo_confd.resources.call_logs import mapper
+from xivo_confd.resources.call_logs import serializer
+from xivo_dao.data_handler import errors
+from xivo_dao.data_handler.call_log import services
+
 
 logger = logging.getLogger(__name__)
 blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config.VERSION_1_1)

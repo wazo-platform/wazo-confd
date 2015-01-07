@@ -16,24 +16,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
+
+from flask import Flask
 from hamcrest import assert_that, equal_to
 from werkzeug.exceptions import HTTPException, BadRequest
-from xivo_confd.helpers.common import extract_search_parameters, handle_error
-from xivo_confd.flask_http_server import app
-from xivo_confd.helpers import serializer
 
-from xivo_dao.data_handler.exception import ServiceError
+from xivo_confd.helpers import serializer
+from xivo_confd.helpers.common import extract_search_parameters, handle_error
+from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
+from xivo_confd.helpers.mooltiparse.errors import ValidationError
 from xivo_dao.data_handler.exception import InputError
 from xivo_dao.data_handler.exception import NotFoundError
-
-from xivo_confd.helpers.mooltiparse.errors import ValidationError
-from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
+from xivo_dao.data_handler.exception import ServiceError
 
 
 class TestCommon(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        app = Flask('test')
         app.testing = True
         app.test_request_context('').push()
 

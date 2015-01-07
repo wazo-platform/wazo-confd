@@ -20,11 +20,13 @@ import logging
 import sys
 import unittest
 
+from flask import Flask
 from flask.testing import FlaskClient
 from hamcrest import assert_that, equal_to, has_entries, is_in, has_items, has_key, contains
 
 from xivo_confd import flask_http_server
 from xivo_confd.helpers import serializer
+from xivo_confd.helpers.common import handle_error
 
 
 class TestClient(FlaskClient):
@@ -47,10 +49,15 @@ class TestResources(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-        flask_http_server.register_blueprints_v1_1()
-        flask_http_server.app.testing = True
-        flask_http_server.app.test_client_class = TestClient
-        cls.app = flask_http_server.app.test_client()
+        app = Flask('test')
+        app.config['TESTING'] = True
+        app.test_client_class = TestClient
+        cls.app = app.test_client()
+        flask_http_server.register_blueprints_v1_1(app)
+
+        @app.errorhandler(Exception)
+        def _handle_error(error):
+            return handle_error(error)
 
     def _serialize_encode(self, data):
         return serializer.encode(data).encode('utf8')

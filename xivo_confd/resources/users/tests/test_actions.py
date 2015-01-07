@@ -16,12 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from hamcrest import *
 from mock import patch
 
+from xivo_confd.helpers.tests.test_resources import TestResources
 from xivo_dao.data_handler.user.model import User, UserDirectory
 from xivo_dao.data_handler.utils.search import SearchResult
-from xivo_confd.helpers.tests.test_resources import TestResources
+
 
 BASE_URL = "/1.1/users"
 

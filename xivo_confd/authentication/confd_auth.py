@@ -15,12 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask import request
-from flask.ext.httpauth import HTTPDigestAuth
 from functools import wraps
+import logging
+
+from flask import request
+from flask_httpauth import HTTPDigestAuth
+
 from xivo_dao import accesswebservice_dao
 
-import logging
+
 logger = logging.getLogger(__name__)
 
 

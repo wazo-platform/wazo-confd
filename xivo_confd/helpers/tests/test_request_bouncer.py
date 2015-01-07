@@ -16,11 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import Flask
 from flask.helpers import make_response
 from mock import patch
 from werkzeug.exceptions import Forbidden
 
-from xivo_confd.flask_http_server import app
 from xivo_confd.helpers.request_bouncer import limit_to_localhost
 from xivo_confd.helpers.tests import test_resources
 
@@ -28,6 +28,7 @@ from xivo_confd.helpers.tests import test_resources
 class TestRequestBouncer(test_resources.TestResources):
 
     def setUp(self):
+        app = Flask('test')
         ctx = app.test_request_context('')
         ctx.push()
 

@@ -16,8 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import patch, Mock
+
+from flask import Flask
 from hamcrest import assert_that, contains
+from mock import patch, Mock
 
 from xivo_confd import flask_http_server as server
 
@@ -28,11 +30,12 @@ class TestLoadResources(unittest.TestCase):
     @patch('xivo_confd.flask_http_server._load_module')
     def test_load_resources(self, load_module, list_resources):
         list_resources.return_value = ['resource1', 'resource2']
+        app = Mock(Flask)
 
-        server._load_resources()
+        server._load_resources(app)
 
-        load_module.assert_any_call('xivo_confd.resources.resource1.routes')
-        load_module.assert_any_call('xivo_confd.resources.resource2.routes')
+        load_module.assert_any_call('xivo_confd.resources.resource1.routes', app)
+        load_module.assert_any_call('xivo_confd.resources.resource2.routes', app)
 
 
 class TestListResources(unittest.TestCase):
@@ -84,13 +87,13 @@ class TestListResources(unittest.TestCase):
 
 class TestLoadModule(unittest.TestCase):
 
-    @patch.object(server, 'app')
     @patch('__builtin__.__import__')
-    def test_given_module_name_then_registers_blueprints(self, import_, app):
+    def test_given_module_name_then_registers_blueprints(self, import_):
         package = import_.return_value = Mock()
         module = package.module = Mock()
+        app = Mock(Flask)
 
-        server._load_module('package.module')
+        server._load_module('package.module', app)
 
         import_.assert_any_call('package.module')
         module.register_blueprints.assert_called_once_with(app)
@@ -98,7 +101,8 @@ class TestLoadModule(unittest.TestCase):
     @patch('__builtin__.__import__')
     def test_given_import_error_then_does_not_raise_error(self, import_):
         import_.side_effect = ImportError
+        app = Mock(Flask)
 
-        server._load_module('package.module')
+        server._load_module('package.module', app)
 
         import_.assert_any_call('package.module')

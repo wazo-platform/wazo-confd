@@ -17,15 +17,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 from datetime import datetime
-from mock import Mock, patch
+import re
+
 from hamcrest import assert_that, equal_to, has_entries
+from mock import Mock, patch
+
 from xivo_confd.helpers.tests.test_resources import TestResources
 from xivo_confd.resources.call_logs.serializer import CSV_HEADERS
 from xivo_dao.data_handler.call_log.model import CallLog
 
-BASE_URL = "/1.1/call_logs"
 
-import re
+BASE_URL = "/1.1/call_logs"
 
 
 class TestCallLogActions(TestResources):
