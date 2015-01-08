@@ -16,80 +16,73 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-import logging
-
-from flask.globals import request
 from flask.blueprints import Blueprint
+from flask.globals import request
 from flask.helpers import make_response, url_for
 
 from xivo_confd import config
-from xivo_confd.helpers.route_generator import RouteGenerator
 from xivo_confd.helpers.common import extract_search_parameters
-
-from xivo_dao.data_handler.voicemail.model import Voicemail
-from xivo_dao.data_handler.voicemail import services as voicemail_services
-
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
 from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
+from xivo_dao.data_handler.voicemail import services as voicemail_services
+from xivo_dao.data_handler.voicemail.model import Voicemail
 
 
-logger = logging.getLogger(__name__)
-blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
+def load(core_rest_api):
+    blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.VERSION_1_1)
+    document = core_rest_api.content_parser.document(
+        Field('id', Int()),
+        Field('name', Unicode()),
+        Field('number', Unicode()),
+        Field('context', Unicode()),
+        Field('password', Unicode()),
+        Field('email', Unicode()),
+        Field('language', Unicode()),
+        Field('timezone', Unicode()),
+        Field('max_messages', Int()),
+        Field('attach_audio', Boolean()),
+        Field('delete_messages', Boolean()),
+        Field('ask_password', Boolean())
+    )
+    converter = Converter.for_resource(document, Voicemail)
 
-document = content_parser.document(
-    Field('id', Int()),
-    Field('name', Unicode()),
-    Field('number', Unicode()),
-    Field('context', Unicode()),
-    Field('password', Unicode()),
-    Field('email', Unicode()),
-    Field('language', Unicode()),
-    Field('timezone', Unicode()),
-    Field('max_messages', Int()),
-    Field('attach_audio', Boolean()),
-    Field('delete_messages', Boolean()),
-    Field('ask_password', Boolean())
-)
+    @blueprint.route('')
+    @core_rest_api.auth.login_required
+    def list():
+        search_parameters = extract_search_parameters(request.args)
+        search_result = voicemail_services.search(**search_parameters)
+        encoded_result = converter.encode_list(search_result.items, search_result.total)
+        return make_response(encoded_result, 200)
 
-converter = Converter.for_resource(document, Voicemail)
+    @blueprint.route('/<int:resource_id>')
+    @core_rest_api.auth.login_required
+    def get(resource_id):
+        voicemail = voicemail_services.get(resource_id)
+        encoded_voicemail = converter.encode(voicemail)
+        return make_response(encoded_voicemail, 200)
 
+    @blueprint.route('', methods=['POST'])
+    @core_rest_api.auth.login_required
+    def create():
+        voicemail = converter.decode(request)
+        created_voicemail = voicemail_services.create(voicemail)
+        encoded_voicemail = converter.encode(created_voicemail)
+        location = url_for('.get', resource_id=created_voicemail.id)
+        return make_response(encoded_voicemail, 201, {'Location': location})
 
-@route('')
-def list():
-    search_parameters = extract_search_parameters(request.args)
-    search_result = voicemail_services.search(**search_parameters)
-    encoded_result = converter.encode_list(search_result.items, search_result.total)
-    return make_response(encoded_result, 200)
+    @blueprint.route('/<int:resource_id>', methods=['PUT'])
+    @core_rest_api.auth.login_required
+    def edit(resource_id):
+        voicemail = voicemail_services.get(resource_id)
+        converter.update(request, voicemail)
+        voicemail_services.edit(voicemail)
+        return make_response('', 204)
 
+    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
+    @core_rest_api.auth.login_required
+    def delete(resource_id):
+        voicemail = voicemail_services.get(resource_id)
+        voicemail_services.delete(voicemail)
+        return make_response('', 204)
 
-@route('/<int:resource_id>')
-def get(resource_id):
-    voicemail = voicemail_services.get(resource_id)
-    encoded_voicemail = converter.encode(voicemail)
-    return make_response(encoded_voicemail, 200)
-
-
-@route('', methods=['POST'])
-def create():
-    voicemail = converter.decode(request)
-    created_voicemail = voicemail_services.create(voicemail)
-    encoded_voicemail = converter.encode(created_voicemail)
-    location = url_for('.get', resource_id=created_voicemail.id)
-    return make_response(encoded_voicemail, 201, {'Location': location})
-
-
-@route('/<int:resource_id>', methods=['PUT'])
-def edit(resource_id):
-    voicemail = voicemail_services.get(resource_id)
-    converter.update(request, voicemail)
-    voicemail_services.edit(voicemail)
-    return make_response('', 204)
-
-
-@route('/<int:resource_id>', methods=['DELETE'])
-def delete(resource_id):
-    voicemail = voicemail_services.get(resource_id)
-    voicemail_services.delete(voicemail)
-    return make_response('', 204)
+    core_rest_api.register(blueprint)

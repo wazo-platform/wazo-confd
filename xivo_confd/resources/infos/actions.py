@@ -15,29 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
-
 from flask import make_response, Blueprint
 
 from xivo_confd import config
-from xivo_confd.helpers.route_generator import RouteGenerator
+from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.mooltiparse import Field, Unicode
 from xivo_dao.data_handler.infos import services as infos_services
 from xivo_dao.data_handler.infos.model import Infos
 
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Unicode
 
-from xivo_confd.helpers.converter import Converter
+def load(core_rest_api):
+    blueprint = Blueprint('infos', __name__, url_prefix='/%s/infos' % config.VERSION_1_1)
+    document = core_rest_api.content_parser.document(Field('uuid', Unicode()))
 
-logger = logging.getLogger(__name__)
-blueprint = Blueprint('infos', __name__, url_prefix='/%s/infos' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
+    converter = Converter.for_resource(document, Infos, 'infos', 'uuid')
 
-document = content_parser.document(Field('uuid', Unicode()))
+    @blueprint.route('')
+    @core_rest_api.auth.login_required
+    def get():
+        return make_response(converter.encode(infos_services.get()), 200)
 
-converter = Converter.for_resource(document, Infos, 'infos', 'uuid')
-
-
-@route('')
-def get():
-    return make_response(converter.encode(infos_services.get()), 200)
+    core_rest_api.register(blueprint)

@@ -90,7 +90,8 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 @@ -55,7 +55,7 @@
  
  
- @route('')
+ @blueprint.route('')
+ @core_rest_api.auth.login_required
 -def list():
 +def list(): # pylint: disable=redefined-builtin
      find_parameters = extract_find_parameters(order_mapping)
@@ -102,7 +103,8 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 @@ -36,7 +36,7 @@
  
  
- @route('')
+ @blueprint.route('')
+ @core_rest_api.auth.login_required
 -def list():
 +def list(): # pylint: disable=redefined-builtin
      if 'q' in request.args:
@@ -126,7 +128,8 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 @@ -28,7 +28,7 @@
  
  
- @route('')
+ @blueprint.route('')
+ @core_rest_api.auth.login_required
 -def list():
 +def list(): # pylint: disable=redefined-builtin
      return actions.list()
@@ -150,7 +153,8 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 @@ -33,7 +33,7 @@
  
  
- @route('')
+ @blueprint.route('')
+ @core_rest_api.auth.login_required
 -def list():
 +def list(): # pylint: disable=redefined-builtin
      if 'q' in request.args:
@@ -198,7 +202,8 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 @@ -36,7 +36,7 @@
  
  
- @route('')
+ @blueprint.route('')
+ @core_rest_api.auth.login_required
 -def list():
 +def list(): # pylint: disable=redefined-builtin
      if 'q' in request.args:
@@ -234,7 +239,8 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 @@ -48,7 +48,7 @@
  
  
- @route('')
+ @blueprint.route('')
+ @core_rest_api.auth.login_required
 -def list():
 +def list(): # pylint: disable=redefined-builtin
      find_parameters = extract_find_parameters(order_mapping)

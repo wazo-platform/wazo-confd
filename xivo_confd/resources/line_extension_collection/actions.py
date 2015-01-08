@@ -18,47 +18,47 @@
 
 from flask import request, url_for, make_response
 
-from xivo_confd.resources.lines.routes import line_route
-
-from xivo_dao.data_handler.line_extension.model import LineExtension
-from xivo_dao.data_handler.line_extension import services as line_extension_services
-
 from xivo_confd.helpers import url
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Int
 from xivo_confd.helpers.converter import Converter
-
-document = content_parser.document(
-    Field('line_id', Int()),
-    Field('extension_id', Int())
-)
-
-converter = Converter.for_request(document, LineExtension, {'lines': 'line_id',
-                                                            'extensions': 'extension_id'})
+from xivo_confd.helpers.mooltiparse import Field, Int
+from xivo_dao.data_handler.line_extension import services as line_extension_services
+from xivo_dao.data_handler.line_extension.model import LineExtension
 
 
-@line_route('/<int:line_id>/extensions')
-def list_extensions(line_id):
-    url.check_line_exists(line_id)
-    line_extensions = line_extension_services.get_all_by_line_id(line_id)
-    items = converter.encode_list(line_extensions)
-    return make_response(items, 200)
+def load(core_rest_api):
+    line_blueprint = core_rest_api.blueprint('lines')
+    document = core_rest_api.content_parser.document(
+        Field('line_id', Int()),
+        Field('extension_id', Int())
+    )
+    converter = Converter.for_request(document, LineExtension, {'lines': 'line_id',
+                                                                'extensions': 'extension_id'})
 
+    @line_blueprint.route('/<int:line_id>/extensions')
+    @core_rest_api.auth.login_required
+    def list_extensions(line_id):
+        url.check_line_exists(line_id)
+        line_extensions = line_extension_services.get_all_by_line_id(line_id)
+        items = converter.encode_list(line_extensions)
+        return make_response(items, 200)
 
-@line_route('/<int:line_id>/extensions', methods=['POST'])
-def associate_line_extension(line_id):
-    url.check_line_exists(line_id)
-    model = converter.decode(request)
-    created_model = line_extension_services.associate(model)
-    encoded_model = converter.encode(created_model)
-    location = url_for('.list_extensions', line_id=line_id)
-    return make_response(encoded_model, 201, {'Location': location})
+    @line_blueprint.route('/<int:line_id>/extensions', methods=['POST'])
+    @core_rest_api.auth.login_required
+    def associate_line_extension(line_id):
+        url.check_line_exists(line_id)
+        model = converter.decode(request)
+        created_model = line_extension_services.associate(model)
+        encoded_model = converter.encode(created_model)
+        location = url_for('.list_extensions', line_id=line_id)
+        return make_response(encoded_model, 201, {'Location': location})
 
+    @line_blueprint.route('/<int:line_id>/extensions/<int:extension_id>', methods=['DELETE'])
+    @core_rest_api.auth.login_required
+    def dissociate_line_extension(line_id, extension_id):
+        url.check_line_exists(line_id)
+        url.check_extension_exists(extension_id)
+        model = LineExtension(line_id=line_id, extension_id=extension_id)
+        line_extension_services.dissociate(model)
+        return make_response('', 204)
 
-@line_route('/<int:line_id>/extensions/<int:extension_id>', methods=['DELETE'])
-def dissociate_line_extension(line_id, extension_id):
-    url.check_line_exists(line_id)
-    url.check_extension_exists(extension_id)
-    model = LineExtension(line_id=line_id, extension_id=extension_id)
-    line_extension_services.dissociate(model)
-    return make_response('', 204)
+    core_rest_api.register(line_blueprint)

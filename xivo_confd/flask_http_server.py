@@ -17,45 +17,38 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import logging
-
-import pkg_resources
-
 from xivo_confd import config
-
-from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 
 
 logger = logging.getLogger(__name__)
 
-content_parser = mooltiparse_parser()
+ORDER_RESOURCES = [
+    "call_logs",
+    "configuration",
+    "cti_profiles",
+    "devices",
+    "extensions",
+    "infos",
+    "lines",
+    "queue_members",
+    "users",
+    "voicemails",
+
+    "line_extension",
+    "line_extension_collection",
+    "user_cti_profile",
+    "user_line",
+    "user_voicemail",
+]
 
 
-def register_blueprints_v1_1(app):
-    _load_resources(app)
-
-
-def _load_resources(app):
-    resources = _list_resources()
-    for resource in resources:
+def register_blueprints(core_rest_api):
+    for resource in ORDER_RESOURCES:
         pkg_resource = '%s.%s' % (config.RESOURCES_PACKAGE, resource)
-        _load_module('%s.routes' % pkg_resource, app)
+        _load_module('%s.actions' % pkg_resource, core_rest_api)
 
 
-def _list_resources():
-    try:
-        contents = sorted(pkg_resources.resource_listdir(config.RESOURCES_PACKAGE, ""))
-    except ImportError:
-        return []
-    resources = []
-    for entry in contents:
-        if not entry.endswith('.py') and not entry.endswith('.pyc'):
-            if pkg_resources.resource_isdir(config.RESOURCES_PACKAGE, entry):
-                logger.debug('Resources found: %s', entry)
-                resources.append(entry)
-    return resources
-
-
-def _load_module(name, app):
+def _load_module(name, core_rest_api):
     try:
         mod = __import__(name)
         components = name.split('.')
@@ -65,5 +58,5 @@ def _load_module(name, app):
         logger.error('Module not found %s', name)
         logger.exception(e)
     else:
-        mod.register_blueprints(app)
+        mod.load(core_rest_api)
         logger.debug('Module successfully loaded: %s', name)

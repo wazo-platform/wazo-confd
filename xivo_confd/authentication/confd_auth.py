@@ -47,7 +47,9 @@ class ConfdAuth(HTTPDigestAuth):
         return decorated
 
     def _remote_address_allowed(self):
+        logger.debug(request.access_route)
         # check localhost first to avoid accessing the database for nothing
-        if request.remote_addr in self.ALLOWED_HOSTS:
+        remote_addr = request.access_route[0]
+        if remote_addr in self.ALLOWED_HOSTS:
             return True
-        return request.remote_addr in accesswebservice_dao.get_allowed_hosts()
+        return remote_addr in accesswebservice_dao.get_allowed_hosts()

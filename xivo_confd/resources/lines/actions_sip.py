@@ -20,78 +20,77 @@ import logging
 from flask import Blueprint, url_for
 from flask import request
 from flask.helpers import make_response
+
+from xivo_confd import config
+from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
 from xivo_dao.data_handler.line import services as line_services
 from xivo_dao.data_handler.line.model import LineSIP
-from xivo_confd import config
-from xivo_confd.helpers.route_generator import RouteGenerator
-
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
-from xivo_confd.helpers.converter import Converter
 
 
 logger = logging.getLogger(__name__)
-blueprint = Blueprint('lines_sip', __name__, url_prefix='/%s/lines_sip' % config.VERSION_1_1)
-route = RouteGenerator(blueprint)
-
-document = content_parser.document(
-    Field('id', Int()),
-    Field('context', Unicode()),
-    Field('username', Unicode()),
-    Field('secret', Unicode()),
-    Field('provisioning_extension', Unicode()),
-    Field('device_slot', Int()),
-    Field('callerid', Unicode()),
-)
-
-converter = Converter.for_resource(document, LineSIP, 'lines_sip')
 
 
-@route('')
-def list_sip():
-    lines = line_services.find_all_by_protocol('sip')
-    items = converter.encode_list(lines)
-    return make_response(items, 200)
+def load(core_rest_api):
+    blueprint = Blueprint('lines_sip', __name__, url_prefix='/%s/lines_sip' % config.VERSION_1_1)
+    document = core_rest_api.content_parser.document(
+        Field('id', Int()),
+        Field('context', Unicode()),
+        Field('username', Unicode()),
+        Field('secret', Unicode()),
+        Field('provisioning_extension', Unicode()),
+        Field('device_slot', Int()),
+        Field('callerid', Unicode()),
+    )
+    converter = Converter.for_resource(document, LineSIP, 'lines_sip')
 
+    @blueprint.route('')
+    @core_rest_api.auth.login_required
+    def list_sip():
+        lines = line_services.find_all_by_protocol('sip')
+        items = converter.encode_list(lines)
+        return make_response(items, 200)
 
-@route('/<int:resource_id>')
-def get(resource_id):
-    line = line_services.get(resource_id)
-    encoded_line = converter.encode(line)
-    return make_response(encoded_line, 200)
+    @blueprint.route('/<int:resource_id>')
+    @core_rest_api.auth.login_required
+    def get(resource_id):
+        line = line_services.get(resource_id)
+        encoded_line = converter.encode(line)
+        return make_response(encoded_line, 200)
 
+    @blueprint.route('', methods=['POST'])
+    @core_rest_api.auth.login_required
+    def create():
+        line = converter.decode(request)
+        _fix_line(line)
+        line.name = line.username
 
-@route('', methods=['POST'])
-def create():
-    line = converter.decode(request)
-    _fix_line(line)
-    line.name = line.username
+        created_line = line_services.create(line)
+        encoded_line = converter.encode(created_line)
+        location = url_for('.get', resource_id=created_line.id)
+        return make_response(encoded_line, 201, {'Location': location})
 
-    created_line = line_services.create(line)
-    encoded_line = converter.encode(created_line)
-    location = url_for('.get', resource_id=created_line.id)
-    return make_response(encoded_line, 201, {'Location': location})
+    @blueprint.route('/<int:resource_id>', methods=['PUT'])
+    @core_rest_api.auth.login_required
+    def edit(resource_id):
+        line = line_services.get(resource_id)
 
+        converter.update(request, line)
+        line.name = line.username
 
-@route('/<int:resource_id>', methods=['PUT'])
-def edit(resource_id):
-    line = line_services.get(resource_id)
+        line_services.edit(line)
+        return make_response('', 204)
 
-    converter.update(request, line)
-    line.name = line.username
+    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
+    @core_rest_api.auth.login_required
+    def delete(resource_id):
+        line = line_services.get(resource_id)
+        line_services.delete(line)
+        return make_response('', 204)
 
-    line_services.edit(line)
-    return make_response('', 204)
+    def _fix_line(line):
+        for field in line._MAPPING.values():
+            if not hasattr(line, field):
+                setattr(line, field, None)
 
-
-@route('/<int:resource_id>', methods=['DELETE'])
-def delete(resource_id):
-    line = line_services.get(resource_id)
-    line_services.delete(line)
-    return make_response('', 204)
-
-
-def _fix_line(line):
-    for field in line._MAPPING.values():
-        if not hasattr(line, field):
-            setattr(line, field, None)
+    core_rest_api.register(blueprint)

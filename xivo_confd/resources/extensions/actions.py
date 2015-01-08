@@ -15,69 +15,69 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
-
+from flask import Blueprint
 from flask import url_for, request
 from flask.helpers import make_response
+
+from xivo_confd import config
+from xivo_confd.helpers.common import extract_search_parameters
+from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
 from xivo_dao.data_handler.extension import services as extension_services
 from xivo_dao.data_handler.extension.model import Extension
-from xivo_confd.helpers.common import extract_search_parameters
-from xivo_confd.resources.extensions.routes import extension_route as route
-
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
-
-from xivo_confd.helpers.converter import Converter
 
 
-logger = logging.getLogger(__name__)
-extra_parameters = ['type']
+def load(core_rest_api):
+    blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.VERSION_1_1)
+    extra_parameters = ['type']
 
-document = content_parser.document(
-    Field('id', Int()),
-    Field('exten', Unicode()),
-    Field('context', Unicode()),
-    Field('commented', Boolean())
-)
+    document = core_rest_api.content_parser.document(
+        Field('id', Int()),
+        Field('exten', Unicode()),
+        Field('context', Unicode()),
+        Field('commented', Boolean())
+    )
 
-converter = Converter.for_resource(document, Extension)
+    converter = Converter.for_resource(document, Extension)
 
+    @blueprint.route('')
+    @core_rest_api.auth.login_required
+    def list():
+        parameters = extract_search_parameters(request.args, extra_parameters)
+        search_result = extension_services.search(**parameters)
+        items = converter.encode_list(search_result.items, search_result.total)
+        return make_response(items, 200)
 
-@route('')
-def list():
-    parameters = extract_search_parameters(request.args, extra_parameters)
-    search_result = extension_services.search(**parameters)
-    items = converter.encode_list(search_result.items, search_result.total)
-    return make_response(items, 200)
+    @blueprint.route('/<int:resource_id>')
+    @core_rest_api.auth.login_required
+    def get(resource_id):
+        extension = extension_services.get(resource_id)
+        encoded_extension = converter.encode(extension)
+        return make_response(encoded_extension, 200)
 
+    @blueprint.route('', methods=['POST'])
+    @core_rest_api.auth.login_required
+    def create():
+        extension = converter.decode(request)
+        created_extension = extension_services.create(extension)
+        encoded_extension = converter.encode(created_extension)
+        location = url_for('.get', resource_id=created_extension.id)
 
-@route('/<int:resource_id>')
-def get(resource_id):
-    extension = extension_services.get(resource_id)
-    encoded_extension = converter.encode(extension)
-    return make_response(encoded_extension, 200)
+        return make_response(encoded_extension, 201, {'Location': location})
 
+    @blueprint.route('/<int:resource_id>', methods=['PUT'])
+    @core_rest_api.auth.login_required
+    def edit(resource_id):
+        extension = extension_services.get(resource_id)
+        converter.update(request, extension)
+        extension_services.edit(extension)
+        return make_response('', 204)
 
-@route('', methods=['POST'])
-def create():
-    extension = converter.decode(request)
-    created_extension = extension_services.create(extension)
-    encoded_extension = converter.encode(created_extension)
-    location = url_for('.get', resource_id=created_extension.id)
+    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
+    @core_rest_api.auth.login_required
+    def delete(resource_id):
+        extension = extension_services.get(resource_id)
+        extension_services.delete(extension)
+        return make_response('', 204)
 
-    return make_response(encoded_extension, 201, {'Location': location})
-
-
-@route('/<int:resource_id>', methods=['PUT'])
-def edit(resource_id):
-    extension = extension_services.get(resource_id)
-    converter.update(request, extension)
-    extension_services.edit(extension)
-    return make_response('', 204)
-
-
-@route('/<int:resource_id>', methods=['DELETE'])
-def delete(resource_id):
-    extension = extension_services.get(resource_id)
-    extension_services.delete(extension)
-    return make_response('', 204)
+    core_rest_api.register(blueprint)

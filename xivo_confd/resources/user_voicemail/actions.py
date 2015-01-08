@@ -18,49 +18,48 @@
 
 from flask import request, url_for, make_response
 
-
+from xivo_confd.helpers import url
+from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
 from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
 from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
 
-from xivo_confd.helpers import url
-from xivo_confd.resources.users.routes import route
 
-from xivo_confd.flask_http_server import content_parser
-from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
-from xivo_confd.helpers.converter import Converter
+def load(core_rest_api):
+    user_blueprint = core_rest_api.blueprint('users')
+    document = core_rest_api.content_parser.document(
+        Field('user_id', Int()),
+        Field('voicemail_id', Int()),
+        Field('enabled', Boolean())
+    )
+    converter = Converter.for_request(document, UserVoicemail, {'users': 'user_id',
+                                                                'voicemails': 'voicemail_id'})
 
-document = content_parser.document(
-    Field('user_id', Int()),
-    Field('voicemail_id', Int()),
-    Field('enabled', Boolean())
-)
+    @user_blueprint.route('/<int:user_id>/voicemail', methods=['POST'])
+    @core_rest_api.auth.login_required
+    def associate_voicemail(user_id):
+        url.check_user_exists(user_id)
+        model = converter.decode(request)
+        created_model = user_voicemail_services.associate(model)
+        encoded_model = converter.encode(created_model)
 
-converter = Converter.for_request(document, UserVoicemail, {'users': 'user_id',
-                                                            'voicemails': 'voicemail_id'})
+        location = url_for('.associate_voicemail', user_id=user_id)
+        return make_response(encoded_model, 201, {'Location': location})
 
+    @user_blueprint.route('/<int:user_id>/voicemail')
+    @core_rest_api.auth.login_required
+    def get_user_voicemail(user_id):
+        url.check_user_exists(user_id)
+        user_voicemail = user_voicemail_services.get_by_user_id(user_id)
+        encoded_user_voicemail = converter.encode(user_voicemail)
+        return make_response(encoded_user_voicemail, 200)
 
-@route('/<int:user_id>/voicemail', methods=['POST'])
-def associate_voicemail(user_id):
-    url.check_user_exists(user_id)
-    model = converter.decode(request)
-    created_model = user_voicemail_services.associate(model)
-    encoded_model = converter.encode(created_model)
+    @user_blueprint.route('/<int:user_id>/voicemail', methods=['DELETE'])
+    @core_rest_api.auth.login_required
+    def dissociate_voicemail(user_id):
+        url.check_user_exists(user_id)
+        user_voicemail = user_voicemail_services.get_by_user_id(user_id)
+        user_voicemail_services.dissociate(user_voicemail)
+        return make_response('', 204)
 
-    location = url_for('.associate_voicemail', user_id=user_id)
-    return make_response(encoded_model, 201, {'Location': location})
-
-
-@route('/<int:user_id>/voicemail')
-def get_user_voicemail(user_id):
-    url.check_user_exists(user_id)
-    user_voicemail = user_voicemail_services.get_by_user_id(user_id)
-    encoded_user_voicemail = converter.encode(user_voicemail)
-    return make_response(encoded_user_voicemail, 200)
-
-
-@route('/<int:user_id>/voicemail', methods=['DELETE'])
-def dissociate_voicemail(user_id):
-    url.check_user_exists(user_id)
-    user_voicemail = user_voicemail_services.get_by_user_id(user_id)
-    user_voicemail_services.dissociate(user_voicemail)
-    return make_response('', 204)
+    core_rest_api.register(user_blueprint)

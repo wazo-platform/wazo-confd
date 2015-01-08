@@ -14,30 +14,34 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from xivo_confd.resources.configuration.routes import blueprint
-from xivo_confd.helpers.route_generator import RouteGenerator
+
+from flask import Blueprint
+from flask import make_response
+from flask import request
+
+from xivo_confd import config
 from xivo_confd.helpers import serializer
-
-from xivo_dao.data_handler.configuration import services
-from flask.helpers import make_response
-from flask.globals import request
-
-from xivo_confd.flask_http_server import content_parser
 from xivo_confd.helpers.mooltiparse import Field, Boolean
-
-route = RouteGenerator(blueprint)
-
-document = content_parser.document(Field('enabled', Boolean()))
+from xivo_dao.data_handler.configuration import services
 
 
-@route('/live_reload', methods=['GET'])
-def get_live_reload():
-    result = services.get_live_reload_status()
-    return make_response(serializer.encode(result), 200)
+def load(core_rest_api):
+    blueprint = Blueprint('configuration',
+                          __name__,
+                          url_prefix='/%s/configuration' % config.VERSION_1_1)
+    document = core_rest_api.content_parser.document(Field('enabled', Boolean()))
 
+    @blueprint.route('/live_reload', methods=['GET'])
+    @core_rest_api.auth.login_required
+    def get_live_reload():
+        result = services.get_live_reload_status()
+        return make_response(serializer.encode(result), 200)
 
-@route('/live_reload', methods=['PUT'])
-def set_live_reload():
-    data = document.parse(request)
-    services.set_live_reload_status(data)
-    return make_response('', 204)
+    @blueprint.route('/live_reload', methods=['PUT'])
+    @core_rest_api.auth.login_required
+    def set_live_reload():
+        data = document.parse(request)
+        services.set_live_reload_status(data)
+        return make_response('', 204)
+
+    core_rest_api.register(blueprint)

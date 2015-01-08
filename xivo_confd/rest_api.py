@@ -18,6 +18,7 @@
 from datetime import timedelta
 import logging
 import os
+from pprint import pformat
 import urllib
 
 from flask import Flask
@@ -25,7 +26,9 @@ from flask import request
 from gevent.pywsgi import WSGIServer
 
 from xivo_confd import flask_http_server
+from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
+from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 
 
 logger = logging.getLogger(__name__)
@@ -35,19 +38,20 @@ class CoreRestApi(object):
 
     def __init__(self, config):
         self.config = config
+        self.content_parser = mooltiparse_parser()
 
         self.app = Flask('xivo_confd')
         self.app.secret_key = os.urandom(24)
         self.app.permanent_session_lifetime = timedelta(minutes=5)
+        self.auth = ConfdAuth()
 
         if config['debug']:
             logger.info("Debug mode enabled.")
             self.app.debug = True
 
-        flask_http_server.register_blueprints_v1_1(self.app)
-
         @self.app.before_request
         def log_requests():
+            logger.info(pformat(request.__dict__))
             params = {
                 'method': request.method,
                 'url': urllib.unquote(request.url).decode('utf8')
@@ -62,9 +66,19 @@ class CoreRestApi(object):
         def error_handler(error):
             return handle_error(error)
 
+        flask_http_server.register_blueprints(self)
+
+        logger.info(pformat(self.app.url_map))
+
+    def blueprint(self, name):
+        return self.app.blueprints[name]
+
+    def register(self, blueprint):
+        self.app.register_blueprint(blueprint)
+
     def run(self):
         environ = {
-            'wsgi.multithread': True,
+            'wsgi.multithread': True
         }
         http_server = WSGIServer(listener=(self.config['rest_api']['listen'], self.config['rest_api']['port']),
                                  application=self.app,
@@ -76,3 +90,4 @@ class CoreRestApi(object):
                      self.config['rest_api']['port'])
 
         http_server.serve_forever()
+

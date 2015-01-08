@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
 import sys
 
 from xivo.daemonize import pidfile_context
@@ -24,8 +23,6 @@ from xivo.xivo_logging import setup_logging
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
-
-logger = logging.getLogger(__name__)
 
 
 def main(argv):
