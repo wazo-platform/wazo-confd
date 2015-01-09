@@ -24,6 +24,7 @@ import urllib
 from flask import Flask
 from flask import request
 from gevent.pywsgi import WSGIServer
+from werkzeug.contrib.fixers import ProxyFix
 
 from xivo_confd import flask_http_server
 from xivo_confd.authentication.confd_auth import ConfdAuth
@@ -41,6 +42,7 @@ class CoreRestApi(object):
         self.content_parser = mooltiparse_parser()
 
         self.app = Flask('xivo_confd')
+        self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.app.secret_key = os.urandom(24)
         self.app.permanent_session_lifetime = timedelta(minutes=5)
         self.auth = ConfdAuth()
