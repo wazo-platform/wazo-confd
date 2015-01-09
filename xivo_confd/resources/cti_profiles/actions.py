@@ -26,7 +26,7 @@ from xivo_dao.data_handler.cti_profile.model import CtiProfile
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('cti_profiles', __name__, url_prefix='/%s/cti_profiles' % config.VERSION_1_1)
+    blueprint = Blueprint('cti_profiles', __name__, url_prefix='/%s/cti_profiles' % config.API_VERSION)
     document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('name', Unicode())

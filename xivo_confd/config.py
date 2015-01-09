@@ -21,8 +21,7 @@ import argparse
 from xivo.config_helper import parse_config_file
 from xivo.xivo_logging import get_log_level_by_name
 
-RESOURCES_PACKAGE = 'xivo_confd.resources'
-VERSION_1_1 = '1.1'
+API_VERSION = '1.1'
 
 
 def load(argv):

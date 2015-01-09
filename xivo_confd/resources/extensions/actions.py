@@ -28,7 +28,7 @@ from xivo_dao.data_handler.extension.model import Extension
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.VERSION_1_1)
+    blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.API_VERSION)
     extra_parameters = ['type']
 
     document = core_rest_api.content_parser.document(

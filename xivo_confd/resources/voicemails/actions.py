@@ -29,7 +29,7 @@ from xivo_dao.data_handler.voicemail.model import Voicemail
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.VERSION_1_1)
+    blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % config.API_VERSION)
     document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('name', Unicode()),

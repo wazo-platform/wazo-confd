@@ -28,7 +28,7 @@ from xivo_dao.data_handler.configuration import services
 def load(core_rest_api):
     blueprint = Blueprint('configuration',
                           __name__,
-                          url_prefix='/%s/configuration' % config.VERSION_1_1)
+                          url_prefix='/%s/configuration' % config.API_VERSION)
     document = core_rest_api.content_parser.document(Field('enabled', Boolean()))
 
     @blueprint.route('/live_reload', methods=['GET'])

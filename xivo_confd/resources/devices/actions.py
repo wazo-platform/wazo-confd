@@ -28,7 +28,7 @@ from xivo_dao.data_handler.line import services as line_services
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.VERSION_1_1)
+    blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.API_VERSION)
     document = core_rest_api.content_parser.document(
         Field('id', Unicode()),
         Field('ip', Unicode()),

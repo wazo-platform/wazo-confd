@@ -30,7 +30,7 @@ from xivo_dao.data_handler.call_log import services
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config.VERSION_1_1)
+    blueprint = Blueprint('call_logs', __name__, url_prefix='/%s/call_logs' % config.API_VERSION)
 
     @blueprint.route('')
     @core_rest_api.auth.login_required

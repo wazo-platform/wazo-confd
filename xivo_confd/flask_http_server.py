@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import logging
-from xivo_confd import config
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +43,7 @@ ORDER_RESOURCES = [
 
 def register_blueprints(core_rest_api):
     for resource in ORDER_RESOURCES:
-        pkg_resource = '%s.%s' % (config.RESOURCES_PACKAGE, resource)
+        pkg_resource = 'xivo_confd.resources.{resource}'.format(resource=resource)
         _load_module('%s.actions' % pkg_resource, core_rest_api)
 
 

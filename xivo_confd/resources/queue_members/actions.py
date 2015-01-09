@@ -27,7 +27,7 @@ from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('queues', __name__, url_prefix='/%s/queues' % config.VERSION_1_1)
+    blueprint = Blueprint('queues', __name__, url_prefix='/%s/queues' % config.API_VERSION)
     document = core_rest_api.content_parser.document(
         Field('queue_id', Int()),
         Field('agent_id', Int()),

@@ -76,7 +76,7 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 --- original/resources/configuration/routes.py
 +++ patched/resources/configuration/routes.py
 @@ -24,7 +24,7 @@
- blueprint = Blueprint('configuration', __name__, url_prefix='/%s/configuration' % config.VERSION_1_1)
+ blueprint = Blueprint('configuration', __name__, url_prefix='/%s/configuration' % config.API_VERSION)
  route = RouteGenerator(blueprint)
  
 -from . import actions
@@ -164,7 +164,7 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 --- original/resources/lines/routes.py
 +++ patched/resources/lines/routes.py
 @@ -25,7 +25,7 @@
- line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.VERSION_1_1)
+ line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.API_VERSION)
  line_route = RouteGenerator(line_blueprint)
  
 -from xivo_confd.resources.lines import actions
@@ -213,7 +213,7 @@ diff --unified --recursive '--exclude=.pylint-disable.patch' original/resources/
 --- original/resources/users/routes.py
 +++ patched/resources/users/routes.py
 @@ -24,7 +24,7 @@
- blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
+ blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.API_VERSION)
  route = RouteGenerator(blueprint)
  
 -from . import actions

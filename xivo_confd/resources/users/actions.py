@@ -39,7 +39,7 @@ class DirectorySerializer(Serializer):
 
 
 def load(core_rest_api):
-    blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.VERSION_1_1)
+    blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.API_VERSION)
     user_document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('firstname', Unicode()),
