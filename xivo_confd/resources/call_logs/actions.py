@@ -68,7 +68,11 @@ def load(core_rest_api):
     def _list_call_logs(call_logs):
         mapped_call_logs = map(mapper.to_api, call_logs)
         response = serializer.encode_list(mapped_call_logs)
-        return make_response(response, 200, {'Content-disposition': 'attachment;filename=xivo-call-logs.csv'})
+        headers = {
+            'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
+            'Content-Type': 'text/csv; charset=utf-8'
+        }
+        return make_response(response, 200, headers)
 
     def _decode_datetime(datetime_str):
         result = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')
