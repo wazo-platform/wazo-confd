@@ -1,0 +1,20 @@
+# Change the log level to debug level.
+debug: false
+
+# Change the log level. Values are: critical, error, warning, info, debug.
+log_level: info
+
+# Log file.
+log_filename: /var/log/xivo-confd.log
+
+# PID file.
+pid_filename: /var/run/xivo-confd/xivo-confd.pid
+
+# REST API server
+rest_api:
+
+    # Listening address
+    listen: 127.0.0.1
+
+    # Listening port
+    port: 9487
