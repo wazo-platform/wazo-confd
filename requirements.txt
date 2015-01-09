@@ -7,6 +7,9 @@ psycopg2
 mock
 pyhamcrest
 pika
-flask==0.8
+flask==0.10.1
 flask-httpauth
+flask-negotiate
 flup
+pyyaml
+gevent

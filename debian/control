@@ -26,7 +26,9 @@ Depends: ${python:Depends},
          xivo-libdao (>= 13.02~20130131.124922.ae70e6f-1),
          python-flask,
          python-flask-httpauth,
-         python-flup
+         python-flask-negociate,
+         python-flup,
+         python-gevent
 Provides: xivo-librestapi
 Conflicts: xivo-librestapi
 Replaces: xivo-librestapi
