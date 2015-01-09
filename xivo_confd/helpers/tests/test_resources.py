@@ -23,7 +23,6 @@ import unittest
 from flask.testing import FlaskClient
 from hamcrest import assert_that, equal_to, has_entries, is_in, has_items, has_key, contains
 
-from xivo_confd import flask_http_server
 from xivo_confd import config
 from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import handle_error
@@ -34,15 +33,15 @@ class TestClient(FlaskClient):
 
     def open(self, *args, **kwargs):
         kwargs.setdefault('environ_base', {})['REMOTE_ADDR'] = '127.0.0.1'
-        return super(FlaskClient, self).open(*args, **kwargs)
+        return super(TestClient, self).open(*args, **kwargs)
 
     def put(self, *args, **kwargs):
         kwargs.setdefault('content_type', 'application/json')
-        return super(FlaskClient, self).put(*args, **kwargs)
+        return super(TestClient, self).put(*args, **kwargs)
 
     def post(self, *args, **kwargs):
         kwargs.setdefault('content_type', 'application/json')
-        return super(FlaskClient, self).post(*args, **kwargs)
+        return super(TestClient, self).post(*args, **kwargs)
 
 
 class TestResources(unittest.TestCase):
