@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,12 +24,24 @@ from xivo.user_rights import change_user
 from xivo.xivo_logging import setup_logging
 from xivo_confd import config
 from xivo_confd import flask_http_server
+from xivo_dao import install_bus_event_producer
+from xivo_bus.ctl.producer import BusProducer
+from xivo_bus.ctl.config import BusConfig
 
 
 DAEMONNAME = 'xivo-confd'
 LOGFILENAME = '/var/log/{}.log'.format(DAEMONNAME)
 PID_FILENAME = '/var/run/{daemon}/{daemon}.pid'.format(daemon=DAEMONNAME)
 SOCKET_FILENAME = '/var/run/{daemon}/{daemon}.sock'.format(daemon=DAEMONNAME)
+BUS_CONFIG = {
+    'exchange_name': 'xivo',
+    'exchange_type': 'topic',
+    'exchange_durable': True,
+    'username': 'guest',
+    'password': 'guest',
+    'host': 'localhost',
+    'port': 5672,
+}
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +59,12 @@ def main():
 
     flask_http_server.register_blueprints_v1_1()
 
+    bus_producer = BusProducer(BusConfig(**BUS_CONFIG))
+    bus_producer.connect()
+    bus_producer.declare_exchange(BUS_CONFIG['exchange_name'],
+                                  BUS_CONFIG['exchange_type'],
+                                  BUS_CONFIG['exchange_durable'])
+    install_bus_event_producer(bus_producer)
     if parsed_args.dev_mode:
         logger.info("Starting xivo-confd in dev mode.")
         config.HOST = parsed_args.listen_addr
