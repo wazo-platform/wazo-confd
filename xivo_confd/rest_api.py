@@ -53,7 +53,6 @@ class CoreRestApi(object):
 
         @self.app.before_request
         def log_requests():
-            logger.info(pformat(request.__dict__))
             params = {
                 'method': request.method,
                 'url': urllib.unquote(request.url).decode('utf8')
@@ -69,8 +68,6 @@ class CoreRestApi(object):
             return handle_error(error)
 
         flask_http_server.register_blueprints(self)
-
-        logger.info(pformat(self.app.url_map))
 
     def blueprint(self, name):
         return self.app.blueprints[name]
