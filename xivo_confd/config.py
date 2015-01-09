@@ -23,24 +23,25 @@ from xivo.xivo_logging import get_log_level_by_name
 
 API_VERSION = '1.1'
 
+DEFAULT_CONFIG = {
+    'foreground': False,
+    'debug': False,
+    'user': 'www-data',
+    'log_level': 'info',
+    'config_file': '/etc/xivo-confd/config.yml',
+    'log_filename': '/var/log/xivo-confd.log',
+    'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
+    'rest_api': {
+        'listen': '127.0.0.1',
+        'port': 9487
+    }
+}
+
 
 def load(argv):
-    default_config = {
-        'foreground': False,
-        'debug': False,
-        'user': 'www-data',
-        'log_level': 'info',
-        'config_file': '/etc/xivo-confd/config.yml',
-        'log_filename': '/var/log/xivo-confd.log',
-        'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
-        'rest_api': {
-            'listen': '127.0.0.1',
-            'port': 9487
-        }
-    }
-    config = dict(default_config)
+    config = dict(DEFAULT_CONFIG)
 
-    config.update(_parse_cli_args(argv, default_config))
+    config.update(_parse_cli_args(argv, DEFAULT_CONFIG))
     config.update(parse_config_file(config['config_file']))
     _interpret_raw_values(config)
 

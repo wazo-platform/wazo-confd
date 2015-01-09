@@ -39,7 +39,9 @@ class TestCallLogActions(TestResources):
 
         mock_call_log_services_find_all.return_value = []
 
-        result = self.app.get(BASE_URL)
+        result = self.app.get(BASE_URL,
+                              content_type='application/json',
+                              headers={'Accept': 'text/csv'})
 
         mock_call_log_services_find_all.assert_any_call()
         assert_that(result.status_code, equal_to(expected_status_code))
@@ -54,18 +56,20 @@ class TestCallLogActions(TestResources):
         mapped_1, mapped_2 = mapper_to_api.side_effect = [Mock(), Mock()]
         serialized_data = serialize_encode.return_value = 'field1,field2\r\nvalue1,value2\r\n'
 
-        result = self.app.get(BASE_URL)
+        result = self.app.get(BASE_URL,
+                              content_type='application/json',
+                              headers={'Accept': 'text/csv'})
 
-        mock_call_log_services_find_all.assert_called_once_with()
-        mapper_to_api.assert_any_call(call_log_1)
-        mapper_to_api.assert_any_call(call_log_2)
-        assert_that(mapper_to_api.call_count, equal_to(2))
-        serialize_encode.assert_called_once_with([mapped_1, mapped_2])
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(serialized_data))
         assert_that(result.headers, has_entries({
             'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
         }))
+        mock_call_log_services_find_all.assert_called_once_with()
+        mapper_to_api.assert_any_call(call_log_1)
+        mapper_to_api.assert_any_call(call_log_2)
+        assert_that(mapper_to_api.call_count, equal_to(2))
+        serialize_encode.assert_called_once_with([mapped_1, mapped_2])
 
     @patch('xivo_dao.data_handler.call_log.services.find_all_in_period')
     @patch('xivo_confd.resources.call_logs.mapper.to_api')
@@ -77,20 +81,24 @@ class TestCallLogActions(TestResources):
         mapped_1, mapped_2 = mapper_to_api.side_effect = [Mock(), Mock()]
         serialized_data = serialize_encode.return_value = 'field1,field2\r\nvalue1,value2\r\n'
 
-        result = self.app.get(BASE_URL + '?start_date=2013-01-01T00:00:00&end_date=2013-01-02T00:00:00')
+        result = self.app.get(BASE_URL + '?start_date=2013-01-01T00:00:00&end_date=2013-01-02T00:00:00',
+                              content_type='application/json',
+                              headers={'Accept': 'text/csv'})
 
-        mock_call_log_services_find_period.assert_called_once_with(expected_start, expected_end)
-        mapper_to_api.assert_any_call(call_log_1)
-        mapper_to_api.assert_any_call(call_log_2)
-        assert_that(mapper_to_api.call_count, equal_to(2))
-        serialize_encode.assert_called_once_with([mapped_1, mapped_2])
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(serialized_data))
         assert_that(result.headers, has_entries({
             'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
         }))
+        mock_call_log_services_find_period.assert_called_once_with(expected_start, expected_end)
+        mapper_to_api.assert_any_call(call_log_1)
+        mapper_to_api.assert_any_call(call_log_2)
+        assert_that(mapper_to_api.call_count, equal_to(2))
+        serialize_encode.assert_called_once_with([mapped_1, mapped_2])
 
     def test_list_call_logs_with_wrongly_formatted_date(self):
-        result = self.app.get(BASE_URL + '?start_date=20AB-12-14')
+        result = self.app.get(BASE_URL + '?start_date=20AB-12-14',
+                              content_type='application/json',
+                              headers={'Accept': 'text/csv'})
 
         self.assert_error(result, re.compile('start_date'))

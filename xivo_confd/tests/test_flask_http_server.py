@@ -17,8 +17,6 @@
 
 import unittest
 
-from flask import Flask
-from hamcrest import assert_that, contains
 from mock import patch, Mock
 
 from xivo_confd import flask_http_server as server
@@ -26,63 +24,15 @@ from xivo_confd import flask_http_server as server
 
 class TestLoadResources(unittest.TestCase):
 
-    @patch('xivo_confd.flask_http_server._list_resources')
     @patch('xivo_confd.flask_http_server._load_module')
-    def test_load_resources(self, load_module, list_resources):
-        list_resources.return_value = ['resource1', 'resource2']
-        app = Mock(Flask)
+    def test_load_resources(self, load_module):
+        rest_api = Mock()
+        server.ORDER_RESOURCES = ['resource1', 'resource2']
 
-        server._load_resources(app)
+        server.register_blueprints(rest_api)
 
-        load_module.assert_any_call('xivo_confd.resources.resource1.routes', app)
-        load_module.assert_any_call('xivo_confd.resources.resource2.routes', app)
-
-
-class TestListResources(unittest.TestCase):
-
-    @patch('pkg_resources.resource_listdir')
-    def test_given_no_files_then_returns_empty_list(self, resource_listdir):
-        resource_listdir.return_value = []
-
-        result = server._list_resources()
-
-        assert_that(result, contains())
-
-    @patch('pkg_resources.resource_listdir')
-    def test_given_python_files_then_returns_empty_list(self, resource_listdir):
-        resource_listdir.return_value = ['python_file.py', 'python_file.pyc']
-
-        result = server._list_resources()
-
-        assert_that(result, contains())
-
-    @patch('pkg_resources.resource_isdir')
-    @patch('pkg_resources.resource_listdir')
-    def test_given_directory_then_returns_list_with_directory_name(self, resource_listdir, resource_isdir):
-        resource_listdir.return_value = ['directory']
-        resource_isdir.return_value = True
-
-        result = server._list_resources()
-
-        assert_that(result, contains('directory'))
-
-    @patch('pkg_resources.resource_isdir')
-    @patch('pkg_resources.resource_listdir')
-    def test_given_file_then_returns_empty_list(self, resource_listdir, resource_isdir):
-        resource_listdir.return_value = ['file']
-        resource_isdir.return_value = False
-
-        result = server._list_resources()
-
-        assert_that(result, contains())
-
-    @patch('pkg_resources.resource_listdir')
-    def test_given_import_error_then_returns_empty_list(self, resource_listdir):
-        resource_listdir.side_effect = ImportError
-
-        result = server._list_resources()
-
-        assert_that(result, contains())
+        load_module.assert_any_call('xivo_confd.resources.resource1.actions', rest_api)
+        load_module.assert_any_call('xivo_confd.resources.resource2.actions', rest_api)
 
 
 class TestLoadModule(unittest.TestCase):
@@ -91,18 +41,18 @@ class TestLoadModule(unittest.TestCase):
     def test_given_module_name_then_registers_blueprints(self, import_):
         package = import_.return_value = Mock()
         module = package.module = Mock()
-        app = Mock(Flask)
+        rest_api = Mock()
 
-        server._load_module('package.module', app)
+        server._load_module('package.module', rest_api)
 
         import_.assert_any_call('package.module')
-        module.register_blueprints.assert_called_once_with(app)
+        module.load.assert_called_once_with(rest_api)
 
     @patch('__builtin__.__import__')
     def test_given_import_error_then_does_not_raise_error(self, import_):
         import_.side_effect = ImportError
-        app = Mock(Flask)
+        rest_api = Mock()
 
-        server._load_module('package.module', app)
+        server._load_module('package.module', rest_api)
 
         import_.assert_any_call('package.module')
