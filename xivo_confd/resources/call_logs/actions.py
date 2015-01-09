@@ -21,7 +21,6 @@ from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
 from flask_negotiate import consumes
-from flask_negotiate import produces
 
 from xivo_confd import config
 from xivo_confd.resources.call_logs import mapper
@@ -35,7 +34,6 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
-    @produces('text/csv')
     @consumes('application/json')
     def list():
         if 'start_date' in request.args or 'end_date' in request.args:

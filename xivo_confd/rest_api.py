@@ -18,7 +18,6 @@
 from datetime import timedelta
 import logging
 import os
-from pprint import pformat
 import urllib
 
 from flask import Flask
@@ -89,4 +88,3 @@ class CoreRestApi(object):
                      self.config['rest_api']['port'])
 
         http_server.serve_forever()
-
