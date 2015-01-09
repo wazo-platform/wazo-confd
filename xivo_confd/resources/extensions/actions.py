@@ -18,6 +18,8 @@
 from flask import Blueprint
 from flask import url_for, request
 from flask.helpers import make_response
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
@@ -42,6 +44,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def list():
         parameters = extract_search_parameters(request.args, extra_parameters)
         search_result = extension_services.search(**parameters)
@@ -50,6 +53,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         extension = extension_services.get(resource_id)
         encoded_extension = converter.encode(extension)
@@ -57,6 +61,8 @@ def load(core_rest_api):
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def create():
         extension = converter.decode(request)
         created_extension = extension_services.create(extension)
@@ -67,6 +73,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @consumes('application/json')
     def edit(resource_id):
         extension = extension_services.get(resource_id)
         converter.update(request, extension)

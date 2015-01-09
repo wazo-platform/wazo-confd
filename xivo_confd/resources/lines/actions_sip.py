@@ -20,6 +20,8 @@ import logging
 from flask import Blueprint, url_for
 from flask import request
 from flask.helpers import make_response
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
@@ -46,6 +48,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def list_sip():
         lines = line_services.find_all_by_protocol('sip')
         items = converter.encode_list(lines)
@@ -53,6 +56,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         line = line_services.get(resource_id)
         encoded_line = converter.encode(line)
@@ -60,6 +64,8 @@ def load(core_rest_api):
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def create():
         line = converter.decode(request)
         _fix_line(line)
@@ -72,6 +78,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @consumes('application/json')
     def edit(resource_id):
         line = line_services.get(resource_id)
 

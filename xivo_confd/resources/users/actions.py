@@ -19,6 +19,8 @@ import json
 
 from flask import Blueprint
 from flask import url_for, request, make_response
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
@@ -73,6 +75,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def list():
         if 'q' in request.args:
             items = user_services.find_all_by_fullname(request.args['q'])
@@ -93,6 +96,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         user = user_services.get(resource_id)
         encoded_user = user_converter.encode(user)
@@ -100,6 +104,8 @@ def load(core_rest_api):
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def create():
         user = user_converter.decode(request)
         created_user = user_services.create(user)
@@ -109,6 +115,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @consumes('application/json')
     def edit(resource_id):
         user = user_services.get(resource_id)
         user_converter.update(request, user)

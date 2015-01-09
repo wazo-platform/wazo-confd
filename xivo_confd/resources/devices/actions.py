@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint, url_for, make_response, request
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
@@ -48,6 +50,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<resource_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         device = device_services.get(resource_id)
         result = converter.encode(device)
@@ -55,6 +58,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def list():
         search_parameters = extract_search_parameters(request.args)
         search_result = device_services.search(**search_parameters)
@@ -63,6 +67,8 @@ def load(core_rest_api):
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def create():
         device = converter.decode(request)
         created_device = device_services.create(device)
@@ -73,6 +79,8 @@ def load(core_rest_api):
 
     @blueprint.route('/<resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def edit(resource_id):
         device = device_services.get(resource_id)
         converter.update(request, device)

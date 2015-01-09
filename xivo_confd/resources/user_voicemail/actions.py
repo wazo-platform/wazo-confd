@@ -17,6 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import request, url_for, make_response
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
@@ -37,6 +39,8 @@ def load(core_rest_api):
 
     @user_blueprint.route('/<int:user_id>/voicemail', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def associate_voicemail(user_id):
         url.check_user_exists(user_id)
         model = converter.decode(request)
@@ -48,6 +52,7 @@ def load(core_rest_api):
 
     @user_blueprint.route('/<int:user_id>/voicemail')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get_user_voicemail(user_id):
         url.check_user_exists(user_id)
         user_voicemail = user_voicemail_services.get_by_user_id(user_id)

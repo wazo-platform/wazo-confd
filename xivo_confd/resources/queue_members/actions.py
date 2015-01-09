@@ -18,6 +18,8 @@
 
 from flask import Blueprint
 from flask import request, make_response, url_for
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
@@ -37,12 +39,14 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get_agent_queue_association(queue_id, agent_id):
         queue_member = services.get_by_queue_id_and_agent_id(queue_id, agent_id)
         return make_response(converter.encode(queue_member), 200)
 
     @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @consumes('application/json')
     def edit_agent_queue_association(queue_id, agent_id):
         queue_member = converter.decode(request)
         services.edit_agent_queue_association(queue_member)
@@ -50,6 +54,8 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:queue_id>/members/agents', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def associate_agent_to_queue(queue_id):
         queue_member = converter.decode(request)
         created_queue_member = services.associate_agent_to_queue(queue_member)

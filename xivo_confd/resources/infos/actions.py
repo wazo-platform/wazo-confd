@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import make_response, Blueprint
+from flask_negotiate import produces
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
@@ -32,6 +33,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get():
         return make_response(converter.encode(infos_services.get()), 200)
 

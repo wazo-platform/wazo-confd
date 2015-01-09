@@ -17,6 +17,7 @@
 
 from flask.blueprints import Blueprint
 from flask.helpers import make_response
+from flask_negotiate import produces
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
@@ -35,6 +36,7 @@ def load(core_rest_api):
 
     @blueprint.route('', methods=['GET'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def find_all():
         profiles = services.find_all()
         items = converter.encode_list(profiles)
@@ -42,6 +44,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>', methods=['GET'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         profile = services.get(resource_id)
         result = converter.encode(profile)

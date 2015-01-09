@@ -18,6 +18,8 @@
 
 from flask import request
 from flask.helpers import make_response
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
@@ -38,6 +40,7 @@ def load(core_rest_api):
 
     @user_blueprint.route('/<int:user_id>/cti', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @consumes('application/json')
     def edit_cti_configuration(user_id):
         url.check_user_exists(user_id)
         user_cti_profile = converter.decode(request)
@@ -46,6 +49,7 @@ def load(core_rest_api):
 
     @user_blueprint.route('/<int:user_id>/cti', methods=['GET'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get_cti_configuration(user_id):
         url.check_user_exists(user_id)
         user_cti_profile = user_cti_profile_services.get(user_id)

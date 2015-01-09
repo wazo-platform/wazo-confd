@@ -18,6 +18,7 @@
 from flask import Blueprint
 from flask import request
 from flask.helpers import make_response
+from flask_negotiate import produces
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
@@ -42,6 +43,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def list():
         if 'q' in request.args:
             lines = line_services.find_all_by_name(request.args['q'])
@@ -53,6 +55,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         line = line_services.get(resource_id)
         encoded_line = converter.encode(line)

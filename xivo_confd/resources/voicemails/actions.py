@@ -19,6 +19,8 @@
 from flask.blueprints import Blueprint
 from flask.globals import request
 from flask.helpers import make_response, url_for
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
@@ -48,6 +50,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def list():
         search_parameters = extract_search_parameters(request.args)
         search_result = voicemail_services.search(**search_parameters)
@@ -56,6 +59,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get(resource_id):
         voicemail = voicemail_services.get(resource_id)
         encoded_voicemail = converter.encode(voicemail)
@@ -63,6 +67,8 @@ def load(core_rest_api):
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def create():
         voicemail = converter.decode(request)
         created_voicemail = voicemail_services.create(voicemail)
@@ -72,6 +78,7 @@ def load(core_rest_api):
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @consumes('application/json')
     def edit(resource_id):
         voicemail = voicemail_services.get(resource_id)
         converter.update(request, voicemail)

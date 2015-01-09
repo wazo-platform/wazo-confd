@@ -17,6 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import request, url_for, make_response
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
@@ -36,6 +38,8 @@ def load(core_rest_api):
 
     @line_blueprint.route('/<int:line_id>/extension', methods=['POST'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def associate_extension(line_id):
         url.check_line_exists(line_id)
         line_extension = converter.decode(request)
@@ -46,6 +50,7 @@ def load(core_rest_api):
 
     @line_blueprint.route('/<int:line_id>/extension')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get_extension_from_line(line_id):
         url.check_line_exists(line_id)
         line_extension = line_extension_services.get_by_line_id(line_id)
@@ -62,6 +67,7 @@ def load(core_rest_api):
 
     @extension_blueprint.route('/<int:extension_id>/line')
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get_line_from_extension(extension_id):
         url.check_extension_exists(extension_id)
         line_extension = line_extension_services.get_by_extension_id(extension_id)

@@ -18,6 +18,8 @@
 from flask import Blueprint
 from flask import make_response
 from flask import request
+from flask_negotiate import produces
+from flask_negotiate import consumes
 
 from xivo_confd import config
 from xivo_confd.helpers import serializer
@@ -33,12 +35,15 @@ def load(core_rest_api):
 
     @blueprint.route('/live_reload', methods=['GET'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
     def get_live_reload():
         result = services.get_live_reload_status()
         return make_response(serializer.encode(result), 200)
 
     @blueprint.route('/live_reload', methods=['PUT'])
     @core_rest_api.auth.login_required
+    @produces('application/json')
+    @consumes('application/json')
     def set_live_reload():
         data = document.parse(request)
         services.set_live_reload_status(data)
