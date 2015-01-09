@@ -22,13 +22,11 @@ import urllib
 
 from flask import Flask
 from flask import request
-from flask_restplus import Api
 from gevent.pywsgi import WSGIServer
 from werkzeug.contrib.fixers import ProxyFix
 
 from xivo_confd import flask_http_server
 from xivo_confd.authentication.confd_auth import ConfdAuth
-from xivo_confd.config import API_VERSION
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 
@@ -47,7 +45,6 @@ class CoreRestApi(object):
         self.app.secret_key = os.urandom(24)
         self.app.permanent_session_lifetime = timedelta(minutes=5)
         self.auth = ConfdAuth()
-        self.api = Api(self.app, version=API_VERSION, prefix='/{}'.format(API_VERSION))
 
         if config['debug']:
             logger.info("Debug mode enabled.")
