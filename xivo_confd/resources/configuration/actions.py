@@ -42,7 +42,6 @@ def load(core_rest_api):
 
     @blueprint.route('/live_reload', methods=['PUT'])
     @core_rest_api.auth.login_required
-    @produces('application/json')
     @consumes('application/json')
     def set_live_reload():
         data = document.parse(request)
