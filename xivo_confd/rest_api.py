@@ -18,11 +18,12 @@
 from datetime import timedelta
 import logging
 import os
+from pprint import pformat
 import urllib
 
 from flask import Flask
+from flask import g
 from flask import request
-from gevent.pywsgi import WSGIServer
 from werkzeug.contrib.fixers import ProxyFix
 
 from xivo_confd import flask_http_server
@@ -62,6 +63,18 @@ class CoreRestApi(object):
             else:
                 logger.info("%(method)s %(url)s", params)
 
+        @self.app.after_request
+        def per_request_callbacks(response):
+            for func in getattr(g, 'call_after_request', ()):
+                response = func(response)
+            params = {
+                'statuscode': response.status_code,
+                'method': request.method,
+                'url': urllib.unquote(request.url).decode('utf8')
+            }
+            logger.info("%(method)s %(url)s %(statuscode)s", params)
+            return response
+
         @self.app.errorhandler(Exception)
         def error_handler(error):
             return handle_error(error)
@@ -79,16 +92,16 @@ class CoreRestApi(object):
         self.app.register_blueprint(blueprint)
 
     def run(self):
-        environ = {
-            'wsgi.multithread': True
-        }
-        http_server = WSGIServer(listener=(self.config['rest_api']['listen'], self.config['rest_api']['port']),
-                                 application=self.app,
-                                 environ=environ)
+        bind_addr = (self.config['rest_api']['listen'], self.config['rest_api']['port'])
 
-        logger.debug('WSGIServer starting... uid: %s, listen: %s:%s',
-                     os.getuid(),
-                     self.config['rest_api']['listen'],
-                     self.config['rest_api']['port'])
+        from cherrypy import wsgiserver
+        wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': self.app})
+        server = wsgiserver.CherryPyWSGIServer(bind_addr=bind_addr,
+                                               wsgi_app=wsgi_app)
 
-        http_server.serve_forever()
+        logger.debug('WSGIServer starting... uid: %s, listen: %s:%s', os.getuid(), bind_addr[0], bind_addr[1])
+
+        try:
+            server.start()
+        except KeyboardInterrupt:
+            server.stop()
