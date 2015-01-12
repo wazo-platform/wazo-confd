@@ -35,12 +35,18 @@ class TestClient(FlaskClient):
         kwargs.setdefault('environ_base', {})['REMOTE_ADDR'] = '127.0.0.1'
         return super(TestClient, self).open(*args, **kwargs)
 
+    def get(self, *args, **kwargs):
+        kwargs.setdefault('headers', {'Accept': 'application/json'})
+        return super(TestClient, self).get(*args, **kwargs)
+
     def put(self, *args, **kwargs):
         kwargs.setdefault('content_type', 'application/json')
+        kwargs.setdefault('headers', {'Accept': 'application/json'})
         return super(TestClient, self).put(*args, **kwargs)
 
     def post(self, *args, **kwargs):
         kwargs.setdefault('content_type', 'application/json')
+        kwargs.setdefault('headers', {'Accept': 'application/json'})
         return super(TestClient, self).post(*args, **kwargs)
 
 
