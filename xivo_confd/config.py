@@ -44,6 +44,24 @@ DEFAULT_CONFIG = {
         'exchange_type': 'topic',
         'exchange_durable': True,
     },
+    'default_plugins': [
+        "call_logs",
+        "configuration",
+        "cti_profiles",
+        "devices",
+        "extensions",
+        "infos",
+        "lines",
+        "queue_members",
+        "users",
+        "voicemails",
+        "line_extension",
+        "line_extension_collection",
+        "user_cti_profile",
+        "user_line",
+        "user_voicemail",
+    ],
+    'extra_plugins': [],
 }
 
 

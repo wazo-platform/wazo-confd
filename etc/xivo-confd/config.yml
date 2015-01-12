@@ -28,3 +28,7 @@ bus:
     exchange_name: xivo
     exchange_type: topic
     exchange_durable: True
+
+# Extra resources to load
+#extra_plugins:
+#   - resource_name
