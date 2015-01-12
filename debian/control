@@ -27,7 +27,7 @@ Depends: ${python:Depends},
          python-flask,
          python-flask-httpauth,
          python-flask-negotiate,
-         python-cherrypy
+         python-cherrypy3
 Provides: xivo-librestapi
 Conflicts: xivo-librestapi
 Replaces: xivo-librestapi
