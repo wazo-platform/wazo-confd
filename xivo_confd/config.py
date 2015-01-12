@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,16 @@ DEFAULT_CONFIG = {
     'rest_api': {
         'listen': '127.0.0.1',
         'port': 9487
-    }
+    },
+    'bus': {
+        'username': 'guest',
+        'password': 'guest',
+        'host': 'localhost',
+        'port': 5672,
+        'exchange_name': 'xivo',
+        'exchange_type': 'topic',
+        'exchange_durable': True,
+    },
 }
 
 

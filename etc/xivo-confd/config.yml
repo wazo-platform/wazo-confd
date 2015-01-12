@@ -18,3 +18,13 @@ rest_api:
 
     # Listening port
     port: 9487
+
+# Event bus (AMQP) connection informations
+bus:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    exchange_name: xivo
+    exchange_type: topic
+    exchange_durable: True
