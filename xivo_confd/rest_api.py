@@ -81,9 +81,8 @@ class CoreRestApi(object):
 
         flask_http_server.register_resources(self, config['default_plugins'])
 
-        logger.debug('Load extra plugins')
-        if 'extra_plugins' in config and config['extra_plugins']:
-            flask_http_server.register_resources(self, config['extra_plugins'])
+        logger.debug('Loading extra plugins...')
+        flask_http_server.register_resources(self, config['extra_plugins'])
 
     def blueprint(self, name):
         return self.app.blueprints[name]
