@@ -64,7 +64,7 @@ def main():
     bus_producer.declare_exchange(BUS_CONFIG['exchange_name'],
                                   BUS_CONFIG['exchange_type'],
                                   BUS_CONFIG['exchange_durable'])
-    install_bus_event_producer(bus_producer)
+    install_bus_event_producer(bus_producer, BUS_CONFIG['exchange_name'])
     if parsed_args.dev_mode:
         logger.info("Starting xivo-confd in dev mode.")
         config.HOST = parsed_args.listen_addr
