@@ -27,9 +27,9 @@ class TestLoadResources(unittest.TestCase):
     @patch('xivo_confd.flask_http_server._load_module')
     def test_load_resources(self, load_module):
         rest_api = Mock()
-        server.ORDER_RESOURCES = ['resource1', 'resource2']
+        resources = ['resource1', 'resource2']
 
-        server.register_blueprints(rest_api)
+        server.register_resources(rest_api, resources)
 
         load_module.assert_any_call('xivo_confd.resources.resource1.actions', rest_api)
         load_module.assert_any_call('xivo_confd.resources.resource2.actions', rest_api)

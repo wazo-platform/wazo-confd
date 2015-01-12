@@ -34,7 +34,24 @@ DEFAULT_CONFIG = {
     'rest_api': {
         'listen': '127.0.0.1',
         'port': 9487
-    }
+    },
+    'default_plugins': [
+        "call_logs",
+        "configuration",
+        "cti_profiles",
+        "devices",
+        "extensions",
+        "infos",
+        "lines",
+        "queue_members",
+        "users",
+        "voicemails",
+        "line_extension",
+        "line_extension_collection",
+        "user_cti_profile",
+        "user_line",
+        "user_voicemail",
+    ]
 }
 
 

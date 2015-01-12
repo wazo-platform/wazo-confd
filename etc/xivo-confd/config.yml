@@ -18,3 +18,7 @@ rest_api:
 
     # Listening port
     port: 9487
+
+# Extra resources to load
+#extra_plugins:
+#   - resource_name

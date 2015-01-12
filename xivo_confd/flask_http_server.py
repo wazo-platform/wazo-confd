@@ -21,28 +21,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-ORDER_RESOURCES = [
-    "call_logs",
-    "configuration",
-    "cti_profiles",
-    "devices",
-    "extensions",
-    "infos",
-    "lines",
-    "queue_members",
-    "users",
-    "voicemails",
 
-    "line_extension",
-    "line_extension_collection",
-    "user_cti_profile",
-    "user_line",
-    "user_voicemail",
-]
-
-
-def register_blueprints(core_rest_api):
-    for resource in ORDER_RESOURCES:
+def register_resources(core_rest_api, resources):
+    for resource in resources:
         pkg_resource = 'xivo_confd.resources.{resource}'.format(resource=resource)
         _load_module('%s.actions' % pkg_resource, core_rest_api)
 
