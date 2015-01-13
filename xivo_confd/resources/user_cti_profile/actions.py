@@ -16,16 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import Response
 from flask import request
-from flask.helpers import make_response
-from flask_negotiate import produces
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
+from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
-from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
-from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
 
 
 def load(core_rest_api):
@@ -45,7 +45,7 @@ def load(core_rest_api):
         url.check_user_exists(user_id)
         user_cti_profile = converter.decode(request)
         user_cti_profile_services.edit(user_cti_profile)
-        return make_response('', 204)
+        return Response(status=204)
 
     @user_blueprint.route('/<int:user_id>/cti', methods=['GET'])
     @core_rest_api.auth.login_required
@@ -53,7 +53,9 @@ def load(core_rest_api):
     def get_cti_configuration(user_id):
         url.check_user_exists(user_id)
         user_cti_profile = user_cti_profile_services.get(user_id)
-        encoded_profile = converter.encode(user_cti_profile)
-        return make_response(encoded_profile, 200)
+        response = converter.encode(user_cti_profile)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     core_rest_api.register(user_blueprint)

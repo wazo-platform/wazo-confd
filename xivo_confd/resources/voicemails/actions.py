@@ -16,18 +16,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from flask.blueprints import Blueprint
-from flask.globals import request
-from flask.helpers import make_response, url_for
-from flask_negotiate import produces
+from flask import Blueprint
+from flask import Response
+from flask import request
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.voicemail import services as voicemail_services
+from xivo_dao.data_handler.voicemail.model import Voicemail
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
-from xivo_dao.data_handler.voicemail import services as voicemail_services
-from xivo_dao.data_handler.voicemail.model import Voicemail
 
 
 def load(core_rest_api):
@@ -54,16 +55,20 @@ def load(core_rest_api):
     def list():
         search_parameters = extract_search_parameters(request.args)
         search_result = voicemail_services.search(**search_parameters)
-        encoded_result = converter.encode_list(search_result.items, search_result.total)
-        return make_response(encoded_result, 200)
+        response = converter.encode_list(search_result.items, search_result.total)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
     @produces('application/json')
     def get(resource_id):
         voicemail = voicemail_services.get(resource_id)
-        encoded_voicemail = converter.encode(voicemail)
-        return make_response(encoded_voicemail, 200)
+        response = converter.encode(voicemail)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -72,9 +77,12 @@ def load(core_rest_api):
     def create():
         voicemail = converter.decode(request)
         created_voicemail = voicemail_services.create(voicemail)
-        encoded_voicemail = converter.encode(created_voicemail)
+        response = converter.encode(created_voicemail)
         location = url_for('.get', resource_id=created_voicemail.id)
-        return make_response(encoded_voicemail, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        content_type='application/json',
+                        headers={'Location': location})
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -83,13 +91,13 @@ def load(core_rest_api):
         voicemail = voicemail_services.get(resource_id)
         converter.update(request, voicemail)
         voicemail_services.edit(voicemail)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<int:resource_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
     def delete(resource_id):
         voicemail = voicemail_services.get(resource_id)
         voicemail_services.delete(voicemail)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(blueprint)
