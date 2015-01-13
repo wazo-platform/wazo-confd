@@ -25,6 +25,4 @@ Running unit tests
 Running functional tests
 ------------------------
 
-1. Install and configure the [XiVO acceptance](https://github.com/xivo-pbx/xivo-acceptance) library
-2. Go into ```acceptance/features_1_1```
-3. Run any of the files with [lettuce](http://lettuce.it)
+1. [XiVO acceptance](https://github.com/xivo-pbx/xivo-acceptance)
