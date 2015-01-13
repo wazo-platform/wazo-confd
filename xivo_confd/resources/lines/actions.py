@@ -44,7 +44,7 @@ def load(core_rest_api):
     @blueprint.route('')
     @core_rest_api.auth.login_required
     @produces('application/json')
-    def list():
+    def get_lines():
         if 'q' in request.args:
             lines = line_services.find_all_by_name(request.args['q'])
         else:
