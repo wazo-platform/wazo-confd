@@ -16,15 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, url_for, make_response
-from flask_negotiate import produces
+from flask import Response
+from flask import request
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.line_extension import services as line_extension_services
+from xivo_dao.data_handler.line_extension.model import LineExtension
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int
-from xivo_dao.data_handler.line_extension import services as line_extension_services
-from xivo_dao.data_handler.line_extension.model import LineExtension
 
 
 def load(core_rest_api):
@@ -44,9 +46,12 @@ def load(core_rest_api):
         url.check_line_exists(line_id)
         line_extension = converter.decode(request)
         created_line_extension = line_extension_services.associate(line_extension)
-        encoded_line_extension = converter.encode(created_line_extension)
+        response = converter.encode(created_line_extension)
         location = url_for('.associate_extension', line_id=line_id)
-        return make_response(encoded_line_extension, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        headers={'Location': location},
+                        content_type='application/json')
 
     @line_blueprint.route('/<int:line_id>/extension')
     @core_rest_api.auth.login_required
@@ -54,8 +59,10 @@ def load(core_rest_api):
     def get_extension_from_line(line_id):
         url.check_line_exists(line_id)
         line_extension = line_extension_services.get_by_line_id(line_id)
-        encoded_line_extension = converter.encode(line_extension)
-        return make_response(encoded_line_extension, 200)
+        response = converter.encode(line_extension)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @line_blueprint.route('/<int:line_id>/extension', methods=['DELETE'])
     @core_rest_api.auth.login_required
@@ -63,7 +70,7 @@ def load(core_rest_api):
         url.check_line_exists(line_id)
         line_extension = line_extension_services.get_by_line_id(line_id)
         line_extension_services.dissociate(line_extension)
-        return make_response('', 204)
+        return Response(status=204)
 
     @extension_blueprint.route('/<int:extension_id>/line')
     @core_rest_api.auth.login_required
@@ -71,8 +78,10 @@ def load(core_rest_api):
     def get_line_from_extension(extension_id):
         url.check_extension_exists(extension_id)
         line_extension = line_extension_services.get_by_extension_id(extension_id)
-        encoded_line_extension = converter.encode(line_extension)
-        return make_response(encoded_line_extension, 200)
+        response = converter.encode(line_extension)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     core_rest_api.register(line_blueprint)
     core_rest_api.register(extension_blueprint)

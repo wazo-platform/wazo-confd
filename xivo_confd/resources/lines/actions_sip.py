@@ -15,22 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
 
-from flask import Blueprint, url_for
+from flask import Blueprint
+from flask import Response
 from flask import request
-from flask.helpers import make_response
-from flask_negotiate import produces
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.line import services as line_services
+from xivo_dao.data_handler.line.model import LineSIP
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
-from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.line.model import LineSIP
-
-
-logger = logging.getLogger(__name__)
 
 
 def load(core_rest_api):
@@ -51,16 +48,20 @@ def load(core_rest_api):
     @produces('application/json')
     def list_sip():
         lines = line_services.find_all_by_protocol('sip')
-        items = converter.encode_list(lines)
-        return make_response(items, 200)
+        response = converter.encode_list(lines)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
     @produces('application/json')
     def get(resource_id):
         line = line_services.get(resource_id)
-        encoded_line = converter.encode(line)
-        return make_response(encoded_line, 200)
+        response = converter.encode(line)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -72,9 +73,12 @@ def load(core_rest_api):
         line.name = line.username
 
         created_line = line_services.create(line)
-        encoded_line = converter.encode(created_line)
+        response = converter.encode(created_line)
         location = url_for('.get', resource_id=created_line.id)
-        return make_response(encoded_line, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        content_type='application/json',
+                        headers={'Location': location})
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -86,14 +90,14 @@ def load(core_rest_api):
         line.name = line.username
 
         line_services.edit(line)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<int:resource_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
     def delete(resource_id):
         line = line_services.get(resource_id)
         line_services.delete(line)
-        return make_response('', 204)
+        return Response(status=204)
 
     def _fix_line(line):
         for field in line._MAPPING.values():

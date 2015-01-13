@@ -18,16 +18,18 @@
 import json
 
 from flask import Blueprint
-from flask import url_for, request, make_response
-from flask_negotiate import produces
+from flask import Response
+from flask import request
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.user import services as user_services
+from xivo_dao.data_handler.user.model import User, UserDirectory
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter, Serializer, DocumentParser, DocumentMapper
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
-from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.user.model import User, UserDirectory
 
 
 class DirectorySerializer(Serializer):
@@ -79,15 +81,16 @@ def load(core_rest_api):
     def list():
         if 'q' in request.args:
             items = user_services.find_all_by_fullname(request.args['q'])
-            encoded_items = user_converter.encode_list(items)
-            return make_response(encoded_items, 200)
+            response = user_converter.encode_list(items)
+        else:
+            parameters = extract_search_parameters(request.args, ['view'])
+            search_result = user_services.search(**parameters)
+            converter = _find_converter()
+            response = converter.encode_list(search_result.items, search_result.total)
 
-        parameters = extract_search_parameters(request.args, ['view'])
-        search_result = user_services.search(**parameters)
-
-        converter = _find_converter()
-        encoded_result = converter.encode_list(search_result.items, search_result.total)
-        return make_response(encoded_result, 200)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     def _find_converter():
         if request.args.get('view') == 'directory':
@@ -99,8 +102,10 @@ def load(core_rest_api):
     @produces('application/json')
     def get(resource_id):
         user = user_services.get(resource_id)
-        encoded_user = user_converter.encode(user)
-        return make_response(encoded_user, 200)
+        response = user_converter.encode(user)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -109,9 +114,12 @@ def load(core_rest_api):
     def create():
         user = user_converter.decode(request)
         created_user = user_services.create(user)
-        encoded_user = user_converter.encode(created_user)
+        response = user_converter.encode(created_user)
         location = url_for('.get', resource_id=created_user.id)
-        return make_response(encoded_user, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        content_type='application/json',
+                        headers={'Location': location})
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -120,13 +128,13 @@ def load(core_rest_api):
         user = user_services.get(resource_id)
         user_converter.update(request, user)
         user_services.edit(user)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<int:resource_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
     def delete(resource_id):
         user = user_services.get(resource_id)
         user_services.delete(user)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(blueprint)

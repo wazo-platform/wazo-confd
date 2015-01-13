@@ -17,15 +17,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import Blueprint
-from flask import request, make_response, url_for
-from flask_negotiate import produces
+from flask import Response
+from flask import request
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.queue_members import services
+from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int
-from xivo_dao.data_handler.queue_members import services
-from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 
 
 def load(core_rest_api):
@@ -42,7 +44,10 @@ def load(core_rest_api):
     @produces('application/json')
     def get_agent_queue_association(queue_id, agent_id):
         queue_member = services.get_by_queue_id_and_agent_id(queue_id, agent_id)
-        return make_response(converter.encode(queue_member), 200)
+        response = converter.encode(queue_member)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -50,7 +55,7 @@ def load(core_rest_api):
     def edit_agent_queue_association(queue_id, agent_id):
         queue_member = converter.decode(request)
         services.edit_agent_queue_association(queue_member)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<int:queue_id>/members/agents', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -59,15 +64,19 @@ def load(core_rest_api):
     def associate_agent_to_queue(queue_id):
         queue_member = converter.decode(request)
         created_queue_member = services.associate_agent_to_queue(queue_member)
+        response = converter.encode(created_queue_member)
         location = url_for('.get_agent_queue_association',
                            queue_id=created_queue_member.queue_id,
                            agent_id=created_queue_member.agent_id)
-        return make_response(converter.encode(created_queue_member), 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        content_type='application/json',
+                        headers={'Location': location})
 
     @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
     def remove_agent_from_queue(agent_id, queue_id):
         services.remove_agent_from_queue(agent_id, queue_id)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(blueprint)

@@ -16,15 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, url_for, make_response
-from flask_negotiate import produces
+from flask import Response
+from flask import request
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.user_line import services as user_line_services
+from xivo_dao.data_handler.user_line.model import UserLine
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
-from xivo_dao.data_handler.user_line import services as user_line_services
-from xivo_dao.data_handler.user_line.model import UserLine
 
 
 def load(core_rest_api):
@@ -46,10 +48,12 @@ def load(core_rest_api):
         url.check_user_exists(user_id)
         model = converter.decode(request)
         created_model = user_line_services.associate(model)
-
-        encoded_model = converter.encode(created_model)
+        response = converter.encode(created_model)
         location = url_for('.associate_line', user_id=user_id)
-        return make_response(encoded_model, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        content_type='application/json',
+                        headers={'Location': location})
 
     @user_blueprint.route('/<int:user_id>/lines/<int:line_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
@@ -58,7 +62,7 @@ def load(core_rest_api):
         url.check_line_exists(line_id)
         user_line = user_line_services.get_by_user_id_and_line_id(user_id, line_id)
         user_line_services.dissociate(user_line)
-        return make_response('', 204)
+        return Response(status=204)
 
     @user_blueprint.route('/<int:user_id>/lines')
     @core_rest_api.auth.login_required
@@ -66,7 +70,9 @@ def load(core_rest_api):
     def get_user_lines(user_id):
         url.check_user_exists(user_id)
         user_lines = user_line_services.find_all_by_user_id(user_id)
-        encoded_user_lines = converter.encode_list(user_lines)
-        return make_response(encoded_user_lines, 200)
+        response = converter.encode_list(user_lines)
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     core_rest_api.register(user_blueprint)
