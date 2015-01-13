@@ -16,15 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import request
 from flask import Response
-from flask_negotiate import produces
+from flask import request
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.configuration import services
 
 from xivo_confd import config
 from xivo_confd.helpers import serializer
 from xivo_confd.helpers.mooltiparse import Field, Boolean
-from xivo_dao.data_handler.configuration import services
 
 
 def load(core_rest_api):
@@ -39,7 +39,9 @@ def load(core_rest_api):
     def get_live_reload():
         result = services.get_live_reload_status()
         response = serializer.encode(result)
-        return Response(response, 200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('/live_reload', methods=['PUT'])
     @core_rest_api.auth.login_required

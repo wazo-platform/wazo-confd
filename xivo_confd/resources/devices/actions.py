@@ -16,20 +16,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import request
 from flask import Response
+from flask import request
 from flask import url_for
-from flask_negotiate import produces
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.device import services as device_services
+from xivo_dao.data_handler.device.model import Device
+from xivo_dao.data_handler.line import services as line_services
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Dict
 from xivo_confd.helpers.request_bouncer import limit_to_localhost
-from xivo_dao.data_handler.device import services as device_services
-from xivo_dao.data_handler.device.model import Device
-from xivo_dao.data_handler.line import services as line_services
 
 
 def load(core_rest_api):
@@ -57,7 +57,9 @@ def load(core_rest_api):
     def get(resource_id):
         device = device_services.get(resource_id)
         response = converter.encode(device)
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
@@ -66,7 +68,9 @@ def load(core_rest_api):
         search_parameters = extract_search_parameters(request.args)
         search_result = device_services.search(**search_parameters)
         response = converter.encode_list(search_result.items, search_result.total)
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required

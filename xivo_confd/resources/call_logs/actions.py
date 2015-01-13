@@ -19,7 +19,7 @@ from datetime import datetime
 
 from flask import Blueprint
 from flask import Response
-from flask.globals import request
+from flask import request
 from flask_negotiate import produces
 from xivo_dao.data_handler import errors
 from xivo_dao.data_handler.call_log import services

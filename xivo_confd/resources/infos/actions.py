@@ -19,11 +19,12 @@ from flask import Blueprint
 from flask import Response
 from flask_negotiate import produces
 
+from xivo_dao.data_handler.infos import services as infos_services
+from xivo_dao.data_handler.infos.model import Infos
+
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode
-from xivo_dao.data_handler.infos import services as infos_services
-from xivo_dao.data_handler.infos.model import Infos
 
 
 def load(core_rest_api):
@@ -37,6 +38,8 @@ def load(core_rest_api):
     @produces('application/json')
     def get():
         response = converter.encode(infos_services.get())
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     core_rest_api.register(blueprint)

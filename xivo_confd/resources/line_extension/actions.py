@@ -16,16 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, url_for
 from flask import Response
-from flask_negotiate import produces
+from flask import request
+from flask import url_for
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.line_extension import services as line_extension_services
+from xivo_dao.data_handler.line_extension.model import LineExtension
 
 from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int
-from xivo_dao.data_handler.line_extension import services as line_extension_services
-from xivo_dao.data_handler.line_extension.model import LineExtension
 
 
 def load(core_rest_api):
@@ -59,7 +60,9 @@ def load(core_rest_api):
         url.check_line_exists(line_id)
         line_extension = line_extension_services.get_by_line_id(line_id)
         response = converter.encode(line_extension)
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @line_blueprint.route('/<int:line_id>/extension', methods=['DELETE'])
     @core_rest_api.auth.login_required
@@ -76,7 +79,9 @@ def load(core_rest_api):
         url.check_extension_exists(extension_id)
         line_extension = line_extension_services.get_by_extension_id(extension_id)
         response = converter.encode(line_extension)
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     core_rest_api.register(line_blueprint)
     core_rest_api.register(extension_blueprint)

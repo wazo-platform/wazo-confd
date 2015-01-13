@@ -16,18 +16,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import request
 from flask import Response
+from flask import request
 from flask import url_for
-from flask_negotiate import produces
 from flask_negotiate import consumes
+from flask_negotiate import produces
+from xivo_dao.data_handler.extension import services as extension_services
+from xivo_dao.data_handler.extension.model import Extension
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
-from xivo_dao.data_handler.extension import services as extension_services
-from xivo_dao.data_handler.extension.model import Extension
 
 
 def load(core_rest_api):
@@ -50,7 +50,9 @@ def load(core_rest_api):
         parameters = extract_search_parameters(request.args, extra_parameters)
         search_result = extension_services.search(**parameters)
         response = converter.encode_list(search_result.items, search_result.total)
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
@@ -58,7 +60,9 @@ def load(core_rest_api):
     def get(resource_id):
         extension = extension_services.get(resource_id)
         response = converter.encode(extension)
-        return Response(response=response, status=200, content_type='application/json')
+        return Response(response=response,
+                        status=200,
+                        content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
