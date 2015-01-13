@@ -21,12 +21,12 @@ from flask import Blueprint
 from flask import Response
 from flask.globals import request
 from flask_negotiate import produces
+from xivo_dao.data_handler import errors
+from xivo_dao.data_handler.call_log import services
 
 from xivo_confd import config
 from xivo_confd.resources.call_logs import mapper
 from xivo_confd.resources.call_logs import serializer
-from xivo_dao.data_handler import errors
-from xivo_dao.data_handler.call_log import services
 
 
 def load(core_rest_api):
@@ -66,14 +66,10 @@ def load(core_rest_api):
     def _list_call_logs(call_logs):
         mapped_call_logs = map(mapper.to_api, call_logs)
         response = serializer.encode_list(mapped_call_logs)
-        headers = {
-            'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
-            'Content-Type': 'text/csv; charset=utf-8'
-        }
         return Response(response=response,
                         status=200,
-                        headers=headers,
-                        content_type='application/json')
+                        headers={'Content-disposition': 'attachment;filename=xivo-call-logs.csv'},
+                        content_type='text/csv; charset=utf-8')
 
     def _decode_datetime(datetime_str):
         result = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')
