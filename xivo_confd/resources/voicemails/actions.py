@@ -52,7 +52,7 @@ def load(core_rest_api):
     @blueprint.route('')
     @core_rest_api.auth.login_required
     @produces('application/json')
-    def list():
+    def get_voicemails():
         search_parameters = extract_search_parameters(request.args)
         search_result = voicemail_services.search(**search_parameters)
         response = converter.encode_list(search_result.items, search_result.total)

@@ -35,7 +35,7 @@ def load(core_rest_api):
     @blueprint.route('')
     @core_rest_api.auth.login_required
     @produces('text/csv')
-    def list():
+    def get_call_logs():
         if 'start_date' in request.args or 'end_date' in request.args:
             return _list_period()
         else:

@@ -46,7 +46,7 @@ def load(core_rest_api):
     @blueprint.route('')
     @core_rest_api.auth.login_required
     @produces('application/json')
-    def list():
+    def get_extensions():
         parameters = extract_search_parameters(request.args, extra_parameters)
         search_result = extension_services.search(**parameters)
         response = converter.encode_list(search_result.items, search_result.total)

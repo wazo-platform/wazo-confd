@@ -78,7 +78,7 @@ def load(core_rest_api):
     @blueprint.route('')
     @core_rest_api.auth.login_required
     @produces('application/json')
-    def list():
+    def get_uers():
         if 'q' in request.args:
             items = user_services.find_all_by_fullname(request.args['q'])
             response = user_converter.encode_list(items)
