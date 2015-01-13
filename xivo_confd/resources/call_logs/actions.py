@@ -18,8 +18,8 @@
 from datetime import datetime
 
 from flask import Blueprint
+from flask import Response
 from flask.globals import request
-from flask.helpers import make_response
 from flask_negotiate import produces
 
 from xivo_confd import config
@@ -70,7 +70,10 @@ def load(core_rest_api):
             'Content-disposition': 'attachment;filename=xivo-call-logs.csv',
             'Content-Type': 'text/csv; charset=utf-8'
         }
-        return make_response(response, 200, headers)
+        return Response(response=response,
+                        status=200,
+                        headers=headers,
+                        content_type='application/json')
 
     def _decode_datetime(datetime_str):
         result = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')

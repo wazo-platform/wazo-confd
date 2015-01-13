@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask import make_response, Blueprint
+from flask import Blueprint
+from flask import Response
 from flask_negotiate import produces
 
 from xivo_confd import config
@@ -35,6 +36,7 @@ def load(core_rest_api):
     @core_rest_api.auth.login_required
     @produces('application/json')
     def get():
-        return make_response(converter.encode(infos_services.get()), 200)
+        response = converter.encode(infos_services.get())
+        return Response(response=response, status=200, content_type='application/json')
 
     core_rest_api.register(blueprint)

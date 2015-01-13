@@ -16,7 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import request, url_for, make_response
+from flask import request
+from flask import Response
+from flask import url_for
 from flask_negotiate import produces
 from flask_negotiate import consumes
 
@@ -42,8 +44,8 @@ def load(core_rest_api):
     def list_extensions(line_id):
         url.check_line_exists(line_id)
         line_extensions = line_extension_services.get_all_by_line_id(line_id)
-        items = converter.encode_list(line_extensions)
-        return make_response(items, 200)
+        response = converter.encode_list(line_extensions)
+        return Response(response=response, status=200, content_type='application/json')
 
     @line_blueprint.route('/<int:line_id>/extensions', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -53,9 +55,12 @@ def load(core_rest_api):
         url.check_line_exists(line_id)
         model = converter.decode(request)
         created_model = line_extension_services.associate(model)
-        encoded_model = converter.encode(created_model)
+        response = converter.encode(created_model)
         location = url_for('.list_extensions', line_id=line_id)
-        return make_response(encoded_model, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        headers={'Location': location},
+                        content_type='application/json')
 
     @line_blueprint.route('/<int:line_id>/extensions/<int:extension_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
@@ -64,6 +69,6 @@ def load(core_rest_api):
         url.check_extension_exists(extension_id)
         model = LineExtension(line_id=line_id, extension_id=extension_id)
         line_extension_services.dissociate(model)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(line_blueprint)

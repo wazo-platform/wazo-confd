@@ -16,8 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import url_for, request
-from flask.helpers import make_response
+from flask import request
+from flask import Response
+from flask import url_for
 from flask_negotiate import produces
 from flask_negotiate import consumes
 
@@ -48,16 +49,16 @@ def load(core_rest_api):
     def list():
         parameters = extract_search_parameters(request.args, extra_parameters)
         search_result = extension_services.search(**parameters)
-        items = converter.encode_list(search_result.items, search_result.total)
-        return make_response(items, 200)
+        response = converter.encode_list(search_result.items, search_result.total)
+        return Response(response=response, status=200, content_type='application/json')
 
     @blueprint.route('/<int:resource_id>')
     @core_rest_api.auth.login_required
     @produces('application/json')
     def get(resource_id):
         extension = extension_services.get(resource_id)
-        encoded_extension = converter.encode(extension)
-        return make_response(encoded_extension, 200)
+        response = converter.encode(extension)
+        return Response(response=response, status=200, content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -66,10 +67,13 @@ def load(core_rest_api):
     def create():
         extension = converter.decode(request)
         created_extension = extension_services.create(extension)
-        encoded_extension = converter.encode(created_extension)
+        response = converter.encode(created_extension)
         location = url_for('.get', resource_id=created_extension.id)
 
-        return make_response(encoded_extension, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        headers={'Location': location},
+                        content_type='application/json')
 
     @blueprint.route('/<int:resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -78,13 +82,13 @@ def load(core_rest_api):
         extension = extension_services.get(resource_id)
         converter.update(request, extension)
         extension_services.edit(extension)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<int:resource_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
     def delete(resource_id):
         extension = extension_services.get(resource_id)
         extension_services.delete(extension)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(blueprint)

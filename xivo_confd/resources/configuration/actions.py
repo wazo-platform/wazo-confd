@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import make_response
 from flask import request
+from flask import Response
 from flask_negotiate import produces
 from flask_negotiate import consumes
 
@@ -38,7 +38,8 @@ def load(core_rest_api):
     @produces('application/json')
     def get_live_reload():
         result = services.get_live_reload_status()
-        return make_response(serializer.encode(result), 200)
+        response = serializer.encode(result)
+        return Response(response, 200, content_type='application/json')
 
     @blueprint.route('/live_reload', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -46,6 +47,6 @@ def load(core_rest_api):
     def set_live_reload():
         data = document.parse(request)
         services.set_live_reload_status(data)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(blueprint)

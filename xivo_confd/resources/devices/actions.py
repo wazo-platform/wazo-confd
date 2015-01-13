@@ -15,7 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask import Blueprint, url_for, make_response, request
+from flask import Blueprint
+from flask import request
+from flask import Response
+from flask import url_for
 from flask_negotiate import produces
 from flask_negotiate import consumes
 
@@ -53,8 +56,8 @@ def load(core_rest_api):
     @produces('application/json')
     def get(resource_id):
         device = device_services.get(resource_id)
-        result = converter.encode(device)
-        return make_response(result, 200)
+        response = converter.encode(device)
+        return Response(response=response, status=200, content_type='application/json')
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
@@ -62,8 +65,8 @@ def load(core_rest_api):
     def list():
         search_parameters = extract_search_parameters(request.args)
         search_result = device_services.search(**search_parameters)
-        result = converter.encode_list(search_result.items, search_result.total)
-        return make_response(result, 200)
+        response = converter.encode_list(search_result.items, search_result.total)
+        return Response(response=response, status=200, content_type='application/json')
 
     @blueprint.route('', methods=['POST'])
     @core_rest_api.auth.login_required
@@ -72,10 +75,13 @@ def load(core_rest_api):
     def create():
         device = converter.decode(request)
         created_device = device_services.create(device)
-        encoded_device = converter.encode(created_device)
+        response = converter.encode(created_device)
         location = url_for('.get', resource_id=created_device.id)
 
-        return make_response(encoded_device, 201, {'Location': location})
+        return Response(response=response,
+                        status=201,
+                        headers={'Location': location},
+                        content_type='application/json')
 
     @blueprint.route('/<resource_id>', methods=['PUT'])
     @core_rest_api.auth.login_required
@@ -85,28 +91,28 @@ def load(core_rest_api):
         device = device_services.get(resource_id)
         converter.update(request, device)
         device_services.edit(device)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<resource_id>', methods=['DELETE'])
     @core_rest_api.auth.login_required
     def delete(resource_id):
         device = device_services.get(resource_id)
         device_services.delete(device)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<resource_id>/synchronize')
     @core_rest_api.auth.login_required
     def synchronize(resource_id):
         device = device_services.get(resource_id)
         device_services.synchronize(device)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<resource_id>/autoprov')
     @core_rest_api.auth.login_required
     def autoprov(resource_id):
         device = device_services.get(resource_id)
         device_services.reset_to_autoprov(device)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<deviceid>/associate_line/<int:lineid>')
     @core_rest_api.auth.login_required
@@ -115,7 +121,7 @@ def load(core_rest_api):
         device = device_services.get(deviceid)
         line = line_services.get(lineid)
         device_services.associate_line_to_device(device, line)
-        return make_response('', 204)
+        return Response(status=204)
 
     @blueprint.route('/<deviceid>/remove_line/<int:lineid>')
     @core_rest_api.auth.login_required
@@ -124,6 +130,6 @@ def load(core_rest_api):
         device = device_services.get(deviceid)
         line = line_services.get(lineid)
         device_services.remove_line_from_device(device, line)
-        return make_response('', 204)
+        return Response(status=204)
 
     core_rest_api.register(blueprint)
