@@ -52,10 +52,12 @@ class TestClient(FlaskClient):
 
 class TestResources(unittest.TestCase):
 
+    config = config.DEFAULT_CONFIG
+
     @classmethod
     def setUpClass(cls):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-        rest_api = CoreRestApi(config.DEFAULT_CONFIG)
+        rest_api = CoreRestApi(cls.config)
         rest_api.app.config['TESTING'] = True
         rest_api.app.test_client_class = TestClient
         cls.app = rest_api.app.test_client()
