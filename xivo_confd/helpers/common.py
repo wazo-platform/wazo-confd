@@ -17,7 +17,7 @@
 
 import logging
 
-from flask.helpers import make_response
+from flask import Response
 from werkzeug.exceptions import HTTPException
 
 from xivo_dao.data_handler import errors
@@ -53,7 +53,10 @@ def handle_error(error):
 
 def error_response(error, code, exc_info=False):
     logger.error(error, exc_info=exc_info)
-    return make_response(serializer.encode([unicode(error)]), code)
+    response = serializer.encode([unicode(error)])
+    return Response(response=response,
+                    status=code,
+                    content_type='application/json')
 
 
 class ParameterExtractor(object):

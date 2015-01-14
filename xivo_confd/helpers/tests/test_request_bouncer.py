@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import Flask
-from flask.helpers import make_response
+from flask import Response
 from mock import patch
 from werkzeug.exceptions import Forbidden
 
@@ -40,7 +40,7 @@ class TestRequestBouncer(test_resources.TestResources):
 
         @limit_to_localhost
         def decorated_func():
-            return make_response('', 200)
+            return Response(status=200)
 
         result = decorated_func()
         self.assertEqual(200, result.status_code)
@@ -51,6 +51,6 @@ class TestRequestBouncer(test_resources.TestResources):
 
         @limit_to_localhost
         def decorated_func():
-            return make_response('', 200)
+            return Response(status=200)
 
         self.assertRaises(Forbidden, decorated_func)
