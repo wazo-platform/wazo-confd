@@ -18,7 +18,8 @@
 
 import argparse
 
-from xivo.config_helper import parse_config_file
+from xivo.chain_map import ChainMap
+from xivo.config_helper import read_config_file_hierarchy
 from xivo.xivo_logging import get_log_level_by_name
 
 API_VERSION = '1.1'
@@ -29,6 +30,7 @@ DEFAULT_CONFIG = {
     'user': 'www-data',
     'log_level': 'info',
     'config_file': '/etc/xivo-confd/config.yml',
+    'extra_config_files': '/etc/xivo-confd/conf.d/',
     'log_filename': '/var/log/xivo-confd.log',
     'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
     'rest_api': {
@@ -66,31 +68,25 @@ DEFAULT_CONFIG = {
 
 
 def load(argv):
-    config = dict(DEFAULT_CONFIG)
-
-    config.update(_parse_cli_args(argv, DEFAULT_CONFIG))
-    config.update(parse_config_file(config['config_file']))
-    _interpret_raw_values(config)
-
-    return config
+    cli_config = _parse_cli_args(argv)
+    file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
+    reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
+    return ChainMap(reinterpreted_config, cli_config, file_config, DEFAULT_CONFIG)
 
 
-def _parse_cli_args(argv, default_config):
+def _parse_cli_args(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('-c',
                         '--config-file',
                         action='store',
-                        default=default_config['config_file'],
                         help="The path where is the config file. Default: %(default)s")
     parser.add_argument('-d',
                         '--debug',
                         action='store_true',
-                        default=default_config['debug'],
                         help="Log debug messages. Overrides log_level. Default: %(default)s")
     parser.add_argument('-f',
                         '--foreground',
                         action='store_true',
-                        default=default_config['foreground'],
                         help="Foreground, don't daemonize. Default: %(default)s")
     parser.add_argument('-l',
                         '--log-level',
@@ -101,11 +97,29 @@ def _parse_cli_args(argv, default_config):
     parser.add_argument('-u',
                         '--user',
                         action='store',
-                        default=default_config['user'],
                         help="The owner of the process.")
     parsed_args = parser.parse_args(argv)
-    return vars(parsed_args)
+
+    result = {}
+    if parsed_args.config_file:
+        result['config_file'] = parsed_args.config_file
+    if parsed_args.debug:
+        result['debug'] = parsed_args.debug
+    if parsed_args.foreground:
+        result['foreground'] = parsed_args.foreground
+    if parsed_args.log_level:
+        result['log_level'] = parsed_args.log_level
+    if parsed_args.user:
+        result['user'] = parsed_args.user
+
+    return result
 
 
-def _interpret_raw_values(config):
-    config['log_level'] = get_log_level_by_name(config['log_level'])
+def _get_reinterpreted_raw_values(config):
+    result = {}
+
+    log_level = config.get('log_level')
+    if log_level:
+        result['log_level'] = get_log_level_by_name(log_level)
+
+    return result

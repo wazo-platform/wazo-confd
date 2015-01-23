@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import unittest
 from flask.testing import FlaskClient
 from hamcrest import assert_that, equal_to, has_entries, is_in, has_items, has_key, contains
 
-from xivo_confd import config
+from xivo_confd.config import DEFAULT_CONFIG
 from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.rest_api import CoreRestApi
@@ -52,7 +52,7 @@ class TestClient(FlaskClient):
 
 class TestResources(unittest.TestCase):
 
-    config = config.DEFAULT_CONFIG
+    config = DEFAULT_CONFIG
 
     @classmethod
     def setUpClass(cls):
