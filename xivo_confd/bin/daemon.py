@@ -17,15 +17,19 @@
 
 import sys
 import xivo_dao
+import logging
+
+from kombu import Connection, Exchange, Producer
 
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
 from xivo.xivo_logging import setup_logging
-from xivo_bus.ctl.config import BusConfig
-from xivo_bus.ctl.producer import BusProducer
+from xivo_bus import Marshaler
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
+
+logger = logging.getLogger(__name__)
 
 
 def main(argv):
@@ -45,13 +49,20 @@ def main(argv):
 
 
 def _configure_xivo_dao(config):
-    bus_producer = BusProducer(BusConfig(**config['bus']))
-    bus_producer.connect()
-    bus_producer.declare_exchange(config['bus']['exchange_name'],
-                                  config['bus']['exchange_type'],
-                                  config['bus']['exchange_durable'])
+    def _on_bus_publish_error(exc, interval):
+        logger.error('Error: %s', exc, exc_info=1)
+        logger.info('Retry in %s seconds...', interval)
 
-    xivo_dao.install_bus_event_producer(bus_producer, config['bus']['exchange_name'])
+    bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**config['bus'])
+    bus_connection = Connection(bus_url)
+    bus_exchange = Exchange(config['bus']['exchange_name'],
+                            type=config['bus']['exchange_type'])
+    bus_producer = Producer(bus_connection, exchange=bus_exchange, auto_declare=True)
+    bus_publish_fn = bus_connection.ensure(bus_producer, bus_producer.publish,
+                                           errback=_on_bus_publish_error, max_retries=3,
+                                           interval_start=1)
+
+    xivo_dao.install_bus_event_producer(bus_publish_fn, Marshaler())
 
 
 if __name__ == '__main__':
