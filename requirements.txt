@@ -4,7 +4,6 @@ git+https://github.com/xivo-pbx/xivo-lib-python.git
 git+https://github.com/xivo-pbx/xivo-bus.git
 sqlalchemy
 psycopg2
-pika
 flask==0.10.1
 flask-httpauth
 flask-negotiate
