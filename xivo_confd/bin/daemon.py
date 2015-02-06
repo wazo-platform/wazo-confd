@@ -21,8 +21,6 @@ import xivo_dao
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
 from xivo.xivo_logging import setup_logging
-from xivo_bus.ctl.config import BusConfig
-from xivo_bus.ctl.producer import BusProducer
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
@@ -36,22 +34,13 @@ def main(argv):
     if config['user']:
         change_user(config['user'])
 
-    _configure_xivo_dao(config)
+    xivo_dao.init_bus_from_config(config)
+    xivo_dao.init_db_from_config(config)
 
     controller = Controller(config)
 
     with pidfile_context(config['pid_filename'], config['foreground']):
         controller.run()
-
-
-def _configure_xivo_dao(config):
-    bus_producer = BusProducer(BusConfig(**config['bus']))
-    bus_producer.connect()
-    bus_producer.declare_exchange(config['bus']['exchange_name'],
-                                  config['bus']['exchange_type'],
-                                  config['bus']['exchange_durable'])
-
-    xivo_dao.install_bus_event_producer(bus_producer, config['bus']['exchange_name'])
 
 
 if __name__ == '__main__':
