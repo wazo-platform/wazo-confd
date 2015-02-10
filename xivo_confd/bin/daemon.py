@@ -18,9 +18,11 @@
 import sys
 import xivo_dao
 
+from xivo.chain_map import ChainMap
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
 from xivo.xivo_logging import setup_logging
+from xivo_dao.data_handler.infos import services as info_services
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
@@ -34,8 +36,8 @@ def main(argv):
     if config['user']:
         change_user(config['user'])
 
-    xivo_dao.init_bus_from_config(config)
     xivo_dao.init_db_from_config(config)
+    xivo_dao.init_bus_from_config(ChainMap(config, {'uuid': info_services.get().uuid}))
 
     controller = Controller(config)
 
