@@ -44,7 +44,6 @@ class CoreRestApi(object):
         self.app = Flask('xivo_confd')
         self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.app.secret_key = os.urandom(24)
-        self.app.permanent_session_lifetime = timedelta(minutes=5)
         self.auth = ConfdAuth()
 
         if config['debug']:
