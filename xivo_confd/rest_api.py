@@ -15,10 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from datetime import timedelta
 import logging
 import os
-from pprint import pformat
 import urllib
 
 from flask import Flask
