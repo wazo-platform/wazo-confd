@@ -22,6 +22,7 @@ import urllib
 from flask import Flask
 from flask import g
 from flask import request
+from flask_cors import CORS
 from werkzeug.contrib.fixers import ProxyFix
 
 from xivo_confd import flask_http_server
@@ -43,6 +44,8 @@ class CoreRestApi(object):
         self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.app.secret_key = os.urandom(24)
         self.auth = ConfdAuth()
+
+        self.load_cors()
 
         if config['debug']:
             logger.info("Debug mode enabled.")
@@ -80,6 +83,12 @@ class CoreRestApi(object):
 
         logger.debug('Loading extra plugins...')
         flask_http_server.register_resources(self, config['extra_plugins'])
+
+    def load_cors(self):
+        cors_config = dict(self.config['rest_api'].get('cors', {}))
+        enabled = cors_config.pop('enabled', False)
+        if enabled:
+            CORS(self.app, **cors_config)
 
     def blueprint(self, name):
         return self.app.blueprints[name]
