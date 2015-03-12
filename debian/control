@@ -26,6 +26,7 @@ Depends: ${python:Depends},
          xivo-libdao (>= 13.02~20130131.124922.ae70e6f-1),
          python-flask,
          python-flask-httpauth,
+         python-flask-cors,
          python-flask-negotiate,
          python-cherrypy3
 Provides: xivo-librestapi

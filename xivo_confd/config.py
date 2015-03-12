@@ -22,6 +22,7 @@ from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 from xivo.xivo_logging import get_log_level_by_name
 
+
 API_VERSION = '1.1'
 
 DEFAULT_CONFIG = {
@@ -35,7 +36,11 @@ DEFAULT_CONFIG = {
     'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
     'rest_api': {
         'listen': '127.0.0.1',
-        'port': 9487
+        'port': 9487,
+        'cors': {
+            'enabled': True,
+            'allow_headers': 'Content-Type',
+        },
     },
     'bus': {
         'username': 'guest',

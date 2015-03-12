@@ -27,6 +27,16 @@ rest_api:
     # Listening port
     port: 9487
 
+    #CORS configuration. See Flask-CORS documentation for other values.
+    cors:
+
+        #Enabled by default
+        enabled: true
+
+        #Allow JSON preflight requests
+        allow_headers: Content-Type
+
+
 # Event bus (AMQP) connection informations
 bus:
     username: guest
