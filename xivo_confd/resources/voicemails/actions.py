@@ -42,6 +42,7 @@ def load(core_rest_api):
         Field('email', Unicode()),
         Field('language', Unicode()),
         Field('timezone', Unicode()),
+        Field('pager', Unicode()),
         Field('max_messages', Int()),
         Field('attach_audio', Boolean()),
         Field('delete_messages', Boolean()),
