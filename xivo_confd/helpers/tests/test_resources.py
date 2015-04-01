@@ -26,7 +26,7 @@ from hamcrest import assert_that, equal_to, has_entries, is_in, has_items, has_k
 from xivo_confd.config import DEFAULT_CONFIG
 from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import handle_error
-from xivo_confd.rest_api import CoreRestApi
+from xivo_confd.core_rest_api import CoreRestApi
 
 
 class TestClient(FlaskClient):

@@ -17,7 +17,7 @@
 
 import logging
 
-from xivo_confd.rest_api import CoreRestApi
+from xivo_confd.core_rest_api import CoreRestApi
 
 
 logger = logging.getLogger(__name__)
