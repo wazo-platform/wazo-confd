@@ -16,14 +16,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import Response
-from flask_negotiate import produces
-from xivo_dao.data_handler.cti_profile import services
+from xivo_dao.data_handler.cti_profile import dao
 from xivo_dao.data_handler.cti_profile.model import CtiProfile
+from xivo_dao.data_handler.utils.search import SearchResult
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+
+
+class CtiProfileService(object):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def search(self, args):
+        items = self.dao.find_all()
+        return SearchResult(items=items, total=len(items))
+
+    def get(self, profile_id):
+        return self.dao.get(profile_id)
 
 
 def load(core_rest_api):
@@ -34,24 +47,11 @@ def load(core_rest_api):
     )
     converter = Converter.for_resource(document, CtiProfile, 'cti_profiles')
 
-    @blueprint.route('', methods=['GET'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def find_all():
-        profiles = services.find_all()
-        response = converter.encode_list(profiles)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    service = CtiProfileService(dao)
+    resource = CRUDResource(service, converter)
 
-    @blueprint.route('/<int:resource_id>', methods=['GET'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get(resource_id):
-        profile = services.get(resource_id)
-        response = converter.encode(profile)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    chain = DecoratorChain(core_rest_api, blueprint)
+    chain.start().search().decorate(resource.search)
+    chain.start().get().decorate(resource.get)
 
     core_rest_api.register(blueprint)
