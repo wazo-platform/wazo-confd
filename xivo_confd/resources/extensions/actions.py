@@ -16,23 +16,42 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import Response
-from flask import request
-from flask import url_for
-from flask_negotiate import consumes
-from flask_negotiate import produces
-from xivo_dao.data_handler.extension import services as extension_services
+from xivo_dao.data_handler.extension import dao, validator, notifier
 from xivo_dao.data_handler.extension.model import Extension
+from xivo_dao.data_handler.line import dao as line_dao
+from xivo_dao.data_handler.line_extension import dao as line_extension_dao
 
 from xivo_confd import config
-from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
 
+from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
+
+
+class ExtensionService(CRUDService):
+
+    def __init__(self, dao, line_extension_dao, line_dao,
+                 validator, notifier, extra_parameters=None):
+        super(ExtensionService, self).__init__(dao, validator, notifier, extra_parameters)
+        self.line_extension_dao = line_extension_dao
+        self.line_dao = line_dao
+
+    def edit(self, extension):
+        self.validator.validate_edit(extension)
+        self.dao.edit(extension)
+        self.update_line(extension)
+        self.notifier.edited(extension)
+
+    def update_line(self, extension):
+        line_extension = self.line_extension_dao.find_by_extension_id(extension.id)
+        if line_extension:
+            self.line_dao.associate_extension(extension, line_extension.line_id)
+
 
 def load(core_rest_api):
-    blueprint = Blueprint('extensions', __name__, url_prefix='/%s/extensions' % config.API_VERSION)
-    extra_parameters = ['type']
+    blueprint = Blueprint('extensions',
+                          __name__,
+                          url_prefix='/%s/extensions' % config.API_VERSION)
 
     document = core_rest_api.content_parser.document(
         Field('id', Int()),
@@ -40,59 +59,9 @@ def load(core_rest_api):
         Field('context', Unicode()),
         Field('commented', Boolean())
     )
-
     converter = Converter.for_resource(document, Extension)
 
-    @blueprint.route('')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_extensions():
-        parameters = extract_search_parameters(request.args, extra_parameters)
-        search_result = extension_services.search(**parameters)
-        response = converter.encode_list(search_result.items, search_result.total)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    service = ExtensionService(dao, line_extension_dao, line_dao, validator, notifier, ['type'])
+    resource = CRUDResource(service, converter)
 
-    @blueprint.route('/<int:resource_id>')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get(resource_id):
-        extension = extension_services.get(resource_id)
-        response = converter.encode(extension)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
-    @blueprint.route('', methods=['POST'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    @consumes('application/json')
-    def create():
-        extension = converter.decode(request)
-        created_extension = extension_services.create(extension)
-        response = converter.encode(created_extension)
-        location = url_for('.get', resource_id=created_extension.id)
-
-        return Response(response=response,
-                        status=201,
-                        headers={'Location': location},
-                        content_type='application/json')
-
-    @blueprint.route('/<int:resource_id>', methods=['PUT'])
-    @core_rest_api.auth.login_required
-    @consumes('application/json')
-    def edit(resource_id):
-        extension = extension_services.get(resource_id)
-        converter.update(request, extension)
-        extension_services.edit(extension)
-        return Response(status=204)
-
-    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
-    @core_rest_api.auth.login_required
-    def delete(resource_id):
-        extension = extension_services.get(resource_id)
-        extension_services.delete(extension)
-        return Response(status=204)
-
-    core_rest_api.register(blueprint)
+    DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
