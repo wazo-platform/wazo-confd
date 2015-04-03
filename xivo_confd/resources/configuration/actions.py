@@ -16,15 +16,50 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import Response
 from flask import request
-from flask_negotiate import consumes
-from flask_negotiate import produces
-from xivo_dao.data_handler.configuration import services
+from xivo_dao.data_handler.configuration import dao
 
 from xivo_confd import config
-from xivo_confd.helpers import serializer
 from xivo_confd.helpers.mooltiparse import Field, Boolean
+from xivo_confd.helpers.resource import DecoratorChain
+from xivo_confd.helpers.converter import Converter
+
+
+class LiveReload(object):
+
+    def __init__(self, enabled):
+        self.enabled = enabled
+
+
+class LiveReloadService(object):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def get(self):
+        return LiveReload(self.dao.is_live_reload_enabled())
+
+    def edit(self, live_reload):
+        data = {'enabled': live_reload.enabled}
+        self.dao.set_live_reload_status(data)
+
+
+class LiveReloadResource(object):
+
+    def __init__(self, service, converter):
+        self.service = service
+        self.converter = converter
+
+    def get(self):
+        resource = self.service.get()
+        response = self.converter.encode(resource)
+        return (response, 200, {'Content-Type': 'application/json'})
+
+    def edit(self):
+        resource = self.service.get()
+        self.converter.update(request, resource)
+        self.service.edit(resource)
+        return ('', 204)
 
 
 def load(core_rest_api):
@@ -32,23 +67,13 @@ def load(core_rest_api):
                           __name__,
                           url_prefix='/%s/configuration' % config.API_VERSION)
     document = core_rest_api.content_parser.document(Field('enabled', Boolean()))
+    converter = Converter.for_request(document, LiveReload)
 
-    @blueprint.route('/live_reload', methods=['GET'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_live_reload():
-        result = services.get_live_reload_status()
-        response = serializer.encode(result)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    service = LiveReloadService(dao)
+    resource = LiveReloadResource(service, converter)
 
-    @blueprint.route('/live_reload', methods=['PUT'])
-    @core_rest_api.auth.login_required
-    @consumes('application/json')
-    def set_live_reload():
-        data = document.parse(request)
-        services.set_live_reload_status(data)
-        return Response(status=204)
+    chain = DecoratorChain(core_rest_api, blueprint)
+    chain.start().get('/live_reload').decorate(resource.get)
+    chain.start().edit('/live_reload').decorate(resource.edit)
 
     core_rest_api.register(blueprint)
