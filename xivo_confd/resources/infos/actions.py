@@ -16,15 +16,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import Response
-from flask_negotiate import produces
 
-from xivo_dao.data_handler.infos import services as infos_services
+from xivo_dao.data_handler.infos import dao
 from xivo_dao.data_handler.infos.model import Infos
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode
+from xivo_confd.helpers.resource import DecoratorChain
+
+
+class InfoResource(object):
+
+    def __init__(self, dao, converter):
+        self.dao = dao
+        self.converter = converter
+
+    def get(self):
+        info = self.dao.get()
+        response = self.converter.encode(info)
+        return (response, 200, {'Content-Type': 'application/json'})
 
 
 def load(core_rest_api):
@@ -32,14 +43,9 @@ def load(core_rest_api):
     document = core_rest_api.content_parser.document(Field('uuid', Unicode()))
 
     converter = Converter.for_resource(document, Infos, 'infos', 'uuid')
+    resource = InfoResource(dao, converter)
 
-    @blueprint.route('')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get():
-        response = converter.encode(infos_services.get())
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    chain = DecoratorChain(core_rest_api, blueprint)
+    chain.start().get('').decorate(resource.get)
 
     core_rest_api.register(blueprint)
