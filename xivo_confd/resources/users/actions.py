@@ -18,11 +18,7 @@
 import json
 
 from flask import Blueprint
-from flask import Response
 from flask import request
-from flask import url_for
-from flask_negotiate import consumes
-from flask_negotiate import produces
 from xivo_dao.data_handler.user import services as user_services
 from xivo_dao.data_handler.user.model import User, UserDirectory
 
@@ -30,6 +26,7 @@ from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter, Serializer, DocumentParser, DocumentMapper
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
 
 
 class DirectorySerializer(Serializer):
@@ -42,8 +39,39 @@ class DirectorySerializer(Serializer):
                            'items': items})
 
 
+class UserResource(CRUDResource):
+
+    def __init__(self, service, converter, directory_converter):
+        super(UserResource, self).__init__(service, converter)
+        self.directory_converter = directory_converter
+
+    def search(self):
+        if 'q' in request.args:
+            return self.search_by_fullname(request.args['q'])
+        else:
+            args = extract_search_parameters(request.args, ['view'])
+            return self.search_by_view(args)
+
+    def search_by_fullname(self, fullname):
+        items = self.service.find_all_by_fullname(fullname)
+        response = self.converter.encode_list(items)
+        return (response, 200, {'Content-Type': 'application/json'})
+
+    def search_by_view(self, args):
+        search_result = self.service.search(**args)
+        converter = self.find_converter(args.get('view'))
+        response = converter.encode_list(search_result.items, search_result.total)
+        return (response, 200, {'Content-Type': 'application/json'})
+
+    def find_converter(self, view=None):
+        if view == 'directory':
+            return self.directory_converter
+        return self.converter
+
+
 def load(core_rest_api):
     blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.API_VERSION)
+
     user_document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('firstname', Unicode()),
@@ -60,6 +88,7 @@ def load(core_rest_api):
         Field('description', Unicode()),
         Field('preprocess_subroutine', Unicode())
     )
+
     directory_document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('line_id', Int()),
@@ -69,72 +98,12 @@ def load(core_rest_api):
         Field('exten', Unicode()),
         Field('mobile_phone_number', Unicode())
     )
+
     user_converter = Converter.for_resource(user_document, User)
     directory_converter = Converter(parser=DocumentParser(directory_document),
                                     mapper=DocumentMapper(directory_document),
                                     serializer=DirectorySerializer(),
                                     model=UserDirectory)
 
-    @blueprint.route('')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_uers():
-        if 'q' in request.args:
-            items = user_services.find_all_by_fullname(request.args['q'])
-            response = user_converter.encode_list(items)
-        else:
-            parameters = extract_search_parameters(request.args, ['view'])
-            search_result = user_services.search(**parameters)
-            converter = _find_converter()
-            response = converter.encode_list(search_result.items, search_result.total)
-
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
-    def _find_converter():
-        if request.args.get('view') == 'directory':
-            return directory_converter
-        return user_converter
-
-    @blueprint.route('/<int:resource_id>')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get(resource_id):
-        user = user_services.get(resource_id)
-        response = user_converter.encode(user)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
-    @blueprint.route('', methods=['POST'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    @consumes('application/json')
-    def create():
-        user = user_converter.decode(request)
-        created_user = user_services.create(user)
-        response = user_converter.encode(created_user)
-        location = url_for('.get', resource_id=created_user.id)
-        return Response(response=response,
-                        status=201,
-                        content_type='application/json',
-                        headers={'Location': location})
-
-    @blueprint.route('/<int:resource_id>', methods=['PUT'])
-    @core_rest_api.auth.login_required
-    @consumes('application/json')
-    def edit(resource_id):
-        user = user_services.get(resource_id)
-        user_converter.update(request, user)
-        user_services.edit(user)
-        return Response(status=204)
-
-    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
-    @core_rest_api.auth.login_required
-    def delete(resource_id):
-        user = user_services.get(resource_id)
-        user_services.delete(user)
-        return Response(status=204)
-
-    core_rest_api.register(blueprint)
+    resource = UserResource(user_services, user_converter, directory_converter)
+    DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
