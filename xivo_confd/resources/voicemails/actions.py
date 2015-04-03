@@ -17,18 +17,27 @@
 
 
 from flask import Blueprint
-from flask import Response
-from flask import request
-from flask import url_for
-from flask_negotiate import consumes
-from flask_negotiate import produces
-from xivo_dao.data_handler.voicemail import services as voicemail_services
+
+from xivo_dao.helpers import sysconfd_connector
+from xivo_dao.data_handler.voicemail import dao, validator, notifier
 from xivo_dao.data_handler.voicemail.model import Voicemail
 
 from xivo_confd import config
-from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
+from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
+
+
+class VoicemailService(CRUDService):
+
+    def __init__(self, dao, validator, notifier, connector, extra=None):
+        super(VoicemailService, self).__init__(dao, validator, notifier, extra)
+        self.connector = connector
+
+    def delete(self, voicemail):
+        super(VoicemailService, self).delete(voicemail)
+        self.connector.delete_voicemail_storage(voicemail.number,
+                                                voicemail.context)
 
 
 def load(core_rest_api):
@@ -50,55 +59,7 @@ def load(core_rest_api):
     )
     converter = Converter.for_resource(document, Voicemail)
 
-    @blueprint.route('')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_voicemails():
-        search_parameters = extract_search_parameters(request.args)
-        search_result = voicemail_services.search(**search_parameters)
-        response = converter.encode_list(search_result.items, search_result.total)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    service = VoicemailService(dao, validator, notifier, sysconfd_connector)
+    resource = CRUDResource(service, converter)
 
-    @blueprint.route('/<int:resource_id>')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get(resource_id):
-        voicemail = voicemail_services.get(resource_id)
-        response = converter.encode(voicemail)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
-    @blueprint.route('', methods=['POST'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    @consumes('application/json')
-    def create():
-        voicemail = converter.decode(request)
-        created_voicemail = voicemail_services.create(voicemail)
-        response = converter.encode(created_voicemail)
-        location = url_for('.get', resource_id=created_voicemail.id)
-        return Response(response=response,
-                        status=201,
-                        content_type='application/json',
-                        headers={'Location': location})
-
-    @blueprint.route('/<int:resource_id>', methods=['PUT'])
-    @core_rest_api.auth.login_required
-    @consumes('application/json')
-    def edit(resource_id):
-        voicemail = voicemail_services.get(resource_id)
-        converter.update(request, voicemail)
-        voicemail_services.edit(voicemail)
-        return Response(status=204)
-
-    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
-    @core_rest_api.auth.login_required
-    def delete(resource_id):
-        voicemail = voicemail_services.get(resource_id)
-        voicemail_services.delete(voicemail)
-        return Response(status=204)
-
-    core_rest_api.register(blueprint)
+    DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
