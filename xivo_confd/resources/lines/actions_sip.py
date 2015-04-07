@@ -17,17 +17,44 @@
 
 
 from flask import Blueprint
-from flask import Response
-from flask import request
-from flask import url_for
-from flask_negotiate import consumes
-from flask_negotiate import produces
 from xivo_dao.data_handler.line import services as line_services
 from xivo_dao.data_handler.line.model import LineSIP
+from xivo_dao.data_handler.utils.search import SearchResult
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+
+
+class LineSIPServiceProxy(object):
+
+    def __init__(self, service):
+        self.service = service
+
+    def search(self, args):
+        lines = self.service.find_all_by_protocol('sip')
+        return SearchResult(items=lines, total=len(lines))
+
+    def get(self, line_id):
+        return self.service.get(line_id)
+
+    def create(self, line):
+        self.fix_line(line)
+        line.name = line.username
+        return self.service.create(line)
+
+    def edit(self, line):
+        line.name = line.username
+        return self.service.edit(line)
+
+    def delete(self, line):
+        self.service.delete(line)
+
+    def fix_line(self, line):
+        for field in line._MAPPING.values():
+            if not hasattr(line, field):
+                setattr(line, field, None)
 
 
 def load(core_rest_api):
@@ -43,65 +70,7 @@ def load(core_rest_api):
     )
     converter = Converter.for_resource(document, LineSIP, 'lines_sip')
 
-    @blueprint.route('')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def list_sip():
-        lines = line_services.find_all_by_protocol('sip')
-        response = converter.encode_list(lines)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    service = LineSIPServiceProxy(line_services)
+    resource = CRUDResource(service, converter)
 
-    @blueprint.route('/<int:resource_id>')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get(resource_id):
-        line = line_services.get(resource_id)
-        response = converter.encode(line)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
-    @blueprint.route('', methods=['POST'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    @consumes('application/json')
-    def create():
-        line = converter.decode(request)
-        _fix_line(line)
-        line.name = line.username
-
-        created_line = line_services.create(line)
-        response = converter.encode(created_line)
-        location = url_for('.get', resource_id=created_line.id)
-        return Response(response=response,
-                        status=201,
-                        content_type='application/json',
-                        headers={'Location': location})
-
-    @blueprint.route('/<int:resource_id>', methods=['PUT'])
-    @core_rest_api.auth.login_required
-    @consumes('application/json')
-    def edit(resource_id):
-        line = line_services.get(resource_id)
-
-        converter.update(request, line)
-        line.name = line.username
-
-        line_services.edit(line)
-        return Response(status=204)
-
-    @blueprint.route('/<int:resource_id>', methods=['DELETE'])
-    @core_rest_api.auth.login_required
-    def delete(resource_id):
-        line = line_services.get(resource_id)
-        line_services.delete(line)
-        return Response(status=204)
-
-    def _fix_line(line):
-        for field in line._MAPPING.values():
-            if not hasattr(line, field):
-                setattr(line, field, None)
-
-    core_rest_api.register(blueprint)
+    DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

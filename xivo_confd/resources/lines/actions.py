@@ -16,20 +16,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from flask import Response
-from flask import request
-from flask_negotiate import produces
 from xivo_dao.data_handler.line import services as line_services
 from xivo_dao.data_handler.line.model import Line
+from xivo_dao.data_handler.utils.search import SearchResult
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
 from xivo_confd.resources.lines import actions_sip
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+
+
+class LineServiceProxy(object):
+
+    def __init__(self, service):
+        self.service = service
+
+    def search(self, args):
+        if 'q' in args:
+            lines = self.service.find_all_by_name(args['q'])
+        else:
+            lines = self.service.find_all()
+        return SearchResult(items=lines, total=len(lines))
+
+    def get(self, line_id):
+        return self.service.get(line_id)
 
 
 def load(core_rest_api):
     blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.API_VERSION)
+
     document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('context', Unicode()),
@@ -41,30 +57,13 @@ def load(core_rest_api):
     )
     converter = Converter.for_resource(document, Line)
 
-    @blueprint.route('')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_lines():
-        if 'q' in request.args:
-            lines = line_services.find_all_by_name(request.args['q'])
-        else:
-            lines = line_services.find_all()
-
-        response = converter.encode_list(lines)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
-    @blueprint.route('/<int:resource_id>')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get(resource_id):
-        line = line_services.get(resource_id)
-        response = converter.encode(line)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
-
     actions_sip.load(core_rest_api)
+
+    service = LineServiceProxy(line_services)
+    resource = CRUDResource(service, converter)
+
+    chain = DecoratorChain(core_rest_api, blueprint)
+    chain.start().search().decorate(resource.search)
+    chain.start().get().decorate(resource.get)
 
     core_rest_api.register(blueprint)

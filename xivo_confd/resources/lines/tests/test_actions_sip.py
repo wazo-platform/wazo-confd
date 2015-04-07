@@ -1,10 +1,10 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2013-2014 Avencall
 #
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -12,167 +12,74 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from mock import patch
+import unittest
+from mock import Mock, sentinel
+from hamcrest import assert_that, equal_to, has_property
 
+from xivo_dao.data_handler.utils.search import SearchResult
 from xivo_dao.data_handler.line.model import LineSIP
-from xivo_confd.helpers.tests.test_resources import TestResources
 
-BASE_URL = "/1.1/lines_sip"
+from xivo_confd.resources.lines.actions_sip import LineSIPServiceProxy
 
 
-class TestLineSIPActions(TestResources):
+class TestUserResource(unittest.TestCase):
 
     def setUp(self):
-        super(TestLineSIPActions, self).setUp()
-        self.line = self.build_line(id=1,
-                                    protocol="sip",
-                                    name='username',
-                                    context='default',
-                                    provisioning_extension='123456',
-                                    device_slot=1,
-                                    username='username',
-                                    secret="secret",
-                                    callerid='"John Doe" <1000>')
+        self.service = Mock()
+        self.proxy = LineSIPServiceProxy(self.service)
+        self.items = [sentinel.item1, sentinel.item2]
 
-    def build_line(self, **kwargs):
-        params = {
-            'id': None,
-            'name': None,
-            'number': None,
-            'context': None,
-            'protocol': None,
-            'protocolid': None,
-            'callerid': None,
-            'device_id': None,
-            'provisioning_extension': None,
-            'configregistrar': None,
-            'device_slot': None,
-            'username': None,
-            'secret': None,
-        }
-        params.update(kwargs)
+    def test_when_searching_then_returns_sip_lines(self):
+        self.service.find_all_by_protocol.return_value = self.items
+        expected = SearchResult(items=self.items, total=len(self.items))
 
-        line = LineSIP()
-        for name, value in params.iteritems():
-            setattr(line, name, value)
+        result = self.proxy.search({})
 
-        return line
+        assert_that(result, equal_to(expected))
+        self.service.find_all_by_protocol.assert_called_once_with('sip')
 
-    def build_item(self, line):
-        item = {
-            'id': line.id,
-            'context': line.context,
-            'device_slot': line.device_slot,
-            'provisioning_extension': line.provisioning_extension,
-            'username': line.username,
-            'secret': line.secret,
-            'callerid': line.callerid,
-            'links': [{
-                'href': 'http://localhost/1.1/lines_sip/%d' % line.id,
-                'rel': 'lines_sip'
-            }]
-        }
+    def test_when_getting_item_then_uses_service(self):
+        expected = self.service.get.return_value
 
-        return item
+        result = self.proxy.get(sentinel.line_id)
 
-    @patch('xivo_dao.data_handler.line.services.find_all_by_protocol')
-    def test_list_lines_with_no_lines(self, mock_line_services_find_all_by_protocol):
-        mock_line_services_find_all_by_protocol.return_value = []
+        assert_that(result, equal_to(expected))
+        self.service.get.assert_called_once_with(sentinel.line_id)
 
-        expected_result = {'total': 0, 'items': []}
+    def test_when_creating_then_fixes_attributes_on_model(self):
+        line = LineSIP(username='myusername')
+        attributes = ['id',
+                      'number',
+                      'context',
+                      'protocol',
+                      'protocolid',
+                      'callerid',
+                      'device_id',
+                      'provisioning_extension',
+                      'configregistrar',
+                      'device_slot']
 
-        result = self.app.get(BASE_URL)
+        self.proxy.create(line)
 
-        self.assert_response_for_list(result, expected_result)
-        mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
+        created_line = self.service.create.call_args[0][0]
 
-    @patch('xivo_dao.data_handler.line.services.find_all_by_protocol')
-    def test_list_lines_with_two_lines(self, mock_line_services_find_all_by_protocol):
-        line1 = self.build_line(id=1)
-        line2 = self.build_line(id=2)
-        mock_line_services_find_all_by_protocol.return_value = [line1, line2]
+        assert_that(line.name, equal_to('myusername'))
+        for attribute in attributes:
+            assert_that(created_line, has_property(attribute, None))
 
-        expected_result = {
-            'total': 2,
-            'items': [self.build_item(line1),
-                      self.build_item(line2)]
-        }
+    def test_when_editing_then_fixes_username_on_model(self):
+        line = LineSIP(username='myusername')
 
-        result = self.app.get(BASE_URL)
+        self.proxy.edit(line)
 
-        self.assert_response_for_list(result, expected_result)
-        mock_line_services_find_all_by_protocol.assert_called_once_with('sip')
+        edited_line = self.service.edit.call_args[0][0]
 
-    @patch('xivo_dao.data_handler.line.services.get')
-    def test_get(self, mock_line_services_get):
-        mock_line_services_get.return_value = self.line
+        assert_that(edited_line.name, equal_to('myusername'))
 
-        expected_result = self.build_item(self.line)
+    def test_when_deleting_line_then_deletes_using_service(self):
+        self.proxy.delete(sentinel.line)
 
-        result = self.app.get("%s/%d" % (BASE_URL, self.line.id))
-
-        self.assert_response_for_get(result, expected_result)
-        mock_line_services_get.assert_called_with(self.line.id)
-
-    @patch('xivo_dao.data_handler.line.services.create')
-    def test_create(self, mock_line_services_create):
-        mock_line_services_create.return_value = self.line
-
-        expected_result = self.build_item(self.line)
-
-        created_line = self.build_line(context=self.line.context,
-                                       name=self.line.username,
-                                       provisioning_extension=self.line.provisioning_extension,
-                                       device_slot=self.line.device_slot,
-                                       username=self.line.username,
-                                       protocol='sip')
-
-        data = {
-            'context': self.line.context,
-            'provisioning_extension': self.line.provisioning_extension,
-            'device_slot': self.line.device_slot,
-            'username': self.line.username,
-        }
-
-        result = self.app.post(BASE_URL, data=self._serialize_encode(data))
-
-        self.assert_response_for_create(result, expected_result)
-        mock_line_services_create.assert_called_once_with(created_line)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.edit')
-    def test_edit(self, mock_line_services_edit, mock_line_services_get):
-        mock_line_services_get.return_value = self.line
-
-        updated_line = self.build_line(id=1,
-                                       protocol='sip',
-                                       name='toto',
-                                       context='default',
-                                       provisioning_extension='123456',
-                                       device_slot=1,
-                                       username='toto',
-                                       secret='secret',
-                                       callerid='"John Doe" <1000>')
-
-        data = {'username': 'toto'}
-
-        result = self.app.put("%s/%d" % (BASE_URL, self.line.id), data=self._serialize_encode(data))
-
-        self.assert_response_for_update(result)
-        mock_line_services_get.assert_called_once_with(self.line.id)
-        mock_line_services_edit.assert_called_once_with(updated_line)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    @patch('xivo_dao.data_handler.line.services.delete')
-    def test_delete(self, mock_line_services_delete, mock_line_services_get):
-        mock_line_services_get.return_value = self.line
-
-        result = self.app.delete("%s/%s" % (BASE_URL, self.line.id))
-
-        self.assert_response_for_delete(result)
-        mock_line_services_get.assert_called_once_with(self.line.id)
-        mock_line_services_delete.assert_called_with(self.line)
+        self.service.delete.assert_called_once_with(sentinel.line)
