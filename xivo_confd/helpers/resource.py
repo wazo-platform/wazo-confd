@@ -86,9 +86,8 @@ class CRUDService(object):
 
     def edit(self, resource):
         self.validator.validate_edit(resource)
-        edited_resource = self.dao.edit(resource)
-        self.notifier.edited(edited_resource)
-        return edited_resource
+        self.dao.edit(resource)
+        self.notifier.edited(resource)
 
     def delete(self, resource):
         self.validator.validate_delete(resource)

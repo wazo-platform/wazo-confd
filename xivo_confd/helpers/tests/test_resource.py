@@ -193,19 +193,14 @@ class TestCRUDService(unittest.TestCase):
         self.validator.validate_edit.assert_called_once_with(sentinel.resource)
 
     def test_when_editing_then_resource_edited_with_dao(self):
-        expected_resource = self.dao.edit.return_value
-
-        result = self.service.edit(sentinel.resource)
-
-        self.dao.edit.assert_called_with(sentinel.resource)
-        assert_that(result, equal_to(expected_resource))
-
-    def test_when_editing_then_notifier_is_notified_using_resource(self):
-        expected_resource = self.dao.edit.return_value
-
         self.service.edit(sentinel.resource)
 
-        self.notifier.edited.assert_called_once_with(expected_resource)
+        self.dao.edit.assert_called_with(sentinel.resource)
+
+    def test_when_editing_then_notifier_is_notified_using_resource(self):
+        self.service.edit(sentinel.resource)
+
+        self.notifier.edited.assert_called_once_with(sentinel.resource)
 
     def test_when_deleting_then_resource_validated(self):
         self.service.delete(sentinel.resource)
