@@ -17,7 +17,7 @@
 
 from flask import Blueprint
 from flask import request
-from xivo_dao.data_handler.configuration import dao
+from xivo_dao.data_handler.configuration import dao, validator, notifier
 
 from xivo_confd import config
 from xivo_confd.helpers.mooltiparse import Field, Boolean
@@ -27,21 +27,28 @@ from xivo_confd.helpers.converter import Converter
 
 class LiveReload(object):
 
-    def __init__(self, enabled):
-        self.enabled = enabled
+    def __init__(self, **kwargs):
+        self.enabled = kwargs.get('enabled')
+
+    def dao_dict(self):
+        return {'enabled': self.enabled}
 
 
 class LiveReloadService(object):
 
-    def __init__(self, dao):
+    def __init__(self, dao, validator, notifier):
         self.dao = dao
+        self.validator = validator
+        self.notifier = notifier
 
     def get(self):
-        return LiveReload(self.dao.is_live_reload_enabled())
+        return LiveReload(enabled=self.dao.is_live_reload_enabled())
 
     def edit(self, live_reload):
-        data = {'enabled': live_reload.enabled}
+        data = live_reload.dao_dict()
+        self.validator.validate_live_reload_data(data)
         self.dao.set_live_reload_status(data)
+        self.notifier.live_reload_status_changed(data)
 
 
 class LiveReloadResource(object):
@@ -56,8 +63,7 @@ class LiveReloadResource(object):
         return (response, 200, {'Content-Type': 'application/json'})
 
     def edit(self):
-        resource = self.service.get()
-        self.converter.update(request, resource)
+        resource = self.converter.decode(request)
         self.service.edit(resource)
         return ('', 204)
 
@@ -69,7 +75,7 @@ def load(core_rest_api):
     document = core_rest_api.content_parser.document(Field('enabled', Boolean()))
     converter = Converter.for_request(document, LiveReload)
 
-    service = LiveReloadService(dao)
+    service = LiveReloadService(dao, validator, notifier)
     resource = LiveReloadResource(service, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)

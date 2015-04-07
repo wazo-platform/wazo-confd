@@ -25,7 +25,9 @@ class TestLiveReloadService(unittest.TestCase):
 
     def setUp(self):
         self.dao = Mock()
-        self.service = LiveReloadService(self.dao)
+        self.validator = Mock()
+        self.notifier = Mock()
+        self.service = LiveReloadService(self.dao, self.validator, self.notifier)
 
     def test_when_get_called_then_returns_a_model_with_live_reload_enabled(self):
         self.dao.is_live_reload_enabled.return_value = True
@@ -34,8 +36,11 @@ class TestLiveReloadService(unittest.TestCase):
         assert_that(result.enabled, equal_to(True))
 
     def test_when_edit_called_then_sets_live_reload_status(self):
-        live_reload = Mock(enabled=False)
+        live_reload = Mock()
+        expected_data = live_reload.dao_dict.return_value = {'enabled': True}
 
         self.service.edit(live_reload)
 
-        self.dao.set_live_reload_status.assert_called_once_with({'enabled': False})
+        self.validator.validate_live_reload_data.assert_called_once_with(expected_data)
+        self.dao.set_live_reload_status.assert_called_once_with(expected_data)
+        self.notifier.live_reload_status_changed.assert_called_once_with(expected_data)
