@@ -31,8 +31,8 @@ from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChai
 class ExtensionService(CRUDService):
 
     def __init__(self, dao, line_extension_dao, line_dao,
-                 validator, notifier, extra_parameters=None):
-        super(ExtensionService, self).__init__(dao, validator, notifier, extra_parameters)
+                 validator, notifier):
+        super(ExtensionService, self).__init__(dao, validator, notifier)
         self.line_extension_dao = line_extension_dao
         self.line_dao = line_dao
 
@@ -61,7 +61,7 @@ def load(core_rest_api):
     )
     converter = Converter.for_resource(document, Extension)
 
-    service = ExtensionService(dao, line_extension_dao, line_dao, validator, notifier, ['type'])
-    resource = CRUDResource(service, converter)
+    service = ExtensionService(dao, line_extension_dao, line_dao, validator, notifier)
+    resource = CRUDResource(service, converter, ['type'])
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

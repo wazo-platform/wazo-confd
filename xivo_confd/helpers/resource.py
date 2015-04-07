@@ -27,12 +27,14 @@ from xivo_confd.helpers.request_bouncer import limit_to_localhost
 
 class CRUDResource(object):
 
-    def __init__(self, service, converter):
+    def __init__(self, service, converter, extra_parameters=None):
         self.service = service
         self.converter = converter
+        self.extra_parameters = extra_parameters
 
     def search(self):
-        search_result = self.service.search(request.args)
+        parameters = extract_search_parameters(request.args, self.extra_parameters)
+        search_result = self.service.search(parameters)
         response = self.converter.encode_list(search_result.items, search_result.total)
         return (response, 200, {'Content-Type': 'application/json'})
 
@@ -71,8 +73,7 @@ class CRUDService(object):
         self.notifier = notifier
         self.extra_parameters = extra_parameters or []
 
-    def search(self, args):
-        parameters = extract_search_parameters(args, self.extra_parameters)
+    def search(self, parameters):
         return self.dao.search(**parameters)
 
     def get(self, resource_id):

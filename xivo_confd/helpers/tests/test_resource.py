@@ -30,14 +30,20 @@ class TestCRUDResource(unittest.TestCase):
     def setUp(self):
         self.service = Mock()
         self.converter = Mock()
-        self.resource = CRUDResource(self.service, self.converter)
+        self.extra_parameters = ['extra']
+        self.resource = CRUDResource(self.service, self.converter, self.extra_parameters)
 
-    def test_when_search_requested_then_search_service_called(self, request, _):
+    @patch('xivo_confd.helpers.resource.extract_search_parameters')
+    def test_when_search_requested_then_search_service_called(self, mock_extract, request, _):
+        expected_parameters = mock_extract.return_value
+
         self.resource.search()
 
-        self.service.search.assert_called_once_with(request.args)
+        mock_extract.assert_called_once_with(request.args, self.extra_parameters)
+        self.service.search.assert_called_once_with(expected_parameters)
 
     def test_when_search_requested_then_search_result_converted(self, request, _):
+        request.args = {}
         search_result = self.service.search.return_value
         expected_response = self.converter.encode_list.return_value
 
@@ -144,19 +150,15 @@ class TestCRUDService(unittest.TestCase):
         self.dao = Mock()
         self.validator = Mock()
         self.notifier = Mock()
-        self.extra_params = Mock()
-        self.service = CRUDService(self.dao, self.validator, self.notifier, self.extra_params)
+        self.service = CRUDService(self.dao, self.validator, self.notifier)
 
-    @patch('xivo_confd.helpers.resource.extract_search_parameters')
-    def test_when_searching_then_dao_is_searched(self, mock_extract):
-        expected_parameters = mock_extract.return_value = {'param': 'value'}
+    def test_when_searching_then_dao_is_searched(self):
+        parameters = {'param': 'value'}
         expected_search_result = self.dao.search.return_value
-        args = Mock()
 
-        result = self.service.search(args)
+        result = self.service.search(parameters)
 
-        mock_extract.assert_called_once_with(args, self.extra_params)
-        self.dao.search.assert_called_once_with(**expected_parameters)
+        self.dao.search.assert_called_once_with(**parameters)
         assert_that(result, equal_to(expected_search_result))
 
     def test_when_getting_then_resource_is_fetched_from_dao(self):
