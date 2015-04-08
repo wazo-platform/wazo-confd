@@ -25,6 +25,13 @@ from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.request_bouncer import limit_to_localhost
 
 
+def build_response(response, code=200, location=None):
+    headers = {'Content-Type': 'application/json'}
+    if location:
+        headers['Location'] = location
+    return (response, code, headers)
+
+
 class CRUDResource(object):
 
     def __init__(self, service, converter, extra_parameters=None):
@@ -36,7 +43,7 @@ class CRUDResource(object):
         parameters = extract_search_parameters(request.args, self.extra_parameters)
         search_result = self.service.search(parameters)
         response = self.converter.encode_list(search_result.items, search_result.total)
-        return (response, 200, {'Content-Type': 'application/json'})
+        return build_response(response)
 
     def get(self, resource_id):
         resource = self.service.get(resource_id)
@@ -61,8 +68,7 @@ class CRUDResource(object):
     def encode_resource(self, resource, status=200):
         response = self.converter.encode(resource)
         location = url_for('.get', resource_id=resource.id)
-        return (response, status, {'Location': location,
-                                   'Content-Type': 'application/json'})
+        return build_response(response, status, location)
 
 
 class CRUDService(object):

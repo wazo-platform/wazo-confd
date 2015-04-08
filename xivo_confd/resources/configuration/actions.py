@@ -21,7 +21,7 @@ from xivo_dao.data_handler.configuration import dao, validator, notifier
 
 from xivo_confd import config
 from xivo_confd.helpers.mooltiparse import Field, Boolean
-from xivo_confd.helpers.resource import DecoratorChain
+from xivo_confd.helpers.resource import DecoratorChain, build_response
 from xivo_confd.helpers.converter import Converter
 
 
@@ -60,7 +60,7 @@ class LiveReloadResource(object):
     def get(self):
         resource = self.service.get()
         response = self.converter.encode(resource)
-        return (response, 200, {'Content-Type': 'application/json'})
+        return build_response(response)
 
     def edit(self):
         resource = self.converter.decode(request)

@@ -23,7 +23,7 @@ from xivo_dao.data_handler.infos.model import Infos
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode
-from xivo_confd.helpers.resource import DecoratorChain
+from xivo_confd.helpers.resource import DecoratorChain, build_response
 
 
 class InfoResource(object):
@@ -35,7 +35,7 @@ class InfoResource(object):
     def get(self):
         info = self.dao.get()
         response = self.converter.encode(info)
-        return (response, 200, {'Content-Type': 'application/json'})
+        return build_response(response)
 
 
 def load(core_rest_api):

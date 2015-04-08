@@ -26,7 +26,7 @@ from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
 from xivo_confd.helpers.converter import Converter, Serializer, DocumentParser, DocumentMapper
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
-from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain, build_response
 
 
 class DirectorySerializer(Serializer):
@@ -55,13 +55,13 @@ class UserResource(CRUDResource):
     def search_by_fullname(self, fullname):
         items = self.service.find_all_by_fullname(fullname)
         response = self.converter.encode_list(items)
-        return (response, 200, {'Content-Type': 'application/json'})
+        return build_response(response)
 
     def search_by_view(self, args):
         search_result = self.service.search(**args)
         converter = self.find_converter(args.get('view'))
         response = converter.encode_list(search_result.items, search_result.total)
-        return (response, 200, {'Content-Type': 'application/json'})
+        return build_response(response)
 
     def find_converter(self, view=None):
         if view == 'directory':
