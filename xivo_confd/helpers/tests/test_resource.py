@@ -20,7 +20,7 @@ import unittest
 from mock import Mock, patch, sentinel
 from hamcrest import assert_that, equal_to
 
-from xivo_confd.helpers.resource import CRUDResource, CRUDService
+from xivo_confd.helpers.resource import CRUDResource, CRUDService, AssociationResource
 
 
 @patch('xivo_confd.helpers.resource.url_for')
@@ -218,3 +218,66 @@ class TestCRUDService(unittest.TestCase):
         self.service.delete(sentinel.resource)
 
         self.notifier.deleted.assert_called_once_with(sentinel.resource)
+
+
+@patch('xivo_confd.helpers.resource.url_for')
+@patch('xivo_confd.helpers.resource.request')
+class TestAssociationResource(unittest.TestCase):
+
+    def setUp(self):
+        self.service = Mock()
+        self.converter = Mock()
+        self.resource = AssociationResource(self.service, self.converter)
+
+    def test_when_listing_associations_then_service_called(self, request, url_for):
+        self.resource.association_list(sentinel.parent_id)
+
+        self.service.association_list.assert_called_once_with(sentinel.parent_id)
+
+    def test_when_listing_associations_then_list_converted(self, request, url_for):
+        expected_list = self.service.association_list.return_value
+        expected_response = self.converter.encode_list.return_value
+
+        result = self.resource.association_list(sentinel.parent_id)
+
+        self.converter.encode_list.assert_called_once_with(expected_list)
+        assert_that(result, equal_to((expected_response,
+                                     200,
+                                     {'Content-Type': 'application/json'})))
+
+    def test_when_associating_resource_then_request_decoded(self, request, _):
+        self.resource.associate(sentinel.parent_id)
+
+        self.converter.decode.assert_called_once_with(request)
+
+    def test_when_associating_resource_then_association_created(self, request, _):
+        expected_association = self.converter.decode.return_value
+
+        self.resource.associate(sentinel.parent_id)
+
+        self.service.associate.assert_called_once_with(sentinel.parent_id, expected_association)
+
+    def test_when_associating_then_association_encoded(self, request, url_for):
+        expected_association = self.service.associate.return_value
+        expected_response = self.converter.encode.return_value
+
+        result = self.resource.associate(sentinel.parent_id)
+
+        self.converter.encode.assert_called_once_with(expected_association)
+        assert_that(result, equal_to((expected_response,
+                                      201,
+                                      {'Content-Type': 'application/json',
+                                       'Location': url_for.return_value})))
+
+    def test_when_dissociating_then_association_fetched_through_service(self, request, url_for):
+        self.resource.dissociate(sentinel.parent_id, sentinel.resource_id)
+
+        self.service.get_association.assert_called_once_with(sentinel.parent_id, sentinel.resource_id)
+
+    def test_when_dissociating_then_service_called(self, request, url_for):
+        expected_association = self.service.get_association.return_value
+
+        result = self.resource.dissociate(sentinel.parent_id, sentinel.resource_id)
+
+        self.service.dissociate.assert_called_once_with(expected_association)
+        assert_that(result, equal_to(('', 204)))
