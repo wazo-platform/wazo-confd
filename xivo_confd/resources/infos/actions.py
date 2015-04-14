@@ -42,7 +42,7 @@ def load(core_rest_api):
     blueprint = Blueprint('infos', __name__, url_prefix='/%s/infos' % config.API_VERSION)
     document = core_rest_api.content_parser.document(Field('uuid', Unicode()))
 
-    converter = Converter.for_resource(document, Infos, 'infos', 'uuid')
+    converter = Converter.resource(document, Infos, 'infos', 'uuid')
     resource = InfoResource(dao, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)

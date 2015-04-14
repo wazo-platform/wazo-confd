@@ -73,7 +73,7 @@ def load(core_rest_api):
                           __name__,
                           url_prefix='/%s/configuration' % config.API_VERSION)
     document = core_rest_api.content_parser.document(Field('enabled', Boolean()))
-    converter = Converter.for_request(document, LiveReload)
+    converter = Converter.association(document, LiveReload)
 
     service = LiveReloadService(dao, validator, notifier)
     resource = LiveReloadResource(service, converter)

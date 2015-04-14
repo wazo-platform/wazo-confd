@@ -45,7 +45,7 @@ def load(core_rest_api):
         Field('id', Int()),
         Field('name', Unicode())
     )
-    converter = Converter.for_resource(document, CtiProfile, 'cti_profiles')
+    converter = Converter.resource(document, CtiProfile, 'cti_profiles')
 
     service = CtiProfileService(dao)
     resource = CRUDResource(service, converter)

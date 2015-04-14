@@ -59,7 +59,7 @@ def load(core_rest_api):
         Field('context', Unicode()),
         Field('commented', Boolean())
     )
-    converter = Converter.for_resource(document, Extension)
+    converter = Converter.resource(document, Extension)
 
     service = ExtensionService(dao, line_extension_dao, line_dao, validator, notifier)
     resource = CRUDResource(service, converter, ['type'])

@@ -128,13 +128,13 @@ class TestConverter(unittest.TestCase):
 
         assert_that(model.field1, equal_to('value2'))
 
-    def test_for_resource_creates_resource_converter(self):
+    def test_resource_creates_resource_converter(self):
         document = Mock()
 
         class Model(object):
             pass
 
-        converter = Converter.for_resource(document, Model)
+        converter = Converter.resource(document, Model)
 
         assert_that(converter.model, equal_to(Model))
         assert_that(converter.parser, instance_of(DocumentParser))
@@ -142,24 +142,24 @@ class TestConverter(unittest.TestCase):
         assert_that(converter.serializer, instance_of(ResourceSerializer))
         assert_that(converter.serializer.resources, has_entry('models', 'id'))
 
-    def test_for_resource_replaces_resource_name_and_resource_id(self):
+    def test_resource_replaces_resource_name_and_resource_id(self):
         document = Mock()
 
         class Model(object):
             pass
 
-        converter = Converter.for_resource(document, Model, 'resource_name', 'resource_id')
+        converter = Converter.resource(document, Model, 'resource_name', 'resource_id')
 
         assert_that(converter.serializer.resources, has_entry('resource_name', 'resource_id'))
 
-    def test_for_request_creates_request_converter(self):
+    def test_association_creates_request_converter(self):
         document = Mock()
 
         class Model(object):
             pass
 
         links = {'users': 'user_id', 'lines': 'line_id'}
-        converter = Converter.for_request(document, Model, links)
+        converter = Converter.association(document, Model, links)
 
         assert_that(converter.model, equal_to(Model))
         assert_that(converter.parser, instance_of(RequestParser))

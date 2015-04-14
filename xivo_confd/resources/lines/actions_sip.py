@@ -68,7 +68,7 @@ def load(core_rest_api):
         Field('device_slot', Int()),
         Field('callerid', Unicode()),
     )
-    converter = Converter.for_resource(document, LineSIP, 'lines_sip')
+    converter = Converter.resource(document, LineSIP, 'lines_sip')
 
     service = LineSIPServiceProxy(line_services)
     resource = CRUDResource(service, converter)

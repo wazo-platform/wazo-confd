@@ -37,7 +37,7 @@ def load(core_rest_api):
         Field('agent_id', Int()),
         Field('penalty', Int())
     )
-    converter = Converter.for_request(document, QueueMemberAgent)
+    converter = Converter.association(document, QueueMemberAgent)
 
     @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>')
     @core_rest_api.auth.login_required

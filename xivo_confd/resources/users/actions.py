@@ -99,7 +99,7 @@ def load(core_rest_api):
         Field('mobile_phone_number', Unicode())
     )
 
-    user_converter = Converter.for_resource(user_document, User)
+    user_converter = Converter.resource(user_document, User)
     directory_converter = Converter(parser=DocumentParser(directory_document),
                                     mapper=DocumentMapper(directory_document),
                                     serializer=DirectorySerializer(),

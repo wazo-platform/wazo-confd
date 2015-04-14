@@ -57,7 +57,7 @@ def load(core_rest_api):
         Field('delete_messages', Boolean()),
         Field('ask_password', Boolean())
     )
-    converter = Converter.for_resource(document, Voicemail)
+    converter = Converter.resource(document, Voicemail)
 
     service = VoicemailService(dao, validator, notifier, sysconfd_connector)
     resource = CRUDResource(service, converter)

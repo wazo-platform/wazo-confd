@@ -35,7 +35,7 @@ def load(core_rest_api):
         Field('cti_profile_id', Int()),
         Field('enabled', Boolean())
     )
-    converter = Converter.for_request(document, UserCtiProfile, {'users': 'user_id',
+    converter = Converter.association(document, UserCtiProfile, {'users': 'user_id',
                                                                  'cti_profiles': 'cti_profile_id'})
 
     @user_blueprint.route('/<int:user_id>/cti', methods=['PUT'])

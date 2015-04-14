@@ -159,15 +159,16 @@ class Converter(object):
             setattr(model, name, value)
 
     @classmethod
-    def for_request(cls, document, model, links=None):
+    def association(cls, document, model, links=None, rename=None):
         links = links or {}
+        rename = rename or {}
         parser = RequestParser(document)
-        mapper = DocumentMapper(document)
+        mapper = DocumentMapper(document, rename)
         serializer = ResourceSerializer(links)
         return cls(model, parser, mapper, serializer)
 
     @classmethod
-    def for_resource(cls, document, model, resource_name=None, resource_id=None):
+    def resource(cls, document, model, resource_name=None, resource_id=None):
         resource_name = resource_name or model.__name__.lower() + 's'
         resource_id = resource_id or 'id'
         links = {resource_name: resource_id}

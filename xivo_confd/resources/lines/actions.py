@@ -55,7 +55,7 @@ def load(core_rest_api):
         Field('device_slot', Int()),
         Field('device_id', Unicode()),
     )
-    converter = Converter.for_resource(document, Line)
+    converter = Converter.resource(document, Line)
 
     actions_sip.load(core_rest_api)
 

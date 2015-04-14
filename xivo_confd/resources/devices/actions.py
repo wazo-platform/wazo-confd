@@ -73,7 +73,7 @@ def load(core_rest_api):
 
     blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.API_VERSION)
 
-    converter = Converter.for_resource(document, Device)
+    converter = Converter.resource(document, Device)
 
     resource = DeviceResource(device_service, line_service, converter)
 
