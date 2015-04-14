@@ -78,32 +78,28 @@ def load(core_rest_api):
     resource = DeviceResource(device_service, line_service, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)
-    chain.start().search().decorate(resource.search)
-    chain.start().get('/<resource_id>').decorate(resource.get)
-    chain.start().create().decorate(resource.create)
-    chain.start().edit('/<resource_id>').decorate(resource.edit)
-    chain.start().delete('/<resource_id>').decorate(resource.delete)
+    chain.search().decorate(resource.search)
+    chain.get('/<resource_id>').decorate(resource.get)
+    chain.create().decorate(resource.create)
+    chain.edit('/<resource_id>').decorate(resource.edit)
+    chain.delete('/<resource_id>').decorate(resource.delete)
 
-    (chain.start()
-     .authenticate()
-     .route_get('/<device_id>/synchronize')
+    (chain
+     .get('/<device_id>/synchronize')
      .decorate(resource.synchronize))
 
-    (chain.start()
-     .authenticate()
-     .route_get('/<device_id>/autoprov')
+    (chain
+     .get('/<device_id>/autoprov')
      .decorate(resource.autoprov))
 
-    (chain.start()
+    (chain
+     .get('/<device_id>/associate_line/<int:line_id>')
      .limit_localhost()
-     .authenticate()
-     .route_get('/<device_id>/associate_line/<int:line_id>')
      .decorate(resource.associate_line))
 
-    (chain.start()
+    (chain
+     .get('/<device_id>/remove_line/<int:line_id>')
      .limit_localhost()
-     .authenticate()
-     .route_get('/<device_id>/remove_line/<int:line_id>')
      .decorate(resource.remove_line))
 
     core_rest_api.register(blueprint)

@@ -131,11 +131,11 @@ class DecoratorChain(object):
     @classmethod
     def register_scrud(cls, core, blueprint, resource):
         chain = cls(core, blueprint)
-        chain.start().search().decorate(resource.search)
-        chain.start().get().decorate(resource.get)
-        chain.start().create().decorate(resource.create)
-        chain.start().edit().decorate(resource.edit)
-        chain.start().delete().decorate(resource.delete)
+        chain.search().decorate(resource.search)
+        chain.get().decorate(resource.get)
+        chain.create().decorate(resource.create)
+        chain.edit().decorate(resource.edit)
+        chain.delete().decorate(resource.delete)
         core.register(blueprint)
 
     def __init__(self, core, blueprint):
@@ -184,19 +184,19 @@ class DecoratorChain(object):
         return self
 
     def search(self, path=''):
-        return self.produce().authenticate().route_get(path)
+        return self.start().produce().authenticate().route_get(path)
 
     def get(self, path='/<int:resource_id>'):
-        return self.produce().authenticate().route_get(path)
+        return self.start().produce().authenticate().route_get(path)
 
     def create(self, path=''):
-        return self.consume().produce().authenticate().route_post(path)
+        return self.start().consume().produce().authenticate().route_post(path)
 
     def edit(self, path='/<int:resource_id>'):
-        return self.consume().authenticate().route_put(path)
+        return self.start().consume().authenticate().route_put(path)
 
     def delete(self, path='/<int:resource_id>'):
-        return self.authenticate().route_delete(path)
+        return self.start().authenticate().route_delete(path)
 
     def decorate(self, func):
         for decorator in self.decorators:

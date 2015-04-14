@@ -79,7 +79,7 @@ def load(core_rest_api):
     resource = LiveReloadResource(service, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)
-    chain.start().get('/live_reload').decorate(resource.get)
-    chain.start().edit('/live_reload').decorate(resource.edit)
+    chain.get('/live_reload').decorate(resource.get)
+    chain.edit('/live_reload').decorate(resource.edit)
 
     core_rest_api.register(blueprint)

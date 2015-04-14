@@ -46,6 +46,6 @@ def load(core_rest_api):
     resource = InfoResource(dao, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)
-    chain.start().get('').decorate(resource.get)
+    chain.get('').decorate(resource.get)
 
     core_rest_api.register(blueprint)

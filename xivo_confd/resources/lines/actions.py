@@ -63,7 +63,7 @@ def load(core_rest_api):
     resource = CRUDResource(service, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)
-    chain.start().search().decorate(resource.search)
-    chain.start().get().decorate(resource.get)
+    chain.search().decorate(resource.search)
+    chain.get().decorate(resource.get)
 
     core_rest_api.register(blueprint)
