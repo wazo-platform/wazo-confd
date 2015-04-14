@@ -58,16 +58,27 @@ class Parser(object):
 
 class DocumentMapper(Mapper):
 
-    def __init__(self, document):
+    def __init__(self, document, rename=None):
         self.document = document
+        self.rename = rename or {}
 
     def for_encoding(self, model):
         return {name: getattr(model, name) for name in self.document.field_names()}
 
     def for_decoding(self, mapping):
+        renamed_mapping = self.rename_mapping(mapping)
+        return self.extract_mapping(renamed_mapping)
+
+    def extract_mapping(self, mapping):
         return {name: mapping[name]
                 for name in self.document.field_names()
                 if name in mapping}
+
+    def rename_mapping(self, mapping):
+        for old_name, new_name in self.rename.items():
+            if old_name in mapping:
+                mapping[new_name] = mapping.pop(old_name)
+        return mapping
 
 
 class DocumentParser(Parser):

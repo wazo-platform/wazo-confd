@@ -173,9 +173,10 @@ class TestDocumentMapper(unittest.TestCase):
     def setUp(self):
         self.document = Document([
             Field('field1', Unicode()),
-            Field('field2', Unicode())])
+            Field('field2', Unicode()),
+            Field('newname', Unicode())])
 
-        self.mapper = DocumentMapper(self.document)
+        self.mapper = DocumentMapper(self.document, {'oldname': 'newname'})
 
     def test_given_document_when_encoding_then_maps_model_using_fields_in_document(self):
         model = Mock()
@@ -202,6 +203,13 @@ class TestDocumentMapper(unittest.TestCase):
         result = self.mapper.for_decoding(mapping)
 
         assert_that(result, has_entries({'field1': 'value1'}))
+
+    def test_given_document_when_decoding_then_renames_fields_in_mapping(self):
+        mapping = {'oldname': 'value'}
+
+        result = self.mapper.for_decoding(mapping)
+
+        assert_that(result, has_entries({'newname': 'value'}))
 
 
 class TestDocumentParser(unittest.TestCase):
