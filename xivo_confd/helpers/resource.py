@@ -71,26 +71,50 @@ class CRUDResource(object):
         return build_response(response, status, location)
 
 
-class AssociationResource(object):
+class CollectionAssociationResource(object):
 
     def __init__(self, service, converter):
         self.service = service
         self.converter = converter
 
-    def association_list(self, parent_id):
-        associations = self.service.association_list(parent_id)
+    def list_association(self, parent_id):
+        associations = self.service.list(parent_id)
         response = self.converter.encode_list(associations)
+        return build_response(response)
+
+    def associate_collection(self, parent_id):
+        association = self.converter.decode(request)
+        created_association = self.service.associate(association)
+        response = self.converter.encode(created_association)
+        location = url_for('.list_association', parent_id=parent_id)
+        return build_response(response, 201, location)
+
+    def dissociate_collection(self, parent_id, resource_id):
+        association = self.service.get(parent_id, resource_id)
+        self.service.dissociate(association)
+        return ('', 204)
+
+
+class SingleAssociationResource(object):
+
+    def __init__(self, service, converter):
+        self.service = service
+        self.converter = converter
+
+    def get_association(self, parent_id):
+        association = self.service.get_by_parent(parent_id)
+        response = self.converter.encode(association)
         return build_response(response)
 
     def associate(self, parent_id):
         association = self.converter.decode(request)
-        created_association = self.service.associate(parent_id, association)
+        created_association = self.service.associate(association)
         response = self.converter.encode(created_association)
-        location = url_for('.association_list', parent_id=parent_id)
+        location = url_for('.get_association', parent_id=parent_id)
         return build_response(response, 201, location)
 
-    def dissociate(self, parent_id, resource_id):
-        association = self.service.get_association(parent_id, resource_id)
+    def dissociate(self, parent_id):
+        association = self.service.get_by_parent(parent_id)
         self.service.dissociate(association)
         return ('', 204)
 
