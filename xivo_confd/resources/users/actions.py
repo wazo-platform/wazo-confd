@@ -24,7 +24,7 @@ from xivo_dao.data_handler.user.model import User, UserDirectory
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters
-from xivo_confd.helpers.converter import Converter, Serializer, DocumentParser, DocumentMapper
+from xivo_confd.helpers.converter import Converter, Serializer, DocumentParser, DocumentMapper, ModelBuilder
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain, build_response
 
@@ -101,9 +101,9 @@ def load(core_rest_api):
 
     user_converter = Converter.resource(user_document, User)
     directory_converter = Converter(parser=DocumentParser(directory_document),
-                                    mapper=DocumentMapper(directory_document),
+                                    mapper=DocumentMapper(directory_document, UserDirectory),
                                     serializer=DirectorySerializer(),
-                                    model=UserDirectory)
+                                    builder=ModelBuilder(directory_document, UserDirectory))
 
     resource = UserResource(user_services, user_converter, directory_converter)
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
