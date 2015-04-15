@@ -56,6 +56,19 @@ class Parser(object):
         return
 
 
+class Builder(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def create(self, mapping):
+        return
+
+    @abc.abstractmethod
+    def update(self, mapping):
+        return
+
+
 class DocumentMapper(Mapper):
 
     def __init__(self, document, rename=None):
@@ -105,7 +118,6 @@ class RequestParser(Parser):
         mapping.update({name: request.view_args[name]
                         for name in field_names
                         if name in request.view_args})
-        self.document.validate(mapping)
         return mapping
 
 
@@ -136,13 +148,29 @@ class ResourceSerializer(Serializer):
         return json.dumps(result)
 
 
+class ModelBuilder(Builder):
+
+    def __init__(self, document, model_class):
+        self.document = document
+        self.model_class = model_class
+
+    def create(self, mapping):
+        self.document.validate(mapping)
+        return self.model_class(**mapping)
+
+    def update(self, model, mapping):
+        self.document.validate(mapping)
+        for attr_name, attr_value in mapping.iteritems():
+            setattr(model, attr_name, attr_value)
+
+
 class Converter(object):
 
-    def __init__(self, model, parser, mapper, serializer):
-        self.model = model
+    def __init__(self, parser, mapper, serializer, builder):
         self.parser = parser
         self.mapper = mapper
         self.serializer = serializer
+        self.builder = builder
 
     def encode(self, model):
         mapped_model = self.mapper.for_encoding(model)
@@ -155,13 +183,12 @@ class Converter(object):
     def decode(self, request):
         parsed_request = self.parser.parse(request)
         mapped_request = self.mapper.for_decoding(parsed_request)
-        return self.model(**mapped_request)
+        return self.builder.create(mapped_request)
 
     def update(self, request, model):
-        parsed_mapping = self.parser.parse(request)
-        mapped_model = self.mapper.for_decoding(parsed_mapping)
-        for name, value in mapped_model.iteritems():
-            setattr(model, name, value)
+        parsed_request = self.parser.parse(request)
+        parsed_mapping = self.mapper.for_decoding(parsed_request)
+        self.builder.update(model, parsed_mapping)
 
     @classmethod
     def association(cls, document, model, links=None, rename=None):
@@ -170,7 +197,8 @@ class Converter(object):
         parser = RequestParser(document, rename.keys())
         mapper = DocumentMapper(document, rename)
         serializer = ResourceSerializer(links)
-        return cls(model, parser, mapper, serializer)
+        builder = ModelBuilder(document, model)
+        return cls(parser, mapper, serializer, builder)
 
     @classmethod
     def resource(cls, document, model, resource_name=None, resource_id=None):
@@ -179,6 +207,7 @@ class Converter(object):
         links = {resource_name: resource_id}
 
         parser = DocumentParser(document)
-        mapper = DocumentMapper(document)
+        mapper = DocumentMapper(document, model)
         serializer = ResourceSerializer(links)
-        return cls(model, parser, mapper, serializer)
+        builder = ModelBuilder(document, model)
+        return cls(parser, mapper, serializer, builder)

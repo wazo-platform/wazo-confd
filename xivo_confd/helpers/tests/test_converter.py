@@ -21,11 +21,9 @@ import json
 from mock import Mock, patch
 from hamcrest import assert_that, equal_to, has_entries, instance_of, has_items, has_entry, contains
 
-from xivo_confd.helpers.converter import Converter, Mapper, Serializer, Parser
-from xivo_confd.helpers.converter import DocumentMapper, DocumentParser, ResourceSerializer, RequestParser
+from xivo_confd.helpers.converter import Converter, Mapper, Serializer, Parser, Builder
+from xivo_confd.helpers.converter import DocumentMapper, DocumentParser, ResourceSerializer, RequestParser, ModelBuilder
 from xivo_confd.helpers.mooltiparse.document import Document, DocumentProxy
-from xivo_confd.helpers.mooltiparse.field import Field
-from xivo_confd.helpers.mooltiparse.types import Unicode
 
 
 class TestConverter(unittest.TestCase):
@@ -36,12 +34,12 @@ class TestConverter(unittest.TestCase):
 
         self.serializer = Mock(Serializer)
         self.parser = Mock(Parser)
-        self.model = Mock()
+        self.builder = Mock(Builder)
 
         self.converter = Converter(mapper=self.mapper,
                                    serializer=self.serializer,
                                    parser=self.parser,
-                                   model=self.model)
+                                   builder=self.builder)
 
     def test_when_encoding_then_maps_model_using_mapper(self):
         model = Mock()
@@ -106,27 +104,40 @@ class TestConverter(unittest.TestCase):
 
         self.mapper.for_decoding.assert_called_once_with(parsed_request)
 
-    def test_when_decoding_then_creates_model_with_mapped_request(self):
+    def test_when_decoding_then_builds_model_using_mapping(self):
         request = Mock()
-
-        mapped_request = self.mapper.for_decoding.return_value = {'foo': 'bar'}
-        created_model = self.model.return_value
+        expected_model = self.builder.create.return_value
 
         result = self.converter.decode(request)
 
-        assert_that(result, equal_to(created_model))
-        self.model.assert_called_once_with(**mapped_request)
+        assert_that(result, equal_to(expected_model))
+        self.builder.create.assert_called_once_with(self.mapper.for_decoding.return_value)
 
-    def test_when_updating_then_updates_mapped_fields_on_model(self):
+    def test_when_updating_then_request_parsed(self):
         request = Mock()
         model = Mock()
-        model.field1 = 'value1'
-
-        self.mapper.for_decoding.return_value = {'field1': 'value2'}
 
         self.converter.update(request, model)
 
-        assert_that(model.field1, equal_to('value2'))
+        self.parser.parse.assert_called_once_with(request)
+
+    def test_when_updating_then_request_mapped(self):
+        request = Mock()
+        model = Mock()
+        parsed_request = self.parser.parse.return_value
+
+        self.converter.update(request, model)
+
+        self.mapper.for_decoding.assert_called_with(parsed_request)
+
+    def test_when_updating_then_updates_using_mapped_request(self):
+        request = Mock()
+        model = Mock()
+        mapped_request = self.mapper.for_decoding.return_value
+
+        self.converter.update(request, model)
+
+        self.builder.update.assert_called_once_with(model, mapped_request)
 
     def test_resource_creates_resource_converter(self):
         document = Mock()
@@ -136,10 +147,10 @@ class TestConverter(unittest.TestCase):
 
         converter = Converter.resource(document, Model)
 
-        assert_that(converter.model, equal_to(Model))
         assert_that(converter.parser, instance_of(DocumentParser))
         assert_that(converter.mapper, instance_of(DocumentMapper))
         assert_that(converter.serializer, instance_of(ResourceSerializer))
+        assert_that(converter.builder, instance_of(ModelBuilder))
         assert_that(converter.serializer.resources, has_entry('models', 'id'))
 
     def test_resource_replaces_resource_name_and_resource_id(self):
@@ -234,7 +245,7 @@ class TestRequestParser(unittest.TestCase):
         request.view_args = {'line_id': 2, 'extrafield': 'extravalue'}
 
         document = Mock(DocumentProxy)
-        document.field_names.return_value = ['user_id', 'line_id']
+        document.field_names.return_value = ('user_id', 'line_id')
         document.parse.return_value = {'user_id': 1}
 
         parser = RequestParser(document)
@@ -244,7 +255,6 @@ class TestRequestParser(unittest.TestCase):
         expected_entries = {'user_id': 1, 'line_id': 2}
         assert_that(result, has_entries(expected_entries))
         document.parse.assert_called_once_with(request)
-        document.validate.assert_called_once_with(expected_entries)
 
 
 class TestResourceSerializer(unittest.TestCase):
@@ -313,3 +323,42 @@ class TestResourceSerializer(unittest.TestCase):
 
         decoded_result = json.loads(result)
         assert_that(decoded_result, has_entries(expected_entries))
+
+
+class TestModelBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.model_class = Mock()
+        self.document = Mock(Document)
+        self.builder = ModelBuilder(self.document, self.model_class)
+
+    def test_when_creating_then_validates_mapping(self):
+        mapping = {'foo': 'bar'}
+
+        self.builder.create(mapping)
+
+        self.document.validate.assert_called_once_with(mapping)
+
+    def test_when_creating_then_passes_mapping_to_class(self):
+        mapping = {'foo': 'bar'}
+
+        result = self.builder.create(mapping)
+
+        assert_that(result, equal_to(self.model_class.return_value))
+        self.model_class.assert_called_once_with(foo='bar')
+
+    def test_when_updating_then_validates_mapping(self):
+        mapping = {'foo': 'bar'}
+        model = Mock()
+
+        self.builder.update(model, mapping)
+
+        self.document.validate.assert_called_once_with(mapping)
+
+    def test_when_updating_then_applies_mapping_to_model(self):
+        mapping = {'foo': 'bar'}
+        model = Mock()
+
+        self.builder.update(model, mapping)
+
+        assert_that(model.foo, equal_to('bar'))
