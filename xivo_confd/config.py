@@ -63,7 +63,6 @@ DEFAULT_CONFIG = {
         "users",
         "voicemails",
         "line_extension",
-        "line_extension_collection",
         "user_cti_profile",
         "user_line",
         "user_voicemail",
