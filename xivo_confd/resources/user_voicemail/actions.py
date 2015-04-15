@@ -16,17 +16,43 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Response
-from flask import request
-from flask import url_for
-from flask_negotiate import consumes
-from flask_negotiate import produces
 from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
+from xivo_dao.data_handler.user import dao as user_dao
+from xivo_dao.data_handler.voicemail import dao as voicemail_dao
 from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
 
-from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
+
+from xivo_confd.helpers.resource import DecoratorChain, SingleAssociationResource
+
+
+class UserVoicemailService(object):
+
+    def __init__(self, service, user_dao, voicemail_dao):
+        self.service = service
+        self.user_dao = user_dao
+        self.voicemail_dao = voicemail_dao
+
+    def check_user_exists(self, user_id):
+        self.user_dao.get(user_id)
+
+    def check_voicemail_exists(self, voicemail_id):
+        self.voicemail_dao.get(voicemail_id)
+
+    def get_by_parent(self, user_id):
+        self.check_user_exists(user_id)
+        return self.service.get_by_user_id(user_id)
+
+    def associate(self, association):
+        self.check_user_exists(association.user_id)
+        self.check_voicemail_exists(association.voicemail_id)
+        return self.service.associate(association)
+
+    def dissociate(self, association):
+        self.check_user_exists(association.user_id)
+        self.check_voicemail_exists(association.voicemail_id)
+        self.service.dissociate(association)
 
 
 def load(core_rest_api):
@@ -36,41 +62,26 @@ def load(core_rest_api):
         Field('voicemail_id', Int()),
         Field('enabled', Boolean())
     )
-    converter = Converter.for_request(document, UserVoicemail, {'users': 'user_id',
-                                                                'voicemails': 'voicemail_id'})
+    converter = Converter.association(document, UserVoicemail,
+                                      links={'users': 'user_id',
+                                             'voicemails': 'voicemail_id'},
+                                      rename={'parent_id': 'user_id'})
 
-    @user_blueprint.route('/<int:user_id>/voicemail', methods=['POST'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    @consumes('application/json')
-    def associate_voicemail(user_id):
-        url.check_user_exists(user_id)
-        model = converter.decode(request)
-        created_model = user_voicemail_services.associate(model)
-        response = converter.encode(created_model)
-        location = url_for('.associate_voicemail', user_id=user_id)
-        return Response(response=response,
-                        status=201,
-                        content_type='application/json',
-                        headers={'Location': location})
+    service = UserVoicemailService(user_voicemail_services, user_dao, voicemail_dao)
+    resource = SingleAssociationResource(service, converter)
 
-    @user_blueprint.route('/<int:user_id>/voicemail')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_user_voicemail(user_id):
-        url.check_user_exists(user_id)
-        user_voicemail = user_voicemail_services.get_by_user_id(user_id)
-        response = converter.encode(user_voicemail)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    chain = DecoratorChain(core_rest_api, user_blueprint)
 
-    @user_blueprint.route('/<int:user_id>/voicemail', methods=['DELETE'])
-    @core_rest_api.auth.login_required
-    def dissociate_voicemail(user_id):
-        url.check_user_exists(user_id)
-        user_voicemail = user_voicemail_services.get_by_user_id(user_id)
-        user_voicemail_services.dissociate(user_voicemail)
-        return Response(status=204)
+    (chain
+     .get('/<int:parent_id>/voicemail')
+     .decorate(resource.get_association))
+
+    (chain
+     .create('/<int:parent_id>/voicemail')
+     .decorate(resource.associate))
+
+    (chain
+     .delete('/<int:parent_id>/voicemail')
+     .decorate(resource.dissociate))
 
     core_rest_api.register(user_blueprint)
