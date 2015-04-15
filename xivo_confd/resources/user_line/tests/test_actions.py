@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (C) 2013-2014 Avencall
 #
-# Copyright (C) 2013 Avencall
-#
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -12,99 +12,78 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from mock import patch
-from xivo_dao.data_handler.user_line.model import UserLine
-from xivo_dao.data_handler.user.model import User
-from xivo_confd.helpers.tests.test_resources import TestResources
+import unittest
+from mock import Mock, sentinel
+from hamcrest import assert_that, equal_to
 
-
-BASE_URL = '/1.1/users/%s/lines'
-DISSOCIATE_URL = BASE_URL + '/%s'
+from xivo_confd.resources.user_line.actions import UserLineService
 
 
-@patch('xivo_confd.helpers.url.check_user_exists')
-class TestUserLineActions(TestResources):
+class TestUserLineService(unittest.TestCase):
 
     def setUp(self):
-        super(TestUserLineActions, self).setUp()
-        self.user_line = UserLine(user_id=1, line_id=2)
+        self.old_service = Mock()
+        self.user_dao = Mock()
+        self.line_dao = Mock()
+        self.service = UserLineService(self.old_service, self.user_dao, self.line_dao)
 
-    def build_item(self, user_line):
-        item = {
-            u'user_id': user_line.user_id,
-            u'line_id': user_line.line_id,
-            u'main_user': user_line.main_user,
-            u'main_line': user_line.main_line,
-            'links': [
-                {
-                    'rel': 'lines',
-                    'href': 'http://localhost/1.1/lines/%s' % user_line.line_id
-                },
-                {
-                    u'href': u'http://localhost/1.1/users/%d' % user_line.user_id,
-                    u'rel': u'users'
-                }
-            ]
-        }
+    def test_when_listing_associations_then_user_is_checked(self):
+        self.service.list(sentinel.user_id)
 
-        return item
+        self.user_dao.get.assert_called_once_with(sentinel.user_id)
 
-    @patch('xivo_dao.data_handler.user_line.services.associate')
-    def test_associate_line(self, user_line_associate, user_exists):
-        user_line_associate.return_value = self.user_line
+    def test_when_listing_associations_then_service_is_called(self):
+        expected_user_lines = self.old_service.find_all_by_user_id.return_value
 
-        expected_result = self.build_item(self.user_line)
+        result = self.service.list(sentinel.user_id)
 
-        data = {'line_id': self.user_line.line_id}
-        data_serialized = self._serialize_encode(data)
+        self.old_service.find_all_by_user_id.assert_called_once_with(sentinel.user_id)
+        assert_that(result, equal_to(expected_user_lines))
 
-        result = self.app.post(BASE_URL % self.user_line.user_id, data=data_serialized)
+    def test_when_getting_association_then_service_is_called(self):
+        expected_user_line = self.old_service.get_by_user_id_and_line_id.return_value
 
-        self.assert_response_for_create(result, expected_result)
-        user_line_associate.assert_called_once_with(self.user_line)
+        result = self.service.get(sentinel.user_id, sentinel.line_id)
 
-    @patch('xivo_confd.helpers.url.check_line_exists')
-    @patch('xivo_dao.data_handler.user_line.services.get_by_user_id_and_line_id')
-    @patch('xivo_dao.data_handler.user_line.services.dissociate')
-    def test_dissociate_line(self, user_line_dissociate, get_by_user_id_and_line_id, line_exists, user_exists):
-        get_by_user_id_and_line_id.return_value = self.user_line
+        self.old_service.get_by_user_id_and_line_id.assert_called_once_with(sentinel.user_id,
+                                                                            sentinel.line_id)
+        assert_that(result, equal_to(expected_user_line))
 
-        result = self.app.delete(DISSOCIATE_URL % (self.user_line.user_id,
-                                                   self.user_line.line_id))
+    def test_when_associating_then_user_is_checked(self):
+        association = Mock(user_id=sentinel.user_id)
+        self.service.associate(association)
 
-        self.assert_response_for_delete(result)
-        user_exists.assert_called_once_with(self.user_line.user_id)
-        line_exists.assert_called_once_with(self.user_line.line_id)
-        get_by_user_id_and_line_id.assert_called_once_with(self.user_line.user_id, self.user_line.line_id)
-        user_line_dissociate.assert_called_once_with(self.user_line)
+        self.user_dao.get.assert_called_once_with(sentinel.user_id)
 
-    @patch('xivo_dao.data_handler.user_line.services.find_all_by_user_id')
-    def test_get_lines_associated_to_a_user_with_no_line(self, user_line_find_all_by_user_id, user_exists):
-        user_exists.return_value = User(id=self.user_line.user_id)
-        user_line_find_all_by_user_id.return_value = []
+    def test_when_associating_then_line_is_checked(self):
+        association = Mock(line_id=sentinel.line_id)
+        self.service.associate(association)
 
-        expected_result = {u'items': [], u'total': 0}
+        self.line_dao.get.assert_called_once_with(sentinel.line_id)
 
-        result = self.app.get(BASE_URL % self.user_line.user_id)
+    def test_when_associating_then_service_is_called(self):
+        association = Mock()
+        self.service.associate(association)
 
-        self.assert_response_for_list(result, expected_result)
-        user_exists.assert_called_once_with(self.user_line.user_id)
+        self.old_service.associate.assert_called_once_with(association)
 
-    @patch('xivo_dao.data_handler.user_line.services.find_all_by_user_id')
-    def test_get_lines_associated_to_a_user(self, user_line_find_all_by_user_id, user_exists):
-        user_exists.return_value = User(id=self.user_line.user_id)
-        user_line_find_all_by_user_id.return_value = [self.user_line]
+    def test_when_dissociating_then_user_is_checked(self):
+        association = Mock(user_id=sentinel.user_id)
+        self.service.dissociate(association)
 
-        expected_result = {
-            u'total': 1,
-            u'items': [self.build_item(self.user_line)]
-        }
+        self.user_dao.get.assert_called_once_with(sentinel.user_id)
 
-        result = self.app.get(BASE_URL % self.user_line.user_id)
+    def test_when_dissociating_then_line_is_checked(self):
+        association = Mock(line_id=sentinel.line_id)
+        self.service.dissociate(association)
 
-        self.assert_response_for_list(result, expected_result)
-        user_exists.assert_called_once_with(self.user_line.user_id)
+        self.line_dao.get.assert_called_once_with(sentinel.line_id)
+
+    def test_when_dissociating_then_service_is_called(self):
+        association = Mock()
+        self.service.dissociate(association)
+
+        self.old_service.dissociate.assert_called_once_with(association)
