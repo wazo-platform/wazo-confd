@@ -66,19 +66,22 @@ class DocumentMapper(Mapper):
         return {name: getattr(model, name) for name in self.document.field_names()}
 
     def for_decoding(self, mapping):
+        return self.adjust_mapping(mapping)
+
+    def adjust_mapping(self, mapping):
         renamed_mapping = self.rename_mapping(mapping)
         return self.extract_mapping(renamed_mapping)
-
-    def extract_mapping(self, mapping):
-        return {name: mapping[name]
-                for name in self.document.field_names()
-                if name in mapping}
 
     def rename_mapping(self, mapping):
         for old_name, new_name in self.rename.items():
             if old_name in mapping:
                 mapping[new_name] = mapping.pop(old_name)
         return mapping
+
+    def extract_mapping(self, mapping):
+        return {name: mapping[name]
+                for name in self.document.field_names()
+                if name in mapping}
 
 
 class DocumentParser(Parser):
@@ -92,13 +95,15 @@ class DocumentParser(Parser):
 
 class RequestParser(Parser):
 
-    def __init__(self, document):
+    def __init__(self, document, extra=None):
         self.document = document
+        self.extra = tuple(extra) if extra else tuple()
 
     def parse(self, request):
         mapping = self.document.parse(request)
+        field_names = self.document.field_names() + self.extra
         mapping.update({name: request.view_args[name]
-                        for name in self.document.field_names()
+                        for name in field_names
                         if name in request.view_args})
         self.document.validate(mapping)
         return mapping
@@ -162,7 +167,7 @@ class Converter(object):
     def association(cls, document, model, links=None, rename=None):
         links = links or {}
         rename = rename or {}
-        parser = RequestParser(document)
+        parser = RequestParser(document, rename.keys())
         mapper = DocumentMapper(document, rename)
         serializer = ResourceSerializer(links)
         return cls(model, parser, mapper, serializer)

@@ -161,55 +161,55 @@ class TestConverter(unittest.TestCase):
         links = {'users': 'user_id', 'lines': 'line_id'}
         converter = Converter.association(document, Model, links)
 
-        assert_that(converter.model, equal_to(Model))
         assert_that(converter.parser, instance_of(RequestParser))
         assert_that(converter.mapper, instance_of(DocumentMapper))
         assert_that(converter.serializer, instance_of(ResourceSerializer))
+        assert_that(converter.builder, instance_of(ModelBuilder))
         assert_that(converter.serializer.resources, has_entries(links))
 
 
 class TestDocumentMapper(unittest.TestCase):
 
     def setUp(self):
-        self.document = Document([
-            Field('field1', Unicode()),
-            Field('field2', Unicode()),
-            Field('newname', Unicode())])
+        self.document = Mock(Document)
+        self.document.field_names.return_value = ('field1', 'field2', 'newname')
 
         self.mapper = DocumentMapper(self.document, {'oldname': 'newname'})
 
     def test_given_document_when_encoding_then_maps_model_using_fields_in_document(self):
         model = Mock()
-        model.field1 = 'value1'
-        model.field2 = 'value2'
-        model.field3 = 'value3'
+        model.field1 = u'value1'
+        model.field2 = u'value2'
+        model.field3 = u'value3'
 
         result = self.mapper.for_encoding(model)
 
-        assert_that(result, has_entries({'field1': 'value1', 'field2': 'value2'}))
+        assert_that(result, has_entries({u'field1': u'value1', u'field2': u'value2'}))
 
     def test_given_document_when_decoding_then_maps_dict_using_fields_in_document(self):
-        mapping = {'field1': 'value1',
-                   'field2': 'value2',
-                   'field3': 'value3'}
+        mapping = {u'field1': u'value1',
+                   u'field2': u'value2',
+                   u'field3': u'value3'}
 
         result = self.mapper.for_decoding(mapping)
 
-        assert_that(result, has_entries({'field1': 'value1', 'field2': 'value2'}))
+        assert_that(result, has_entries({u'field1': u'value1', u'field2': u'value2'}))
 
     def test_given_document_when_decoding_then_ignores_fields_not_in_mapping(self):
-        mapping = {'field1': 'value1'}
+        mapping = {u'field1': u'value1',
+                   u'whackyfield': u'whackyvalue'}
 
         result = self.mapper.for_decoding(mapping)
 
-        assert_that(result, has_entries({'field1': 'value1'}))
+        assert_that(result, has_entries({u'field1': u'value1'}))
 
     def test_given_document_when_decoding_then_renames_fields_in_mapping(self):
-        mapping = {'oldname': 'value'}
+        mapping = {u'oldname': u'value'}
 
         result = self.mapper.for_decoding(mapping)
+        print result
 
-        assert_that(result, has_entries({'newname': 'value'}))
+        assert_that(result, has_entries({u'newname': u'value'}))
 
 
 class TestDocumentParser(unittest.TestCase):
