@@ -17,7 +17,7 @@
 
 from flask import Blueprint
 from flask import request
-from xivo_dao.data_handler.configuration import dao, validator, notifier
+from xivo_confd.resources.configuration import dao, validator, notifier
 
 from xivo_confd import config
 from xivo_confd.helpers.mooltiparse import Field, Boolean
