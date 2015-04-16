@@ -207,7 +207,7 @@ class Converter(object):
         links = {resource_name: resource_id}
 
         parser = DocumentParser(document)
-        mapper = DocumentMapper(document, model)
+        mapper = DocumentMapper(document)
         serializer = ResourceSerializer(links)
         builder = ModelBuilder(document, model)
         return cls(parser, mapper, serializer, builder)
