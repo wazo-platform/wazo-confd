@@ -17,17 +17,71 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import Blueprint
-from flask import Response
 from flask import request
 from flask import url_for
-from flask_negotiate import consumes
-from flask_negotiate import produces
-from xivo_dao.data_handler.queue_members import services
-from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int
+from xivo_confd.helpers.resource import CollectionAssociationResource, DecoratorChain, build_response
+
+from xivo_dao.data_handler.queue_members import dao
+from xivo_dao.data_handler.queue_members import validator
+from xivo_dao.data_handler.queue_members import notifier
+from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
+
+
+class QueueMemberService(object):
+
+    def __init__(self, dao, validator, notifier):
+        self.dao = dao
+        self.validator = validator
+        self.notifier = notifier
+
+    def get(self, queue_id, agent_id):
+        self.validator.validate_get_agent_queue_association(queue_id, agent_id)
+        return self.dao.get_by_queue_id_and_agent_id(queue_id, agent_id)
+
+    def edit(self, queue_member):
+        self.validator.validate_edit_agent_queue_association(queue_member)
+        self.dao.edit_agent_queue_association(queue_member)
+        self.notifier.agent_queue_association_updated(queue_member)
+
+    def associate(self, queue_member):
+        self.validator.validate_associate_agent_queue(queue_member.queue_id, queue_member.agent_id)
+        qm = self.dao.associate(queue_member)
+        self.notifier.agent_queue_associated(queue_member)
+        return qm
+
+    def dissociate(self, queue_member):
+        self.validator.validate_remove_agent_from_queue(queue_member.agent_id, queue_member.queue_id)
+        self.dao.remove_agent_from_queue(queue_member.agent_id, queue_member.queue_id)
+        self.notifier.agent_removed_from_queue(queue_member.agent_id, queue_member.queue_id)
+
+
+class QueueMemberAssociationResource(CollectionAssociationResource):
+
+    def get_association(self, parent_id, resource_id):
+        association = self.service.get(parent_id, resource_id)
+        response = self.converter.encode(association)
+        location = url_for('.get_association',
+                           parent_id=parent_id,
+                           resource_id=resource_id)
+        return build_response(response, location=location)
+
+    def edit_association(self, parent_id, resource_id):
+        association = self.converter.decode(request)
+        self.service.edit(association)
+        return ('', 204)
+
+    def associate_collection(self, parent_id):
+        association = self.converter.decode(request)
+        created_association = self.service.associate(association)
+        response = self.converter.encode(created_association)
+        location = url_for('.get_association',
+                           parent_id=parent_id,
+                           resource_id=created_association.agent_id)
+        return build_response(response, 201, location)
 
 
 def load(core_rest_api):
@@ -37,46 +91,29 @@ def load(core_rest_api):
         Field('agent_id', Int()),
         Field('penalty', Int())
     )
-    converter = Converter.association(document, QueueMemberAgent)
+    converter = Converter.association(document, QueueMemberAgent,
+                                      rename={'parent_id': 'queue_id',
+                                              'resource_id': 'agent_id'})
 
-    @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>')
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    def get_agent_queue_association(queue_id, agent_id):
-        queue_member = services.get_by_queue_id_and_agent_id(queue_id, agent_id)
-        response = converter.encode(queue_member)
-        return Response(response=response,
-                        status=200,
-                        content_type='application/json')
+    service = QueueMemberService(dao, validator, notifier)
+    resource = QueueMemberAssociationResource(service, converter)
 
-    @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>', methods=['PUT'])
-    @core_rest_api.auth.login_required
-    @consumes('application/json')
-    def edit_agent_queue_association(queue_id, agent_id):
-        queue_member = converter.decode(request)
-        services.edit_agent_queue_association(queue_member)
-        return Response(status=204)
+    chain = DecoratorChain(core_rest_api, blueprint)
 
-    @blueprint.route('/<int:queue_id>/members/agents', methods=['POST'])
-    @core_rest_api.auth.login_required
-    @produces('application/json')
-    @consumes('application/json')
-    def associate_agent_to_queue(queue_id):
-        queue_member = converter.decode(request)
-        created_queue_member = services.associate_agent_to_queue(queue_member)
-        response = converter.encode(created_queue_member)
-        location = url_for('.get_agent_queue_association',
-                           queue_id=created_queue_member.queue_id,
-                           agent_id=created_queue_member.agent_id)
-        return Response(response=response,
-                        status=201,
-                        content_type='application/json',
-                        headers={'Location': location})
+    (chain
+     .get('/<int:parent_id>/members/agents/<int:resource_id>')
+     .decorate(resource.get_association))
 
-    @blueprint.route('/<int:queue_id>/members/agents/<int:agent_id>', methods=['DELETE'])
-    @core_rest_api.auth.login_required
-    def remove_agent_from_queue(agent_id, queue_id):
-        services.remove_agent_from_queue(agent_id, queue_id)
-        return Response(status=204)
+    (chain
+     .edit('/<int:parent_id>/members/agents/<int:resource_id>')
+     .decorate(resource.edit_association))
+
+    (chain
+     .create('/<int:parent_id>/members/agents')
+     .decorate(resource.associate_collection))
+
+    (chain
+     .delete('/<int:parent_id>/members/agents/<int:resource_id>')
+     .decorate(resource.dissociate_collection))
 
     core_rest_api.register(blueprint)

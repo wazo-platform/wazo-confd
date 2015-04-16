@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (C) 2013-2014 Avencall
 #
-# Copyright (C) 2013 Avencall
-#
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -12,73 +12,63 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from hamcrest import assert_that, equal_to
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+import unittest
 
-from mock import patch
+from hamcrest import assert_that, equal_to
+from mock import Mock
 
 from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
-from xivo_confd.helpers.tests.test_resources import TestResources
+
+from xivo_confd.resources.queue_members.actions import QueueMemberService
 
 
-BASE_URL = '/1.1/queues/%s/members/agents'
-EDIT_URL = BASE_URL + '/%s'
+class TestQueueMembers(unittest.TestCase):
 
-
-class TestQueueMemberActions(TestResources):
     def setUp(self):
-        super(TestQueueMemberActions, self).setUp()
-        self.queue_member = QueueMemberAgent(agent_id=12, queue_id=3, penalty=5)
+        self.dao = Mock()
+        self.validator = Mock()
+        self.notifier = Mock()
+        self.service = QueueMemberService(self.dao, self.validator, self.notifier)
 
-    @patch('xivo_dao.data_handler.queue_members.services.get_by_queue_id_and_agent_id')
-    def test_get_agent_queue_association(self, get_by_queue_id_and_agent_id):
-        get_by_queue_id_and_agent_id.return_value = self.queue_member
+    def test_get_by_queue_id_and_agent_id(self):
+        agent_id = 3
+        queue_id = 2
+        queue_member = self.dao.get_by_queue_id_and_agent_id.return_value = QueueMemberAgent(agent_id=agent_id,
+                                                                                             queue_id=queue_id, penalty=5)
 
-        expected_result = {
-            u'agent_id': self.queue_member.agent_id,
-            u'queue_id': self.queue_member.queue_id,
-            u'penalty': self.queue_member.penalty
-        }
+        result = self.service.get(queue_id, agent_id)
 
-        result = self.app.get(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
+        self.validator.validate_get_agent_queue_association.assert_called_once_with(queue_id, agent_id)
+        self.dao.get_by_queue_id_and_agent_id.assert_called_once_with(queue_id, agent_id)
+        assert_that(result, equal_to(queue_member))
 
-        self.assert_response_for_get(result, expected_result)
-        get_by_queue_id_and_agent_id.assert_called_once_with(self.queue_member.queue_id, self.queue_member.agent_id)
+    def test_edit_agent_queue_association(self):
+        queue_member = QueueMemberAgent(agent_id=12, queue_id=2, penalty=4)
 
-    @patch('xivo_dao.data_handler.queue_members.services.edit_agent_queue_association')
-    def test_edit_agent_queue_association(self, edit_agent_queue_association):
-        data = {'penalty': self.queue_member.penalty}
-        data_serialized = self._serialize_encode(data)
-        result = self.app.put(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id), data=data_serialized)
+        self.service.edit(queue_member)
 
-        self.assert_response_for_update(result)
-        edit_agent_queue_association.assert_called_once_with(self.queue_member)
+        self.validator.validate_edit_agent.assert_called_once_with(queue_member)
+        self.dao.edit_agent.assert_called_once_with(queue_member)
+        self.notifier.agent_queue_association_updated.assert_called_once_with(queue_member)
 
-    @patch('xivo_dao.data_handler.queue_members.services.associate_agent_to_queue')
-    def test_associate_agent_to_queue(self, associate_agent_to_queue):
-        associate_agent_to_queue.return_value = self.queue_member
+    def test_associate_agent_to_queue(self):
+        queue_member = QueueMemberAgent(agent_id=31, queue_id=7, penalty=3)
+        self.dao.associate.return_value = queue_member
 
-        expected_result = {
-            u'agent_id': self.queue_member.agent_id,
-            u'queue_id': self.queue_member.queue_id,
-            u'penalty': self.queue_member.penalty
-        }
+        qm = self.service.associate(queue_member)
 
-        data = {'agent_id': self.queue_member.agent_id, 'penalty': self.queue_member.penalty}
-        data_serialized = self._serialize_encode(data)
-        result = self.app.post(BASE_URL % (self.queue_member.queue_id), data=data_serialized)
-        self.assert_response_for_create(result, expected_result)
+        self.validator.validate_associate_agent_queue.assert_called_once_with(queue_member.queue_id, queue_member.agent_id)
+        self.dao.associate.assert_called_once_with(queue_member)
+        self.notifier.agent_queue_associated.assert_called_once_with(queue_member)
+        assert_that(qm, equal_to(queue_member))
 
-        location = result.headers['location']
+    def test_remove_agent_from_queue(self):
+        queue_member = QueueMemberAgent(agent_id=31, queue_id=7)
 
-        assert_that(location, equal_to('http://localhost/1.1/queues/3/members/agents/12'))
-        associate_agent_to_queue.assert_called_once_with(self.queue_member)
+        self.service.dissociate(queue_member)
 
-    @patch('xivo_dao.data_handler.queue_members.services.remove_agent_from_queue')
-    def test_remove_agent_from_queue(self, remove_agent_from_queue):
-        result = self.app.delete(EDIT_URL % (self.queue_member.queue_id, self.queue_member.agent_id))
-
-        remove_agent_from_queue.assert_called_once_with(self.queue_member.agent_id, self.queue_member.queue_id)
-        self.assert_response_for_delete(result)
+        self.validator.validate_remove_agent_from_queue.assert_called_once_with(queue_member.agent_id, queue_member.queue_id)
+        self.dao.remove_agent_from_queue.assert_called_once_with(queue_member.agent_id, queue_member.queue_id)
+        self.notifier.agent_removed_from_queue.assert_called_once_with(queue_member.agent_id, queue_member.queue_id)
