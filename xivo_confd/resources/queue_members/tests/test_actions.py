@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ class TestQueueMembers(unittest.TestCase):
 
         self.service.edit(queue_member)
 
-        self.validator.validate_edit_agent.assert_called_once_with(queue_member)
-        self.dao.edit_agent.assert_called_once_with(queue_member)
+        self.validator.validate_edit_agent_queue_association.assert_called_once_with(queue_member)
+        self.dao.edit_agent_queue_association.assert_called_once_with(queue_member)
         self.notifier.agent_queue_association_updated.assert_called_once_with(queue_member)
 
     def test_associate_agent_to_queue(self):
