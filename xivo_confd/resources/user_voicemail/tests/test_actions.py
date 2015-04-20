@@ -30,11 +30,6 @@ class TestUserVoicemailService(unittest.TestCase):
         self.voicemail_dao = Mock()
         self.service = UserVoicemailService(self.old_service, self.user_dao, self.voicemail_dao)
 
-    def test_when_getting_parent_then_user_is_checked(self):
-        self.service.get_by_parent(sentinel.user_id)
-
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
-
     def test_when_getting_parent_then_service_is_called(self):
         expected_user_voicemail = self.old_service.get_by_user_id.return_value
 
@@ -43,35 +38,11 @@ class TestUserVoicemailService(unittest.TestCase):
         self.old_service.get_by_user_id.assert_called_once_with(sentinel.user_id)
         assert_that(result, equal_to(expected_user_voicemail))
 
-    def test_when_associating_then_user_is_checked(self):
-        association = Mock(user_id=sentinel.user_id)
-        self.service.associate(association)
-
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
-
-    def test_when_associating_then_voicemail_is_checked(self):
-        association = Mock(voicemail_id=sentinel.voicemail_id)
-        self.service.associate(association)
-
-        self.voicemail_dao.get.assert_called_once_with(sentinel.voicemail_id)
-
     def test_when_associating_then_service_is_called(self):
         association = Mock()
         self.service.associate(association)
 
         self.old_service.associate.assert_called_once_with(association)
-
-    def test_when_dissociating_then_user_is_checked(self):
-        association = Mock(user_id=sentinel.user_id)
-        self.service.dissociate(association)
-
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
-
-    def test_when_dissociating_then_voicemail_is_checked(self):
-        association = Mock(voicemail_id=sentinel.voicemail_id)
-        self.service.dissociate(association)
-
-        self.voicemail_dao.get.assert_called_once_with(sentinel.voicemail_id)
 
     def test_when_dissociating_then_service_is_called(self):
         association = Mock()

@@ -34,27 +34,22 @@ class UserLineService(object):
         self.user_dao = user_dao
         self.line_dao = line_dao
 
-    def check_user_exists(self, user_id):
+    def validate_parent(self, user_id):
         self.user_dao.get(user_id)
 
-    def check_line_exists(self, line_id):
+    def validate_resource(self, line_id):
         self.line_dao.get(line_id)
 
     def list(self, user_id):
-        self.check_user_exists(user_id)
         return self.service.find_all_by_user_id(user_id)
 
     def get(self, user_id, line_id):
         return self.service.get_by_user_id_and_line_id(user_id, line_id)
 
     def associate(self, association):
-        self.check_user_exists(association.user_id)
-        self.check_line_exists(association.line_id)
         return self.service.associate(association)
 
     def dissociate(self, association):
-        self.check_user_exists(association.user_id)
-        self.check_line_exists(association.line_id)
         return self.service.dissociate(association)
 
 
