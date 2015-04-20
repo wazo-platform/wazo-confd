@@ -167,10 +167,6 @@ class DecoratorChain(object):
         self.blueprint = blueprint
         self.decorators = []
 
-    def start(self):
-        self.decorators = []
-        return self
-
     def produce(self):
         self.decorators.append(produces('application/json'))
         return self
@@ -208,21 +204,22 @@ class DecoratorChain(object):
         return self
 
     def search(self, path=''):
-        return self.start().produce().authenticate().route_get(path)
+        return self.produce().authenticate().route_get(path)
 
     def get(self, path='/<int:resource_id>'):
-        return self.start().produce().authenticate().route_get(path)
+        return self.produce().authenticate().route_get(path)
 
     def create(self, path=''):
-        return self.start().consume().produce().authenticate().route_post(path)
+        return self.consume().produce().authenticate().route_post(path)
 
     def edit(self, path='/<int:resource_id>'):
-        return self.start().consume().authenticate().route_put(path)
+        return self.consume().authenticate().route_put(path)
 
     def delete(self, path='/<int:resource_id>'):
-        return self.start().authenticate().route_delete(path)
+        return self.authenticate().route_delete(path)
 
     def decorate(self, func):
         for decorator in self.decorators:
             func = decorator(func)
+        self.decorators = []
         return func
