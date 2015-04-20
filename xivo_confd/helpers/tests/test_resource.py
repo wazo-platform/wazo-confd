@@ -229,6 +229,11 @@ class TestCollectionAssociationResource(unittest.TestCase):
         self.converter = Mock()
         self.resource = CollectionAssociationResource(self.service, self.converter)
 
+    def test_when_listing_associations_then_parent_is_validated(self, request, url_for):
+        self.resource.list_association(sentinel.parent_id)
+
+        self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
+
     def test_when_listing_associations_then_service_called(self, request, url_for):
         self.resource.list_association(sentinel.parent_id)
 
@@ -244,6 +249,11 @@ class TestCollectionAssociationResource(unittest.TestCase):
         assert_that(result, equal_to((expected_response,
                                      200,
                                      {'Content-Type': 'application/json'})))
+
+    def test_when_associating_resource_then_parent_is_validated(self, request, _):
+        self.resource.associate_collection(sentinel.parent_id)
+
+        self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
 
     def test_when_associating_resource_then_request_decoded(self, request, _):
         self.resource.associate_collection(sentinel.parent_id)
@@ -269,6 +279,16 @@ class TestCollectionAssociationResource(unittest.TestCase):
                                       {'Content-Type': 'application/json',
                                        'Location': url_for.return_value})))
 
+    def test_when_dissociating_then_parent_is_validated(self, request, url_for):
+        self.resource.dissociate_collection(sentinel.parent_id, sentinel.resource_id)
+
+        self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
+
+    def test_when_dissociating_then_resource_is_validated(self, request, url_for):
+        self.resource.dissociate_collection(sentinel.parent_id, sentinel.resource_id)
+
+        self.service.validate_resource.assert_called_once_with(sentinel.resource_id)
+
     def test_when_dissociating_then_association_fetched_through_service(self, request, url_for):
         self.resource.dissociate_collection(sentinel.parent_id, sentinel.resource_id)
 
@@ -292,6 +312,11 @@ class TestSingleAssociationResource(unittest.TestCase):
         self.converter = Mock()
         self.resource = SingleAssociationResource(self.service, self.converter)
 
+    def test_when_getting_an_association_then_parent_validated(self, request, url_for):
+        self.resource.get_association(sentinel.parent_id)
+
+        self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
+
     def test_when_getting_an_association_then_service_called(self, request, url_for):
         self.resource.get_association(sentinel.parent_id)
 
@@ -313,6 +338,11 @@ class TestSingleAssociationResource(unittest.TestCase):
 
         self.converter.decode.assert_called_once_with(request)
 
+    def test_when_associating_resource_then_parent_is_validated(self, request, _):
+        self.resource.associate(sentinel.parent_id)
+
+        self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
+
     def test_when_associating_resource_then_association_created(self, request, _):
         expected_association = self.converter.decode.return_value
 
@@ -331,6 +361,11 @@ class TestSingleAssociationResource(unittest.TestCase):
                                       201,
                                       {'Content-Type': 'application/json',
                                        'Location': url_for.return_value})))
+
+    def test_when_dissociating_then_parent_is_validated(self, request, url_for):
+        self.resource.dissociate(sentinel.parent_id)
+
+        self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
 
     def test_when_dissociating_then_association_fetched_through_service(self, request, url_for):
         self.resource.dissociate(sentinel.parent_id)
