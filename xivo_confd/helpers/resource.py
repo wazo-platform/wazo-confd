@@ -78,11 +78,13 @@ class CollectionAssociationResource(object):
         self.converter = converter
 
     def list_association(self, parent_id):
+        self.service.validate_parent(parent_id)
         associations = self.service.list(parent_id)
         response = self.converter.encode_list(associations)
         return build_response(response)
 
     def associate_collection(self, parent_id):
+        self.service.validate_parent(parent_id)
         association = self.converter.decode(request)
         created_association = self.service.associate(association)
         response = self.converter.encode(created_association)
@@ -90,6 +92,8 @@ class CollectionAssociationResource(object):
         return build_response(response, 201, location)
 
     def dissociate_collection(self, parent_id, resource_id):
+        self.service.validate_parent(parent_id)
+        self.service.validate_resource(resource_id)
         association = self.service.get(parent_id, resource_id)
         self.service.dissociate(association)
         return ('', 204)
@@ -102,11 +106,13 @@ class SingleAssociationResource(object):
         self.converter = converter
 
     def get_association(self, parent_id):
+        self.service.validate_parent(parent_id)
         association = self.service.get_by_parent(parent_id)
         response = self.converter.encode(association)
         return build_response(response)
 
     def associate(self, parent_id):
+        self.service.validate_parent(parent_id)
         association = self.converter.decode(request)
         created_association = self.service.associate(association)
         response = self.converter.encode(created_association)
@@ -114,6 +120,7 @@ class SingleAssociationResource(object):
         return build_response(response, 201, location)
 
     def dissociate(self, parent_id):
+        self.service.validate_parent(parent_id)
         association = self.service.get_by_parent(parent_id)
         self.service.dissociate(association)
         return ('', 204)
@@ -167,10 +174,6 @@ class DecoratorChain(object):
         self.blueprint = blueprint
         self.decorators = []
 
-    def start(self):
-        self.decorators = []
-        return self
-
     def produce(self):
         self.decorators.append(produces('application/json'))
         return self
@@ -208,21 +211,22 @@ class DecoratorChain(object):
         return self
 
     def search(self, path=''):
-        return self.start().produce().authenticate().route_get(path)
+        return self.produce().authenticate().route_get(path)
 
     def get(self, path='/<int:resource_id>'):
-        return self.start().produce().authenticate().route_get(path)
+        return self.produce().authenticate().route_get(path)
 
     def create(self, path=''):
-        return self.start().consume().produce().authenticate().route_post(path)
+        return self.consume().produce().authenticate().route_post(path)
 
     def edit(self, path='/<int:resource_id>'):
-        return self.start().consume().authenticate().route_put(path)
+        return self.consume().authenticate().route_put(path)
 
     def delete(self, path='/<int:resource_id>'):
-        return self.start().authenticate().route_delete(path)
+        return self.authenticate().route_delete(path)
 
     def decorate(self, func):
         for decorator in self.decorators:
             func = decorator(func)
+        self.decorators = []
         return func

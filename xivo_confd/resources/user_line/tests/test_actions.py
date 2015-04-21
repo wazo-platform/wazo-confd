@@ -30,11 +30,6 @@ class TestUserLineService(unittest.TestCase):
         self.line_dao = Mock()
         self.service = UserLineService(self.old_service, self.user_dao, self.line_dao)
 
-    def test_when_listing_associations_then_user_is_checked(self):
-        self.service.list(sentinel.user_id)
-
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
-
     def test_when_listing_associations_then_service_is_called(self):
         expected_user_lines = self.old_service.find_all_by_user_id.return_value
 
@@ -52,35 +47,11 @@ class TestUserLineService(unittest.TestCase):
                                                                             sentinel.line_id)
         assert_that(result, equal_to(expected_user_line))
 
-    def test_when_associating_then_user_is_checked(self):
-        association = Mock(user_id=sentinel.user_id)
-        self.service.associate(association)
-
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
-
-    def test_when_associating_then_line_is_checked(self):
-        association = Mock(line_id=sentinel.line_id)
-        self.service.associate(association)
-
-        self.line_dao.get.assert_called_once_with(sentinel.line_id)
-
     def test_when_associating_then_service_is_called(self):
         association = Mock()
         self.service.associate(association)
 
         self.old_service.associate.assert_called_once_with(association)
-
-    def test_when_dissociating_then_user_is_checked(self):
-        association = Mock(user_id=sentinel.user_id)
-        self.service.dissociate(association)
-
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
-
-    def test_when_dissociating_then_line_is_checked(self):
-        association = Mock(line_id=sentinel.line_id)
-        self.service.dissociate(association)
-
-        self.line_dao.get.assert_called_once_with(sentinel.line_id)
 
     def test_when_dissociating_then_service_is_called(self):
         association = Mock()

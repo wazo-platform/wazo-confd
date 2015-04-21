@@ -34,24 +34,19 @@ class UserVoicemailService(object):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
 
-    def check_user_exists(self, user_id):
+    def validate_parent(self, user_id):
         self.user_dao.get(user_id)
 
-    def check_voicemail_exists(self, voicemail_id):
+    def validate_resource(self, voicemail_id):
         self.voicemail_dao.get(voicemail_id)
 
     def get_by_parent(self, user_id):
-        self.check_user_exists(user_id)
         return self.service.get_by_user_id(user_id)
 
     def associate(self, association):
-        self.check_user_exists(association.user_id)
-        self.check_voicemail_exists(association.voicemail_id)
         return self.service.associate(association)
 
     def dissociate(self, association):
-        self.check_user_exists(association.user_id)
-        self.check_voicemail_exists(association.voicemail_id)
         self.service.dissociate(association)
 
 

@@ -93,13 +93,13 @@ def load(core_rest_api):
      .decorate(resource.autoprov))
 
     (chain
-     .get('/<device_id>/associate_line/<int:line_id>')
      .limit_localhost()
+     .get('/<device_id>/associate_line/<int:line_id>')
      .decorate(resource.associate_line))
 
     (chain
-     .get('/<device_id>/remove_line/<int:line_id>')
      .limit_localhost()
+     .get('/<device_id>/remove_line/<int:line_id>')
      .decorate(resource.remove_line))
 
     core_rest_api.register(blueprint)

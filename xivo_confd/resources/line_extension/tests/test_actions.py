@@ -58,11 +58,6 @@ class TestLineExtensionService(unittest.TestCase):
         self.extension_dao = Mock()
         self.service = LineExtensionService(self.old_service, self.line_dao, self.extension_dao)
 
-    def test_when_listing_associations_then_line_is_checked(self):
-        self.service.list(sentinel.line_id)
-
-        self.line_dao.get.assert_called_once_with(sentinel.line_id)
-
     def test_when_listing_associations_then_service_is_called(self):
         expected_line_extensions = self.old_service.get_all_by_line_id.return_value
 
@@ -77,40 +72,12 @@ class TestLineExtensionService(unittest.TestCase):
         assert_that(result.line_id, equal_to(sentinel.line_id))
         assert_that(result.extension_id, equal_to(sentinel.extension_id))
 
-    def test_when_associating_then_line_is_checked(self):
-        association = Mock(line_id=sentinel.line_id)
-
-        self.service.associate(association)
-
-        self.line_dao.get.assert_called_once_with(sentinel.line_id)
-
-    def test_when_associating_then_extension_is_checked(self):
-        association = Mock(extension_id=sentinel.extension_id)
-
-        self.service.associate(association)
-
-        self.extension_dao.get.assert_called_once_with(sentinel.extension_id)
-
     def test_when_associating_then_service_is_called(self):
         association = Mock()
 
         self.service.associate(association)
 
         self.old_service.associate.assert_called_once_with(association)
-
-    def test_when_dissociating_then_line_is_checked(self):
-        association = Mock(line_id=sentinel.line_id)
-
-        self.service.dissociate(association)
-
-        self.line_dao.get.assert_called_once_with(sentinel.line_id)
-
-    def test_when_dissociating_then_extension_is_checked(self):
-        association = Mock(extension_id=sentinel.extension_id)
-
-        self.service.dissociate(association)
-
-        self.extension_dao.get.assert_called_once_with(sentinel.extension_id)
 
     def test_when_dissociating_then_service_is_called(self):
         association = Mock()
@@ -119,11 +86,6 @@ class TestLineExtensionService(unittest.TestCase):
 
         self.old_service.dissociate.assert_called_once_with(association)
 
-    def test_when_getting_parent_then_line_is_checked(self):
-        self.service.get_by_parent(sentinel.line_id)
-
-        self.line_dao.get.assert_called_once_with(sentinel.line_id)
-
     def test_when_getting_parent_then_service_is_called(self):
         expected_line_voicemail = self.old_service.get_by_line_id.return_value
 
@@ -131,11 +93,6 @@ class TestLineExtensionService(unittest.TestCase):
 
         self.old_service.get_by_line_id.assert_called_once_with(sentinel.line_id)
         assert_that(result, equal_to(expected_line_voicemail))
-
-    def test_when_getting_extension_then_extension_id_is_checked(self):
-        self.service.get_by_extension_id(sentinel.extension_id)
-
-        self.extension_dao.get.assert_called_once_with(sentinel.extension_id)
 
     def test_when_getting_extension_then_service_is_called(self):
         expected_line_extension = self.old_service.get_by_extension_id.return_value

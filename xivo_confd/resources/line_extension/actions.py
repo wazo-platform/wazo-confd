@@ -45,35 +45,28 @@ class LineExtensionService(object):
         self.line_dao = line_dao
         self.extension_dao = extension_dao
 
-    def check_line_exists(self, line_id):
+    def validate_parent(self, line_id):
         self.line_dao.get(line_id)
 
-    def check_extension_exists(self, extension_id):
+    def validate_resource(self, extension_id):
         self.extension_dao.get(extension_id)
 
     def list(self, line_id):
-        self.check_line_exists(line_id)
         return self.service.get_all_by_line_id(line_id)
 
     def get(self, line_id, extension_id):
         return LineExtension(line_id=line_id, extension_id=extension_id)
 
     def associate(self, line_extension):
-        self.check_line_exists(line_extension.line_id)
-        self.check_extension_exists(line_extension.extension_id)
         return self.service.associate(line_extension)
 
     def dissociate(self, line_extension):
-        self.check_line_exists(line_extension.line_id)
-        self.check_extension_exists(line_extension.extension_id)
         self.service.dissociate(line_extension)
 
     def get_by_parent(self, line_id):
-        self.check_line_exists(line_id)
         return self.service.get_by_line_id(line_id)
 
     def get_by_extension_id(self, extension_id):
-        self.check_extension_exists(extension_id)
         return self.service.get_by_extension_id(extension_id)
 
 
