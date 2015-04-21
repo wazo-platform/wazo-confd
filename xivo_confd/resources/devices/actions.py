@@ -16,21 +16,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.data_handler.device import services as device_service
 from xivo_dao.data_handler.device.model import Device
-from xivo_dao.data_handler.line import services as line_service
+from xivo_dao.data_handler.device import notifier as device_notifier
+from xivo_dao.data_handler.line import dao as line_dao
+from xivo_dao.data_handler.extension import dao as extension_dao
+from xivo_dao.data_handler.line_extension import dao as line_extension_dao
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Dict
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, DeviceValidator, SearchEngine
+from xivo_confd.resources.devices.dao import ProvdDeviceDao, DeviceDao
 
 
 class DeviceResource(CRUDResource):
 
-    def __init__(self, device_service, line_service, converter):
+    def __init__(self, device_service, association_service, converter):
         super(DeviceResource, self).__init__(device_service, converter)
-        self.line_service = line_service
+        self.association_service = association_service
 
     def synchronize(self, device_id):
         device = self.service.get(device_id)
@@ -39,19 +43,19 @@ class DeviceResource(CRUDResource):
 
     def autoprov(self, device_id):
         device = self.service.get(device_id)
-        self.service.reset_to_autoprov(device)
+        self.service.reset_autoprov(device)
         return ('', 204)
 
     def associate_line(self, device_id, line_id):
         device = self.service.get(device_id)
-        line = self.line_service.get(line_id)
-        self.service.associate_line_to_device(device, line)
+        line = self.association_service.get_line(line_id)
+        self.association_service.associate(line, device)
         return ('', 204)
 
     def remove_line(self, device_id, line_id):
         device = self.service.get(device_id)
-        line = self.line_service.get(line_id)
-        self.service.remove_line_from_device(device, line)
+        line = self.association_service.get_line(line_id)
+        self.association_service.dissociate(line, device)
         return ('', 204)
 
 
@@ -75,7 +79,25 @@ def load(core_rest_api):
 
     converter = Converter.resource(document, Device)
 
-    resource = DeviceResource(device_service, line_service, converter)
+    provd_client = core_rest_api.provd_client()
+
+    provd_dao = ProvdDeviceDao(provd_client.device_manager(),
+                               provd_client.config_manager())
+
+    device_dao = DeviceDao(provd_client, provd_dao)
+
+    search_engine = SearchEngine(provd_dao)
+
+    device_validator = DeviceValidator(device_dao, line_dao)
+
+    association_service = LineDeviceAssociationService(line_dao,
+                                                       extension_dao,
+                                                       line_extension_dao,
+                                                       device_dao)
+
+    device_service = DeviceService(device_dao, device_validator, device_notifier, search_engine)
+
+    resource = DeviceResource(device_service, association_service, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)
     chain.search().decorate(resource.search)
