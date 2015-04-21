@@ -51,6 +51,9 @@ DEFAULT_CONFIG = {
         'exchange_type': 'topic',
         'exchange_durable': True,
     },
+    'provd': {
+        'url': 'http://localhost:8666/provd',
+    },
     'default_plugins': [
         "call_logs",
         "configuration",

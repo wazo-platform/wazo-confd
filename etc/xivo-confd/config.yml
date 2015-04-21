@@ -47,6 +47,10 @@ bus:
     exchange_type: topic
     exchange_durable: True
 
+#Provd server
+provd:
+    url: http://localhost:8666/provd
+
 # Extra resources to load
 #extra_plugins:
 #   - resource_name

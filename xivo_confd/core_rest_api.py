@@ -30,6 +30,8 @@ from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 
+from xivo_provd_client import new_provisioning_client
+
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +97,10 @@ class CoreRestApi(object):
 
     def register(self, blueprint):
         self.app.register_blueprint(blueprint)
+
+    def provd_client(self):
+        url = self.config['provd']['url']
+        return new_provisioning_client(url)
 
     def run(self):
         bind_addr = (self.config['rest_api']['listen'], self.config['rest_api']['port'])
