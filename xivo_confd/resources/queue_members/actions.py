@@ -83,6 +83,11 @@ class QueueMemberAssociationResource(CollectionAssociationResource):
                            resource_id=created_association.agent_id)
         return build_response(response, 201, location)
 
+    def dissociate_collection(self, parent_id, resource_id):
+        association = self.service.get(parent_id, resource_id)
+        self.service.dissociate(association)
+        return ('', 204)
+
 
 def load(core_rest_api):
     blueprint = Blueprint('queues', __name__, url_prefix='/%s/queues' % config.API_VERSION)
