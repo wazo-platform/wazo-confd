@@ -26,8 +26,8 @@ class TestDeviceResource(unittest.TestCase):
 
     def setUp(self):
         self.service = Mock()
-        self.line_service = Mock()
-        self.resource = DeviceResource(self.service, self.line_service, Mock())
+        self.association_service = Mock()
+        self.resource = DeviceResource(self.service, self.association_service, Mock())
 
     def test_synchronize_synchronizes_device(self):
         expected_device = self.service.get.return_value
@@ -42,23 +42,23 @@ class TestDeviceResource(unittest.TestCase):
 
         response = self.resource.autoprov(sentinel.device_id)
 
-        self.service.reset_to_autoprov.assert_called_once_with(expected_device)
+        self.service.reset_autoprov.assert_called_once_with(expected_device)
         assert_that(response, equal_to(('', 204)))
 
     def test_associate_line_associates_line_and_device(self):
         expected_device = self.service.get.return_value
-        expected_line = self.line_service.get.return_value
+        expected_line = self.association_service.get_line.return_value
 
         response = self.resource.associate_line(sentinel.device_id, sentinel.line_id)
 
-        self.service.associate_line_to_device.assert_called_once_with(expected_device, expected_line)
+        self.association_service.associate.assert_called_once_with(expected_line, expected_device)
         assert_that(response, equal_to(('', 204)))
 
     def test_remove_line_removes_line_from_device(self):
         expected_device = self.service.get.return_value
-        expected_line = self.line_service.get.return_value
+        expected_line = self.association_service.get_line.return_value
 
         response = self.resource.remove_line(sentinel.device_id, sentinel.line_id)
 
-        self.service.remove_line_from_device.assert_called_once_with(expected_device, expected_line)
+        self.association_service.dissociate.assert_called_once_with(expected_line, expected_device)
         assert_that(response, equal_to(('', 204)))

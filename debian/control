@@ -28,7 +28,8 @@ Depends: ${python:Depends},
          python-flask-httpauth,
          python-flask-cors,
          python-flask-negotiate,
-         python-cherrypy3
+         python-cherrypy3,
+         xivo-provd-client (>= 15.08~20150422.145633.62b1f57-1)
 Provides: xivo-librestapi
 Conflicts: xivo-librestapi
 Replaces: xivo-librestapi

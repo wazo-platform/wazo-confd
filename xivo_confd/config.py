@@ -51,6 +51,8 @@ DEFAULT_CONFIG = {
         'exchange_type': 'topic',
         'exchange_durable': True,
     },
+    'provd': {
+    },
     'default_plugins': [
         "call_logs",
         "configuration",
