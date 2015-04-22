@@ -95,7 +95,7 @@ def load(core_rest_api):
                                                        line_extension_dao,
                                                        device_dao)
 
-    device_service = DeviceService(device_dao, device_validator, device_notifier, search_engine)
+    device_service = DeviceService(device_dao, device_validator, device_notifier, search_engine, line_dao)
 
     resource = DeviceResource(device_service, association_service, converter)
 

@@ -25,9 +25,10 @@ from xivo_dao.data_handler import errors
 
 class DeviceService(CRUDService):
 
-    def __init__(self, dao, validator, notifier, search_engine):
+    def __init__(self, dao, validator, notifier, search_engine, line_dao):
         super(DeviceService, self).__init__(dao, validator, notifier)
         self.search_engine = search_engine
+        self.line_dao = line_dao
 
     def search(self, parameters):
         return self.search_engine.search(parameters)
@@ -37,6 +38,7 @@ class DeviceService(CRUDService):
 
     def reset_autoprov(self, device):
         self.dao.reset_autoprov(device)
+        self.line_dao.reset_device(device.id)
 
 
 class LineDeviceAssociationService(object):
