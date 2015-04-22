@@ -59,7 +59,6 @@ class DeviceDao(object):
 
     def device_templates(self):
         templates = self.client.config_manager().find({'X_type': 'device'})
-        logger.info("found templates %s", templates)
         return [t['id'] for t in templates]
 
 
@@ -74,7 +73,6 @@ class ProvdDeviceDao(object):
 
     def find_by(self, name, value):
         devices = self.device_manager.find({name: value})
-        logger.info("find by %s %s found %s", name, value, devices)
         if devices:
             return self.build_provd_device(devices[0])
         return None
@@ -86,6 +84,7 @@ class ProvdDeviceDao(object):
 
     def _build_config_converter(self, device):
         config_id = device.get('config', device['id'])
+        logger.debug("fetching config %s for device %s", config_id, device['id'])
         config = self._find_config(config_id)
         return ConfigConverter(config) if config else EmptyConfigConverter()
 
@@ -99,14 +98,14 @@ class ProvdDeviceDao(object):
 
     def create(self):
         device_id = self.device_manager.add({})
-        logger.info("new device %s created", device_id)
+        logger.debug("new device %s created", device_id)
 
         config = {'id': device_id,
                   'parent_ids': ['base'],
                   'deletable': True,
                   'raw_config': {}}
 
-        logger.info("adding config %s", config)
+        logger.debug("adding config %s", config)
         self.config_manager.add(config)
         return self.find_by('id', device_id)
 
@@ -114,9 +113,9 @@ class ProvdDeviceDao(object):
         device = provd_device.extract_device()
         config = provd_device.extract_config()
 
-        logger.info("updating device %s", device)
+        logger.debug("updating device %s", device)
         self.device_manager.update(device)
-        logger.info("updating config %s", config)
+        logger.debug("updating config %s", config)
         self.config_manager.update(config)
 
     def delete(self, provd_device):
@@ -125,6 +124,7 @@ class ProvdDeviceDao(object):
 
     def reset_autoprov(self, provd_device):
         self.config_manager.remove(provd_device.config_id)
+        logger.debug("removed config %s", provd_device.config_id)
         autoprov_id = self.config_manager.autocreate()
         autoprov_config = self.config_manager.get(autoprov_id)
         provd_device.reset_autoprov(autoprov_config)
