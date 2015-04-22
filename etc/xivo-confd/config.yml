@@ -47,9 +47,10 @@ bus:
     exchange_type: topic
     exchange_durable: True
 
-#Provd server
+# xivo-provd connection informations.
 provd:
-    url: http://localhost:8666/provd
+    host: localhost
+    port: 8666
 
 # Extra resources to load
 #extra_plugins:
