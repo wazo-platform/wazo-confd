@@ -63,6 +63,7 @@ class ParameterExtractor(object):
 
     PARAMETERS = ('search', 'direction', 'order')
     NUMERIC = ('limit', 'skip')
+    DIRECTIONS = ('asc', 'desc')
 
     def __init__(self, extra):
         self.extra = extra
@@ -77,6 +78,8 @@ class ParameterExtractor(object):
         for parameter in all_parameters:
             self._extract_parameter(parameter, arguments)
 
+        self._validate_direction()
+
         return self.extracted
 
     def _reset(self):
@@ -87,11 +90,19 @@ class ParameterExtractor(object):
         if value:
             if not value.isdigit():
                 raise errors.wrong_type(name, 'positive number')
-            self.extracted[name] = int(value)
+            value = int(value)
+            if value < 0:
+                raise errors.wrong_type(name, 'positive number')
+            self.extracted[name] = value
 
     def _extract_parameter(self, name, arguments):
         if name in arguments:
             self.extracted[name] = arguments[name]
+
+    def _validate_direction(self):
+        if 'direction' in self.extracted:
+            if self.extracted['direction'] not in self.DIRECTIONS:
+                raise errors.invalid_direction()
 
 
 def extract_search_parameters(arguments, extra=None):

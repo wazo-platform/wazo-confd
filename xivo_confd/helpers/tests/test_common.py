@@ -104,6 +104,10 @@ class TestExtractSearchParameters(unittest.TestCase):
         args = {'skip': 'toto'}
         self.assertRaises(InputError, extract_search_parameters, args)
 
+    def test_given_negative_skip_then_raises_error(self):
+        args = {'skip': '-1'}
+        self.assertRaises(InputError, extract_search_parameters, args)
+
     def test_given_skip_parameter_then_extracts_skip(self):
         expected_result = {'skip': 532}
         args = {'skip': '532'}
@@ -114,6 +118,10 @@ class TestExtractSearchParameters(unittest.TestCase):
 
     def test_given_invalid_limit_then_raises_error(self):
         args = {'limit': 'toto'}
+        self.assertRaises(InputError, extract_search_parameters, args)
+
+    def test_given_negative_limit_then_raises_error(self):
+        args = {'limit': '-1'}
         self.assertRaises(InputError, extract_search_parameters, args)
 
     def test_given_limit_parameter_then_extracts_limit(self):
@@ -131,6 +139,11 @@ class TestExtractSearchParameters(unittest.TestCase):
         parameters = extract_search_parameters(args)
 
         assert_that(parameters, equal_to(expected_result))
+
+    def test_given_invalid_direction_parameter_then_raises_error(self):
+        args = {'direction': 'yeehaw'}
+
+        self.assertRaises(InputError, extract_search_parameters, args)
 
     def test_given_search_parameter_then_extracts_search_term(self):
         expected_result = {'search': 'abcd'}
