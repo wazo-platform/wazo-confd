@@ -199,6 +199,7 @@ class SearchEngine(object):
         self.provd_dao = provd_dao
 
     def search(self, parameters):
+        self.validate_parameters(parameters)
         provd_devices = self.provd_dao.find_all_devices(parameters.get('order', self.DEFAULT_ORDER),
                                                         parameters.get('direction', self.DEFAULT_DIRECTION))
 
@@ -215,6 +216,11 @@ class SearchEngine(object):
                  for device in provd_devices]
 
         return SearchResult(total=total, items=items)
+
+    def validate_parameters(self, parameters):
+        if 'order' in parameters:
+            if parameters['order'] not in self.PROVD_DEVICE_KEYS:
+                raise errors.invalid_ordering(parameters['order'], self.PROVD_DEVICE_KEYS)
 
     def filter_devices(self, devices, search=None):
         if search is None:
