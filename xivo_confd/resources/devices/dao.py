@@ -21,6 +21,8 @@ from xivo_dao.data_handler import errors
 
 from xivo_confd.resources.devices.model import ProvdDevice, DeviceConverter, ConfigConverter, EmptyConfigConverter
 
+from xivo_provd_client.error import NotFoundError
+
 logger = logging.getLogger(__name__)
 
 
@@ -137,11 +139,17 @@ class ProvdDeviceDao(object):
 
     def delete(self, provd_device):
         self.device_manager.remove(provd_device.device_id)
-        self.config_manager.remove(provd_device.config_id)
+        self._remove_config(provd_device.config_id)
+
+    def _remove_config(self, config_id):
+        try:
+            self.config_manager.remove(config_id)
+        except NotFoundError:
+            pass
+        logger.debug("removed config %s", config_id)
 
     def reset_autoprov(self, provd_device):
-        self.config_manager.remove(provd_device.config_id)
-        logger.debug("removed config %s", provd_device.config_id)
+        self._remove_config(provd_device.config_id)
         autoprov_id = self.config_manager.autocreate()
         autoprov_config = self.config_manager.get(autoprov_id)
         provd_device.reset_autoprov(autoprov_config)
