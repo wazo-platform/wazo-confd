@@ -226,12 +226,14 @@ class SearchEngine(object):
         if search is None:
             return devices
 
+        search = search.lower()
+
         return [device for device in devices
                 if self._matches_search(device, search)]
 
-    def _matches_search(self, device, search):
+    def _matches_search(self, device, search_lowered):
         for key in self.PROVD_DEVICE_KEYS:
-            if key in device and search in unicode(device[key]).lower():
+            if key in device and search_lowered in unicode(device[key]).lower():
                 return True
         return False
 
