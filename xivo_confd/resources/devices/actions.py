@@ -26,7 +26,7 @@ from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Dict
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
-from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, DeviceValidator, SearchEngine
+from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, DeviceValidator, SearchEngine, LineDeviceUpdater
 from xivo_confd.resources.devices.dao import ProvdDeviceDao, DeviceDao
 
 
@@ -90,10 +90,13 @@ def load(core_rest_api):
 
     device_validator = DeviceValidator(device_dao, line_dao)
 
+    line_device_updater = LineDeviceUpdater(line_dao,
+                                            extension_dao,
+                                            line_extension_dao,
+                                            device_dao)
+
     association_service = LineDeviceAssociationService(line_dao,
-                                                       extension_dao,
-                                                       line_extension_dao,
-                                                       device_dao)
+                                                       line_device_updater)
 
     device_service = DeviceService(device_dao, device_validator, device_notifier, search_engine, line_dao)
 
