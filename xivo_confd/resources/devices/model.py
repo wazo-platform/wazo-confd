@@ -216,13 +216,22 @@ class LineSIPConverter(LineConverter):
 
         return {self.line.device_slot: slot}
 
+    def __eq__(self, other):
+        return all([self.registrar == other.registrar,
+                    self.line == other.line,
+                    self.extension == other.extension])
+
+    def __repr__(self):
+        tpl = "<LineSIPConverter line_id:{} extension_id:{} registrar_id:{}>"
+        return tpl.format(self.line.id, self.extension.id, self.registrar['id'])
+
 
 class LineSCCPConverter(LineConverter):
 
     section = 'sccp_call_managers'
 
     def __init__(self, registrar):
-        self.registar = registrar
+        self.registrar = registrar
 
     def build(self):
         slot = {1: {'ip': self.registar['proxy_main']}}
@@ -232,3 +241,9 @@ class LineSCCPConverter(LineConverter):
             slot[2] = {'ip': proxy_backup}
 
         return slot
+
+    def __eq__(self, other):
+        return self.registrar == other.registrar
+
+    def __repr__(self):
+        return "<LineSCCPConverter {}>".format(self.registrar)

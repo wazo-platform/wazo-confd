@@ -43,11 +43,9 @@ class DeviceService(CRUDService):
 
 class LineDeviceAssociationService(object):
 
-    def __init__(self, line_dao, extension_dao, line_extension_dao, device_dao):
+    def __init__(self, line_dao, line_updater):
         self.line_dao = line_dao
-        self.extension_dao = extension_dao
-        self.line_extension_dao = line_extension_dao
-        self.device_dao = device_dao
+        self.line_updater = line_updater
 
     def get_line(self, line_id):
         return self.line_dao.get(line_id)
@@ -55,22 +53,31 @@ class LineDeviceAssociationService(object):
     def associate(self, line, device):
         line.device_id = device.id
         self.line_dao.edit(line)
-        self._update_lines(device)
+        self.line_updater.update_lines(device)
 
     def dissociate(self, line, device):
         line.device_id = None
         self.line_dao.edit(line)
-        self._update_lines(device)
+        self.line_updater.update_lines(device)
 
-    def _update_lines(self, device):
+
+class LineDeviceUpdater(object):
+
+    def __init__(self, line_dao, extension_dao, line_extension_dao, device_dao):
+        self.line_dao = line_dao
+        self.extension_dao = extension_dao
+        self.line_extension_dao = line_extension_dao
+        self.device_dao = device_dao
+
+    def update_lines(self, device):
         converters = self._get_converters(device)
         self.device_dao.update_lines(device, converters)
         if not converters:
-            self.dao.reset_autoprov(device)
+            self.device_dao.reset_autoprov(device)
 
     def _get_converters(self, device):
         converters = []
-        lines = self.line_dao.find_by_device_id(device.id)
+        lines = self.line_dao.find_all_by_device_id(device.id)
         for line in lines:
             converter = self._line_converter(line)
             if converter:
@@ -88,9 +95,10 @@ class LineDeviceAssociationService(object):
     def _sip_line_converter(self, line, registrar):
         extension = self._find_extension_for_line(line)
         if extension:
-            return LineSIPConverter(line,
-                                    extension,
-                                    registrar)
+            print line
+            return LineSIPConverter(registrar,
+                                    line,
+                                    extension)
         return None
 
     def _find_extension_for_line(self, line):

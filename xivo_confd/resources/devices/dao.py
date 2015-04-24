@@ -80,6 +80,9 @@ class DeviceDao(object):
         templates = self.client.config_manager().find({'X_type': 'device'})
         return [t['id'] for t in templates]
 
+    def get_registrar(self, registrar_id):
+        return self.config_manager.get(registrar_id)
+
 
 class ProvdDeviceDao(object):
 
