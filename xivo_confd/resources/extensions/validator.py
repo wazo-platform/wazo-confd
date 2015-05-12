@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ def validate_extension_available(extension):
 
 
 def validate_extension_in_range(extension):
-    if not context_services.is_extension_valid_for_context(extension):
+    if not is_extension_valid_for_context(extension):
         raise errors.outside_context_range(extension.exten, extension.context)
 
 
@@ -82,7 +82,7 @@ def validate_extension_exists(extension):
 def validate_extension_not_associated(extension_id):
     extension_type, typeval = extension_dao.get_type_typeval(extension_id)
 
-    #extensions that are created or dissociated are set to these values by default
+    # extensions that are created or dissociated are set to these values by default
     if extension_type != 'user' and typeval != '0':
         raise errors.resource_associated('Extension', extension_type,
                                          extension_id=extension_id, associated_id=typeval)
@@ -99,3 +99,28 @@ def validate_extension_available_for_edit(extension):
     if existing_extension.exten != extension.exten or \
        existing_extension.context != extension.context:
         validate_extension_available(extension)
+
+
+def is_extension_valid_for_context(extension):
+    exten = _validate_exten(extension)
+    context_ranges = context_dao.find_all_context_ranges(extension.context)
+    return is_extension_included_in_ranges(exten, context_ranges)
+
+
+def _validate_exten(extension):
+    if not extension.exten.isdigit():
+        raise errors.wrong_type('exten', 'numeric string')
+    return extension.exten
+
+
+def is_extension_included_in_ranges(exten, context_ranges):
+    for context_range in context_ranges:
+        if context_range.in_range(exten):
+            return True
+    return False
+
+
+def is_extension_valid_for_context_range(extension, context_range):
+    exten = _validate_exten(extension)
+    context_ranges = context_dao.find_all_specific_context_ranges(extension.context, context_range)
+    return is_extension_included_in_ranges(exten, context_ranges)

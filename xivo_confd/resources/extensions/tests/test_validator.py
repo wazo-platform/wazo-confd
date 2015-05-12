@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,23 +17,26 @@
 
 from xivo_dao.tests.test_case import TestCase
 
+from hamcrest import assert_that, equal_to
 from mock import patch, Mock
 
-from xivo_dao.resources.exception import InputError
-from xivo_dao.resources.exception import ResourceError
+from xivo_dao.helpers.exception import InputError
+from xivo_dao.helpers.exception import ResourceError
 
-from xivo_dao.resources.extension import validator
 from xivo_dao.resources.extension.model import Extension
+from xivo_dao.resources.context.model import ContextRange, ContextRangeType
 from xivo_dao.resources.line_extension.model import LineExtension
+
+from xivo_confd.resources.extensions import validator
 
 
 class TestValidators(TestCase):
 
-    @patch('xivo_dao.resources.extension.validator.validate_extension_in_range')
-    @patch('xivo_dao.resources.extension.validator.validate_extension_available')
-    @patch('xivo_dao.resources.extension.validator.validate_context_exists')
-    @patch('xivo_dao.resources.extension.validator.validate_invalid_parameters')
-    @patch('xivo_dao.resources.extension.validator.validate_missing_parameters')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_in_range')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_available')
+    @patch('xivo_confd.resources.extensions.validator.validate_context_exists')
+    @patch('xivo_confd.resources.extensions.validator.validate_invalid_parameters')
+    @patch('xivo_confd.resources.extensions.validator.validate_missing_parameters')
     def test_validate_create(self,
                              validate_missing_parameters,
                              validate_invalid_parameters,
@@ -51,11 +54,11 @@ class TestValidators(TestCase):
         validate_extension_available.assert_called_once_with(extension)
         validate_extension_in_range.assert_called_once_with(extension)
 
-    @patch('xivo_dao.resources.extension.validator.validate_extension_in_range')
-    @patch('xivo_dao.resources.extension.validator.validate_extension_available_for_edit')
-    @patch('xivo_dao.resources.extension.validator.validate_context_exists')
-    @patch('xivo_dao.resources.extension.validator.validate_invalid_parameters')
-    @patch('xivo_dao.resources.extension.validator.validate_missing_parameters')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_in_range')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_available_for_edit')
+    @patch('xivo_confd.resources.extensions.validator.validate_context_exists')
+    @patch('xivo_confd.resources.extensions.validator.validate_invalid_parameters')
+    @patch('xivo_confd.resources.extensions.validator.validate_missing_parameters')
     def test_validate_edit(self,
                            validate_missing_parameters,
                            validate_invalid_parameters,
@@ -73,8 +76,8 @@ class TestValidators(TestCase):
         validate_extension_available_for_edit.assert_called_once_with(extension)
         validate_extension_in_range.assert_called_once_with(extension)
 
-    @patch('xivo_dao.resources.extension.validator.validate_extension_not_associated')
-    @patch('xivo_dao.resources.extension.validator.validate_extension_exists')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_not_associated')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_exists')
     def test_delete(self, validate_extension_exists, validate_extension_not_associated):
         extension = Mock(Extension, id=0)
 
@@ -161,9 +164,9 @@ class TestValidateExtensionAvailable(TestCase):
         find_by_exten_context.assert_called_once_with(extension.exten, extension.context)
 
 
+@patch('xivo_confd.resources.extensions.validator.is_extension_valid_for_context')
 class TestValidateExtensionInRange(TestCase):
 
-    @patch('xivo_dao.resources.context.services.is_extension_valid_for_context')
     def test_validate_extension_in_range_when_extension_outside_of_range(self, is_extension_valid_for_context):
         is_extension_valid_for_context.return_value = False
 
@@ -173,7 +176,6 @@ class TestValidateExtensionInRange(TestCase):
 
         is_extension_valid_for_context.assert_called_once_with(extension)
 
-    @patch('xivo_dao.resources.context.services.is_extension_valid_for_context')
     def test_validate_extension_in_range_when_extension_inside_of_range(self, is_extension_valid_for_context):
         is_extension_valid_for_context.return_value = True
 
@@ -235,7 +237,7 @@ class TestValidateExtensionNotAssociated(TestCase):
 
 class TestValidateExtensionAvailableForEdit(TestCase):
 
-    @patch('xivo_dao.resources.extension.validator.validate_extension_available')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_available')
     @patch('xivo_dao.resources.extension.dao.get')
     def test_when_exten_does_not_change(self, dao_get, validate_extension_available):
         dao_get.return_value = Extension(exten='1000')
@@ -247,7 +249,7 @@ class TestValidateExtensionAvailableForEdit(TestCase):
         dao_get.assert_called_once_with(extension.id)
         self.assertNotCalled(validate_extension_available)
 
-    @patch('xivo_dao.resources.extension.validator.validate_extension_available')
+    @patch('xivo_confd.resources.extensions.validator.validate_extension_available')
     @patch('xivo_dao.resources.extension.dao.get')
     def test_when_exten_changes_but_is_available(self, dao_get, validate_extension_available):
         dao_get.return_value = Extension(exten='1000', context='default')
@@ -258,3 +260,205 @@ class TestValidateExtensionAvailableForEdit(TestCase):
 
         dao_get.assert_called_once_with(extension.id)
         validate_extension_available.assert_called_once_with(extension)
+
+
+class TestContextIsExtensionValidForContext(TestCase):
+
+    @patch('xivo_dao.resources.context.dao.find_all_context_ranges')
+    @patch('xivo_confd.resources.extensions.validator.is_extension_included_in_ranges')
+    def test_is_extension_valid_for_context(self, is_extension_included_in_ranges, find_all_context_ranges):
+        extension = Mock(Extension, exten='1000', context='default')
+
+        context_ranges = find_all_context_ranges.return_value = Mock()
+        is_extension_included_in_ranges.return_value = True
+
+        result = validator.is_extension_valid_for_context(extension)
+
+        assert_that(result, equal_to(True))
+        find_all_context_ranges.assert_called_once_with(extension.context)
+        is_extension_included_in_ranges.assert_called_once_with('1000', context_ranges)
+
+    @patch('xivo_dao.resources.context.dao.find_all_context_ranges')
+    def test_is_extension_valid_for_context_when_extension_is_alphanumeric(self, context_ranges):
+        extension = Extension(exten='ABC123',
+                              context='default')
+
+        self.assertRaises(InputError, validator.is_extension_valid_for_context, extension)
+
+
+class TestContextIsExtensionIncludedInRanges(TestCase):
+
+    def test_when_no_ranges(self):
+        expected = False
+
+        exten = '1000'
+        context_ranges = []
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_below_minimum(self):
+        expected = False
+
+        exten = '1000'
+        context_ranges = [ContextRange(start='2000', end='3000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_above_maximum(self):
+        expected = False
+
+        exten = '9999'
+        context_ranges = [ContextRange(start='2000', end='3000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_same_as_minimum(self):
+        expected = True
+
+        exten = '1000'
+        context_ranges = [ContextRange(start='1000', end='3000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_same_as_maximum(self):
+        expected = True
+
+        exten = '3000'
+        context_ranges = [ContextRange(start='1000', end='3000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_inside_second_range(self):
+        expected = True
+
+        exten = '2000'
+        context_ranges = [ContextRange(start='1000', end='1999'),
+                          ContextRange(start='2000', end='2999')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_ranges_overlap(self):
+        expected = True
+
+        exten = '1450'
+        context_ranges = [ContextRange(start='1400', end='2000'),
+                          ContextRange(start='1000', end='1500')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_no_maximum_and_exten_is_below_minimum(self):
+        expected = False
+
+        exten = '500'
+        context_ranges = [ContextRange(start='1000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_no_maximum_and_exten_is_above_minimum(self):
+        expected = False
+
+        exten = '1450'
+        context_ranges = [ContextRange(start='1000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_no_maximum_and_exten_is_same_as_minimum(self):
+        expected = True
+
+        exten = '1000'
+        context_ranges = [ContextRange(start='1000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_only_matches_on_a_range_with_minimum_and_maximum(self):
+        expected = True
+
+        exten = '2000'
+        context_ranges = [ContextRange(start='1000'),
+                          ContextRange(start='2000', end='3000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_only_matches_on_a_range_with_minimum(self):
+        expected = True
+
+        exten = '1000'
+        context_ranges = [ContextRange(start='2000', end='3000'),
+                          ContextRange(start='1000')]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_inside_of_range_with_did_length(self):
+        expected = True
+
+        exten = '10'
+        context_ranges = [ContextRange(start='100', end='120', did_length=2)]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+    def test_when_exten_is_outside_of_range_with_did_length(self):
+        expected = False
+
+        exten = '30'
+        context_ranges = [ContextRange(start='100', end='120', did_length=2)]
+
+        result = validator.is_extension_included_in_ranges(exten, context_ranges)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestContextIsExtensionValidForContextRange(TestCase):
+
+    @patch('xivo_dao.resources.context.dao.find_all_specific_context_ranges')
+    @patch('xivo_confd.resources.extensions.validator.is_extension_included_in_ranges')
+    def test_is_extension_valid_for_context_range(self,
+                                                  is_extension_included_in_ranges,
+                                                  find_all_specific_context_ranges):
+        extension = Extension(exten='1000',
+                              context='default')
+
+        context_range = find_all_specific_context_ranges.return_value = Mock()
+        is_extension_included_in_ranges.return_value = True
+
+        result = validator.is_extension_valid_for_context_range(extension, ContextRangeType.users)
+
+        find_all_specific_context_ranges.assert_called_once_with(extension.context, ContextRangeType.users)
+        is_extension_included_in_ranges.assert_called_once_with('1000', context_range)
+
+        assert_that(result, equal_to(True))
+
+    @patch('xivo_dao.resources.context.dao.find_all_context_ranges')
+    def test_is_extension_valid_for_context_range_when_extension_is_alphanumeric(self, context_ranges):
+        extension = Extension(exten='ABC123',
+                              context='default')
+
+        self.assertRaises(InputError,
+                          validator.is_extension_valid_for_context_range,
+                          extension,
+                          ContextRangeType.users)
