@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.context import services as context_services
+from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
@@ -58,7 +58,7 @@ def validate_missing_parameters(extension):
 
 
 def validate_context_exists(extension):
-    existing_context = context_services.find_by_name(extension.context)
+    existing_context = context_dao.get(extension.context)
     if not existing_context:
         raise errors.param_not_found('context', 'Context')
 

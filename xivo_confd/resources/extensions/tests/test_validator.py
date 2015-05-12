@@ -118,32 +118,31 @@ class TestValidateMissingParameters(TestCase):
         validator.validate_missing_parameters(extension)
 
 
+@patch('xivo_dao.resources.context.dao.get')
 class TestValidateContextExists(TestCase):
 
-    @patch('xivo_dao.resources.context.services.find_by_name')
-    def test_validate_context_exists_when_context_does_not_exist(self, find_by_name):
-        find_by_name.return_value = None
+    def test_validate_context_exists_when_context_does_not_exist(self, context_get):
+        context_get.return_value = None
 
         extension = Extension(exten='1000', context='default')
 
         self.assertRaises(InputError, validator.validate_context_exists, extension)
 
-        find_by_name.assert_called_once_with(extension.context)
+        context_get.assert_called_once_with(extension.context)
 
-    @patch('xivo_dao.resources.context.services.find_by_name')
-    def test_validate_context_exists_when_context_exists(self, find_by_name):
-        find_by_name.return_value = Mock()
+    def test_validate_context_exists_when_context_exists(self, context_get):
+        context_get.return_value = Mock()
 
         extension = Extension(exten='1000', context='default')
 
         validator.validate_context_exists(extension)
 
-        find_by_name.assert_called_once_with(extension.context)
+        context_get.assert_called_once_with(extension.context)
 
 
+@patch('xivo_dao.resources.extension.dao.find_by_exten_context')
 class TestValidateExtensionAvailable(TestCase):
 
-    @patch('xivo_dao.resources.extension.dao.find_by_exten_context')
     def test_validate_extension_available_when_extension_does_not_exist(self, find_by_exten_context):
         find_by_exten_context.return_value = None
 
@@ -153,7 +152,6 @@ class TestValidateExtensionAvailable(TestCase):
 
         find_by_exten_context.assert_called_once_with(extension.exten, extension.context)
 
-    @patch('xivo_dao.resources.extension.dao.find_by_exten_context')
     def test_validate_extension_available_when_extension_exists(self, find_by_exten_context):
         find_by_exten_context.return_value = Mock(Extension)
 
