@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_bus.resources.configuration import event
-from xivo_dao.helpers import bus_manager, sysconfd_connector
+from xivo_confd.helpers import bus_manager, sysconfd_connector
 
 
 def live_reload_status_changed(data):

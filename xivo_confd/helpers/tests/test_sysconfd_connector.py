@@ -17,18 +17,18 @@
 
 from mock import patch
 from unittest import TestCase
-from xivo_dao.helpers import sysconfd_connector
+from xivo_confd.helpers import sysconfd_connector
 
 
 class TestSysconfdConnector(TestCase):
 
-    @patch('xivo_dao.helpers.sysconfd_connector.sysconfd_conn_request')
+    @patch('xivo_confd.helpers.sysconfd_connector.sysconfd_conn_request')
     def test_delete_voicemail_storage(self, sysconfd_conn_request):
         sysconfd_connector.delete_voicemail_storage("default", "123")
         sysconfd_conn_request.assert_called_with('GET', '/delete_voicemail?context=default&name=123', '')
 
     @patch('xivo_dao.resources.configuration.dao.is_live_reload_enabled')
-    @patch('xivo_dao.helpers.sysconfd_connector.sysconfd_conn_request')
+    @patch('xivo_confd.helpers.sysconfd_connector.sysconfd_conn_request')
     def test_exec_request_handlers_live_reload_enabled(self, sysconfd_conn_request, is_live_reload_enabled):
         commands = {'ctibus': [],
                     'ipbx': []}
@@ -40,7 +40,7 @@ class TestSysconfdConnector(TestCase):
         is_live_reload_enabled.assert_called_once_with()
 
     @patch('xivo_dao.resources.configuration.dao.is_live_reload_enabled')
-    @patch('xivo_dao.helpers.sysconfd_connector.sysconfd_conn_request')
+    @patch('xivo_confd.helpers.sysconfd_connector.sysconfd_conn_request')
     def test_exec_request_handlers_live_reload_disabled(self, sysconfd_conn_request, is_live_reload_enabled):
         commands = {'ctibus': [],
                     'ipbx': []}

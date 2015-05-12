@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.bus_manager import send_bus_event
+from xivo_confd.helpers.bus_manager import send_bus_event
 from xivo_bus.resources.line.event import CreateLineEvent, \
     EditLineEvent, DeleteLineEvent
-from xivo_dao.helpers import sysconfd_connector
+from xivo_confd.helpers import sysconfd_connector
 
 
 def _new_sysconfd_data():

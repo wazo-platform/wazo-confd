@@ -24,15 +24,15 @@ class TestUserCtiProfileNotifier(unittest.TestCase):
 
     def setUp(self):
         self.sysconfd_command = {
-                                'ctibus': [],
-                                'dird': [],
-                                'ipbx': [],
-                                'agentbus': [],
-                            }
+            'ctibus': [],
+            'dird': [],
+            'ipbx': [],
+            'agentbus': [],
+        }
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_bus.resources.configuration.event.LiveReloadEditedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_disable_live_reload(self, send_bus_event, LiveReloadEditedEvent, exec_request_handler):
         new_event = LiveReloadEditedEvent.return_value = Mock()
         data = {'enabled': False}
@@ -43,9 +43,9 @@ class TestUserCtiProfileNotifier(unittest.TestCase):
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
         self.assertFalse(exec_request_handler.called)
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_bus.resources.configuration.event.LiveReloadEditedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_enable_live_reload(self, send_bus_event, LiveReloadEditedEvent, exec_request_handler):
         new_event = LiveReloadEditedEvent.return_value = Mock()
         data = {'enabled': True}

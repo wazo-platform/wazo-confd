@@ -26,15 +26,15 @@ class TestUserCtiProfileNotifier(unittest.TestCase):
 
     def setUp(self):
         self.sysconfd_command = {
-                                'ctibus': [],
-                                'dird': [],
-                                'ipbx': [],
-                                'agentbus': [],
-                            }
+            'ctibus': [],
+            'dird': [],
+            'ipbx': [],
+            'agentbus': [],
+        }
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_bus.resources.user_cti_profile.event.UserCtiProfileEditedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_edited(self, send_bus_event, UserCtiProfileEditedEvent, exec_request_handler):
         new_event = UserCtiProfileEditedEvent.return_value = Mock()
         user_cti_profile = UserCtiProfile(user_id=1, cti_profile_id=2, enabled=True)

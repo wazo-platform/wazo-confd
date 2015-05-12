@@ -35,7 +35,7 @@ class TestUserVoicemailNotifier(unittest.TestCase):
         sysconf_command_association_updated.assert_called_once_with(user_voicemail)
         bus_event_associated.assert_called_once_with(user_voicemail)
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_dao.resources.user_line.dao.find_all_by_user_id')
     def test_send_sysconf_command_association_updated(self, find_all_by_user_id, exec_request_handlers):
         user_voicemail = UserVoicemail(user_id=1, voicemail_id=2)
@@ -57,7 +57,7 @@ class TestUserVoicemailNotifier(unittest.TestCase):
         find_all_by_user_id.assert_called_once_with(user_voicemail.user_id)
 
     @patch('xivo_bus.resources.user_voicemail.event.UserVoicemailAssociatedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_bus_event_associated(self, send_bus_event, UserVoiceailAssociatedEvent):
         new_event = UserVoiceailAssociatedEvent.return_value = Mock()
 
@@ -81,7 +81,7 @@ class TestUserVoicemailNotifier(unittest.TestCase):
         bus_event_dissociated.assert_called_once_with(user_voicemail)
 
     @patch('xivo_bus.resources.user_voicemail.event.UserVoicemailDissociatedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_bus_event_dissociated(self, send_bus_event, UserVoiceailDissociatedEvent):
         new_event = UserVoiceailDissociatedEvent.return_value = Mock()
 

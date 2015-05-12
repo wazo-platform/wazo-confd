@@ -31,9 +31,9 @@ class TestQueueMembersNotifier(unittest.TestCase):
             'agentbus': [],
         }
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_bus.resources.queue_members.event.AgentQueueAssociationEditedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_edited(self, send_bus_event, AgentQueueAssociationEditedEvent, exec_request_handler):
         new_event = AgentQueueAssociationEditedEvent.return_value = Mock()
         queue_member = QueueMemberAgent(queue_id=2, agent_id=30, penalty=5)
@@ -47,9 +47,9 @@ class TestQueueMembersNotifier(unittest.TestCase):
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
         exec_request_handler.assert_called_once_with(self.sysconfd_command)
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_bus.resources.queue_members.event.AgentQueueAssociatedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_associated(self, send_bus_event, AgentQueueAssociatedEvent, exec_request_handler):
         new_event = AgentQueueAssociatedEvent.return_value = Mock()
         queue_member = QueueMemberAgent(queue_id=2, agent_id=30, penalty=5)
@@ -65,9 +65,9 @@ class TestQueueMembersNotifier(unittest.TestCase):
 
         exec_request_handler.assert_called_once_with(self.sysconfd_command)
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_bus.resources.queue_members.event.AgentRemovedFromQueueEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_removed_from_queue(self, send_bus_event, AgentRemovedFromQueueEvent, exec_request_handler):
         agent_id = 104
         queue_id = 25

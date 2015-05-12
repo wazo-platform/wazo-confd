@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.bus_manager import send_bus_event
+from xivo_confd.helpers.bus_manager import send_bus_event
 from xivo_bus.resources.extension.event import CreateExtensionEvent, \
     EditExtensionEvent, DeleteExtensionEvent
-from xivo_dao.helpers import sysconfd_connector
+from xivo_confd.helpers import sysconfd_connector
 
 sysconfd_base_data = {
     'ctibus': [],
@@ -26,6 +26,7 @@ sysconfd_base_data = {
     'ipbx': ['dialplan reload'],
     'agentbus': []
 }
+
 
 def created(extension):
     sysconfd_connector.exec_request_handlers(sysconfd_base_data)

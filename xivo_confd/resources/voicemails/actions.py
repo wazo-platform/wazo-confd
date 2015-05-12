@@ -18,7 +18,7 @@
 
 from flask import Blueprint
 
-from xivo_dao.helpers import sysconfd_connector
+from xivo_confd.helpers import sysconfd_connector
 from xivo_dao.resources.voicemail import dao
 from xivo_dao.resources.voicemail.model import Voicemail
 

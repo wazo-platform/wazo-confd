@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers import bus_manager
+from xivo_confd.helpers import bus_manager
 from xivo_bus.resources.func_key import event as func_key_event
 
 from xivo_dao.resources.func_key.model import UserFuncKey, BSFilterFuncKey

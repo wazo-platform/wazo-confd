@@ -34,7 +34,7 @@ class TestUserLineNotifier(unittest.TestCase):
         sysconf_command_association_updated.assert_called_once_with(user_line)
         bus_event_associated.assert_called_once_with(user_line)
 
-    @patch('xivo_dao.helpers.sysconfd_connector.exec_request_handlers')
+    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
     @patch('xivo_dao.resources.user_line.dao.find_all_by_user_id')
     def test_send_sysconf_command_association_updated(self, find_all_by_user_id, exec_request_handlers):
         user_line = UserLine(user_id=1, line_id=2)
@@ -56,7 +56,7 @@ class TestUserLineNotifier(unittest.TestCase):
         find_all_by_user_id.assert_called_once_with(user_line.user_id)
 
     @patch('xivo_bus.resources.user_line.event.UserLineAssociatedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_bus_event_associated(self, send_bus_event, UserLineAssociatedEvent):
         new_event = UserLineAssociatedEvent.return_value = Mock()
 
@@ -81,7 +81,7 @@ class TestUserLineNotifier(unittest.TestCase):
         bus_event_dissociated.assert_called_once_with(user_line)
 
     @patch('xivo_bus.resources.user_line.event.UserLineDissociatedEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_bus_event_dissociated(self, send_bus_event, UserLineDissociatedEvent):
         new_event = UserLineDissociatedEvent.return_value = Mock()
 
