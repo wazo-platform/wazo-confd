@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.data_handler.device.model import Device
+from xivo_dao.resources.device.model import Device
 from xivo_dao.data_handler.device import notifier as device_notifier
 from xivo_dao.data_handler.line import dao as line_dao
 from xivo_dao.data_handler.extension import dao as extension_dao

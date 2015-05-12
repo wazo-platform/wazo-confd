@@ -19,7 +19,7 @@ import unittest
 from hamcrest import assert_that, equal_to
 from mock import Mock
 
-from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
+from xivo_dao.resources.queue_members.model import QueueMemberAgent
 
 from xivo_confd.resources.queue_members.actions import QueueMemberService
 

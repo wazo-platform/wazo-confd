@@ -20,9 +20,9 @@ import logging
 from flask import Response
 from werkzeug.exceptions import HTTPException
 
-from xivo_dao.data_handler import errors
-from xivo_dao.data_handler.exception import ServiceError
-from xivo_dao.data_handler.exception import NotFoundError
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import ServiceError
+from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_confd.helpers.mooltiparse.errors import ValidationError
 from xivo_confd.helpers.mooltiparse.errors import ContentTypeError

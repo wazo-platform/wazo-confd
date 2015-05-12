@@ -18,7 +18,7 @@
 from xivo_dao import queue_dao, agent_dao
 from xivo_dao.resources.exception import NotFoundError
 from xivo_dao.resources.queue_members import dao as queue_members_dao
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 
 
 def validate_edit_agent_queue_association(queue_member):

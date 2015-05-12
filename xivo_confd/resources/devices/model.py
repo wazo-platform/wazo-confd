@@ -17,7 +17,7 @@
 
 import abc
 
-from xivo_dao.data_handler.device.model import Device
+from xivo_dao.resources.device.model import Device
 
 
 class ProvdDevice(object):

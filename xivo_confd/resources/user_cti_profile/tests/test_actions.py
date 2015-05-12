@@ -19,7 +19,7 @@ from hamcrest import assert_that, equal_to
 
 from mock import patch
 from xivo_confd.helpers.tests.test_resources import TestResources
-from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
+from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 
 BASE_URL = "/1.1/users/%s/cti"
 

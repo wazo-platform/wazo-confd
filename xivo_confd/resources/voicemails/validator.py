@@ -19,7 +19,7 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.language import dao as language_dao
 
 from xivo_dao.resources.exception import NotFoundError
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 from xivo_dao.helpers import validator
 
 

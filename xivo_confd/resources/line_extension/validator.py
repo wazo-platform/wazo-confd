@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 from xivo_dao.resources.exception import NotFoundError
 from xivo_dao.resources.context.model import ContextType
 from xivo_dao.resources.context import dao as context_dao

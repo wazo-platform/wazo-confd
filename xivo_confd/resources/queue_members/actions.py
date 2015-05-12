@@ -28,7 +28,7 @@ from xivo_confd.helpers.resource import CollectionAssociationResource, Decorator
 from xivo_dao.data_handler.queue_members import dao
 from xivo_dao.data_handler.queue_members import validator
 from xivo_dao.data_handler.queue_members import notifier
-from xivo_dao.data_handler.queue_members.model import QueueMemberAgent
+from xivo_dao.resources.queue_members.model import QueueMemberAgent
 
 
 class QueueMemberService(object):

@@ -19,7 +19,7 @@ import re
 
 from . import dao
 from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 
 IP_REGEX = re.compile(r'(1?\d{1,2}|2([0-4][0-9]|5[0-5]))(\.(1?\d{1,2}|2([0-4][0-9]|5[0-5]))){3}$')
 MAC_REGEX = re.compile(r'^([0-9A-Fa-f]{2})(:[0-9A-Fa-f]{2}){5}$')

@@ -19,7 +19,7 @@
 from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
 from xivo_dao.data_handler.user import dao as user_dao
 from xivo_dao.data_handler.voicemail import dao as voicemail_dao
-from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
+from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean

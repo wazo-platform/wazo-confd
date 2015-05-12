@@ -24,7 +24,7 @@ from mock import Mock, patch
 
 from xivo_confd.helpers.tests.test_resources import TestResources
 from xivo_confd.resources.call_logs.serializer import CSV_HEADERS
-from xivo_dao.data_handler.call_log.model import CallLog
+from xivo_dao.resources.call_log.model import CallLog
 
 
 BASE_URL = "/1.1/call_logs"

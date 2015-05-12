@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.resources import errors
+from xivo_dao.helpers import errors
 
 LIVE_RELOAD_PARAM = 'enabled'
 

@@ -18,7 +18,7 @@
 from flask import Blueprint
 
 from xivo_dao.data_handler.infos import dao
-from xivo_dao.data_handler.infos.model import Infos
+from xivo_dao.resources.infos.model import Infos
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter

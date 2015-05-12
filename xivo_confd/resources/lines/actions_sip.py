@@ -18,7 +18,7 @@
 
 from flask import Blueprint
 from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.line.model import LineSIP
+from xivo_dao.resources.line.model import LineSIP
 from xivo_dao.data_handler.utils.search import SearchResult
 
 from xivo_confd import config

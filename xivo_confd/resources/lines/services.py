@@ -20,7 +20,7 @@ import random
 from . import notifier
 from . import dao
 
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 from xivo_dao.resources.device import services as device_services
 from xivo_dao.resources.device import dao as device_dao
 from xivo_dao.resources.context import services as context_services

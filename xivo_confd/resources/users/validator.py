@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import re
 
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao

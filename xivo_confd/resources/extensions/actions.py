@@ -17,7 +17,7 @@
 
 from flask import Blueprint
 from xivo_dao.data_handler.extension import dao, validator, notifier
-from xivo_dao.data_handler.extension.model import Extension
+from xivo_dao.resources.extension.model import Extension
 from xivo_dao.data_handler.line import dao as line_dao
 from xivo_dao.data_handler.line_extension import dao as line_extension_dao
 

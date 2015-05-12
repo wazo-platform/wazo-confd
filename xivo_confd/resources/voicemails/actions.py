@@ -20,7 +20,7 @@ from flask import Blueprint
 
 from xivo_dao.helpers import sysconfd_connector
 from xivo_dao.data_handler.voicemail import dao, validator, notifier
-from xivo_dao.data_handler.voicemail.model import Voicemail
+from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter

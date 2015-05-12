@@ -22,7 +22,7 @@ from . import notifier
 
 from urllib2 import URLError
 
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 from xivo_dao.helpers import provd_connector
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.extension import dao as extension_dao

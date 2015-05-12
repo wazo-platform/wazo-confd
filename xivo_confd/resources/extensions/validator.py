@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources import errors
+from xivo_dao.helpers import errors
 from xivo_dao.resources.context import services as context_services
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
