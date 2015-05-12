@@ -18,9 +18,9 @@
 from flask import Blueprint
 from xivo_dao.resources.device.model import Device
 from xivo_dao.data_handler.device import notifier as device_notifier
-from xivo_dao.data_handler.line import dao as line_dao
-from xivo_dao.data_handler.extension import dao as extension_dao
-from xivo_dao.data_handler.line_extension import dao as line_extension_dao
+from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
