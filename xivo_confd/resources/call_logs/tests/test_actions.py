@@ -32,7 +32,7 @@ BASE_URL = "/1.1/call_logs"
 
 class TestCallLogActions(TestResources):
 
-    @patch('xivo_dao.data_handler.call_log.services.find_all')
+    @patch('xivo_confd.resources.call_log.services.find_all')
     def test_list_call_logs_with_no_call_logs(self, mock_call_log_services_find_all):
         expected_status_code = 200
         expected_result = ','.join(CSV_HEADERS) + '\r\n'
@@ -47,7 +47,7 @@ class TestCallLogActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(result.data, equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.call_log.services.find_all')
+    @patch('xivo_confd.resources.call_log.services.find_all')
     @patch('xivo_confd.resources.call_logs.mapper.to_api')
     @patch('xivo_confd.resources.call_logs.serializer.encode_list')
     def test_list_call_logs_with_call_logs(self, serialize_encode, mapper_to_api, mock_call_log_services_find_all):
@@ -71,7 +71,7 @@ class TestCallLogActions(TestResources):
         assert_that(mapper_to_api.call_count, equal_to(2))
         serialize_encode.assert_called_once_with([mapped_1, mapped_2])
 
-    @patch('xivo_dao.data_handler.call_log.services.find_all_in_period')
+    @patch('xivo_confd.resources.call_log.services.find_all_in_period')
     @patch('xivo_confd.resources.call_logs.mapper.to_api')
     @patch('xivo_confd.resources.call_logs.serializer.encode_list')
     def test_list_call_logs_with_call_logs_interval(self, serialize_encode, mapper_to_api, mock_call_log_services_find_period):

@@ -20,7 +20,7 @@ from flask import Response
 from flask import request
 from flask_negotiate import consumes
 from flask_negotiate import produces
-from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
+from xivo_confd.resources.user_cti_profile import services as user_cti_profile_services
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 
 from xivo_confd.helpers import url

@@ -26,8 +26,8 @@ from xivo_confd.helpers.mooltiparse import Field, Int
 from xivo_confd.helpers.resource import CollectionAssociationResource, DecoratorChain, build_response
 
 from xivo_dao.resources.queue_members import dao
-from xivo_dao.data_handler.queue_members import validator
-from xivo_dao.data_handler.queue_members import notifier
+from xivo_confd.resources.queue_members import validator
+from xivo_confd.resources.queue_members import notifier
 from xivo_dao.resources.queue_members.model import QueueMemberAgent
 
 

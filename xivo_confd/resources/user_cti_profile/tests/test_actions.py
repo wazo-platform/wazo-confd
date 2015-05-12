@@ -27,7 +27,7 @@ BASE_URL = "/1.1/users/%s/cti"
 @patch('xivo_confd.helpers.url.check_user_exists')
 class TestUserVoicemailActions(TestResources):
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.edit')
+    @patch('xivo_confd.resources.user_cti_profile.services.edit')
     def test_update_cti_configuration(self, user_cti_profile_edit, user_exists):
         user_id = 1
         cti_profile_id = 2
@@ -45,7 +45,7 @@ class TestUserVoicemailActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         user_exists.assert_called_once_with(user_id)
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
+    @patch('xivo_confd.resources.user_cti_profile.services.get')
     def test_get_cti_configuration(self, user_cti_profile_get, user_exists):
         user_id = 1
         cti_profile_id = 2
@@ -76,7 +76,7 @@ class TestUserVoicemailActions(TestResources):
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
         user_exists.assert_called_once_with(user_id)
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
+    @patch('xivo_confd.resources.user_cti_profile.services.get')
     def test_get_cti_profile_association_not_exists(self, user_cti_profile_get, user_exists):
         user_id = 1
 

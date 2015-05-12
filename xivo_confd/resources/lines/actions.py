@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.data_handler.line import services as line_services
+from xivo_confd.resources.line import services as line_services
 from xivo_dao.resources.line.model import Line
 from xivo_dao.resources.utils.search import SearchResult
 
