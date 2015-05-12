@@ -17,7 +17,7 @@
 
 from httplib import HTTPConnection
 import json
-from xivo_dao.data_handler.configuration import dao as configuration_dao
+from xivo_dao.resources.configuration import dao as configuration_dao
 
 SYSCONFD_SERVER = "localhost"
 SYSCONFD_PORT = "8668"

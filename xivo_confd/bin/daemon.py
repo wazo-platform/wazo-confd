@@ -22,7 +22,7 @@ from xivo.chain_map import ChainMap
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
 from xivo.xivo_logging import setup_logging
-from xivo_dao.data_handler.infos import services as info_services
+from xivo_confd.resources.infos import services as info_services
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller

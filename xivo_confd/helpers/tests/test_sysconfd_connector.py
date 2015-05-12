@@ -27,7 +27,7 @@ class TestSysconfdConnector(TestCase):
         sysconfd_connector.delete_voicemail_storage("default", "123")
         sysconfd_conn_request.assert_called_with('GET', '/delete_voicemail?context=default&name=123', '')
 
-    @patch('xivo_dao.data_handler.configuration.dao.is_live_reload_enabled')
+    @patch('xivo_dao.resources.configuration.dao.is_live_reload_enabled')
     @patch('xivo_dao.helpers.sysconfd_connector.sysconfd_conn_request')
     def test_exec_request_handlers_live_reload_enabled(self, sysconfd_conn_request, is_live_reload_enabled):
         commands = {'ctibus': [],
@@ -39,7 +39,7 @@ class TestSysconfdConnector(TestCase):
         sysconfd_conn_request.assert_any_call('POST', '/exec_request_handlers', commands)
         is_live_reload_enabled.assert_called_once_with()
 
-    @patch('xivo_dao.data_handler.configuration.dao.is_live_reload_enabled')
+    @patch('xivo_dao.resources.configuration.dao.is_live_reload_enabled')
     @patch('xivo_dao.helpers.sysconfd_connector.sysconfd_conn_request')
     def test_exec_request_handlers_live_reload_disabled(self, sysconfd_conn_request, is_live_reload_enabled):
         commands = {'ctibus': [],

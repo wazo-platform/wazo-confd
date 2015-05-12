@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.extension import services as extension_services
+from xivo_confd.resources.user import services as user_services
+from xivo_confd.resources.line import services as line_services
+from xivo_confd.resources.extension import services as extension_services
 
-#Each of these methods wil raise a NotFoundError if the resource doesn't exist
+# Each of these methods wil raise a NotFoundError if the resource doesn't exist
 
 
 def check_user_exists(user_id):

@@ -21,7 +21,7 @@ from hamcrest import assert_that, equal_to, contains
 
 from xivo_confd.helpers.mooltiparse.field import Field
 from xivo_confd.helpers.mooltiparse.document import Document, DocumentProxy
-from xivo_dao.data_handler.exception import InputError
+from xivo_dao.helpers.exception import InputError
 
 
 class TestDocument(unittest.TestCase):
