@@ -19,7 +19,7 @@ import re
 
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.resources.devices.model import LineSIPConverter, LineSCCPConverter
-from xivo_dao.data_handler.utils.search import SearchResult
+from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.helpers import errors
 
 

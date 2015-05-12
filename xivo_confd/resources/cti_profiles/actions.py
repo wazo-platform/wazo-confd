@@ -18,7 +18,7 @@
 from flask import Blueprint
 from xivo_dao.resources.cti_profile import dao
 from xivo_dao.resources.cti_profile.model import CtiProfile
-from xivo_dao.data_handler.utils.search import SearchResult
+from xivo_dao.resources.utils.search import SearchResult
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
