@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,17 +17,18 @@
 
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to, contains, none
+from xivo_confd.tests.test_case import TestCase
 
-from xivo_dao.tests.test_case import TestCase
 from xivo_dao.resources.user_line.model import UserLine
 from xivo_dao.resources.line_extension.model import LineExtension
 from xivo_dao.resources.user.model import User
 from xivo_dao.resources.line.model import Line
 from xivo_dao.resources.extension.model import Extension
-from xivo_dao.resources.user_line_extension import services as ule_service
+
+from xivo_confd.resources.user_line_extension import services as ule_service
 
 
-@patch('xivo_dao.resources.user_line_extension.services.fix_associations')
+@patch('xivo_confd.resources.user_line_extension.services.fix_associations')
 @patch('xivo_dao.resources.user_line.dao.find_main_user_line')
 @patch('xivo_dao.resources.user_line.dao.associate')
 class TestAssociateUserLine(TestCase):
@@ -47,7 +48,7 @@ class TestAssociateUserLine(TestCase):
         fix_associations.assert_called_once_with(main_user_line)
 
 
-@patch('xivo_dao.resources.user_line_extension.services.fix_associations')
+@patch('xivo_confd.resources.user_line_extension.services.fix_associations')
 @patch('xivo_dao.resources.user_line.dao.find_main_user_line')
 @patch('xivo_dao.resources.line_extension.dao.associate')
 class TestAssociateLineExtension(TestCase):
@@ -81,8 +82,8 @@ class TestAssociateLineExtension(TestCase):
         self.assertNotCalled(fix_associations)
 
 
-@patch('xivo_dao.resources.user_line_extension.services.update_resources')
-@patch('xivo_dao.resources.user_line_extension.services.find_resources')
+@patch('xivo_confd.resources.user_line_extension.services.update_resources')
+@patch('xivo_confd.resources.user_line_extension.services.find_resources')
 class TestFixAssociations(TestCase):
 
     def test_given_main_user_line_then_resources_updated(self,
@@ -97,7 +98,7 @@ class TestFixAssociations(TestCase):
         update_resources.assert_called_once_with(main_user, line, extension)
 
 
-@patch('xivo_dao.resources.user_line_extension.services.find_extension')
+@patch('xivo_confd.resources.user_line_extension.services.find_extension')
 @patch('xivo_dao.resources.line.dao.get')
 @patch('xivo_dao.resources.user.dao.get')
 class TestFindResources(TestCase):
@@ -141,9 +142,9 @@ class TestFindExtension(TestCase):
         assert_that(result, equal_to(extension))
 
 
-@patch('xivo_dao.resources.user_line_extension.services.update_exten_and_context')
-@patch('xivo_dao.resources.user_line_extension.services.update_line')
-@patch('xivo_dao.resources.user_line_extension.services.update_caller_id')
+@patch('xivo_confd.resources.user_line_extension.services.update_exten_and_context')
+@patch('xivo_confd.resources.user_line_extension.services.update_line')
+@patch('xivo_confd.resources.user_line_extension.services.update_caller_id')
 class TestUpdateResources(TestCase):
 
     def test_given_no_extension_then_updates_caller_id_and_line(self,
@@ -235,7 +236,7 @@ class TestExtenAndContext(TestCase):
         line_associate_extension.assert_called_once_with(extension, line.id)
 
 
-@patch('xivo_dao.resources.user_line_extension.services.remove_exten_and_context')
+@patch('xivo_confd.resources.user_line_extension.services.remove_exten_and_context')
 @patch('xivo_dao.resources.extension.dao.get')
 @patch('xivo_dao.resources.line_extension.dao.dissociate')
 class TestDissociateLineExtension(TestCase):
@@ -269,7 +270,7 @@ class TestRemoveExtenAndContext(TestCase):
         ext_dissociate_extension.assert_called_once_with(extension.id)
 
 
-@patch('xivo_dao.resources.user_line_extension.services.fix_main_user_dissociation')
+@patch('xivo_confd.resources.user_line_extension.services.fix_main_user_dissociation')
 @patch('xivo_dao.resources.user_line.dao.dissociate')
 class TestDissociateUserLine(TestCase):
 
@@ -294,9 +295,9 @@ class TestDissociateUserLine(TestCase):
         fix_main_user_dissociation.assert_called_once_with(user_line.line_id)
 
 
-@patch('xivo_dao.resources.user_line_extension.services.remove_exten_and_context')
-@patch('xivo_dao.resources.user_line_extension.services.find_extension')
-@patch('xivo_dao.resources.user_line_extension.services.remove_caller_id')
+@patch('xivo_confd.resources.user_line_extension.services.remove_exten_and_context')
+@patch('xivo_confd.resources.user_line_extension.services.find_extension')
+@patch('xivo_confd.resources.user_line_extension.services.remove_caller_id')
 class TestFixMainUserDissociation(TestCase):
 
     def test_given_no_extension_associated_then_caller_id_removed(self,
