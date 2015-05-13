@@ -17,14 +17,22 @@
 
 import random
 
-from . import notifier
-from . import dao
+from xivo import caller_id
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.device import services as device_services
-from xivo_dao.resources.device import dao as device_dao
-from xivo_dao.resources.context import services as context_services
-from xivo import caller_id
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.line import dao
+
+from xivo_confd.resources.devices import builder as device_builder
+from xivo_confd.resources.lines import notifier
+
+provd_client = None
+
+
+def setup_provd_client(client):
+    global provd_client
+    provd_client = client
 
 
 def get(line_id):
@@ -72,22 +80,14 @@ def edit(line):
 
 def delete(line):
     dao.delete(line)
-    _delete_line_from_device(line)
+    _update_device(line)
     notifier.deleted(line)
 
 
 def _update_device(line):
-    if hasattr(line, 'device_id') and line.device_id:
-        device = device_dao.find(line.device_id)
-        if device:
-            device_services.rebuild_device_config(device)
-
-
-def _delete_line_from_device(line):
-    if hasattr(line, 'device_id') and line.device_id:
-        device = device_dao.find(line.device_id)
-        if device:
-            device_services.remove_line_from_device(device, line)
+    device_dao = device_builder.build_dao(provd_client)
+    line_device_updater = device_builder.build_line_device_updater(device_dao)
+    line_device_updater.update_device_for_line(line)
 
 
 def update_callerid(user):
@@ -122,9 +122,10 @@ def _check_invalid_parameters(line):
 
 
 def _check_invalid_context(line):
-    context = context_services.find_by_name(line.context)
-    if not context:
-        raise errors.param_not_found('context', 'Context')
+    try:
+        context_dao.get(line.context)
+    except NotFoundError:
+        raise errors.param_not_found('context', line.context)
 
 
 def make_provisioning_id():

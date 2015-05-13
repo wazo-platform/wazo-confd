@@ -17,7 +17,6 @@
 
 
 from flask import Blueprint
-from xivo_confd.resources.line import services as line_services
 from xivo_dao.resources.line.model import LineSIP
 from xivo_dao.resources.utils.search import SearchResult
 
@@ -25,6 +24,7 @@ from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+from xivo_confd.resources.lines import services as line_services
 
 
 class LineSIPServiceProxy(object):
