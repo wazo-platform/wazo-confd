@@ -26,6 +26,7 @@ from xivo_confd.resources.infos import services as info_services
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
+from xivo_confd.helpers.bus_manager import init_bus_from_config
 
 
 def main(argv):
@@ -37,7 +38,7 @@ def main(argv):
         change_user(config['user'])
 
     xivo_dao.init_db_from_config(config)
-    xivo_dao.init_bus_from_config(ChainMap(config, {'uuid': info_services.get().uuid}))
+    init_bus_from_config(ChainMap(config, {'uuid': info_services.get().uuid}))
 
     controller = Controller(config)
 
