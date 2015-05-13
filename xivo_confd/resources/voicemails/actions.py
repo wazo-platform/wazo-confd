@@ -26,7 +26,7 @@ from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
 from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
-from xivo_confd.resources.voicemail import validator, notifier
+from xivo_confd.resources.voicemails import validator, notifier
 
 
 class VoicemailService(CRUDService):

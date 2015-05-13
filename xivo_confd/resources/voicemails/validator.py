@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao import context_dao
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers import errors
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.language import dao as language_dao
-
-from xivo_dao.resources.exception import NotFoundError
-from xivo_dao.helpers import errors
-from xivo_dao.helpers import validator
 
 
 def validate_create(voicemail):
@@ -71,7 +70,7 @@ def _validate_not_empty(field_name, value):
 
 
 def _validate_number(field_name, value):
-    if not validator.is_positive_number(value):
+    if not is_positive_number(value):
         raise errors.wrong_type(field_name, 'numeric string')
 
 
@@ -81,7 +80,7 @@ def _validate_boolean(field_name, value):
 
 
 def _check_parameter_references(voicemail):
-    if not validator.is_existing_context(voicemail.context):
+    if not is_existing_context(voicemail.context):
         raise errors.param_not_found('context', 'Context')
     if voicemail.language is not None and voicemail.language not in language_dao.find_all():
         raise errors.param_not_found('language', 'Language')
@@ -108,3 +107,14 @@ def validate_existing_number_context(voicemail):
 def _check_if_voicemail_associated(voicemail):
     if voicemail_dao.is_voicemail_linked(voicemail):
         raise errors.resource_associated('Voicemail', 'User')
+
+
+def is_positive_number(string):
+    if str(string).isdigit():
+        return True
+    else:
+        return False
+
+
+def is_existing_context(context_name):
+    return context_dao.get(context_name) is not None

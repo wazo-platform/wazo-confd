@@ -16,9 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_confd.helpers.bus_manager import send_bus_event
-from xivo_bus.resources.voicemail.event import CreateVoicemailEvent, \
-    EditVoicemailEvent, DeleteVoicemailEvent
 from xivo_confd.helpers import sysconfd_connector
+
+from xivo_bus.resources.voicemail.event import CreateVoicemailEvent
+from xivo_bus.resources.voicemail.event import EditVoicemailEvent
+from xivo_bus.resources.voicemail.event import DeleteVoicemailEvent
 
 
 def _new_sysconfd_data(ctibus_command):
