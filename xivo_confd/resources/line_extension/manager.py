@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,14 @@
 from xivo_dao.resources.incall.model import Incall
 
 from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.extension import validator as extension_validator
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.user_line_extension import services as ule_services
 from xivo_dao.resources.context import dao as context_dao
-from xivo_dao.resources.line_extension import validator as line_extension_validator
-from xivo_dao.resources.line_device import validator as line_device_validator
+
+from xivo_confd.resources.user_line_extension import services as ule_services
+from xivo_confd.resources.line_extension import validator as line_extension_validator
+from xivo_confd.resources.line_device import validator as line_device_validator
+from xivo_confd.resources.extensions import validator as extension_validator
 
 
 def build_manager():

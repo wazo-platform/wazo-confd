@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,15 +19,16 @@ import unittest
 from mock import Mock, patch
 from hamcrest import assert_that, equal_to, has_items, none
 
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.context.model import Context
 from xivo_dao.resources.line.model import Line
 from xivo_dao.resources.line_extension.model import LineExtension
-from xivo_dao.resources.line_extension import services as line_extension_service
-from xivo_dao.resources.exception import NotFoundError
+
+from xivo_confd.resources.line_extension import services as line_extension_service
 
 
-@patch('xivo_dao.resources.line_extension.notifier.associated')
-@patch('xivo_dao.resources.line_extension.services.association_manager')
+@patch('xivo_confd.resources.line_extension.notifier.associated')
+@patch('xivo_confd.resources.line_extension.services.association_manager')
 class TestLineExtensionAssociate(unittest.TestCase):
 
     def test_associate(self, manager, notifier_associated):
@@ -167,8 +168,8 @@ class TestGetByExtensionId(unittest.TestCase):
         find_line_extension_by_extension_id.assert_called_once_with(2)
 
 
-@patch('xivo_dao.resources.line_extension.notifier.dissociated')
-@patch('xivo_dao.resources.line_extension.services.association_manager')
+@patch('xivo_confd.resources.line_extension.notifier.dissociated')
+@patch('xivo_confd.resources.line_extension.services.association_manager')
 class TestLineExtensionDissociate(unittest.TestCase):
 
     def test_dissociate(self, manager, notifier_dissociated):

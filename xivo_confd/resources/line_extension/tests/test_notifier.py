@@ -20,13 +20,14 @@ from mock import patch, Mock
 
 from xivo_dao.resources.line_extension.model import LineExtension
 from xivo_dao.resources.user_line.model import UserLine
-from xivo_dao.resources.line_extension import notifier
+
+from xivo_confd.resources.line_extension import notifier
 
 
 class TestLineExtensionNotifier(unittest.TestCase):
 
-    @patch('xivo_dao.resources.line_extension.notifier.send_sysconf_commands')
-    @patch('xivo_dao.resources.line_extension.notifier.send_bus_association_events')
+    @patch('xivo_confd.resources.line_extension.notifier.send_sysconf_commands')
+    @patch('xivo_confd.resources.line_extension.notifier.send_bus_association_events')
     def test_associated(self, send_bus_association_events, send_sysconf_association_commands):
         line_extension = LineExtension(line_id=1, extension_id=2)
 
@@ -71,8 +72,8 @@ class TestLineExtensionNotifier(unittest.TestCase):
                                                              line_extension.extension_id)
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
 
-    @patch('xivo_dao.resources.line_extension.notifier.send_bus_dissociation_events')
-    @patch('xivo_dao.resources.line_extension.notifier.send_sysconf_commands')
+    @patch('xivo_confd.resources.line_extension.notifier.send_bus_dissociation_events')
+    @patch('xivo_confd.resources.line_extension.notifier.send_sysconf_commands')
     def test_dissociated(self, send_sysconf_commands, send_bus_dissociation_events):
         line_extension = LineExtension(line_id=1, extension_id=2)
 

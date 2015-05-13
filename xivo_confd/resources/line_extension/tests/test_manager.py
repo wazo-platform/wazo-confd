@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,25 +23,26 @@ from xivo_dao.resources.context.model import Context
 from xivo_dao.resources.user_line.model import UserLine
 from xivo_dao.resources.incall.model import Incall
 from xivo_dao.resources.line_extension.model import LineExtension
-from xivo_dao.resources.line_extension.manager import AssociationManager
-from xivo_dao.resources.line_extension.manager import IncallAssociator
-from xivo_dao.resources.line_extension.manager import InternalAssociator
-from xivo_dao.resources.line_extension.manager import build_manager
+
+from xivo_confd.resources.line_extension.manager import AssociationManager
+from xivo_confd.resources.line_extension.manager import IncallAssociator
+from xivo_confd.resources.line_extension.manager import InternalAssociator
+from xivo_confd.resources.line_extension.manager import build_manager
 
 
 class TestBuildManager(unittest.TestCase):
 
-    @patch('xivo_dao.resources.line_extension.manager.line_device_validator')
-    @patch('xivo_dao.resources.line_extension.manager.extension_validator')
-    @patch('xivo_dao.resources.line_extension.manager.extension_dao')
-    @patch('xivo_dao.resources.line_extension.manager.incall_dao')
-    @patch('xivo_dao.resources.line_extension.manager.user_line_dao')
-    @patch('xivo_dao.resources.line_extension.manager.ule_services')
-    @patch('xivo_dao.resources.line_extension.manager.context_dao')
-    @patch('xivo_dao.resources.line_extension.manager.line_extension_validator')
-    @patch('xivo_dao.resources.line_extension.manager.IncallAssociator')
-    @patch('xivo_dao.resources.line_extension.manager.InternalAssociator')
-    @patch('xivo_dao.resources.line_extension.manager.AssociationManager')
+    @patch('xivo_confd.resources.line_extension.manager.line_device_validator')
+    @patch('xivo_confd.resources.line_extension.manager.extension_validator')
+    @patch('xivo_confd.resources.line_extension.manager.extension_dao')
+    @patch('xivo_confd.resources.line_extension.manager.incall_dao')
+    @patch('xivo_confd.resources.line_extension.manager.user_line_dao')
+    @patch('xivo_confd.resources.line_extension.manager.ule_services')
+    @patch('xivo_confd.resources.line_extension.manager.context_dao')
+    @patch('xivo_confd.resources.line_extension.manager.line_extension_validator')
+    @patch('xivo_confd.resources.line_extension.manager.IncallAssociator')
+    @patch('xivo_confd.resources.line_extension.manager.InternalAssociator')
+    @patch('xivo_confd.resources.line_extension.manager.AssociationManager')
     def test_build_manager(self,
                            AssociationManager,
                            InternalAssociator,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,13 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao.helpers import errors
+
 from xivo_dao.resources.context.model import ContextType
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
-from xivo_dao.resources.line_extension import notifier
-from xivo_dao.resources.line_extension.manager import build_manager
+
+from xivo_confd.resources.line_extension import notifier
+from xivo_confd.resources.line_extension.manager import build_manager
 
 association_manager = build_manager()
 

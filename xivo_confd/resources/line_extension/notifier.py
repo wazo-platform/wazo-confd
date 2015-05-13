@@ -18,6 +18,7 @@
 from xivo_bus.resources.line_extension import event
 
 from xivo_dao.resources.user_line import dao as user_line_dao
+
 from xivo_confd.helpers import bus_manager
 from xivo_confd.helpers import sysconfd_connector
 
