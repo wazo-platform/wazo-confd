@@ -17,12 +17,14 @@
 
 from flask import Blueprint
 from flask import request
-from xivo_confd.resources.configuration import dao, validator, notifier
+from xivo_dao.resources.configuration import dao
 
 from xivo_confd import config
 from xivo_confd.helpers.mooltiparse import Field, Boolean
 from xivo_confd.helpers.resource import DecoratorChain, build_response
 from xivo_confd.helpers.converter import Converter
+
+from xivo_confd.resources.configuration import validator, notifier
 
 
 class LiveReload(object):

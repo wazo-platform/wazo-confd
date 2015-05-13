@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
+
 from xivo_confd.resources.configuration import validator
-from xivo_confd.resources.exception import InputError
+from xivo_dao.helpers.exception import InputError
 
 
 class TestValidator(unittest.TestCase):
