@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,18 +19,19 @@ import unittest
 
 from mock import patch, Mock, sentinel
 
-from xivo_dao.resources.exception import ResourceError
-from xivo_dao.resources.exception import InputError
-from xivo_dao.resources.user import validator
+from xivo_dao.helpers.exception import ResourceError
+from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.user.model import User
 from xivo_dao.resources.user_line.model import UserLine
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
+from xivo_confd.resources.users import validator
+
 
 class TestUserValidator(unittest.TestCase):
 
-    @patch('xivo_dao.resources.user.validator.validate_model')
-    @patch('xivo_dao.resources.user.validator.validate_private_template_id_is_not_set')
+    @patch('xivo_confd.resources.users.validator.validate_model')
+    @patch('xivo_confd.resources.users.validator.validate_private_template_id_is_not_set')
     def test_validate_create(self, validate_template, validate_model):
         user = Mock(User)
 
@@ -38,8 +39,8 @@ class TestUserValidator(unittest.TestCase):
         validate_model.assert_called_once_with(user)
         validate_template.assert_called_once_with(user)
 
-    @patch('xivo_dao.resources.user.validator.validate_model')
-    @patch('xivo_dao.resources.user.validator.validate_private_template_id_does_not_change')
+    @patch('xivo_confd.resources.users.validator.validate_model')
+    @patch('xivo_confd.resources.users.validator.validate_private_template_id_does_not_change')
     def test_validate_edit(self, validate_template, validate_model):
         user = Mock(User)
 
@@ -47,8 +48,8 @@ class TestUserValidator(unittest.TestCase):
         validate_model.assert_called_once_with(user)
         validate_template.assert_called_once_with(user)
 
-    @patch('xivo_dao.resources.user.validator.validate_user_not_associated')
-    @patch('xivo_dao.resources.user.validator.validate_user_exists')
+    @patch('xivo_confd.resources.users.validator.validate_user_not_associated')
+    @patch('xivo_confd.resources.users.validator.validate_user_exists')
     def test_validate_delete(self, validate_user_exists, validate_user_not_associated):
         user = Mock(User)
 
@@ -114,8 +115,8 @@ class TestValidateModel(unittest.TestCase):
 
 class TestValidateUserNotAssociated(unittest.TestCase):
 
-    @patch('xivo_dao.resources.user.validator.validate_not_associated_to_line')
-    @patch('xivo_dao.resources.user.validator.validate_not_associated_to_voicemail')
+    @patch('xivo_confd.resources.users.validator.validate_not_associated_to_line')
+    @patch('xivo_confd.resources.users.validator.validate_not_associated_to_voicemail')
     def test_validate_user_not_associated(self, validate_not_associated_to_voicemail,
                                           validate_not_associated_to_line):
 

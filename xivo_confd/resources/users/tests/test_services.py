@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from hamcrest import *
+from hamcrest import assert_that, equal_to
 from mock import patch, Mock
 
 from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.tests.test_case import TestCase
-from xivo_dao.resources.user import services as user_services
 from xivo_dao.resources.user.model import User
+
+from xivo_confd.resources.users import services as user_services
 
 
 class TestGetUser(TestCase):
@@ -137,12 +138,12 @@ class TestFindUser(TestCase):
 
 class TestCreate(TestCase):
 
-    @patch('xivo_dao.resources.func_key.services.create_user_destination')
+    @patch('xivo_confd.resources.func_key.services.create_user_destination')
     @patch('xivo_dao.resources.dial_action.dao.create_default_dial_actions_for_user')
     @patch('xivo_dao.resources.func_key_template.dao.create_private_template')
-    @patch('xivo_dao.resources.user.notifier.created')
+    @patch('xivo_confd.resources.users.notifier.created')
     @patch('xivo_dao.resources.user.dao.create')
-    @patch('xivo_dao.resources.user.validator.validate_create')
+    @patch('xivo_confd.resources.users.validator.validate_create')
     def test_create(self,
                     user_validate_create,
                     user_dao_create,
@@ -170,12 +171,12 @@ class TestCreate(TestCase):
 
 class TestEdit(TestCase):
 
-    @patch('xivo_dao.resources.user.services.update_voicemail_fullname')
-    @patch('xivo_dao.resources.user.services.update_caller_id')
-    @patch('xivo_dao.resources.line.services.update_callerid')
-    @patch('xivo_dao.resources.user.notifier.edited')
+    @patch('xivo_confd.resources.users.services.update_voicemail_fullname')
+    @patch('xivo_confd.resources.users.services.update_caller_id')
+    @patch('xivo_confd.resources.lines.services.update_callerid')
+    @patch('xivo_confd.resources.users.notifier.edited')
     @patch('xivo_dao.resources.user.dao.edit')
-    @patch('xivo_dao.resources.user.validator.validate_edit')
+    @patch('xivo_confd.resources.users.validator.validate_edit')
     def test_edit(self,
                   user_validate_edit,
                   user_dao_edit,
@@ -198,11 +199,11 @@ class TestEdit(TestCase):
 class TestDelete(TestCase):
 
     @patch('xivo_dao.resources.func_key_template.dao.delete_private_template')
-    @patch('xivo_dao.resources.user.notifier.deleted')
+    @patch('xivo_confd.resources.users.notifier.deleted')
     @patch('xivo_dao.resources.user.dao.delete')
-    @patch('xivo_dao.resources.func_key.services.delete_bsfilter_destination')
-    @patch('xivo_dao.resources.func_key.services.delete_user_destination')
-    @patch('xivo_dao.resources.user.validator.validate_delete')
+    @patch('xivo_confd.resources.func_key.services.delete_bsfilter_destination')
+    @patch('xivo_confd.resources.func_key.services.delete_user_destination')
+    @patch('xivo_confd.resources.users.validator.validate_delete')
     def test_delete(self,
                     user_validate_delete,
                     delete_user_destination,

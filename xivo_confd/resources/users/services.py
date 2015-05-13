@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,14 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.user import dao as user_dao, notifier
-from xivo_dao.resources.line import services as line_services
-from xivo_dao.resources.user import validator
+from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
-from xivo_dao.resources.func_key import services as func_key_service
 from xivo_dao.resources.dial_action import dao as dial_action_dao
-from xivo_dao.resources.exception import NotFoundError
+from xivo_dao.helpers.exception import NotFoundError
+
+from xivo_confd.resources.users import notifier, validator
+from xivo_confd.resources.lines import services as line_services
+from xivo_confd.resources.func_key import services as func_key_service
 
 
 def get(user_id):
