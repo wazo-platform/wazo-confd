@@ -19,13 +19,13 @@ import unittest
 from mock import patch, Mock
 
 from xivo_dao.resources.user_line.model import UserLine
-from xivo_dao.resources.user_line import notifier
+from xivo_confd.resources.user_line import notifier
 
 
 class TestUserLineNotifier(unittest.TestCase):
 
-    @patch('xivo_dao.resources.user_line.notifier.sysconf_command_association_updated')
-    @patch('xivo_dao.resources.user_line.notifier.bus_event_associated')
+    @patch('xivo_confd.resources.user_line.notifier.sysconf_command_association_updated')
+    @patch('xivo_confd.resources.user_line.notifier.bus_event_associated')
     def test_associated(self, bus_event_associated, sysconf_command_association_updated):
         user_line = UserLine(user_id=1, line_id=2)
 
@@ -70,8 +70,8 @@ class TestUserLineNotifier(unittest.TestCase):
                                                         True)
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
 
-    @patch('xivo_dao.resources.user_line.notifier.sysconf_command_association_updated')
-    @patch('xivo_dao.resources.user_line.notifier.bus_event_dissociated')
+    @patch('xivo_confd.resources.user_line.notifier.sysconf_command_association_updated')
+    @patch('xivo_confd.resources.user_line.notifier.bus_event_dissociated')
     def test_dissociated(self, bus_event_dissociated, sysconf_command_association_updated):
         user_line = UserLine(user_id=1, line_id=2)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.exception import NotFoundError
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.line_device import validator as line_device_validator
+
+from xivo_confd.resources.line_device import validator as line_device_validator
 
 
 def validate_association(user_line):

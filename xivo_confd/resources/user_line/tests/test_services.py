@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ from hamcrest import assert_that, equal_to, contains
 
 from xivo_dao.tests.test_case import TestCase
 from xivo_dao.resources.user_line.model import UserLine
-from xivo_dao.resources.user_line import services as user_line_services
+
+from xivo_confd.resources.user_line import services as user_line_services
 
 
 class TestUserLineGetByUserIdAndLineId(TestCase):
@@ -55,9 +56,9 @@ class TestFindAllByLineId(TestCase):
 class TestUserLineAssociate(TestCase):
 
     @patch('xivo_dao.resources.user_line.dao.find_main_user_line', Mock(return_value=None))
-    @patch('xivo_dao.resources.user_line.notifier.associated')
-    @patch('xivo_dao.resources.user_line_extension.services.associate_user_line')
-    @patch('xivo_dao.resources.user_line.validator.validate_association')
+    @patch('xivo_confd.resources.user_line.notifier.associated')
+    @patch('xivo_confd.resources.user_line_extension.services.associate_user_line')
+    @patch('xivo_confd.resources.user_line.validator.validate_association')
     def test_associate(self,
                        validate_association,
                        associate_user_line,
@@ -73,9 +74,9 @@ class TestUserLineAssociate(TestCase):
         notifier_associated.assert_called_once_with(user_line)
 
     @patch('xivo_dao.resources.user_line.dao.find_main_user_line')
-    @patch('xivo_dao.resources.user_line.notifier.associated')
-    @patch('xivo_dao.resources.user_line_extension.services.associate_user_line')
-    @patch('xivo_dao.resources.user_line.validator.validate_association')
+    @patch('xivo_confd.resources.user_line.notifier.associated')
+    @patch('xivo_confd.resources.user_line_extension.services.associate_user_line')
+    @patch('xivo_confd.resources.user_line.validator.validate_association')
     def test_associate_main_user(self,
                                  validate_association,
                                  associate_user_line,
@@ -97,9 +98,9 @@ class TestUserLineAssociate(TestCase):
         notifier_associated.assert_called_once_with(expected_user_line)
 
     @patch('xivo_dao.resources.user_line.dao.find_main_user_line')
-    @patch('xivo_dao.resources.user_line.notifier.associated')
-    @patch('xivo_dao.resources.user_line_extension.services.associate_user_line')
-    @patch('xivo_dao.resources.user_line.validator.validate_association')
+    @patch('xivo_confd.resources.user_line.notifier.associated')
+    @patch('xivo_confd.resources.user_line_extension.services.associate_user_line')
+    @patch('xivo_confd.resources.user_line.validator.validate_association')
     def test_associate_with_main_user_already_associated_to_this_line(self,
                                                                       validate_association,
                                                                       associate_user_line,
@@ -126,9 +127,9 @@ class TestUserLineAssociate(TestCase):
 
 class TestUserLineDissociate(TestCase):
 
-    @patch('xivo_dao.resources.user_line.notifier.dissociated')
-    @patch('xivo_dao.resources.user_line_extension.services.dissociate_user_line')
-    @patch('xivo_dao.resources.user_line.validator.validate_dissociation')
+    @patch('xivo_confd.resources.user_line.notifier.dissociated')
+    @patch('xivo_confd.resources.user_line_extension.services.dissociate_user_line')
+    @patch('xivo_confd.resources.user_line.validator.validate_dissociation')
     def test_dissociate(self,
                         validate_dissociation,
                         dissociate_user_line,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.user_line import validator, dao, notifier
-from xivo_dao.resources.user_line_extension import services as ule_service
+from xivo_dao.resources.user_line import dao
+
+from xivo_confd.resources.user_line import validator, notifier
+from xivo_confd.resources.user_line_extension import services as ule_service
 
 
 def get_by_user_id_and_line_id(user_id, line_id):

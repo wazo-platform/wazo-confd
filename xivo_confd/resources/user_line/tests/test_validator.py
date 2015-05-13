@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 from mock import patch, Mock
 import unittest
 
-from xivo_dao.resources.exception import InputError
-from xivo_dao.resources.exception import ResourceError
-from xivo_dao.resources.exception import NotFoundError
-from xivo_dao.resources.user_line import validator
+from xivo_dao.helpers.exception import InputError
+from xivo_dao.helpers.exception import ResourceError
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_confd.resources.user_line import validator
 from xivo_dao.resources.user_line.model import UserLine
 
 
@@ -133,7 +133,7 @@ class TestValidator(unittest.TestCase):
         self.assertEquals(user_line_dao_find_all_by_user_id.call_count, 0)
         self.assertEquals(line_has_secondary_user.call_count, 0)
 
-    @patch('xivo_dao.resources.line_device.validator.validate_no_device')
+    @patch('xivo_confd.resources.line_device.validator.validate_no_device')
     @patch('xivo_dao.resources.user_line.dao.line_has_secondary_user')
     @patch('xivo_dao.resources.user_line.dao.find_all_by_user_id')
     @patch('xivo_dao.resources.line.dao.get')
