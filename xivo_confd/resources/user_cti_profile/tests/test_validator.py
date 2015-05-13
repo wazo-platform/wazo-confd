@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,10 @@ from xivo_dao.helpers.exception import ResourceError
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers.exception import InputError
 
-from xivo_dao.resources.user_cti_profile import validator
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.user.model import User
+
+from xivo_confd.resources.user_cti_profile import validator
 
 
 class TestUserCtiProfileValidator(unittest.TestCase):

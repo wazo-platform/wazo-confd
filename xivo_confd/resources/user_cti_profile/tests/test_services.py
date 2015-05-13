@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,10 +20,12 @@ import unittest
 from hamcrest import assert_that, equal_to
 from mock import patch, Mock
 
-from xivo_dao.resources.user_cti_profile import services as user_cti_profile_services
+from xivo_confd.resources.user_cti_profile import services as user_cti_profile_services
+
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.cti_profile.model import CtiProfile
-from hamcrest.core.core.isnone import none
+
+from hamcrest import none
 
 
 class TestUserCtiProfile(unittest.TestCase):
@@ -56,9 +58,9 @@ class TestUserCtiProfile(unittest.TestCase):
         assert_that(result.cti_profile_id, none())
         self.assertTrue(result.enabled)
 
-    @patch('xivo_dao.resources.user_cti_profile.validator.validate_edit')
+    @patch('xivo_confd.resources.user_cti_profile.validator.validate_edit')
     @patch('xivo_dao.resources.user_cti_profile.dao.edit')
-    @patch('xivo_dao.resources.user_cti_profile.notifier.edited')
+    @patch('xivo_confd.resources.user_cti_profile.notifier.edited')
     def test_edit(self, notifier_edited, dao_edit, validate_edit):
         user_cti_profile = Mock(UserCtiProfile)
 
