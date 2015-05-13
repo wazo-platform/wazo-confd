@@ -16,8 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao.helpers.bus_manager import send_bus_event
-from xivo_bus.resources.device.event import CreateDeviceEvent, \
-    EditDeviceEvent, DeleteDeviceEvent
+
+from xivo_bus.resources.device.event import CreateDeviceEvent
+from xivo_bus.resources.device.event import EditDeviceEvent
+from xivo_bus.resources.device.event import DeleteDeviceEvent
+
 
 def created(device):
     event = CreateDeviceEvent(device.id)

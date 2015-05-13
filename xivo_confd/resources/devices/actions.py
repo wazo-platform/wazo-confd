@@ -17,7 +17,7 @@
 
 from flask import Blueprint
 from xivo_dao.resources.device.model import Device
-from xivo_confd.resources.device import notifier as device_notifier
+from xivo_confd.resources.devices import notifier as device_notifier
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
