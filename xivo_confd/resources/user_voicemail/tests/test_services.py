@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,14 +20,15 @@ from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
-from xivo_dao.resources.user_voicemail import services as user_voicemail_services
+
+from xivo_confd.resources.user_voicemail import services as user_voicemail_services
 
 
 class TestUserVoicemail(unittest.TestCase):
 
-    @patch('xivo_dao.resources.user_voicemail.validator.validate_association')
+    @patch('xivo_confd.resources.user_voicemail.validator.validate_association')
     @patch('xivo_dao.resources.user_voicemail.dao.associate')
-    @patch('xivo_dao.resources.user_voicemail.notifier.associated')
+    @patch('xivo_confd.resources.user_voicemail.notifier.associated')
     def test_associate(self, notifier_associated, dao_associate, validate_association):
         user_voicemail = Mock(UserVoicemail)
 
@@ -81,8 +82,8 @@ class TestUserVoicemail(unittest.TestCase):
         assert_that(result, equal_to(expected_result))
 
     @patch('xivo_dao.resources.user_voicemail.dao.dissociate')
-    @patch('xivo_dao.resources.user_voicemail.notifier.dissociated')
-    @patch('xivo_dao.resources.user_voicemail.validator.validate_dissociation')
+    @patch('xivo_confd.resources.user_voicemail.notifier.dissociated')
+    @patch('xivo_confd.resources.user_voicemail.validator.validate_dissociation')
     def test_dissociate(self, validate_dissociation, notifier_dissociated, dao_dissociate):
         user_voicemail = Mock(UserVoicemail)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 import unittest
 
 from mock import patch, Mock
-from xivo_dao.resources.exception import ResourceError
-from xivo_dao.resources.exception import NotFoundError
-from xivo_dao.resources.exception import InputError
-
+from xivo_dao.helpers.exception import ResourceError
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.user_line.model import UserLine
-from xivo_dao.resources.user_voicemail import validator
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
+
+from xivo_confd.resources.user_voicemail import validator
 
 
 class TestValidator(unittest.TestCase):
