@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao import queue_dao, agent_dao
-from xivo_dao.resources.exception import NotFoundError
-from xivo_dao.resources.queue_members import dao as queue_members_dao
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
+from xivo_dao.resources.queue_members import dao as queue_members_dao
 
 
 def validate_edit_agent_queue_association(queue_member):

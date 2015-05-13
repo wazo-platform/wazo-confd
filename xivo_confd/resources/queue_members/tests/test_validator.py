@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 from mock import patch
 import unittest
 
-from xivo_dao.resources.queue_members import validator
+from xivo_dao.helpers.exception import NotFoundError, ResourceError
+from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.queue_members.model import QueueMemberAgent
-from xivo_dao.resources.exception import NotFoundError, ResourceError
-from xivo_dao.resources.exception import InputError
+
+from xivo_confd.resources.queue_members import validator
 
 
 class TestQueueMembersValidator(unittest.TestCase):

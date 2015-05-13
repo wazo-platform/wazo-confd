@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_bus.resources.queue_members import event
+
 from xivo_confd.helpers import sysconfd_connector
 from xivo_confd.helpers import bus_manager
 

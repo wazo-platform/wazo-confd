@@ -18,7 +18,7 @@
 import unittest
 from mock import patch, Mock
 
-from xivo_dao.resources.queue_members import notifier
+from xivo_confd.resources.queue_members import notifier
 from xivo_dao.resources.queue_members.model import QueueMemberAgent
 
 
