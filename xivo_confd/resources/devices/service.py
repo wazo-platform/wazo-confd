@@ -69,6 +69,12 @@ class LineDeviceUpdater(object):
         self.line_extension_dao = line_extension_dao
         self.device_dao = device_dao
 
+    def update_device_for_line(self, line):
+        device_id = getattr(line, 'device_id', None)
+        if device_id is not None:
+            device = self.device_dao.get(device_id)
+            self.update_lines(device)
+
     def update_lines(self, device):
         converters = self._get_converters(device)
         self.device_dao.update_lines(device, converters)
