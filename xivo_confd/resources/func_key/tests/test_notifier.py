@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.tests.test_case import TestCase
+from unittest import TestCase
+
 from xivo_dao.resources.func_key.model import UserFuncKey, BSFilterFuncKey
-from xivo_dao.resources.func_key import notifier
+
+from xivo_confd.resources.func_key import notifier
 
 from mock import patch, Mock
 
@@ -25,7 +27,7 @@ from mock import patch, Mock
 class TestNotifier(TestCase):
 
     @patch('xivo_bus.resources.func_key.event.UserCreateFuncKeyEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_create_user_func_key(self, send_bus_event, UserCreateFuncKeyEvent):
         new_event = UserCreateFuncKeyEvent.return_value = Mock()
 
@@ -39,7 +41,7 @@ class TestNotifier(TestCase):
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
 
     @patch('xivo_bus.resources.func_key.event.UserDeleteFuncKeyEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_delete_user_func_key(self, send_bus_event, UserDeleteFuncKeyEvent):
         new_event = UserDeleteFuncKeyEvent.return_value = Mock()
 
@@ -53,7 +55,7 @@ class TestNotifier(TestCase):
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
 
     @patch('xivo_bus.resources.func_key.event.BSFilterCreateFuncKeyEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_create_bsfilter_func_key(self, send_bus_event, BSFilterCreateFuncKeyEvent):
         new_event = BSFilterCreateFuncKeyEvent.return_value = Mock()
 
@@ -68,7 +70,7 @@ class TestNotifier(TestCase):
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
 
     @patch('xivo_bus.resources.func_key.event.BSFilterDeleteFuncKeyEvent')
-    @patch('xivo_dao.helpers.bus_manager.send_bus_event')
+    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_delete_bsfilter_func_key(self, send_bus_event, BSFilterDeleteFuncKeyEvent):
         new_event = BSFilterDeleteFuncKeyEvent.return_value = Mock()
 

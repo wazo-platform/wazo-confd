@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_confd.tests.test_case import TestCase
 from mock import patch, Mock
 from hamcrest import assert_that, contains, equal_to
 
-from xivo_dao.tests.test_case import TestCase
-from xivo_dao.resources.func_key import services
 from xivo_dao.resources.func_key.model import UserFuncKey, BSFilterFuncKey, Forward
 from xivo_dao.resources.user.model import User
+
+from xivo_confd.resources.func_key import services
 
 
 class TestFuncKeyService(TestCase):
@@ -81,7 +82,7 @@ class TestFuncKeyService(TestCase):
         assert_that(result, contains(expected_number, ''))
 
 
-@patch('xivo_dao.resources.func_key.notifier.created')
+@patch('xivo_confd.resources.func_key.notifier.created')
 @patch('xivo_dao.resources.func_key.dao.create')
 class TestCreateUserDestination(TestCase):
 
@@ -98,7 +99,7 @@ class TestCreateUserDestination(TestCase):
         notifier_create.assert_called_once_with(dao_create.return_value)
 
 
-@patch('xivo_dao.resources.func_key.notifier.deleted')
+@patch('xivo_confd.resources.func_key.notifier.deleted')
 @patch('xivo_dao.resources.func_key.dao.delete')
 @patch('xivo_dao.resources.func_key_template.dao.remove_func_key_from_templates')
 @patch('xivo_dao.resources.func_key.dao.find_user_destination')
@@ -138,7 +139,7 @@ class TestDeleteUserDestination(TestCase):
         self.assertNotCalled(notifier_delete)
 
 
-@patch('xivo_dao.resources.func_key.notifier.deleted')
+@patch('xivo_confd.resources.func_key.notifier.deleted')
 @patch('xivo_dao.resources.func_key.dao.delete')
 @patch('xivo_dao.resources.func_key_template.dao.remove_func_key_from_templates')
 @patch('xivo_dao.resources.func_key.dao.find_bsfilter_destinations_for_user')
