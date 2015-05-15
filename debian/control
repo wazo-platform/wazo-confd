@@ -23,6 +23,7 @@ Package: xivo-libconfd
 Architecture: all
 Depends: ${python:Depends},
          ${misc:Depends},
+         xivo-bus (>= 15.05~20150311.194150.b00ca46-1),
          xivo-libdao (>= 13.02~20130131.124922.ae70e6f-1),
          python-flask,
          python-flask-httpauth,
