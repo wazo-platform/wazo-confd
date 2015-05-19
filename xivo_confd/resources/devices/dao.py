@@ -17,7 +17,7 @@
 
 import logging
 
-from xivo_dao.data_handler import errors
+from xivo_dao.helpers import errors
 
 from xivo_confd.resources.devices.model import ProvdDevice, DeviceConverter, ConfigConverter, EmptyConfigConverter
 

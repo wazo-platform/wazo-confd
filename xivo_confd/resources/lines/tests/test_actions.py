@@ -19,7 +19,7 @@ import unittest
 from mock import Mock, sentinel
 from hamcrest import assert_that, equal_to
 
-from xivo_dao.data_handler.utils.search import SearchResult
+from xivo_dao.resources.utils.search import SearchResult
 
 from xivo_confd.resources.lines.actions import LineServiceProxy
 

@@ -19,8 +19,8 @@ import re
 
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.resources.devices.model import LineSIPConverter, LineSCCPConverter
-from xivo_dao.data_handler.utils.search import SearchResult
-from xivo_dao.data_handler import errors
+from xivo_dao.resources.utils.search import SearchResult
+from xivo_dao.helpers import errors
 
 
 class DeviceService(CRUDService):
@@ -68,6 +68,12 @@ class LineDeviceUpdater(object):
         self.extension_dao = extension_dao
         self.line_extension_dao = line_extension_dao
         self.device_dao = device_dao
+
+    def update_device_for_line(self, line):
+        device_id = getattr(line, 'device_id', None)
+        if device_id is not None:
+            device = self.device_dao.get(device_id)
+            self.update_lines(device)
 
     def update_lines(self, device):
         converters = self._get_converters(device)

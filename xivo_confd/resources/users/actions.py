@@ -19,8 +19,8 @@ import json
 
 from flask import Blueprint
 from flask import request
-from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.user.model import User, UserDirectory
+from xivo_confd.resources.users import services as user_services
+from xivo_dao.resources.user.model import User, UserDirectory
 
 from xivo_confd import config
 from xivo_confd.helpers.common import extract_search_parameters

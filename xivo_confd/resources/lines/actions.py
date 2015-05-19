@@ -16,15 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.line.model import Line
-from xivo_dao.data_handler.utils.search import SearchResult
+from xivo_confd.resources.lines import services as line_services
+from xivo_dao.resources.line.model import Line
+from xivo_dao.resources.utils.search import SearchResult
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode
-from xivo_confd.resources.lines import actions_sip
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+from xivo_confd.resources.lines import actions_sip
 
 
 class LineServiceProxy(object):
@@ -56,6 +56,8 @@ def load(core_rest_api):
         Field('device_id', Unicode()),
     )
     converter = Converter.resource(document, Line)
+
+    line_services.setup_provd_client(core_rest_api.provd_client())
 
     actions_sip.load(core_rest_api)
 

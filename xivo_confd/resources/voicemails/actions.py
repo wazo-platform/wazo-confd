@@ -18,14 +18,15 @@
 
 from flask import Blueprint
 
-from xivo_dao.helpers import sysconfd_connector
-from xivo_dao.data_handler.voicemail import dao, validator, notifier
-from xivo_dao.data_handler.voicemail.model import Voicemail
+from xivo_confd.helpers import sysconfd_connector
+from xivo_dao.resources.voicemail import dao
+from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
 from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
+from xivo_confd.resources.voicemails import validator, notifier
 
 
 class VoicemailService(CRUDService):

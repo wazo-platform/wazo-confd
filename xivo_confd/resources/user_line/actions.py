@@ -16,10 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.data_handler.user_line import services as user_line_services
-from xivo_dao.data_handler.user_line.model import UserLine
-from xivo_dao.data_handler.user import dao as user_dao
-from xivo_dao.data_handler.line import dao as line_dao
+from xivo_confd.resources.user_line import services as user_line_services
+from xivo_dao.resources.user_line.model import UserLine
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.line import dao as line_dao
 
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean

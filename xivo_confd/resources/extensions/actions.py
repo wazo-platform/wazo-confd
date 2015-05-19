@@ -16,16 +16,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.data_handler.extension import dao, validator, notifier
-from xivo_dao.data_handler.extension.model import Extension
-from xivo_dao.data_handler.line import dao as line_dao
-from xivo_dao.data_handler.line_extension import dao as line_extension_dao
+
+from xivo_dao.resources.extension import dao
+from xivo_dao.resources.extension.model import Extension
+from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
-
 from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
+
+from xivo_confd.resources.extensions import validator, notifier
 
 
 class ExtensionService(CRUDService):

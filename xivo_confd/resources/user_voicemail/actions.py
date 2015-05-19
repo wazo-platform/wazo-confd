@@ -16,10 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.data_handler.user_voicemail import services as user_voicemail_services
-from xivo_dao.data_handler.user import dao as user_dao
-from xivo_dao.data_handler.voicemail import dao as voicemail_dao
-from xivo_dao.data_handler.user_voicemail.model import UserVoicemail
+from xivo_confd.resources.user_voicemail import services as user_voicemail_services
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
+from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean

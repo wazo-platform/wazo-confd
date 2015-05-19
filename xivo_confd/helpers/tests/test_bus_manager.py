@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,20 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.data_handler.user import services as user_services
-from xivo_dao.data_handler.line import services as line_services
-from xivo_dao.data_handler.extension import services as extension_services
-
-#Each of these methods wil raise a NotFoundError if the resource doesn't exist
+import unittest
+from xivo_confd.helpers.bus_manager import BusContext
 
 
-def check_user_exists(user_id):
-    return user_services.get(user_id)
+class TestBusContext(unittest.TestCase):
 
+    def test_new_from_config(self):
+        config = {
+            'bus': {
+                'host': 'example.org',
+                'port': 5672,
+                'username': 'foo',
+                'password': 'bar',
+                'exchange_name': 'xivo',
+                'exchange_type': 'topic',
+            },
+            'uuid': '111-2222',
+        }
 
-def check_line_exists(line_id):
-    return line_services.get(line_id)
+        bus_context = BusContext.new_from_config(config)
 
-
-def check_extension_exists(extension_id):
-    return extension_services.get(extension_id)
+        self.assertEqual(bus_context._url, 'amqp://foo:bar@example.org:5672//')

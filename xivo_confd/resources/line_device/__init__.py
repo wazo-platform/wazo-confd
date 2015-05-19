@@ -14,29 +14,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-import unittest
-from mock import patch
-
-from xivo_confd.helpers import url
-
-
-class TestUrlCheckers(unittest.TestCase):
-
-    @patch('xivo_dao.data_handler.user.services.get')
-    def test_check_user_exists(self, user_get):
-        url.check_user_exists(1)
-
-        user_get.assert_called_once_with(1)
-
-    @patch('xivo_dao.data_handler.line.services.get')
-    def test_check_line_exists(self, line_get):
-        url.check_line_exists(1)
-
-        line_get.assert_called_once_with(1)
-
-    @patch('xivo_dao.data_handler.extension.services.get')
-    def test_check_extension_exists(self, extension_get):
-        url.check_extension_exists(1)
-
-        extension_get.assert_called_once_with(1)

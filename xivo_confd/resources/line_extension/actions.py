@@ -18,10 +18,10 @@
 
 from flask import url_for
 
-from xivo_dao.data_handler.line_extension import services as line_extension_services
-from xivo_dao.data_handler.line import dao as line_dao
-from xivo_dao.data_handler.extension import dao as extension_dao
-from xivo_dao.data_handler.line_extension.model import LineExtension
+from xivo_confd.resources.line_extension import services as line_extension_services
+from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.line_extension.model import LineExtension
 
 from xivo_confd.helpers.resource import SingleAssociationResource, CollectionAssociationResource, DecoratorChain, build_response
 

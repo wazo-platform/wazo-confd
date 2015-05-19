@@ -21,12 +21,12 @@ from flask import Blueprint
 from flask import Response
 from flask import request
 from flask_negotiate import produces
-from xivo_dao.data_handler import errors
-from xivo_dao.data_handler.call_log import services
+from xivo_dao.helpers import errors
 
 from xivo_confd import config
 from xivo_confd.resources.call_logs import mapper
 from xivo_confd.resources.call_logs import serializer
+from xivo_confd.resources.call_logs import services
 
 
 def load(core_rest_api):

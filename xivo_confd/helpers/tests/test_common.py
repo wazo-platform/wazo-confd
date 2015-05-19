@@ -25,9 +25,9 @@ from xivo_confd.helpers import serializer
 from xivo_confd.helpers.common import extract_search_parameters, handle_error
 from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
 from xivo_confd.helpers.mooltiparse.errors import ValidationError
-from xivo_dao.data_handler.exception import InputError
-from xivo_dao.data_handler.exception import NotFoundError
-from xivo_dao.data_handler.exception import ServiceError
+from xivo_dao.helpers.exception import InputError
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers.exception import ServiceError
 
 
 class TestCommon(unittest.TestCase):

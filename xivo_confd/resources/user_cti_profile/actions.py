@@ -20,10 +20,10 @@ from flask import Response
 from flask import request
 from flask_negotiate import consumes
 from flask_negotiate import produces
-from xivo_dao.data_handler.user_cti_profile import services as user_cti_profile_services
-from xivo_dao.data_handler.user_cti_profile.model import UserCtiProfile
+from xivo_confd.resources.user_cti_profile import services as user_cti_profile_services
+from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
+from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.helpers import url
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
 
@@ -42,7 +42,7 @@ def load(core_rest_api):
     @core_rest_api.auth.login_required
     @consumes('application/json')
     def edit_cti_configuration(user_id):
-        url.check_user_exists(user_id)
+        user_dao.get(user_id)
         user_cti_profile = converter.decode(request)
         user_cti_profile_services.edit(user_cti_profile)
         return Response(status=204)
@@ -51,7 +51,7 @@ def load(core_rest_api):
     @core_rest_api.auth.login_required
     @produces('application/json')
     def get_cti_configuration(user_id):
-        url.check_user_exists(user_id)
+        user_dao.get(user_id)
         user_cti_profile = user_cti_profile_services.get(user_id)
         response = converter.encode(user_cti_profile)
         return Response(response=response,

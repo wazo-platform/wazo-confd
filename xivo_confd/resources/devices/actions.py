@@ -16,18 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.data_handler.device.model import Device
-from xivo_dao.data_handler.device import notifier as device_notifier
-from xivo_dao.data_handler.line import dao as line_dao
-from xivo_dao.data_handler.extension import dao as extension_dao
-from xivo_dao.data_handler.line_extension import dao as line_extension_dao
+from xivo_dao.resources.device.model import Device
+from xivo_confd.resources.devices import builder
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Dict
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
-from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, DeviceValidator, SearchEngine, LineDeviceUpdater
-from xivo_confd.resources.devices.dao import ProvdDeviceDao, DeviceDao
 
 
 class DeviceResource(CRUDResource):
@@ -81,24 +76,11 @@ def load(core_rest_api):
 
     provd_client = core_rest_api.provd_client()
 
-    provd_dao = ProvdDeviceDao(provd_client.device_manager(),
-                               provd_client.config_manager())
-
-    device_dao = DeviceDao(provd_client, provd_dao)
-
-    search_engine = SearchEngine(provd_dao)
-
-    device_validator = DeviceValidator(device_dao, line_dao)
-
-    line_device_updater = LineDeviceUpdater(line_dao,
-                                            extension_dao,
-                                            line_extension_dao,
-                                            device_dao)
-
-    association_service = LineDeviceAssociationService(line_dao,
-                                                       line_device_updater)
-
-    device_service = DeviceService(device_dao, device_validator, device_notifier, search_engine, line_dao)
+    provd_dao = builder.build_provd_dao(provd_client)
+    device_dao = builder.build_dao(provd_client, provd_dao)
+    device_service = builder.build_service(device_dao, provd_dao)
+    line_device_updater = builder.build_line_device_updater(device_dao)
+    association_service = builder.build_line_device_associator(line_device_updater)
 
     resource = DeviceResource(device_service, association_service, converter)
 

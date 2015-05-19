@@ -18,7 +18,7 @@
 import unittest
 
 from xivo_confd.helpers import mapper
-from xivo_dao.data_handler.exception import InputError
+from xivo_dao.helpers.exception import InputError
 
 
 class TestMapper(unittest.TestCase):
