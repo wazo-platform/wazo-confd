@@ -6,7 +6,7 @@ git+https://github.com/xivo-pbx/xivo-provd-client.git
 sqlalchemy
 psycopg2
 flask==0.10.1
-flask-cors
+flask-cors==1.10.3
 flask-httpauth
 flask-negotiate
 pyyaml
