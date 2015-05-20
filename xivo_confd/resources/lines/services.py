@@ -126,7 +126,7 @@ def _check_invalid_context(line):
     try:
         context_dao.get(line.context)
     except NotFoundError:
-        raise errors.param_not_found('context', line.context)
+        raise errors.param_not_found('context', 'Context', name=line.context)
 
 
 def make_provisioning_id():
