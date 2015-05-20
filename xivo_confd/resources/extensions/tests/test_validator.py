@@ -118,26 +118,26 @@ class TestValidateMissingParameters(TestCase):
         validator.validate_missing_parameters(extension)
 
 
-@patch('xivo_dao.resources.context.dao.get')
+@patch('xivo_dao.resources.context.dao.find')
 class TestValidateContextExists(TestCase):
 
-    def test_validate_context_exists_when_context_does_not_exist(self, context_get):
-        context_get.return_value = None
+    def test_validate_context_exists_when_context_does_not_exist(self, context_find):
+        context_find.return_value = None
 
         extension = Extension(exten='1000', context='default')
 
         self.assertRaises(InputError, validator.validate_context_exists, extension)
 
-        context_get.assert_called_once_with(extension.context)
+        context_find.assert_called_once_with(extension.context)
 
-    def test_validate_context_exists_when_context_exists(self, context_get):
-        context_get.return_value = Mock()
+    def test_validate_context_exists_when_context_exists(self, context_find):
+        context_find.return_value = Mock()
 
         extension = Extension(exten='1000', context='default')
 
         validator.validate_context_exists(extension)
 
-        context_get.assert_called_once_with(extension.context)
+        context_find.assert_called_once_with(extension.context)
 
 
 @patch('xivo_dao.resources.extension.dao.find_by_exten_context')
