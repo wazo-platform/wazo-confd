@@ -71,7 +71,7 @@ class LineDeviceUpdater(object):
 
     def update_device_for_line(self, line):
         device_id = getattr(line, 'device_id', None)
-        if device_id is not None:
+        if device_id:
             device = self.device_dao.get(device_id)
             self.update_lines(device)
 

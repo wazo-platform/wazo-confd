@@ -58,7 +58,7 @@ def validate_missing_parameters(extension):
 
 
 def validate_context_exists(extension):
-    existing_context = context_dao.get(extension.context)
+    existing_context = context_dao.find(extension.context)
     if not existing_context:
         raise errors.param_not_found('context', 'Context')
 
