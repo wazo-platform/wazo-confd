@@ -12,3 +12,4 @@ flask-negotiate
 pyyaml
 cherrypy
 kombu==2.1.8
+stevedore
