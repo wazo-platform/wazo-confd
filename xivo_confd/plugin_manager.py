@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from stevedore.dispatch import DispatchExtensionManager
+from stevedore.enabled import EnabledExtensionManager
 
 
 def load_plugins(application):
-    plugins = DispatchExtensionManager(namespace='xivo_confd.plugins',
+    plugins = EnabledExtensionManager(namespace='xivo_confd.plugins',
                                        check_func=check_plugin,
                                        on_load_failure_callback=plugins_load_fail,
                                        propagate_map_exceptions=True,
