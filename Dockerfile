@@ -18,17 +18,20 @@ RUN apt-get -qq -y install \
     libyaml-dev
 
 # Install xivo-amid
-WORKDIR /root
-RUN git clone "git://github.com/xivo-pbx/xivo-confd"
-WORKDIR xivo-confd
+ADD . /usr/src/xivo-confd
+WORKDIR /usr/src/xivo-confd
 RUN pip install -r requirements.txt
 RUN python setup.py install
 
 # Configure environment
 RUN touch /var/log/xivo-confd.log
 RUN mkdir /etc/xivo-confd/
+RUN cp /usr/src/xivo-confd/etc/xivo-confd/*.yml /etc/xivo-confd/
+RUN mkdir /etc/xivo-confd/conf.d
 RUN mkdir /var/run/xivo-confd
 RUN chown www-data /var/run/xivo-confd
+
+WORKDIR /root
 
 # Clean
 RUN apt-get clean

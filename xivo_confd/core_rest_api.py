@@ -29,6 +29,7 @@ from xivo_confd import flask_http_server
 from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
+from xivo_confd import plugin_manager
 
 from xivo_provd_client import new_provisioning_client_from_config
 
@@ -103,6 +104,8 @@ class CoreRestApi(object):
 
     def run(self):
         bind_addr = (self.config['rest_api']['listen'], self.config['rest_api']['port'])
+
+        plugin_manager.load_plugins(self.app)
 
         from cherrypy import wsgiserver
         wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': self.app})

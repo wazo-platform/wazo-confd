@@ -32,4 +32,10 @@ setup(
     scripts=[
         'bin/xivo-confd'
     ],
+
+    zip_safe = False,
+    entry_points={
+        'xivo_confd.plugins': []
+    }
+
 )
