@@ -35,3 +35,23 @@ class FuncKeyTemplate(object):
                     self.name == other.name,
                     self.description == other.description,
                     self.keys == other.keys])
+
+
+class FuncKey(object):
+
+    def __init__(self, position, destination, label=None, blf=False, id=None):
+        self.id = id
+        self.position = position
+        self.destination = destination
+        self.label = label
+        self.blf = blf
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError("'cannot compare '{}' and '{}'".format(self.__class__,
+                                                                   other.__class__))
+        return all([self.id == other.id,
+                    self.position == other.position,
+                    self.destination == other.destination,
+                    self.label == other.label,
+                    self.blf == other.blf])

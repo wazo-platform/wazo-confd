@@ -25,7 +25,7 @@ from hamcrest import assert_that, equal_to, calling, raises
 
 from xivo_confd.resources.func_keys.converter import JsonParser, JsonMapper, \
     TemplateBuilder, DestinationBuilder
-from xivo_confd.resources.func_keys.model import FuncKeyTemplate
+from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
 from xivo_dao.helpers.exception import InputError
 
 
@@ -96,37 +96,73 @@ class TestTemplateBuilder(unittest.TestCase):
 
     def test_given_keys_mapping_are_not_numbers_when_creating_then_raises_error(self):
         body = {'name': 'foobar',
-                'keys': {'1': {'type': 'user',
-                               'user_id': 1}}}
+                'keys': {'1': 'spam'}}
+
+        assert_that(calling(self.builder.create).with_args(body),
+                    raises(InputError))
+
+    def test_given_destination_has_wrong_type_when_creating_then_raises_error(self):
+        body = {'name': 'foobar',
+                'keys': {
+                    1: {
+                        'destination': 'spam'}}}
 
         assert_that(calling(self.builder.create).with_args(body),
                     raises(InputError))
 
     def test_given_destination_has_no_type_when_creating_then_raises_error(self):
         body = {'name': 'foobar',
-                'keys': {1: {'foo': 'bar'}}}
+                'keys': {
+                    1: {
+                        'destination': {}}}}
 
         assert_that(calling(self.builder.create).with_args(body),
                     raises(InputError))
 
     def test_given_unknown_destination_type_when_creating_then_raises_error(self):
         body = {'name': 'foobar',
-                'keys': {1: {'type': 'foobar'}}}
+                'keys': {
+                    1: {
+                        'destination': {
+                            'type': 'foobar'}}}}
 
         assert_that(calling(self.builder.create).with_args(body),
                     raises(InputError))
 
     def test_given_template_with_funckeys_when_creating_then_returns_model(self):
         expected_destination = self.dest_builder.build.return_value
+        expected_func_key = FuncKey(destination=expected_destination,
+                                    label=None,
+                                    blf=False,
+                                    position=1)
+
+        expected = FuncKeyTemplate(name='foobar',
+                                   description=None,
+                                   keys={1: expected_func_key})
+
+        body = {'name': 'foobar',
+                'keys': {1: {'destination': {'type': 'user'}}}}
+
+        result = self.builder.create(body)
+
+        assert_that(result, equal_to(expected))
+
+    def test_given_template_with_complete_funckeys_when_creating_then_returns_model(self):
+        expected_destination = self.dest_builder.build.return_value
+        expected_func_key = FuncKey(destination=expected_destination,
+                                    label='myuser',
+                                    blf=True,
+                                    position=1)
 
         expected = FuncKeyTemplate(name='foobar',
                                    description='a foobar template',
-                                   keys={1: expected_destination})
+                                   keys={1: expected_func_key})
 
         body = {'name': 'foobar',
                 'description': 'a foobar template',
-                'keys': {1: {'type': 'user',
-                             'user_id': sentinel.user_id}}}
+                'keys': {1: {'label': 'myuser',
+                             'blf': True,
+                             'destination': {'type': 'user'}}}}
 
         result = self.builder.create(body)
 

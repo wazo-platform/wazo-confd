@@ -21,7 +21,7 @@ import abc
 
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.converter import Parser, Mapper, Builder
-from xivo_confd.resources.func_keys.model import FuncKeyTemplate
+from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
 
 
 class JsonParser(Parser):
@@ -53,11 +53,11 @@ class TemplateBuilder(Builder):
     def create(self, mapping):
         self.validate_required(mapping)
         self.validate_unknown(mapping)
-        funckeys = mapping.get('keys', {})
-        built_keys = self.build_destinations(funckeys)
+        key_mapping = mapping.get('keys', {})
+        funckeys = self.build_funckeys(key_mapping)
         return FuncKeyTemplate(name=mapping['name'],
                                description=mapping.get('description'),
-                               keys=built_keys)
+                               keys=funckeys)
 
     def update(self, mapping):
         pass
@@ -72,27 +72,44 @@ class TemplateBuilder(Builder):
         if unknown:
             raise errors.unknown(*unknown)
 
-    def build_destinations(self, funckeys):
-        self.validate_types(funckeys)
-        keys = {}
-        for pos, dest_data in funckeys.iteritems():
-            builder = self.destination_builders[dest_data['type']]
-            destination = builder.build(dest_data)
-            keys[pos] = destination
+    def build_funckeys(self, key_mapping):
+        self.validate_types(key_mapping)
+        keys = {pos: self.build_funckey(pos, mapping)
+                for pos, mapping in key_mapping.iteritems()}
         return keys
 
-    def validate_types(self, funckeys):
-        if not isinstance(funckeys, dict):
+    def validate_types(self, key_mapping):
+        if not isinstance(key_mapping, dict):
             raise errors.wrong_type('keys', 'dict-like structure')
 
-        for pos, dest in funckeys.iteritems():
+        for pos, mapping in key_mapping.iteritems():
             if not isinstance(pos, int):
                 raise errors.wrong_type('keys', 'numeric positions')
-            elif 'type' not in dest:
-                raise errors.param_not_found('keys.{}'.format(pos),
+
+            destination = mapping.get('destination', {})
+            if not isinstance(destination, dict):
+                raise errors.wrong_type('keys.{}.destination'.format(pos),
+                                        'dict-like structure')
+
+            dest_type = destination.get('type')
+            if not dest_type:
+                raise errors.param_not_found('keys.{}.destination'.format(pos),
                                              'type')
-            elif dest['type'] not in self.destination_builders:
-                raise errors.invalid_destination_type(dest['type'])
+
+            if dest_type not in self.destination_builders:
+                raise errors.invalid_destination_type(dest_type)
+
+    def build_funckey(self, position, mapping):
+        destination = self.build_destination(mapping['destination'])
+        funckey = FuncKey(position=position,
+                          label=mapping.get('label'),
+                          blf=mapping.get('blf', False),
+                          destination=destination)
+        return funckey
+
+    def build_destination(self, destination):
+        builder = self.destination_builders[destination['type']]
+        return builder.build(destination)
 
 
 class DestinationBuilder(object):
