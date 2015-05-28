@@ -28,8 +28,10 @@ from hamcrest import assert_that, equal_to, calling, raises
 from xivo_dao.helpers.exception import InputError
 
 from xivo_confd.helpers.mooltiparse.field import Field
-from xivo_confd.resources.func_keys.converter import JsonParser, JsonMapper, \
-    TemplateBuilder, DestinationBuilder
+from xivo_confd.resources.func_keys.converter import JsonParser, \
+    TemplateMapper, TemplateValidator, TemplateBuilder, \
+    FuncKeyMapper, FuncKeyValidator, FuncKeyBuilder, \
+    DestinationBuilder
 from xivo_confd.resources.func_keys.converter import UserDestinationBuilder, \
     ConferenceDestinationBuilder, GroupDestinationBuilder, QueueDestinationBuilder, \
     PagingDestinationBuilder, BSFilterDestinationBuilder, CustomDestinationBuilder, \
@@ -61,94 +63,169 @@ class TestJsonParser(unittest.TestCase):
         assert_that(result, equal_to(expected))
 
 
-class TestJsonMapper(unittest.TestCase):
+class TestTemplateMapper(unittest.TestCase):
 
     def setUp(self):
-        self.mapper = JsonMapper()
-
-    def test_given_json_dict_when_encoding_then_returns_dict(self):
-        expected = {'foo': 'bar'}
-
-        result = self.mapper.for_encoding(expected)
-
-        assert_that(result, equal_to(expected))
+        self.funckey_mapper = Mock(FuncKeyMapper)
+        self.mapper = TemplateMapper(self.funckey_mapper)
 
     def test_given_json_dict_when_decoding_then_returns_dict(self):
-        expected = {'foo': 'bar'}
+        expected = {'name': 'foo',
+                    'description': 'bar'}
 
         result = self.mapper.for_decoding(expected)
 
         assert_that(result, equal_to(expected))
 
+    def test_given_empty_model_when_encoding_then_returns_bare_mapping(self):
+        model = FuncKeyTemplate(id=1, name='foobar')
+        expected = {'id': 1,
+                    'name': 'foobar',
+                    'description': None,
+                    'keys': {}}
 
-class TestTemplateBuilder(unittest.TestCase):
+        result = self.mapper.for_encoding(model)
+
+        assert_that(result, equal_to(expected))
+
+    def test_given_template_with_funckey_when_encoding_then_encodes_funckeys(self):
+        funckey = Mock(FuncKey)
+        model = FuncKeyTemplate(id=1, name='foobar',
+                                keys={1: funckey})
+
+        expected_mapping = self.funckey_mapper.for_encoding.return_value
+
+        expected = {'id': 1,
+                    'name': 'foobar',
+                    'description': None,
+                    'keys': {1: expected_mapping}}
+
+        result = self.mapper.for_encoding(model)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestFuncKeyMapper(unittest.TestCase):
 
     def setUp(self):
-        self.dest_builder = Mock(DestinationBuilder)
-        self.dest_builders = {'user': self.dest_builder}
-        self.builder = TemplateBuilder(self.dest_builders)
+        self.builder = Mock(DestinationBuilder)
+        self.builders = {'spam': self.builder}
+        self.mapper = FuncKeyMapper(self.builders)
+
+    def test_given_json_dict_when_decoding_then_returns_dict(self):
+        expected = {'label': 'foo',
+                    'blf': True,
+                    'destination': {'type': 'spam'}}
+
+        result = self.mapper.for_decoding(expected)
+
+        assert_that(result, equal_to(expected))
+
+    def test_given_model_when_encoding_then_encodes_funckey_and_destination(self):
+        destination = Mock(type='spam')
+
+        expected_destination = self.builder.to_mapping.return_value
+        expected = {'id': sentinel.id,
+                    'label': None,
+                    'blf': False,
+                    'destination': expected_destination}
+
+        model = FuncKey(id=sentinel.id, destination=destination)
+
+        result = self.mapper.for_encoding(model)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestTemplateValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.funckey_validator = Mock(FuncKeyValidator)
+        self.validator = TemplateValidator(self.funckey_validator)
 
     def test_given_missing_required_fields_when_creating_then_raises_error(self):
         body = {}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body, action='create'),
                     raises(InputError))
 
-    def test_given_unknown_fields_when_creating_then_raises_error(self):
+    def test_given_unknown_fields_when_validating_then_raises_error(self):
         body = {'name': 'foobar', 'invalid': 'invalid'}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
-    def test_given_invalid_keys_mapping_when_creating_then_raises_error(self):
+    def test_given_invalid_keys_mapping_when_validating_then_raises_error(self):
         body = {'name': 'foobar',
                 'keys': 'spam'}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
-    def test_given_keys_mapping_are_not_numbers_when_creating_then_raises_error(self):
+    def test_given_keys_mapping_are_not_numbers_when_validating_then_raises_error(self):
         body = {'name': 'foobar',
                 'keys': {'1': 'spam'}}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body),
+                    raises(InputError))
+
+    def test_given_mapping_when_validating_then_validating_funckey_validator(self):
+        funckey = {'type': 'spam'}
+        body = {'name': 'foobar',
+                'keys': {1: funckey}}
+
+        self.validator.validate(body)
+        self.funckey_validator.validate.assert_called_once_with(funckey)
+
+
+class TestFuncKeyValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = Mock(DestinationBuilder)
+        self.validator = FuncKeyValidator({'foobar': self.builder})
+
+    def test_given_required_fields_missing_when_creating_then_raises_error(self):
+        body = {}
+
+        assert_that(calling(self.validator.validate).with_args(body, action='create'),
                     raises(InputError))
 
     def test_given_destination_has_wrong_type_when_creating_then_raises_error(self):
-        body = {'name': 'foobar',
-                'keys': {
-                    1: {
-                        'destination': 'spam'}}}
+        body = {'destination': 'invalid'}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
     def test_given_destination_has_no_type_when_creating_then_raises_error(self):
-        body = {'name': 'foobar',
-                'keys': {
-                    1: {
-                        'destination': {}}}}
+        body = {'destination': {}}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
     def test_given_unknown_destination_type_when_creating_then_raises_error(self):
-        body = {'name': 'foobar',
-                'keys': {
-                    1: {
-                        'destination': {
-                            'type': 'foobar'}}}}
+        body = {'destination': {'type': 'invalid'}}
 
-        assert_that(calling(self.builder.create).with_args(body),
+        assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
-    def test_given_template_with_funckeys_when_creating_then_returns_model(self):
-        expected_destination = self.dest_builder.build.return_value
-        expected_func_key = FuncKey(destination=expected_destination,
-                                    label=None,
-                                    blf=False,
-                                    position=1)
+    def test_given_destination_when_validating_then_calls_destination_validator(self):
+        destination = {'type': 'foobar'}
+        body = {'destination': destination}
 
+        self.validator.validate(body)
+
+        self.builder.validate.assert_called_once_with(destination)
+
+
+class TestTemplateBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = Mock(TemplateValidator)
+        self.funckey_builder = Mock(FuncKeyBuilder)
+        self.builder = TemplateBuilder(self.validator, self.funckey_builder)
+
+    def test_given_template_with_funckeys_when_creating_then_returns_model(self):
+        expected_func_key = self.funckey_builder.create.return_value
         expected = FuncKeyTemplate(name='foobar',
                                    description=None,
                                    keys={1: expected_func_key})
@@ -161,12 +238,7 @@ class TestTemplateBuilder(unittest.TestCase):
         assert_that(result, equal_to(expected))
 
     def test_given_template_with_complete_funckeys_when_creating_then_returns_model(self):
-        expected_destination = self.dest_builder.build.return_value
-        expected_func_key = FuncKey(destination=expected_destination,
-                                    label='myuser',
-                                    blf=True,
-                                    position=1)
-
+        expected_func_key = self.funckey_builder.create.return_value
         expected = FuncKeyTemplate(name='foobar',
                                    description='a foobar template',
                                    keys={1: expected_func_key})
@@ -182,33 +254,36 @@ class TestTemplateBuilder(unittest.TestCase):
         assert_that(result, equal_to(expected))
 
     def test_given_template_when_updating_then_updates_model(self):
-        first_func_key = Mock(FuncKey)
-
-        expected_destination = self.dest_builder.build.return_value
-        expected_func_key = FuncKey(destination=expected_destination,
-                                    label='otheruser',
-                                    blf=False,
-                                    position=2)
-
         model = FuncKeyTemplate(name='foobar',
                                 description='a foobar template',
-                                keys={1: first_func_key,
-                                      2: Mock(FuncKey)})
+                                keys={})
 
         expected = FuncKeyTemplate(name='otherfoobar',
                                    description='another description',
-                                   keys={1: first_func_key,
-                                         2: expected_func_key})
+                                   keys={})
 
         body = {'name': 'otherfoobar',
-                'description': 'another description',
-                'keys': {2: {'label': 'otheruser',
-                             'blf': False,
-                             'destination': {'type': 'user'}}}}
+                'description': 'another description'}
 
         self.builder.update(model, body)
 
         assert_that(model, equal_to(expected))
+
+    def test_given_funckey_when_updating_then_updates_keys(self):
+        unmodified_key = Mock(FuncKey)
+        original_key = Mock(FuncKey)
+
+        model = FuncKeyTemplate(name='foobar',
+                                description='a foobar template',
+                                keys={1: unmodified_key,
+                                      2: original_key})
+
+        key = {'type': 'user'}
+        body = {'keys': {2: key}}
+
+        self.builder.update(model, body)
+
+        self.funckey_builder.update.assert_called_once_with(original_key, key)
 
 
 class TestDestinationBuilder(unittest.TestCase):
@@ -220,9 +295,11 @@ class TestDestinationBuilder(unittest.TestCase):
 
         class TestBuilder(DestinationBuilder):
 
+            destination = 'destination'
+
             fields = [field]
 
-            def convert(self, destination):
+            def to_model(self, destination):
                 pass
 
         builder = TestBuilder()

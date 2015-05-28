@@ -20,6 +20,8 @@ import json
 import abc
 import re
 
+from flask import url_for
+
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.converter import Parser, Mapper, Builder
 from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
@@ -44,85 +46,155 @@ class JsonParser(Parser):
         return json.loads(request.body)
 
 
-class JsonMapper(Mapper):
+class TemplateValidator(object):
 
-    def for_encoding(self, mapping):
-        return mapping
+    def __init__(self, funckey_validator):
+        self.funckey_validator = funckey_validator
 
-    def for_decoding(self, mapping):
-        return mapping
-
-
-class TemplateBuilder(Builder):
-
-    TEMPLATE_DOC = Document([
+    DOCUMENT = Document([
+        Field('id', Int()),
         Field('name', Unicode(), create=[Required()]),
         Field('description', Unicode()),
         Field('keys', Dict())
     ])
 
-    FUNCKEY_DOC = Document([
+    def validate(self, mapping, action=None):
+        self.DOCUMENT.validate(mapping, action)
+        keys = mapping.get('keys', {})
+        self.validate_keys(keys)
+
+    def validate_keys(self, key_mapping):
+        for pos, mapping in key_mapping.iteritems():
+            if not isinstance(pos, int):
+                raise errors.wrong_type('keys', 'numeric positions')
+            if not isinstance(mapping, dict):
+                raise errors.wrong_type('keys', 'dict-like structures')
+            self.funckey_validator.validate(mapping)
+
+
+class FuncKeyValidator(object):
+
+    DOCUMENT = Document([
         Field('label', Unicode()),
         Field('blf', Boolean()),
-        Field('destination', Dict(), Required())
+        Field('destination', Dict(), create=[Required()])
     ])
 
-    def __init__(self, destination_builders):
-        self.destination_builders = destination_builders
+    def __init__(self, builders):
+        self.builders = builders
+
+    def validate(self, mapping, action=None):
+        self.DOCUMENT.validate(mapping, action)
+
+        if 'destination' in mapping:
+            self.validate_destination(mapping['destination'])
+
+    def validate_destination(self, destination):
+        dest_type = destination.get('type')
+
+        if not dest_type:
+            raise errors.param_not_found('destination', 'type')
+
+        if dest_type not in self.builders:
+            raise errors.param_not_found('destination', 'type')
+
+        builder = self.builders[dest_type]
+        builder.validate(destination)
+
+
+class TemplateMapper(object):
+
+    def __init__(self, funckey_mapper):
+        self.funckey_mapper = funckey_mapper
+
+    def for_decoding(self, mapping):
+        return mapping
+
+    def for_encoding(self, model):
+        mapping = {field: getattr(model, field)
+                   for field in model.FIELDS
+                   if field != 'keys'}
+        mapping['keys'] = {pos: self.funckey_mapper.for_encoding(key)
+                           for pos, key in model.keys.iteritems()}
+        return mapping
+
+
+class FuncKeyMapper(Mapper):
+
+    def __init__(self, builders):
+        self.builders = builders
+
+    def for_decoding(self, mapping):
+        return mapping
+
+    def for_encoding(self, model):
+        mapping = {field: getattr(model, field)
+                   for field in model.FIELDS
+                   if field != 'destination'}
+        mapping['destination'] = self.map_destination(model.destination)
+        return mapping
+
+    def map_destination(self, destination):
+        builder = self.builders[destination.type]
+        return builder.to_mapping(destination)
+
+
+class TemplateBuilder(Builder):
+
+    def __init__(self, validator, funckey_builder):
+        self.validator = validator
+        self.funckey_builder = funckey_builder
 
     def create(self, mapping):
-        self.TEMPLATE_DOC.validate(mapping, 'create')
-
+        self.validator.validate(mapping, 'create')
         key_mapping = mapping.get('keys', {})
-        funckeys = self.build_funckeys(key_mapping)
-
+        funckeys = self.create_funckeys(key_mapping)
         return FuncKeyTemplate(name=mapping['name'],
                                description=mapping.get('description'),
                                keys=funckeys)
 
     def update(self, model, mapping):
-        self.TEMPLATE_DOC.validate(mapping)
-
-        key_mapping = mapping.get('keys', {})
-        funckeys = self.build_funckeys(key_mapping)
-
+        self.validator.validate(mapping, 'update')
         model.name = mapping.get('name', model.name)
         model.description = mapping.get('description', model.description)
-        model.keys.update(funckeys)
 
-    def build_funckeys(self, key_mapping):
-        self.validate_keys(key_mapping)
-        keys = {pos: self.build_funckey(pos, mapping)
-                for pos, mapping in key_mapping.iteritems()}
-        return keys
+        key_mapping = mapping.get('keys', {})
+        self.update_funckeys(model.keys, key_mapping)
 
-    def validate_keys(self, key_mapping):
-        for pos, mapping in key_mapping.iteritems():
-            if not isinstance(mapping, dict):
-                raise errors.wrong_type('keys', 'dict-like structure')
-            elif not isinstance(pos, int):
-                raise errors.wrong_type('keys', 'numeric positions')
+    def create_funckeys(self, key_mapping):
+        return {pos: self.funckey_builder.create(funckey)
+                for pos, funckey in key_mapping.iteritems()}
 
-            self.FUNCKEY_DOC.validate(mapping)
+    def update_funckeys(self, old_mapping, new_mapping):
+        for pos, mapping in new_mapping.iteritems():
+            self.funckey_builder.update(old_mapping[pos], mapping)
 
-            dest_type = mapping['destination'].get('type')
-            if not dest_type:
-                raise errors.param_not_found('keys.{}.destination'.format(pos),
-                                             'type')
 
-            if dest_type not in self.destination_builders:
-                raise errors.invalid_destination_type(dest_type)
+class FuncKeyBuilder(Builder):
 
-    def build_funckey(self, position, mapping):
+    def __init__(self, validator, builders):
+        self.validator = validator
+        self.builders = builders
+
+    def create(self, mapping):
+        self.validator.validate(mapping, 'create')
         destination = self.build_destination(mapping['destination'])
-        funckey = FuncKey(position=position,
-                          label=mapping.get('label'),
-                          blf=mapping.get('blf', False),
-                          destination=destination)
-        return funckey
+        return FuncKey(label=mapping.get('label'),
+                       blf=mapping.get('blf', False),
+                       destination=destination)
+
+    def update(self, model, mapping):
+        self.validator.validate(mapping, 'update')
+
+        for field, value in mapping.iteritems():
+            if field != 'destination':
+                setattr(model, value)
+
+        if 'destination' in mapping:
+            model.destination = self.build_destination(mapping['destination'])
 
     def build_destination(self, destination):
-        builder = self.destination_builders[destination['type']]
+        builder = self.builders[destination['type']]
         return builder.build(destination)
 
 
@@ -134,84 +206,119 @@ class DestinationBuilder(object):
     def fields(self):
         return
 
+    @abc.abstractproperty
+    def destination(self):
+        return
+
+    @abc.abstractmethod
+    def to_model(self, destination):
+        pass
+
     def build(self, destination):
         self.validate(destination)
-        return self.convert(destination)
+        return self.to_model(destination)
 
     def validate(self, destination):
         for field in self.fields:
             field.validate(destination.get(field.name))
 
-    @abc.abstractmethod
-    def convert(self, destination):
-        pass
+    def to_mapping(self, destination):
+        mapping = {field.name: getattr(field.name, destination)
+                   for field in self.fields}
+        mapping['type'] = self.destination
+        mapping['href'] = self.url(destination)
+        return mapping
+
+    def url(self, destination):
+        return None
 
 
 class UserDestinationBuilder(DestinationBuilder):
 
+    destination = 'user'
+
     fields = [Field('user_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return UserDestination(user_id=destination['user_id'])
+
+    def url(self, destination):
+        return url_for('users.get', id=destination['user_id'], external_=True)
 
 
 class GroupDestinationBuilder(DestinationBuilder):
 
+    destination = 'group'
+
     fields = [Field('group_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return GroupDestination(group_id=destination['group_id'])
 
 
 class QueueDestinationBuilder(DestinationBuilder):
 
+    destination = 'queue'
+
     fields = [Field('queue_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return QueueDestination(queue_id=destination['queue_id'])
 
 
 class ConferenceDestinationBuilder(DestinationBuilder):
 
+    destination = 'conference'
+
     fields = [Field('conference_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return ConferenceDestination(conference_id=destination['conference_id'])
 
 
 class PagingDestinationBuilder(DestinationBuilder):
 
+    destination = 'paging'
+
     fields = [Field('paging_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return PagingDestination(paging_id=destination['paging_id'])
 
 
 class BSFilterDestinationBuilder(DestinationBuilder):
 
+    destination = 'bsfilter'
+
     fields = [Field('filter_member_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return BSFilterDestination(filter_member_id=destination['filter_member_id'])
 
 
 class ServiceDestinationBuilder(DestinationBuilder):
 
+    destination = 'service'
+
     fields = [Field('service', Unicode(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return ServiceDestination(service=destination['service'])
 
 
 class CustomDestinationBuilder(DestinationBuilder):
 
+    destination = 'custom'
+
     fields = [Field('exten', Unicode(), Required(), Regexp(EXTEN_REGEX))]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return CustomDestination(exten=destination['exten'])
 
 
 class ForwardDestinationBuilder(DestinationBuilder):
+
+    destination = 'forward'
 
     fields = [Field('forward',
                     Unicode(),
@@ -221,12 +328,14 @@ class ForwardDestinationBuilder(DestinationBuilder):
                     Required(), Regexp(EXTEN_REGEX))
               ]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return ForwardDestination(forward=destination['forward'],
                                   exten=destination['exten'])
 
 
 class TransferDestinationBuilder(DestinationBuilder):
+
+    destination = 'transfer'
 
     fields = [Field('transfer',
                     Unicode(),
@@ -236,37 +345,43 @@ class TransferDestinationBuilder(DestinationBuilder):
                     Required(), Regexp(EXTEN_REGEX))
               ]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return TransferDestination(transfer=destination['transfer'],
                                    exten=destination['exten'])
 
 
 class ParkPositionDestinationBuilder(DestinationBuilder):
 
+    destination = 'park_position'
+
     fields = [Field('position',
                     Unicode(),
                     Required(), Regexp(EXTEN_REGEX))
               ]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return ParkPositionDestination(position=destination['position'])
 
 
 class ParkingDestinationBuilder(DestinationBuilder):
 
+    destination = 'parking'
+
     fields = []
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return ParkingDestination()
 
 
 class AgentDestinationBuilder(DestinationBuilder):
+
+    destination = 'agent'
 
     fields = [Field('action',
                     Unicode(),
                     Required(), Choice(['login', 'logoff', 'toggle'])),
               Field('agent_id', Int(), Required())]
 
-    def convert(self, destination):
+    def to_model(self, destination):
         return AgentDestination(action=destination['action'],
                                 agent_id=destination['agent_id'])
