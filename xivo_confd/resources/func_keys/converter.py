@@ -24,6 +24,12 @@ from xivo_confd.helpers.converter import Parser, Mapper, Builder
 from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
 
 
+from xivo_confd.helpers.mooltiparse import Document, Field, \
+    Int, Boolean, Unicode, Dict, \
+    Required, Choice, Regexp
+
+
+
 class JsonParser(Parser):
 
     def parse(self, request):
@@ -41,57 +47,57 @@ class JsonMapper(Mapper):
 
 class TemplateBuilder(Builder):
 
-    REQUIRED = ('name', )
+    TEMPLATE_DOC = Document([
+        Field('name', Unicode(), create=[Required()]),
+        Field('description', Unicode()),
+        Field('keys', Dict())
+    ])
 
-    VALID = ('name',
-             'description',
-             'keys')
+    FUNCKEY_DOC = Document([
+        Field('label', Unicode()),
+        Field('blf', Boolean()),
+        Field('destination', Dict(), Required())
+    ])
 
     def __init__(self, destination_builders):
         self.destination_builders = destination_builders
 
     def create(self, mapping):
-        self.validate_required(mapping)
-        self.validate_unknown(mapping)
+        self.TEMPLATE_DOC.validate(mapping, 'create')
+
         key_mapping = mapping.get('keys', {})
         funckeys = self.build_funckeys(key_mapping)
+
         return FuncKeyTemplate(name=mapping['name'],
                                description=mapping.get('description'),
                                keys=funckeys)
 
-    def update(self, mapping):
-        pass
+    def update(self, model, mapping):
+        self.TEMPLATE_DOC.validate(mapping)
 
-    def validate_required(self, mapping):
-        missing = [f for f in self.REQUIRED if f not in mapping]
-        if missing:
-            raise errors.missing(*missing)
+        key_mapping = mapping.get('keys', {})
+        funckeys = self.build_funckeys(key_mapping)
 
-    def validate_unknown(self, mapping):
-        unknown = set(mapping.keys()) - set(self.VALID)
-        if unknown:
-            raise errors.unknown(*unknown)
+        model.name = mapping.get('name', model.name)
+        model.description = mapping.get('description', model.description)
+        model.keys.update(funckeys)
 
     def build_funckeys(self, key_mapping):
-        self.validate_types(key_mapping)
+        self.validate_keys(key_mapping)
         keys = {pos: self.build_funckey(pos, mapping)
                 for pos, mapping in key_mapping.iteritems()}
         return keys
 
-    def validate_types(self, key_mapping):
-        if not isinstance(key_mapping, dict):
-            raise errors.wrong_type('keys', 'dict-like structure')
-
+    def validate_keys(self, key_mapping):
         for pos, mapping in key_mapping.iteritems():
-            if not isinstance(pos, int):
+            if not isinstance(mapping, dict):
+                raise errors.wrong_type('keys', 'dict-like structure')
+            elif not isinstance(pos, int):
                 raise errors.wrong_type('keys', 'numeric positions')
 
-            destination = mapping.get('destination', {})
-            if not isinstance(destination, dict):
-                raise errors.wrong_type('keys.{}.destination'.format(pos),
-                                        'dict-like structure')
+            self.FUNCKEY_DOC.validate(mapping)
 
-            dest_type = destination.get('type')
+            dest_type = mapping['destination'].get('type')
             if not dest_type:
                 raise errors.param_not_found('keys.{}.destination'.format(pos),
                                              'type')
