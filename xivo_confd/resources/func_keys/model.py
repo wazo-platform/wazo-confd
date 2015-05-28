@@ -34,17 +34,24 @@ class FuncKeyTemplate(Model):
 
     MANDATORY = ['name']
 
+    def __init__(self, **parameters):
+        parameters.setdefault('keys', {})
+        super(FuncKeyTemplate, self).__init__(**parameters)
+
 
 class FuncKey(Model):
 
     FIELDS = ['id',
-              'position',
               'destination',
               'label',
               'blf']
 
     MANDATORY = ['position',
                  'destination']
+
+    def __init__(self, **parameters):
+        parameters.setdefault('blf', False)
+        super(FuncKey, self).__init__(**parameters)
 
 
 class UserDestination(Model):
