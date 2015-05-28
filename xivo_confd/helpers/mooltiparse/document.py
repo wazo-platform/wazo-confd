@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_dao.helpers import errors
+from xivo_confd.helpers.mooltiparse.validators import ValidationError
+from xivo_dao.helpers.exception import InputError
 
 
 class Document(object):
 
-    def __init__(self, fields):
+    def __init__(self, fields, error_exc=None):
         self.fields = fields
+        self.error_exc = error_exc or InputError
 
     def validate(self, content, action=None):
         self._validate_unknown_fields(content)
@@ -37,7 +40,13 @@ class Document(object):
     def _validate_fields(self, content, action):
         for field in self.fields:
             value = content.get(field.name)
-            field.validate(value, action)
+            try:
+                field.validate(value, action)
+            except ValidationError as e:
+                raise self._reformat_error(e)
+
+    def _reformat_error(self, exc):
+        return self.error_exc(str(exc))
 
     def field_names(self):
         return tuple(f.name for f in self.fields)
