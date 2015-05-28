@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -124,3 +124,19 @@ class TestChoiceValidator(unittest.TestCase):
 
     def test_given_value_is_in_choices_then_passes(self):
         self.validator('b')
+
+
+class TestRegexpValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = validators.Regexp.compile(r'\d+')
+
+    def test_given_value_is_none_then_validation_passes(self):
+        self.validator(None)
+
+    def test_given_value_does_not_match_regex_then_raises_error(self):
+        self.assertRaisesRegexp(ValidationError, r"must match regex: .*",
+                                self.validator, 'ab')
+
+    def test_given_value_matches_regex_then_passes(self):
+        self.validator('123')

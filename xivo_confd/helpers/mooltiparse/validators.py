@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+import re
 
 from errors import ValidationError
 
@@ -64,3 +66,22 @@ class Choice(object):
             choices = ', '.join(self.possibilities)
             msg = "must be one of the following choices: {}".format(choices)
             raise ValidationError(msg)
+
+
+class Regexp(object):
+
+    @classmethod
+    def compile(cls, text, message=None):
+        regexp = re.compile(text)
+        return cls(regexp, message)
+
+    def __init__(self, regexp, message=None):
+        self.regexp = regexp
+        self.message = message
+
+    def __call__(self, value):
+        if value is None:
+            return
+        if not self.regexp.match(value):
+            msg = "must match regex: '{}'".format(str(self.regexp.pattern))
+            raise ValidationError(self.message or msg)
