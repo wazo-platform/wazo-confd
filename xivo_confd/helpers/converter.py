@@ -65,7 +65,7 @@ class Builder(object):
         return
 
     @abc.abstractmethod
-    def update(self, mapping):
+    def update(self, model, mapping):
         return
 
 
