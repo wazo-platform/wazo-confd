@@ -16,42 +16,123 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import abc
+
+from xivo_dao.helpers.new_model import NewModel
 
 
-class FuncKeyTemplate(object):
+class Model(NewModel):
 
-    def __init__(self, name, keys=None, description=None, id=None):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.keys = keys or {}
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            raise TypeError("'cannot compare '{}' and '{}'".format(self.__class__,
-                                                                   other.__class__))
-        return all([self.id == other.id,
-                    self.name == other.name,
-                    self.description == other.description,
-                    self.keys == other.keys])
+    _RELATION = {}
 
 
-class FuncKey(object):
+class FuncKeyTemplate(Model):
 
-    def __init__(self, position, destination, label=None, blf=False, id=None):
-        self.id = id
-        self.position = position
-        self.destination = destination
-        self.label = label
-        self.blf = blf
+    FIELDS = ['id',
+              'name',
+              'description',
+              'keys']
 
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            raise TypeError("'cannot compare '{}' and '{}'".format(self.__class__,
-                                                                   other.__class__))
-        return all([self.id == other.id,
-                    self.position == other.position,
-                    self.destination == other.destination,
-                    self.label == other.label,
-                    self.blf == other.blf])
+    MANDATORY = ['name']
+
+
+class FuncKey(Model):
+
+    FIELDS = ['id',
+              'position',
+              'destination',
+              'label',
+              'blf']
+
+    MANDATORY = ['position',
+                 'destination']
+
+
+class UserDestination(Model):
+
+    FIELDS = ['user_id']
+
+    MANDATORY = ['user_id']
+
+
+class GroupDestination(Model):
+
+    FIELDS = ['group_id']
+
+    MANDATORY = ['group_id']
+
+
+class QueueDestination(Model):
+
+    FIELDS = ['queue_id']
+
+    MANDATORY = ['queue_id']
+
+
+class ConferenceDestination(Model):
+
+    FIELDS = ['conference_id']
+
+    MANDATORY = ['conference_id']
+
+
+class PagingDestination(Model):
+
+    FIELDS = ['paging_id']
+
+    MANDATORY = ['paging_id']
+
+
+class BSFilterDestination(Model):
+
+    FIELDS = ['filter_member_id']
+
+    MANDATORY = ['filter_member_id']
+
+
+class CustomDestination(Model):
+
+    FIELDS = ['exten']
+
+    MANDATORY = ['exten']
+
+
+class ServiceDestination(Model):
+
+    FIELDS = ['service']
+
+    MANDATORY = ['service']
+
+
+class ForwardDestination(Model):
+
+    FIELDS = ['forward', 'exten']
+
+    MANDATORY = ['forward', 'exten']
+
+
+class TransferDestination(Model):
+
+    FIELDS = ['transfer', 'exten']
+
+    MANDATORY = ['forward', 'exten']
+
+
+class AgentDestination(Model):
+
+    FIELDS = ['action', 'agent_id']
+
+    MANDATORY = ['action', 'agent_id']
+
+
+class ParkPositionDestination(Model):
+
+    FIELDS = ['position']
+
+    MANDATORY = ['position']
+
+
+class ParkingDestination(Model):
+
+    FIELDS = []
+
+    MANDATORY = []

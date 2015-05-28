@@ -16,17 +16,31 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from __future__ import unicode_literals
+
 
 import unittest
 import json
 
-from mock import patch, Mock, sentinel
+from mock import Mock, sentinel
 from hamcrest import assert_that, equal_to, calling, raises
 
+from xivo_dao.helpers.exception import InputError
+
+from xivo_confd.helpers.mooltiparse.field import Field
 from xivo_confd.resources.func_keys.converter import JsonParser, JsonMapper, \
     TemplateBuilder, DestinationBuilder
+from xivo_confd.resources.func_keys.converter import UserDestinationBuilder, \
+    ConferenceDestinationBuilder, GroupDestinationBuilder, QueueDestinationBuilder, \
+    PagingDestinationBuilder, BSFilterDestinationBuilder, CustomDestinationBuilder, \
+    ServiceDestinationBuilder, ForwardDestinationBuilder, TransferDestinationBuilder, \
+    ParkPositionDestinationBuilder, ParkingDestinationBuilder, AgentDestinationBuilder
 from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
-from xivo_dao.helpers.exception import InputError
+from xivo_confd.resources.func_keys.model import UserDestination, \
+    GroupDestination, QueueDestination, ConferenceDestination, \
+    PagingDestination, BSFilterDestination, CustomDestination, \
+    ServiceDestination, ForwardDestination, TransferDestination, \
+    ParkPositionDestination, ParkingDestination, AgentDestination
 
 
 class TestJsonParser(unittest.TestCase):
@@ -65,7 +79,6 @@ class TestJsonMapper(unittest.TestCase):
         result = self.mapper.for_decoding(expected)
 
         assert_that(result, equal_to(expected))
-
 
 
 class TestTemplateBuilder(unittest.TestCase):
@@ -165,5 +178,266 @@ class TestTemplateBuilder(unittest.TestCase):
                              'destination': {'type': 'user'}}}}
 
         result = self.builder.create(body)
+
+        assert_that(result, equal_to(expected))
+
+    def test_given_template_when_updating_then_updates_model(self):
+        first_func_key = Mock(FuncKey)
+
+        expected_destination = self.dest_builder.build.return_value
+        expected_func_key = FuncKey(destination=expected_destination,
+                                    label='otheruser',
+                                    blf=False,
+                                    position=2)
+
+        model = FuncKeyTemplate(name='foobar',
+                                description='a foobar template',
+                                keys={1: first_func_key,
+                                      2: Mock(FuncKey)})
+
+        expected = FuncKeyTemplate(name='otherfoobar',
+                                   description='another description',
+                                   keys={1: first_func_key,
+                                         2: expected_func_key})
+
+        body = {'name': 'otherfoobar',
+                'description': 'another description',
+                'keys': {2: {'label': 'otheruser',
+                             'blf': False,
+                             'destination': {'type': 'user'}}}}
+
+        self.builder.update(model, body)
+
+        assert_that(model, equal_to(expected))
+
+
+class TestDestinationBuilder(unittest.TestCase):
+
+    def test_given_set_of_fields_then_runs_validators(self):
+
+        field = Mock(Field)
+        field.name = 'foobar'
+
+        class TestBuilder(DestinationBuilder):
+
+            fields = [field]
+
+            def convert(self, destination):
+                pass
+
+        builder = TestBuilder()
+        builder.validate({'foobar': sentinel.foobar})
+
+        field.validate.assert_called_once_with(sentinel.foobar)
+
+
+class TestUserDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = UserDestinationBuilder()
+
+    def test_given_destination_type_user_then_returns_user_destination(self):
+        dest = {'type': 'user',
+                'user_id': 1}
+
+        expected = UserDestination(user_id=1)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestGroupDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = GroupDestinationBuilder()
+
+    def test_given_destination_type_group_then_returns_group_destination(self):
+        dest = {'type': 'group',
+                'group_id': 1}
+
+        expected = GroupDestination(group_id=1)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestQueueDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = QueueDestinationBuilder()
+
+    def test_given_destination_type_queue_then_returns_queue_destination(self):
+        dest = {'type': 'queue',
+                'queue_id': 1}
+
+        expected = QueueDestination(queue_id=1)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestConferenceDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = ConferenceDestinationBuilder()
+
+    def test_given_destination_type_conference_then_returns_conference_destination(self):
+        dest = {'type': 'conference',
+                'conference_id': 1}
+
+        expected = ConferenceDestination(conference_id=1)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestPagingDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = PagingDestinationBuilder()
+
+    def test_given_destination_type_paging_then_returns_paging_destination(self):
+        dest = {'type': 'paging',
+                'paging_id': 1}
+
+        expected = PagingDestination(paging_id=1)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestBSFilterDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = BSFilterDestinationBuilder()
+
+    def test_given_destination_type_queue_then_returns_queue_destination(self):
+        dest = {'type': 'bsfilter',
+                'filter_member_id': 1}
+
+        expected = BSFilterDestination(filter_member_id=1)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestCustomDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = CustomDestinationBuilder()
+
+    def test_given_destination_type_custom_then_returns_custom_destination(self):
+        dest = {'type': 'bsfilter',
+                'exten': '1234567890'}
+
+        expected = CustomDestination(exten='1234567890')
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestServiceDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = ServiceDestinationBuilder()
+
+    def test_given_destination_type_service_then_returns_service_destination(self):
+        dest = {'type': 'bsfilter',
+                'service': 'enablevm'}
+
+        expected = ServiceDestination(service='enablevm')
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestForwardDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = ForwardDestinationBuilder()
+
+    def test_given_destination_type_forward_then_returns_forward_destination(self):
+        dest = {'type': 'forward',
+                'forward': 'noanswer',
+                'exten': '1000'}
+
+        expected = ForwardDestination(forward='noanswer',
+                                      exten='1000')
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestTransferDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = TransferDestinationBuilder()
+
+    def test_given_destination_type_transfer_then_returns_transfer_destination(self):
+        dest = {'type': 'transfer',
+                'transfer': 'blind',
+                'exten': '1000'}
+
+        expected = TransferDestination(transfer='blind',
+                                       exten='1000')
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestParkPositionDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = ParkPositionDestinationBuilder()
+
+    def test_given_destination_type_park_position_then_returns_park_position_destination(self):
+        dest = {'type': 'park_position',
+                'position': '701'}
+
+        expected = ParkPositionDestination(position='701')
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestParkingDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = ParkingDestinationBuilder()
+
+    def test_given_destination_type_parking_then_returns_parking_destination(self):
+        dest = {'type': 'parking'}
+
+        expected = ParkingDestination()
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestAgentDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = AgentDestinationBuilder()
+
+    def test_given_destination_type_parking_then_returns_parking_destination(self):
+        dest = {'type': 'agent',
+                'action': 'login',
+                'agent_id': 1234}
+
+        expected = AgentDestination(action='login', agent_id=1234)
+
+        result = self.builder.build(dest)
 
         assert_that(result, equal_to(expected))

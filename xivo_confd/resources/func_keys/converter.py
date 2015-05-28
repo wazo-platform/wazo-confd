@@ -18,16 +18,24 @@
 
 import json
 import abc
+import re
 
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.converter import Parser, Mapper, Builder
 from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
 
+from xivo_confd.resources.func_keys.model import UserDestination, \
+    GroupDestination, QueueDestination, ConferenceDestination, \
+    PagingDestination, BSFilterDestination, ServiceDestination, \
+    CustomDestination, ForwardDestination, TransferDestination, \
+    ParkPositionDestination, ParkingDestination, AgentDestination
 
 from xivo_confd.helpers.mooltiparse import Document, Field, \
     Int, Boolean, Unicode, Dict, \
     Required, Choice, Regexp
 
+
+EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
 
 
 class JsonParser(Parser):
@@ -120,16 +128,145 @@ class TemplateBuilder(Builder):
 
 class DestinationBuilder(object):
 
-    __metaclass__  = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractproperty
+    def fields(self):
+        return
 
     def build(self, destination):
         self.validate(destination)
         return self.convert(destination)
 
-    @abc.abstractmethod
     def validate(self, destination):
-        pass
+        for field in self.fields:
+            field.validate(destination.get(field.name))
 
     @abc.abstractmethod
     def convert(self, destination):
         pass
+
+
+class UserDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('user_id', Int(), Required())]
+
+    def convert(self, destination):
+        return UserDestination(user_id=destination['user_id'])
+
+
+class GroupDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('group_id', Int(), Required())]
+
+    def convert(self, destination):
+        return GroupDestination(group_id=destination['group_id'])
+
+
+class QueueDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('queue_id', Int(), Required())]
+
+    def convert(self, destination):
+        return QueueDestination(queue_id=destination['queue_id'])
+
+
+class ConferenceDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('conference_id', Int(), Required())]
+
+    def convert(self, destination):
+        return ConferenceDestination(conference_id=destination['conference_id'])
+
+
+class PagingDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('paging_id', Int(), Required())]
+
+    def convert(self, destination):
+        return PagingDestination(paging_id=destination['paging_id'])
+
+
+class BSFilterDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('filter_member_id', Int(), Required())]
+
+    def convert(self, destination):
+        return BSFilterDestination(filter_member_id=destination['filter_member_id'])
+
+
+class ServiceDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('service', Unicode(), Required())]
+
+    def convert(self, destination):
+        return ServiceDestination(service=destination['service'])
+
+
+class CustomDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('exten', Unicode(), Required(), Regexp(EXTEN_REGEX))]
+
+    def convert(self, destination):
+        return CustomDestination(exten=destination['exten'])
+
+
+class ForwardDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('forward',
+                    Unicode(),
+                    Required(), Choice(['noanswer', 'busy', 'unconditional'])),
+              Field('exten',
+                    Unicode(),
+                    Required(), Regexp(EXTEN_REGEX))
+              ]
+
+    def convert(self, destination):
+        return ForwardDestination(forward=destination['forward'],
+                                  exten=destination['exten'])
+
+
+class TransferDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('transfer',
+                    Unicode(),
+                    Required(), Choice(['blind', 'attended'])),
+              Field('exten',
+                    Unicode(),
+                    Required(), Regexp(EXTEN_REGEX))
+              ]
+
+    def convert(self, destination):
+        return TransferDestination(transfer=destination['transfer'],
+                                   exten=destination['exten'])
+
+
+class ParkPositionDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('position',
+                    Unicode(),
+                    Required(), Regexp(EXTEN_REGEX))
+              ]
+
+    def convert(self, destination):
+        return ParkPositionDestination(position=destination['position'])
+
+
+class ParkingDestinationBuilder(DestinationBuilder):
+
+    fields = []
+
+    def convert(self, destination):
+        return ParkingDestination()
+
+
+class AgentDestinationBuilder(DestinationBuilder):
+
+    fields = [Field('action',
+                    Unicode(),
+                    Required(), Choice(['login', 'logoff', 'toggle'])),
+              Field('agent_id', Int(), Required())]
+
+    def convert(self, destination):
+        return AgentDestination(action=destination['action'],
+                                agent_id=destination['agent_id'])
