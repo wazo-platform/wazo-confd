@@ -24,9 +24,9 @@ from flask import url_for
 
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.converter import Parser, Mapper, Builder
-from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
+from xivo_dao.resources.func_key.model import FuncKeyTemplate, FuncKey
 
-from xivo_confd.resources.func_keys.model import UserDestination, \
+from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
     PagingDestination, BSFilterDestination, ServiceDestination, \
     CustomDestination, ForwardDestination, TransferDestination, \

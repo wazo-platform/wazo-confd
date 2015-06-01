@@ -32,13 +32,15 @@ from xivo_confd.resources.func_keys.converter import JsonParser, \
     TemplateMapper, TemplateValidator, TemplateBuilder, \
     FuncKeyMapper, FuncKeyValidator, FuncKeyBuilder, \
     DestinationBuilder
+
 from xivo_confd.resources.func_keys.converter import UserDestinationBuilder, \
     ConferenceDestinationBuilder, GroupDestinationBuilder, QueueDestinationBuilder, \
     PagingDestinationBuilder, BSFilterDestinationBuilder, CustomDestinationBuilder, \
     ServiceDestinationBuilder, ForwardDestinationBuilder, TransferDestinationBuilder, \
     ParkPositionDestinationBuilder, ParkingDestinationBuilder, AgentDestinationBuilder
-from xivo_confd.resources.func_keys.model import FuncKeyTemplate, FuncKey
-from xivo_confd.resources.func_keys.model import UserDestination, \
+
+from xivo_dao.resources.func_key.model import FuncKeyTemplate, FuncKey
+from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
     PagingDestination, BSFilterDestination, CustomDestination, \
     ServiceDestination, ForwardDestination, TransferDestination, \
