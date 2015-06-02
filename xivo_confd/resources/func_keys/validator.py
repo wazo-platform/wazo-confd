@@ -49,10 +49,10 @@ class ServiceValidator(Validator):
     def __init__(self, dao):
         self.dao = dao
 
-    def validate(self, funckey):
+    def validate(self, destination):
         extensions = self.dao.find_all_service_extensions()
         all_services = [e.service for e in extensions]
-        service = funckey.destination.service
+        service = destination.service
 
         if service not in all_services:
             raise errors.param_not_found('service', service)
@@ -63,10 +63,10 @@ class ForwardValidator(Validator):
     def __init__(self, dao):
         self.dao = dao
 
-    def validate(self, funckey):
+    def validate(self, destination):
         extensions = self.dao.find_all_forward_extensions()
         all_forwards = [e.forward for e in extensions]
-        forward = funckey.destination.forward
+        forward = destination.forward
 
         if forward not in all_forwards:
             raise errors.param_not_found('forward', forward)
@@ -77,10 +77,10 @@ class TransferValidator(Validator):
     def __init__(self, dao):
         self.dao = dao
 
-    def validate(self, funckey):
+    def validate(self, destination):
         extensions = self.dao.find_all_transfer_extensions()
         all_transfers = [e.transfer for e in extensions]
-        transfer = funckey.destination.transfer
+        transfer = destination.transfer
 
         if transfer not in all_transfers:
             raise errors.param_not_found('transfer', transfer)
@@ -91,10 +91,10 @@ class AgentActionValidator(Validator):
     def __init__(self, dao):
         self.dao = dao
 
-    def validate(self, funckey):
+    def validate(self, destination):
         extensions = self.dao.find_all_agent_action_extensions()
         all_actions = [e.action for e in extensions]
-        action = funckey.destination.action
+        action = destination.action
 
         if action not in all_actions:
             raise errors.param_not_found('action', action)
@@ -105,9 +105,9 @@ class ParkPositionValidator(Validator):
     def __init__(self, dao):
         self.dao = dao
 
-    def validate(self, funckey):
+    def validate(self, destination):
         min_pos, max_pos = self.dao.find_park_position_range()
-        position = funckey.destination.position
+        position = destination.position
 
         if not min_pos <= position <= max_pos:
             raise errors.outside_park_range(position, min=min_pos, max=max_pos)

@@ -91,9 +91,8 @@ class TestServiceValidator(unittest.TestCase):
         self.dao.find_all_service_extensions.return_value = []
 
         destination = ServiceDestination(service='enablevm')
-        model = FuncKey(destination=destination)
 
-        assert_that(calling(self.validator.validate).with_args(model),
+        assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_service_exists_when_validating_then_validation_passes(self):
@@ -106,9 +105,8 @@ class TestServiceValidator(unittest.TestCase):
         self.dao.find_all_service_extensions.return_value = service_extensions
 
         destination = ServiceDestination(service='enablevm')
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_all_service_extensions.assert_called_once_with()
 
@@ -123,9 +121,8 @@ class TestForwardValidator(unittest.TestCase):
         self.dao.find_all_forward_extensions.return_value = []
 
         destination = ForwardDestination(forward='noanswer')
-        model = FuncKey(destination=destination)
 
-        assert_that(calling(self.validator.validate).with_args(model),
+        assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_forward_exists_when_validating_then_validation_passes(self):
@@ -138,9 +135,8 @@ class TestForwardValidator(unittest.TestCase):
         self.dao.find_all_forward_extensions.return_value = forward_extensions
 
         destination = ForwardDestination(forward='busy')
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_all_forward_extensions.assert_called_once_with()
 
@@ -155,9 +151,8 @@ class TestTransferValidator(unittest.TestCase):
         self.dao.find_all_transfer_extensions.return_value = []
 
         destination = TransferDestination(transfer='blind')
-        model = FuncKey(destination=destination)
 
-        assert_that(calling(self.validator.validate).with_args(model),
+        assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_transfer_exists_when_validating_then_validation_passes(self):
@@ -170,9 +165,8 @@ class TestTransferValidator(unittest.TestCase):
         self.dao.find_all_transfer_extensions.return_value = transfer_extensions
 
         destination = TransferDestination(transfer='blind')
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_all_transfer_extensions.assert_called_once_with()
 
@@ -187,9 +181,8 @@ class TestAgentActionValidator(unittest.TestCase):
         self.dao.find_all_agent_action_extensions.return_value = []
 
         destination = AgentDestination(action='login')
-        model = FuncKey(destination=destination)
 
-        assert_that(calling(self.validator.validate).with_args(model),
+        assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_agent_action_exists_when_validating_then_validation_passes(self):
@@ -202,9 +195,8 @@ class TestAgentActionValidator(unittest.TestCase):
         self.dao.find_all_agent_action_extensions.return_value = agent_action_extensions
 
         destination = AgentDestination(action='login')
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_all_agent_action_extensions.assert_called_once_with()
 
@@ -218,38 +210,33 @@ class TestParkPositionValidator(unittest.TestCase):
 
     def test_given_position_under_minimum_then_raises_error(self):
         destination = ParkPositionDestination(position=600)
-        model = FuncKey(destination=destination)
 
-        assert_that(calling(self.validator.validate).with_args(model),
+        assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_position_over_maximum_then_raises_error(self):
         destination = ParkPositionDestination(position=800)
-        model = FuncKey(destination=destination)
 
-        assert_that(calling(self.validator.validate).with_args(model),
+        assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_position_on_minimum_position_then_validation_passes(self):
         destination = ParkPositionDestination(position=701)
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
 
     def test_given_position_on_maximum_position_then_validation_passes(self):
         destination = ParkPositionDestination(position=750)
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
 
     def test_given_position_inside_range_then_validation_passes(self):
         destination = ParkPositionDestination(position=710)
-        model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
