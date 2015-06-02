@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-import json
 import abc
 import re
 
@@ -43,7 +42,7 @@ EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
 class JsonParser(Parser):
 
     def parse(self, request):
-        return json.loads(request.body)
+        return request.json
 
 
 class TemplateValidator(object):

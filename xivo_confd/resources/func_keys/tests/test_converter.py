@@ -53,8 +53,7 @@ class TestJsonParser(unittest.TestCase):
         self.parser = JsonParser()
 
     def build_request(self, body):
-        encoded = json.dumps(body)
-        return Mock(body=encoded)
+        return Mock(json=body)
 
     def test_given_json_data_then_returns_dict(self):
         expected = {'foo': 'bar'}
