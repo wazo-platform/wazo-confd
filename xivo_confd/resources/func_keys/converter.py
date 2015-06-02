@@ -116,8 +116,8 @@ class TemplateMapper(object):
         mapping = {field: getattr(model, field)
                    for field in model.FIELDS
                    if field != 'keys'}
-        mapping['keys'] = {pos: self.funckey_mapper.for_encoding(key)
-                           for pos, key in model.keys.iteritems()}
+        mapping['keys'] = {pos: self.funckey_mapper.for_encoding(funckey)
+                           for pos, funckey in model.keys.iteritems()}
         return mapping
 
 
