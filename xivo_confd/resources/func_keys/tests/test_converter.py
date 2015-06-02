@@ -178,14 +178,14 @@ class TestTemplateValidator(unittest.TestCase):
         assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
-    def test_given_keys_mapping_are_not_numbers_when_validating_then_raises_error(self):
+    def test_given_keys_mapping_are_negative_when_validating_then_raises_error(self):
         body = {'name': 'foobar',
-                'keys': {'1': 'spam'}}
+                'keys': {-1: 'spam'}}
 
         assert_that(calling(self.validator.validate).with_args(body),
                     raises(InputError))
 
-    def test_given_mapping_when_validating_then_validating_funckey_validator(self):
+    def test_given_mapping_when_validating_then_validates_using_funckey_validator(self):
         funckey = {'type': 'spam'}
         body = {'name': 'foobar',
                 'keys': {1: funckey}}

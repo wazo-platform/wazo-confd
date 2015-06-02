@@ -64,7 +64,7 @@ class TemplateValidator(object):
 
     def validate_keys(self, key_mapping):
         for pos, mapping in key_mapping.iteritems():
-            if not isinstance(pos, int):
+            if pos <= 0:
                 raise errors.wrong_type('keys', 'numeric positions')
             if not isinstance(mapping, dict):
                 raise errors.wrong_type('keys', 'dict-like structures')
