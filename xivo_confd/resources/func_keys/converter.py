@@ -225,7 +225,7 @@ class DestinationBuilder(object):
             field.validate(destination.get(field.name))
 
     def to_mapping(self, destination):
-        mapping = {field.name: getattr(field.name, destination)
+        mapping = {field.name: getattr(destination, field.name)
                    for field in self.fields}
         mapping['type'] = self.destination
         mapping['href'] = self.url(destination)

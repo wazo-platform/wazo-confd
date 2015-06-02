@@ -323,6 +323,32 @@ class TestDestinationBuilder(unittest.TestCase):
 
         field.validate.assert_called_once_with(sentinel.foobar)
 
+    def test_given_destination_then_maps_fields(self):
+
+        field = Mock(Field)
+        field.name = 'foobar'
+
+        destination = Mock()
+        destination.foobar = 'spam'
+
+        class TestBuilder(DestinationBuilder):
+
+            destination = 'destination'
+
+            fields = [field]
+
+            def to_model(self, destination):
+                pass
+
+        builder = TestBuilder()
+        result = builder.to_mapping(destination)
+
+        expected = {'foobar': 'spam',
+                    'type': 'destination',
+                    'href': None}
+
+        assert_that(result, equal_to(expected))
+
 
 class TestUserDestinationBuilder(unittest.TestCase):
 
