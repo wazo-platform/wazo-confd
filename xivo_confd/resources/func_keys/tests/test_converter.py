@@ -78,6 +78,21 @@ class TestTemplateMapper(unittest.TestCase):
 
         assert_that(result, equal_to(expected))
 
+    def test_given_json_dict_with_keys_when_decoding_then_converts_key_positions(self):
+        body = {'name': 'foo',
+                'description': 'bar',
+                'keys': {'1': {'destination': 'parking'},
+                         '2': {'destination': 'custom'}}}
+
+        expected = {'name': 'foo',
+                    'description': 'bar',
+                    'keys': {1: {'destination': 'parking'},
+                             2: {'destination': 'custom'}}}
+
+        result = self.mapper.for_decoding(body)
+
+        assert_that(result, equal_to(expected))
+
     def test_given_empty_model_when_encoding_then_returns_bare_mapping(self):
         model = FuncKeyTemplate(id=1, name='foobar')
         expected = {'id': 1,

@@ -107,6 +107,9 @@ class TemplateMapper(object):
         self.funckey_mapper = funckey_mapper
 
     def for_decoding(self, mapping):
+        if 'keys' in mapping:
+            mapping['keys'] = {int(pos): funckey
+                               for pos, funckey in mapping['keys'].iteritems()}
         return mapping
 
     def for_encoding(self, model):
