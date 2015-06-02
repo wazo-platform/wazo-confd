@@ -245,7 +245,7 @@ class UserDestinationBuilder(DestinationBuilder):
         return UserDestination(user_id=destination['user_id'])
 
     def url(self, destination):
-        return url_for('users.get', id=destination['user_id'], external_=True)
+        return url_for('users.get', resource_id=destination.user_id, _external=True)
 
 
 class GroupDestinationBuilder(DestinationBuilder):

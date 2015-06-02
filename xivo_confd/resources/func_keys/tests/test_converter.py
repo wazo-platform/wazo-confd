@@ -20,9 +20,8 @@ from __future__ import unicode_literals
 
 
 import unittest
-import json
 
-from mock import Mock, sentinel
+from mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to, calling, raises
 
 from xivo_dao.helpers.exception import InputError
@@ -364,6 +363,17 @@ class TestUserDestinationBuilder(unittest.TestCase):
         result = self.builder.build(dest)
 
         assert_that(result, equal_to(expected))
+
+    @patch('xivo_confd.resources.func_keys.converter.url_for')
+    def test_given_destination_then_generates_url(self, url_for):
+        dest = UserDestination(user_id=sentinel.user_id)
+
+        expected = url_for.return_value
+
+        result = self.builder.url(dest)
+
+        assert_that(result, equal_to(expected))
+        url_for.assert_called_once_with('users.get', _external=True, resource_id=sentinel.user_id)
 
 
 class TestGroupDestinationBuilder(unittest.TestCase):
