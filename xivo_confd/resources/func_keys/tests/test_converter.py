@@ -531,9 +531,9 @@ class TestParkPositionDestinationBuilder(unittest.TestCase):
 
     def test_given_destination_type_park_position_then_returns_park_position_destination(self):
         dest = {'type': 'park_position',
-                'position': '701'}
+                'position': 701}
 
-        expected = ParkPositionDestination(position='701')
+        expected = ParkPositionDestination(position=701)
 
         result = self.builder.build(dest)
 

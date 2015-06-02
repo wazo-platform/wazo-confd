@@ -357,8 +357,8 @@ class ParkPositionDestinationBuilder(DestinationBuilder):
     destination = 'park_position'
 
     fields = [Field('position',
-                    Unicode(),
-                    Required(), Regexp(EXTEN_REGEX))
+                    Int(),
+                    Required())
               ]
 
     def to_model(self, destination):
