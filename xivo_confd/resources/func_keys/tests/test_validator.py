@@ -23,7 +23,8 @@ from hamcrest import assert_that, calling, raises
 from xivo_dao.resources.extension.model import ServiceExtension, ForwardExtension, \
     AgentActionExtension
 from xivo_dao.resources.features.model import TransferExtension
-from xivo_dao.resources.func_key.model import FuncKeyTemplate, FuncKey, \
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.resources.func_key.model import FuncKey, \
     ServiceDestination, ForwardDestination, TransferDestination, \
     AgentDestination, ParkPositionDestination
 

@@ -23,7 +23,8 @@ from flask import url_for
 
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.converter import Parser, Mapper, Builder
-from xivo_dao.resources.func_key.model import FuncKeyTemplate, FuncKey
+from xivo_dao.resources.func_key.model import FuncKey
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 
 from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \

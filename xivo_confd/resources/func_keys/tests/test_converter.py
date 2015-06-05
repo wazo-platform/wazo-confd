@@ -38,7 +38,8 @@ from xivo_confd.resources.func_keys.converter import UserDestinationBuilder, \
     ServiceDestinationBuilder, ForwardDestinationBuilder, TransferDestinationBuilder, \
     ParkPositionDestinationBuilder, ParkingDestinationBuilder, AgentDestinationBuilder
 
-from xivo_dao.resources.func_key.model import FuncKeyTemplate, FuncKey
+from xivo_dao.resources.func_key.model import FuncKey
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
     PagingDestination, BSFilterDestination, CustomDestination, \
