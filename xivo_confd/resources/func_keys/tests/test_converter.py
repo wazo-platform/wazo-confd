@@ -71,8 +71,7 @@ class TestTemplateMapper(unittest.TestCase):
         self.mapper = TemplateMapper(self.funckey_mapper)
 
     def test_given_json_dict_when_decoding_then_returns_dict(self):
-        expected = {'name': 'foo',
-                    'description': 'bar'}
+        expected = {'name': 'foo'}
 
         result = self.mapper.for_decoding(expected)
 
@@ -80,12 +79,10 @@ class TestTemplateMapper(unittest.TestCase):
 
     def test_given_json_dict_with_keys_when_decoding_then_converts_key_positions(self):
         body = {'name': 'foo',
-                'description': 'bar',
                 'keys': {'1': {'destination': 'parking'},
                          '2': {'destination': 'custom'}}}
 
         expected = {'name': 'foo',
-                    'description': 'bar',
                     'keys': {1: {'destination': 'parking'},
                              2: {'destination': 'custom'}}}
 
@@ -97,7 +94,6 @@ class TestTemplateMapper(unittest.TestCase):
         model = FuncKeyTemplate(id=1, name='foobar')
         expected = {'id': 1,
                     'name': 'foobar',
-                    'description': None,
                     'keys': {}}
 
         result = self.mapper.for_encoding(model)
@@ -113,7 +109,6 @@ class TestTemplateMapper(unittest.TestCase):
 
         expected = {'id': 1,
                     'name': 'foobar',
-                    'description': None,
                     'keys': {1: expected_mapping}}
 
         result = self.mapper.for_encoding(model)
@@ -243,7 +238,6 @@ class TestTemplateBuilder(unittest.TestCase):
     def test_given_template_with_funckeys_when_creating_then_returns_model(self):
         expected_func_key = self.funckey_builder.create.return_value
         expected = FuncKeyTemplate(name='foobar',
-                                   description=None,
                                    keys={1: expected_func_key})
 
         body = {'name': 'foobar',
@@ -256,11 +250,9 @@ class TestTemplateBuilder(unittest.TestCase):
     def test_given_template_with_complete_funckeys_when_creating_then_returns_model(self):
         expected_func_key = self.funckey_builder.create.return_value
         expected = FuncKeyTemplate(name='foobar',
-                                   description='a foobar template',
                                    keys={1: expected_func_key})
 
         body = {'name': 'foobar',
-                'description': 'a foobar template',
                 'keys': {1: {'label': 'myuser',
                              'blf': True,
                              'destination': {'type': 'user'}}}}
@@ -271,15 +263,12 @@ class TestTemplateBuilder(unittest.TestCase):
 
     def test_given_template_when_updating_then_updates_model(self):
         model = FuncKeyTemplate(name='foobar',
-                                description='a foobar template',
                                 keys={})
 
         expected = FuncKeyTemplate(name='otherfoobar',
-                                   description='another description',
                                    keys={})
 
-        body = {'name': 'otherfoobar',
-                'description': 'another description'}
+        body = {'name': 'otherfoobar'}
 
         self.builder.update(model, body)
 
@@ -290,7 +279,6 @@ class TestTemplateBuilder(unittest.TestCase):
         original_key = Mock(FuncKey)
 
         model = FuncKeyTemplate(name='foobar',
-                                description='a foobar template',
                                 keys={1: unmodified_key,
                                       2: original_key})
 
