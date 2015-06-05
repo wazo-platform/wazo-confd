@@ -343,14 +343,10 @@ class TransferDestinationBuilder(DestinationBuilder):
     fields = [Field('transfer',
                     Unicode(),
                     Required(), Choice(['blind', 'attended'])),
-              Field('exten',
-                    Unicode(),
-                    Required(), Regexp(EXTEN_REGEX))
               ]
 
     def to_model(self, destination):
-        return TransferDestination(transfer=destination['transfer'],
-                                   exten=destination['exten'])
+        return TransferDestination(transfer=destination['transfer'])
 
 
 class ParkPositionDestinationBuilder(DestinationBuilder):

@@ -514,11 +514,9 @@ class TestTransferDestinationBuilder(unittest.TestCase):
 
     def test_given_destination_type_transfer_then_returns_transfer_destination(self):
         dest = {'type': 'transfer',
-                'transfer': 'blind',
-                'exten': '1000'}
+                'transfer': 'blind'}
 
-        expected = TransferDestination(transfer='blind',
-                                       exten='1000')
+        expected = TransferDestination(transfer='blind')
 
         result = self.builder.build(dest)
 
