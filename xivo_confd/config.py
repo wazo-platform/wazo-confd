@@ -68,6 +68,7 @@ DEFAULT_CONFIG = {
         "user_cti_profile",
         "user_line",
         "user_voicemail",
+        "func_keys",
     ],
     'extra_plugins': [],
 }
