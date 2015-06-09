@@ -15,13 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, DeviceValidator, SearchEngine, LineDeviceUpdater
+from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, \
+    DeviceValidator, SearchEngine, LineDeviceUpdater, DeviceUpdater, FuncKeyDeviceUpdater
 from xivo_confd.resources.devices.dao import ProvdDeviceDao, DeviceDao
 from xivo_confd.resources.devices import notifier as device_notifier
 
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.func_key_template import dao as template_dao
+
+from xivo_confd.resources.devices.funckey import build_converters
 
 
 def build_service(device_dao, provd_dao):
@@ -49,12 +55,26 @@ def build_dao(provd_client, provd_dao):
     return device_dao
 
 
-def build_line_device_updater(device_dao):
-    line_device_updater = LineDeviceUpdater(line_dao,
-                                            extension_dao,
-                                            line_extension_dao,
-                                            device_dao)
-    return line_device_updater
+def build_device_updater(device_dao):
+    converters = build_converters()
+    funckey_updater = FuncKeyDeviceUpdater(user_dao,
+                                           line_dao,
+                                           user_line_dao,
+                                           template_dao,
+                                           device_dao,
+                                           converters)
+
+    line_updater = LineDeviceUpdater(line_dao,
+                                     extension_dao,
+                                     line_extension_dao,
+                                     device_dao)
+
+    return DeviceUpdater(line_updater,
+                         funckey_updater,
+                         user_dao,
+                         line_dao,
+                         user_line_dao,
+                         device_dao)
 
 
 def build_line_device_associator(updater):

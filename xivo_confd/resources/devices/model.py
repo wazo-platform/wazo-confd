@@ -57,6 +57,9 @@ class ProvdDevice(object):
         self.device_converter.update_config_id(self.device_id)
         self.config_converter.update_lines(lines)
 
+    def update_funckeys(self, funckeys):
+        self.config_converter.update_funckeys(funckeys)
+
 
 class DeviceConverter(object):
 
@@ -157,6 +160,11 @@ class ConfigConverter(object):
         for line in lines:
             config = line.build()
             self.config['raw_config'][line.section].update(config)
+
+    def update_funckeys(self, new_funckeys):
+        funckeys = self.config['raw_config'].setdefault('funckeys', {})
+        funckeys.clear()
+        funckeys.update(new_funckeys)
 
 
 class EmptyConfigConverter(object):

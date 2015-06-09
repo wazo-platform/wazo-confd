@@ -69,8 +69,13 @@ class DeviceDao(object):
         self.client.device_manager().synchronize(model.id)
 
     def update_lines(self, model, lines):
-        provd_device = self.get(model.id)
+        provd_device = self._get_provd_device(model.id)
         provd_device.update_lines(lines)
+        self.provd_dao.edit(provd_device)
+
+    def update_funckeys(self, model, funckeys):
+        provd_device = self._get_provd_device(model.id)
+        provd_device.update_funckeys(funckeys)
         self.provd_dao.edit(provd_device)
 
     def plugins(self):
@@ -81,7 +86,7 @@ class DeviceDao(object):
         return [t['id'] for t in templates]
 
     def get_registrar(self, registrar_id):
-        return self.config_manager.get(registrar_id)
+        return self.client.config_manager().get(registrar_id)
 
 
 class ProvdDeviceDao(object):

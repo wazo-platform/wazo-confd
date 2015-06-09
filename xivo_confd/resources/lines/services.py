@@ -87,8 +87,8 @@ def delete(line):
 def _update_device(line):
     provd_dao = device_builder.build_provd_dao(provd_client)
     device_dao = device_builder.build_dao(provd_client, provd_dao)
-    line_device_updater = device_builder.build_line_device_updater(device_dao)
-    line_device_updater.update_device_for_line(line)
+    device_updater = device_builder.build_device_updater(device_dao)
+    device_updater.update_for_line(line)
 
 
 def update_callerid(user):
