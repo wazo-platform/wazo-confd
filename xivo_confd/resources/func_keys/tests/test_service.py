@@ -19,12 +19,12 @@
 
 import unittest
 
-from mock import patch, Mock, sentinel
+from mock import Mock, sentinel
 from hamcrest import assert_that, equal_to
 
 from xivo_confd.resources.func_keys.service import TemplateService
 from xivo_confd.resources.devices.service import DeviceUpdater
-from xivo_confd.resources.func_keys.model import FuncKeyTemplate
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 
 
 class TestTemplateService(unittest.TestCase):
