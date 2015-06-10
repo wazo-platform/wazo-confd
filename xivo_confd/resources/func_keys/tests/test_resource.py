@@ -172,18 +172,23 @@ class TestUserTemplateResource(unittest.TestCase):
         assert_that(response, equal_to(('', 204)))
 
     def test_when_dissociating_public_template_then_removes_template_from_user(self):
+        self.user.func_key_template_id = sentinel.public_template_id
+
         expected_user = User(id=sentinel.user_id,
                              private_template_id=sentinel.private_template_id,
                              func_key_template_id=None)
 
-        self.template_dao.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id)
+        self.template_dao.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id,
+                                                             private=False)
 
-        response = self.resource.dissociate_template(sentinel.user_id, sentinel.template_id)
+        response = self.resource.dissociate_template(sentinel.user_id, sentinel.public_template_id)
 
         self.user_dao.edit.assert_called_once_with(expected_user)
         assert_that(response, equal_to(('', 204)))
 
     def test_when_fetching_unified_template_then_merges_funckeys(self):
+        self.user.func_key_template_id = sentinel.public_template_id
+
         expected_response = self.template_converter.encode.return_value
 
         public_funckey = Mock(FuncKey)
@@ -202,4 +207,5 @@ class TestUserTemplateResource(unittest.TestCase):
         assert_that(response, equal_to((expected_response,
                                         200,
                                         {'Content-Type': 'application/json'})))
+
         self.template_converter.encode.assert_called_once_with(expected_template)

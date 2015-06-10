@@ -139,6 +139,7 @@ class TestFuncKeyMapper(unittest.TestCase):
         expected = {'id': sentinel.id,
                     'label': None,
                     'blf': False,
+                    'inherited': True,
                     'destination': expected_destination}
 
         model = FuncKey(id=sentinel.id, destination=destination)

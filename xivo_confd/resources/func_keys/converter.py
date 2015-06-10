@@ -115,7 +115,7 @@ class TemplateMapper(object):
     def for_encoding(self, model):
         mapping = {field: getattr(model, field)
                    for field in model.FIELDS
-                   if field != 'keys'}
+                   if field not in ['keys', 'private']}
         mapping['keys'] = {pos: self.funckey_mapper.for_encoding(funckey)
                            for pos, funckey in model.keys.iteritems()}
         return mapping
