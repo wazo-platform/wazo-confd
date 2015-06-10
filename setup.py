@@ -35,6 +35,8 @@ setup(
 
     zip_safe=False,
     entry_points={
-        'xivo_confd.plugins': []
+        'xivo_confd.plugins': [
+            'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
+        ]
     }
 )
