@@ -19,7 +19,7 @@ import unittest
 from hamcrest import assert_that, equal_to
 
 from mock import Mock, sentinel
-from xivo_confd.resources.devices.service import DeviceService, DeviceValidator, SearchEngine, LineDeviceUpdater, LineDeviceAssociationService
+from xivo_confd.resources.devices.service import DeviceService, DeviceValidator, SearchEngine, LineDeviceUpdater, DeviceUpdater, LineDeviceAssociationService
 from xivo_confd.resources.devices.dao import DeviceDao
 from xivo_confd.resources.devices.model import LineSCCPConverter, LineSIPConverter
 
@@ -71,9 +71,9 @@ class TestDeviceService(unittest.TestCase):
 class TestLineDeviceAssociationService(unittest.TestCase):
 
     def setUp(self):
-        self.line_updater = Mock(LineDeviceUpdater)
+        self.device_updater = Mock(DeviceUpdater)
         self.line_dao = Mock()
-        self.service = LineDeviceAssociationService(self.line_dao, self.line_updater)
+        self.service = LineDeviceAssociationService(self.line_dao, self.device_updater)
 
     def test_when_associating_a_line_to_a_device_then_updates_device_id_on_line(self):
         device = Device(id=sentinel.device_id)
@@ -90,7 +90,7 @@ class TestLineDeviceAssociationService(unittest.TestCase):
 
         self.service.associate(line, device)
 
-        self.line_updater.update_lines.assert_called_once_with(device)
+        self.device_updater.update_for_line.assert_called_once_with(line)
 
     def test_when_dissociating_a_line_to_a_device_then_removes_device_id_on_line(self):
         device = Device(id=sentinel.device_id)
@@ -107,7 +107,7 @@ class TestLineDeviceAssociationService(unittest.TestCase):
 
         self.service.dissociate(line, device)
 
-        self.line_updater.update_lines.assert_called_once_with(device)
+        self.device_updater.update_for_line.assert_called_once_with(line)
 
 
 class TestLineDeviceUpdater(unittest.TestCase):
@@ -152,21 +152,21 @@ class TestLineDeviceUpdater(unittest.TestCase):
     def test_given_no_lines_then_lines_on_device_are_emptied(self):
         self.line_dao.find_all_by_device_id.return_value = []
 
-        self.service.update_lines(self.device)
+        self.service.update(self.device)
 
         self.device_dao.update_lines.assert_called_once_with(self.device, [])
 
     def test_given_no_lines_then_resets_device_to_autoprov(self):
         self.line_dao.find_all_by_device_id.return_value = []
 
-        self.service.update_lines(self.device)
+        self.service.update(self.device)
 
         self.device_dao.reset_autoprov.assert_called_once_with(self.device)
 
     def test_given_unknown_line_protocol_then_does_not_update_lines(self):
         self.build_line(protocol='foobar')
 
-        self.service.update_lines(self.device)
+        self.service.update(self.device)
 
         self.device_dao.update_lines.assert_called_once_with(self.device, [])
 
@@ -174,7 +174,7 @@ class TestLineDeviceUpdater(unittest.TestCase):
         line = self.build_line(protocol='sccp')
         expected_converter = LineSCCPConverter(sentinel.registrar)
 
-        self.service.update_lines(self.device)
+        self.service.update(self.device)
 
         self.device_dao.update_lines.assert_called_once_with(self.device, [expected_converter])
 
@@ -185,7 +185,7 @@ class TestLineDeviceUpdater(unittest.TestCase):
         self.build_line(protocol='sip')
         self.line_extension_dao.find_by_line_id.return_value = None
 
-        self.service.update_lines(self.device)
+        self.service.update(self.device)
 
         self.device_dao.update_lines.assert_called_once_with(self.device, [])
 
@@ -196,7 +196,7 @@ class TestLineDeviceUpdater(unittest.TestCase):
 
         expected_converter = LineSIPConverter(sentinel.registrar, line, extension)
 
-        self.service.update_lines(self.device)
+        self.service.update(self.device)
 
         self.device_dao.update_lines.assert_called_once_with(self.device, [expected_converter])
 
