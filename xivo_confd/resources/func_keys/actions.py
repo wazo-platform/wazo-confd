@@ -34,7 +34,7 @@ from xivo_dao.resources.func_key_template import dao as template_dao
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter, ResourceSerializer
 from xivo_confd.helpers.resource import DecoratorChain, CRUDResource
-from xivo_confd.helpers import validator as val
+from xivo_confd.helpers import validator as common_validator
 from xivo_confd.resources.func_keys.resource import FuncKeyResource, UserFuncKeyResource, UserTemplateResource
 from xivo_confd.resources.devices import builder
 
@@ -44,25 +44,6 @@ from xivo_confd.resources.func_keys import validator as fk_validator
 from xivo_confd.resources.func_keys import notifier
 
 logger = logging.getLogger(__name__)
-
-
-class ValidationGroup(object):
-
-    def __init__(self, validators):
-        self.validators = validators
-
-    def validate_create(self, model):
-        self.validate(model)
-
-    def validate_edit(self, model):
-        self.validate(model)
-
-    def validate_delete(self, model):
-        self.validate(model)
-
-    def validate(self, model):
-        for validator in self.validators:
-            validator.validate(model)
 
 
 def load(core_rest_api):
@@ -81,9 +62,8 @@ def load(core_rest_api):
                             'agent': fk_converter.AgentDestinationBuilder(),
                             }
 
-    template_converter = build_converter(destination_builders, {'func_key_templates': 'id'})
-    user_template_converter = build_converter(destination_builders, {})
-
+    template_converter = build_template_converter(destination_builders, {'func_key_templates': 'id'})
+    user_template_converter = build_template_converter(destination_builders, {})
     funckey_converter = build_fk_converter(destination_builders)
 
     validator = build_validator()
@@ -106,6 +86,7 @@ def load(core_rest_api):
 
     blueprint = Blueprint('func_key_templates', __name__, url_prefix='/%s/funckeys/templates' % config.API_VERSION)
     user_blueprint = core_rest_api.blueprint('users')
+
     chain = DecoratorChain(core_rest_api, blueprint)
 
     chain.get().decorate(template_resource.get)
@@ -117,6 +98,7 @@ def load(core_rest_api):
     chain.get("/<int:template_id>/<int:position>").decorate(funckey_resource.get_funckey)
 
     user_chain = DecoratorChain(core_rest_api, user_blueprint)
+
     user_chain.get("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.get_funckey)
     user_chain.edit("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.update_funckey)
     user_chain.delete("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.remove_funckey)
@@ -138,7 +120,7 @@ def build_fk_converter(destination_builders):
     return Converter(parser, funckey_mapper, serializer, funckey_builder)
 
 
-def build_converter(destination_builders, resources):
+def build_template_converter(destination_builders, resources):
     parser = fk_converter.JsonParser()
 
     funckey_validator = fk_converter.FuncKeyValidator(destination_builders)
@@ -159,23 +141,23 @@ def build_converter(destination_builders, resources):
 
 def build_validator():
     destination_validators = {
-        'user': [val.ResourceGetValidator('user_id', user_dao.get, 'User')],
-        'group': [val.ResourceExistValidator('group_id', group_dao.exists, 'Group')],
-        'queue': [val.ResourceExistValidator('queue_id', queue_dao.exists, 'Queue')],
-        'conference': [val.ResourceExistValidator('conference_id', conference_dao.exists, 'Conference')],
+        'user': [common_validator.ResourceGetValidator('user_id', user_dao.get, 'User')],
+        'group': [common_validator.ResourceExistValidator('group_id', group_dao.exists, 'Group')],
+        'queue': [common_validator.ResourceExistValidator('queue_id', queue_dao.exists, 'Queue')],
+        'conference': [common_validator.ResourceExistValidator('conference_id', conference_dao.exists, 'Conference')],
         'custom': [],
         'service': [fk_validator.ServiceValidator(extension_dao)],
         'forward': [fk_validator.ForwardValidator(extension_dao)],
         'transfer': [fk_validator.TransferValidator(feature_dao)],
         'agent': [fk_validator.AgentActionValidator(extension_dao),
-                  val.ResourceExistValidator('agent_id', agent_dao.exists, 'Agent')],
+                  common_validator.ResourceExistValidator('agent_id', agent_dao.exists, 'Agent')],
         'park_position': [fk_validator.ParkPositionValidator(feature_dao)],
         'parking': [],
-        'paging': [val.ResourceExistValidator('paging_id', paging_dao.exists, 'Paging')],
-        'bsfilter': [val.ResourceExistValidator('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
+        'paging': [common_validator.ResourceExistValidator('paging_id', paging_dao.exists, 'Paging')],
+        'bsfilter': [common_validator.ResourceExistValidator('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
     }
 
     funckey_validator = fk_validator.FuncKeyValidator(destination_validators)
     mapping_validator = fk_validator.FuncKeyMappingValidator(funckey_validator)
 
-    return ValidationGroup([val.RequiredValidator(), mapping_validator])
+    return fk_validator.ValidationGroup([common_validator.RequiredValidator(), mapping_validator])

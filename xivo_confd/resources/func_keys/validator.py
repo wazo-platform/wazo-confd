@@ -111,3 +111,24 @@ class ParkPositionValidator(Validator):
 
         if not min_pos <= position <= max_pos:
             raise errors.outside_park_range(position, min=min_pos, max=max_pos)
+
+
+class ValidationGroup(object):
+
+    def __init__(self, validators):
+        self.validators = validators
+
+    def validate_create(self, model):
+        self.validate(model)
+
+    def validate_edit(self, model):
+        self.validate(model)
+
+    def validate_delete(self, model):
+        self.validate(model)
+
+    def validate(self, model):
+        for validator in self.validators:
+            validator.validate(model)
+
+
