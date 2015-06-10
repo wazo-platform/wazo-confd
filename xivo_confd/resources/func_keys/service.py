@@ -45,14 +45,6 @@ class TemplateService(object):
         self.validator.validate_delete(template)
         users = self.user_dao.find_all_by_template_id(template.id)
         self.template_dao.delete(template)
-        self.device_updater.update_for_users(users)
+        for user in users:
+            self.device_updater.update_for_user(user)
         self.notifier.deleted(template)
-
-
-class DeviceUpdater(object):
-
-    def update_for_template(self, template):
-        pass
-
-    def update_for_users(self, users):
-        pass
