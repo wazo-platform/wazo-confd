@@ -22,9 +22,11 @@ from stevedore.enabled import EnabledExtensionManager
 logger = logging.getLogger(__name__)
 
 
-def load_plugins(application):
+def load_plugins(application, config):
+    enabled_plugins = config['enabled_plugins']
+    logger.debug('Enabled plugins: %s', enabled_plugins)
     plugins = EnabledExtensionManager(namespace='xivo_confd.plugins',
-                                      check_func=check_plugin,
+                                      check_func=lambda p: p.name in enabled_plugins,
                                       on_load_failure_callback=plugins_load_fail,
                                       propagate_map_exceptions=True,
                                       invoke_on_load=True)
@@ -45,4 +47,5 @@ def launch_plugin(ext, application):
 
 
 def plugins_load_fail(_, entrypoint, exception):
-    logger.warning("There is an error with this module: %s\n%s", entrypoint, exception)
+    logger.warning("There is an error with this module: %s", entrypoint)
+    logger.warning('%s', exception)
