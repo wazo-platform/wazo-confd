@@ -242,7 +242,7 @@ class LineSCCPConverter(LineConverter):
         self.registrar = registrar
 
     def build(self):
-        slot = {1: {'ip': self.registar['proxy_main']}}
+        slot = {1: {'ip': self.registrar['proxy_main']}}
 
         proxy_backup = self.registrar.get('proxy_backup', '')
         if proxy_backup:
