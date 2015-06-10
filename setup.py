@@ -25,17 +25,16 @@ setup(
     version='0.1',
     description='XIVO CONFD daemon',
     author='Avencall',
-    author_email='xivo-dev@lists.proformatique.com',
-    url='http://git.xivo.io/',
+    author_email='dev@avencall.com',
+    url='http://github.com/xivo-pbx/xivo-confd',
     license='GPLv3',
     packages=find_packages(),
     scripts=[
         'bin/xivo-confd'
     ],
 
-    zip_safe = False,
+    zip_safe=False,
     entry_points={
         'xivo_confd.plugins': []
     }
-
 )

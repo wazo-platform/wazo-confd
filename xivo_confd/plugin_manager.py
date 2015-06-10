@@ -20,10 +20,10 @@ from stevedore.enabled import EnabledExtensionManager
 
 def load_plugins(application):
     plugins = EnabledExtensionManager(namespace='xivo_confd.plugins',
-                                       check_func=check_plugin,
-                                       on_load_failure_callback=plugins_load_fail,
-                                       propagate_map_exceptions=True,
-                                       invoke_on_load=True)
+                                      check_func=check_plugin,
+                                      on_load_failure_callback=plugins_load_fail,
+                                      propagate_map_exceptions=True,
+                                      invoke_on_load=True)
 
     try:
         plugins.map(launch_plugin, application)
@@ -44,4 +44,3 @@ def plugins_load_fail(manager, entrypoint, exception):
     print "There is an error with this module: ", manager
     print "The entry point is: ", entrypoint
     print "The exception is: ", exception
-
