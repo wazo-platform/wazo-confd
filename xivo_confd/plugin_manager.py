@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
+
 from stevedore.enabled import EnabledExtensionManager
+
+logger = logging.getLogger(__name__)
 
 
 def load_plugins(application):
@@ -28,7 +32,7 @@ def load_plugins(application):
     try:
         plugins.map(launch_plugin, application)
     except RuntimeError:
-        print "There is no plugin to load!"
+        logger.info('There is no plugin to load!')
 
 
 def check_plugin(plugin):
@@ -36,11 +40,9 @@ def check_plugin(plugin):
 
 
 def launch_plugin(ext, application):
-    print "Loading dynamic plugin : %s" % ext.name
+    logger.debug('Loading dynamic plugin: %s', ext.name)
     ext.obj.load(application)
 
 
-def plugins_load_fail(manager, entrypoint, exception):
-    print "There is an error with this module: ", manager
-    print "The entry point is: ", entrypoint
-    print "The exception is: ", exception
+def plugins_load_fail(_, entrypoint, exception):
+    logger.warning("There is an error with this module: %s\n%s", entrypoint, exception)
