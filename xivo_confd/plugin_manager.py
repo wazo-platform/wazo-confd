@@ -32,18 +32,14 @@ def load_plugins(application, config):
                                       invoke_on_load=True)
 
     try:
-        plugins.map(launch_plugin, application)
+        plugins.map(launch_plugin, application, config)
     except RuntimeError:
         logger.info('There is no plugin to load!')
 
 
-def check_plugin(plugin):
-    return True
-
-
-def launch_plugin(ext, application):
+def launch_plugin(ext, application, config):
     logger.debug('Loading dynamic plugin: %s', ext.name)
-    ext.obj.load(application)
+    ext.obj.load(application, config)
 
 
 def plugins_load_fail(_, entrypoint, exception):
