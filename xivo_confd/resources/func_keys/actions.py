@@ -41,8 +41,7 @@ from xivo_confd.resources.devices import builder
 from xivo_confd.resources.func_keys import service as fk_service
 from xivo_confd.resources.func_keys import converter as fk_converter
 from xivo_confd.resources.func_keys import validator as fk_validator
-
-from xivo_bus.resources.func_key import notifier
+from xivo_confd.resources.func_keys import notifier
 
 logger = logging.getLogger(__name__)
 
