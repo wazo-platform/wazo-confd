@@ -15,4 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.interfaces import BasePlugin  # noqa
+import abc
+
+
+class BasePlugin(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def load(self, app, config):
+        pass
+
+    def unload(self):
+        pass
