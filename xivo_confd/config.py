@@ -54,6 +54,7 @@ DEFAULT_CONFIG = {
     'provd': {
     },
     'default_plugins': [
+        "api",
         "call_logs",
         "configuration",
         "cti_profiles",
