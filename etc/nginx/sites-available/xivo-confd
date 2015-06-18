@@ -3,8 +3,8 @@ server {
     listen 127.0.0.1:50050;
     listen 50051 ssl;
 
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_certificate /usr/share/xivo-certs/server.crt;
+    ssl_certificate_key /usr/share/xivo-certs/server.key;
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
     location / {
