@@ -37,7 +37,7 @@ rest_api:
         allow_headers: Content-Type
 
 
-# Event bus (AMQP) connection informations
+# Event bus (AMQP) connection information
 bus:
     username: guest
     password: guest
@@ -47,7 +47,7 @@ bus:
     exchange_type: topic
     exchange_durable: True
 
-# xivo-provd connection informations.
+# xivo-provd connection information
 provd:
     host: localhost
     port: 8666
