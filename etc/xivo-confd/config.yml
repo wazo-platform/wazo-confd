@@ -52,6 +52,11 @@ provd:
     host: localhost
     port: 8666
 
+#xivo-sysconfd connection information
+sysconfd:
+    host: localhost
+    port: 8668
+
 # Extra resources to load.
 # This is deprecated and for retro-compatibility only.
 #extra_plugins:
