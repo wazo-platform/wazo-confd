@@ -1,14 +1,3 @@
-services:
-  # This image checks that all the links are up by pinging the ports.
-  # Used to make sure everything is ready before executing tests
-  image: n3llyb0y/wait
-  links:
-    - rabbitmq
-    - postgres
-    - provd
-    - sysconfd
-  environment:
-    PORTS: "5672 5432 8666 8668"
 provd:
   image: xivo/xivo-provd
   ports:
@@ -21,6 +10,8 @@ postgres:
   image: xivo/xivo-postgres
   expose:
     - "5432"
+  ports:
+    - "5432:5432"
   volumes:
     - "./etc/xivo-postgres/populate_db.sh:/docker-entrypoint-initdb.d/populate_db.sh"
 rabbitmq:
@@ -28,13 +19,16 @@ rabbitmq:
   expose:
     - "5672"
 sysconfd:
-  image: xivo-confd-test
+  image: nickstenning/flask
   expose:
     - "8668"
-  command:
-    "python /usr/src/mock_sysconfd/mock_sysconfd.py"
+  volumes:
+    - "./mock_sysconfd/:/tmp/mock_sysconfd"
+  command: "python /tmp/mock_sysconfd/mock_sysconfd.py"
 confd:
   image: xivo-confd-test
+  expose:
+    - "9486"
   ports:
     - "9486:9486"
   links:
@@ -45,13 +39,24 @@ confd:
   command: "xivo-confd -f -d"
   volumes:
     - "./etc/xivo-confd:/etc/xivo-confd"
-confddaemon:
+testdeps:
+  # This image checks that all the links are up by pinging the ports.
+  # Used to make sure everything is ready before executing tests
   image: n3llyb0y/wait
   links:
-    - confd
     - rabbitmq
-    - provd
     - postgres
+    - provd
     - sysconfd
+  environment:
+    PORTS: "5672 5432 8666 8668"
+tests:
+  image: n3llyb0y/wait
+  links:
+    - rabbitmq
+    - postgres
+    - provd
+    - sysconfd
+    - confd
   environment:
     PORTS: "5672 5432 8666 8668 9486"
