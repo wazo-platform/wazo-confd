@@ -17,90 +17,30 @@
 
 
 import os
-import logging
-import subprocess
-import time
-
-from client import ConfdClient
-
-ASSETS_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
-ASSET_PATH = os.path.join(ASSETS_ROOT, 'base')
-DOCKER_SERVICES = ('testdeps', 'tests')
-
-logger = logging.getLogger(__name__)
+from setup import setup_docker, stop_docker, new_client, new_confd
 
 
-class BuilderProxy(object):
+class FactoryProxy(object):
 
-    def __init__(self, func):
-        self.func = func
+    def __init__(self, factory_func):
+        self.factory_func = factory_func
 
     def __getattr__(self, name):
-        return getattr(self.func(), name)
+        return getattr(self.factory_func(), name)
 
     def __call__(self):
-        return self.func()
+        return self.factory_func()
 
 
 def setup():
-    setup_docker()
+    if os.environ.get('DOCKER', '1') == '1':
+        setup_docker()
 
 
 def teardown():
-    stop_docker()
+    if os.environ.get('DOCKER', '1') == '1':
+        stop_docker()
 
 
-def new_client(headers=None):
-    xivo_host = os.environ.get('XIVO_HOST', 'localhost')
-    xivo_confd_port = os.environ.get('XIVO_CONFD_PORT', 9486)
-    xivo_confd_login = os.environ.get('XIVO_CONFD_LOGIN', 'admin')
-    xivo_confd_password = os.environ.get('XIVO_CONFD_PASSWORD', 'proformatique')
-    xivo_https = bool(os.environ.get('XIVO_HTTPS', ''))
-    client = ConfdClient.from_options(host=xivo_host,
-                                      port=xivo_confd_port,
-                                      username=xivo_confd_login,
-                                      password=xivo_confd_password,
-                                      https=xivo_https,
-                                      headers=headers)
-    return client
-
-
-def new_confd(headers=None):
-    return new_client(headers).url
-
-
-def setup_docker():
-    _cleanup_docker()
-    _start_docker()
-
-
-def stop_docker():
-    os.chdir(ASSET_PATH)
-    _run_cmd(('docker-compose', 'kill'))
-
-
-def _cleanup_docker():
-    os.chdir(ASSET_PATH)
-    _run_cmd(('docker-compose', 'kill'))
-    _run_cmd(('docker-compose', 'rm', '-f'))
-
-
-def _start_docker():
-    os.chdir(ASSET_PATH)
-    for service in DOCKER_SERVICES:
-        cmd = ('docker-compose', 'run', '--rm', '--service-ports', service)
-        _run_cmd(cmd)
-        time.sleep(3)
-
-
-def _run_cmd(cmd):
-    process = subprocess.Popen(cmd,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT)
-    out, _ = process.communicate()
-    logger.info(out)
-    return out
-
-
-confd = BuilderProxy(new_confd)
-client = BuilderProxy(new_client)
+confd = FactoryProxy(new_confd)
+client = FactoryProxy(new_client)

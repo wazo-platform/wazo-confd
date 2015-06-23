@@ -20,7 +20,7 @@
 import unittest
 
 from test_api import errors as e
-from test_api import new_client
+from test_api.setup import new_client
 
 
 class TestCallLogs(unittest.TestCase):
