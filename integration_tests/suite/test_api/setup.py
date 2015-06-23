@@ -1,6 +1,5 @@
 import os
 import subprocess
-import time
 import logging
 
 from client import ConfdClient
@@ -49,7 +48,6 @@ def cleanup_docker():
 def start_docker():
     os.chdir(ASSET_PATH)
     run_cmd(('docker-compose', 'run', '--rm', '--service-ports', 'testdeps'))
-    time.sleep(3)
     run_cmd(('docker-compose', 'run', '--rm', '--service-ports', 'tests'))
 
 
