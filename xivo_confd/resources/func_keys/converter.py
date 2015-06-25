@@ -53,7 +53,7 @@ class TemplateValidator(object):
 
     DOCUMENT = Document([
         Field('id', Int()),
-        Field('name', Unicode(), create=[Required()]),
+        Field('name', Unicode()),
         Field('keys', Dict())
     ])
 
@@ -151,7 +151,7 @@ class TemplateBuilder(Builder):
         self.validator.validate(mapping, 'create')
         key_mapping = mapping.get('keys', {})
         funckeys = self.create_funckeys(key_mapping)
-        return FuncKeyTemplate(name=mapping['name'],
+        return FuncKeyTemplate(name=mapping.get('name'),
                                keys=funckeys)
 
     def update(self, model, mapping):

@@ -155,12 +155,6 @@ class TestTemplateValidator(unittest.TestCase):
         self.funckey_validator = Mock(FuncKeyValidator)
         self.validator = TemplateValidator(self.funckey_validator)
 
-    def test_given_missing_required_fields_when_creating_then_raises_error(self):
-        body = {}
-
-        assert_that(calling(self.validator.validate).with_args(body, action='create'),
-                    raises(InputError))
-
     def test_given_unknown_fields_when_validating_then_raises_error(self):
         body = {'name': 'foobar', 'invalid': 'invalid'}
 
