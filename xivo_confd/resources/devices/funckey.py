@@ -77,7 +77,7 @@ class UserConverter(FuncKeyConverter):
 
     def build(self, user, line, position, funckey):
         funckey_line = self.find_user_line(funckey.destination.user_id)
-        if not line:
+        if not funckey_line:
             return {}
 
         extension = self.find_extension(funckey_line)
