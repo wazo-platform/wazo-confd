@@ -18,4 +18,5 @@ INSERT INTO "contextinclude" (context, include) VALUES ('default', 'to-extern')
 INSERT INTO "contextnumbers" (context, type, numberbeg, numberend, didlength) VALUES ('default', 'user', '1000', '1999', 0)
 INSERT INTO "contextnumbers" (context, type, numberbeg, numberend, didlength) VALUES ('from-extern', 'incall', '1000', '4999', 0)
 
+CREATE DATABASE xivotemplate TEMPLATE asterisk
 EOF
