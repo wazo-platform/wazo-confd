@@ -80,7 +80,8 @@ class UserTemplateResource(object):
         template = self.template_dao.get(template_id)
         user = self.user_dao.get(user_id)
         if template.private:
-            raise errors.not_found("FuncKeyTemplate", id=template_id)
+            raise errors.not_permitted("Cannot associate a private template with a user",
+                                       template_id=template_id)
         user.func_key_template_id = template.id
         self.user_dao.edit(user)
         return ('', 204)
@@ -89,7 +90,7 @@ class UserTemplateResource(object):
         self.template_dao.get(template_id)
         user = self.user_dao.get(user_id)
         if user.func_key_template_id != template_id:
-            raise errors.not_found("FuncKeyTemplate", id=template_id)
+            raise errors.not_found("FuncKeyTemplate", template_id=template_id)
         user.func_key_template_id = None
         self.user_dao.edit(user)
         return ('', 204)
