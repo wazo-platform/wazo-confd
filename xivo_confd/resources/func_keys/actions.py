@@ -160,4 +160,8 @@ def build_validator():
     funckey_validator = fk_validator.FuncKeyValidator(destination_validators)
     mapping_validator = fk_validator.FuncKeyMappingValidator(funckey_validator)
 
-    return fk_validator.ValidationGroup([common_validator.RequiredValidator(), mapping_validator])
+    required_validator = common_validator.RequiredValidator()
+    private_template_validator = fk_validator.PrivateTemplateValidator()
+
+    return common_validator.ValidationGroup(common=[required_validator, mapping_validator],
+                                            delete=[private_template_validator])
