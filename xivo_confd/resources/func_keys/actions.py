@@ -35,7 +35,7 @@ from xivo_confd import config
 from xivo_confd.helpers.converter import Converter, ResourceSerializer
 from xivo_confd.helpers.resource import DecoratorChain, CRUDResource
 from xivo_confd.helpers import validator as common_validator
-from xivo_confd.resources.func_keys.resource import FuncKeyResource, UserFuncKeyResource, UserTemplateResource
+from xivo_confd.resources.func_keys.resource import FuncKeyResource, UserFuncKeyResource, UserTemplateResource, TemplateManipulator
 from xivo_confd.resources.devices import builder
 
 from xivo_confd.resources.func_keys import service as fk_service
@@ -67,6 +67,7 @@ def load(core_rest_api):
     funckey_converter = build_fk_converter(destination_builders)
 
     validator = build_validator()
+    bsfilter_validator = fk_validator.BSFilterValidator(bsfilter_dao)
 
     provd_client = core_rest_api.provd_client()
     provd_dao = builder.build_provd_dao(provd_client)
@@ -79,9 +80,10 @@ def load(core_rest_api):
                                          notifier,
                                          device_updater)
 
+    template_manipulator = TemplateManipulator(service)
     template_resource = CRUDResource(service, template_converter)
-    funckey_resource = FuncKeyResource(service, funckey_converter)
-    user_funckey_resource = UserFuncKeyResource(funckey_resource, user_dao)
+    funckey_resource = FuncKeyResource(template_manipulator, funckey_converter)
+    user_funckey_resource = UserFuncKeyResource(template_manipulator, funckey_converter, bsfilter_validator, user_dao)
     user_template_resource = UserTemplateResource(user_dao, template_dao, user_template_converter)
 
     blueprint = Blueprint('func_key_templates', __name__, url_prefix='/%s/funckeys/templates' % config.API_VERSION)
