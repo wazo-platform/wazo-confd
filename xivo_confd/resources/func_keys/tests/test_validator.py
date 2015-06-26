@@ -28,13 +28,30 @@ from xivo_dao.resources.func_key.model import FuncKey, \
     ServiceDestination, ForwardDestination, TransferDestination, \
     AgentDestination, ParkPositionDestination
 
-from xivo_dao.helpers.exception import InputError
+from xivo_dao.helpers.exception import InputError, ResourceError
 
 from xivo_confd.helpers.validator import Validator
 from xivo_confd.resources.func_keys.validator import FuncKeyMappingValidator
 from xivo_confd.resources.func_keys.validator import FuncKeyValidator, \
     ServiceValidator, ForwardValidator, TransferValidator, AgentActionValidator, \
-    ParkPositionValidator
+    ParkPositionValidator, PrivateTemplateValidator
+
+
+class TestPrivateTemplateValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = PrivateTemplateValidator()
+
+    def test_when_validating_private_template_then_raises_error(self):
+        template = FuncKeyTemplate(private=True)
+
+        assert_that(calling(self.validator.validate).with_args(template),
+                    raises(ResourceError))
+
+    def test_when_validating_public_template_then_validation_passes(self):
+        template = FuncKeyTemplate(private=False)
+
+        self.validator.validate(template)
 
 
 class TestFuncKeyMappingValidator(unittest.TestCase):

@@ -21,6 +21,14 @@ from xivo_confd.helpers.validator import Validator
 from xivo_dao.helpers import errors
 
 
+class PrivateTemplateValidator(Validator):
+
+    def validate(self, template):
+        if template.private:
+            raise errors.not_permitted("Deleting private templates is not allowed",
+                                       template_id=template.id)
+
+
 class FuncKeyMappingValidator(Validator):
 
     def __init__(self, funckey_validator):
