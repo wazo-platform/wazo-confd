@@ -133,3 +133,18 @@ class ParkPositionValidator(Validator):
 
         if not min_pos <= position <= max_pos:
             raise errors.outside_park_range(position, min=min_pos, max=max_pos)
+
+
+class BSFilterValidator(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, user, funckey):
+        if funckey.destination.type != 'bsfilter':
+            return
+
+        member_ids = [filter_member.member_id
+                      for filter_member in self.dao.find_all_by_member_id(user.id)]
+        if not member_ids:
+            raise errors.missing_association('User', 'BSFilter', user_id=user.id)
