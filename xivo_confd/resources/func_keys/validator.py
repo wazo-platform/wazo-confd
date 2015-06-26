@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from collections import Counter
+
 from xivo_confd.helpers.validator import Validator
 
 from xivo_dao.helpers import errors
@@ -27,6 +29,18 @@ class PrivateTemplateValidator(Validator):
         if template.private:
             raise errors.not_permitted("Deleting private templates is not allowed",
                                        template_id=template.id)
+
+
+class SimilarFuncKeyValidator(Validator):
+
+    def validate(self, template):
+        counter = Counter(funckey.hash_destination()
+                          for funckey in template.keys.values())
+        if len(counter) > 0:
+            destination, counts = counter.most_common(1)[0]
+            if counts > 1:
+                args = dict(destination)
+                raise errors.resource_exists('destination', **args)
 
 
 class FuncKeyMappingValidator(Validator):

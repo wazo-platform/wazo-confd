@@ -26,7 +26,7 @@ from xivo_dao.resources.features.model import TransferExtension
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 from xivo_dao.resources.func_key.model import FuncKey, \
     ServiceDestination, ForwardDestination, TransferDestination, \
-    AgentDestination, ParkPositionDestination
+    AgentDestination, ParkPositionDestination, CustomDestination
 
 from xivo_dao.helpers.exception import InputError, ResourceError
 
@@ -34,7 +34,38 @@ from xivo_confd.helpers.validator import Validator
 from xivo_confd.resources.func_keys.validator import FuncKeyMappingValidator
 from xivo_confd.resources.func_keys.validator import FuncKeyValidator, \
     ServiceValidator, ForwardValidator, TransferValidator, AgentActionValidator, \
-    ParkPositionValidator, PrivateTemplateValidator
+    ParkPositionValidator, PrivateTemplateValidator, SimilarFuncKeyValidator
+
+
+class TestSimilarFuncKeyValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = SimilarFuncKeyValidator()
+
+    def test_when_template_empty_then_validation_passes(self):
+        template = FuncKeyTemplate()
+
+        self.validator.validate(template)
+
+    def test_when_template_has_a_single_func_key_then_validation_passes(self):
+        funckey = FuncKey(destination=CustomDestination(exten='1234'))
+        template = FuncKeyTemplate(keys={1: funckey})
+
+        self.validator.validate(template)
+
+    def test_when_template_has_two_func_keys_with_different_destination_then_validation_passes(self):
+        template = FuncKeyTemplate(keys={1: FuncKey(destination=CustomDestination(exten='1234')),
+                                         2: FuncKey(destination=ServiceDestination(service='enablednd'))})
+
+        self.validator.validate(template)
+
+    def test_when_template_has_two_func_keys_with_same_destination_then_raises_error(self):
+        destination = CustomDestination(exten='1234')
+        template = FuncKeyTemplate(keys={1: FuncKey(destination=destination),
+                                         2: FuncKey(destination=destination)})
+
+        assert_that(calling(self.validator.validate).with_args(template),
+                    raises(ResourceError))
 
 
 class TestPrivateTemplateValidator(unittest.TestCase):
