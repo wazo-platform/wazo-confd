@@ -55,7 +55,7 @@ class FuncKeyConverter(object):
 
     def provd_funckey(self, line, position, funckey, value):
         return {position: {
-            'label': funckey.label,
+            'label': (funckey.label or ''),
             'line': line.device_slot,
             'type': self.determine_type(funckey),
             'value': value}}
