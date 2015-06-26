@@ -17,131 +17,90 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-from mock import sentinel, Mock, patch
-from hamcrest import assert_that, equal_to, is_not, has_key, calling, raises
+from mock import sentinel, Mock
+from hamcrest import assert_that, equal_to, is_not, has_key
 
 from xivo_confd.helpers.converter import Converter
 
 from xivo_confd.resources.func_keys.service import TemplateService
-from xivo_confd.resources.func_keys.resource import FuncKeyResource, UserFuncKeyResource, UserTemplateResource
+from xivo_confd.resources.func_keys.resource import UserFuncKeyResource, UserTemplateResource, TemplateManipulator
+from xivo_confd.resources.func_keys.validator import BSFilterValidator
 
-from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.user.model import User
 from xivo_dao.resources.func_key.model import FuncKey
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 
 
-@patch('xivo_confd.resources.func_keys.resource.request')
-class TestFuncKeyTemplateResource(unittest.TestCase):
+class TestFuncKeyManipulator(unittest.TestCase):
 
     def setUp(self):
         self.service = Mock(TemplateService)
-        self.funckey_converter = Mock(Converter)
+        self.manipulator = TemplateManipulator(self.service)
 
-        self.resource = FuncKeyResource(self.service,
-                                        self.funckey_converter)
-
-    def test_when_getting_func_key_then_returns_encoded_funckey(self, request):
-        funckey = Mock(FuncKey)
-        template = FuncKeyTemplate(keys={1: funckey})
-        self.service.get.return_value = template
-
-        expected_response = self.funckey_converter.encode.return_value
-
-        response = self.resource.get_funckey(sentinel.template_id, 1)
-
-        assert_that(response, equal_to((expected_response, 200,
-                                        {'Content-Type': 'application/json'})))
-
-    def test_given_template_empty_when_getting_func_key_then_raises_error(self, request):
-        template = FuncKeyTemplate(keys={})
-        self.service.get.return_value = template
-
-        assert_that(calling(self.resource.get_funckey).with_args(sentinel.template_id, 1),
-                    raises(NotFoundError))
-
-    def test_when_updating_func_key_then_updates_template_using_request(self, request):
+    def test_when_updating_func_key_then_updates_template(self):
         funckey = Mock(FuncKey)
         expected_funckey = Mock(FuncKey)
 
         template = FuncKeyTemplate(keys={1: funckey})
         self.service.get.return_value = template
-        self.funckey_converter.decode.return_value = expected_funckey
 
-        response = self.resource.update_funckey(sentinel.template_id, 1)
+        self.manipulator.update_funckey(sentinel.template_id, 1, expected_funckey)
 
         assert_that(template.keys[1], equal_to(expected_funckey))
-        assert_that(response, equal_to(('', 204)))
         self.service.get.assert_called_once_with(sentinel.template_id)
         self.service.edit.assert_called_once_with(template)
 
-    def test_given_position_does_not_exist_when_updating_then_adds_key(self, request):
+    def test_given_position_does_not_exist_when_updating_then_adds_key(self):
         expected_funckey = Mock(FuncKey)
 
         template = FuncKeyTemplate(keys={})
         self.service.get.return_value = template
-        self.funckey_converter.decode.return_value = expected_funckey
 
-        self.resource.update_funckey(sentinel.template_id, 2)
+        self.manipulator.update_funckey(sentinel.template_id, 2, expected_funckey)
 
         assert_that(template.keys[2], equal_to(expected_funckey))
 
-    def test_when_deleting_func_key_then_removes_func_key_from_template(self, request):
+    def test_when_deleting_func_key_then_removes_func_key_from_template(self):
         funckey = Mock(FuncKey)
         template = FuncKeyTemplate(keys={1: funckey})
         self.service.get.return_value = template
 
-        self.resource.remove_funckey(sentinel.template_id, 1)
+        self.manipulator.remove_funckey(sentinel.template_id, 1)
 
         assert_that(template.keys, is_not(has_key(1)))
         self.service.get.assert_called_once_with(sentinel.template_id)
         self.service.edit.assert_called_once_with(template)
 
-    def test_given_template_is_empty_when_deleting_func_key_then_returns_success(self, request):
+    def test_given_template_is_empty_when_deleting_func_key_then_returns_success(self):
         template = FuncKeyTemplate(keys={})
         self.service.get.return_value = template
 
-        response = self.resource.remove_funckey(sentinel.template_id, 1)
-
-        assert_that(response, equal_to(('', 204)))
+        self.manipulator.remove_funckey(sentinel.template_id, 1)
 
 
 class TestUserFuncKeyResource(unittest.TestCase):
 
     def setUp(self):
-        self.fk_resource = Mock(FuncKeyResource)
+        self.manipulator = Mock(TemplateManipulator)
+        self.converter = Mock(Converter)
+        self.validator = Mock(BSFilterValidator)
 
-        self.user_dao = Mock()
         self.user = User(id=sentinel.user_id,
                          private_template_id=sentinel.private_template_id)
+        self.user_dao = Mock()
         self.user_dao.get.return_value = self.user
 
-        self.resource = UserFuncKeyResource(self.fk_resource,
+        self.resource = UserFuncKeyResource(self.manipulator,
+                                            self.converter,
+                                            self.validator,
                                             self.user_dao)
 
-    def test_when_updating_func_key_then_updates_private_template(self):
-        expected_response = self.fk_resource.update_funckey.return_value
+    def test_when_updating_func_key_then_calls_bsfilter_validator(self):
+        funckey = self.converter.decode.return_value = Mock(FuncKey)
 
-        response = self.resource.update_funckey(sentinel.user_id, 1)
+        self.resource.update_funckey(sentinel.user_id, 1)
 
-        self.fk_resource.update_funckey.assert_called_once_with(sentinel.private_template_id, 1)
-        assert_that(response, equal_to(expected_response))
-
-    def test_when_removing_func_key_then_removes_from_private_template(self):
-        expected_response = self.fk_resource.remove_funckey.return_value
-
-        response = self.resource.remove_funckey(sentinel.user_id, 1)
-
-        self.fk_resource.remove_funckey.assert_called_once_with(sentinel.private_template_id, 1)
-        assert_that(response, equal_to(expected_response))
-
-    def test_when_getting_func_key_then_gets_from_private_template(self):
-        expected_response = self.fk_resource.get_funckey.return_value
-
-        response = self.resource.get_funckey(sentinel.user_id, 1)
-
-        self.fk_resource.get_funckey.assert_called_once_with(sentinel.private_template_id, 1)
-        assert_that(response, equal_to(expected_response))
+        self.validator.validate.assert_called_once_with(self.user, funckey)
 
 
 class TestUserTemplateResource(unittest.TestCase):

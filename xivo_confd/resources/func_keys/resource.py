@@ -21,52 +21,75 @@ from flask import request
 from xivo_dao.helpers import errors
 
 
-class FuncKeyResource(object):
+class TemplateManipulator(object):
 
-    def __init__(self, service, converter):
+    def __init__(self, service):
         self.service = service
-        self.converter = converter
 
     def get_funckey(self, template_id, position):
         template = self.service.get(template_id)
         if position not in template.keys:
             raise errors.not_found('FuncKey', template_id=template_id, position=position)
-        funckey = template.keys[position]
-        response = self.converter.encode(funckey)
-        return (response, 200, {'Content-Type': 'application/json'})
+        return template.keys[position]
 
-    def update_funckey(self, template_id, position):
+    def update_funckey(self, template_id, position, funckey):
         template = self.service.get(template_id)
-        funckey = self.converter.decode(request)
         template.keys[position] = funckey
         self.service.edit(template)
-        return ('', 204)
 
     def remove_funckey(self, template_id, position):
         template = self.service.get(template_id)
         if position in template.keys:
             del template.keys[position]
         self.service.edit(template)
+
+
+class FuncKeyResource(object):
+
+    def __init__(self, manipulator, converter):
+        self.manipulator = manipulator
+        self.converter = converter
+
+    def get_funckey(self, template_id, position):
+        funckey = self.manipulator.get_funckey(template_id, position)
+        response = self.converter.encode(funckey)
+        return (response, 200, {'Content-Type': 'application/json'})
+
+    def update_funckey(self, template_id, position):
+        funckey = self.converter.decode(request)
+        self.manipulator.update_funckey(template_id, position, funckey)
+        return ('', 204)
+
+    def remove_funckey(self, template_id, position):
+        self.manipulator.remove_funckey(template_id, position)
         return ('', 204)
 
 
 class UserFuncKeyResource(object):
 
-    def __init__(self, fk_resource, user_dao):
-        self.fk_resource = fk_resource
+    def __init__(self, manipulator, converter, validator, user_dao):
+        self.manipulator = manipulator
+        self.converter = converter
+        self.validator = validator
         self.user_dao = user_dao
 
     def update_funckey(self, user_id, position):
         user = self.user_dao.get(user_id)
-        return self.fk_resource.update_funckey(user.private_template_id, position)
+        funckey = self.converter.decode(request)
+        self.validator.validate(user, funckey)
+        self.manipulator.update_funckey(user.private_template_id, position, funckey)
+        return ('', 204)
 
     def remove_funckey(self, user_id, position):
         user = self.user_dao.get(user_id)
-        return self.fk_resource.remove_funckey(user.private_template_id, position)
+        self.manipulator.remove_funckey(user.private_template_id, position)
+        return ('', 204)
 
     def get_funckey(self, user_id, position):
         user = self.user_dao.get(user_id)
-        return self.fk_resource.get_funckey(user.private_template_id, position)
+        funckey = self.manipulator.get_funckey(user.private_template_id, position)
+        response = self.converter.encode(funckey)
+        return (response, 200, {'Content-Type': 'application/json'})
 
 
 class UserTemplateResource(object):
