@@ -375,7 +375,7 @@ class AgentDestinationBuilder(DestinationBuilder):
 
     fields = [Field('action',
                     Unicode(),
-                    Required(), Choice(['login', 'logoff', 'toggle'])),
+                    Required(), Choice(['login', 'logout', 'toggle'])),
               Field('agent_id', Int(), Required())]
 
     def to_model(self, destination):
