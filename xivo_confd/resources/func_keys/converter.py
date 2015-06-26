@@ -325,12 +325,12 @@ class ForwardDestinationBuilder(DestinationBuilder):
                     Required(), Choice(['noanswer', 'busy', 'unconditional'])),
               Field('exten',
                     Unicode(),
-                    Required(), Regexp(EXTEN_REGEX))
+                    Regexp(EXTEN_REGEX))
               ]
 
     def to_model(self, destination):
         return ForwardDestination(forward=destination['forward'],
-                                  exten=destination['exten'])
+                                  exten=destination.get('exten'))
 
 
 class TransferDestinationBuilder(DestinationBuilder):

@@ -489,6 +489,17 @@ class TestForwardDestinationBuilder(unittest.TestCase):
 
         assert_that(result, equal_to(expected))
 
+    def test_given_no_exten_then_returns_forward_destination(self):
+        dest = {'type': 'forward',
+                'forward': 'noanswer'}
+
+        expected = ForwardDestination(forward='noanswer',
+                                      exten=None)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
 
 class TestTransferDestinationBuilder(unittest.TestCase):
 
