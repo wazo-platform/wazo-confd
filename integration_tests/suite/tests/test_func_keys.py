@@ -76,13 +76,13 @@ class TestUserWithFuncKey(TestFuncKey):
     def test_when_updating_position_then_func_key_modified_in_provd(self):
         modified_funckey = {'blf': True,
                             'label': 'myfunckey',
-                            'destination': {'type': 'service',
-                                            'service': 'enablednd'}}
+                            'destination': {'type': 'park_position',
+                                            'position': 701}}
 
         provd_funckey = {'label': 'myfunckey',
                          'type': 'blf',
                          'line': 1,
-                         'value': '*25'}
+                         'value': '701'}
 
         self.funckey_url.put(**modified_funckey).assert_ok()
 
@@ -151,7 +151,7 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             '24': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
             '25': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
             '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
-            '27': {'label': '', 'type': 'speeddial', 'line': 1, 'value': parking},
+            '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
             '28': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*11{paging}'.format(paging=paging_number)},
             '29': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
             '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
@@ -182,13 +182,13 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             '21': {'destination': {'type': 'transfer', 'transfer': 'blind'}},
             '22': {'destination': {'type': 'transfer', 'transfer': 'attended'}},
             '23': {'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
-            '24': {'destination': {'type': 'agent', 'action': 'logoff', 'agent_id': agent_id}},
+            '24': {'destination': {'type': 'agent', 'action': 'logout', 'agent_id': agent_id}},
             '25': {'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
             '26': {'destination': {'type': 'park_position', 'position': park_pos}},
             '27': {'destination': {'type': 'parking'}},
             '28': {'destination': {'type': 'paging', 'paging_id': paging_id}},
             '29': {'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
-            '30': {'destination': {'type': 'service', 'service': 'automon'}},
+            '30': {'destination': {'type': 'onlinerec'}},
             '31': {'destination': {'type': 'service', 'service': 'fwdundoall'}},
         }
 
@@ -202,7 +202,7 @@ class TestAllFuncKeyDestinations(TestFuncKey):
     def assert_template_has_funckey(self, funckeys, pos, expected):
         base = {'label': None,
                 'blf': False,
-                'inherited': False}
+                'inherited': True}
 
         assert_that(funckeys, has_key(pos))
 
@@ -227,7 +227,7 @@ class TestTemplateAssociation(TestFuncKey):
 
         self.provd_funckeys = {
             '1': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '9999'},
-            '2': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '700'}
+            '2': {'label': '', 'type': 'park', 'line': 1, 'value': '700'}
         }
 
         response = confd.funckeys.templates.post(keys=self.funckeys)
@@ -250,15 +250,17 @@ class TestTemplateAssociation(TestFuncKey):
 
     def test_given_user_has_funckey_when_template_associated_then_funckeys_merged(self):
         second_funckey = {'destination': {'type': 'user', 'user_id': self.user['id']}}
-        third_funckey = {'destination': {'type': 'service', 'service': 'enablednd'}}
+        third_funckey = {'destination': {'type': 'service', 'service': 'phonestatus'}}
 
         first_provd_funckey = self.provd_funckeys['1']
         second_provd_funckey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '1000'}
-        third_provd_fundkey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*25'}
+        third_provd_fundkey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*10'}
 
         with confd.users(self.user['id']).funckeys as url:
             url(2).put(**second_funckey).assert_ok()
             url(3).put(**third_funckey).assert_ok()
+
+        self.association_url.put().assert_ok()
 
         self.check_provd_has_funckey('1', first_provd_funckey)
         self.check_provd_has_funckey('2', second_provd_funckey)
@@ -305,7 +307,7 @@ class TestBlfFuncKeys(TestFuncKey):
             '19': {'blf': True, 'destination': {'type': 'forward', 'forward': 'unconditional'}},
             '20': {'blf': True, 'destination': {'type': 'forward', 'forward': 'busy', 'exten': forward_number}},
             '23': {'blf': True, 'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
-            '24': {'blf': True, 'destination': {'type': 'agent', 'action': 'logoff', 'agent_id': agent_id}},
+            '24': {'blf': True, 'destination': {'type': 'agent', 'action': 'logout', 'agent_id': agent_id}},
             '25': {'blf': True, 'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
             '26': {'blf': True, 'destination': {'type': 'park_position', 'position': park_pos}},
             '29': {'blf': True, 'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
@@ -340,7 +342,7 @@ class TestBlfFuncKeys(TestFuncKey):
     def test_when_creating_func_key_that_cannot_be_blf_then_func_key_isnt_blf_in_provd(self):
         position = '1'
         funckey = {'blf': True, 'destination': {'type': 'parking'}}
-        provd_funckey = {'label': '', 'type': 'park', 'line': 1, 'value': '700'},
+        provd_funckey = {'label': '', 'type': 'park', 'line': 1, 'value': '700'}
 
         self.add_funckey_to_user(position, funckey)
         self.check_provd_has_funckey(position, provd_funckey)
