@@ -312,7 +312,7 @@ def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')
     password = os.environ.get('DB_PASSORD', 'proformatique')
     host = os.environ.get('DB_HOST', 'localhost')
-    port = os.environ.get('DB_PORT', 5432)
+    port = os.environ.get('DB_PORT', 15432)
     db = os.environ.get('DB_NAME', 'asterisk')
 
     return DbHelper.build(user, password, host, port, db)
