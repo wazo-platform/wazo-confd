@@ -36,7 +36,8 @@ from xivo_confd.resources.func_keys.converter import UserDestinationBuilder, \
     ConferenceDestinationBuilder, GroupDestinationBuilder, QueueDestinationBuilder, \
     PagingDestinationBuilder, BSFilterDestinationBuilder, CustomDestinationBuilder, \
     ServiceDestinationBuilder, ForwardDestinationBuilder, TransferDestinationBuilder, \
-    ParkPositionDestinationBuilder, ParkingDestinationBuilder, AgentDestinationBuilder
+    ParkPositionDestinationBuilder, ParkingDestinationBuilder, AgentDestinationBuilder, \
+    OnlineRecordingDestinationBuilder
 
 from xivo_dao.resources.func_key.model import FuncKey
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
@@ -44,7 +45,8 @@ from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
     PagingDestination, BSFilterDestination, CustomDestination, \
     ServiceDestination, ForwardDestination, TransferDestination, \
-    ParkPositionDestination, ParkingDestination, AgentDestination
+    ParkPositionDestination, ParkingDestination, AgentDestination, \
+    OnlineRecordingDestination
 
 
 class TestJsonParser(unittest.TestCase):
@@ -559,6 +561,21 @@ class TestAgentDestinationBuilder(unittest.TestCase):
                 'agent_id': 1234}
 
         expected = AgentDestination(action='login', agent_id=1234)
+
+        result = self.builder.build(dest)
+
+        assert_that(result, equal_to(expected))
+
+
+class TestOnlineRecordingDestinationBuilder(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = OnlineRecordingDestinationBuilder()
+
+    def test_given_destination_type_onlinerec_then_returns_online_recording_destination(self):
+        dest = {'type': 'onlinerec'}
+
+        expected = OnlineRecordingDestination()
 
         result = self.builder.build(dest)
 

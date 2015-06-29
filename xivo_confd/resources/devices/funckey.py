@@ -41,7 +41,8 @@ def build_converters():
             'park_position': ParkPositionConverter(),
             'parking': ParkingConverter(features_dao),
             'bsfilter': BSFilterConverter(extension_dao),
-            'agent': AgentConverter(extension_dao)
+            'agent': AgentConverter(extension_dao),
+            'onlinerec': OnlineRecordingConverter(features_dao),
             }
 
 
@@ -269,3 +270,16 @@ class AgentConverter(FuncKeyConverter):
                                  '*{}'.format(funckey.destination.agent_id))
 
         return self.provd_funckey(line, position, funckey, value)
+
+
+class OnlineRecordingConverter(FuncKeyConverter):
+
+    def __init__(self, features_dao):
+        self.features_dao = features_dao
+
+    def build(self, user, line, position, funckey):
+        exten = self.features_dao.get_value(funckey.destination.feature_id)
+        return self.provd_funckey(line, position, funckey, exten)
+
+    def determine_type(self, funckey):
+        return 'speeddial'

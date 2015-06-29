@@ -30,7 +30,8 @@ from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
     PagingDestination, BSFilterDestination, ServiceDestination, \
     CustomDestination, ForwardDestination, TransferDestination, \
-    ParkPositionDestination, ParkingDestination, AgentDestination
+    ParkPositionDestination, ParkingDestination, AgentDestination, \
+    OnlineRecordingDestination
 
 from xivo_confd.helpers.mooltiparse import Document, Field, \
     Int, Boolean, Unicode, Dict, \
@@ -381,3 +382,13 @@ class AgentDestinationBuilder(DestinationBuilder):
     def to_model(self, destination):
         return AgentDestination(action=destination['action'],
                                 agent_id=destination['agent_id'])
+
+
+class OnlineRecordingDestinationBuilder(DestinationBuilder):
+
+    destination = 'onlinerec'
+
+    fields = []
+
+    def to_model(self, destination):
+        return OnlineRecordingDestination()

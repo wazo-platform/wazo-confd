@@ -60,6 +60,7 @@ def load(core_rest_api):
                             'parking': fk_converter.ParkingDestinationBuilder(),
                             'bsfilter': fk_converter.BSFilterDestinationBuilder(),
                             'agent': fk_converter.AgentDestinationBuilder(),
+                            'onlinerec': fk_converter.OnlineRecordingDestinationBuilder(),
                             }
 
     template_converter = build_template_converter(destination_builders, {'func_key_templates': 'id'})
@@ -156,6 +157,7 @@ def build_validator():
                   common_validator.ResourceExistValidator('agent_id', agent_dao.exists, 'Agent')],
         'park_position': [fk_validator.ParkPositionValidator(feature_dao)],
         'parking': [],
+        'onlinerec': [],
         'paging': [common_validator.ResourceExistValidator('paging_id', paging_dao.exists, 'Paging')],
         'bsfilter': [common_validator.ResourceExistValidator('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
     }
