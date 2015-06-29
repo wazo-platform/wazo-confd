@@ -23,25 +23,54 @@ from xivo_dao.helpers import errors
 
 class TemplateManipulator(object):
 
-    def __init__(self, service):
-        self.service = service
+    def __init__(self, tpl_service, device_updater, user_dao):
+        self.tpl_service = tpl_service
+        self.device_updater = device_updater
+        self.user_dao = user_dao
 
     def get_funckey(self, template_id, position):
-        template = self.service.get(template_id)
+        template = self.tpl_service.get(template_id)
         if position not in template.keys:
             raise errors.not_found('FuncKey', template_id=template_id, position=position)
         return template.keys[position]
 
     def update_funckey(self, template_id, position, funckey):
-        template = self.service.get(template_id)
+        template = self.tpl_service.get(template_id)
         template.keys[position] = funckey
-        self.service.edit(template)
+        self.tpl_service.edit(template)
 
     def remove_funckey(self, template_id, position):
-        template = self.service.get(template_id)
+        template = self.tpl_service.get(template_id)
         if position in template.keys:
             del template.keys[position]
-        self.service.edit(template)
+        self.tpl_service.edit(template)
+
+    def associate_user(self, template_id, user_id):
+        template = self.tpl_service.get(template_id)
+        user = self.user_dao.get(user_id)
+        if template.private:
+            raise errors.not_permitted("Cannot associate a private template with a user",
+                                       template_id=template_id)
+        user.func_key_template_id = template.id
+        self.user_dao.edit(user)
+        self.device_updater.update_for_user(user)
+
+    def dissociate_user(self, template_id, user_id):
+        user = self.user_dao.get(user_id)
+        if user.func_key_template_id != template_id:
+            raise errors.not_found("FuncKeyTemplate", template_id=template_id)
+        user.func_key_template_id = None
+        self.user_dao.edit(user)
+        self.device_updater.update_for_user(user)
+
+    def get_unified_template(self, user_id):
+        user = self.user_dao.get(user_id)
+        if user.func_key_template_id:
+            public_template = self.tpl_service.get(user.func_key_template_id)
+            private_template = self.tpl_service.get(user.private_template_id)
+            return public_template.merge(private_template)
+        else:
+            return self.tpl_service.get(user.private_template_id)
 
 
 class FuncKeyResource(object):
@@ -94,37 +123,19 @@ class UserFuncKeyResource(object):
 
 class UserTemplateResource(object):
 
-    def __init__(self, user_dao, template_dao, template_converter):
-        self.user_dao = user_dao
-        self.template_dao = template_dao
+    def __init__(self, manipulator, template_converter):
+        self.manipulator = manipulator
         self.template_converter = template_converter
 
     def associate_template(self, user_id, template_id):
-        template = self.template_dao.get(template_id)
-        user = self.user_dao.get(user_id)
-        if template.private:
-            raise errors.not_permitted("Cannot associate a private template with a user",
-                                       template_id=template_id)
-        user.func_key_template_id = template.id
-        self.user_dao.edit(user)
+        self.manipulator.associate_user(template_id, user_id)
         return ('', 204)
 
     def dissociate_template(self, user_id, template_id):
-        self.template_dao.get(template_id)
-        user = self.user_dao.get(user_id)
-        if user.func_key_template_id != template_id:
-            raise errors.not_found("FuncKeyTemplate", template_id=template_id)
-        user.func_key_template_id = None
-        self.user_dao.edit(user)
+        self.manipulator.dissociate_user(template_id, user_id)
         return ('', 204)
 
     def get_unified_template(self, user_id):
-        user = self.user_dao.get(user_id)
-        if user.func_key_template_id:
-            public_template = self.template_dao.get(user.func_key_template_id)
-            private_template = self.template_dao.get(user.private_template_id)
-            unified_template = public_template.merge(private_template)
-        else:
-            unified_template = self.template_dao.get(user.private_template_id)
-        response = self.template_converter.encode(unified_template)
+        template = self.manipulator.get_unified_template(user_id)
+        response = self.template_converter.encode(template)
         return (response, 200, {'Content-Type': 'application/json'})

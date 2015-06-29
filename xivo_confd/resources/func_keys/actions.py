@@ -80,11 +80,11 @@ def load(core_rest_api):
                                          notifier,
                                          device_updater)
 
-    template_manipulator = TemplateManipulator(service)
+    template_manipulator = TemplateManipulator(service, device_updater, user_dao)
     template_resource = CRUDResource(service, template_converter)
     funckey_resource = FuncKeyResource(template_manipulator, funckey_converter)
     user_funckey_resource = UserFuncKeyResource(template_manipulator, funckey_converter, bsfilter_validator, user_dao)
-    user_template_resource = UserTemplateResource(user_dao, template_dao, user_template_converter)
+    user_template_resource = UserTemplateResource(template_manipulator, user_template_converter)
 
     blueprint = Blueprint('func_key_templates', __name__, url_prefix='/%s/funckeys/templates' % config.API_VERSION)
     user_blueprint = core_rest_api.blueprint('users')

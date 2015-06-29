@@ -18,14 +18,16 @@
 
 import unittest
 from mock import sentinel, Mock
-from hamcrest import assert_that, equal_to, is_not, has_key
+from hamcrest import assert_that, equal_to, is_not, has_key, calling, raises
 
 from xivo_confd.helpers.converter import Converter
 
 from xivo_confd.resources.func_keys.service import TemplateService
-from xivo_confd.resources.func_keys.resource import UserFuncKeyResource, UserTemplateResource, TemplateManipulator
+from xivo_confd.resources.func_keys.resource import UserFuncKeyResource, TemplateManipulator
 from xivo_confd.resources.func_keys.validator import BSFilterValidator
+from xivo_confd.resources.devices.service import DeviceUpdater
 
+from xivo_dao.helpers.exception import ResourceError, NotFoundError
 from xivo_dao.resources.user.model import User
 from xivo_dao.resources.func_key.model import FuncKey
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
@@ -35,7 +37,9 @@ class TestFuncKeyManipulator(unittest.TestCase):
 
     def setUp(self):
         self.service = Mock(TemplateService)
-        self.manipulator = TemplateManipulator(self.service)
+        self.device_updater = Mock(DeviceUpdater)
+        self.user_dao = Mock()
+        self.manipulator = TemplateManipulator(self.service, self.device_updater, self.user_dao)
 
     def test_when_updating_func_key_then_updates_template(self):
         funckey = Mock(FuncKey)
@@ -77,6 +81,85 @@ class TestFuncKeyManipulator(unittest.TestCase):
 
         self.manipulator.remove_funckey(sentinel.template_id, 1)
 
+    def test_when_associating_template_then_adds_template_to_user(self):
+        self.service.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id)
+        self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                              private_template_id=sentinel.private_template_id)
+
+        expected_user = User(id=sentinel.user_id,
+                             private_template_id=sentinel.private_template_id,
+                             func_key_template_id=sentinel.public_template_id)
+
+        self.manipulator.associate_user(sentinel.template_id, sentinel.user_id)
+
+        self.user_dao.edit.assert_called_once_with(expected_user)
+        self.device_updater.update_for_user.assert_called_once_with(expected_user)
+
+    def test_when_associating_private_template_then_raises_error(self):
+        self.service.get.return_value = FuncKeyTemplate(id=sentinel.private_template_id,
+                                                        private=True)
+        self.user_dao.get.return_value = User(id=sentinel.user_id)
+
+        assert_that(
+            calling(self.manipulator.associate_user).with_args(sentinel.template_id, sentinel.user_id),
+            raises(ResourceError))
+
+    def test_when_dissociating_public_template_then_removes_template_from_user(self):
+        self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                              private_template_id=sentinel.private_template_id,
+                                              func_key_template_id=sentinel.public_template_id)
+
+        expected_user = User(id=sentinel.user_id,
+                             private_template_id=sentinel.private_template_id,
+                             func_key_template_id=None)
+
+        self.manipulator.dissociate_user(sentinel.public_template_id, sentinel.user_id)
+
+        self.user_dao.edit.assert_called_once_with(expected_user)
+        self.device_updater.update_for_user.assert_called_once_with(expected_user)
+
+    def test_when_dissociating_unknown_template_then_raises_error(self):
+        self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                              private_template_id=sentinel.private_template_id,
+                                              func_key_template_id=sentinel.other_template_id)
+
+        assert_that(
+            calling(self.manipulator.dissociate_user).with_args(sentinel.template_id, sentinel.user_id),
+            raises(NotFoundError))
+
+    def test_when_fetching_unified_template_then_merges_funckeys(self):
+        self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                              private_template_id=sentinel.private_template_id,
+                                              func_key_template_id=sentinel.public_template_id)
+
+        public_funckey = Mock(FuncKey)
+        private_funckey = Mock(FuncKey)
+
+        public_template = FuncKeyTemplate(keys={1: public_funckey})
+        private_template = FuncKeyTemplate(keys={2: private_funckey})
+
+        self.service.get.side_effect = [public_template, private_template]
+
+        expected_template = FuncKeyTemplate(keys={1: public_funckey,
+                                                  2: private_funckey})
+
+        result = self.manipulator.get_unified_template(sentinel.user_id)
+
+        assert_that(result, equal_to(expected_template))
+
+    def test_given_no_template_associated_when_fetching_unified_template_then_returns_private_template(self):
+        self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                              private_template_id=sentinel.private_template_id,
+                                              func_key_template_id=None)
+
+        private_funckey = Mock(FuncKey)
+        private_template = FuncKeyTemplate(keys={1: private_funckey})
+        self.service.get.return_value = private_template
+
+        result = self.manipulator.get_unified_template(sentinel.user_id)
+
+        assert_that(result, equal_to(private_template))
+
 
 class TestUserFuncKeyResource(unittest.TestCase):
 
@@ -101,70 +184,3 @@ class TestUserFuncKeyResource(unittest.TestCase):
         self.resource.update_funckey(sentinel.user_id, 1)
 
         self.validator.validate.assert_called_once_with(self.user, funckey)
-
-
-class TestUserTemplateResource(unittest.TestCase):
-
-    def setUp(self):
-        self.template_converter = Mock(Converter)
-        self.template_dao = Mock()
-
-        self.user_dao = Mock()
-        self.user = User(id=sentinel.user_id,
-                         private_template_id=sentinel.private_template_id)
-        self.user_dao.get.return_value = self.user
-
-        self.resource = UserTemplateResource(self.user_dao,
-                                             self.template_dao,
-                                             self.template_converter)
-
-    def test_when_associating_public_template_then_adds_template_to_user(self):
-        expected_user = User(id=sentinel.user_id,
-                             private_template_id=sentinel.private_template_id,
-                             func_key_template_id=sentinel.public_template_id)
-
-        self.template_dao.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id)
-
-        response = self.resource.associate_template(sentinel.user_id, sentinel.template_id)
-
-        self.user_dao.edit.assert_called_once_with(expected_user)
-        assert_that(response, equal_to(('', 204)))
-
-    def test_when_dissociating_public_template_then_removes_template_from_user(self):
-        self.user.func_key_template_id = sentinel.public_template_id
-
-        expected_user = User(id=sentinel.user_id,
-                             private_template_id=sentinel.private_template_id,
-                             func_key_template_id=None)
-
-        self.template_dao.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id,
-                                                             private=False)
-
-        response = self.resource.dissociate_template(sentinel.user_id, sentinel.public_template_id)
-
-        self.user_dao.edit.assert_called_once_with(expected_user)
-        assert_that(response, equal_to(('', 204)))
-
-    def test_when_fetching_unified_template_then_merges_funckeys(self):
-        self.user.func_key_template_id = sentinel.public_template_id
-
-        expected_response = self.template_converter.encode.return_value
-
-        public_funckey = Mock(FuncKey)
-        private_funckey = Mock(FuncKey)
-
-        public_template = FuncKeyTemplate(keys={1: public_funckey})
-        private_template = FuncKeyTemplate(keys={2: private_funckey})
-
-        expected_template = FuncKeyTemplate(keys={1: public_funckey,
-                                                  2: private_funckey})
-
-        self.template_dao.get.side_effect = [public_template, private_template]
-
-        response = self.resource.get_unified_template(sentinel.user_id)
-
-        assert_that(response, equal_to((expected_response,
-                                        200,
-                                        {'Content-Type': 'application/json'})))
-
-        self.template_converter.encode.assert_called_once_with(expected_template)
