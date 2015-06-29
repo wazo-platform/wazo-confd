@@ -91,6 +91,7 @@ def load(core_rest_api):
 
     chain = DecoratorChain(core_rest_api, blueprint)
 
+    chain.search().decorate(template_resource.search)
     chain.get().decorate(template_resource.get)
     chain.create().decorate(template_resource.create)
     chain.delete().decorate(template_resource.delete)

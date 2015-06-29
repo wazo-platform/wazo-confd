@@ -42,6 +42,9 @@ class TemplateService(object):
     def get(self, template_id):
         return self.template_dao.get(template_id)
 
+    def search(self, parameters):
+        return self.template_dao.search(**parameters)
+
     def create(self, template):
         self.validator.validate_create(template)
         self.adjust_blfs(template)
