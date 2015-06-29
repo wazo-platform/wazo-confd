@@ -44,6 +44,10 @@ class TestFuncKey(unittest.TestCase):
 
         assert_that(funckeys, is_not(has_key(pos)))
 
+    def add_funckey_to_user(self, pos, funckey):
+        response = confd.users(self.user['id']).funckeys(pos).put(**funckey)
+        response.assert_ok()
+
 
 class TestUserWithFuncKey(TestFuncKey):
 
@@ -212,10 +216,6 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             self.add_funckey_to_user(pos, funckey)
             self.check_provd_has_funckey(pos, provd_funckey)
 
-    def add_funckey_to_user(self, pos, funckey):
-        response = confd.users(self.user['id']).funckeys(pos).put(**funckey)
-        response.assert_ok()
-
 
 class TestTemplateAssociation(TestFuncKey):
 
@@ -272,3 +272,75 @@ class TestTemplateAssociation(TestFuncKey):
 
         for pos in self.provd_funckeys.keys():
             self.check_provd_does_not_have_funckey(pos)
+
+
+class TestBlfFuncKeys(TestFuncKey):
+
+    def setUp(self):
+        super(TestBlfFuncKeys, self).setUp()
+
+        user_exten = '1000'
+        conf_exten = '4000'
+        forward_number = '5000'
+        custom_exten = '9999'
+        park_pos = 701
+
+        with self.db.queries() as queries:
+            conference_id = queries.insert_conference(number=conf_exten)
+            callfilter_id = queries.insert_callfilter()
+            agent_id = queries.insert_agent(self.user['id'])
+            filter_member_id = queries.insert_filter_member(callfilter_id,
+                                                            self.user['id'])
+
+        self.confd_funckeys = {
+            '1': {'blf': True, 'destination': {'type': 'user', 'user_id': self.user['id']}},
+            '4': {'blf': True, 'destination': {'type': 'conference', 'conference_id': conference_id}},
+            '5': {'blf': True, 'destination': {'type': 'custom', 'exten': custom_exten}},
+            '8': {'blf': True, 'destination': {'type': 'service', 'service': 'callrecord'}},
+            '9': {'blf': True, 'destination': {'type': 'service', 'service': 'incallfilter'}},
+            '10': {'blf': True, 'destination': {'type': 'service', 'service': 'enablednd'}},
+            '14': {'blf': True, 'destination': {'type': 'service', 'service': 'enablevm'}},
+            '17': {'blf': True, 'destination': {'type': 'forward', 'forward': 'noanswer'}},
+            '18': {'blf': True, 'destination': {'type': 'forward', 'forward': 'busy'}},
+            '19': {'blf': True, 'destination': {'type': 'forward', 'forward': 'unconditional'}},
+            '20': {'blf': True, 'destination': {'type': 'forward', 'forward': 'busy', 'exten': forward_number}},
+            '23': {'blf': True, 'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
+            '24': {'blf': True, 'destination': {'type': 'agent', 'action': 'logoff', 'agent_id': agent_id}},
+            '25': {'blf': True, 'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
+            '26': {'blf': True, 'destination': {'type': 'park_position', 'position': park_pos}},
+            '29': {'blf': True, 'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
+        }
+
+        self.provd_funckeys = {
+            '1': {'label': '', 'type': 'blf', 'line': 1, 'value': user_exten},
+            '4': {'label': '', 'type': 'blf', 'line': 1, 'value': conf_exten},
+            '5': {'label': '', 'type': 'blf', 'line': 1, 'value': custom_exten},
+            '8': {'label': '', 'type': 'blf', 'line': 1, 'value': '*26'},
+            '9': {'label': '', 'type': 'blf', 'line': 1, 'value': '*27'},
+            '10': {'label': '', 'type': 'blf', 'line': 1, 'value': '*25'},
+            '14': {'label': '', 'type': 'blf', 'line': 1, 'value': '*90'},
+            '17': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
+            '18': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
+            '19': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
+            '20': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'],
+                                                                                                      fwd=forward_number)},
+            '23': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '24': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '25': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
+            '29': {'label': '', 'type': 'blf', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
+        }
+
+    def test_when_adding_blf_func_keys_to_user_then_func_keys_added_in_provd(self):
+        for pos, funckey in self.confd_funckeys.items():
+            provd_funckey = self.provd_funckeys[pos]
+            self.add_funckey_to_user(pos, funckey)
+            self.check_provd_has_funckey(pos, provd_funckey)
+
+    def test_when_creating_func_key_that_cannot_be_blf_then_func_key_isnt_blf_in_provd(self):
+        position = '1'
+        funckey = {'blf': True, 'destination': {'type': 'parking'}}
+        provd_funckey = {'label': '', 'type': 'park', 'line': 1, 'value': '700'},
+
+        self.add_funckey_to_user(position, funckey)
+        self.check_provd_has_funckey(position, provd_funckey)
