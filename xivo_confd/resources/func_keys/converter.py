@@ -37,6 +37,8 @@ from xivo_confd.helpers.mooltiparse import Document, Field, \
     Int, Boolean, Unicode, Dict, \
     Required, Choice, Regexp
 
+from xivo_confd.helpers.converter import Converter, ResourceSerializer
+
 
 EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
 
@@ -392,3 +394,51 @@ class OnlineRecordingDestinationBuilder(DestinationBuilder):
 
     def to_model(self, destination):
         return OnlineRecordingDestination()
+
+
+def build_destinations(exclude=None):
+    exclude = exclude or []
+    destinations = {'user': UserDestinationBuilder(),
+                    'group': GroupDestinationBuilder(),
+                    'queue': QueueDestinationBuilder(),
+                    'conference': ConferenceDestinationBuilder(),
+                    'paging': PagingDestinationBuilder(),
+                    'service': ServiceDestinationBuilder(),
+                    'custom': CustomDestinationBuilder(),
+                    'forward': ForwardDestinationBuilder(),
+                    'transfer': TransferDestinationBuilder(),
+                    'park_position': ParkPositionDestinationBuilder(),
+                    'parking': ParkingDestinationBuilder(),
+                    'bsfilter': BSFilterDestinationBuilder(),
+                    'agent': AgentDestinationBuilder(),
+                    'onlinerec': OnlineRecordingDestinationBuilder(),
+                    }
+
+    for name in exclude:
+        del destinations[name]
+
+    return destinations
+
+
+def build_funckey_converter(exclude=None):
+    destinations = build_destinations(exclude)
+    parser = JsonParser()
+    funckey_validator = FuncKeyValidator(destinations)
+    funckey_mapper = FuncKeyMapper(destinations)
+    funckey_builder = FuncKeyBuilder(funckey_validator, destinations)
+    serializer = ResourceSerializer({})
+    return Converter(parser, funckey_mapper, serializer, funckey_builder)
+
+
+def build_template_converter(funckey_converter):
+    parser = JsonParser()
+    funckey_converter = build_funckey_converter()
+
+    template_validator = TemplateValidator(funckey_converter.builder.validator)
+    template_mapper = TemplateMapper(funckey_converter.mapper)
+    template_builder = TemplateBuilder(template_validator, funckey_converter.builder)
+    serializer = ResourceSerializer({'func_key_templates': 'id'})
+
+    converter = Converter(parser, template_mapper, serializer, template_builder)
+
+    return converter

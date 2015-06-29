@@ -20,23 +20,14 @@ import logging
 
 from flask import Blueprint
 
-from xivo_dao.resources.agent import dao as agent_dao
 from xivo_dao.resources.bsfilter import dao as bsfilter_dao
-from xivo_dao.resources.conference import dao as conference_dao
-from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.features import dao as feature_dao
-from xivo_dao.resources.group import dao as group_dao
-from xivo_dao.resources.paging import dao as paging_dao
-from xivo_dao.resources.queue import dao as queue_dao
-from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.user import dao as user_dao
 
 from xivo_confd import config
-from xivo_confd.helpers.converter import Converter, ResourceSerializer
 from xivo_confd.helpers.resource import DecoratorChain, CRUDResource
-from xivo_confd.helpers import validator as common_validator
 from xivo_confd.resources.func_keys.resource import FuncKeyResource, UserFuncKeyResource, UserTemplateResource, TemplateManipulator
-from xivo_confd.resources.devices import builder
+from xivo_confd.resources.devices import builder as device_builder
 
 from xivo_confd.resources.func_keys import service as fk_service
 from xivo_confd.resources.func_keys import converter as fk_converter
@@ -47,33 +38,18 @@ logger = logging.getLogger(__name__)
 
 
 def load(core_rest_api):
-    destination_builders = {'user': fk_converter.UserDestinationBuilder(),
-                            'group': fk_converter.GroupDestinationBuilder(),
-                            'queue': fk_converter.QueueDestinationBuilder(),
-                            'conference': fk_converter.ConferenceDestinationBuilder(),
-                            'paging': fk_converter.PagingDestinationBuilder(),
-                            'service': fk_converter.ServiceDestinationBuilder(),
-                            'custom': fk_converter.CustomDestinationBuilder(),
-                            'forward': fk_converter.ForwardDestinationBuilder(),
-                            'transfer': fk_converter.TransferDestinationBuilder(),
-                            'park_position': fk_converter.ParkPositionDestinationBuilder(),
-                            'parking': fk_converter.ParkingDestinationBuilder(),
-                            'bsfilter': fk_converter.BSFilterDestinationBuilder(),
-                            'agent': fk_converter.AgentDestinationBuilder(),
-                            'onlinerec': fk_converter.OnlineRecordingDestinationBuilder(),
-                            }
-
-    template_converter = build_template_converter(destination_builders, {'func_key_templates': 'id'})
-    user_template_converter = build_template_converter(destination_builders, {})
-    funckey_converter = build_fk_converter(destination_builders)
-
-    validator = build_validator()
+    validator = fk_validator.build_validators()
     bsfilter_validator = fk_validator.BSFilterValidator(bsfilter_dao)
 
+    funckey_converter = fk_converter.build_funckey_converter()
+    user_funckey_converter = fk_converter.build_funckey_converter(exclude=['agent', 'bsfilter'])
+
+    template_converter = fk_converter.build_template_converter(funckey_converter)
+    user_template_converter = fk_converter.build_template_converter(user_funckey_converter)
+
     provd_client = core_rest_api.provd_client()
-    provd_dao = builder.build_provd_dao(provd_client)
-    device_dao = builder.build_dao(provd_client, provd_dao)
-    device_updater = builder.build_device_updater(device_dao)
+    device_dao = device_builder.build_dao(provd_client)
+    device_updater = device_builder.build_device_updater(device_dao)
 
     service = fk_service.TemplateService(validator,
                                          template_dao,
@@ -113,61 +89,3 @@ def load(core_rest_api):
 
     core_rest_api.register(blueprint)
     core_rest_api.register(user_blueprint)
-
-
-def build_fk_converter(destination_builders):
-    parser = fk_converter.JsonParser()
-    funckey_validator = fk_converter.FuncKeyValidator(destination_builders)
-    funckey_mapper = fk_converter.FuncKeyMapper(destination_builders)
-    funckey_builder = fk_converter.FuncKeyBuilder(funckey_validator, destination_builders)
-    serializer = ResourceSerializer({})
-    return Converter(parser, funckey_mapper, serializer, funckey_builder)
-
-
-def build_template_converter(destination_builders, resources):
-    parser = fk_converter.JsonParser()
-
-    funckey_validator = fk_converter.FuncKeyValidator(destination_builders)
-    template_validator = fk_converter.TemplateValidator(funckey_validator)
-
-    funckey_mapper = fk_converter.FuncKeyMapper(destination_builders)
-    template_mapper = fk_converter.TemplateMapper(funckey_mapper)
-
-    funckey_builder = fk_converter.FuncKeyBuilder(funckey_validator, destination_builders)
-    template_builder = fk_converter.TemplateBuilder(template_validator, funckey_builder)
-
-    serializer = ResourceSerializer(resources)
-
-    converter = Converter(parser, template_mapper, serializer, template_builder)
-
-    return converter
-
-
-def build_validator():
-    destination_validators = {
-        'user': [common_validator.ResourceGetValidator('user_id', user_dao.get, 'User')],
-        'group': [common_validator.ResourceExistValidator('group_id', group_dao.exists, 'Group')],
-        'queue': [common_validator.ResourceExistValidator('queue_id', queue_dao.exists, 'Queue')],
-        'conference': [common_validator.ResourceExistValidator('conference_id', conference_dao.exists, 'Conference')],
-        'custom': [],
-        'service': [fk_validator.ServiceValidator(extension_dao)],
-        'forward': [fk_validator.ForwardValidator(extension_dao)],
-        'transfer': [fk_validator.TransferValidator(feature_dao)],
-        'agent': [fk_validator.AgentActionValidator(extension_dao),
-                  common_validator.ResourceExistValidator('agent_id', agent_dao.exists, 'Agent')],
-        'park_position': [fk_validator.ParkPositionValidator(feature_dao)],
-        'parking': [],
-        'onlinerec': [],
-        'paging': [common_validator.ResourceExistValidator('paging_id', paging_dao.exists, 'Paging')],
-        'bsfilter': [common_validator.ResourceExistValidator('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
-    }
-
-    funckey_validator = fk_validator.FuncKeyValidator(destination_validators)
-    mapping_validator = fk_validator.FuncKeyMappingValidator(funckey_validator)
-    similar_validator = fk_validator.SimilarFuncKeyValidator()
-
-    required_validator = common_validator.RequiredValidator()
-    private_template_validator = fk_validator.PrivateTemplateValidator()
-
-    return common_validator.ValidationGroup(common=[required_validator, mapping_validator, similar_validator],
-                                            delete=[private_template_validator])

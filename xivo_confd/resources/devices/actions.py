@@ -76,9 +76,8 @@ def load(core_rest_api):
 
     provd_client = core_rest_api.provd_client()
 
-    provd_dao = builder.build_provd_dao(provd_client)
-    device_dao = builder.build_dao(provd_client, provd_dao)
-    device_service = builder.build_service(device_dao, provd_dao)
+    device_dao = builder.build_dao(provd_client)
+    device_service = builder.build_service(device_dao)
     device_updater = builder.build_device_updater(device_dao)
     association_service = builder.build_line_device_associator(device_updater)
 
