@@ -41,8 +41,8 @@ def load(core_rest_api):
     validator = fk_validator.build_validators()
     bsfilter_validator = fk_validator.BSFilterValidator(bsfilter_dao)
 
-    funckey_converter = fk_converter.build_funckey_converter()
-    user_funckey_converter = fk_converter.build_funckey_converter(exclude=['agent', 'bsfilter'])
+    funckey_converter = fk_converter.build_funckey_converter(exclude=['agent', 'bsfilter'])
+    user_funckey_converter = fk_converter.build_funckey_converter()
 
     template_converter = fk_converter.build_template_converter(funckey_converter)
     user_template_converter = fk_converter.build_template_converter(user_funckey_converter)

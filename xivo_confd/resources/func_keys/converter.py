@@ -432,7 +432,6 @@ def build_funckey_converter(exclude=None):
 
 def build_template_converter(funckey_converter):
     parser = JsonParser()
-    funckey_converter = build_funckey_converter()
 
     template_validator = TemplateValidator(funckey_converter.builder.validator)
     template_mapper = TemplateMapper(funckey_converter.mapper)
