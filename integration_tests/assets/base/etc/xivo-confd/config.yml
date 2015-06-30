@@ -18,14 +18,16 @@ log_filename: /var/log/xivo-confd.log
 # PID file.
 pid_filename: /var/run/xivo-confd/xivo-confd.pid
 
+db_uri: postgresql://asterisk:proformatique@postgres/asterisk
+
 # REST API server
 rest_api:
 
     # Listening address
-    listen: 127.0.0.1
+    listen: 0.0.0.0
 
     # Listening port
-    port: 9487
+    port: 9486
 
     #CORS configuration. See Flask-CORS documentation for other values.
     cors:
@@ -37,24 +39,24 @@ rest_api:
         allow_headers: Content-Type
 
 
-# Event bus (AMQP) connection information
+# Event bus (AMQP) connection informations
 bus:
     username: guest
     password: guest
-    host: localhost
+    host: rabbitmq
     port: 5672
     exchange_name: xivo
     exchange_type: topic
     exchange_durable: True
 
-# xivo-provd connection information
+# xivo-provd connection informations.
 provd:
-    host: localhost
+    host: provd
     port: 8666
 
-#xivo-sysconfd connection information
+# xivo-sysconfd connection informations.
 sysconfd:
-    host: localhost
+    host: sysconfd
     port: 8668
 
 # Extra resources to load.

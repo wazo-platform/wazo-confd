@@ -27,6 +27,7 @@ from xivo_dao.resources.infos import dao as info_dao
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
 from xivo_confd.helpers.bus_manager import init_bus_from_config
+from xivo_confd.helpers.sysconfd_connector import setup_sysconfd
 
 
 def main(argv):
@@ -39,6 +40,7 @@ def main(argv):
 
     xivo_dao.init_db_from_config(config)
     init_bus_from_config(ChainMap(config, {'uuid': info_dao.get().uuid}))
+    setup_sysconfd(config['sysconfd']['host'], config['sysconfd']['port'])
 
     controller = Controller(config)
 

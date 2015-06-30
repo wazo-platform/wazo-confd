@@ -53,6 +53,10 @@ DEFAULT_CONFIG = {
     },
     'provd': {
     },
+    'sysconfd': {
+        'host': 'localhost',
+        'port': '8668'
+    },
     'default_plugins': [
         "call_logs",
         "configuration",
