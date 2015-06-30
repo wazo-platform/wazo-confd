@@ -1,5 +1,5 @@
 nose
 mock
 pyhamcrest
-requests==2.5.3
+requests==2.6.1
 docker-compose
