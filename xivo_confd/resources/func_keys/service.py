@@ -19,6 +19,19 @@
 
 class TemplateService(object):
 
+    DESTINATION_BLFS = ('user',
+                        'conference',
+                        'custom',
+                        'bsfilter',
+                        'forward',
+                        'agent',
+                        'park_position')
+
+    SERVICE_BLFS = ('callrecord',
+                    'incallfilter',
+                    'enablednd',
+                    'enablevm')
+
     def __init__(self, validator, template_dao, user_dao, notifier, device_updater):
         self.validator = validator
         self.template_dao = template_dao
@@ -29,14 +42,19 @@ class TemplateService(object):
     def get(self, template_id):
         return self.template_dao.get(template_id)
 
+    def search(self, parameters):
+        return self.template_dao.search(**parameters)
+
     def create(self, template):
         self.validator.validate_create(template)
+        self.adjust_blfs(template)
         created_template = self.template_dao.create(template)
         self.notifier.created(created_template)
         return created_template
 
     def edit(self, template):
         self.validator.validate_edit(template)
+        self.adjust_blfs(template)
         self.template_dao.edit(template)
         self.device_updater.update_for_template(template)
         self.notifier.edited(template)
@@ -48,3 +66,12 @@ class TemplateService(object):
         for user in users:
             self.device_updater.update_for_user(user)
         self.notifier.deleted(template)
+
+    def adjust_blfs(self, template):
+        for funckey in template.keys.values():
+            destination = funckey.destination
+            if destination.type == 'service':
+                if destination.service not in self.SERVICE_BLFS:
+                    funckey.blf = False
+            elif destination.type not in self.DESTINATION_BLFS:
+                funckey.blf = False

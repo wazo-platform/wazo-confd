@@ -41,7 +41,8 @@ def build_converters():
             'park_position': ParkPositionConverter(),
             'parking': ParkingConverter(features_dao),
             'bsfilter': BSFilterConverter(extension_dao),
-            'agent': AgentConverter(extension_dao)
+            'agent': AgentConverter(extension_dao),
+            'onlinerec': OnlineRecordingConverter(features_dao),
             }
 
 
@@ -55,7 +56,7 @@ class FuncKeyConverter(object):
 
     def provd_funckey(self, line, position, funckey, value):
         return {position: {
-            'label': funckey.label,
+            'label': (funckey.label or ''),
             'line': line.device_slot,
             'type': self.determine_type(funckey),
             'value': value}}
@@ -77,7 +78,7 @@ class UserConverter(FuncKeyConverter):
 
     def build(self, user, line, position, funckey):
         funckey_line = self.find_user_line(funckey.destination.user_id)
-        if not line:
+        if not funckey_line:
             return {}
 
         extension = self.find_extension(funckey_line)
@@ -157,10 +158,10 @@ class PagingConverter(FuncKeyConverter):
 
 class ServiceConverter(FuncKeyConverter):
 
-    BLFS = ('callrecord',
-            'incallfilter',
-            'enablednd',
-            'enablevm')
+    PROGFUNCKEYS = ('callrecord',
+                    'incallfilter',
+                    'enablednd',
+                    'enablevm')
 
     def __init__(self, extension_dao):
         self.extension_dao = extension_dao
@@ -168,13 +169,19 @@ class ServiceConverter(FuncKeyConverter):
     def build(self, user, line, position, funckey):
         extension = self.extension_dao.get(funckey.destination.extension_id)
 
-        return self.provd_funckey(line,
-                                  position,
-                                  funckey,
-                                  extension.clean_exten())
+        if funckey.destination.service in self.PROGFUNCKEYS:
+            prog_exten = self.extension_dao.get_by_type('extenfeatures', 'phoneprogfunckey')
+            value = self.progfunckey(prog_exten.exten,
+                                     user.id,
+                                     extension.clean_exten(),
+                                     None)
+        else:
+            value = extension.clean_exten()
+
+        return self.provd_funckey(line, position, funckey, value)
 
     def determine_type(self, funckey):
-        if funckey.blf and funckey.destination.service in self.BLFS:
+        if funckey.blf and funckey.destination.service in self.PROGFUNCKEYS:
             return 'blf'
         return 'speeddial'
 
@@ -263,3 +270,16 @@ class AgentConverter(FuncKeyConverter):
                                  '*{}'.format(funckey.destination.agent_id))
 
         return self.provd_funckey(line, position, funckey, value)
+
+
+class OnlineRecordingConverter(FuncKeyConverter):
+
+    def __init__(self, features_dao):
+        self.features_dao = features_dao
+
+    def build(self, user, line, position, funckey):
+        exten = self.features_dao.get_value(funckey.destination.feature_id)
+        return self.provd_funckey(line, position, funckey, exten)
+
+    def determine_type(self, funckey):
+        return 'speeddial'

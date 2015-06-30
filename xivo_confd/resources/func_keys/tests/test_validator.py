@@ -26,15 +26,66 @@ from xivo_dao.resources.features.model import TransferExtension
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 from xivo_dao.resources.func_key.model import FuncKey, \
     ServiceDestination, ForwardDestination, TransferDestination, \
-    AgentDestination, ParkPositionDestination
+    AgentDestination, ParkPositionDestination, CustomDestination, BSFilterDestination
+from xivo_dao.resources.user.model import User
+from xivo_dao.resources.bsfilter.model import FilterMember
 
-from xivo_dao.helpers.exception import InputError
+from xivo_dao.helpers.exception import InputError, ResourceError
 
 from xivo_confd.helpers.validator import Validator
 from xivo_confd.resources.func_keys.validator import FuncKeyMappingValidator
 from xivo_confd.resources.func_keys.validator import FuncKeyValidator, \
     ServiceValidator, ForwardValidator, TransferValidator, AgentActionValidator, \
-    ParkPositionValidator
+    ParkPositionValidator, PrivateTemplateValidator, SimilarFuncKeyValidator, \
+    BSFilterValidator
+
+
+class TestSimilarFuncKeyValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = SimilarFuncKeyValidator()
+
+    def test_when_template_empty_then_validation_passes(self):
+        template = FuncKeyTemplate()
+
+        self.validator.validate(template)
+
+    def test_when_template_has_a_single_func_key_then_validation_passes(self):
+        funckey = FuncKey(destination=CustomDestination(exten='1234'))
+        template = FuncKeyTemplate(keys={1: funckey})
+
+        self.validator.validate(template)
+
+    def test_when_template_has_two_func_keys_with_different_destination_then_validation_passes(self):
+        template = FuncKeyTemplate(keys={1: FuncKey(destination=CustomDestination(exten='1234')),
+                                         2: FuncKey(destination=ServiceDestination(service='enablednd'))})
+
+        self.validator.validate(template)
+
+    def test_when_template_has_two_func_keys_with_same_destination_then_raises_error(self):
+        destination = CustomDestination(exten='1234')
+        template = FuncKeyTemplate(keys={1: FuncKey(destination=destination),
+                                         2: FuncKey(destination=destination)})
+
+        assert_that(calling(self.validator.validate).with_args(template),
+                    raises(ResourceError))
+
+
+class TestPrivateTemplateValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = PrivateTemplateValidator()
+
+    def test_when_validating_private_template_then_raises_error(self):
+        template = FuncKeyTemplate(private=True)
+
+        assert_that(calling(self.validator.validate).with_args(template),
+                    raises(ResourceError))
+
+    def test_when_validating_public_template_then_validation_passes(self):
+        template = FuncKeyTemplate(private=False)
+
+        self.validator.validate(template)
 
 
 class TestFuncKeyMappingValidator(unittest.TestCase):
@@ -241,3 +292,31 @@ class TestParkPositionValidator(unittest.TestCase):
         self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
+
+
+class TestBSFilterValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.bsfilter_dao = Mock()
+
+        self.user = User(id=sentinel.user_id)
+        self.funckey = FuncKey(destination=BSFilterDestination(filter_member_id=sentinel.filter_member_id))
+
+        self.validator = BSFilterValidator(self.bsfilter_dao)
+
+    def test_when_func_key_does_not_have_bsfilter_destination_then_validation_passes(self):
+        funckey = FuncKey(destination=CustomDestination(exten='1234'))
+
+        self.validator.validate(self.user, funckey)
+
+    def test_when_user_is_not_member_of_a_filter_then_raises_error(self):
+        self.bsfilter_dao.find_all_by_member_id.return_value = []
+
+        assert_that(calling(self.validator.validate).with_args(self.user, self.funckey),
+                    raises(ResourceError))
+
+    def test_when_user_is_member_of_a_filter_then_validation_passes(self):
+        filter_member = FilterMember(id=None, member_id=sentinel.user_id, role='boss')
+        self.bsfilter_dao.find_all_by_member_id.return_value = [filter_member]
+
+        self.validator.validate(self.user, self.funckey)

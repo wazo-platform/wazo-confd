@@ -30,11 +30,16 @@ from xivo_dao.resources.func_key_template import dao as template_dao
 from xivo_confd.resources.devices.funckey import build_converters
 
 
-def build_service(device_dao, provd_dao):
-    search_engine = SearchEngine(provd_dao)
+def build_dao(provd_client):
+    provd_dao = ProvdDeviceDao(provd_client.device_manager(),
+                               provd_client.config_manager())
+    device_dao = DeviceDao(provd_client, provd_dao)
+    return device_dao
 
+
+def build_service(device_dao):
+    search_engine = SearchEngine(device_dao.provd_dao)
     device_validator = DeviceValidator(device_dao, line_dao)
-
     device_service = DeviceService(device_dao,
                                    device_validator,
                                    device_notifier,
@@ -44,19 +49,9 @@ def build_service(device_dao, provd_dao):
     return device_service
 
 
-def build_provd_dao(provd_client):
-    provd_dao = ProvdDeviceDao(provd_client.device_manager(),
-                               provd_client.config_manager())
-    return provd_dao
-
-
-def build_dao(provd_client, provd_dao):
-    device_dao = DeviceDao(provd_client, provd_dao)
-    return device_dao
-
-
 def build_device_updater(device_dao):
     converters = build_converters()
+
     funckey_updater = FuncKeyDeviceUpdater(user_dao,
                                            line_dao,
                                            user_line_dao,

@@ -30,11 +30,14 @@ from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
     PagingDestination, BSFilterDestination, ServiceDestination, \
     CustomDestination, ForwardDestination, TransferDestination, \
-    ParkPositionDestination, ParkingDestination, AgentDestination
+    ParkPositionDestination, ParkingDestination, AgentDestination, \
+    OnlineRecordingDestination
 
 from xivo_confd.helpers.mooltiparse import Document, Field, \
     Int, Boolean, Unicode, Dict, \
     Required, Choice, Regexp
+
+from xivo_confd.helpers.converter import Converter, ResourceSerializer
 
 
 EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
@@ -53,7 +56,7 @@ class TemplateValidator(object):
 
     DOCUMENT = Document([
         Field('id', Int()),
-        Field('name', Unicode(), create=[Required()]),
+        Field('name', Unicode()),
         Field('keys', Dict())
     ])
 
@@ -151,7 +154,7 @@ class TemplateBuilder(Builder):
         self.validator.validate(mapping, 'create')
         key_mapping = mapping.get('keys', {})
         funckeys = self.create_funckeys(key_mapping)
-        return FuncKeyTemplate(name=mapping['name'],
+        return FuncKeyTemplate(name=mapping.get('name'),
                                keys=funckeys)
 
     def update(self, model, mapping):
@@ -325,12 +328,12 @@ class ForwardDestinationBuilder(DestinationBuilder):
                     Required(), Choice(['noanswer', 'busy', 'unconditional'])),
               Field('exten',
                     Unicode(),
-                    Required(), Regexp(EXTEN_REGEX))
+                    Regexp(EXTEN_REGEX))
               ]
 
     def to_model(self, destination):
         return ForwardDestination(forward=destination['forward'],
-                                  exten=destination['exten'])
+                                  exten=destination.get('exten'))
 
 
 class TransferDestinationBuilder(DestinationBuilder):
@@ -375,9 +378,66 @@ class AgentDestinationBuilder(DestinationBuilder):
 
     fields = [Field('action',
                     Unicode(),
-                    Required(), Choice(['login', 'logoff', 'toggle'])),
+                    Required(), Choice(['login', 'logout', 'toggle'])),
               Field('agent_id', Int(), Required())]
 
     def to_model(self, destination):
         return AgentDestination(action=destination['action'],
                                 agent_id=destination['agent_id'])
+
+
+class OnlineRecordingDestinationBuilder(DestinationBuilder):
+
+    destination = 'onlinerec'
+
+    fields = []
+
+    def to_model(self, destination):
+        return OnlineRecordingDestination()
+
+
+def build_destinations(exclude=None):
+    exclude = exclude or []
+    destinations = {'user': UserDestinationBuilder(),
+                    'group': GroupDestinationBuilder(),
+                    'queue': QueueDestinationBuilder(),
+                    'conference': ConferenceDestinationBuilder(),
+                    'paging': PagingDestinationBuilder(),
+                    'service': ServiceDestinationBuilder(),
+                    'custom': CustomDestinationBuilder(),
+                    'forward': ForwardDestinationBuilder(),
+                    'transfer': TransferDestinationBuilder(),
+                    'park_position': ParkPositionDestinationBuilder(),
+                    'parking': ParkingDestinationBuilder(),
+                    'bsfilter': BSFilterDestinationBuilder(),
+                    'agent': AgentDestinationBuilder(),
+                    'onlinerec': OnlineRecordingDestinationBuilder(),
+                    }
+
+    for name in exclude:
+        del destinations[name]
+
+    return destinations
+
+
+def build_funckey_converter(exclude=None):
+    destinations = build_destinations(exclude)
+    parser = JsonParser()
+    funckey_validator = FuncKeyValidator(destinations)
+    funckey_mapper = FuncKeyMapper(destinations)
+    funckey_builder = FuncKeyBuilder(funckey_validator, destinations)
+    serializer = ResourceSerializer({})
+    return Converter(parser, funckey_mapper, serializer, funckey_builder)
+
+
+def build_template_converter(funckey_converter):
+    parser = JsonParser()
+
+    template_validator = TemplateValidator(funckey_converter.builder.validator)
+    template_mapper = TemplateMapper(funckey_converter.mapper)
+    template_builder = TemplateBuilder(template_validator, funckey_converter.builder)
+    serializer = ResourceSerializer({'func_key_templates': 'id'})
+
+    converter = Converter(parser, template_mapper, serializer, template_builder)
+
+    return converter

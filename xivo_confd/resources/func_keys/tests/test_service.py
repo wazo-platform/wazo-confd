@@ -46,6 +46,13 @@ class TestTemplateService(unittest.TestCase):
                                        self.notifier,
                                        self.device_updater)
 
+    def test_when_searching_then_returns_search_from_database(self):
+        expected_search = self.template_dao.search.return_value
+
+        result = self.service.search({'search': 'search'})
+
+        assert_that(expected_search, equal_to(result))
+        self.template_dao.search.assert_called_once_with(search='search')
 
     def test_when_getting_then_returns_template_from_database(self):
         expected_template = self.template_dao.get.return_value

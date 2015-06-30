@@ -230,7 +230,6 @@ class TestLineServices(unittest.TestCase):
         self.assertEquals(make_provisioning_id.call_count, 0)
 
     @patch('xivo_dao.resources.context.dao.get', Mock(return_value=Mock()))
-    @patch('xivo_confd.resources.lines.services.device_builder.build_provd_dao', Mock())
     @patch('xivo_confd.resources.lines.services.device_builder.build_dao')
     @patch('xivo_confd.resources.lines.services.device_builder.build_device_updater')
     @patch('xivo_confd.resources.lines.notifier.edited')
@@ -272,7 +271,6 @@ class TestLineServices(unittest.TestCase):
         self.assertEquals(line_notifier_edited.call_count, 0)
         self.assertEquals(build_device_updater.return_value.call_count, 0)
 
-    @patch('xivo_confd.resources.lines.services.device_builder.build_provd_dao', Mock())
     @patch('xivo_confd.resources.lines.services.device_builder.build_dao')
     @patch('xivo_confd.resources.lines.services.device_builder.build_device_updater')
     @patch('xivo_confd.resources.lines.notifier.deleted')

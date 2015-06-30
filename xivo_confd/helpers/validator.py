@@ -68,3 +68,24 @@ class ResourceExistValidator(Validator):
         if not exists:
             metadata = {self.field: value}
             raise errors.param_not_found(self.field, self.resource, **metadata)
+
+
+class ValidationGroup(object):
+
+    def __init__(self, common=None, create=None, edit=None, delete=None):
+        self.common = common or []
+        self.create = create or []
+        self.edit = edit or []
+        self.delete = delete or []
+
+    def validate_create(self, model):
+        for validator in self.common + self.create:
+            validator.validate(model)
+
+    def validate_edit(self, model):
+        for validator in self.common + self.edit:
+            validator.validate(model)
+
+    def validate_delete(self, model):
+        for validator in self.common + self.delete:
+            validator.validate(model)
