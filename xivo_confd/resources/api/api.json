@@ -1,0 +1,2224 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "XiVO Confd",
+        "description": "Confd exposes an API for managing core resources on a XiVO server such as users, extensions, devices, voicemails, queues, etc. Resources can be associated together to provide additional functionality. For example: By associating a voicemail with a user, calls will automatically fallback on to the voicemail when the user cannot answer.",
+        "version": "1.1",
+        "license": {
+            "name": "GPL v3",
+            "url": "http://www.gnu.org/licenses/gpl.txt"
+        },
+        "contact": {
+            "name": "Dev Team",
+            "url": "http://xivo.io",
+            "email": "dev@avencall.com"
+        }
+    },
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/1.1",
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "x-xivo-port": 9486,
+    "x-xivo-name": "confd",
+    "paths": {
+        "/call_logs": {
+            "get": {
+                "operationId": "list_call_logs",
+                "summary": "List call logs",
+                "tags": [
+                    "call_logs"
+                ],
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "description": "filter call logs after start date",
+                        "in": "query",
+                        "type": "string",
+                        "format": "datetime",
+                        "required": false
+                    },
+                    {
+                        "name": "end_date",
+                        "description": "filter call logs before end date",
+                        "in": "query",
+                        "type": "string",
+                        "format": "datetime",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of call logs",
+                        "schema": {
+                            "$ref": "#/definitions/CallLog"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    }
+                }
+            }
+        },
+        "/configuration/live_reload": {
+            "get": {
+                "operationId": "get_configuration",
+                "summary": "Get live reload status",
+                "tags": [
+                    "configuration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Live reload status",
+                        "schema": {
+                            "$ref": "#/definitions/LiveReload"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_configuration",
+                "summary": "Update live reload status",
+                "tags": [
+                    "configuration"
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    }
+                }
+            }
+        },
+        "/cti_profiles": {
+            "get": {
+                "operationId": "list_cti_profiles",
+                "summary": "List CTI profiles",
+                "tags": [
+                    "cti_profiles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of CTI profiles",
+                        "schema": {
+                            "$ref": "#/definitions/CtiProfileItems"
+                        }
+                    }
+                }
+            }
+        },
+        "/cti_profiles/{cti_profile_id}": {
+            "get": {
+                "operationId": "get_cti_profile",
+                "summary": "Get CTI profile",
+                "tags": [
+                    "cti_profiles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CTI profile",
+                        "schema": {
+                            "$ref": "#/definitions/CtiProfile"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFound"
+                    }
+                },
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "cti_profile_id",
+                        "in": "path",
+                        "description": "CTI Profile ID"
+                    }
+                ]
+            }
+        },
+        "/devices": {
+            "get": {
+                "operationId": "list_devices",
+                "summary": "List devices",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/skip"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Device list",
+                        "schema": {
+                            "$ref": "#/definitions/DeviceItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_device",
+                "summary": "Create device",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Device to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Device created",
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}": {
+            "get": {
+                "operationId": "get_device",
+                "summary": "Get device",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Device",
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_device",
+                "summary": "Update device",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_device",
+                "summary": "Delete device",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}/autoprov": {
+            "get": {
+                "operationId": "reset_device_autoprov",
+                "summary": "Reset device to autoprov",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Device synchronized"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}/synchronize": {
+            "get": {
+                "operationId": "synchronize_device",
+                "summary": "Synchronize device",
+                "tags": [
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Device synchronized"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}/associate_line/{line_id}": {
+            "get": {
+                "operationId": "associate_line_device",
+                "summary": "Associate line and device",
+                "tags": [
+                    "devices",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Device associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}/remove_line/{line_id}": {
+            "get": {
+                "operationId": "dissociate_line_device",
+                "summary": "Dissociate line and device",
+                "tags": [
+                    "devices",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "string",
+                        "name": "device_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Device dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/extensions": {
+            "get": {
+                "operationId": "list_extensions",
+                "summary": "List extensions",
+                "tags": [
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/skip"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter extensions of a certain type. Types allowed: internal, incall"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Extension list",
+                        "schema": {
+                            "$ref": "#/definitions/ExtensionItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_extension",
+                "summary": "Create extension",
+                "tags": [
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Extension to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Extension"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Extension created",
+                        "schema": {
+                            "$ref": "#/definitions/Extension"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/extensions/{extension_id}": {
+            "get": {
+                "operationId": "get_extension",
+                "summary": "Get extension",
+                "tags": [
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "extension_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Extension",
+                        "schema": {
+                            "$ref": "#/definitions/Extension"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_extension",
+                "summary": "Update extension",
+                "tags": [
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "extension_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Extension"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_extension",
+                "summary": "Delete extension",
+                "tags": [
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "extension_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/extensions/{extension_id}/line": {
+            "get": {
+                "operationId": "get_extension_line_association",
+                "summary": "List lines association to extension",
+                "tags": [
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "extension_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line-Extension association",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/funckeys/templates": {
+            "post": {
+                "operationId": "create_func_key_template",
+                "summary": "Create a template of func keys",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Template to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FuncKeyTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Template created",
+                        "schema": {
+                            "$ref": "#/definitions/Extension"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/funckeys/templates/{template_id}": {
+            "get": {
+                "operationId": "get_func_key_template",
+                "summary": "Get a func key template",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Func key template",
+                        "schema": {
+                            "$ref": "#/definitions/FuncKeyTemplate"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_func_key_template",
+                "summary": "Delete func key template",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/funckeys/templates/{template_id}/{position}": {
+            "get": {
+                "operationId": "get_func_key",
+                "summary": "Get a func key inside template",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "position",
+                        "in": "path",
+                        "description": "position of the funckey"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Func key",
+                        "schema": {
+                            "$ref": "#/definitions/FuncKey"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_func_key",
+                "summary": "Add/Replace a func key in a template",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "position",
+                        "in": "path",
+                        "description": "position of the funckey"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FuncKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_func_key",
+                "summary": "Remove func key from template",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "position",
+                        "in": "path",
+                        "description": "position of the funckey"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/infos": {
+            "get": {
+                "operationId": "get_infos",
+                "summary": "Get server info",
+                "tags": [
+                    "infos"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Server information",
+                        "schema": {
+                            "$ref": "#/definitions/Info"
+                        }
+                    }
+                }
+            }
+        },
+        "/lines": {
+            "get": {
+                "operationId": "list_lines",
+                "summary": "List lines",
+                "tags": [
+                    "lines"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line list",
+                        "schema": {
+                            "$ref": "#/definitions/LineItems"
+                        }
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/extension": {
+            "get": {
+                "operationId": "get_line_extension_legacy",
+                "summary": "Get extension associated to line",
+                "deprecated": true,
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line-Extension association",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "400": {
+                        "description": "No extension associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_line_extension_legacy",
+                "summary": "Associate line and extension",
+                "deprecated": true,
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Line and Extension associated",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_extension_legacy",
+                "summary": "Dissociate line and extension",
+                "deprecated": true,
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and Extension dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/extensions": {
+            "get": {
+                "operationId": "get_line_extension_association",
+                "summary": "List extensions associated to line",
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of associations",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtensionItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_line_extension",
+                "summary": "Associate line and extension",
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line and Extension associated",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/extensions/{extension_id}": {
+            "delete": {
+                "operationId": "dissociate_line_extension",
+                "summary": "Dissociate line and extension",
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "extension_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and Extension dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}": {
+            "get": {
+                "operationId": "get_line",
+                "summary": "Get line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line",
+                        "schema": {
+                            "$ref": "#/definitions/Line"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines_sip": {
+            "get": {
+                "operationId": "list_line_sip",
+                "summary": "List SIP Lines",
+                "tags": [
+                    "lines",
+                    "lines_sip"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of SIP Lines",
+                        "schema": {
+                            "$ref": "#/definitions/LineSipItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_line_sip",
+                "summary": "Create SIP line",
+                "tags": [
+                    "lines",
+                    "lines_sip"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "SIP Line to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "SIP Line created",
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/lines_sip/{line_id}": {
+            "get": {
+                "operationId": "get_line_sip",
+                "summary": "Get SIP line",
+                "tags": [
+                    "lines",
+                    "lines_sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SIP Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_line_sip",
+                "summary": "Update SIP line",
+                "tags": [
+                    "lines",
+                    "lines_sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_line_sip",
+                "summary": "Delete SIP line",
+                "tags": [
+                    "lines_sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/queues/{queue_id}/members/agents": {
+            "post": {
+                "operationId": "associate_agent_queue",
+                "summary": "Associate an agent and queue",
+                "tags": [
+                    "agents",
+                    "queues"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "queue_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Agent and Queue associated",
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueue"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/queues/{queue_id}/members/agents/{agent_id}": {
+            "get": {
+                "operationId": "get_agent_queue_association",
+                "summary": "Get Agent-Queue association",
+                "tags": [
+                    "agents",
+                    "queues"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "queue_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "agent_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Agent-Queue association",
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueue"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_agent_queue_association",
+                "summary": "Update Agent-Queue association",
+                "tags": [
+                    "agents",
+                    "queues"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "queue_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "agent_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Association updated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_agent_queue",
+                "summary": "Dissociate agent and queue",
+                "tags": [
+                    "agents",
+                    "queues"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "queue_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "agent_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Agent and Queue associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "operationId": "list_user",
+                "summary": "List users",
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/skip"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User list",
+                        "schema": {
+                            "$ref": "#/definitions/UserItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_user",
+                "summary": "Create user",
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}": {
+            "get": {
+                "operationId": "get_user",
+                "summary": "Get user",
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_user",
+                "summary": "Update user",
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_user",
+                "summary": "Delete user",
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/funckeys": {
+            "get": {
+                "operationId": "list_user_func_keys",
+                "summary": "List func keys for a user",
+                "tags": [
+                    "funckeys",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Func keys for user",
+                        "schema": {
+                            "$ref": "#/definitions/FuncKeyTemplate"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_func_key_template",
+                "summary": "Delete func key template",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/funckeys/{position}": {
+            "get": {
+                "operationId": "get_user_func_key",
+                "summary": "Get a func key for a user",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "position",
+                        "in": "path",
+                        "description": "position of the funckey"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Func key",
+                        "schema": {
+                            "$ref": "#/definitions/FuncKey"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_user_func_key",
+                "summary": "Add/Replace a func key for a user",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "position",
+                        "in": "path",
+                        "description": "position of the funckey"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FuncKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_user_func_key",
+                "summary": "Remove func key for user",
+                "tags": [
+                    "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "position",
+                        "in": "path",
+                        "description": "position of the funckey"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/funckeys/templates/{template_id}": {
+            "put": {
+                "operationId": "associate_user_func_key_template",
+                "summary": "Associate a func key template to a user",
+                "tags": [
+                    "funckeys",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and template associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_user_func_key_template",
+                "summary": "Dissociate a func key template to a user",
+                "tags": [
+                    "funckeys",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and template dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/lines": {
+            "get": {
+                "operationId": "get_user_line_associations",
+                "summary": "List lines associated to user",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lines associated to a User",
+                        "schema": {
+                            "$ref": "#/definitions/UserLineItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_user_line",
+                "summary": "Associate user and line",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User associated with Line",
+                        "schema": {
+                            "$ref": "#/definitions/UserLine"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/lines/{line_id}": {
+            "delete": {
+                "operationId": "dissociate_user_line",
+                "summary": "Dissociate user and line",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and Line dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/voicemail": {
+            "get": {
+                "operationId": "get_user_voicemail_association",
+                "summary": "Get voicemail associated to user",
+                "tags": [
+                    "users",
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-Voicemail association",
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_user_voicemail",
+                "summary": "Associate user and voicemail",
+                "tags": [
+                    "users",
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User and Voicemail associated",
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_user_voicemail",
+                "summary": "Dissociate user and voicemail",
+                "tags": [
+                    "users",
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and Voicemail dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/cti": {
+            "get": {
+                "operationId": "get_user_cti_profile_association",
+                "summary": "Get CtiProfile associated to User",
+                "tags": [
+                    "users",
+                    "cti_profiles"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-CtiProfile association",
+                        "schema": {
+                            "$ref": "#/definitions/UserCtiProfile"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_user_cti_profile_association",
+                "summary": "Update User-CtiProfile association",
+                "tags": [
+                    "users",
+                    "cti_profiles"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserCtiProfile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Association updated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/voicemails": {
+            "get": {
+                "operationId": "list_voicemails",
+                "summary": "List voicemails",
+                "tags": [
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/skip"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Voicemail list",
+                        "schema": {
+                            "$ref": "#/definitions/VoicemailItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_voicemail",
+                "summary": "Create voicemail",
+                "tags": [
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Voicemail to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Voicemail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Voicemail created",
+                        "schema": {
+                            "$ref": "#/definitions/Voicemail"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/voicemails/{voicemail_id}": {
+            "get": {
+                "operationId": "get_voicemail",
+                "summary": "Get voicemail",
+                "tags": [
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "voicemail_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Voicemail",
+                        "schema": {
+                            "$ref": "#/definitions/Voicemail"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_voicemail",
+                "summary": "Update voicemail",
+                "tags": [
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "voicemail_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Voicemail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_voicemail",
+                "summary": "Delete voicemail",
+                "tags": [
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "voicemail_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        }
+    },
+    "parameters": {
+        "order": {
+            "required": false,
+            "name": "order",
+            "in": "query",
+            "type": "string",
+            "description": "Name of the field to use for sorting the list of items returned."
+        },
+        "direction": {
+            "required": false,
+            "name": "direction",
+            "in": "query",
+            "type": "string",
+            "description": "Sort list of items in 'asc' (ascending) or 'desc' (descending) order"
+        },
+        "limit": {
+            "required": false,
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Maximum number of items to return in the list"
+        },
+        "skip": {
+            "required": false,
+            "name": "skip",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to skip over in the list. Useful for pagination."
+        },
+        "search": {
+            "required": false,
+            "name": "search",
+            "in": "query",
+            "type": "string",
+            "description": "Search term for filtering a list of items. Only items with a field containing the search term will be returned."
+        }
+    },
+    "responses": {
+        "GenericError": {
+            "description": "An error occured during the operation",
+            "schema": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "CreateError": {
+            "description": "An error occured when creating the resource",
+            "schema": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "UpdateError": {
+            "description": "An error occured when updating the resource",
+            "schema": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "DeleteError": {
+            "description": "An error occured when deleting the resource",
+            "schema": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "NotFoundError": {
+            "description": "The resource requested was not found on the server",
+            "schema": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "ResourceUpdated": {
+            "description": "Resource was updated sucessfully"
+        },
+        "ResourceDeleted": {
+            "description": "Resource was deleted sucessfully"
+        }
+    },
+    "definitions": {
+        "AgentQueue": {
+            "title": "AgentQueue",
+            "description": "An association between an agent and a queue. Agents associated to a Queue will receive calls when they are logged in.",
+            "required": [
+                "agent_id",
+                "queue_id",
+                "penalty"
+            ],
+            "properties": {
+                "agent_id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Agent's ID"
+                },
+                "queue_id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Queue's ID"
+                },
+                "penalty": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0,
+                    "description": "Agent's penalty. A priority used for distributing calls."
+                }
+            }
+        },
+        "CallLog": {},
+        "CtiProfile": {},
+        "CtiProfileItems": {},
+        "Device": {},
+        "DeviceItems": {},
+        "Error": {},
+        "Extension": {},
+        "ExtensionItems": {},
+        "FuncKeyTemplate": {},
+        "FuncKey": {},
+        "Info": {},
+        "Line": {},
+        "LineExtension": {},
+        "LineExtensionItems": {},
+        "LineItems": {},
+        "LineSip": {},
+        "LineSipItems": {},
+        "LiveReload": {},
+        "User": {},
+        "UserCtiProfile": {},
+        "UserItems": {},
+        "UserLine": {},
+        "UserLineItems": {},
+        "UserVoicemail": {},
+        "Voicemail": {},
+        "VoicemailItems": {}
+    }
+}

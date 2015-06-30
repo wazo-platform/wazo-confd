@@ -58,6 +58,7 @@ DEFAULT_CONFIG = {
         'port': '8668'
     },
     'default_plugins': [
+        "api",
         "call_logs",
         "configuration",
         "cti_profiles",
