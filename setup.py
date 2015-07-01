@@ -33,6 +33,10 @@ setup(
         'bin/xivo-confd'
     ],
 
+    package_data={
+        'xivo_confd.resources.api': ['*.json'],
+    },
+
     zip_safe=False,
     entry_points={
         'xivo_confd.plugins': [
