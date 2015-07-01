@@ -606,6 +606,24 @@
             }
         },
         "/funckeys/templates": {
+            "get": {
+                "operationId": "list_func_key_template",
+                "summary": "List a func key template",
+                "tags": [
+                    "funckeys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List Func key template",
+                        "schema": {
+                            "$ref": "#/definitions/FuncKeyTemplate"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
             "post": {
                 "operationId": "create_func_key_template",
                 "summary": "Create a template of func keys",
