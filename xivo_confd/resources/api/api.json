@@ -15,7 +15,7 @@
         }
     },
     "schemes": [
-        "http"
+        "https"
     ],
     "basePath": "/1.1",
     "consumes": [
