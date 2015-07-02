@@ -26,6 +26,15 @@
     ],
     "x-xivo-port": 9486,
     "x-xivo-name": "confd",
+    "tags": [
+        {
+            "name": "funckeys",
+            "externalDocs": {
+                "url": "http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
+                "description": "Documentation on function key models"
+            }
+        }
+    ],
     "paths": {
         "/call_logs": {
             "get": {
@@ -2220,8 +2229,41 @@
         "Error": {},
         "Extension": {},
         "ExtensionItems": {},
-        "FuncKeyTemplate": {},
-        "FuncKey": {},
+        "FuncKeyTemplate": {
+            "title": "FuncKeyTemplate",
+            "description": "Further documentation at http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "keys": {
+                    "type": "object"
+                }
+            },
+            "externalDocs": {
+                "url": "http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
+                "description": "Documentation on function key models"
+            }
+        },
+        "FuncKey": {
+            "title": "FuncKey",
+            "description": "Further documentation at http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
+            "properties": {
+                "blf": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "destination": {
+                    "type": "object"
+                }
+            },
+            "externalDocs": {
+                "url": "http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
+                "description": "Documentation on function key models"
+            }
+        },
         "Info": {},
         "Line": {},
         "LineExtension": {},
