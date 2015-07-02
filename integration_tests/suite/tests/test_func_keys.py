@@ -204,6 +204,12 @@ class TestAllFuncKeyDestinations(TestFuncKey):
         for pos, expected_funckey in self.confd_funckeys.items():
             self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
+    def test_when_creating_agent_or_bsfilter_for_public_template_then_returns_error(self):
+        for position in self.exclude_for_template:
+            funckey = self.confd_funckeys[position]
+            response = confd.funckeys.templates.post(keys={'1': funckey})
+            response.assert_status(400)
+
     def assert_template_has_funckey(self, funckeys, pos, expected):
         base = {'label': None,
                 'blf': False,
