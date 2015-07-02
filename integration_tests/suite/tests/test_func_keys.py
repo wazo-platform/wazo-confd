@@ -192,7 +192,12 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             '31': {'destination': {'type': 'service', 'service': 'fwdundoall'}},
         }
 
+        self.exclude_for_template = ['23', '24', '25', '29']
+
     def test_when_creating_template_then_all_func_keys_created(self):
+        for position in self.exclude_for_template:
+            del self.confd_funckeys[position]
+
         response = confd.funckeys.templates.post(name='mytemplate', keys=self.confd_funckeys)
         funckeys = response.item['keys']
 
