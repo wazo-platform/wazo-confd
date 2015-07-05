@@ -1525,7 +1525,8 @@
                 "operationId": "delete_func_key_template",
                 "summary": "Delete func key template",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -1553,7 +1554,8 @@
                 "operationId": "get_user_func_key",
                 "summary": "Get a func key for a user",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -1586,7 +1588,8 @@
                 "operationId": "update_user_func_key",
                 "summary": "Add/Replace a func key for a user",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -1624,7 +1627,8 @@
                 "operationId": "delete_user_func_key",
                 "summary": "Remove func key for user",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
