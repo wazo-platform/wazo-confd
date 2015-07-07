@@ -1520,32 +1520,6 @@
                         }
                     }
                 }
-            },
-            "delete": {
-                "operationId": "delete_func_key_template",
-                "summary": "Delete func key template",
-                "tags": [
-                    "funckeys"
-                ],
-                "parameters": [
-                    {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/responses/ResourceDeleted"
-                    },
-                    "400": {
-                        "$ref": "#/responses/DeleteError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
             }
         },
         "/users/{user_id}/funckeys/{position}": {
@@ -1553,7 +1527,8 @@
                 "operationId": "get_user_func_key",
                 "summary": "Get a func key for a user",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -1586,7 +1561,8 @@
                 "operationId": "update_user_func_key",
                 "summary": "Add/Replace a func key for a user",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -1624,7 +1600,8 @@
                 "operationId": "delete_user_func_key",
                 "summary": "Remove func key for user",
                 "tags": [
-                    "funckeys"
+                    "funckeys",
+                    "users"
                 ],
                 "parameters": [
                     {
