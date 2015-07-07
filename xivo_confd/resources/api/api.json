@@ -40,6 +40,7 @@
             "get": {
                 "operationId": "list_call_logs",
                 "summary": "List call logs",
+                "description": "List call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"",
                 "tags": [
                     "call_logs"
                 ],
@@ -2347,7 +2348,11 @@
                 }
             }
         },
-        "CallLog": {},
+        "CallLog": {
+            "title": "CallLog",
+            "description": "Call log in CSV format: \"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"",
+            "type": "string"
+        },
         "CtiProfile": {
             "title": "CtiProfile",
             "properties": {
