@@ -1520,33 +1520,6 @@
                         }
                     }
                 }
-            },
-            "delete": {
-                "operationId": "delete_func_key_template",
-                "summary": "Delete func key template",
-                "tags": [
-                    "funckeys",
-                    "users"
-                ],
-                "parameters": [
-                    {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/responses/ResourceDeleted"
-                    },
-                    "400": {
-                        "$ref": "#/responses/DeleteError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
             }
         },
         "/users/{user_id}/funckeys/{position}": {
