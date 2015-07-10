@@ -96,6 +96,16 @@
                 "tags": [
                     "configuration"
                 ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LiveReloadEnabled"
+                        }
+                    }
+                ],
                 "responses": {
                     "204": {
                         "$ref": "#/responses/ResourceUpdated"
@@ -2248,7 +2258,37 @@
         "LineItems": {},
         "LineSip": {},
         "LineSipItems": {},
-        "LiveReload": {},
+        "Link": {
+            "title": "Link",
+            "properties": {
+                "rel": {
+                    "type": "string"
+                },
+                "href": {
+                    "type": "string"
+                }
+            }
+        },
+        "LiveReload": {
+            "title": "LiveReload",
+            "properties": {
+                "$ref": "#/definition/LiveReloadEnabled",
+                "links": {
+                    "items": {
+                        "$ref": "#/definitions/Link"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "LiveReloadEnabled": {
+            "title": "LiveReload",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
         "User": {},
         "UserCtiProfile": {},
         "UserItems": {},
