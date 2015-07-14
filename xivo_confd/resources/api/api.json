@@ -148,7 +148,7 @@
                         }
                     },
                     "404": {
-                        "$ref": "#/responses/NotFound"
+                        "$ref": "#/responses/NotFoundError"
                     }
                 },
                 "parameters": [
@@ -2209,8 +2209,38 @@
             }
         },
         "CallLog": {},
-        "CtiProfile": {},
-        "CtiProfileItems": {},
+        "CtiProfile": {
+            "title": "CtiProfile",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "links":{
+                    "items": {
+                        "$ref": "#/definitions/Link"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "CtiProfileItems": {
+            "title": "CtiProfileItems",
+            "description": "Listing all available CTI profiles",
+            "properties": {
+                "total": {
+                    "type": "integer"
+                },
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/CtiProfile"
+                    },
+                    "type": "array"
+                }
+            }
+        },
         "Device": {},
         "DeviceItems": {},
         "Error": {},
