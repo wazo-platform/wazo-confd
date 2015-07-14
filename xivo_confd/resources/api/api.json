@@ -2272,7 +2272,9 @@
         "LiveReload": {
             "title": "LiveReload",
             "properties": {
-                "$ref": "#/definition/LiveReloadEnabled",
+                "enabled": {
+                    "type": "boolean"
+                },
                 "links": {
                     "items": {
                         "$ref": "#/definitions/Link"
