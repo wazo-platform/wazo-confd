@@ -1936,7 +1936,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserCtiProfile"
+                            "$ref": "#/definitions/UserCtiProfileMinimum"
                         }
                     }
                 ],
@@ -2322,7 +2322,37 @@
             }
         },
         "User": {},
-        "UserCtiProfile": {},
+        "UserCtiProfile": {
+            "title": "UserCtiProfile",
+            "properties": {
+                "cti_profile_id": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "links": {
+                    "items": {
+                        "$ref": "#/definitions/Link"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "UserCtiProfileMinimum": {
+            "title": "UserCtiProfile",
+            "properties": {
+                "cti_profile_id": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
         "UserItems": {},
         "UserLine": {},
         "UserLineItems": {},
