@@ -2261,10 +2261,10 @@
         "Link": {
             "title": "Link",
             "properties": {
-                "rel": {
+                "href": {
                     "type": "string"
                 },
-                "href": {
+                "rel": {
                     "type": "string"
                 }
             }
