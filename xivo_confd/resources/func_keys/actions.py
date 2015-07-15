@@ -47,6 +47,8 @@ def load(core_rest_api):
     template_converter = fk_converter.build_template_converter(funckey_converter)
     user_template_converter = fk_converter.build_template_converter(user_funckey_converter)
 
+    association_converter = fk_converter.build_association_converter(core_rest_api.content_parser)
+
     provd_client = core_rest_api.provd_client()
     device_dao = device_builder.build_dao(provd_client)
     device_updater = device_builder.build_device_updater(device_dao)
@@ -58,34 +60,47 @@ def load(core_rest_api):
                                          device_updater)
 
     template_manipulator = TemplateManipulator(service, device_updater, user_dao)
+
     template_resource = CRUDResource(service, template_converter)
-    funckey_resource = FuncKeyResource(template_manipulator, funckey_converter)
-    user_funckey_resource = UserFuncKeyResource(template_manipulator, user_funckey_converter, bsfilter_validator, user_dao)
-    user_template_resource = UserTemplateResource(template_manipulator, user_template_converter)
+    funckey_resource = FuncKeyResource(template_manipulator, funckey_converter, association_converter)
+    user_funckey_resource = UserFuncKeyResource(template_manipulator,
+                                                user_funckey_converter,
+                                                association_converter,
+                                                bsfilter_validator,
+                                                user_dao)
+    user_template_resource = UserTemplateResource(template_manipulator,
+                                                  user_template_converter,
+                                                  association_converter)
 
     blueprint = Blueprint('func_key_templates', __name__, url_prefix='/%s/funckeys/templates' % config.API_VERSION)
     user_blueprint = core_rest_api.blueprint('users')
 
     chain = DecoratorChain(core_rest_api, blueprint)
 
+    # /funckeys/templates
     chain.search().decorate(template_resource.search)
     chain.get().decorate(template_resource.get)
     chain.create().decorate(template_resource.create)
     chain.delete().decorate(template_resource.delete)
 
+    # /funckeys/templates/:id/:position
     chain.edit("/<int:template_id>/<int:position>").decorate(funckey_resource.update_funckey)
     chain.delete("/<int:template_id>/<int:position>").decorate(funckey_resource.remove_funckey)
     chain.get("/<int:template_id>/<int:position>").decorate(funckey_resource.get_funckey)
+    chain.get("/<int:template_id>/users").decorate(funckey_resource.get_associations)
 
     user_chain = DecoratorChain(core_rest_api, user_blueprint)
 
+    # /users/:id/funckeys/:position
     user_chain.get("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.get_funckey)
     user_chain.edit("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.update_funckey)
     user_chain.delete("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.remove_funckey)
 
+    # /users/:id/funckeys/templates
     user_chain.get("/<int:user_id>/funckeys").decorate(user_template_resource.get_unified_template)
     user_chain.edit("/<int:user_id>/funckeys/templates/<int:template_id>").decorate(user_template_resource.associate_template)
     user_chain.delete("/<int:user_id>/funckeys/templates/<int:template_id>").decorate(user_template_resource.dissociate_template)
+    user_chain.get("/<int:user_id>/funckeys/templates").decorate(user_template_resource.get_associations)
 
     core_rest_api.register(blueprint)
     core_rest_api.register(user_blueprint)

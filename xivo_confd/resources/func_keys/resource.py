@@ -20,6 +20,8 @@ from flask import request
 
 from xivo_dao.helpers import errors
 
+from xivo_dao.resources.func_key_template.model import UserTemplate
+
 
 class TemplateManipulator(object):
 
@@ -69,21 +71,35 @@ class TemplateManipulator(object):
         else:
             return self.tpl_service.get(user.private_template_id)
 
+    def find_associations_by_user(self, user_id):
+        user = self.user_dao.get(user_id)
+        if user.func_key_template_id:
+            return [UserTemplate(user_id=user.id,
+                                 template_id=user.func_key_template_id)]
+        return []
+
+    def find_associations_by_template(self, template_id):
+        users = self.user_dao.find_all_by_template_id(template_id, private=False)
+        return [UserTemplate(user_id=user.id,
+                             template_id=user.func_key_template_id)
+                for user in users]
+
 
 class FuncKeyResource(object):
 
-    def __init__(self, manipulator, converter):
+    def __init__(self, manipulator, fk_converter, association_converter):
         self.manipulator = manipulator
-        self.converter = converter
+        self.fk_converter = fk_converter
+        self.association_converter = association_converter
 
     def get_funckey(self, template_id, position):
         template = self.manipulator.get_template(template_id)
         funckey = template.get(position)
-        response = self.converter.encode(funckey)
+        response = self.fk_converter.encode(funckey)
         return (response, 200, {'Content-Type': 'application/json'})
 
     def update_funckey(self, template_id, position):
-        funckey = self.converter.decode(request)
+        funckey = self.fk_converter.decode(request)
         self.manipulator.update_funckey(template_id, position, funckey)
         return ('', 204)
 
@@ -91,18 +107,24 @@ class FuncKeyResource(object):
         self.manipulator.remove_funckey(template_id, position)
         return ('', 204)
 
+    def get_associations(self, template_id):
+        associations = self.manipulator.find_associations_by_template(template_id)
+        response = self.association_converter.encode_list(associations)
+        return (response, 200, {'Content-Type': 'application/json'})
+
 
 class UserFuncKeyResource(object):
 
-    def __init__(self, manipulator, converter, validator, user_dao):
+    def __init__(self, manipulator, fk_converter, association_converter, validator, user_dao):
         self.manipulator = manipulator
-        self.converter = converter
+        self.fk_converter = fk_converter
+        self.association_converter = association_converter
         self.validator = validator
         self.user_dao = user_dao
 
     def update_funckey(self, user_id, position):
         user = self.user_dao.get(user_id)
-        funckey = self.converter.decode(request)
+        funckey = self.fk_converter.decode(request)
         self.validator.validate(user, funckey)
         self.manipulator.update_funckey(user.private_template_id, position, funckey)
         return ('', 204)
@@ -116,15 +138,16 @@ class UserFuncKeyResource(object):
         user = self.user_dao.get(user_id)
         template = self.manipulator.get_unified_template(user.id)
         funckey = template.get(position)
-        response = self.converter.encode(funckey)
+        response = self.fk_converter.encode(funckey)
         return (response, 200, {'Content-Type': 'application/json'})
 
 
 class UserTemplateResource(object):
 
-    def __init__(self, manipulator, template_converter):
+    def __init__(self, manipulator, template_converter, association_converter):
         self.manipulator = manipulator
         self.template_converter = template_converter
+        self.association_converter = association_converter
 
     def associate_template(self, user_id, template_id):
         self.manipulator.associate_user(template_id, user_id)
@@ -137,4 +160,9 @@ class UserTemplateResource(object):
     def get_unified_template(self, user_id):
         template = self.manipulator.get_unified_template(user_id)
         response = self.template_converter.encode(template)
+        return (response, 200, {'Content-Type': 'application/json'})
+
+    def get_associations(self, user_id):
+        associations = self.manipulator.find_associations_by_user(user_id)
+        response = self.association_converter.encode_list(associations)
         return (response, 200, {'Content-Type': 'application/json'})
