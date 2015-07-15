@@ -138,7 +138,7 @@
                         }
                     },
                     "404": {
-                        "$ref": "#/responses/NotFound"
+                        "$ref": "#/responses/NotFoundError"
                     }
                 },
                 "parameters": [
@@ -710,6 +710,35 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/funckeys/templates/{template_id}/users": {
+            "get": {
+                "operationId": "list_user_func_key_template_associations",
+                "summary": "List users associated to template",
+                "tags": [
+                    "funckeys",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "template_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-FuncKeyTemplate associations",
+                        "schema": {
+                            "$ref": "#/definitions/UserFuncKeyTemplate"
+                        }
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -1631,6 +1660,35 @@
                 }
             }
         },
+        "/users/{user_id}/funckeys/templates": {
+            "get": {
+                "operationId": "list_user_func_key_template_associations",
+                "summary": "List funckey templates associated to user",
+                "tags": [
+                    "funckeys",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-FuncKeyTemplate associations",
+                        "schema": {
+                            "$ref": "#/definitions/UserFuncKeyTemplate"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/users/{user_id}/funckeys/templates/{template_id}": {
             "put": {
                 "operationId": "associate_user_func_key_template",
@@ -2255,6 +2313,22 @@
         "UserLine": {},
         "UserLineItems": {},
         "UserVoicemail": {},
+        "UserFuncKeyTemplate": {
+            "title": "UserFuncKeyTemplate",
+            "description": "Association between a User and a FuncKey Template",
+            "properties": {
+                "user_id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "User's ID"
+                },
+                "template_id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "FuncKey Template's ID"
+                }
+            }
+        },
         "Voicemail": {},
         "VoicemailItems": {}
     }

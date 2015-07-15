@@ -1,5 +1,5 @@
 import unittest
-from hamcrest import assert_that, has_entries, has_key, is_not, has_entry
+from hamcrest import assert_that, has_entries, has_key, is_not, has_entry, contains
 
 from test_api import confd
 from test_api import helpers
@@ -294,6 +294,26 @@ class TestTemplateAssociation(TestFuncKey):
         expected_destination = self.funckeys['1']['destination']
         assert_that(response.item, has_entry('inherited', True))
         assert_that(response.item['destination'], has_entries(expected_destination))
+
+    def test_given_template_associated_when_getting_association_then_user_associated(self):
+        self.association_url.put().assert_ok()
+
+        response = confd.users(self.user['id']).funckeys.templates.get()
+
+        expected_association = {'user_id': self.user['id'],
+                                'template_id': self.template['id']}
+
+        assert_that(response.items, contains(has_entries(expected_association)))
+
+    def test_given_template_associated_when_getting_association_then_template_associated(self):
+        self.association_url.put().assert_ok()
+
+        response = confd.funckeys.templates(self.template['id']).users.get()
+
+        expected_association = {'user_id': self.user['id'],
+                                'template_id': self.template['id']}
+
+        assert_that(response.items, contains(has_entries(expected_association)))
 
 
 class TestBlfFuncKeys(TestFuncKey):

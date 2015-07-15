@@ -33,6 +33,8 @@ from xivo_dao.resources.func_key.model import UserDestination, \
     ParkPositionDestination, ParkingDestination, AgentDestination, \
     OnlineRecordingDestination
 
+from xivo_dao.resources.func_key_template.model import UserTemplate
+
 from xivo_confd.helpers.mooltiparse import Document, Field, \
     Int, Boolean, Unicode, Dict, \
     Required, Choice, Regexp
@@ -439,5 +441,18 @@ def build_template_converter(funckey_converter):
     serializer = ResourceSerializer({'func_key_templates': 'id'})
 
     converter = Converter(parser, template_mapper, serializer, template_builder)
+
+    return converter
+
+
+def build_association_converter(content_parser):
+    document = content_parser.document(
+        Field('user_id', Int()),
+        Field('template_id', Int())
+    )
+
+    converter = Converter.association(document, UserTemplate,
+                                      links={'users': 'user_id',
+                                             'func_key_templates': 'template_id'})
 
     return converter
