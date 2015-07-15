@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class Parser(object):
         return parsed
 
     def _extract_from_request(self, request):
-        content_type = request.headers.get('Content-Type')
+        content_type = request.mimetype
         content = request.data
 
         if not content_type:

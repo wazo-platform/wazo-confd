@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,23 @@ class TestParser(unittest.TestCase):
 
     def test_given_a_request_then_extracts_and_returns_parsed_content(self):
         content_type = 'application/json'
-        request = Mock(headers={'Content-Type': content_type})
+        request = Mock(mimetype=content_type)
+        content = request.data = Mock()
+        document = Mock(Document)
+        parser = self.registry.parser_for_content_type.return_value = Mock()
+        parsed_content = parser.return_value
+
+        result = self.parser.parse(request, document)
+
+        self.registry.parser_for_content_type.assert_called_once_with(content_type)
+        parser.assert_called_once_with(content, document)
+
+        assert_that(result, equal_to(parsed_content))
+
+    def test_given_a_request_with_option_then_extracts_only_mimetype(self):
+        content_type = 'application/json'
+        content_type_with_option = '{content_type}; charset=UTF-8'.format(content_type=content_type)
+        request = Mock(mimetype=content_type, headers={'Content-Type': content_type_with_option})
         content = request.data = Mock()
         document = Mock(Document)
         parser = self.registry.parser_for_content_type.return_value = Mock()
@@ -48,7 +64,7 @@ class TestParser(unittest.TestCase):
         assert_that(result, equal_to(parsed_content))
 
     def test_given_no_content_type_then_raises_error(self):
-        request = Mock(headers={}, data=None)
+        request = Mock(mimetype='', data=None)
 
         self.assertRaises(ContentTypeError, self.parser.parse, request, Mock())
 
