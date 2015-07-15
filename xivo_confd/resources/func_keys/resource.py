@@ -28,12 +28,6 @@ class TemplateManipulator(object):
         self.device_updater = device_updater
         self.user_dao = user_dao
 
-    def get_funckey(self, template_id, position):
-        template = self.tpl_service.get(template_id)
-        if position not in template.keys:
-            raise errors.not_found('FuncKey', template_id=template_id, position=position)
-        return template.keys[position]
-
     def update_funckey(self, template_id, position, funckey):
         template = self.tpl_service.get(template_id)
         template.keys[position] = funckey
@@ -63,6 +57,9 @@ class TemplateManipulator(object):
         self.user_dao.edit(user)
         self.device_updater.update_for_user(user)
 
+    def get_template(self, template_id):
+        return self.tpl_service.get(template_id)
+
     def get_unified_template(self, user_id):
         user = self.user_dao.get(user_id)
         if user.func_key_template_id:
@@ -80,7 +77,8 @@ class FuncKeyResource(object):
         self.converter = converter
 
     def get_funckey(self, template_id, position):
-        funckey = self.manipulator.get_funckey(template_id, position)
+        template = self.manipulator.get_template(template_id)
+        funckey = template.get(position)
         response = self.converter.encode(funckey)
         return (response, 200, {'Content-Type': 'application/json'})
 
@@ -116,7 +114,8 @@ class UserFuncKeyResource(object):
 
     def get_funckey(self, user_id, position):
         user = self.user_dao.get(user_id)
-        funckey = self.manipulator.get_funckey(user.private_template_id, position)
+        template = self.manipulator.get_unified_template(user.id)
+        funckey = template.get(position)
         response = self.converter.encode(funckey)
         return (response, 200, {'Content-Type': 'application/json'})
 
