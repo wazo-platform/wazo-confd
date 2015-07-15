@@ -1,5 +1,5 @@
 import unittest
-from hamcrest import assert_that, has_entries, has_key, is_not
+from hamcrest import assert_that, has_entries, has_key, is_not, has_entry
 
 from test_api import confd
 from test_api import helpers
@@ -285,6 +285,15 @@ class TestTemplateAssociation(TestFuncKey):
 
         for pos in self.provd_funckeys.keys():
             self.check_provd_does_not_have_funckey(pos)
+
+    def test_given_template_associated_when_getting_func_key_then_fetches_from_unified_template(self):
+        self.association_url.put().assert_ok()
+
+        response = confd.users(self.user['id']).funckeys(1).get()
+
+        expected_destination = self.funckeys['1']['destination']
+        assert_that(response.item, has_entry('inherited', True))
+        assert_that(response.item['destination'], has_entries(expected_destination))
 
 
 class TestBlfFuncKeys(TestFuncKey):
