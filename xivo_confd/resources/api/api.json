@@ -138,7 +138,7 @@
                         }
                     },
                     "404": {
-                        "$ref": "#/responses/NotFound"
+                        "$ref": "#/responses/NotFoundError"
                     }
                 },
                 "parameters": [
