@@ -15,6 +15,16 @@ test-setup:
 test-image:
 	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
+stop:
+	cd assets/base && \
+	docker-compose kill && \
+	docker-compose rm -f 
+
+start:
+	cd assets/base && \
+	docker-compose run --service-ports --rm testdeps && \
+	docker-compose run --service-ports --rm tests
+
 test:
 	nosetests suite
 
