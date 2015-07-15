@@ -49,8 +49,8 @@ class TestCRUDResource(unittest.TestCase):
 
         response = self.resource.search()
 
-        self.converter.encode_list.assert_that_called_once_with(search_result.items,
-                                                                search_result.total)
+        self.converter.encode_list.assert_called_once_with(search_result.items,
+                                                           search_result.total)
         assert_that(response,
                     equal_to((expected_response,
                               200,
