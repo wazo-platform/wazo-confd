@@ -614,6 +614,23 @@
                 }
             }
         },
+        "/funckeys/destinations": {
+            "get": {
+                "operationId": "list_func_key_destinations",
+                "summary": "List of possible func key destinations and their parameters",
+                "tags": [
+                    "funckeys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of destinations",
+                        "schema": {
+                            "$ref": "#/definitions/FuncKeyDestination"
+                        }
+                    }
+                }
+            }
+        },
         "/funckeys/templates": {
             "get": {
                 "operationId": "list_func_key_template",
@@ -2264,6 +2281,29 @@
         "Error": {},
         "Extension": {},
         "ExtensionItems": {},
+        "FuncKeyDestination": {
+            "title": "FuncKeyDestination",
+            "description": "Description of func key destinations and their parameters",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Parameter name"
+                    },
+                    "collection": {
+                        "type": "string",
+                        "description": "URL towards a collection of entities representing possible values as a destination"
+                    },
+                    "values": {
+                        "description": "Array of values to choose from for this parameter",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "FuncKeyTemplate": {
             "title": "FuncKeyTemplate",
             "description": "Further documentation at http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
