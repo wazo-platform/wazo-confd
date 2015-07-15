@@ -112,6 +112,10 @@ class FuncKeyResource(object):
         response = self.association_converter.encode_list(associations)
         return (response, 200, {'Content-Type': 'application/json'})
 
+    def get_destinations(self):
+        response = self.fk_converter.description()
+        return (response, 200, {'Content-Type': 'application/json'})
+
 
 class UserFuncKeyResource(object):
 

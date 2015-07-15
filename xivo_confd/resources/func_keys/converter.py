@@ -18,6 +18,7 @@
 
 import abc
 import re
+import json
 
 from flask import url_for
 
@@ -25,6 +26,8 @@ from xivo_dao.helpers import errors
 from xivo_confd.helpers.converter import Parser, Mapper, Builder
 from xivo_dao.resources.func_key.model import FuncKey
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.features import dao as feature_dao
 
 from xivo_dao.resources.func_key.model import UserDestination, \
     GroupDestination, QueueDestination, ConferenceDestination, \
@@ -181,6 +184,9 @@ class FuncKeyBuilder(Builder):
         self.validator = validator
         self.builders = builders
 
+    def description(self):
+        return [b.description() for b in self.builders.values()]
+
     def create(self, mapping):
         self.validator.validate(mapping, 'create')
         destination = self.build_destination(mapping['destination'])
@@ -219,6 +225,13 @@ class DestinationBuilder(object):
     def to_model(self, destination):
         pass
 
+    def description(self):
+        return {'type': self.destination,
+                'parameters': self.parameters()}
+
+    def parameters(self):
+        return [{'name': field.name} for field in self.fields]
+
     def build(self, destination):
         self.validate(destination)
         return self.to_model(destination)
@@ -243,6 +256,10 @@ class UserDestinationBuilder(DestinationBuilder):
     destination = 'user'
 
     fields = [Field('user_id', Int(), Required())]
+
+    def parameters(self):
+        return [{'name': 'user_id',
+                 'collection': url_for('users.search')}]
 
     def to_model(self, destination):
         return UserDestination(user_id=destination['user_id'])
@@ -307,6 +324,11 @@ class ServiceDestinationBuilder(DestinationBuilder):
 
     fields = [Field('service', Unicode(), Required())]
 
+    def parameters(self):
+        services = [e.service for e in extension_dao.find_all_service_extensions()]
+        return [{'name': 'service',
+                 'values': services}]
+
     def to_model(self, destination):
         return ServiceDestination(service=destination['service'])
 
@@ -333,6 +355,12 @@ class ForwardDestinationBuilder(DestinationBuilder):
                     Regexp(EXTEN_REGEX))
               ]
 
+    def parameters(self):
+        forwards = [e.forward for e in extension_dao.find_all_forward_extensions()]
+        return [{'name': 'exten'},
+                {'name': 'forward',
+                 'values': forwards}]
+
     def to_model(self, destination):
         return ForwardDestination(forward=destination['forward'],
                                   exten=destination.get('exten'))
@@ -346,6 +374,11 @@ class TransferDestinationBuilder(DestinationBuilder):
                     Unicode(),
                     Required(), Choice(['blind', 'attended'])),
               ]
+
+    def parameters(self):
+        transfers = [e.transfer for e in feature_dao.find_all_transfer_extensions()]
+        return [{'name': 'transfer',
+                 'values': transfers}]
 
     def to_model(self, destination):
         return TransferDestination(transfer=destination['transfer'])
@@ -383,6 +416,12 @@ class AgentDestinationBuilder(DestinationBuilder):
                     Required(), Choice(['login', 'logout', 'toggle'])),
               Field('agent_id', Int(), Required())]
 
+    def parameters(self):
+        actions = [e.action for e in extension_dao.find_all_agent_action_extensions()]
+        return [{'name': 'agent_id'},
+                {'name': 'action',
+                 'values': actions}]
+
     def to_model(self, destination):
         return AgentDestination(action=destination['action'],
                                 agent_id=destination['agent_id'])
@@ -396,6 +435,13 @@ class OnlineRecordingDestinationBuilder(DestinationBuilder):
 
     def to_model(self, destination):
         return OnlineRecordingDestination()
+
+
+class FuncKeyConverter(Converter):
+
+    def description(self):
+        description = self.builder.description()
+        return json.dumps(description)
 
 
 def build_destinations(exclude=None):
@@ -429,7 +475,7 @@ def build_funckey_converter(exclude=None):
     funckey_mapper = FuncKeyMapper(destinations)
     funckey_builder = FuncKeyBuilder(funckey_validator, destinations)
     serializer = ResourceSerializer({})
-    return Converter(parser, funckey_mapper, serializer, funckey_builder)
+    return FuncKeyConverter(parser, funckey_mapper, serializer, funckey_builder)
 
 
 def build_template_converter(funckey_converter):
