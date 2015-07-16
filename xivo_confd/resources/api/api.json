@@ -2199,6 +2199,10 @@
             "name": "direction",
             "in": "query",
             "type": "string",
+            "enum": [
+                "asc",
+                "desc"
+            ],
             "description": "Sort list of items in 'asc' (ascending) or 'desc' (descending) order"
         },
         "limit": {
@@ -2316,8 +2320,84 @@
                 }
             }
         },
-        "Device": {},
-        "DeviceItems": {},
+        "Device": {
+            "title": "Device",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "(Read-only)"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "ip": {
+                    "type": "string",
+                    "description": "IP address (10.0.0.0)"
+                },
+                "mac": {
+                    "type": "string",
+                    "description": "MAC address (aa:bb:cc:dd:ee:ff)"
+                },
+                "model": {
+                    "type": "string",
+                    "description": "Device model"
+                },
+                "plugin": {
+                    "type": "string",
+                    "description": "Provisioning plugin to be used by device"
+                },
+                "options": {
+                    "type": "object",
+                    "description": "List of standard keys"
+                },
+                "sn": {
+                    "type": "string",
+                    "description": "Serial number"
+                },
+                "status": {
+                    "type": "string",
+                    "default": "not_configured",
+                    "enum": [
+                        "autoprov",
+                        "configured",
+                        "not_configured"
+                    ],
+                    "description": "Device status"
+                },
+                "template_id": {
+                    "type": "string",
+                    "description": "ID of the device template. All device using a device template will have a certain number of common parameters preconfigured for the device"
+                },
+                "vendor": {
+                    "type": "string",
+                    "description": "Vendor name"
+                },
+                "version": {
+                    "type": "string",
+                    "description": "Firmware version"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "DeviceItems": {
+            "title": "DeviceItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/Device"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
         "Error": {},
         "Extension": {},
         "ExtensionItems": {},
