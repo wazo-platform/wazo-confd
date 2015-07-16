@@ -108,7 +108,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/LiveReloadEnabled"
+                            "$ref": "#/definitions/LiveReload"
                         }
                     }
                 ],
@@ -2298,12 +2298,6 @@
                 },
                 "name": {
                     "type": "string"
-                },
-                "links":{
-                    "items": {
-                        "$ref": "#/definitions/Link"
-                    },
-                    "type": "array"
                 }
             }
         },
@@ -2411,32 +2405,7 @@
         "LineItems": {},
         "LineSip": {},
         "LineSipItems": {},
-        "Link": {
-            "title": "Link",
-            "properties": {
-                "href": {
-                    "type": "string"
-                },
-                "rel": {
-                    "type": "string"
-                }
-            }
-        },
         "LiveReload": {
-            "title": "LiveReload",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "links": {
-                    "items": {
-                        "$ref": "#/definitions/Link"
-                    },
-                    "type": "array"
-                }
-            }
-        },
-        "LiveReloadEnabled": {
             "title": "LiveReload",
             "properties": {
                 "enabled": {
@@ -2456,12 +2425,6 @@
                 },
                 "user_id": {
                     "type": "integer"
-                },
-                "links": {
-                    "items": {
-                        "$ref": "#/definitions/Link"
-                    },
-                    "type": "array"
                 }
             }
         },
