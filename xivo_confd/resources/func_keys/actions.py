@@ -73,9 +73,14 @@ def load(core_rest_api):
                                                   association_converter)
 
     blueprint = Blueprint('func_key_templates', __name__, url_prefix='/%s/funckeys/templates' % config.API_VERSION)
+    fk_blueprint = Blueprint('func_keys', __name__, url_prefix='/%s/funckeys' % config.API_VERSION)
     user_blueprint = core_rest_api.blueprint('users')
 
     chain = DecoratorChain(core_rest_api, blueprint)
+    fk_chain = DecoratorChain(core_rest_api, fk_blueprint)
+
+    # /funckeys
+    fk_chain.get("/destinations").decorate(funckey_resource.get_destinations)
 
     # /funckeys/templates
     chain.search().decorate(template_resource.search)
@@ -91,7 +96,7 @@ def load(core_rest_api):
 
     user_chain = DecoratorChain(core_rest_api, user_blueprint)
 
-    # /users/:id/funckeys/:position
+    # /users/:id/funckeys
     user_chain.get("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.get_funckey)
     user_chain.edit("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.update_funckey)
     user_chain.delete("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.remove_funckey)
@@ -104,3 +109,4 @@ def load(core_rest_api):
 
     core_rest_api.register(blueprint)
     core_rest_api.register(user_blueprint)
+    core_rest_api.register(fk_blueprint)
