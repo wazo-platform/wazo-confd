@@ -2423,8 +2423,46 @@
             ]
         },
         "Error": {},
-        "Extension": {},
-        "ExtensionItems": {},
+        "Extension": {
+            "title": "Extension",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Read-only"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "commented": {
+                    "type": "boolean",
+                    "description": "If True the extension is disabled"
+                },
+                "exten": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "context",
+                "exten"
+            ]
+        },
+        "ExtensionItems": {
+            "title": "ExtensionItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/Extension"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
         "FuncKeyDestination": {
             "title": "FuncKeyDestination",
             "properties": {
