@@ -2314,10 +2314,12 @@
             "title": "CtiProfile",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Read-only"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Display name"
                 }
             }
         },
@@ -2341,7 +2343,7 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "(Read-only)"
+                    "description": "Read-only"
                 },
                 "description": {
                     "type": "string"
@@ -2378,7 +2380,7 @@
                         "configured",
                         "not_configured"
                     ],
-                    "description": "Device status"
+                    "description": "Read-only. Device status"
                 },
                 "template_id": {
                     "type": "string",
@@ -2542,7 +2544,7 @@
             "properties": {
                 "line_id": {
                     "type": "integer",
-                    "description": "Line's ID"
+                    "description": "Read-only. Line's ID"
                 },
                 "extension_id": {
                     "type": "integer",
@@ -2689,15 +2691,15 @@
                 },
                 "main_line": {
                     "type": "boolean",
-                    "description": "Read-Only. To be implemented later. Always true"
+                    "description": "Read-only. To be implemented later. Always true"
                 },
                 "main_user": {
                     "type": "boolean",
-                    "description": "Read-Only. True if the user is the first to have been associated to the line"
+                    "description": "Read-only. True if the user is the first to have been associated to the line"
                 },
                 "user_id": {
                     "type": "integer",
-                    "description": "Read-Only"
+                    "description": "Read-only"
                 }
             },
             "required": [
