@@ -2033,7 +2033,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserCtiProfileMinimum"
+                            "$ref": "#/definitions/UserCtiProfilePut"
                         }
                     }
                 ],
@@ -2660,7 +2660,7 @@
                 }
             }
         },
-        "UserCtiProfileMinimum": {
+        "UserCtiProfilePut": {
             "title": "UserCtiProfile",
             "properties": {
                 "cti_profile_id": {
