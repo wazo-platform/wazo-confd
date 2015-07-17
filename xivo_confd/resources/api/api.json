@@ -1063,6 +1063,14 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
                     }
                 ],
                 "responses": {
@@ -1831,6 +1839,14 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserLine"
+                        }
                     }
                 ],
                 "responses": {
@@ -2488,12 +2504,139 @@
             }
         },
         "Info": {},
-        "Line": {},
-        "LineExtension": {},
-        "LineExtensionItems": {},
-        "LineItems": {},
-        "LineSip": {},
-        "LineSipItems": {},
+        "Line": {
+            "title": "Line",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Read-only"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "The name of an internal context"
+                },
+                "device_id": {
+                    "type": "string",
+                    "description": "ID of the device associated to the line"
+                },
+                "device_slot": {
+                    "type": "integer",
+                    "description": "Line's position on the device"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the line"
+                },
+                "protocol": {
+                    "type": "string",
+                    "enum": [
+                        "sip"
+                    ],
+                    "description": "Read-only"
+                },
+                "provisioning_extension": {
+                    "type": "string",
+                    "description": "Code used to provision a device"
+                }
+            }
+        },
+        "LineExtension": {
+            "title": "LineExtension",
+            "properties": {
+                "line_id": {
+                    "type": "integer",
+                    "description": "Line's ID"
+                },
+                "extension_id": {
+                    "type": "integer",
+                    "description": "Extension's ID"
+                }
+            }
+        },
+        "LineExtensionItems": {
+            "title": "LineExtensionItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/LineExtension"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
+        "LineItems": {
+            "title": "LineItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/Line"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
+        "LineSip": {
+            "title": "LineSip",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Read-only"
+                },
+                "callerid": {
+                    "type": "string",
+                    "description": "Caller id that appears on a phone when calling. Formatted as \"Firstname Lastname\" < number >"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "Context used to emit a call"
+                },
+                "device_slot": {
+                    "type": "integer",
+                    "description": "Line's position on the device"
+                },
+                "provisioning_extension": {
+                    "type": "string",
+                    "description": "Code used to provision a device"
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "SIP account password"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "SIP account username"
+                }
+            }
+        },
+        "LineSipItems": {
+            "title": "LineSipItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/LineSip"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
         "LiveReload": {
             "title": "LiveReload",
             "properties": {
@@ -2529,8 +2672,47 @@
             }
         },
         "UserItems": {},
-        "UserLine": {},
-        "UserLineItems": {},
+        "UserLine": {
+            "title": "UserLine",
+            "properties": {
+                "line_id": {
+                    "type": "integer",
+                    "description": "Line's ID"
+                },
+                "main_line": {
+                    "type": "boolean",
+                    "description": "Read-Only. To be implemented later. Always true"
+                },
+                "main_user": {
+                    "type": "boolean",
+                    "description": "Read-Only. True if the user is the first to have been associated to the line"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "description": "Read-Only"
+                }
+            },
+            "required": [
+                "line_id"
+            ]
+        },
+        "UserLineItems": {
+            "title": "UserLineItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/UserLine"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
         "UserVoicemail": {},
         "UserFuncKeyTemplate": {
             "title": "UserFuncKeyTemplate",
