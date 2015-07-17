@@ -212,7 +212,7 @@
                         "name": "body",
                         "in": "body",
                         "description": "Device to create",
-                        "required": true,
+                        "required": false,
                         "schema": {
                             "$ref": "#/definitions/Device"
                         }
@@ -2392,10 +2392,7 @@
                     "type": "string",
                     "description": "Firmware version"
                 }
-            },
-            "required": [
-                "id"
-            ]
+            }
         },
         "DeviceOptions": {
             "title": "DeviceOptions",
@@ -2551,7 +2548,10 @@
                     "type": "integer",
                     "description": "Extension's ID"
                 }
-            }
+            },
+            "required": [
+                "extension_id"
+            ]
         },
         "LineExtensionItems": {
             "title": "LineExtensionItems",
@@ -2618,7 +2618,11 @@
                     "type": "string",
                     "description": "SIP account username"
                 }
-            }
+            },
+            "required": [
+                "context",
+                "device_slot"
+            ]
         },
         "LineSipItems": {
             "title": "LineSipItems",
@@ -2669,7 +2673,11 @@
                 "enabled": {
                     "type": "boolean"
                 }
-            }
+            },
+            "required": [
+                "cti_profile_id",
+                "enabled"
+            ]
         },
         "UserItems": {},
         "UserLine": {
