@@ -2347,7 +2347,7 @@
                     "description": "Provisioning plugin to be used by device"
                 },
                 "options": {
-                    "type": "object",
+                    "$ref": "#/definitions/DeviceOptions",
                     "description": "List of standard keys"
                 },
                 "sn": {
@@ -2380,6 +2380,15 @@
             "required": [
                 "id"
             ]
+        },
+        "DeviceOptions": {
+            "title": "DeviceOptions",
+            "properties": {
+                "switchboard":{
+                    "type": "boolean",
+                    "description": "Indicate if this device is a switchboard"
+                }
+            }
         },
         "DeviceItems": {
             "title": "DeviceItems",
