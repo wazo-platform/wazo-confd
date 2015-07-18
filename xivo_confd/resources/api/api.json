@@ -102,6 +102,16 @@
                 "tags": [
                     "configuration"
                 ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LiveReloadEnabled"
+                        }
+                    }
+                ],
                 "responses": {
                     "204": {
                         "$ref": "#/responses/ResourceUpdated"
@@ -2007,7 +2017,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserCtiProfile"
+                            "$ref": "#/definitions/UserCtiProfileMinimum"
                         }
                     }
                 ],
@@ -2280,8 +2290,38 @@
             }
         },
         "CallLog": {},
-        "CtiProfile": {},
-        "CtiProfileItems": {},
+        "CtiProfile": {
+            "title": "CtiProfile",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "links":{
+                    "items": {
+                        "$ref": "#/definitions/Link"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "CtiProfileItems": {
+            "title": "CtiProfileItems",
+            "description": "Listing all available CTI profiles",
+            "properties": {
+                "total": {
+                    "type": "integer"
+                },
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/CtiProfile"
+                    },
+                    "type": "array"
+                }
+            }
+        },
         "Device": {},
         "DeviceItems": {},
         "Error": {},
@@ -2352,9 +2392,71 @@
         "LineItems": {},
         "LineSip": {},
         "LineSipItems": {},
-        "LiveReload": {},
+        "Link": {
+            "title": "Link",
+            "properties": {
+                "href": {
+                    "type": "string"
+                },
+                "rel": {
+                    "type": "string"
+                }
+            }
+        },
+        "LiveReload": {
+            "title": "LiveReload",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "links": {
+                    "items": {
+                        "$ref": "#/definitions/Link"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "LiveReloadEnabled": {
+            "title": "LiveReload",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
         "User": {},
-        "UserCtiProfile": {},
+        "UserCtiProfile": {
+            "title": "UserCtiProfile",
+            "properties": {
+                "cti_profile_id": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "links": {
+                    "items": {
+                        "$ref": "#/definitions/Link"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "UserCtiProfileMinimum": {
+            "title": "UserCtiProfile",
+            "properties": {
+                "cti_profile_id": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
         "UserItems": {},
         "UserLine": {},
         "UserLineItems": {},
