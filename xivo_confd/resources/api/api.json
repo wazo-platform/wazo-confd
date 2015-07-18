@@ -43,6 +43,12 @@
                 "tags": [
                     "call_logs"
                 ],
+                "consumes": [
+                    "text/csv"
+                ],
+                "produces": [
+                    "text/csv"
+                ],
                 "parameters": [
                     {
                         "name": "start_date",
