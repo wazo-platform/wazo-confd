@@ -641,7 +641,7 @@
                     "200": {
                         "description": "List of destinations",
                         "schema": {
-                            "$ref": "#/definitions/FuncKeyDestination"
+                            "$ref": "#/definitions/FuncKeyDestinationItems"
                         }
                     }
                 }
@@ -2329,26 +2329,45 @@
         "ExtensionItems": {},
         "FuncKeyDestination": {
             "title": "FuncKeyDestination",
-            "description": "Description of func key destinations and their parameters",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Parameter name"
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "items": {
+                        "$ref": "#/definitions/FuncKeyDestinationParameter"
                     },
-                    "collection": {
-                        "type": "string",
-                        "description": "URL towards a collection of entities representing possible values as a destination"
-                    },
-                    "values": {
-                        "description": "Array of values to choose from for this parameter",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
+                    "type": "array"
                 }
             }
+        },
+        "FuncKeyDestinationParameter": {
+            "title": "FuncKeyDestinationParameter",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Parameter name"
+                },
+                "collection": {
+                    "type": "string",
+                    "description": "URL towards a collection of entities representing possible values as a destination"
+                },
+                "values": {
+                    "description": "Array of values to choose from for this parameter",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "FuncKeyDestinationItems": {
+            "title": "FuncKeyDestinationItems",
+            "description": "Description of func key destinations and their parameters",
+            "items": {
+                "$ref": "#/definitions/FuncKeyDestination"
+            },
+            "type": "array"
         },
         "FuncKeyTemplate": {
             "title": "FuncKeyTemplate",
