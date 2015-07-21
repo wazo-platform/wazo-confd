@@ -2315,7 +2315,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Read-only"
+                    "description": "CtiProfile ID"
                 },
                 "name": {
                     "type": "string",
@@ -2343,7 +2343,7 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "Read-only"
+                    "description": "Device ID"
                 },
                 "description": {
                     "type": "string"
@@ -2428,7 +2428,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Read-only"
+                    "description": "Extension ID"
                 },
                 "context": {
                     "type": "string"
@@ -2546,7 +2546,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Read-only"
+                    "description": "Line ID"
                 },
                 "context": {
                     "type": "string",
@@ -2569,7 +2569,7 @@
                     "enum": [
                         "sip"
                     ],
-                    "description": "Read-only"
+                    "description": "Line's protocol"
                 },
                 "provisioning_extension": {
                     "type": "string",
@@ -2582,7 +2582,7 @@
             "properties": {
                 "line_id": {
                     "type": "integer",
-                    "description": "Read-only. Line's ID"
+                    "description": "Line's ID"
                 },
                 "extension_id": {
                     "type": "integer",
@@ -2632,7 +2632,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Read-only"
+                    "description": "Line ID"
                 },
                 "callerid": {
                     "type": "string",
@@ -2737,7 +2737,7 @@
                 },
                 "user_id": {
                     "type": "integer",
-                    "description": "Read-only"
+                    "description": "Read-only. User's ID"
                 }
             },
             "required": [
