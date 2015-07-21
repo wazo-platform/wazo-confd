@@ -2315,7 +2315,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "CtiProfile ID"
+                    "description": "CtiProfile ID (read-only)"
                 },
                 "name": {
                     "type": "string",
@@ -2343,7 +2343,7 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "Device ID"
+                    "description": "Device ID (read-only)"
                 },
                 "description": {
                     "type": "string"
@@ -2380,7 +2380,7 @@
                         "configured",
                         "not_configured"
                     ],
-                    "description": "Read-only. Device status"
+                    "description": "(read-only) Device status"
                 },
                 "template_id": {
                     "type": "string",
@@ -2428,7 +2428,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Extension ID"
+                    "description": "Extension ID (read-only)"
                 },
                 "context": {
                     "type": "string"
@@ -2546,7 +2546,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Line ID"
+                    "description": "Line ID (read-only)"
                 },
                 "context": {
                     "type": "string",
@@ -2632,7 +2632,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Line ID"
+                    "description": "Line ID (read-only)"
                 },
                 "callerid": {
                     "type": "string",
@@ -2729,15 +2729,15 @@
                 },
                 "main_line": {
                     "type": "boolean",
-                    "description": "Read-only. To be implemented later. Always true"
+                    "description": "To be implemented later. Always true (read-only)"
                 },
                 "main_user": {
                     "type": "boolean",
-                    "description": "Read-only. True if the user is the first to have been associated to the line"
+                    "description": "True if the user is the first to have been associated to the line (read-only)"
                 },
                 "user_id": {
                     "type": "integer",
-                    "description": "Read-only. User's ID"
+                    "description": "User's ID (read-only)"
                 }
             },
             "required": [
