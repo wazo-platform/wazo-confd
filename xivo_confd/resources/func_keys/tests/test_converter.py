@@ -140,7 +140,7 @@ class TestFuncKeyMapper(unittest.TestCase):
         expected_destination = self.builder.to_mapping.return_value
         expected = {'id': sentinel.id,
                     'label': None,
-                    'blf': False,
+                    'blf': True,
                     'inherited': True,
                     'destination': expected_destination}
 
