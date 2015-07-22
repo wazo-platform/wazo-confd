@@ -63,7 +63,7 @@ class TestUserWithFuncKey(TestFuncKey):
     def test_when_getting_position_then_func_key_returned(self):
         expected_funckey = {'label': None,
                             'inherited': False,
-                            'blf': False}
+                            'blf': True}
         expected_destination = {'type': self.destination['type'],
                                 'exten': self.destination['exten'],
                                 'href': None}
@@ -74,13 +74,13 @@ class TestUserWithFuncKey(TestFuncKey):
         assert_that(response.item['destination'], has_entries(expected_destination))
 
     def test_when_updating_position_then_func_key_modified_in_provd(self):
-        modified_funckey = {'blf': True,
+        modified_funckey = {'blf': False,
                             'label': 'myfunckey',
                             'destination': {'type': 'park_position',
                                             'position': 701}}
 
         provd_funckey = {'label': 'myfunckey',
-                         'type': 'blf',
+                         'type': 'speeddial',
                          'line': 1,
                          'value': '701'}
 
@@ -159,37 +159,37 @@ class TestAllFuncKeyDestinations(TestFuncKey):
         }
 
         self.confd_funckeys = {
-            '1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
-            '2': {'destination': {'type': 'group', 'group_id': group_id}},
-            '3': {'destination': {'type': 'queue', 'queue_id': queue_id}},
-            '4': {'destination': {'type': 'conference', 'conference_id': conference_id}},
-            '5': {'destination': {'type': 'custom', 'exten': custom_exten}},
-            '6': {'destination': {'type': 'service', 'service': 'phonestatus'}},
-            '7': {'destination': {'type': 'service', 'service': 'recsnd'}},
-            '8': {'destination': {'type': 'service', 'service': 'callrecord'}},
-            '9': {'destination': {'type': 'service', 'service': 'incallfilter'}},
-            '10': {'destination': {'type': 'service', 'service': 'enablednd'}},
-            '11': {'destination': {'type': 'service', 'service': 'pickup'}},
-            '12': {'destination': {'type': 'service', 'service': 'calllistening'}},
-            '13': {'destination': {'type': 'service', 'service': 'directoryaccess'}},
-            '14': {'destination': {'type': 'service', 'service': 'enablevm'}},
-            '15': {'destination': {'type': 'service', 'service': 'vmusermsg'}},
-            '16': {'destination': {'type': 'service', 'service': 'vmuserpurge'}},
-            '17': {'destination': {'type': 'forward', 'forward': 'noanswer'}},
-            '18': {'destination': {'type': 'forward', 'forward': 'busy'}},
-            '19': {'destination': {'type': 'forward', 'forward': 'unconditional'}},
-            '20': {'destination': {'type': 'forward', 'forward': 'busy', 'exten': forward_number}},
-            '21': {'destination': {'type': 'transfer', 'transfer': 'blind'}},
-            '22': {'destination': {'type': 'transfer', 'transfer': 'attended'}},
-            '23': {'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
-            '24': {'destination': {'type': 'agent', 'action': 'logout', 'agent_id': agent_id}},
-            '25': {'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
-            '26': {'destination': {'type': 'park_position', 'position': park_pos}},
-            '27': {'destination': {'type': 'parking'}},
-            '28': {'destination': {'type': 'paging', 'paging_id': paging_id}},
-            '29': {'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
-            '30': {'destination': {'type': 'onlinerec'}},
-            '31': {'destination': {'type': 'service', 'service': 'fwdundoall'}},
+            '1': {'blf': False, 'destination': {'type': 'user', 'user_id': self.user['id']}},
+            '2': {'blf': False, 'destination': {'type': 'group', 'group_id': group_id}},
+            '3': {'blf': False, 'destination': {'type': 'queue', 'queue_id': queue_id}},
+            '4': {'blf': False, 'destination': {'type': 'conference', 'conference_id': conference_id}},
+            '5': {'blf': False, 'destination': {'type': 'custom', 'exten': custom_exten}},
+            '6': {'blf': False, 'destination': {'type': 'service', 'service': 'phonestatus'}},
+            '7': {'blf': False, 'destination': {'type': 'service', 'service': 'recsnd'}},
+            '8': {'blf': False, 'destination': {'type': 'service', 'service': 'callrecord'}},
+            '9': {'blf': False, 'destination': {'type': 'service', 'service': 'incallfilter'}},
+            '10': {'blf': False, 'destination': {'type': 'service', 'service': 'enablednd'}},
+            '11': {'blf': False, 'destination': {'type': 'service', 'service': 'pickup'}},
+            '12': {'blf': False, 'destination': {'type': 'service', 'service': 'calllistening'}},
+            '13': {'blf': False, 'destination': {'type': 'service', 'service': 'directoryaccess'}},
+            '14': {'blf': False, 'destination': {'type': 'service', 'service': 'enablevm'}},
+            '15': {'blf': False, 'destination': {'type': 'service', 'service': 'vmusermsg'}},
+            '16': {'blf': False, 'destination': {'type': 'service', 'service': 'vmuserpurge'}},
+            '17': {'blf': False, 'destination': {'type': 'forward', 'forward': 'noanswer'}},
+            '18': {'blf': False, 'destination': {'type': 'forward', 'forward': 'busy'}},
+            '19': {'blf': False, 'destination': {'type': 'forward', 'forward': 'unconditional'}},
+            '20': {'blf': False, 'destination': {'type': 'forward', 'forward': 'busy', 'exten': forward_number}},
+            '21': {'blf': False, 'destination': {'type': 'transfer', 'transfer': 'blind'}},
+            '22': {'blf': False, 'destination': {'type': 'transfer', 'transfer': 'attended'}},
+            '23': {'blf': False, 'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
+            '24': {'blf': False, 'destination': {'type': 'agent', 'action': 'logout', 'agent_id': agent_id}},
+            '25': {'blf': False, 'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
+            '26': {'blf': False, 'destination': {'type': 'park_position', 'position': park_pos}},
+            '27': {'blf': False, 'destination': {'type': 'parking'}},
+            '28': {'blf': False, 'destination': {'type': 'paging', 'paging_id': paging_id}},
+            '29': {'blf': False, 'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
+            '30': {'blf': False, 'destination': {'type': 'onlinerec'}},
+            '31': {'blf': False, 'destination': {'type': 'service', 'service': 'fwdundoall'}},
         }
 
         self.exclude_for_template = ['23', '24', '25', '29']
@@ -211,15 +211,16 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             response.assert_status(400)
 
     def assert_template_has_funckey(self, funckeys, pos, expected):
-        base = {'label': None,
-                'blf': False,
-                'inherited': True}
+        expected.setdefault('blf', False)
+        expected.setdefault('label', None)
+        expected.setdefault('inherited', True)
+        expected_destination = expected.pop('destination')
 
         assert_that(funckeys, has_key(pos))
-
         funckey = funckeys[pos]
-        assert_that(funckey, has_entries(base))
-        assert_that(funckey['destination'], has_entries(expected['destination']))
+
+        assert_that(funckey, has_entries(expected))
+        assert_that(funckey['destination'], has_entries(expected_destination))
 
     def test_when_adding_func_keys_to_user_then_func_keys_added_in_provd(self):
         for pos, funckey in self.confd_funckeys.items():
@@ -237,7 +238,7 @@ class TestTemplateAssociation(TestFuncKey):
                          '2': {'destination': {'type': 'parking'}}}
 
         self.provd_funckeys = {
-            '1': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '9999'},
+            '1': {'label': '', 'type': 'blf', 'line': 1, 'value': '9999'},
             '2': {'label': '', 'type': 'park', 'line': 1, 'value': '700'}
         }
 
@@ -264,7 +265,7 @@ class TestTemplateAssociation(TestFuncKey):
         third_funckey = {'destination': {'type': 'service', 'service': 'phonestatus'}}
 
         first_provd_funckey = self.provd_funckeys['1']
-        second_provd_funckey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '1000'}
+        second_provd_funckey = {'label': '', 'type': 'blf', 'line': 1, 'value': '1000'}
         third_provd_fundkey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*10'}
 
         with confd.users(self.user['id']).funckeys as url:
@@ -335,22 +336,22 @@ class TestBlfFuncKeys(TestFuncKey):
                                                             self.user['id'])
 
         self.confd_funckeys = {
-            '1': {'blf': True, 'destination': {'type': 'user', 'user_id': self.user['id']}},
-            '4': {'blf': True, 'destination': {'type': 'conference', 'conference_id': conference_id}},
-            '5': {'blf': True, 'destination': {'type': 'custom', 'exten': custom_exten}},
-            '8': {'blf': True, 'destination': {'type': 'service', 'service': 'callrecord'}},
-            '9': {'blf': True, 'destination': {'type': 'service', 'service': 'incallfilter'}},
-            '10': {'blf': True, 'destination': {'type': 'service', 'service': 'enablednd'}},
-            '14': {'blf': True, 'destination': {'type': 'service', 'service': 'enablevm'}},
-            '17': {'blf': True, 'destination': {'type': 'forward', 'forward': 'noanswer'}},
-            '18': {'blf': True, 'destination': {'type': 'forward', 'forward': 'busy'}},
-            '19': {'blf': True, 'destination': {'type': 'forward', 'forward': 'unconditional'}},
-            '20': {'blf': True, 'destination': {'type': 'forward', 'forward': 'busy', 'exten': forward_number}},
-            '23': {'blf': True, 'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
-            '24': {'blf': True, 'destination': {'type': 'agent', 'action': 'logout', 'agent_id': agent_id}},
-            '25': {'blf': True, 'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
-            '26': {'blf': True, 'destination': {'type': 'park_position', 'position': park_pos}},
-            '29': {'blf': True, 'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
+            '1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
+            '4': {'destination': {'type': 'conference', 'conference_id': conference_id}},
+            '5': {'destination': {'type': 'custom', 'exten': custom_exten}},
+            '8': {'destination': {'type': 'service', 'service': 'callrecord'}},
+            '9': {'destination': {'type': 'service', 'service': 'incallfilter'}},
+            '10': {'destination': {'type': 'service', 'service': 'enablednd'}},
+            '14': {'destination': {'type': 'service', 'service': 'enablevm'}},
+            '17': {'destination': {'type': 'forward', 'forward': 'noanswer'}},
+            '18': {'destination': {'type': 'forward', 'forward': 'busy'}},
+            '19': {'destination': {'type': 'forward', 'forward': 'unconditional'}},
+            '20': {'destination': {'type': 'forward', 'forward': 'busy', 'exten': forward_number}},
+            '23': {'destination': {'type': 'agent', 'action': 'login', 'agent_id': agent_id}},
+            '24': {'destination': {'type': 'agent', 'action': 'logout', 'agent_id': agent_id}},
+            '25': {'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
+            '26': {'destination': {'type': 'park_position', 'position': park_pos}},
+            '29': {'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
         }
 
         self.provd_funckeys = {
@@ -372,6 +373,13 @@ class TestBlfFuncKeys(TestFuncKey):
             '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
             '29': {'label': '', 'type': 'blf', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
         }
+
+    def test_when_creating_funckey_then_blf_activated_by_default(self):
+        funckey = {'destination': {'type': 'custom', 'exten': '9999'}}
+        response = confd.funckeys.templates.post(keys={'1': funckey})
+
+        created_funckey = response.item['keys']['1']
+        assert_that(created_funckey, has_entry('blf', True))
 
     def test_when_adding_blf_func_keys_to_user_then_func_keys_added_in_provd(self):
         for pos, funckey in self.confd_funckeys.items():

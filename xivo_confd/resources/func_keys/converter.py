@@ -190,9 +190,14 @@ class FuncKeyBuilder(Builder):
     def create(self, mapping):
         self.validator.validate(mapping, 'create')
         destination = self.build_destination(mapping['destination'])
-        return FuncKey(label=mapping.get('label'),
-                       blf=mapping.get('blf', False),
-                       destination=destination)
+
+        funckey = FuncKey(destination=destination)
+        if 'label' in mapping:
+            funckey.label = mapping['label']
+        if 'blf' in mapping:
+            funckey.blf = mapping['blf']
+
+        return funckey
 
     def update(self, model, mapping):
         self.validator.validate(mapping, 'update')
