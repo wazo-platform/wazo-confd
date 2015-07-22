@@ -30,23 +30,27 @@ from xivo_confd.resources.users import validator
 
 class TestUserValidator(unittest.TestCase):
 
+    @patch('xivo_confd.resources.users.validator.validate_caller_id')
     @patch('xivo_confd.resources.users.validator.validate_model')
     @patch('xivo_confd.resources.users.validator.validate_private_template_id_is_not_set')
-    def test_validate_create(self, validate_template, validate_model):
+    def test_validate_create(self, validate_template, validate_model, validate_caller_id):
         user = Mock(User)
 
         validator.validate_create(user)
         validate_model.assert_called_once_with(user)
         validate_template.assert_called_once_with(user)
+        validate_caller_id.assert_called_once_with(user, required=False)
 
+    @patch('xivo_confd.resources.users.validator.validate_caller_id')
     @patch('xivo_confd.resources.users.validator.validate_model')
     @patch('xivo_confd.resources.users.validator.validate_private_template_id_does_not_change')
-    def test_validate_edit(self, validate_template, validate_model):
+    def test_validate_edit(self, validate_template, validate_model, validate_caller_id):
         user = Mock(User)
 
         validator.validate_edit(user)
         validate_model.assert_called_once_with(user)
         validate_template.assert_called_once_with(user)
+        validate_caller_id.assert_called_once_with(user, required=True)
 
     @patch('xivo_confd.resources.users.validator.validate_user_not_associated')
     @patch('xivo_confd.resources.users.validator.validate_user_exists')
@@ -111,6 +115,34 @@ class TestValidateModel(unittest.TestCase):
                     mobile_phone_number='+011224657453*77#23')
 
         validator.validate_model(user)
+
+
+class TestValdateCallerId(unittest.TestCase):
+
+    def test_given_invalid_caller_id_when_validating_then_raises_error(self):
+        user = User(caller_id='toto')
+
+        self.assertRaises(InputError, validator.validate_caller_id, user)
+
+    def test_given_valid_caller_id_when_validating_then_validation_passes(self):
+        user = User(caller_id='"toto" <1000>')
+
+        validator.validate_caller_id(user)
+
+    def test_given_no_caller_id_when_caller_id_is_required_then_raises_error(self):
+        user = User()
+
+        self.assertRaises(InputError, validator.validate_caller_id, user, required=True)
+
+    def test_given_no_caller_id_when_caller_id_is_not_required_then_validation_passes(self):
+        user = User()
+
+        validator.validate_caller_id(user, required=False)
+
+    def test_given_caller_id_is_invalid_and_not_required_when_validating_then_raises_error(self):
+        user = User(caller_id='toto')
+
+        self.assertRaises(InputError, validator.validate_caller_id, user, required=False)
 
 
 class TestValidateUserNotAssociated(unittest.TestCase):

@@ -172,7 +172,6 @@ class TestCreate(TestCase):
 class TestEdit(TestCase):
 
     @patch('xivo_confd.resources.users.services.update_voicemail_fullname')
-    @patch('xivo_confd.resources.users.services.update_caller_id')
     @patch('xivo_confd.resources.lines.services.update_callerid')
     @patch('xivo_confd.resources.users.notifier.edited')
     @patch('xivo_dao.resources.user.dao.edit')
@@ -182,14 +181,12 @@ class TestEdit(TestCase):
                   user_dao_edit,
                   user_notifier_edited,
                   line_services_update_callerid,
-                  user_services_update_caller_id,
                   update_voicemail_fullname):
         user = User(id=1, firstname='user', lastname='toto', voicemail_id=3)
 
         user_services.edit(user)
 
         user_validate_edit.assert_called_once_with(user)
-        user_services.update_caller_id.assert_called_once_with(user)
         user_dao_edit.assert_called_once_with(user)
         user_notifier_edited.assert_called_once_with(user)
         line_services_update_callerid.assert_called_once_with(user)
@@ -247,114 +244,3 @@ class TestUpdateVoicemail(TestCase):
         voicemail_dao_get.assert_called_once_with(user.voicemail_id)
         assert_that(voicemail.name, equal_to(fullname))
         voicemail_dao_edit.assert_called_once_with(voicemail)
-
-
-class TestUpdateCallerId(TestCase):
-
-    @patch('xivo_dao.resources.user.dao.get')
-    def test_update_caller_id_no_changes(self, user_dao_get):
-        user = User(id=1,
-                    firstname='firstname',
-                    lastname='lastname',
-                    caller_id='"firstname lastname"')
-
-        db_user = User(id=1,
-                       firstname='firstname',
-                       lastname='lastname',
-                       caller_id='"firstname lastname"')
-
-        user_dao_get.return_value = db_user
-
-        user_services.update_caller_id(user)
-        user_dao_get.assert_called_once_with(user.id)
-        assert_that(user.caller_id, equal_to(db_user.caller_id))
-
-    @patch('xivo_dao.resources.user.dao.get')
-    def test_update_caller_id_firstname_changed(self, user_dao_get):
-        user = User(id=1,
-                    firstname='new_firstname',
-                    lastname='lastname',
-                    caller_id='"firstname lastname"')
-
-        db_user = User(id=1,
-                       firstname='firstname',
-                       lastname='lastname',
-                       caller_id='"firstname lastname"')
-
-        user_dao_get.return_value = db_user
-
-        user_services.update_caller_id(user)
-        user_dao_get.assert_called_once_with(user.id)
-        assert_that(user.caller_id, equal_to('"new_firstname lastname"'))
-
-    @patch('xivo_dao.resources.user.dao.get')
-    def test_update_caller_id_lastname_changed(self, user_dao_get):
-        user = User(id=1,
-                    firstname='firstname',
-                    lastname='new_lastname',
-                    caller_id='"firstname lastname"')
-
-        db_user = User(id=1,
-                       firstname='firstname',
-                       lastname='lastname',
-                       caller_id='"firstname lastname"')
-
-        user_dao_get.return_value = db_user
-
-        user_services.update_caller_id(user)
-        user_dao_get.assert_called_once_with(user.id)
-        assert_that(user.caller_id, equal_to('"firstname new_lastname"'))
-
-    @patch('xivo_dao.resources.user.dao.get')
-    def test_update_caller_id_firstname_lastname_changed(self, user_dao_get):
-        user = User(id=1,
-                    firstname='new_firstname',
-                    lastname='new_lastname',
-                    caller_id='"firstname lastname"')
-
-        db_user = User(id=1,
-                       firstname='firstname',
-                       lastname='lastname',
-                       caller_id='"firstname lastname"')
-
-        user_dao_get.return_value = db_user
-
-        user_services.update_caller_id(user)
-        user_dao_get.assert_called_once_with(user.id)
-        assert_that(user.caller_id, equal_to('"new_firstname new_lastname"'))
-
-    @patch('xivo_dao.resources.user.dao.get')
-    def test_update_caller_id_only_caller_id_changed(self, user_dao_get):
-        user = User(id=1,
-                    firstname='firstname',
-                    lastname='lastname',
-                    caller_id='new_caller_id')
-
-        db_user = User(id=1,
-                       firstname='firstname',
-                       lastname='lastname',
-                       caller_id='"firstname lastname"')
-
-        user_dao_get.return_value = db_user
-
-        user_services.update_caller_id(user)
-        user_dao_get.assert_called_once_with(user.id)
-        assert_that(user.caller_id, equal_to('"new_caller_id"'))
-
-    @patch('xivo_dao.resources.user.dao.get')
-    def test_update_caller_id_firstname_lastname_and_caller_id_changed(self, user_dao_get):
-        user = User(id=1,
-                    firstname='new_firstname',
-                    lastname='new_lastname',
-                    caller_id='new_caller_id')
-
-        db_user = User(id=1,
-                       firstname='firstname',
-                       lastname='lastname',
-                       caller_id='"firstname lastname"')
-
-        user_dao_get.return_value = db_user
-
-        user_services.update_caller_id(user)
-        user_dao_get.assert_called_once_with(user.id)
-        assert_that(user.caller_id, equal_to('"new_caller_id"'))

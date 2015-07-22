@@ -67,7 +67,6 @@ def _create_user_in_database(user):
 
 def edit(user):
     validator.validate_edit(user)
-    update_caller_id(user)
     user_dao.edit(user)
     update_voicemail_fullname(user)
     line_services.update_callerid(user)
@@ -106,9 +105,3 @@ def update_voicemail_fullname(user):
         voicemail = voicemail_dao.get(user.voicemail_id)
         voicemail.name = user.fullname
         voicemail_dao.edit(voicemail)
-
-
-def update_caller_id(user):
-    original = user_dao.get(user.id)
-    user.update_caller_id(original)
-    return user
