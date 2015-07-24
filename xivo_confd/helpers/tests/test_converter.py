@@ -218,7 +218,6 @@ class TestDocumentMapper(unittest.TestCase):
         mapping = {u'oldname': u'value'}
 
         result = self.mapper.for_decoding(mapping)
-        print result
 
         assert_that(result, has_entries({u'newname': u'value'}))
 
