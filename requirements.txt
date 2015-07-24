@@ -2,14 +2,13 @@ git+https://github.com/xivo-pbx/xivo-dao.git
 git+https://github.com/xivo-pbx/xivo-provd-client.git
 git+https://github.com/xivo-pbx/xivo-lib-python.git
 git+https://github.com/xivo-pbx/xivo-bus.git
-git+https://github.com/xivo-pbx/xivo-provd-client.git
-sqlalchemy
-psycopg2
+sqlalchemy  # from xivo-dao
+psycopg2  # from xivo-dao
 flask==0.10.1
 flask-cors==1.10.3
-flask-httpauth
-flask-negotiate
-pyyaml
-cherrypy
+flask-httpauth==2.2.1
+flask-negotiate==0.1.0
+pyyaml==3.10
+cherrypy==3.2.2
 kombu==2.1.8
-stevedore
+stevedore==0.14.1
