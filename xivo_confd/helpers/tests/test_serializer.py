@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import json
 import unittest
+
 from xivo_confd.helpers import serializer
 
 
@@ -42,7 +44,7 @@ class TestSerializer(unittest.TestCase):
 
         result = serializer.encode(data)
 
-        self.assertEqual(result, expected_result)
+        self.assertEqual(json.loads(result), json.loads(expected_result))
 
     def test_decode(self):
         data = '{"items": [{"lastname": "1", "id": 1, "firstname": "User"}, {"lastname": "2", "id": 2, "firstname": "User"}], "total": 2}'

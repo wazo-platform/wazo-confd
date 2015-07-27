@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from hamcrest import assert_that, equal_to
+
+from hamcrest import assert_that
+from hamcrest import contains_inanyorder
+from hamcrest import equal_to
+from hamcrest import has_entries
 
 from mock import patch
 from xivo_confd.helpers.tests.test_resources import TestResources
@@ -55,7 +59,7 @@ class TestUserVoicemailActions(TestResources):
             "user_id": user_id,
             "cti_profile_id": cti_profile_id,
             "enabled": True,
-            "links": [
+            "links": contains_inanyorder(
                 {
                     "rel": "users",
                     "href": "http://localhost/1.1/users/%s" % user_id
@@ -64,7 +68,7 @@ class TestUserVoicemailActions(TestResources):
                     "rel": "cti_profiles",
                     "href": "http://localhost/1.1/cti_profiles/%s" % cti_profile_id
                 }
-            ]
+            )
         }
 
         user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id, enabled=True)
@@ -73,7 +77,7 @@ class TestUserVoicemailActions(TestResources):
         result = self.app.get(BASE_URL % user_id)
 
         assert_that(result.status_code, equal_to(expected_status_code))
-        assert_that(self._serialize_decode(result.data), equal_to(expected_result))
+        assert_that(self._serialize_decode(result.data), has_entries(expected_result))
         user_get.assert_called_once_with(user_id)
 
     @patch('xivo_confd.resources.user_cti_profile.services.get')
