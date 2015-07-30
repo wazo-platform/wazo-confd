@@ -38,7 +38,7 @@ following line in confd volumes in
 integration_tests/assets/base/docker-compose.yml
 
 ```
-- "/path/to/xivo_dao:/usr/local/lib/python2.7/dist-packages/xivo_dao"
+- "/path/to/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
 ```
 
 If you need to run tests more than once (e.g. when developing):
