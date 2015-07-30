@@ -69,7 +69,6 @@ def test_updating_user_when_associated_to_user_and_line(user, line, extension, d
             line_and_extension_associated(line, extension), \
             line_and_device_associated(line, device):
 
-        print user['caller_id']
         response = confd.users(user['id']).put(firstname='foobar')
         response.assert_ok()
 

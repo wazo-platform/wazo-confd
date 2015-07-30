@@ -24,7 +24,7 @@ test-image:
 stop:
 	cd assets/base && \
 	docker-compose kill && \
-	docker-compose rm -f 
+	docker-compose rm -f
 
 start:
 	cd assets/base && \
