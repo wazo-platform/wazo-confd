@@ -59,6 +59,10 @@ def create(user):
 
 def _create_user_in_database(user):
     user.private_template_id = template_dao.create_private_template()
+
+    if not user.caller_id:
+        user.caller_id = '"{}"'.format(user.fullname)
+
     user = user_dao.create(user)
     dial_action_dao.create_default_dial_actions_for_user(user)
     func_key_service.create_user_destination(user)

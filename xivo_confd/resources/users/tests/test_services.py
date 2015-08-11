@@ -136,14 +136,14 @@ class TestFindUser(TestCase):
         user_dao_find_all_by_fullname.assert_called_once_with(fullname)
 
 
+@patch('xivo_confd.resources.func_key.services.create_user_destination')
+@patch('xivo_dao.resources.dial_action.dao.create_default_dial_actions_for_user')
+@patch('xivo_dao.resources.func_key_template.dao.create_private_template')
+@patch('xivo_confd.resources.users.notifier.created')
+@patch('xivo_dao.resources.user.dao.create')
+@patch('xivo_confd.resources.users.validator.validate_create')
 class TestCreate(TestCase):
 
-    @patch('xivo_confd.resources.func_key.services.create_user_destination')
-    @patch('xivo_dao.resources.dial_action.dao.create_default_dial_actions_for_user')
-    @patch('xivo_dao.resources.func_key_template.dao.create_private_template')
-    @patch('xivo_confd.resources.users.notifier.created')
-    @patch('xivo_dao.resources.user.dao.create')
-    @patch('xivo_confd.resources.users.validator.validate_create')
     def test_create(self,
                     user_validate_create,
                     user_dao_create,
@@ -153,7 +153,10 @@ class TestCreate(TestCase):
                     create_user_destination):
         firstname = 'user'
         lastname = 'toto'
-        user = User(firstname=firstname, lastname=lastname)
+        caller_id = '"user toto"'
+        user = User(firstname=firstname,
+                    lastname=lastname,
+                    caller_id=caller_id)
 
         user_dao_create.return_value = user
 
@@ -167,6 +170,27 @@ class TestCreate(TestCase):
 
         self.assertEquals(type(result), User)
         self.assertEquals(result.private_template_id, create_private_template.return_value)
+
+    def test_given_no_caller_id_when_creating_a_user_then_generates_a_caller_id(self,
+                                                                                user_validate_create,
+                                                                                user_dao_create,
+                                                                                user_notifier_created,
+                                                                                create_private_template,
+                                                                                create_default_dial_actions_for_user,
+                                                                                create_user_destination):
+        firstname = 'user'
+        lastname = 'toto'
+        caller_id = '"user toto"'
+
+        user = User(firstname=firstname, lastname=lastname)
+        expected_user = User(firstname=firstname,
+                             lastname=lastname,
+                             caller_id=caller_id,
+                             private_template_id=create_private_template.return_value)
+
+        user_services.create(user)
+
+        user_dao_create.assert_called_once_with(expected_user)
 
 
 class TestEdit(TestCase):
