@@ -19,11 +19,13 @@ import logging
 import os
 import urllib
 
+from flask import current_app
 from flask import Flask
 from flask import g
 from flask import request
 from flask_cors import CORS
 from werkzeug.contrib.fixers import ProxyFix
+from xivo import http_helpers
 
 from xivo_confd import flask_http_server
 from xivo_confd.authentication.confd_auth import ConfdAuth
@@ -44,6 +46,8 @@ class CoreRestApi(object):
         self.content_parser = mooltiparse_parser()
 
         self.app = Flask('xivo_confd')
+        http_helpers.add_logger(self.app, logger)
+        logger.debug('Loggers: %s', self.app.logger.handlers)
         self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.app.secret_key = os.urandom(24)
         self.auth = ConfdAuth()
@@ -57,26 +61,21 @@ class CoreRestApi(object):
         @self.app.before_request
         def log_requests():
             params = {
+                'ip': request.remote_addr,
                 'method': request.method,
                 'url': urllib.unquote(request.url).decode('utf8')
             }
             if request.data:
                 params.update({'data': request.data})
-                logger.info("%(method)s %(url)s with data %(data)s ", params)
+                current_app.logger.debug("(%(ip)s) %(method)s %(url)s with data %(data)s ", params)
             else:
-                logger.info("%(method)s %(url)s", params)
+                current_app.logger.debug("(%(ip)s) %(method)s %(url)s", params)
 
         @self.app.after_request
         def per_request_callbacks(response):
             for func in getattr(g, 'call_after_request', ()):
                 response = func(response)
-            params = {
-                'statuscode': response.status_code,
-                'method': request.method,
-                'url': urllib.unquote(request.url).decode('utf8')
-            }
-            logger.info("%(method)s %(url)s %(statuscode)s", params)
-            return response
+            return http_helpers.log_request(response)
 
         @self.app.errorhandler(Exception)
         def error_handler(error):
