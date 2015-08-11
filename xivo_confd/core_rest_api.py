@@ -57,25 +57,27 @@ class CoreRestApi(object):
         @self.app.before_request
         def log_requests():
             params = {
+                'ip': request.remote_addr,
                 'method': request.method,
                 'url': urllib.unquote(request.url).decode('utf8')
             }
             if request.data:
                 params.update({'data': request.data})
-                logger.info("%(method)s %(url)s with data %(data)s ", params)
+                logger.info("(%(ip)s) %(method)s %(url)s with data %(data)s ", params)
             else:
-                logger.info("%(method)s %(url)s", params)
+                logger.info("(%(ip)s) %(method)s %(url)s", params)
 
         @self.app.after_request
         def per_request_callbacks(response):
             for func in getattr(g, 'call_after_request', ()):
                 response = func(response)
             params = {
+                'ip': request.remote_addr,
                 'statuscode': response.status_code,
                 'method': request.method,
                 'url': urllib.unquote(request.url).decode('utf8')
             }
-            logger.info("%(method)s %(url)s %(statuscode)s", params)
+            logger.info("(%(ip)s) %(method)s %(url)s %(statuscode)s", params)
             return response
 
         @self.app.errorhandler(Exception)
