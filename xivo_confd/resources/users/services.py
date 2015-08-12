@@ -59,6 +59,10 @@ def create(user):
 
 def _create_user_in_database(user):
     user.private_template_id = template_dao.create_private_template()
+
+    if not user.caller_id:
+        user.caller_id = u'"{}"'.format(user.fullname)
+
     user = user_dao.create(user)
     dial_action_dao.create_default_dial_actions_for_user(user)
     func_key_service.create_user_destination(user)
@@ -67,7 +71,6 @@ def _create_user_in_database(user):
 
 def edit(user):
     validator.validate_edit(user)
-    update_caller_id(user)
     user_dao.edit(user)
     update_voicemail_fullname(user)
     line_services.update_callerid(user)
@@ -106,9 +109,3 @@ def update_voicemail_fullname(user):
         voicemail = voicemail_dao.get(user.voicemail_id)
         voicemail.name = user.fullname
         voicemail_dao.edit(voicemail)
-
-
-def update_caller_id(user):
-    original = user_dao.get(user.id)
-    user.update_caller_id(original)
-    return user

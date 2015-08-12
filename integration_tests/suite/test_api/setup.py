@@ -3,6 +3,7 @@ import subprocess
 import logging
 
 from client import ConfdClient
+import provd
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +59,8 @@ def run_cmd(cmd):
     out, _ = process.communicate()
     logger.info(out)
     return out
+
+
+def setup_provd():
+    helper = provd.create_helper()
+    helper.reset()

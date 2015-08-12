@@ -7,6 +7,8 @@ from test_api.helpers.user_line import user_and_line_associated
 from test_api.helpers.line_extension import line_and_extension_associated
 from test_api.helpers.line_device import line_and_device_associated
 
+from hamcrest import assert_that, equal_to, has_entries, has_entry
+
 FIELDS = ['firstname',
           'lastname',
           'timezone',
@@ -24,6 +26,19 @@ FIELDS = ['firstname',
 REQUIRED = ['firstname']
 
 BOGUS = [(f, 123, 'unicode string') for f in FIELDS]
+
+NULL_USER = {"firstname": "John",
+             "lastname": None,
+             "username": None,
+             "mobile_phone_number": None,
+             "userfield": None,
+             "outgoing_caller_id": None,
+             "music_on_hold": None,
+             "language": None,
+             "timezone": None,
+             "preprocess_subroutine": None,
+             "password": None,
+             "description": None}
 
 
 class TestUserResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.DeleteScenarios):
@@ -56,3 +71,27 @@ def test_updating_user_when_associated_to_user_and_line(user, line, extension, d
 
         response = confd.users(user['id']).put(firstname='foobar')
         response.assert_ok()
+
+
+def test_create_user_with_all_parameters_null():
+    response = confd.users.post(**NULL_USER)
+    assert_that(response.item, has_entries(NULL_USER))
+
+
+@fixtures.user()
+def test_update_user_with_all_parameters_null(user):
+    response = confd.users(user['id']).put(**NULL_USER)
+    response.assert_ok()
+
+    response = confd.users(user['id']).get()
+    assert_that(response.item, has_entries(**NULL_USER))
+
+
+def test_create_user_generates_appropriate_caller_id():
+    expected_caller_id = '"John"'
+    response = confd.users.post(firstname='John')
+    assert_that(response.item, has_entry('caller_id', expected_caller_id))
+
+    expected_caller_id = '"John Doe"'
+    response = confd.users.post(firstname='John', lastname='Doe')
+    assert_that(response.item['caller_id'], equal_to(expected_caller_id))

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,16 +23,19 @@ from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 
 MOBILE_PHONE_NUMBER_REGEX = re.compile(r"^\+?[0-9\*#]+$")
+CALLER_ID_REGEX = re.compile(r'^"(.*)"( <\+?\d+>)?$')
 
 
 def validate_create(user):
     validate_model(user)
     validate_private_template_id_is_not_set(user)
+    validate_caller_id(user, required=False)
 
 
 def validate_edit(user):
     validate_model(user)
     validate_private_template_id_does_not_change(user)
+    validate_caller_id(user, required=True)
 
 
 def validate_delete(user):
@@ -58,6 +61,14 @@ def _check_invalid_parameters(user):
         raise errors.wrong_type('mobile_phone_number', 'numeric phone number')
     if user.password is not None and len(user.password) < 4:
         raise errors.minimum_length('password', 4)
+
+
+def validate_caller_id(user, required=False):
+    if user.caller_id:
+        if not CALLER_ID_REGEX.match(user.caller_id):
+            raise errors.wrong_type('caller_id', 'formatted caller id string')
+    elif required:
+        raise errors.missing('caller_id')
 
 
 def validate_user_not_associated(user):
