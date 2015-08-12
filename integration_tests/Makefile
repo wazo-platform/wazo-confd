@@ -13,6 +13,7 @@ build-confd:
 	docker build -t xivo/xivo-confd ..
 
 build-postgres:
+	docker pull postgres:9.1
 	docker build -t xivo/xivo-postgres -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:

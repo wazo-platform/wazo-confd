@@ -13,7 +13,7 @@ postgres:
   ports:
     - "15432:5432"
   volumes:
-    - "./etc/xivo-postgres/populate_db.sh:/docker-entrypoint-initdb.d/populate_db.sh"
+    - "./etc/xivo-postgres/populate.sql:/docker-entrypoint-initdb.d/populate.sql"
     - "./etc/xivo-postgres/fsync_off.sh:/docker-entrypoint-initdb.d/fsync_off.sh"
 rabbitmq:
   image: rabbitmq
