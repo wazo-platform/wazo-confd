@@ -5,12 +5,18 @@ MANAGE_DB_DIR=../../xivo-manage-db/
 POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/xivo-postgres/Dockerfile
 
 
-test-setup:
-	docker build -t xivo/xivo-provd $(PROVD_DIR)
-	docker build -t xivo/xivo-postgres -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
-	docker build -t xivo/xivo-confd ..
+test-setup: build-postgres build-provd build-confd
 	docker pull n3llyb0y/wait
 	docker pull rabbitmq
+
+build-confd:
+	docker build -t xivo/xivo-confd ..
+
+build-postgres:
+	docker build -t xivo/xivo-postgres -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
+
+build-provd:
+	docker build -t xivo/xivo-provd $(PROVD_DIR)
 
 test-image:
 	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
