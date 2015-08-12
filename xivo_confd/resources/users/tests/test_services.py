@@ -151,9 +151,9 @@ class TestCreate(TestCase):
                     create_private_template,
                     create_default_dial_actions_for_user,
                     create_user_destination):
-        firstname = 'user'
-        lastname = 'toto'
-        caller_id = '"user toto"'
+        firstname = u'Clémence'
+        lastname = u'Dupont'
+        caller_id = u'"Clémence Dupont"'
         user = User(firstname=firstname,
                     lastname=lastname,
                     caller_id=caller_id)
@@ -178,9 +178,9 @@ class TestCreate(TestCase):
                                                                                 create_private_template,
                                                                                 create_default_dial_actions_for_user,
                                                                                 create_user_destination):
-        firstname = 'user'
-        lastname = 'toto'
-        caller_id = '"user toto"'
+        firstname = u'Clémence'
+        lastname = u'Dupont'
+        caller_id = u'"Clémence Dupont"'
 
         user = User(firstname=firstname, lastname=lastname)
         expected_user = User(firstname=firstname,
