@@ -65,9 +65,9 @@ class CoreRestApi(object):
             }
             if request.data:
                 params.update({'data': request.data})
-                logger.debug("%(method)s %(url)s with data %(data)s ", params)
+                logger.info("%(method)s %(url)s with data %(data)s ", params)
             else:
-                logger.debug("%(method)s %(url)s", params)
+                logger.info("%(method)s %(url)s", params)
 
         @self.app.after_request
         def per_request_callbacks(response):
