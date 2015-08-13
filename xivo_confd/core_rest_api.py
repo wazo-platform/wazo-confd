@@ -47,7 +47,6 @@ class CoreRestApi(object):
 
         self.app = Flask('xivo_confd')
         http_helpers.add_logger(self.app, logger)
-        logger.debug('Loggers: %s', self.app.logger.handlers)
         self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.app.secret_key = os.urandom(24)
         self.auth = ConfdAuth()
@@ -61,15 +60,14 @@ class CoreRestApi(object):
         @self.app.before_request
         def log_requests():
             params = {
-                'ip': request.remote_addr,
                 'method': request.method,
                 'url': urllib.unquote(request.url).decode('utf8')
             }
             if request.data:
                 params.update({'data': request.data})
-                current_app.logger.debug("(%(ip)s) %(method)s %(url)s with data %(data)s ", params)
+                logger.debug("%(method)s %(url)s with data %(data)s ", params)
             else:
-                current_app.logger.debug("(%(ip)s) %(method)s %(url)s", params)
+                logger.debug("%(method)s %(url)s", params)
 
         @self.app.after_request
         def per_request_callbacks(response):
