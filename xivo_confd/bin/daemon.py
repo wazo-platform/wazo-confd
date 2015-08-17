@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
 import sys
 import xivo_dao
 
 from xivo.chain_map import ChainMap
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
-from xivo.xivo_logging import setup_logging
+from xivo import xivo_logging
 from xivo_dao.resources.infos import dao as info_dao
 
 from xivo_confd.config import load as load_config
@@ -33,7 +34,9 @@ from xivo_confd.helpers.sysconfd_connector import setup_sysconfd
 def main(argv):
     config = load_config(argv)
 
-    setup_logging(config['log_filename'], config['foreground'], config['debug'], config['log_level'])
+    xivo_logging.setup_logging(config['log_filename'], config['foreground'],
+                               config['debug'], config['log_level'])
+    xivo_logging.silence_loggers(['Flask-Cors'], logging.WARNING)
 
     if config['user']:
         change_user(config['user'])
