@@ -29,7 +29,6 @@ Running functional tests
 2. ```
 cd integration_tests
 make test-setup
-make test-image
 nosetests
 ```
 

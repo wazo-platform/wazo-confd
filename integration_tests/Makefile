@@ -11,6 +11,7 @@ test-setup: build-postgres build-provd build-confd
 
 build-confd:
 	docker build -t xivo/xivo-confd ..
+	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
 build-postgres:
 	docker pull postgres:9.1
@@ -18,9 +19,6 @@ build-postgres:
 
 build-provd:
 	docker build -t xivo/xivo-provd $(PROVD_DIR)
-
-test-image:
-	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
 stop:
 	cd assets/base && \

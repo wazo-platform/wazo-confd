@@ -39,6 +39,7 @@ confd:
     - sysconfd
   command: "xivo-confd -f -d"
   volumes:
+    - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"
 testdeps:
   # This image checks that all the links are up by pinging the ports.
