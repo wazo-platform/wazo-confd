@@ -23,9 +23,11 @@ sysconfd:
   image: nickstenning/flask
   expose:
     - "8668"
+  ports:
+    - "18668:8668"
   volumes:
-    - "./mock_sysconfd/:/tmp/mock_sysconfd"
-  command: "python /tmp/mock_sysconfd/mock_sysconfd.py"
+    - "./mocks/sysconfd.py:/tmp/sysconfd.py"
+  command: "python /tmp/sysconfd.py"
 confd:
   image: xivo-confd-test
   expose:
