@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,38 +15,65 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from mock import patch
+import json
+from mock import patch, Mock
 from unittest import TestCase
-from xivo_confd.helpers import sysconfd_connector
+from xivo_confd.helpers.sysconfd_connector import SysconfdClient
 
 
-class TestSysconfdConnector(TestCase):
+@patch('xivo_confd.helpers.sysconfd_connector.requests')
+class TestSysconfdClient(TestCase):
 
-    @patch('xivo_confd.helpers.sysconfd_connector.sysconfd_conn_request')
-    def test_delete_voicemail_storage(self, sysconfd_conn_request):
-        sysconfd_connector.delete_voicemail_storage("default", "123")
-        sysconfd_conn_request.assert_called_with('GET', '/delete_voicemail?context=default&name=123', '')
+    def setUp(self):
+        self.dao = Mock()
+        self.url = "http://localhost:8668"
+        self.client = SysconfdClient(self.url, self.dao)
 
-    @patch('xivo_dao.resources.configuration.dao.is_live_reload_enabled')
-    @patch('xivo_confd.helpers.sysconfd_connector.sysconfd_conn_request')
-    def test_exec_request_handlers_live_reload_enabled(self, sysconfd_conn_request, is_live_reload_enabled):
+    def test_delete_voicemail_storage(self, requests):
+        requests.get.return_value = Mock(status_code=200)
+
+        self.client.delete_voicemail("123", "default")
+
+        url = "http://localhost:8668/delete_voicemail"
+        requests.get.assert_called_once_with(url, params={'mailbox': '123', 'context': 'default'})
+
+    def test_move_voicemail_storage(self, requests):
+        requests.get.return_value = Mock(status_code=200)
+
+        self.client.move_voicemail("100", "default", "2000", "newcontext")
+
+        url = "http://localhost:8668/move_voicemail"
+        params = {'old_mailbox': '100',
+                  'old_context': 'default',
+                  'new_mailbox': '2000',
+                  'new_context': 'newcontext'}
+        requests.get.assert_called_once_with(url, params=params)
+
+    def test_exec_request_handlers_live_reload_enabled(self, requests):
+        requests.post.return_value = Mock(status_code=200)
+        self.dao.is_live_reload_enabled.return_value = True
+
         commands = {'ctibus': [],
                     'ipbx': []}
-        is_live_reload_enabled.return_value = True
 
-        sysconfd_connector.exec_request_handlers(commands)
+        self.client.exec_request_handlers(commands)
 
-        sysconfd_conn_request.assert_any_call('POST', '/exec_request_handlers', commands)
-        is_live_reload_enabled.assert_called_once_with()
+        call = requests.post.call_args_list[0]
+        url, body = call[0][0], call[1]['data']
 
-    @patch('xivo_dao.resources.configuration.dao.is_live_reload_enabled')
-    @patch('xivo_confd.helpers.sysconfd_connector.sysconfd_conn_request')
-    def test_exec_request_handlers_live_reload_disabled(self, sysconfd_conn_request, is_live_reload_enabled):
+        expected_url = "http://localhost:8668/exec_request_handlers"
+        self.assertEquals(url, expected_url)
+        self.assertEquals(json.loads(body), commands)
+
+        self.dao.is_live_reload_enabled.assert_called_once_with()
+
+    def test_exec_request_handlers_live_reload_disabled(self, requests):
+        self.dao.is_live_reload_enabled.return_value = False
+
         commands = {'ctibus': [],
                     'ipbx': []}
-        is_live_reload_enabled.return_value = False
 
-        sysconfd_connector.exec_request_handlers(commands)
+        self.client.exec_request_handlers(commands)
 
-        self.assertFalse(sysconfd_conn_request.called)
-        is_live_reload_enabled.assert_called_once_with()
+        self.assertFalse(requests.post.called)
+        self.dao.is_live_reload_enabled.assert_called_once_with()
