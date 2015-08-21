@@ -17,7 +17,8 @@
 
 
 import os
-from setup import setup_docker, stop_docker, new_client, new_confd, setup_provd
+from setup import setup_docker, stop_docker, new_client, new_confd, \
+    setup_provd, setup_database
 
 
 class FactoryProxy(object):
@@ -36,6 +37,7 @@ def setup():
     if os.environ.get('DOCKER', '1') == '1':
         setup_docker()
     setup_provd()
+    setup_database()
 
 
 def teardown():

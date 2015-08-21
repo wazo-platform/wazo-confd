@@ -5,6 +5,7 @@ import logging
 from client import ConfdClient
 from sysconfd import SysconfdMock
 import provd
+import database
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,13 @@ def run_cmd(cmd):
 def setup_provd():
     helper = provd.create_helper()
     helper.reset()
+    return helper
+
+
+def setup_database():
+    helper = database.create_helper()
+    helper.recreate()
+    return helper
 
 
 def setup_sysconfd():
