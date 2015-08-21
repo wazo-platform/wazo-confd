@@ -1,12 +1,13 @@
 from test_api import confd
 from test_api import config
+from test_api.database import create_helper as db_helper
 
 
-def generate_voicemail(context=config.CONTEXT):
-    number = find_available_number(context)
-    return add_voicemail(name='myvoicemail',
-                         number=number,
-                         context=context)
+def generate_voicemail(**kwargs):
+    kwargs.setdefault('name', 'myvoicemail')
+    kwargs.setdefault('number', find_available_number(config.CONTEXT))
+    kwargs.setdefault('context', config.CONTEXT)
+    return add_voicemail(**kwargs)
 
 
 def generate_number_and_context():
@@ -14,7 +15,14 @@ def generate_number_and_context():
     return number, config.CONTEXT
 
 
-def find_available_number(context):
+def new_number_and_context(context):
+    db = db_helper()
+    with db.queries() as queries:
+        queries.insert_context(context, 'internal')
+    return find_available_number(context), context
+
+
+def find_available_number(context=config.CONTEXT):
     response = confd.voicemails.get()
     numbers = [int(v['number'])
                for v in response.items
