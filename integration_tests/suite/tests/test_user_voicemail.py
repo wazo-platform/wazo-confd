@@ -6,7 +6,7 @@ from test_api import errors as e
 from test_api import confd
 from test_api import fixtures
 
-from test_api.helpers.user_line import user_and_line_associated
+from hamcrest import assert_that, has_entries
 
 
 @contextmanager
@@ -51,16 +51,15 @@ class TestUserVoicemailAssociation(s.AssociationScenarios,
 
 @fixtures.user()
 @fixtures.voicemail()
-def test_associate_when_user_has_no_line(user, voicemail):
+def test_associate(user, voicemail):
     response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
-    response.assert_match(400, e.missing_association('User', 'Line'))
+    response.assert_ok()
 
 
 @fixtures.user()
-@fixtures.line()
 @fixtures.voicemail()
-def test_associate_when_already_associated(user, line, voicemail):
-    with user_and_line_associated(user, line), user_and_voicemail_associated(user, voicemail):
+def test_associate_when_already_associated(user, voicemail):
+    with user_and_voicemail_associated(user, voicemail):
         response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
         response.assert_match(400, e.resource_associated('User', 'Voicemail'))
 
@@ -72,27 +71,50 @@ def test_get_when_not_associated(user):
 
 
 @fixtures.user()
-@fixtures.line()
 @fixtures.voicemail()
-def test_delete_user_when_still_associated(user, line, voicemail):
-    with user_and_line_associated(user, line), user_and_voicemail_associated(user, voicemail):
+def test_get_association(user, voicemail):
+    expected = has_entries({'user_id': user['id'],
+                            'voicemail_id': voicemail['id']})
+
+    with user_and_voicemail_associated(user, voicemail):
+        response = confd.users(user['id']).voicemail.get()
+        assert_that(response.item, expected)
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_dissociate(user, voicemail):
+    with user_and_voicemail_associated(user, voicemail):
+        response = confd.users(user['id']).voicemail.delete()
+        response.assert_ok()
+
+
+@fixtures.user()
+def test_dissociate_when_not_associated(user):
+    response = confd.users(user['id']).voicemail.delete()
+    response.assert_match(404, e.not_found('UserVoicemail'))
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_delete_user_when_still_associated(user, voicemail):
+    with user_and_voicemail_associated(user, voicemail):
         response = confd.users(user['id']).delete()
         response.assert_match(400, e.resource_associated('User', 'Voicemail'))
 
 
 @fixtures.user()
-@fixtures.line()
 @fixtures.voicemail()
-def test_delete_voicemail_when_still_associated(user, line, voicemail):
-    with user_and_line_associated(user, line), user_and_voicemail_associated(user, voicemail):
+def test_delete_voicemail_when_still_associated(user, voicemail):
+    with user_and_voicemail_associated(user, voicemail):
         response = confd.voicemails(voicemail['id']).delete()
         response.assert_match(400, e.resource_associated('Voicemail', 'User'))
 
 
 @fixtures.user()
-@fixtures.line()
 @fixtures.voicemail()
-def test_edit_voicemail_when_still_associated(user, line, voicemail):
-    with user_and_line_associated(user, line), user_and_voicemail_associated(user, voicemail):
-        response = confd.voicemails(voicemail['id']).put(number='1234')
-        response.assert_match(400, e.resource_associated('Voicemail', 'User'))
+def test_edit_voicemail_when_still_associated(user, voicemail):
+    number = h.voicemail.find_available_number(voicemail['context'])
+    with user_and_voicemail_associated(user, voicemail):
+        response = confd.voicemails(voicemail['id']).put(number=number)
+        response.assert_ok()
