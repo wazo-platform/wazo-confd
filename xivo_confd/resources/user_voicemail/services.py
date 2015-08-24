@@ -15,31 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.user_voicemail import dao
 
-from xivo_confd.resources.user_voicemail import validator, notifier
+class UserVoicemailService(object):
 
+    def __init__(self, user_dao, voicemail_dao, user_voicemail_dao, validator, notifier):
+        self.user_dao = user_dao
+        self.voicemail_dao = voicemail_dao
+        self.user_voicemail_dao = user_voicemail_dao
+        self.validator = validator
+        self.notifier = notifier
 
-def associate(user_voicemail):
-    validator.validate_association(user_voicemail)
-    dao.associate(user_voicemail)
-    notifier.associated(user_voicemail)
-    return user_voicemail
+    def validate_parent(self, user_id):
+        self.user_dao.get(user_id)
 
+    def validate_resource(self, voicemail_id):
+        self.voicemail_dao.get(voicemail_id)
 
-def get_by_user_id(user_id):
-    return dao.get_by_user_id(user_id)
+    def get_by_parent(self, user_id):
+        return self.user_voicemail_dao.get_by_user_id(user_id)
 
+    def associate(self, association):
+        self.validator.validate_association(association)
+        self.user_voicemail_dao.associate(association)
+        self.notifier.associated(association)
+        return association
 
-def find_by_user_id(user_id):
-    return dao.find_by_user_id(user_id)
-
-
-def find_by_voicemail_id(voicemail_id):
-    return dao.find_by_voicemail_id(voicemail_id)
-
-
-def dissociate(user_voicemail):
-    validator.validate_dissociation(user_voicemail)
-    dao.dissociate(user_voicemail)
-    notifier.dissociated(user_voicemail)
+    def dissociate(self, association):
+        self.validator.validate_dissociation(association)
+        self.user_voicemail_dao.dissociate(association)
+        self.notifier.dissociated(association)

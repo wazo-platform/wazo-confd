@@ -16,79 +16,79 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import patch, Mock
+from mock import Mock, sentinel
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
-from xivo_confd.resources.user_voicemail import services as user_voicemail_services
+from xivo_confd.resources.user_voicemail.actions import UserVoicemailService
+from xivo_confd.helpers.validator import AssociationValidator
 
 
-class TestUserVoicemail(unittest.TestCase):
+class TestUserVoicemailService(unittest.TestCase):
 
-    @patch('xivo_confd.resources.user_voicemail.validator.validate_association')
-    @patch('xivo_dao.resources.user_voicemail.dao.associate')
-    @patch('xivo_confd.resources.user_voicemail.notifier.associated')
-    def test_associate(self, notifier_associated, dao_associate, validate_association):
-        user_voicemail = Mock(UserVoicemail)
+    def setUp(self):
+        self.user_dao = Mock()
+        self.voicemail_dao = Mock()
+        self.user_voicemail_dao = Mock()
+        self.notifier = Mock()
+        self.validator = Mock(AssociationValidator)
+        self.service = UserVoicemailService(self.user_dao,
+                                            self.voicemail_dao,
+                                            self.user_voicemail_dao,
+                                            self.validator,
+                                            self.notifier)
 
-        result = user_voicemail_services.associate(user_voicemail)
+    def test_when_getting_parent_then_voicemail_dao_is_called(self):
+        expected_user_voicemail = self.user_voicemail_dao.get_by_user_id.return_value
 
-        assert_that(result, equal_to(user_voicemail))
-        validate_association.assert_called_once_with(user_voicemail)
-        dao_associate.assert_called_once_with(user_voicemail)
-        notifier_associated.assert_called_once_with(user_voicemail)
+        result = self.service.get_by_parent(sentinel.user_id)
 
-    @patch('xivo_dao.resources.user_voicemail.dao.get_by_user_id')
-    def test_get_by_user_id(self, user_voicemail_get_by_user_id):
-        user_id = 123
-        voicemail_id = 42
-        expected_result = UserVoicemail(user_id=user_id,
-                                        voicemail_id=voicemail_id)
-        user_voicemail_get_by_user_id.return_value = UserVoicemail(user_id=user_id,
-                                                                   voicemail_id=voicemail_id)
+        self.user_voicemail_dao.get_by_user_id.assert_called_once_with(sentinel.user_id)
+        assert_that(result, equal_to(expected_user_voicemail))
 
-        result = user_voicemail_services.get_by_user_id(user_id)
+    def test_when_validating_parent_then_user_dao_is_called(self):
+        self.service.validate_parent(sentinel.user_id)
 
-        user_voicemail_get_by_user_id.assert_called_once_with(user_id)
-        assert_that(result, equal_to(expected_result))
+        self.user_dao.get.assert_called_once_with(sentinel.user_id)
 
-    @patch('xivo_dao.resources.user_voicemail.dao.find_by_user_id')
-    def test_find_by_user_id(self, user_voicemail_find_by_user_id):
-        user_id = 123
-        voicemail_id = 42
-        expected_result = UserVoicemail(user_id=user_id,
-                                        voicemail_id=voicemail_id)
-        user_voicemail_find_by_user_id.return_value = UserVoicemail(user_id=user_id,
-                                                                    voicemail_id=voicemail_id)
+    def test_when_validating_resource_then_voicemail_dao_is_called(self):
+        self.service.validate_resource(sentinel.voicemail_id)
 
-        result = user_voicemail_services.find_by_user_id(user_id)
+        self.voicemail_dao.get.assert_called_once_with(sentinel.voicemail_id)
 
-        user_voicemail_find_by_user_id.assert_called_once_with(user_id)
-        assert_that(result, equal_to(expected_result))
+    def test_when_associating_then_association_is_validated(self):
+        association = Mock(UserVoicemail)
+        self.service.associate(association)
 
-    @patch('xivo_dao.resources.user_voicemail.dao.find_by_voicemail_id')
-    def test_find_by_voicemail_id(self, user_voicemail_find_by_voicemail_id):
-        user_id = 123
-        voicemail_id = 42
-        expected_result = UserVoicemail(user_id=user_id,
-                                        voicemail_id=voicemail_id)
-        user_voicemail_find_by_voicemail_id.return_value = UserVoicemail(user_id=user_id,
-                                                                         voicemail_id=voicemail_id)
+        self.validator.validate_association.assert_called_once_with(association)
 
-        result = user_voicemail_services.find_by_voicemail_id(voicemail_id)
+    def test_when_associating_then_dao_is_called(self):
+        association = Mock(UserVoicemail)
+        self.service.associate(association)
 
-        user_voicemail_find_by_voicemail_id.assert_called_once_with(voicemail_id)
-        assert_that(result, equal_to(expected_result))
+        self.user_voicemail_dao.associate.assert_called_once_with(association)
 
-    @patch('xivo_dao.resources.user_voicemail.dao.dissociate')
-    @patch('xivo_confd.resources.user_voicemail.notifier.dissociated')
-    @patch('xivo_confd.resources.user_voicemail.validator.validate_dissociation')
-    def test_dissociate(self, validate_dissociation, notifier_dissociated, dao_dissociate):
-        user_voicemail = Mock(UserVoicemail)
+    def test_when_associating_then_notifier_is_called(self):
+        association = Mock(UserVoicemail)
+        self.service.associate(association)
 
-        user_voicemail_services.dissociate(user_voicemail)
+        self.notifier.associated.assert_called_once_with(association)
 
-        validate_dissociation.assert_called_once_with(user_voicemail)
-        dao_dissociate.assert_called_once_with(user_voicemail)
-        notifier_dissociated.assert_called_once_with(user_voicemail)
+    def test_when_dissociating_then_dissociation_is_validated(self):
+        dissociation = Mock(UserVoicemail)
+        self.service.dissociate(dissociation)
+
+        self.validator.validate_dissociation.assert_called_once_with(dissociation)
+
+    def test_when_dissociating_then_dao_is_called(self):
+        dissociation = Mock(UserVoicemail)
+        self.service.dissociate(dissociation)
+
+        self.user_voicemail_dao.dissociate.assert_called_once_with(dissociation)
+
+    def test_when_dissociating_then_notifier_is_called(self):
+        dissociation = Mock(UserVoicemail)
+        self.service.dissociate(dissociation)
+
+        self.notifier.dissociated.assert_called_once_with(dissociation)
