@@ -220,7 +220,7 @@ def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
                                                      context=context)
     response.assert_ok()
 
-    sysconfd.assert_request('/mv_voicemail',
+    sysconfd.assert_request('/move_voicemail',
                             query={'old_mailbox': voicemail['number'],
                                    'old_context': voicemail['context'],
                                    'new_mailbox': number,

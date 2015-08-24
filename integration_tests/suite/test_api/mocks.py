@@ -1,14 +1,8 @@
 from wrappers import IsolatedAction
 
-from test_api.sysconfd import new_client
-
-
-def new_sysconfd():
-    client = new_client()
-    client.clear()
-    return client
+from test_api.setup import setup_sysconfd
 
 
 class sysconfd(IsolatedAction):
 
-    actions = {'generate': new_sysconfd}
+    actions = {'generate': setup_sysconfd}
