@@ -156,6 +156,45 @@ class TestMemberOfSequence(unittest.TestCase):
         self.validator.validate(model)
 
 
+class TestValidationGroup(unittest.TestCase):
+
+    def test_when_validating_create_then_calls_common_and_create_validators(self):
+        common = Mock(Validator)
+        create = Mock(Validator)
+        model = Mock()
+
+        validator = ValidationGroup(common=[common], create=[create])
+
+        validator.validate_create(model)
+
+        common.validate.assert_called_once_with(model)
+        create.validate.assert_called_once_with(model)
+
+    def test_when_validating_edit_then_calls_common_and_edit_validators(self):
+        common = Mock(Validator)
+        edit = Mock(Validator)
+        model = Mock()
+
+        validator = ValidationGroup(common=[common], edit=[edit])
+
+        validator.validate_edit(model)
+
+        common.validate.assert_called_once_with(model)
+        edit.validate.assert_called_once_with(model)
+
+    def test_when_validating_delete_then_calls_common_and_delete_validators(self):
+        common = Mock(Validator)
+        delete = Mock(Validator)
+        model = Mock()
+
+        validator = ValidationGroup(common=[common], delete=[delete])
+
+        validator.validate_delete(model)
+
+        common.validate.assert_called_once_with(model)
+        delete.validate.assert_called_once_with(model)
+
+
 class TestAssociationValidator(unittest.TestCase):
 
     def test_when_validating_association_then_calls_common_and_association_validators(self):
