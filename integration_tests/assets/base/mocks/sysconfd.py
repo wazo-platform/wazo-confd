@@ -11,7 +11,7 @@ def log_request():
         path = request.path
         log = {'method': request.method,
                'path': path,
-               'query': dict(request.args),
+               'query': dict(request.args.items()),
                'body': request.data,
                'headers': dict(request.headers)}
         REQUESTS.append(log)
