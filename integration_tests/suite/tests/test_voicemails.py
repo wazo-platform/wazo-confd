@@ -4,7 +4,6 @@ from test_api import fixtures
 from test_api import mocks
 from test_api import scenarios as s
 from test_api import errors as e
-from test_api.database import create_helper as db_helper
 
 from test_api.helpers import voicemail as vm_helper
 
@@ -99,7 +98,7 @@ def test_list_voicemails(first, second):
 
 @fixtures.voicemail()
 def test_get_voicemail(voicemail):
-    response = confd.voicemails.get(voicemail['id'])
+    response = confd.voicemails(voicemail['id']).get()
     assert_that(response.item, has_entries(voicemail))
 
 
@@ -116,20 +115,17 @@ def test_create_minimal_voicemail():
 
 
 def test_create_voicemails_same_number_different_contexts():
-    db = db_helper()
-    with db.queries() as queries:
-        queries.insert_context('voicemailctx', 'internal')
-
-    number = vm_helper.find_available_number('default')
+    number, context = vm_helper.new_number_and_context('vmctx1')
+    other_context = vm_helper.new_context('vmctx2')
 
     response = confd.voicemails.post(name='samenumber1',
                                      number=number,
-                                     context='default')
+                                     context=context)
     response.assert_ok()
 
     response = confd.voicemails.post(name='samenumber2',
                                      number=number,
-                                     context='voicemailctx')
+                                     context=other_context)
     response.assert_ok()
 
 
@@ -173,7 +169,7 @@ def test_create_voicemail_with_all_parameters():
 
 @fixtures.voicemail()
 def test_edit_voicemail(voicemail):
-    number, context = vm_helper.new_number_and_context('voicemailctx')
+    number, context = vm_helper.new_number_and_context('vmctxedit')
 
     parameters = {'name': 'edited',
                   'number': number,
@@ -218,7 +214,7 @@ def test_edit_voicemail(voicemail):
 @fixtures.voicemail()
 @mocks.sysconfd()
 def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
-    number, context = vm_helper.new_number_and_context('voicemailctx')
+    number, context = vm_helper.new_number_and_context('vmctxmove')
 
     response = confd.voicemails(voicemail['id']).put(number=number,
                                                      context=context)
