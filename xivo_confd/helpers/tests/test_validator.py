@@ -69,6 +69,28 @@ class TestGetResource(unittest.TestCase):
         self.dao_get.assert_called_once_with(model.field)
 
 
+class TestFindResource(unittest.TestCase):
+
+    def setUp(self):
+        self.dao_find = Mock()
+        self.validator = FindResource('field', self.dao_find)
+
+    def test_given_resource_does_not_exist_then_raises_error(self):
+        model = Mock(field=sentinel.field)
+
+        self.dao_find.return_value = None
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
+
+    def test_given_resource_exists_then_validation_passes(self):
+        model = Mock(field=sentinel.field)
+
+        self.validator.validate(model)
+
+        self.dao_find.assert_called_once_with(model.field)
+
+
 class TestResourceExists(unittest.TestCase):
 
     def setUp(self):
@@ -91,3 +113,71 @@ class TestResourceExists(unittest.TestCase):
         self.validator.validate(model)
 
         self.dao_exist.assert_called_once_with(model.field)
+
+
+class TestOptional(unittest.TestCase):
+
+    def setUp(self):
+        self.child_validator = Mock(Validator)
+        self.validator = Optional('field', self.child_validator)
+
+    def test_given_field_is_none_then_validation_passes(self):
+        model = Mock(field=None)
+
+        self.validator.validate(model)
+
+        assert_that(self.child_validator.validate.called, equal_to(False))
+
+    def test_given_field_has_value_then_child_validator_called(self):
+        model = Mock(field=sentinel.field)
+
+        self.validator.validate(model)
+
+        self.child_validator.validate.assert_called_once_with(model)
+
+
+class TestMemberOfSequence(unittest.TestCase):
+
+    def setUp(self):
+        self.dao_list = Mock()
+        self.validator = MemberOfSequence('field', self.dao_list)
+
+    def test_given_field_not_in_list_of_items_then_raises_error(self):
+        model = Mock(field='value')
+        self.dao_list.return_value = []
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
+
+    def test_given_field_in_list_then_validation_passes(self):
+        model = Mock(field='value')
+        self.dao_list.return_value = ['value']
+
+        self.validator.validate(model)
+
+
+class TestAssociationValidator(unittest.TestCase):
+
+    def test_when_validating_association_then_calls_common_and_association_validators(self):
+        common = Mock(Validator)
+        association = Mock(Validator)
+        model = Mock()
+
+        validator = AssociationValidator(common=[common], association=[association])
+
+        validator.validate_association(model)
+
+        common.validate.assert_called_once_with(model)
+        association.validate.assert_called_once_with(model)
+
+    def test_when_validating_dissociation_then_calls_common_and_dissociation_validators(self):
+        common = Mock(Validator)
+        dissociation = Mock(Validator)
+        model = Mock()
+
+        validator = AssociationValidator(common=[common], dissociation=[dissociation])
+
+        validator.validate_dissociation(model)
+
+        common.validate.assert_called_once_with(model)
+        dissociation.validate.assert_called_once_with(model)

@@ -55,6 +55,21 @@ class GetResource(Validator):
             raise errors.param_not_found(self.field, self.resource, **metadata)
 
 
+class FindResource(Validator):
+
+    def __init__(self, field, dao_find, resource='Resource'):
+        self.field = field
+        self.dao_find = dao_find
+        self.resource = resource
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        found = self.dao_find(value)
+        if found is None:
+            metadata = {self.field: value}
+            raise errors.param_not_found(self.field, self.resource, **metadata)
+
+
 class ResourceExists(Validator):
 
     def __init__(self, field, dao_exist, resource='Resource'):
@@ -66,6 +81,33 @@ class ResourceExists(Validator):
         value = getattr(model, self.field)
         exists = self.dao_exist(value)
         if not exists:
+            metadata = {self.field: value}
+            raise errors.param_not_found(self.field, self.resource, **metadata)
+
+
+class Optional(Validator):
+
+    def __init__(self, field, validator):
+        self.field = field
+        self.validator = validator
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        if value is not None:
+            self.validator.validate(model)
+
+
+class MemberOfSequence(Validator):
+
+    def __init__(self, field, dao_list, resource='Resource'):
+        self.field = field
+        self.resource = resource
+        self.dao_list = dao_list
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        items = self.dao_list()
+        if value not in items:
             metadata = {self.field: value}
             raise errors.param_not_found(self.field, self.resource, **metadata)
 
@@ -88,4 +130,20 @@ class ValidationGroup(object):
 
     def validate_delete(self, model):
         for validator in self.common + self.delete:
+            validator.validate(model)
+
+
+class AssociationValidator(object):
+
+    def __init__(self, common=None, association=None, dissociation=None):
+        self.common = common or []
+        self.association = association or []
+        self.dissociation = dissociation or []
+
+    def validate_association(self, model):
+        for validator in self.common + self.association:
+            validator.validate(model)
+
+    def validate_dissociation(self, model):
+        for validator in self.common + self.dissociation:
             validator.validate(model)
