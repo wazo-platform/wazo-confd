@@ -20,101 +20,73 @@ from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.language import dao as language_dao
+from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+
+from xivo_confd.helpers.validator import Validator, ValidationGroup, \
+    RequiredFields, FindResource, MemberOfSequence, Optional
 
 
-def validate_create(voicemail):
-    validate_model(voicemail)
-    validate_number_context(voicemail)
+class NumberContextExists(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, model):
+        existing = self.find(model)
+        if existing:
+            raise errors.resource_exists('Voicemail',
+                                         number=existing.number,
+                                         context=existing.context)
+
+    def find(self, model):
+        try:
+            return self.dao.get_by_number_context(model.number,
+                                                  model.context)
+        except NotFoundError:
+            return None
 
 
-def validate_edit(voicemail):
-    validate_model(voicemail)
-    validate_existing_number_context(voicemail)
-    _check_if_voicemail_associated(voicemail)
+class NumberContextChanged(NumberContextExists):
+
+    def validate(self, model):
+        existing = self.dao.get(model.id)
+        if model.number_at_context != existing.number_at_context:
+            super(NumberContextChanged, self).validate(model)
 
 
-def validate_delete(voicemail):
-    _check_if_voicemail_associated(voicemail)
+class AssociatedToUser(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, model):
+        association = self.dao.find_by_voicemail_id(model.id)
+        if association:
+            raise errors.resource_associated('Voicemail', 'User',
+                                             voicemail_id=association.voicemail_id,
+                                             user_id=association.user_id)
 
 
-def validate_model(voicemail):
-    _check_missing_parameters(voicemail)
-    _check_parameter_types(voicemail)
-    _check_parameter_references(voicemail)
-
-
-def _check_missing_parameters(voicemail):
-    missing = voicemail.missing_parameters()
-    if missing:
-        raise errors.missing(*missing)
-
-
-def _check_parameter_types(voicemail):
-    validators = {'name': _validate_not_empty,
-                  'number': _validate_number,
-                  'max_messages': _validate_number,
-                  'password': _validate_number,
-                  'attach_audio': _validate_boolean,
-                  'delete_messages': _validate_boolean,
-                  'ask_pasword': _validate_boolean}
-
-    for field_name, field_validator in validators.iteritems():
-        value = getattr(voicemail, field_name, None)
-        if value is not None:
-            field_validator(field_name, value)
-
-
-def _validate_not_empty(field_name, value):
-    if value.strip() == '':
-        raise errors.missing(field_name)
-
-
-def _validate_number(field_name, value):
-    if not is_positive_number(value):
-        raise errors.wrong_type(field_name, 'numeric string')
-
-
-def _validate_boolean(field_name, value):
-    if not isinstance(value, bool):
-        raise errors.wrong_type(field_name, 'boolean')
-
-
-def _check_parameter_references(voicemail):
-    if not is_existing_context(voicemail.context):
-        raise errors.param_not_found('context', 'Context')
-    if voicemail.language is not None and voicemail.language not in language_dao.find_all():
-        raise errors.param_not_found('language', 'Language')
-    if voicemail.timezone is not None and voicemail.timezone not in voicemail_dao.find_all_timezone():
-        raise errors.param_not_found('timezone', 'Timezone')
-
-
-def validate_number_context(voicemail):
-    try:
-        existing = voicemail_dao.get_by_number_context(voicemail.number, voicemail.context)
-    except NotFoundError:
-        return
-
-    if existing:
-        raise errors.resource_exists('Voicemail', number=voicemail.number, context=voicemail.context)
-
-
-def validate_existing_number_context(voicemail):
-    existing_voicemail = voicemail_dao.get(voicemail.id)
-    if voicemail.number_at_context != existing_voicemail.number_at_context:
-        validate_number_context(voicemail)
-
-
-def _check_if_voicemail_associated(voicemail):
-    if voicemail_dao.is_voicemail_linked(voicemail):
-        raise errors.resource_associated('Voicemail', 'User')
-
-
-def is_positive_number(string):
-    if str(string).isdigit():
-        return True
-    else:
-        return False
-
-
-def is_existing_context(context_name):
-    return context_dao.get(context_name) is not None
+def build_validators():
+    return ValidationGroup(
+        common=[
+            RequiredFields(),
+            FindResource('context', context_dao.get, 'Context'),
+            Optional('language', MemberOfSequence(
+                'language',
+                language_dao.find_all,
+                'Language')),
+            Optional('timezone', MemberOfSequence(
+                'timezone',
+                voicemail_dao.find_all_timezone,
+                'Timezone')),
+        ],
+        create=[
+            NumberContextExists(voicemail_dao)
+        ],
+        edit=[
+            NumberContextChanged(voicemail_dao)
+        ],
+        delete=[
+            AssociatedToUser(user_voicemail_dao)
+        ])
