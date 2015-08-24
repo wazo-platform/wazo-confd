@@ -31,7 +31,7 @@ class Validator(object):
         return
 
 
-class RequiredValidator(Validator):
+class RequiredFields(Validator):
 
     def validate(self, model):
         missing = model.missing_parameters()
@@ -39,7 +39,7 @@ class RequiredValidator(Validator):
             raise errors.missing(*missing)
 
 
-class ResourceGetValidator(Validator):
+class GetResource(Validator):
 
     def __init__(self, field, dao_get, resource='Resource'):
         self.field = field
@@ -55,7 +55,7 @@ class ResourceGetValidator(Validator):
             raise errors.param_not_found(self.field, self.resource, **metadata)
 
 
-class ResourceExistValidator(Validator):
+class ResourceExists(Validator):
 
     def __init__(self, field, dao_exist, resource='Resource'):
         self.field = field

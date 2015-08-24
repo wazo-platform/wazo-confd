@@ -17,20 +17,21 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-from hamcrest import assert_that, raises, calling
+from hamcrest import assert_that, raises, calling, equal_to
 from mock import Mock, sentinel
 
 from xivo_dao.helpers.new_model import NewModel
 from xivo_dao.helpers.exception import InputError, NotFoundError
 
-from xivo_confd.helpers.validator import RequiredValidator, ResourceGetValidator, \
-    ResourceExistValidator
+from xivo_confd.helpers.validator import RequiredFields, GetResource, \
+    ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
+    ValidationGroup, AssociationValidator
 
 
-class TestRequiredValidator(unittest.TestCase):
+class TestRequiredFields(unittest.TestCase):
 
     def setUp(self):
-        self.validator = RequiredValidator()
+        self.validator = RequiredFields()
 
     def test_given_missing_fields_when_validating_then_raises_error(self):
         model = Mock(NewModel)
@@ -46,11 +47,11 @@ class TestRequiredValidator(unittest.TestCase):
         self.validator.validate(model)
 
 
-class TestResourceGetValidator(unittest.TestCase):
+class TestGetResource(unittest.TestCase):
 
     def setUp(self):
         self.dao_get = Mock()
-        self.validator = ResourceGetValidator('field', self.dao_get)
+        self.validator = GetResource('field', self.dao_get)
 
     def test_given_resource_does_not_exist_then_raises_error(self):
         model = Mock(field=sentinel.field)
@@ -68,11 +69,11 @@ class TestResourceGetValidator(unittest.TestCase):
         self.dao_get.assert_called_once_with(model.field)
 
 
-class TestResourceExistValidator(unittest.TestCase):
+class TestResourceExists(unittest.TestCase):
 
     def setUp(self):
         self.dao_exist = Mock()
-        self.validator = ResourceExistValidator('field', self.dao_exist)
+        self.validator = ResourceExists('field', self.dao_exist)
 
     def test_given_resource_does_not_exist_then_raises_error(self):
         model = Mock(field=sentinel.field)
