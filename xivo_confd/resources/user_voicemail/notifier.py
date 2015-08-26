@@ -34,7 +34,7 @@ def dissociated(user_voicemail):
 def sysconf_command_association_updated(user_voicemail):
     command = {
         'dird': [],
-        'ipbx': ['sip reload'],
+        'ipbx': ['sip reload', 'module reload chan_sccp.so'],
         'agentbus': [],
         'ctibus': _generate_ctibus_commands(user_voicemail)
     }
