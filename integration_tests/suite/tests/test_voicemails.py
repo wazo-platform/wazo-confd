@@ -144,6 +144,7 @@ def test_create_voicemail_with_all_parameters():
                   'attach_audio': True,
                   'delete_messages': True,
                   'ask_password': True,
+                  'enabled': True,
                   'options': [["saycid", "yes"],
                               ["emailbody", "this\nis\ra\temail|body"]]}
 
@@ -159,6 +160,7 @@ def test_create_voicemail_with_all_parameters():
                             'attach_audio': True,
                             'delete_messages': True,
                             'ask_password': True,
+                            'enabled': True,
                             'options': has_items(["saycid", "yes"],
                                                  ["emailbody", "this\nis\ra\temail|body"])
                             })
@@ -183,6 +185,7 @@ def test_edit_voicemail(voicemail):
                   'attach_audio': True,
                   'delete_messages': True,
                   'ask_password': True,
+                  'enabled': False,
                   'options': [["saycid", "yes"],
                               ["emailbody", "this\nis\ra\temail|body"]]}
 
@@ -198,6 +201,7 @@ def test_edit_voicemail(voicemail):
                             'attach_audio': True,
                             'delete_messages': True,
                             'ask_password': True,
+                            'enabled': False,
                             'options': has_items(["saycid", "yes"],
                                                  ["emailbody", "this\nis\ra\temail|body"])
                             })

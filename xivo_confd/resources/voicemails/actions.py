@@ -52,6 +52,7 @@ def load(core_rest_api):
         Field('attach_audio', Boolean()),
         Field('delete_messages', Boolean()),
         Field('ask_password', Boolean()),
+        Field('enabled', Boolean()),
         Field('options', OptionType())
     )
 
