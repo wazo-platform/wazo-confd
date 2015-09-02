@@ -20,7 +20,6 @@ from hamcrest import assert_that, calling, raises
 
 from mock import Mock
 from xivo_dao.helpers.exception import ResourceError
-from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_confd.resources.user_voicemail.validator import UserHasNoVoicemail
@@ -34,13 +33,13 @@ class TestUserHasNoVoicemail(unittest.TestCase):
 
     def test_given_user_has_no_voicemail_then_validation_passes(self):
         model = UserVoicemail(user_id=1, voicemail_id=2)
-        self.dao.get_by_user_id.side_effect = NotFoundError
+        self.dao.find_by_user_id.return_value = None
 
         self.validator.validate(model)
 
     def test_given_user_has_a_voicemail_then_validation_passes(self):
         model = UserVoicemail(user_id=1, voicemail_id=2)
-        self.dao.get_by_user_id.return_value = model
+        self.dao.find_by_user_id.return_value = model
 
         assert_that(
             calling(self.validator.validate).with_args(model),
