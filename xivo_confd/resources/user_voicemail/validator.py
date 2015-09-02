@@ -20,7 +20,6 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 from xivo_dao.helpers import errors
-from xivo_dao.helpers.exception import NotFoundError
 from xivo_confd.helpers.validator import Validator, AssociationValidator, \
     RequiredFields, GetResource
 
@@ -30,18 +29,12 @@ class UserHasNoVoicemail(Validator):
     def __init__(self, dao):
         self.dao = dao
 
-    def validate(self, model):
-        existing = self.find(model)
+    def validate(self, association):
+        existing = self.dao.find_by_user_id(association.user_id)
         if existing:
             raise errors.resource_associated('User', 'Voicemail',
-                                             user_id=model.user_id,
-                                             voicemail_id=model.voicemail_id)
-
-    def find(self, model):
-        try:
-            return self.dao.get_by_user_id(model.user_id)
-        except NotFoundError:
-            return
+                                             user_id=association.user_id,
+                                             voicemail_id=association.voicemail_id)
 
 
 def build_validator():
