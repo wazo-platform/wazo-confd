@@ -17,20 +17,21 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-from hamcrest import assert_that, raises, calling
+from hamcrest import assert_that, raises, calling, equal_to
 from mock import Mock, sentinel
 
 from xivo_dao.helpers.new_model import NewModel
 from xivo_dao.helpers.exception import InputError, NotFoundError
 
-from xivo_confd.helpers.validator import RequiredValidator, ResourceGetValidator, \
-    ResourceExistValidator
+from xivo_confd.helpers.validator import RequiredFields, GetResource, \
+    ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
+    ValidationGroup, AssociationValidator
 
 
-class TestRequiredValidator(unittest.TestCase):
+class TestRequiredFields(unittest.TestCase):
 
     def setUp(self):
-        self.validator = RequiredValidator()
+        self.validator = RequiredFields()
 
     def test_given_missing_fields_when_validating_then_raises_error(self):
         model = Mock(NewModel)
@@ -46,11 +47,11 @@ class TestRequiredValidator(unittest.TestCase):
         self.validator.validate(model)
 
 
-class TestResourceGetValidator(unittest.TestCase):
+class TestGetResource(unittest.TestCase):
 
     def setUp(self):
         self.dao_get = Mock()
-        self.validator = ResourceGetValidator('field', self.dao_get)
+        self.validator = GetResource('field', self.dao_get)
 
     def test_given_resource_does_not_exist_then_raises_error(self):
         model = Mock(field=sentinel.field)
@@ -68,11 +69,33 @@ class TestResourceGetValidator(unittest.TestCase):
         self.dao_get.assert_called_once_with(model.field)
 
 
-class TestResourceExistValidator(unittest.TestCase):
+class TestFindResource(unittest.TestCase):
+
+    def setUp(self):
+        self.dao_find = Mock()
+        self.validator = FindResource('field', self.dao_find)
+
+    def test_given_resource_does_not_exist_then_raises_error(self):
+        model = Mock(field=sentinel.field)
+
+        self.dao_find.return_value = None
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
+
+    def test_given_resource_exists_then_validation_passes(self):
+        model = Mock(field=sentinel.field)
+
+        self.validator.validate(model)
+
+        self.dao_find.assert_called_once_with(model.field)
+
+
+class TestResourceExists(unittest.TestCase):
 
     def setUp(self):
         self.dao_exist = Mock()
-        self.validator = ResourceExistValidator('field', self.dao_exist)
+        self.validator = ResourceExists('field', self.dao_exist)
 
     def test_given_resource_does_not_exist_then_raises_error(self):
         model = Mock(field=sentinel.field)
@@ -90,3 +113,110 @@ class TestResourceExistValidator(unittest.TestCase):
         self.validator.validate(model)
 
         self.dao_exist.assert_called_once_with(model.field)
+
+
+class TestOptional(unittest.TestCase):
+
+    def setUp(self):
+        self.child_validator = Mock(Validator)
+        self.validator = Optional('field', self.child_validator)
+
+    def test_given_field_is_none_then_validation_passes(self):
+        model = Mock(field=None)
+
+        self.validator.validate(model)
+
+        assert_that(self.child_validator.validate.called, equal_to(False))
+
+    def test_given_field_has_value_then_child_validator_called(self):
+        model = Mock(field=sentinel.field)
+
+        self.validator.validate(model)
+
+        self.child_validator.validate.assert_called_once_with(model)
+
+
+class TestMemberOfSequence(unittest.TestCase):
+
+    def setUp(self):
+        self.dao_list = Mock()
+        self.validator = MemberOfSequence('field', self.dao_list)
+
+    def test_given_field_not_in_list_of_items_then_raises_error(self):
+        model = Mock(field='value')
+        self.dao_list.return_value = []
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
+
+    def test_given_field_in_list_then_validation_passes(self):
+        model = Mock(field='value')
+        self.dao_list.return_value = ['value']
+
+        self.validator.validate(model)
+
+
+class TestValidationGroup(unittest.TestCase):
+
+    def test_when_validating_create_then_calls_common_and_create_validators(self):
+        common = Mock(Validator)
+        create = Mock(Validator)
+        model = Mock()
+
+        validator = ValidationGroup(common=[common], create=[create])
+
+        validator.validate_create(model)
+
+        common.validate.assert_called_once_with(model)
+        create.validate.assert_called_once_with(model)
+
+    def test_when_validating_edit_then_calls_common_and_edit_validators(self):
+        common = Mock(Validator)
+        edit = Mock(Validator)
+        model = Mock()
+
+        validator = ValidationGroup(common=[common], edit=[edit])
+
+        validator.validate_edit(model)
+
+        common.validate.assert_called_once_with(model)
+        edit.validate.assert_called_once_with(model)
+
+    def test_when_validating_delete_then_calls_common_and_delete_validators(self):
+        common = Mock(Validator)
+        delete = Mock(Validator)
+        model = Mock()
+
+        validator = ValidationGroup(common=[common], delete=[delete])
+
+        validator.validate_delete(model)
+
+        common.validate.assert_called_once_with(model)
+        delete.validate.assert_called_once_with(model)
+
+
+class TestAssociationValidator(unittest.TestCase):
+
+    def test_when_validating_association_then_calls_common_and_association_validators(self):
+        common = Mock(Validator)
+        association = Mock(Validator)
+        model = Mock()
+
+        validator = AssociationValidator(common=[common], association=[association])
+
+        validator.validate_association(model)
+
+        common.validate.assert_called_once_with(model)
+        association.validate.assert_called_once_with(model)
+
+    def test_when_validating_dissociation_then_calls_common_and_dissociation_validators(self):
+        common = Mock(Validator)
+        dissociation = Mock(Validator)
+        model = Mock()
+
+        validator = AssociationValidator(common=[common], dissociation=[dissociation])
+
+        validator.validate_dissociation(model)
+
+        common.validate.assert_called_once_with(model)
+        dissociation.validate.assert_called_once_with(model)

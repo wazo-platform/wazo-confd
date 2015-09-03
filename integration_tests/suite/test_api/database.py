@@ -299,6 +299,19 @@ class DatabaseQueries(object):
 
         return filter_member_id
 
+    def insert_context(self, name, contexttype):
+        query = text("""
+                     INSERT INTO context(name, displayname, contexttype, description, entity)
+                     VALUES (
+                                :name, :name, :contexttype, '',
+                                (SELECT id FROM entity LIMIT 1)
+                            )
+                     """)
+
+        self.connection.execute(query, name=name, contexttype=contexttype)
+
+        return name
+
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)

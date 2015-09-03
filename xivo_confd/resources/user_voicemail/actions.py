@@ -16,38 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.resources.user_voicemail import services as user_voicemail_services
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
+from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
-
 from xivo_confd.helpers.resource import DecoratorChain, SingleAssociationResource
 
-
-class UserVoicemailService(object):
-
-    def __init__(self, service, user_dao, voicemail_dao):
-        self.service = service
-        self.user_dao = user_dao
-        self.voicemail_dao = voicemail_dao
-
-    def validate_parent(self, user_id):
-        self.user_dao.get(user_id)
-
-    def validate_resource(self, voicemail_id):
-        self.voicemail_dao.get(voicemail_id)
-
-    def get_by_parent(self, user_id):
-        return self.service.get_by_user_id(user_id)
-
-    def associate(self, association):
-        return self.service.associate(association)
-
-    def dissociate(self, association):
-        self.service.dissociate(association)
+from xivo_confd.resources.user_voicemail.services import UserVoicemailService
+from xivo_confd.resources.user_voicemail.validator import build_validator
+from xivo_confd.resources.user_voicemail import notifier
 
 
 def load(core_rest_api):
@@ -61,8 +42,13 @@ def load(core_rest_api):
                                       links={'users': 'user_id',
                                              'voicemails': 'voicemail_id'},
                                       rename={'parent_id': 'user_id'})
+    validator = build_validator()
 
-    service = UserVoicemailService(user_voicemail_services, user_dao, voicemail_dao)
+    service = UserVoicemailService(user_dao,
+                                   voicemail_dao,
+                                   user_voicemail_dao,
+                                   validator,
+                                   notifier)
     resource = SingleAssociationResource(service, converter)
 
     chain = DecoratorChain(core_rest_api, user_blueprint)

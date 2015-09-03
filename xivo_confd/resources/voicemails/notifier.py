@@ -23,31 +23,36 @@ from xivo_bus.resources.voicemail.event import EditVoicemailEvent
 from xivo_bus.resources.voicemail.event import DeleteVoicemailEvent
 
 
-def _new_sysconfd_data(ctibus_command):
+def _new_sysconfd_data(ctibus_command, ipbx_commands):
     return {
         'ctibus': [ctibus_command],
         'dird': [],
-        'ipbx': ['voicemail reload'],
+        'ipbx': ipbx_commands,
         'agentbus': []
     }
 
 
 def created(voicemail):
-    data = _new_sysconfd_data('xivo[voicemail,add,%s]' % voicemail.id)
+    data = _new_sysconfd_data('xivo[voicemail,add,%s]' % voicemail.id,
+                              ['voicemail reload'])
     sysconfd_connector.exec_request_handlers(data)
     event = CreateVoicemailEvent(voicemail.id)
     send_bus_event(event, event.routing_key)
 
 
 def edited(voicemail):
-    data = _new_sysconfd_data('xivo[voicemail,edit,%s]' % voicemail.id)
+    data = _new_sysconfd_data('xivo[voicemail,edit,%s]' % voicemail.id,
+                              ['voicemail reload',
+                               'sip reload',
+                               'module reload chan_sccp.so'])
     sysconfd_connector.exec_request_handlers(data)
     event = EditVoicemailEvent(voicemail.id)
     send_bus_event(event, event.routing_key)
 
 
 def deleted(voicemail):
-    data = _new_sysconfd_data('xivo[voicemail,delete,%s]' % voicemail.id)
+    data = _new_sysconfd_data('xivo[voicemail,delete,%s]' % voicemail.id,
+                              ['voicemail reload'])
     sysconfd_connector.exec_request_handlers(data)
     event = DeleteVoicemailEvent(voicemail.id)
     send_bus_event(event, event.routing_key)

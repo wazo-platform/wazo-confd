@@ -18,27 +18,18 @@
 
 from flask import Blueprint
 
-from xivo_confd.helpers import sysconfd_connector
+from xivo_confd.helpers.sysconfd_connector import new_client
 from xivo_dao.resources.voicemail import dao
 from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
-from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
-from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
-from xivo_confd.resources.voicemails import validator, notifier
-
-
-class VoicemailService(CRUDService):
-
-    def __init__(self, dao, validator, notifier, connector, extra=None):
-        super(VoicemailService, self).__init__(dao, validator, notifier, extra)
-        self.connector = connector
-
-    def delete(self, voicemail):
-        super(VoicemailService, self).delete(voicemail)
-        self.connector.delete_voicemail_storage(voicemail.number,
-                                                voicemail.context)
+from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean, Regexp
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
+from xivo_confd.resources.voicemails import notifier
+from xivo_confd.resources.voicemails.validator import build_validators
+from xivo_confd.resources.voicemails.services import VoicemailService
+from xivo_confd.resources.voicemails.mooltiparse import OptionType
 
 
 def load(core_rest_api):
@@ -46,9 +37,13 @@ def load(core_rest_api):
     document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('name', Unicode()),
-        Field('number', Unicode()),
+        Field('number',
+              Unicode(),
+              Regexp.compile(r"\d+", "wrong type. Should be a numeric string")),
         Field('context', Unicode()),
-        Field('password', Unicode()),
+        Field('password',
+              Unicode(),
+              Regexp.compile(r"\d+", "wrong type. Should be a numeric string")),
         Field('email', Unicode()),
         Field('language', Unicode()),
         Field('timezone', Unicode()),
@@ -56,11 +51,16 @@ def load(core_rest_api):
         Field('max_messages', Int()),
         Field('attach_audio', Boolean()),
         Field('delete_messages', Boolean()),
-        Field('ask_password', Boolean())
+        Field('ask_password', Boolean()),
+        Field('enabled', Boolean()),
+        Field('options', OptionType())
     )
-    converter = Converter.resource(document, Voicemail)
 
-    service = VoicemailService(dao, validator, notifier, sysconfd_connector)
+    converter = Converter.resource(document, Voicemail)
+    sysconfd_client = new_client()
+    validator = build_validators()
+
+    service = VoicemailService(dao, validator, notifier, sysconfd_client)
     resource = CRUDResource(service, converter)
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

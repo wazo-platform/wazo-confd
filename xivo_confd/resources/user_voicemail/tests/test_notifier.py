@@ -48,7 +48,7 @@ class TestUserVoicemailNotifier(unittest.TestCase):
         expected_sysconf_command = {
             'ctibus': ['xivo[user,edit,1]', 'xivo[phone,edit,3]', 'xivo[phone,edit,4]'],
             'dird': [],
-            'ipbx': ['sip reload'],
+            'ipbx': ['sip reload', 'module reload chan_sccp.so'],
             'agentbus': []
         }
 

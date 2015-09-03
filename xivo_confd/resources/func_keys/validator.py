@@ -18,8 +18,8 @@
 
 from collections import Counter
 
-from xivo_confd.helpers.validator import Validator, ResourceGetValidator, \
-    ResourceExistValidator, RequiredValidator, ValidationGroup
+from xivo_confd.helpers.validator import Validator, GetResource, \
+    ResourceExists, RequiredFields, ValidationGroup
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
@@ -162,28 +162,28 @@ class BSFilterValidator(Validator):
 
 def build_validators():
     destination_validators = {
-        'user': [ResourceGetValidator('user_id', user_dao.get, 'User')],
-        'group': [ResourceExistValidator('group_id', group_dao.exists, 'Group')],
-        'queue': [ResourceExistValidator('queue_id', queue_dao.exists, 'Queue')],
-        'conference': [ResourceExistValidator('conference_id', conference_dao.exists, 'Conference')],
+        'user': [GetResource('user_id', user_dao.get, 'User')],
+        'group': [ResourceExists('group_id', group_dao.exists, 'Group')],
+        'queue': [ResourceExists('queue_id', queue_dao.exists, 'Queue')],
+        'conference': [ResourceExists('conference_id', conference_dao.exists, 'Conference')],
         'custom': [],
         'service': [ServiceValidator(extension_dao)],
         'forward': [ForwardValidator(extension_dao)],
         'transfer': [TransferValidator(feature_dao)],
         'agent': [AgentActionValidator(extension_dao),
-                  ResourceExistValidator('agent_id', agent_dao.exists, 'Agent')],
+                  ResourceExists('agent_id', agent_dao.exists, 'Agent')],
         'park_position': [ParkPositionValidator(feature_dao)],
         'parking': [],
         'onlinerec': [],
-        'paging': [ResourceExistValidator('paging_id', paging_dao.exists, 'Paging')],
-        'bsfilter': [ResourceExistValidator('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
+        'paging': [ResourceExists('paging_id', paging_dao.exists, 'Paging')],
+        'bsfilter': [ResourceExists('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
     }
 
     funckey_validator = FuncKeyValidator(destination_validators)
     mapping_validator = FuncKeyMappingValidator(funckey_validator)
     similar_validator = SimilarFuncKeyValidator()
 
-    required_validator = RequiredValidator()
+    required_validator = RequiredFields()
     private_template_validator = PrivateTemplateValidator()
 
     return ValidationGroup(common=[required_validator, mapping_validator, similar_validator],

@@ -25,5 +25,6 @@ class IsolatedAction(object):
         return self.resource
 
     def __exit__(self, *args):
-        callback = self.actions['delete']
-        callback(self.resource['id'], check=False)
+        callback = self.actions.get('delete')
+        if callback:
+            callback(self.resource['id'], check=False)

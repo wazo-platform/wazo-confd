@@ -13,3 +13,4 @@ cherrypy==3.2.2
 kombu==2.1.8
 stevedore==0.14.1
 pyopenssl
+requests==2.0.0
