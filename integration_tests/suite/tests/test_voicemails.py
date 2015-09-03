@@ -111,6 +111,9 @@ def test_create_minimal_voicemail():
     assert_that(response.item, has_entries({'name': 'minimal',
                                             'number': number,
                                             'context': context,
+                                            'ask_password': True,
+                                            'attach_audio': None,
+                                            'delete_messages': False,
                                             'options': contains()}))
 
 
@@ -142,8 +145,8 @@ def test_create_voicemail_with_all_parameters():
                   'password': '1234',
                   'max_messages': 10,
                   'attach_audio': True,
+                  'ask_password': False,
                   'delete_messages': True,
-                  'ask_password': True,
                   'enabled': True,
                   'options': [["saycid", "yes"],
                               ["emailbody", "this\nis\ra\temail|body"]]}
@@ -158,8 +161,8 @@ def test_create_voicemail_with_all_parameters():
                             'password': '1234',
                             'max_messages': 10,
                             'attach_audio': True,
+                            'ask_password': False,
                             'delete_messages': True,
-                            'ask_password': True,
                             'enabled': True,
                             'options': has_items(["saycid", "yes"],
                                                  ["emailbody", "this\nis\ra\temail|body"])
@@ -183,8 +186,8 @@ def test_edit_voicemail(voicemail):
                   'password': '1234',
                   'max_messages': 10,
                   'attach_audio': True,
+                  'ask_password': False,
                   'delete_messages': True,
-                  'ask_password': True,
                   'enabled': False,
                   'options': [["saycid", "yes"],
                               ["emailbody", "this\nis\ra\temail|body"]]}
@@ -199,8 +202,8 @@ def test_edit_voicemail(voicemail):
                             'password': '1234',
                             'max_messages': 10,
                             'attach_audio': True,
+                            'ask_password': False,
                             'delete_messages': True,
-                            'ask_password': True,
                             'enabled': False,
                             'options': has_items(["saycid", "yes"],
                                                  ["emailbody", "this\nis\ra\temail|body"])
