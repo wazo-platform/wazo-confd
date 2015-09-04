@@ -48,7 +48,7 @@ class SysconfdClient(object):
         if self.dao.is_live_reload_enabled():
             url = "{}/exec_request_handlers".format(self.base_url)
             body = json.dumps(args)
-            response = requests.post(url, data=body)
+            response = self._session().post(url, data=body)
             self.check_for_errors(response)
 
     def move_voicemail(self, old_number, old_context, number, context):
@@ -57,15 +57,20 @@ class SysconfdClient(object):
                   'new_mailbox': number,
                   'new_context': context}
         url = "{}/move_voicemail".format(self.base_url)
-        response = requests.get(url, params=params)
+        response = self._session().get(url, params=params)
         self.check_for_errors(response)
 
     def delete_voicemail(self, number, context):
         params = {'mailbox': number,
                   'context': context}
         url = "{}/delete_voicemail".format(self.base_url)
-        response = requests.get(url, params=params)
+        response = self._session().get(url, params=params)
         self.check_for_errors(response)
+
+    def _session(self):
+        session = requests.Session()
+        session.trust_env = False
+        return session
 
     def check_for_errors(self, response):
         if response.status_code != 200:

@@ -21,24 +21,27 @@ from unittest import TestCase
 from xivo_confd.helpers.sysconfd_connector import SysconfdClient
 
 
-@patch('xivo_confd.helpers.sysconfd_connector.requests')
 class TestSysconfdClient(TestCase):
 
     def setUp(self):
         self.dao = Mock()
         self.url = "http://localhost:8668"
         self.client = SysconfdClient(self.url, self.dao)
+        session_init_patch = patch('xivo_confd.helpers.sysconfd_connector.requests.Session')
+        session_init = session_init_patch.start()
+        self.session = session_init.return_value
+        self.addCleanup(session_init.stop)
 
-    def test_delete_voicemail_storage(self, requests):
-        requests.get.return_value = Mock(status_code=200)
+    def test_delete_voicemail_storage(self):
+        self.session.get.return_value = Mock(status_code=200)
 
         self.client.delete_voicemail("123", "default")
 
         url = "http://localhost:8668/delete_voicemail"
-        requests.get.assert_called_once_with(url, params={'mailbox': '123', 'context': 'default'})
+        self.session.get.assert_called_once_with(url, params={'mailbox': '123', 'context': 'default'})
 
-    def test_move_voicemail_storage(self, requests):
-        requests.get.return_value = Mock(status_code=200)
+    def test_move_voicemail_storage(self):
+        self.session.get.return_value = Mock(status_code=200)
 
         self.client.move_voicemail("100", "default", "2000", "newcontext")
 
@@ -47,10 +50,10 @@ class TestSysconfdClient(TestCase):
                   'old_context': 'default',
                   'new_mailbox': '2000',
                   'new_context': 'newcontext'}
-        requests.get.assert_called_once_with(url, params=params)
+        self.session.get.assert_called_once_with(url, params=params)
 
-    def test_exec_request_handlers_live_reload_enabled(self, requests):
-        requests.post.return_value = Mock(status_code=200)
+    def test_exec_request_handlers_live_reload_enabled(self):
+        self.session.post.return_value = Mock(status_code=200)
         self.dao.is_live_reload_enabled.return_value = True
 
         commands = {'ctibus': [],
@@ -58,7 +61,7 @@ class TestSysconfdClient(TestCase):
 
         self.client.exec_request_handlers(commands)
 
-        call = requests.post.call_args_list[0]
+        call = self.session.post.call_args_list[0]
         url, body = call[0][0], call[1]['data']
 
         expected_url = "http://localhost:8668/exec_request_handlers"
@@ -67,7 +70,7 @@ class TestSysconfdClient(TestCase):
 
         self.dao.is_live_reload_enabled.assert_called_once_with()
 
-    def test_exec_request_handlers_live_reload_disabled(self, requests):
+    def test_exec_request_handlers_live_reload_disabled(self):
         self.dao.is_live_reload_enabled.return_value = False
 
         commands = {'ctibus': [],
@@ -75,5 +78,5 @@ class TestSysconfdClient(TestCase):
 
         self.client.exec_request_handlers(commands)
 
-        self.assertFalse(requests.post.called)
+        self.assertFalse(self.session.post.called)
         self.dao.is_live_reload_enabled.assert_called_once_with()
