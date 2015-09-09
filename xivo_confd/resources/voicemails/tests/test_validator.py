@@ -100,15 +100,15 @@ class TestAssociatedToUser(unittest.TestCase):
 
     def test_when_no_associations_found_then_validation_passes(self):
         model = Voicemail(id=sentinel.id)
-        self.dao.find_by_voicemail_id.return_value = None
+        self.dao.find_all_by_voicemail_id.return_value = []
 
         self.validator.validate(model)
 
     def test_when_associations_found_then_validation_fails(self):
         model = Voicemail(id=sentinel.id)
-        self.dao.find_by_voicemail_id.return_value = Mock(UserVoicemail,
-                                                          user_id=sentinel.user_id,
-                                                          voicemail_id=sentinel.id)
+        self.dao.find_all_by_voicemail_id.return_value = [Mock(UserVoicemail,
+                                                               user_id=sentinel.user_id,
+                                                               voicemail_id=sentinel.id)]
 
         assert_that(
             calling(self.validator.validate).with_args(model),
