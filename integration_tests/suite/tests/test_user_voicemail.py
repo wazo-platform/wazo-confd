@@ -6,7 +6,8 @@ from test_api import errors as e
 from test_api import confd
 from test_api import fixtures
 
-from hamcrest import assert_that, has_entries
+from hamcrest import assert_that, has_entries, has_items
+FAKE_ID = 999999999
 
 
 @contextmanager
@@ -65,6 +66,17 @@ def test_associate_when_already_associated(user, voicemail):
 
 
 @fixtures.user()
+@fixtures.user()
+@fixtures.voicemail()
+def test_associate_multiple_users_to_voicemail(user1, user2, voicemail):
+    response = confd.users(user1['id']).voicemail.post(voicemail_id=voicemail['id'])
+    response.assert_ok()
+
+    response = confd.users(user2['id']).voicemail.post(voicemail_id=voicemail['id'])
+    response.assert_ok()
+
+
+@fixtures.user()
 def test_get_when_not_associated(user):
     response = confd.users(user['id']).voicemail.get()
     response.assert_match(404, e.not_found('UserVoicemail'))
@@ -72,7 +84,7 @@ def test_get_when_not_associated(user):
 
 @fixtures.user()
 @fixtures.voicemail()
-def test_get_association(user, voicemail):
+def test_get_user_voicemail_association(user, voicemail):
     expected = has_entries({'user_id': user['id'],
                             'voicemail_id': voicemail['id']})
 
@@ -118,3 +130,25 @@ def test_edit_voicemail_when_still_associated(user, voicemail):
     with user_and_voicemail_associated(user, voicemail):
         response = confd.voicemails(voicemail['id']).put(number=number)
         response.assert_ok()
+
+
+def test_get_users_associated_to_voicemail_when_voicemail_does_not_exist():
+    response = confd.voicemails(FAKE_ID).users.get()
+    response.assert_match(404, e.not_found('Voicemail'))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_multiple_users_associated_to_voicemail(user1, user2, voicemail):
+    expected = has_items(
+        has_entries({'user_id': user1['id'],
+                     'voicemail_id': voicemail['id']}),
+        has_entries({'user_id': user2['id'],
+                     'voicemail_id': voicemail['id']}))
+
+    with user_and_voicemail_associated(user1, voicemail), \
+            user_and_voicemail_associated(user2, voicemail):
+
+        response = confd.voicemails(voicemail['id']).users.get()
+        assert_that(response.items, expected)
