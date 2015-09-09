@@ -39,13 +39,21 @@ class TestUserVoicemailService(unittest.TestCase):
                                             self.validator,
                                             self.notifier)
 
-    def test_when_getting_parent_then_voicemail_dao_is_called(self):
+    def test_when_getting_parent_then_dao_is_called(self):
         expected_user_voicemail = self.user_voicemail_dao.get_by_user_id.return_value
 
         result = self.service.get_by_parent(sentinel.user_id)
 
         self.user_voicemail_dao.get_by_user_id.assert_called_once_with(sentinel.user_id)
         assert_that(result, equal_to(expected_user_voicemail))
+
+    def test_when_listing_by_children_then_voicemail_dao_is_called(self):
+        expected_user_voicemails = self.user_voicemail_dao.find_all_by_voicemail_id.return_value
+
+        result = self.service.list_by_child(sentinel.voicemail_id)
+
+        self.user_voicemail_dao.find_all_by_voicemail_id.assert_called_once_with(sentinel.voicemail_id)
+        assert_that(result, equal_to(expected_user_voicemails))
 
     def test_when_validating_parent_then_user_dao_is_called(self):
         self.service.validate_parent(sentinel.user_id)

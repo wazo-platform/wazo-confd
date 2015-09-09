@@ -24,15 +24,18 @@ from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
-from xivo_confd.helpers.resource import DecoratorChain, SingleAssociationResource
+from xivo_confd.helpers.resource import DecoratorChain
 
 from xivo_confd.resources.user_voicemail.services import UserVoicemailService
+from xivo_confd.resources.user_voicemail.resource import UserVoicemailResource
 from xivo_confd.resources.user_voicemail.validator import build_validator
 from xivo_confd.resources.user_voicemail import notifier
 
 
 def load(core_rest_api):
     user_blueprint = core_rest_api.blueprint('users')
+    vm_blueprint = core_rest_api.blueprint('voicemails')
+
     document = core_rest_api.content_parser.document(
         Field('user_id', Int()),
         Field('voicemail_id', Int()),
@@ -49,20 +52,26 @@ def load(core_rest_api):
                                    user_voicemail_dao,
                                    validator,
                                    notifier)
-    resource = SingleAssociationResource(service, converter)
+    resource = UserVoicemailResource(service, converter)
 
-    chain = DecoratorChain(core_rest_api, user_blueprint)
+    user_chain = DecoratorChain(core_rest_api, user_blueprint)
+    vm_chain = DecoratorChain(core_rest_api, vm_blueprint)
 
-    (chain
+    (user_chain
      .get('/<int:parent_id>/voicemail')
      .decorate(resource.get_association))
 
-    (chain
+    (user_chain
      .create('/<int:parent_id>/voicemail')
      .decorate(resource.associate))
 
-    (chain
+    (user_chain
      .delete('/<int:parent_id>/voicemail')
      .decorate(resource.dissociate))
 
+    (vm_chain
+     .get('/<int:voicemail_id>/users')
+     .decorate(resource.list_associations_by_child))
+
     core_rest_api.register(user_blueprint)
+    core_rest_api.register(vm_blueprint)
