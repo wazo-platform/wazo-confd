@@ -2200,6 +2200,35 @@
                     }
                 }
             }
+        },
+        "/voicemails/{voicemail_id}/users": {
+            "get": {
+                "operationId": "get_voicemail_user_association",
+                "summary": "Get users associated to voicemail",
+                "tags": [
+                    "users",
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "voicemail_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-Voicemail associations",
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemailItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -2761,7 +2790,40 @@
                 "total"
             ]
         },
-        "UserVoicemail": {},
+        "UserVoicemail": {
+            "title": "UserVoicemail",
+            "properties": {
+                "user_id": {
+                    "type": "integer",
+                    "description": "User ID"
+                },
+                "voicemail_id": {
+                    "type": "integer",
+                    "description": "Voicemail ID"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether the user can use this voicemail or not"
+                }
+            },
+            "required": [
+                "voicemail_id"
+            ]
+        },
+        "UserVoicemailItems": {
+            "title": "UserVoicemailItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/UserVoicemail"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "UserFuncKeyTemplate": {
             "title": "UserFuncKeyTemplate",
             "description": "Association between a User and a FuncKey Template",
