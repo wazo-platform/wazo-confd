@@ -96,7 +96,9 @@ def load(core_rest_api):
         Field('firstname', Unicode()),
         Field('lastname', Unicode()),
         Field('exten', Unicode()),
-        Field('mobile_phone_number', Unicode())
+        Field('mobile_phone_number', Unicode()),
+        Field('userfield', Unicode()),
+        Field('description', Unicode()),
     )
 
     user_converter = Converter.resource(user_document, User)
