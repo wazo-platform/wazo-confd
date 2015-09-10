@@ -1941,6 +1941,15 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User and Voicemail to associate",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
                     }
                 ],
                 "responses": {
