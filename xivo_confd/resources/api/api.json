@@ -1941,6 +1941,15 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User and Voicemail to associate",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
                     }
                 ],
                 "responses": {
@@ -2194,6 +2203,35 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/voicemails/{voicemail_id}/users": {
+            "get": {
+                "operationId": "get_voicemail_user_association",
+                "summary": "Get users associated to voicemail",
+                "tags": [
+                    "users",
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "voicemail_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-Voicemail associations",
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemailItems"
+                        }
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -2761,7 +2799,40 @@
                 "total"
             ]
         },
-        "UserVoicemail": {},
+        "UserVoicemail": {
+            "title": "UserVoicemail",
+            "properties": {
+                "user_id": {
+                    "type": "integer",
+                    "description": "User ID"
+                },
+                "voicemail_id": {
+                    "type": "integer",
+                    "description": "Voicemail ID"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether the user can use this voicemail or not"
+                }
+            },
+            "required": [
+                "voicemail_id"
+            ]
+        },
+        "UserVoicemailItems": {
+            "title": "UserVoicemailItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/UserVoicemail"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "UserFuncKeyTemplate": {
             "title": "UserFuncKeyTemplate",
             "description": "Association between a User and a FuncKey Template",
@@ -2778,7 +2849,84 @@
                 }
             }
         },
-        "Voicemail": {},
-        "VoicemailItems": {}
+        "Voicemail": {
+            "title": "Voicemail",
+            "description": "Leave audio messages for someone",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Voicemail ID (read-only)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Voicemail name"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Mailbox number"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "Voicemail context"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Numeric password used to access the voicemail"
+                },
+                "email": {
+                    "type": "string",
+                    "description": "Email address. Notifications and audio attachements will be sent to this address."
+                },
+                "pager": {
+                    "type": "string",
+                    "description": "Email address. Summarized notifications will be sent to this address"
+                },
+                "language": {
+                    "type": "string",
+                    "description": "Language used for the voicemail menu prompt."
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "Timezone used for announcing at what time a message was recorded."
+                },
+                "max_messages": {
+                    "type": "integer",
+                    "description": "Maximum number of messages to store."
+                },
+                "attach_audio": {
+                    "type": "boolean",
+                    "description": "Attach an audio file of the recorded message when sending an email."
+                },
+                "delete_messages": {
+                    "type": "boolean",
+                    "description": "Delete messages once they have been listened to.",
+                    "default": false
+                },
+                "ask_password": {
+                    "type": "boolean",
+                    "description": "Ask for password when accessing the voicemail menu.",
+                    "default": true
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Voicemail can be used when it is enabled",
+                    "default": true
+                }
+            }
+        },
+        "VoicemailItems": {
+            "title": "VoicemailItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/Voicemail"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        }
     }
 }

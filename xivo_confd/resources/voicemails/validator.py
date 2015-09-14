@@ -60,11 +60,12 @@ class AssociatedToUser(Validator):
         self.dao = dao
 
     def validate(self, model):
-        association = self.dao.find_by_voicemail_id(model.id)
-        if association:
+        associations = self.dao.find_all_by_voicemail_id(model.id)
+        if len(associations) > 0:
+            user_ids = ", ".join(str(uv.user_id) for uv in associations)
             raise errors.resource_associated('Voicemail', 'User',
-                                             voicemail_id=association.voicemail_id,
-                                             user_id=association.user_id)
+                                             voicemail_id=model.id,
+                                             user_ids=user_ids)
 
 
 def build_validators():

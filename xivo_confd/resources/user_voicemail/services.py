@@ -34,6 +34,9 @@ class UserVoicemailService(object):
     def get_by_parent(self, user_id):
         return self.user_voicemail_dao.get_by_user_id(user_id)
 
+    def list_by_child(self, voicemail_id):
+        return self.user_voicemail_dao.find_all_by_voicemail_id(voicemail_id)
+
     def associate(self, association):
         self.validator.validate_association(association)
         self.user_voicemail_dao.associate(association)
