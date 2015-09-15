@@ -249,3 +249,37 @@ def test_delete_voicemail_deletes_on_disk(voicemail, sysconfd):
     sysconfd.assert_request('/delete_voicemail',
                             query={'mailbox': voicemail['number'],
                                    'context': voicemail['context']})
+
+
+@fixtures.voicemail()
+def test_update_fields_with_null_value(voicemail):
+    number, context = vm_helper.generate_number_and_context()
+
+    response = confd.voicemails.post(name='nullfields',
+                                     number=number,
+                                     context=context,
+                                     password='1234',
+                                     email='test@example.com',
+                                     pager='test@example.com',
+                                     language='en_US',
+                                     timezone='eu-fr',
+                                     max_messages=10,
+                                     attach_audio=True)
+
+    url = confd.voicemails(response.item['id'])
+    response = url.put(password=None,
+                       email=None,
+                       pager=None,
+                       language=None,
+                       timezone=None,
+                       max_messages=None,
+                       attach_audio=None)
+    response.assert_ok()
+
+    response = url.get()
+    assert_that(response.item, has_entries({'password': None,
+                                            'email': None,
+                                            'language': None,
+                                            'timezone': None,
+                                            'max_messages': None,
+                                            'attach_audio': None}))
