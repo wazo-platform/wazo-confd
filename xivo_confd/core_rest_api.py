@@ -102,7 +102,7 @@ class CoreRestApi(object):
     def run(self):
         bind_addr = (self.config['rest_api']['listen'], self.config['rest_api']['port'])
 
-        plugin_manager.load_plugins(self.app, self.config)
+        plugin_manager.load_plugins(self)
 
         from cherrypy import wsgiserver
         wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': self.app})

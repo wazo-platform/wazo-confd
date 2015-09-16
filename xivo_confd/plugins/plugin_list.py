@@ -23,8 +23,9 @@ blueprint = Blueprint('example', __name__)
 
 class Plugin(object):
 
-    def load(self, app, config):
-        app.config['enabled_plugins'] = config['enabled_plugins']
+    def load(self, core):
+        app = core.app
+        app.config['enabled_plugins'] = core.config['enabled_plugins']
         app.register_blueprint(blueprint)
 
 
