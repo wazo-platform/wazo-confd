@@ -19,7 +19,6 @@ import logging
 import os
 import urllib
 
-from flask import current_app
 from flask import Flask
 from flask import g
 from flask import request
@@ -27,7 +26,6 @@ from flask_cors import CORS
 from werkzeug.contrib.fixers import ProxyFix
 from xivo import http_helpers
 
-from xivo_confd import flask_http_server
 from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
@@ -78,11 +76,6 @@ class CoreRestApi(object):
         @self.app.errorhandler(Exception)
         def error_handler(error):
             return handle_error(error)
-
-        flask_http_server.register_resources(self, config['default_plugins'])
-
-        logger.debug('Loading extra plugins...')
-        flask_http_server.register_resources(self, config['extra_plugins'])
 
     def load_cors(self):
         cors_config = dict(self.config['rest_api'].get('cors', {}))

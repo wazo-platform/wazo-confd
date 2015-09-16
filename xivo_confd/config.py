@@ -76,7 +76,7 @@ DEFAULT_CONFIG = {
         "func_keys",
     ],
     'extra_plugins': [],
-    'enabled_plugins': [],
+    'enabled_plugins': ['legacy_plugins'],
 }
 
 
