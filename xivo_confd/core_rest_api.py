@@ -47,7 +47,7 @@ class CoreRestApi(object):
         http_helpers.add_logger(self.app, logger)
         self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.app.secret_key = os.urandom(24)
-        self.auth = ConfdAuth()
+        self.auth = ConfdAuth(config)
 
         self.load_cors()
 

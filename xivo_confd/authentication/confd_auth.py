@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014 Avencall
+# Copyright (C) 2014-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
+import requests
 
 from flask import request
 from flask_httpauth import HTTPDigestAuth
 from functools import wraps
 
 from xivo_dao import accesswebservice_dao
+from xivo_auth_client import Client as AuthClient
 
 
 logger = logging.getLogger(__name__)
@@ -31,9 +33,11 @@ class ConfdAuth(HTTPDigestAuth):
 
     ALLOWED_HOSTS = ['127.0.0.1']
 
-    def __init__(self):
+    def __init__(self, config):
         super(ConfdAuth, self).__init__()
         self.get_password(accesswebservice_dao.get_password)
+        self.auth_host = config['auth']['host']
+        self.auth_port = config['auth']['port']
 
     def login_required(self, func):
         auth_func = super(ConfdAuth, self).login_required(func)
@@ -41,6 +45,8 @@ class ConfdAuth(HTTPDigestAuth):
         @wraps(func)
         def decorated(*args, **kwargs):
             if self._remote_address_allowed():
+                return func(*args, **kwargs)
+            elif self._valid_token():
                 return func(*args, **kwargs)
             return auth_func(*args, **kwargs)
 
@@ -52,3 +58,12 @@ class ConfdAuth(HTTPDigestAuth):
         if remote_addr in self.ALLOWED_HOSTS:
             return True
         return remote_addr in accesswebservice_dao.get_allowed_hosts()
+
+    def _valid_token(self):
+        token = request.headers.get('X-Auth-Token', '')
+        try:
+            return AuthClient(self.auth_host, self.auth_port).token.is_valid(token)
+        except requests.RequestException as e:
+            message = 'Authentication server on {host}:{port} unreachable: {error}'
+            logger.error(message.format(host=self.auth_host, port=self.auth_port, error=e))
+            return False

@@ -37,6 +37,11 @@ rest_api:
         allow_headers: Content-Type
 
 
+# xivo-auth connection information
+auth:
+    host: localhost
+    port: 9497
+
 # Event bus (AMQP) connection information
 bus:
     username: guest

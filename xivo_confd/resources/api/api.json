@@ -66,6 +66,9 @@
                         "type": "string",
                         "format": "datetime",
                         "required": false
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -87,6 +90,11 @@
                 "summary": "Get live reload status",
                 "tags": [
                     "configuration"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -111,6 +119,9 @@
                         "schema": {
                             "$ref": "#/definitions/LiveReload"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -130,6 +141,11 @@
                 "tags": [
                     "cti_profiles"
                 ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of CTI profiles",
@@ -147,6 +163,18 @@
                 "tags": [
                     "cti_profiles"
                 ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "cti_profile_id",
+                        "in": "path",
+                        "description": "CTI Profile ID"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "CTI profile",
@@ -157,16 +185,7 @@
                     "404": {
                         "$ref": "#/responses/NotFoundError"
                     }
-                },
-                "parameters": [
-                    {
-                        "required": true,
-                        "type": "integer",
-                        "name": "cti_profile_id",
-                        "in": "path",
-                        "description": "CTI Profile ID"
-                    }
-                ]
+                }
             }
         },
         "/devices": {
@@ -191,6 +210,9 @@
                     },
                     {
                         "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -217,6 +239,9 @@
                         "schema": {
                             "$ref": "#/definitions/Device"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -245,6 +270,9 @@
                         "type": "string",
                         "name": "device_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -279,6 +307,9 @@
                         "schema": {
                             "$ref": "#/definitions/Device"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -305,6 +336,9 @@
                         "type": "string",
                         "name": "device_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -333,6 +367,9 @@
                         "type": "string",
                         "name": "device_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -361,6 +398,9 @@
                         "type": "string",
                         "name": "device_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -396,6 +436,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -431,6 +474,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -474,6 +520,9 @@
                         "in": "query",
                         "type": "string",
                         "description": "Filter extensions of a certain type. Types allowed: internal, incall"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -500,6 +549,9 @@
                         "schema": {
                             "$ref": "#/definitions/Extension"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -528,6 +580,9 @@
                         "type": "integer",
                         "name": "extension_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -562,6 +617,9 @@
                         "schema": {
                             "$ref": "#/definitions/Extension"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -588,6 +646,9 @@
                         "type": "integer",
                         "name": "extension_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -616,6 +677,9 @@
                         "type": "integer",
                         "name": "extension_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -638,6 +702,11 @@
                 "tags": [
                     "funckeys"
                 ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of destinations",
@@ -654,6 +723,11 @@
                 "summary": "List a func key template",
                 "tags": [
                     "funckeys"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -682,6 +756,9 @@
                         "schema": {
                             "$ref": "#/definitions/FuncKeyTemplate"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -710,6 +787,9 @@
                         "type": "integer",
                         "name": "template_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -736,6 +816,9 @@
                         "type": "integer",
                         "name": "template_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -765,6 +848,9 @@
                         "type": "integer",
                         "name": "template_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -800,6 +886,9 @@
                         "name": "position",
                         "in": "path",
                         "description": "position of the funckey"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -841,6 +930,9 @@
                         "schema": {
                             "$ref": "#/definitions/FuncKey"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -871,6 +963,9 @@
                         "name": "position",
                         "in": "path",
                         "description": "position of the funckey"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -893,6 +988,11 @@
                 "tags": [
                     "infos"
                 ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Server information",
@@ -909,6 +1009,11 @@
                 "summary": "List lines",
                 "tags": [
                     "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -935,6 +1040,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -977,6 +1085,9 @@
                         "schema": {
                             "$ref": "#/definitions/LineExtension"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1008,6 +1119,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1037,6 +1151,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1072,6 +1189,9 @@
                         "schema": {
                             "$ref": "#/definitions/LineExtension"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1110,6 +1230,9 @@
                         "type": "integer",
                         "name": "extension_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1138,6 +1261,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1160,6 +1286,11 @@
                 "tags": [
                     "lines",
                     "lines_sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1186,6 +1317,9 @@
                         "schema": {
                             "$ref": "#/definitions/LineSip"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1215,6 +1349,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1250,6 +1387,9 @@
                         "schema": {
                             "$ref": "#/definitions/LineSip"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1276,6 +1416,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1305,6 +1448,9 @@
                         "type": "integer",
                         "name": "queue_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1343,6 +1489,9 @@
                         "type": "integer",
                         "name": "agent_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1376,6 +1525,9 @@
                         "type": "integer",
                         "name": "agent_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1409,6 +1561,9 @@
                         "type": "integer",
                         "name": "agent_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1449,6 +1604,9 @@
                     },
                     {
                         "$ref": "#/parameters/view"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1475,6 +1633,9 @@
                         "schema": {
                             "$ref": "#/definitions/User"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1504,6 +1665,9 @@
                         "name": "user_id",
                         "in": "path",
                         "description": "The user's ID or UUID"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1531,6 +1695,9 @@
                         "name": "user_id",
                         "in": "path",
                         "description": "The user's ID or UUID"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1558,6 +1725,9 @@
                         "name": "user_id",
                         "in": "path",
                         "description": "The user's ID or UUID"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1587,6 +1757,9 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1620,6 +1793,9 @@
                         "name": "position",
                         "in": "path",
                         "description": "position of the funckey"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1662,6 +1838,9 @@
                         "schema": {
                             "$ref": "#/definitions/FuncKey"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1693,6 +1872,9 @@
                         "name": "position",
                         "in": "path",
                         "description": "position of the funckey"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1722,6 +1904,9 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1757,6 +1942,9 @@
                         "type": "integer",
                         "name": "template_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1790,6 +1978,9 @@
                         "type": "integer",
                         "name": "template_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1819,6 +2010,9 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1854,6 +2048,9 @@
                         "schema": {
                             "$ref": "#/definitions/UserLine"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1892,6 +2089,9 @@
                         "type": "integer",
                         "name": "line_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1921,6 +2121,9 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1957,6 +2160,9 @@
                         "schema": {
                             "$ref": "#/definitions/UserVoicemail"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1987,6 +2193,9 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2016,6 +2225,9 @@
                         "type": "integer",
                         "name": "user_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2051,6 +2263,9 @@
                         "schema": {
                             "$ref": "#/definitions/UserCtiProfilePut"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2088,6 +2303,9 @@
                     },
                     {
                         "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2114,6 +2332,9 @@
                         "schema": {
                             "$ref": "#/definitions/Voicemail"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2142,6 +2363,9 @@
                         "type": "integer",
                         "name": "voicemail_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2176,6 +2400,9 @@
                         "schema": {
                             "$ref": "#/definitions/Voicemail"
                         }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2202,6 +2429,9 @@
                         "type": "integer",
                         "name": "voicemail_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2231,6 +2461,9 @@
                         "type": "integer",
                         "name": "voicemail_id",
                         "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2293,6 +2526,13 @@
             "in": "query",
             "type": "string",
             "description": "Different view of the list of users. Acceptable value: directory."
+        },
+        "token": {
+            "required": false,
+            "name": "X-Auth-Token",
+            "in": "header",
+            "type": "string",
+            "description": "Authentication token obtained from xivo-auth."
         }
     },
     "responses": {
