@@ -73,6 +73,9 @@ class RestUrlClient(UrlFragment):
         self.client = client
         self.body = body or {}
 
+    def __repr__(self):
+        return "<Client '{}'>".format('/'.join(self.fragments))
+
     def get(self, **params):
         url = str(self)
         return self.client.get(url, **params)
