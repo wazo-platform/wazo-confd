@@ -78,6 +78,7 @@ def load(core_rest_api):
 
     user_document = core_rest_api.content_parser.document(
         Field('id', Int()),
+        Field('uuid', Unicode()),
         Field('firstname', Unicode()),
         Field('lastname', Unicode()),
         Field('caller_id', Unicode()),
