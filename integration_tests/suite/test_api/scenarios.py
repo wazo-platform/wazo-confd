@@ -1,3 +1,5 @@
+import re
+
 from contextlib import contextmanager
 
 from hamcrest import assert_that, contains, equal_to
@@ -203,3 +205,18 @@ class DissociationCollectionScenarios(DissociationScenarios):
             error = e.not_found(resource=self.right_resource)
             response = self.dissociate_resources(left_id, self.FAKE_ID)
             response.assert_match(404, error)
+
+
+def check_resource_not_found(request, resource):
+    response = request()
+    response.assert_match(404, e.not_found(resource=resource))
+
+
+def check_missing_required_field_returns_error(request, field):
+    response = request({field: None})
+    response.assert_match(400, re.compile(re.escape(field)))
+
+
+def check_wrong_field_type_returns_error(request, field, bogus):
+    response = request({field: bogus})
+    response.assert_match(400, re.compile(re.escape(field)))
