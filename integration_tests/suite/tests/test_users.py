@@ -26,7 +26,7 @@ from test_api.helpers.user_line import user_and_line_associated
 from test_api.helpers.line_extension import line_and_extension_associated
 from test_api.helpers.line_device import line_and_device_associated
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry
+from hamcrest import assert_that, equal_to, has_entries, has_entry, has_length
 
 FIELDS = ['firstname',
           'lastname',
@@ -122,3 +122,12 @@ def test_that_the_directory_view_works_with_unicode_characters(user):
     response.assert_ok()
 
     assert_that(response.items[0]['id'], equal_to(user['id']))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
+    result = confd.users(user_1['uuid']).get()
+
+    assert_that(result.item, has_entries(firstname='John', lastname='Doe'))
