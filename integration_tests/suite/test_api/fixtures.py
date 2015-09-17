@@ -5,6 +5,7 @@ from helpers.line import generate_line, delete_line
 from helpers.extension import generate_extension, delete_extension
 from helpers.device import generate_device, delete_device
 from helpers.voicemail import generate_voicemail, delete_voicemail
+from helpers.context import generate_context, delete_context
 
 
 class user(IsolatedAction):
@@ -35,3 +36,9 @@ class voicemail(IsolatedAction):
 
     actions = {'generate': generate_voicemail,
                'delete': delete_voicemail}
+
+
+class context(IsolatedAction):
+
+    actions = {'generate': generate_context,
+               'delete': delete_context}
