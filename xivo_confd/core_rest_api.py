@@ -55,6 +55,8 @@ class CoreRestApi(object):
             logger.info("Debug mode enabled.")
             self.app.debug = True
 
+        plugin_manager.load_plugins(self)
+
         @self.app.before_request
         def log_requests():
             params = {
@@ -94,8 +96,6 @@ class CoreRestApi(object):
 
     def run(self):
         bind_addr = (self.config['rest_api']['listen'], self.config['rest_api']['port'])
-
-        plugin_manager.load_plugins(self)
 
         from cherrypy import wsgiserver
         wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': self.app})
