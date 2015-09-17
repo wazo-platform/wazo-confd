@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from hamcrest import assert_that, equal_to
-from mock import patch, Mock
+from mock import patch, Mock, sentinel as s
 
 from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.tests.test_case import TestCase
@@ -49,6 +49,13 @@ class TestGetUser(TestCase):
 
         user_dao_get.assert_called_once_with(number, context)
         assert_that(result, equal_to(expected_result))
+
+    @patch('xivo_dao.resources.user.dao.get_by_uuid')
+    def test_get_by_uuid(self, user_dao_get_by_uuid):
+        result = user_services.get_by_uuid(s.uuid)
+
+        user_dao_get_by_uuid.assert_called_once_with(s.uuid)
+        assert_that(result, equal_to(user_dao_get_by_uuid.return_value))
 
 
 class TestSearchUser(TestCase):

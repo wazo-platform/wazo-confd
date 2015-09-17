@@ -45,6 +45,10 @@ class UserResource(CRUDResource):
         super(UserResource, self).__init__(service, converter)
         self.directory_converter = directory_converter
 
+    def get_by_uuid(self, resource_uuid):
+        resource = self.service.get_by_uuid(resource_uuid)
+        return self.encode_resource(resource)
+
     def search(self):
         if 'q' in request.args:
             return self.search_by_fullname(request.args['q'])
@@ -108,4 +112,13 @@ def load(core_rest_api):
                                     builder=ModelBuilder(directory_document, UserDirectory))
 
     resource = UserResource(user_services, user_converter, directory_converter)
-    DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
+
+    chain = DecoratorChain(core_rest_api, blueprint)
+    chain.search().decorate(resource.search)
+    chain.get().decorate(resource.get)
+    chain.get('/<uuid:resource_uuid>').decorate(resource.get_by_uuid)
+    chain.create().decorate(resource.create)
+    chain.edit().decorate(resource.edit)
+    chain.delete().decorate(resource.delete)
+
+    core_rest_api.register(blueprint)

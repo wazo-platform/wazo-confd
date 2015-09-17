@@ -26,6 +26,10 @@ from xivo_confd.resources.lines import services as line_services
 from xivo_confd.resources.func_key import services as func_key_service
 
 
+def get_by_uuid(uuid):
+    return user_dao.get_by_uuid(uuid)
+
+
 def get(user_id):
     return user_dao.get(user_id)
 
