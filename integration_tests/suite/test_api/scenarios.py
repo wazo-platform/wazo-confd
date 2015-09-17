@@ -80,7 +80,7 @@ class EditScenarios(Scenarios):
     def test_unknown_parameter_on_put(self):
         with self.generated_url() as url:
             error = e.unknown_parameters('invalid')
-            response = client.put(url, invalid='invalidvalue')
+            response = client.put(url, {'invalid': 'invalidvalue'})
             response.assert_match(400, error)
 
     def test_wrong_parameter_type_on_put(self):
@@ -93,7 +93,7 @@ class EditScenarios(Scenarios):
         self.delete_resource(resource_id)
 
         error = e.not_found(resource=self.resource)
-        response = client.put(self.generate_url(resource_id), param='param')
+        response = client.put(self.generate_url(resource_id), {'param': 'param'})
 
         response.assert_match(404, error)
 
