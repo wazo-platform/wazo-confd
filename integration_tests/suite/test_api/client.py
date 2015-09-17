@@ -68,9 +68,10 @@ class ConfdClient(object):
 
 class RestUrlClient(UrlFragment):
 
-    def __init__(self, client, fragments):
+    def __init__(self, client, fragments, body=None):
         super(RestUrlClient, self).__init__(fragments)
         self.client = client
+        self.body = body or {}
 
     def get(self, **params):
         url = str(self)
@@ -78,12 +79,12 @@ class RestUrlClient(UrlFragment):
 
     def post(self, body=None, **params):
         url = str(self)
-        params = self._merge_params(params, body)
+        params = self._merge_params(params, body, self.body)
         return self.client.post(url, params)
 
     def put(self, body=None, **params):
         url = str(self)
-        params = self._merge_params(params, body)
+        params = self._merge_params(params, body, self.body)
         return self.client.put(url, params)
 
     def delete(self):
@@ -91,7 +92,11 @@ class RestUrlClient(UrlFragment):
         return self.client.delete(url)
 
     def _copy(self):
-        return self.__class__(self.client, list(self.fragments))
+        return self.__class__(self.client, list(self.fragments), dict(self.body))
+
+    def _add_body(self, body):
+        self.body.update(body)
+        return self
 
     def _merge_params(self, *maps):
         params = {}
@@ -99,6 +104,14 @@ class RestUrlClient(UrlFragment):
             if mapping:
                 params.update(mapping)
         return params
+
+    def __call__(self, fragment=None, **body):
+        url = self._copy()
+        if fragment:
+            url._add(fragment)
+        if body:
+            url._add_body(body)
+        return url
 
 
 class Response(object):
