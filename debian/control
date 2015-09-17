@@ -32,6 +32,7 @@ Depends: ${python:Depends},
          python-flask-httpauth,
          python-flask-cors,
          python-flask-negotiate,
+         python-flask-restful,
          python-cherrypy3,
          python-requests
 Provides: xivo-librestapi

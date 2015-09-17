@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,10 +38,11 @@ class TestCommon(unittest.TestCase):
         app.testing = True
         app.test_request_context('').push()
 
-    def assertResponse(self, response, status_code, result):
-        decoded_response = serializer.decode(response.data)
+    def assertResponse(self, response, expected_code, result):
+        data, status_code, headers = response
+        decoded_response = serializer.decode(data)
 
-        self.assertEquals(response.status_code, status_code)
+        self.assertEquals(status_code, expected_code)
         self.assertEquals(decoded_response, result)
 
 
@@ -84,9 +85,36 @@ class TestHandleError(TestCommon):
         self.assertResponse(response, expected_status_code, expected_message)
 
     def test_when_bad_request_is_raised(self):
-        exception = BadRequest()
+        expected_status_code = 400
+        expected_message = ["bad request"]
+        exception = BadRequest("bad request")
 
-        self.assertRaises(HTTPException, handle_error, exception)
+        response = handle_error(exception)
+
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_when_flask_restful_error_is_raised(self):
+        expected_status_code = 400
+        expected_message = ["Input Error - field: missing"]
+
+        exception = HTTPException()
+        exception.data = {'message': {'field': 'missing'}}
+        exception.code = 400
+
+        response = handle_error(exception)
+
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_when_generic_http_error_is_raised(self):
+        expected_status_code = 400
+        expected_message = ["generic http error"]
+
+        exception = HTTPException("generic http error")
+        exception.code = 400
+
+        response = handle_error(exception)
+
+        self.assertResponse(response, expected_status_code, expected_message)
 
     def test_when_generic_exception_is_raised(self):
         expected_status_code = 500

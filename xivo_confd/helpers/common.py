@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
+import json
 
-from flask import Response
 from werkzeug.exceptions import HTTPException
+from flask_restful.utils import http_status_message
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import ServiceError
@@ -26,8 +27,6 @@ from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_confd.helpers.mooltiparse.errors import ValidationError
 from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
-
-from xivo_confd.helpers import serializer
 
 
 logger = logging.getLogger(__name__)
@@ -40,23 +39,49 @@ NOT_FOUND_ERRORS = (NotFoundError,)
 
 
 def handle_error(error):
+    exc_info = True
+    code = 500
+
     if isinstance(error, NOT_FOUND_ERRORS):
-        return error_response(error, 404)
+        messages = [unicode(error)]
+        code = 404
+        exc_info = False
     elif isinstance(error, GENERIC_ERRORS):
-        return error_response(error, 400)
+        messages = [unicode(error)]
+        code = 400
+        exc_info = False
     elif isinstance(error, HTTPException):
-        raise error
+        messages, code = extract_http_messages(error)
+        exc_info = False
     else:
-        message = 'Unexpected error: %s' % error
-        return error_response(message, 500, exc_info=True)
+        messages = [u'Unexpected error: {}'.format(error)]
 
-
-def error_response(error, code, exc_info=False):
     logger.error(error, exc_info=exc_info)
-    response = serializer.encode([unicode(error)])
-    return Response(response=response,
-                    status=code,
-                    content_type='application/json')
+    return error_response(messages, code)
+
+
+def extract_http_messages(error):
+    # we need to keep error messages compatiable with API v1.1,
+    # but flask-restful's error handling isn't flexible
+    # enough to allow us to reformat its error messages.
+    # So we attempt to extract the errors from the exception
+    data = getattr(error, 'data', {})
+    message = data.get('message', None)
+    if isinstance(message, dict):
+        code = error.code
+        messages = ["Input Error - {}: {}".format(key, value)
+                    for key, value in message.iteritems()]
+    else:
+        # Return a generic HTTP error message if we couldn't find anything
+        code = getattr(error, 'code', 400)
+        messages = [getattr(error, 'description', http_status_message(code))]
+
+    return messages, code
+
+
+def error_response(messages, code):
+    response = json.dumps(messages)
+    return (response, code, {'Content-Type': 'application/json'})
 
 
 class ParameterExtractor(object):
