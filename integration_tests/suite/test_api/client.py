@@ -100,7 +100,7 @@ class RestUrlClient(UrlFragment):
 
     def _merge_params(self, *maps):
         params = {}
-        for mapping in maps:
+        for mapping in reversed(maps):
             if mapping:
                 params.update(mapping)
         return params
