@@ -217,6 +217,6 @@ def check_missing_required_field_returns_error(request, field):
     response.assert_match(400, re.compile(re.escape(field)))
 
 
-def check_wrong_field_type_returns_error(request, field, bogus):
+def check_bogus_field_returns_error(request, field, bogus):
     response = request({field: bogus})
     response.assert_match(400, re.compile(re.escape(field)))
