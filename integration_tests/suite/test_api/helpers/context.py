@@ -13,12 +13,13 @@ def new_context(context=None, type_='internal'):
 
 
 def generate_context(context=None, type_='internal'):
-    new_context(context, type_)
+    context = new_context(context, type_)
     return {'name': context,
+            'id': context,
             'type': type_}
 
 
-def delete_context(context):
+def delete_context(context, check=False):
     db = db_helper()
     with db.queries() as queries:
         queries.delete_context(context)
