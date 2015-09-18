@@ -49,6 +49,11 @@ class UserResource(CRUDResource):
         resource = self.service.get_by_uuid(resource_uuid)
         return self.encode_resource(resource)
 
+    def delete_by_uuid(self, resource_uuid):
+        resource = self.service.get_by_uuid(resource_uuid)
+        self.service.delete(resource)
+        return ('', 204)
+
     def search(self):
         if 'q' in request.args:
             return self.search_by_fullname(request.args['q'])
@@ -121,5 +126,6 @@ def load(core_rest_api):
     chain.create().decorate(resource.create)
     chain.edit().decorate(resource.edit)
     chain.delete().decorate(resource.delete)
+    chain.delete('/<uuid:resource_uuid>').decorate(resource.delete_by_uuid)
 
     core_rest_api.register(blueprint)
