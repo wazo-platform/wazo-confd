@@ -42,6 +42,7 @@ setup(
         'xivo_confd.plugins': [
             'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
             'legacy_plugins = xivo_confd.plugins.legacy_plugins:LegacyPlugins',
+            'lines_plugin = xivo_confd.plugins.lines.plugin:Plugin',
         ]
     }
 )

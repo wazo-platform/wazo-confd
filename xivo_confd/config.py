@@ -80,7 +80,8 @@ DEFAULT_CONFIG = {
         "func_keys",
     ],
     'extra_plugins': [],
-    'enabled_plugins': ['legacy_plugins'],
+    'enabled_plugins': ['legacy_plugins',
+                        'lines_plugin'],
 }
 
 
