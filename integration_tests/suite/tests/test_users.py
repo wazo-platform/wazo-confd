@@ -131,3 +131,12 @@ def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
     result = confd.users(user_1['uuid']).get()
 
     assert_that(result.item, has_entries(firstname='John', lastname='Doe'))
+
+
+@fixtures.user()
+def test_that_users_can_be_deleted_by_uuid(user):
+    response = confd.users(user['uuid']).delete()
+    response.assert_ok()
+
+    response = confd.users(user['uuid']).get()
+    response.assert_status(404)
