@@ -49,6 +49,12 @@ class UserResource(CRUDResource):
         resource = self.service.get_by_uuid(resource_uuid)
         return self.encode_resource(resource)
 
+    def edit_by_uuid(self, resource_uuid):
+        resource = self.service.get_by_uuid(resource_uuid)
+        self.converter.update(request, resource)
+        self.service.edit(resource)
+        return ('', 204)
+
     def delete_by_uuid(self, resource_uuid):
         resource = self.service.get_by_uuid(resource_uuid)
         self.service.delete(resource)
@@ -125,6 +131,7 @@ def load(core_rest_api):
     chain.get('/<uuid:resource_uuid>').decorate(resource.get_by_uuid)
     chain.create().decorate(resource.create)
     chain.edit().decorate(resource.edit)
+    chain.edit('/<uuid:resource_uuid>').decorate(resource.edit_by_uuid)
     chain.delete().decorate(resource.delete)
     chain.delete('/<uuid:resource_uuid>').decorate(resource.delete_by_uuid)
 
