@@ -23,7 +23,7 @@ from xivo_dao.resources.language import dao as language_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 from xivo_confd.helpers.validator import Validator, ValidationGroup, \
-    RequiredFields, FindResource, MemberOfSequence, Optional
+    MissingFields, FindResource, MemberOfSequence, Optional
 
 
 class NumberContextExists(Validator):
@@ -71,7 +71,7 @@ class AssociatedToUser(Validator):
 def build_validators():
     return ValidationGroup(
         common=[
-            RequiredFields(),
+            MissingFields(),
             FindResource('context', context_dao.get, 'Context'),
             Optional('language', MemberOfSequence(
                 'language',

@@ -19,7 +19,7 @@
 from collections import Counter
 
 from xivo_confd.helpers.validator import Validator, GetResource, \
-    ResourceExists, RequiredFields, ValidationGroup
+    ResourceExists, MissingFields, ValidationGroup
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
@@ -183,7 +183,7 @@ def build_validators():
     mapping_validator = FuncKeyMappingValidator(funckey_validator)
     similar_validator = SimilarFuncKeyValidator()
 
-    required_validator = RequiredFields()
+    required_validator = MissingFields()
     private_template_validator = PrivateTemplateValidator()
 
     return ValidationGroup(common=[required_validator, mapping_validator, similar_validator],

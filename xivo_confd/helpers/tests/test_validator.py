@@ -25,13 +25,32 @@ from xivo_dao.helpers.exception import InputError, NotFoundError
 
 from xivo_confd.helpers.validator import RequiredFields, GetResource, \
     ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
-    ValidationGroup, AssociationValidator
+    ValidationGroup, AssociationValidator, MissingFields
 
 
 class TestRequiredFields(unittest.TestCase):
 
     def setUp(self):
-        self.validator = RequiredFields()
+        self.validator = RequiredFields('field1', 'field2')
+        self.model = Mock()
+
+    def test_given_required_fields_are_none_when_validating_then_raises_error(self):
+        self.model.field1 = None
+        self.model.field2 = None
+
+        self.assertRaises(InputError, self.validator.validate, self.model)
+
+    def test_given_required_fields_have_a_value_when_validating_then_validation_passes(self):
+        self.model.field1 = 'value1'
+        self.model.field2 = 'value2'
+
+        self.validator.validate(self.model)
+
+
+class TestMissingFields(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = MissingFields()
 
     def test_given_missing_fields_when_validating_then_raises_error(self):
         model = Mock(NewModel)

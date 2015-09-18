@@ -21,7 +21,7 @@ from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.validator import Validator, AssociationValidator, \
-    RequiredFields, GetResource
+    MissingFields, GetResource
 
 
 class UserHasNoVoicemail(Validator):
@@ -40,7 +40,7 @@ class UserHasNoVoicemail(Validator):
 def build_validator():
     return AssociationValidator(
         common=[
-            RequiredFields(),
+            MissingFields(),
             GetResource('user_id', user_dao.get, 'User'),
             GetResource('voicemail_id', voicemail_dao.get, 'Voicemail')
         ],
