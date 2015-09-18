@@ -18,8 +18,9 @@ further details on installing one.
 Running unit tests
 ------------------
 
-1. Install requirements with ```pip install -r requirements.txt```
-2. Run tests with ```nosetests xivo_confd```
+1. Install libffi ```apt-get install libffi-dev```
+2. Install requirements with ```pip install -r requirements.txt```
+3. Run tests with ```nosetests xivo_confd```
 
 
 Running functional tests

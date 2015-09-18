@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,6 +111,22 @@ class TestExtractSearchParameters(unittest.TestCase):
     def test_given_skip_parameter_then_extracts_skip(self):
         expected_result = {'skip': 532}
         args = {'skip': '532'}
+
+        parameters = extract_search_parameters(args)
+
+        assert_that(parameters, equal_to(expected_result))
+
+    def test_given_invalid_offset_then_raises_error(self):
+        args = {'offset': 'toto'}
+        self.assertRaises(InputError, extract_search_parameters, args)
+
+    def test_given_negative_offset_then_raises_error(self):
+        args = {'offset': '-1'}
+        self.assertRaises(InputError, extract_search_parameters, args)
+
+    def test_given_offset_parameter_then_extracts_offset(self):
+        expected_result = {'offset': 532}
+        args = {'offset': '532'}
 
         parameters = extract_search_parameters(args)
 
