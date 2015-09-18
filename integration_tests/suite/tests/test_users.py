@@ -140,3 +140,13 @@ def test_that_users_can_be_deleted_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.user()
+def test_that_users_can_be_edited_by_uuid(user):
+    response = confd.users(user['uuid']).put({'firstname': 'Foo',
+                                              'lastname': 'Bar'})
+    response.assert_ok()
+
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item, has_entries(firstname='Foo', lastname='Bar'))
