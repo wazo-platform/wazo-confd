@@ -288,7 +288,7 @@ class SearchEngine(object):
         total = len(provd_devices)
 
         provd_devices = self.paginate_devices(provd_devices,
-                                              parameters.get('skip', 0),
+                                              parameters.get('offset', parameters.get('skip', 0)),
                                               parameters.get('limit'))
 
         items = [self.provd_dao.build_provd_device(device).extract_model()
@@ -316,7 +316,7 @@ class SearchEngine(object):
                 return True
         return False
 
-    def paginate_devices(self, devices, skip=0, limit=None):
+    def paginate_devices(self, devices, offset=0, limit=None):
         if limit:
-            return devices[skip:skip + limit]
-        return devices[skip:]
+            return devices[offset:offset + limit]
+        return devices[offset:]
