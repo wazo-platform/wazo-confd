@@ -1529,7 +1529,8 @@
                         "required": true,
                         "type": "integer",
                         "name": "user_id",
-                        "in": "path"
+                        "in": "path",
+                        "description": "The user's ID or UUID"
                     }
                 ],
                 "responses": {
@@ -1555,7 +1556,8 @@
                         "required": true,
                         "type": "integer",
                         "name": "user_id",
-                        "in": "path"
+                        "in": "path",
+                        "description": "The user's ID or UUID"
                     }
                 ],
                 "responses": {
