@@ -22,8 +22,8 @@ from stevedore.enabled import EnabledExtensionManager
 logger = logging.getLogger(__name__)
 
 
-def load_plugins(application, config):
-    enabled_plugins = config['enabled_plugins']
+def load_plugins(core):
+    enabled_plugins = core.config['enabled_plugins']
     logger.debug('Enabled plugins: %s', enabled_plugins)
     plugins = EnabledExtensionManager(namespace='xivo_confd.plugins',
                                       check_func=lambda p: p.name in enabled_plugins,
@@ -32,14 +32,15 @@ def load_plugins(application, config):
                                       invoke_on_load=True)
 
     try:
-        plugins.map(launch_plugin, application, config)
-    except RuntimeError:
-        logger.info('There is no plugin to load!')
+        plugins.map(launch_plugin, core)
+    except RuntimeError as e:
+        logger.error("Could not load enabled plugins")
+        logger.exception(e)
 
 
-def launch_plugin(ext, application, config):
+def launch_plugin(ext, core):
     logger.debug('Loading dynamic plugin: %s', ext.name)
-    ext.obj.load(application, config)
+    ext.obj.load(core)
 
 
 def plugins_load_fail(_, entrypoint, exception):

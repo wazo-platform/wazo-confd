@@ -19,7 +19,6 @@ import logging
 import os
 import urllib
 
-from flask import current_app
 from flask import Flask
 from flask import g
 from flask import request
@@ -27,7 +26,6 @@ from flask_cors import CORS
 from werkzeug.contrib.fixers import ProxyFix
 from xivo import http_helpers
 
-from xivo_confd import flask_http_server
 from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
@@ -57,6 +55,8 @@ class CoreRestApi(object):
             logger.info("Debug mode enabled.")
             self.app.debug = True
 
+        plugin_manager.load_plugins(self)
+
         @self.app.before_request
         def log_requests():
             params = {
@@ -79,11 +79,6 @@ class CoreRestApi(object):
         def error_handler(error):
             return handle_error(error)
 
-        flask_http_server.register_resources(self, config['default_plugins'])
-
-        logger.debug('Loading extra plugins...')
-        flask_http_server.register_resources(self, config['extra_plugins'])
-
     def load_cors(self):
         cors_config = dict(self.config['rest_api'].get('cors', {}))
         enabled = cors_config.pop('enabled', False)
@@ -101,8 +96,6 @@ class CoreRestApi(object):
 
     def run(self):
         bind_addr = (self.config['rest_api']['listen'], self.config['rest_api']['port'])
-
-        plugin_manager.load_plugins(self.app, self.config)
 
         from cherrypy import wsgiserver
         wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': self.app})
