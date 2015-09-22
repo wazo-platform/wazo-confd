@@ -1446,6 +1446,9 @@
                     },
                     {
                         "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/view"
                     }
                 ],
                 "responses": {
@@ -2280,6 +2283,13 @@
             "in": "query",
             "type": "string",
             "description": "Search term for filtering a list of items. Only items with a field containing the search term will be returned."
+        },
+        "view": {
+            "required": false,
+            "name": "view",
+            "in": "query",
+            "type": "string",
+            "description": "Different view of the list of users. Acceptable value: directory."
         }
     },
     "responses": {
