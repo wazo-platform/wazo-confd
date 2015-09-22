@@ -45,6 +45,21 @@ class UserResource(CRUDResource):
         super(UserResource, self).__init__(service, converter)
         self.directory_converter = directory_converter
 
+    def get_by_uuid(self, resource_uuid):
+        resource = self.service.get_by_uuid(resource_uuid)
+        return self.encode_resource(resource)
+
+    def edit_by_uuid(self, resource_uuid):
+        resource = self.service.get_by_uuid(resource_uuid)
+        self.converter.update(request, resource)
+        self.service.edit(resource)
+        return ('', 204)
+
+    def delete_by_uuid(self, resource_uuid):
+        resource = self.service.get_by_uuid(resource_uuid)
+        self.service.delete(resource)
+        return ('', 204)
+
     def search(self):
         if 'q' in request.args:
             return self.search_by_fullname(request.args['q'])
@@ -74,6 +89,7 @@ def load(core_rest_api):
 
     user_document = core_rest_api.content_parser.document(
         Field('id', Int()),
+        Field('uuid', Unicode()),
         Field('firstname', Unicode()),
         Field('lastname', Unicode()),
         Field('caller_id', Unicode()),
@@ -108,4 +124,15 @@ def load(core_rest_api):
                                     builder=ModelBuilder(directory_document, UserDirectory))
 
     resource = UserResource(user_services, user_converter, directory_converter)
-    DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
+
+    chain = DecoratorChain(core_rest_api, blueprint)
+    chain.search().decorate(resource.search)
+    chain.get().decorate(resource.get)
+    chain.get('/<uuid:resource_uuid>').decorate(resource.get_by_uuid)
+    chain.create().decorate(resource.create)
+    chain.edit().decorate(resource.edit)
+    chain.edit('/<uuid:resource_uuid>').decorate(resource.edit_by_uuid)
+    chain.delete().decorate(resource.delete)
+    chain.delete('/<uuid:resource_uuid>').decorate(resource.delete_by_uuid)
+
+    core_rest_api.register(blueprint)

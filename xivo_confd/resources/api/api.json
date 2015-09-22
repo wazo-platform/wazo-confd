@@ -1500,9 +1500,10 @@
                 "parameters": [
                     {
                         "required": true,
-                        "type": "integer",
+                        "type": "string",
                         "name": "user_id",
-                        "in": "path"
+                        "in": "path",
+                        "description": "The user's ID or UUID"
                     }
                 ],
                 "responses": {
@@ -1526,9 +1527,10 @@
                 "parameters": [
                     {
                         "required": true,
-                        "type": "integer",
+                        "type": "string",
                         "name": "user_id",
-                        "in": "path"
+                        "in": "path",
+                        "description": "The user's ID or UUID"
                     }
                 ],
                 "responses": {
@@ -1552,9 +1554,10 @@
                 "parameters": [
                     {
                         "required": true,
-                        "type": "integer",
+                        "type": "string",
                         "name": "user_id",
-                        "in": "path"
+                        "in": "path",
+                        "description": "The user's ID or UUID"
                     }
                 ],
                 "responses": {
