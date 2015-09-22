@@ -20,7 +20,6 @@ from datetime import datetime
 from flask import Blueprint
 from flask import Response
 from flask import request
-from flask_negotiate import produces
 from xivo_dao.helpers import errors
 
 from xivo_confd import config
@@ -34,7 +33,6 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
-    @produces('text/csv')
     def get_call_logs():
         if 'start_date' in request.args or 'end_date' in request.args:
             return _list_period()
