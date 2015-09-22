@@ -5,7 +5,7 @@ MANAGE_DB_DIR=../../xivo-manage-db/
 POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/xivo-postgres/Dockerfile
 
 
-test-setup: build-postgres build-provd build-confd
+test-setup: build-postgres build-provd build-confd egg-info
 	docker pull n3llyb0y/wait
 	docker pull rabbitmq
 
@@ -38,3 +38,6 @@ distclean:
 	docker rmi xivo/xivo-postgres
 	docker rmi xivo/xivo-confd
 	docker rmi xivo-confd-test
+
+egg-info:
+	cd .. && python setup.py egg_info
