@@ -1500,7 +1500,7 @@
                 "parameters": [
                     {
                         "required": true,
-                        "type": "integer",
+                        "type": "string",
                         "name": "user_id",
                         "in": "path",
                         "description": "The user's ID or UUID"
@@ -1527,7 +1527,7 @@
                 "parameters": [
                     {
                         "required": true,
-                        "type": "integer",
+                        "type": "string",
                         "name": "user_id",
                         "in": "path",
                         "description": "The user's ID or UUID"
@@ -1554,7 +1554,7 @@
                 "parameters": [
                     {
                         "required": true,
-                        "type": "integer",
+                        "type": "string",
                         "name": "user_id",
                         "in": "path",
                         "description": "The user's ID or UUID"
