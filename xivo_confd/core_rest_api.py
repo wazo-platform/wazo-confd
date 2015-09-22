@@ -59,9 +59,11 @@ class CoreRestApi(object):
 
         @self.app.before_request
         def log_requests():
+            url = request.url.encode('utf8')
+            url = urllib.unquote(url)
             params = {
                 'method': request.method,
-                'url': urllib.unquote(request.url).decode('utf8')
+                'url': url,
             }
             if request.data:
                 params.update({'data': request.data})
