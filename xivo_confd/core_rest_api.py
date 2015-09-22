@@ -61,7 +61,7 @@ class CoreRestApi(object):
         def log_requests():
             params = {
                 'method': request.method,
-                'url': urllib.unquote(request.url).decode('utf8')
+                'url': urllib.unquote(request.url)
             }
             if request.data:
                 params.update({'data': request.data})
