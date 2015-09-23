@@ -62,7 +62,7 @@ class ConfdAuth(HTTPDigestAuth):
         auth_config = current_app.config['auth']
         token = request.headers.get('X-Auth-Token', '')
         try:
-            return AuthClient(**auth_config).token.is_valid(token)
+            return AuthClient(**auth_config).token.is_valid(token, required_acl='acl:confd')
         except requests.RequestException as e:
             message = 'Authentication server on {host}:{port} unreachable: {error}'
             logger.error(message.format(host=self.auth_host, port=self.auth_port, error=e))
