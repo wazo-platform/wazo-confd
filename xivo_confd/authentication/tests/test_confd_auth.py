@@ -31,9 +31,9 @@ class TestConfdAuthBase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.secret_key = os.urandom(24)
 
-        config = {'auth': {'host': 'localhost',
-                           'port': 9497}}
-        self.auth = ConfdAuth(config)
+        self.app.config['auth'] = {'host': 'localhost',
+                                   'port': 9497}
+        self.auth = ConfdAuth()
 
         @self.app.route('/')
         @self.auth.login_required
@@ -100,7 +100,7 @@ class TestConfdAuthToken(TestConfdAuthBase):
         patch('xivo_dao.accesswebservice_dao.get_allowed_hosts', return_value=[]).start()
         patch('xivo_dao.accesswebservice_dao.get_password').start()
         self.auth_client = patch('xivo_confd.authentication.confd_auth.AuthClient').start().return_value
-        self.auth_client.token.is_valid.side_effect = (lambda token: token == 'valid-token')
+        self.auth_client.token.is_valid.side_effect = (lambda token, required_acl=None: token == 'valid-token')
         super(TestConfdAuthToken, self).setUp()
 
     def tearDown(self):

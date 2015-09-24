@@ -65,5 +65,5 @@ class ConfdAuth(HTTPDigestAuth):
             return AuthClient(**auth_config).token.is_valid(token, required_acl='acl:confd')
         except requests.RequestException as e:
             message = 'Authentication server on {host}:{port} unreachable: {error}'
-            logger.error(message.format(host=self.auth_host, port=self.auth_port, error=e))
+            logger.error(message.format(host=auth_config['host'], port=auth_config['port'], error=e))
             return False
