@@ -54,6 +54,7 @@ testdeps:
     - sysconfd
   environment:
     PORTS: "5672 5432 8666 8668"
+    TIMEOUT: "60"
 tests:
   image: n3llyb0y/wait
   links:
