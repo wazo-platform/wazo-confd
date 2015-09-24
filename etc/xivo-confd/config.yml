@@ -34,8 +34,13 @@ rest_api:
         enabled: true
 
         #Allow JSON preflight requests
-        allow_headers: Content-Type
+        allow_headers: Content-Type, X-Auth-Token
 
+
+# xivo-auth connection information
+auth:
+    host: localhost
+    port: 9497
 
 # Event bus (AMQP) connection information
 bus:

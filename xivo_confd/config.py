@@ -42,6 +42,10 @@ DEFAULT_CONFIG = {
             'allow_headers': 'Content-Type',
         },
     },
+    'auth': {
+        'host': 'localhost',
+        'port': 9497,
+    },
     'bus': {
         'username': 'guest',
         'password': 'guest',
