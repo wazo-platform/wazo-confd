@@ -2718,7 +2718,12 @@
                 "total"
             ]
         },
-        "Error": {},
+        "Error": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "Extension": {
             "title": "Extension",
             "properties": {
@@ -2836,7 +2841,15 @@
                 "description": "Documentation on function key models"
             }
         },
-        "Info": {},
+        "Info": {
+            "title": "Info",
+            "properties": {
+                "uuid": {
+                    "type": "string",
+                    "description": "UUID of the XiVO server"
+                }
+            }
+        },
         "Line": {
             "title": "Line",
             "properties": {
