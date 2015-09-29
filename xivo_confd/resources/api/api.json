@@ -2985,7 +2985,74 @@
                 }
             }
         },
-        "User": {},
+        "User": {
+            "title": "User",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "User ID (read-only)"
+                },
+                "uuid": {
+                    "type": "string",
+                    "description": "User UUID (read-only). This ID is globally unique across multiple XiVO instances"
+                },
+                "firstname": {
+                    "type": "string",
+                    "description": "User firstname"
+                },
+                "lastname": {
+                    "type": "string",
+                    "description": "User lastname"
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "User timezone"
+                },
+                "language": {
+                    "type": "string",
+                    "description": "User language (e.g. \"en_US\")"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Additional information about the user"
+                },
+                "caller_id": {
+                    "type": "string",
+                    "description": "Name that appears on the phone when calling"
+                },
+                "outgoing_caller_id": {
+                    "type": "string",
+                    "description": "Name that appears on the phone when calling"
+                },
+                "mobile_phone_number": {
+                    "type": "string",
+                    "description": "Phone number for the user’s mobile device"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Username for connecting to the CTI"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password for connecting to the CTI"
+                },
+                "music_on_hold": {
+                    "type": "string",
+                    "description": "Name of the MOH category to use for music on hold"
+                },
+                "preprocess_subroutine": {
+                    "type": "string",
+                    "description": "Name of the subroutine to execute in asterisk before receiving a call"
+                },
+                "userfield": {
+                    "type": "string",
+                    "description": "A custom field which purpose is left to the client. If the user has no userfield, then this field is an empty string."
+                }
+            },
+            "required": [
+                "firstname"
+            ]
+        },
         "UserCtiProfile": {
             "title": "UserCtiProfile",
             "properties": {
@@ -3015,7 +3082,23 @@
                 "enabled"
             ]
         },
-        "UserItems": {},
+        "UserItems": {
+            "title": "UserItems",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
         "UserLine": {
             "title": "UserLine",
             "properties": {
