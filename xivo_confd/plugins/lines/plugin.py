@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_confd.plugins.lines.service import build_service
 from xivo_confd.plugins.lines.resources import LineItem, LineList
 
 
@@ -23,13 +24,14 @@ class Plugin(object):
 
     def load(self, core):
         api = core.api
-        self.register_resources(api)
+        service = build_service()
 
-    def register_resources(self, api):
         api.add_resource(LineItem,
-                         '/zlines/<int:id>',
+                         '/lines/<int:id>',
                          endpoint='lines',
+                         resource_class_args=(service,)
                          )
         api.add_resource(LineList,
-                         '/zlines',
+                         '/lines',
+                         resource_class_args=(service,)
                          )
