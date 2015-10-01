@@ -26,11 +26,16 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 line_fields = {
     'id': fields.Integer,
+    'name': fields.String,
+    'protocol': fields.String,
+    'device_slot': fields.Integer,
+    'device_id': fields.String,
     'context': fields.String,
     'provisioning_code': fields.String,
+    'provisioning_extension': fields.String,
     'position': fields.Integer,
-    'caller_name': fields.String,
-    'caller_num': fields.String,
+    'caller_id_name': fields.String,
+    'caller_id_num': fields.String,
     'links': FieldList(Link('lines'))
 }
 
@@ -48,8 +53,8 @@ class LineList(LineResource):
     parser.add_argument('context', required=True)
     parser.add_argument('provisioning_code', type=DigitStr(6))
     parser.add_argument('position', type=inputs.positive, default=1)
-    parser.add_argument('caller_name')
-    parser.add_argument('caller_num', type=DigitStr())
+    parser.add_argument('caller_id_name')
+    parser.add_argument('caller_id_num', type=DigitStr())
 
     def get(self):
         params = {key: request.args[key] for key in request.args}
@@ -71,8 +76,8 @@ class LineItem(LineResource):
     parser.add_argument('context', store_missing=False)
     parser.add_argument('provisioning_code', type=DigitStr(6), store_missing=False)
     parser.add_argument('position', type=inputs.positive, store_missing=False)
-    parser.add_argument('caller_name', store_missing=False)
-    parser.add_argument('caller_num', type=DigitStr(), store_missing=False)
+    parser.add_argument('caller_id_name', store_missing=False)
+    parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
 
     @marshal_with(line_fields)
     def get(self, id):
