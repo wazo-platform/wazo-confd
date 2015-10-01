@@ -21,7 +21,7 @@ from flask import request
 from flask_restful import reqparse, inputs, fields, marshal, marshal_with
 
 from xivo_confd.helpers.restful import ConfdResource, FieldList, Link, DigitStr
-from xivo_confd.plugins.lines.dao import Line
+from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
 line_fields = {
@@ -53,7 +53,7 @@ class LineList(LineResource):
 
     def get(self):
         params = {key: request.args[key] for key in request.args}
-        total, items = self.service.search(**params)
+        total, items = self.service.search(params)
         return {'total': total,
                 'items': [marshal(l, line_fields) for l in items]}
 
