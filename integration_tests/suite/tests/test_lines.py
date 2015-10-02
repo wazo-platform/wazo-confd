@@ -42,7 +42,6 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, line_post, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_post, 'provisioning_code', 'number'
     yield s.check_bogus_field_returns_error, line_post, 'position', '1'
-    yield s.check_bogus_field_returns_error, line_post, 'caller_num', 'number'
 
 
 @fixtures.line()
@@ -54,7 +53,8 @@ def test_put_errors(line):
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 'number'
     yield s.check_bogus_field_returns_error, line_put, 'position', '1'
-    yield s.check_bogus_field_returns_error, line_put, 'caller_num', 'number'
+    yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'
+    yield s.check_bogus_field_returns_error, line_put, 'caller_id_name', 123456
 
 
 @fixtures.line()
@@ -76,8 +76,8 @@ def test_create_line_with_minimal_parameters():
                             'name': none(),
                             'protocol': none(),
                             'device_id': none(),
-                            'caller_name': none(),
-                            'caller_num': none(),
+                            'caller_id_name': none(),
+                            'caller_id_num': none(),
                             'provisioning_code': has_length(6),
                             'provisioning_extension': has_length(6)}
                            )
@@ -93,19 +93,25 @@ def test_create_line_with_all_parameters():
                             'name': none(),
                             'protocol': none(),
                             'device_id': none(),
-                            'caller_name': u"Fodé Sanderson",
-                            'caller_num': "1000",
+                            'caller_id_name': none(),
+                            'caller_id_num': none(),
                             'provisioning_code': "987654",
                             'provisioning_extension': "987654"}
                            )
 
     response = confd.lines.post(context=config.CONTEXT,
                                 position=2,
-                                caller_name=u"Fodé Sanderson",
-                                caller_num="1000",
                                 provisioning_code="987654")
 
     assert_that(response.item, expected)
+
+
+def test_create_line_with_caller_id_raises_error():
+    response = confd.lines.post(context=config.CONTEXT,
+                                caller_id_name="John Smith",
+                                caller_id_num="1000")
+
+    response.assert_status(400)
 
 
 @fixtures.line(provisioning_code="123456")
@@ -127,14 +133,12 @@ def test_update_all_parameters_on_line(line, context):
     url = confd.lines(line['id'])
     expected = has_entries({'context': context['name'],
                             'position': 2,
-                            'caller_name': u"Mamàsta Michel",
-                            'caller_num': "2000",
+                            'caller_id_name': none(),
+                            'caller_id_num': none(),
                             'provisioning_code': '234567'})
 
     response = url.put(context=context['name'],
                        position=2,
-                       caller_name=u"Mamàsta Michel",
-                       caller_num="2000",
                        provisioning_code='234567')
     response.assert_ok()
 
@@ -142,18 +146,11 @@ def test_update_all_parameters_on_line(line, context):
     assert_that(response.item, expected)
 
 
-@fixtures.line(caller_name=u"Fodé Sanderson", caller_num="1000")
-def test_update_null_parameters(line):
-    url = confd.lines(line['id'])
-    expected = has_entries({'caller_name': None,
-                            'caller_num': None})
-
-    response = url.put(caller_name=None,
-                       caller_num=None)
-    response.assert_ok()
-
-    response = url.get()
-    assert_that(response.item, expected)
+@fixtures.line()
+def test_update_caller_id_on_line_without_endpoint_raises_error(line):
+    response = confd.lines(line['id']).put(caller_id_name="John Smith",
+                                           caller_id_num="1000")
+    response.assert_status(400)
 
 
 @fixtures.line()
