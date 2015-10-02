@@ -41,7 +41,7 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, empty_post, 'context', 123
     yield s.check_bogus_field_returns_error, line_post, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_post, 'provisioning_code', 'number'
-    yield s.check_bogus_field_returns_error, line_post, 'position', '1'
+    yield s.check_bogus_field_returns_error, line_post, 'position', 'one'
 
 
 @fixtures.line()
@@ -52,7 +52,7 @@ def test_put_errors(line):
     yield s.check_bogus_field_returns_error, line_put, 'context', 123
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 'number'
-    yield s.check_bogus_field_returns_error, line_put, 'position', '1'
+    yield s.check_bogus_field_returns_error, line_put, 'position', 'one'
     yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'
     yield s.check_bogus_field_returns_error, line_put, 'caller_id_name', 123456
 
