@@ -2,18 +2,20 @@ from test_api import confd
 from contextlib import contextmanager
 
 
-def associate(user_id, line_id):
+def associate(user_id, line_id, check=True):
     response = confd.users(user_id).lines.post(line_id=line_id)
-    response.assert_ok()
+    if check:
+        response.assert_ok()
 
 
-def dissociate(user_id, line_id):
+def dissociate(user_id, line_id, check=True):
     response = confd.users(user_id).lines(line_id).delete()
-    response.assert_ok()
+    if check:
+        response.assert_ok()
 
 
 @contextmanager
-def user_and_line_associated(user, line):
-    associate(user['id'], line['id'])
+def user_and_line_associated(user, line, check=True):
+    associate(user['id'], line['id'], check)
     yield
-    dissociate(user['id'], line['id'])
+    dissociate(user['id'], line['id'], check)
