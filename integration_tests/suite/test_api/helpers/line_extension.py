@@ -21,18 +21,20 @@ from contextlib import contextmanager
 from test_api import confd
 
 
-def associate(line_id, extension_id):
+def associate(line_id, extension_id, check=True):
     response = confd.lines(line_id).extensions.post(extension_id=extension_id)
-    response.assert_ok()
+    if check:
+        response.assert_ok()
 
 
-def dissociate(line_id, extension_id):
+def dissociate(line_id, extension_id, check=True):
     response = confd.lines(line_id).extensions(extension_id).delete()
-    response.assert_ok()
+    if check:
+        response.assert_ok()
 
 
 @contextmanager
-def line_and_extension_associated(line, extension):
-    associate(line['id'], extension['id'])
+def line_and_extension_associated(line, extension, check=True):
+    associate(line['id'], extension['id'], check)
     yield
-    dissociate(line['id'], extension['id'])
+    dissociate(line['id'], extension['id'], check)
