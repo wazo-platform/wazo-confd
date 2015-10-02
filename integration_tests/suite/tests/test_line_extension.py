@@ -1,9 +1,8 @@
 from test_api.helpers.line import generate_line, delete_line
 from test_api.helpers.extension import generate_extension, delete_extension
-from test_api.helpers.line_extension import line_and_extension_associated as association
-from test_api.helpers.line_device import line_and_device_associated as l_d_association
 from test_api import scenarios as s
 from test_api import errors as e
+from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 
@@ -118,7 +117,7 @@ def test_associate_two_internal_extensions_to_same_line(first_extension, second_
 @fixtures.line()
 @fixtures.extension()
 def test_dissociate_line_and_extension(line, extension):
-    with association(line, extension, check=False):
+    with a.line_extension(line, extension, check=False):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_ok()
 
@@ -127,7 +126,7 @@ def test_dissociate_line_and_extension(line, extension):
 @fixtures.extension()
 @fixtures.device()
 def test_dissociate_line_associated_to_a_device(line, extension, device):
-    with association(line, extension), l_d_association(line, device):
+    with a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_status(400, e.resource_associated('Line', 'Device'))
 
@@ -135,6 +134,6 @@ def test_dissociate_line_associated_to_a_device(line, extension, device):
 @fixtures.line()
 @fixtures.extension()
 def test_delete_extension_associated_to_line(line, extension):
-    with association(line, extension):
+    with a.line_extension(line, extension):
         response = confd.extensions(extension['id']).delete()
         response.assert_match(400, e.resource_associated('Extension', 'Line'))

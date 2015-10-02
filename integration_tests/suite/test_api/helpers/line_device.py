@@ -16,8 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from contextlib import contextmanager
-
 from test_api.database import create_helper
 
 
@@ -31,10 +29,3 @@ def dissociate(line_id, device_id):
     database = create_helper()
     with database.queries() as queries:
         queries.dissociate_line_device(line_id, device_id)
-
-
-@contextmanager
-def line_and_device_associated(line, device):
-    associate(line['id'], device['id'])
-    yield
-    dissociate(line['id'], device['id'])

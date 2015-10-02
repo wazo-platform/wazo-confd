@@ -16,8 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from contextlib import contextmanager
-
 from test_api import confd
 
 
@@ -31,10 +29,3 @@ def dissociate(line_id, extension_id, check=True):
     response = confd.lines(line_id).extensions(extension_id).delete()
     if check:
         response.assert_ok()
-
-
-@contextmanager
-def line_and_extension_associated(line, extension, check=True):
-    associate(line['id'], extension['id'], check)
-    yield
-    dissociate(line['id'], extension['id'], check)

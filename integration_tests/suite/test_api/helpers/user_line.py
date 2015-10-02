@@ -1,5 +1,4 @@
 from test_api import confd
-from contextlib import contextmanager
 
 
 def associate(user_id, line_id, check=True):
@@ -12,10 +11,3 @@ def dissociate(user_id, line_id, check=True):
     response = confd.users(user_id).lines(line_id).delete()
     if check:
         response.assert_ok()
-
-
-@contextmanager
-def user_and_line_associated(user, line, check=True):
-    associate(user['id'], line['id'], check)
-    yield
-    dissociate(user['id'], line['id'], check)

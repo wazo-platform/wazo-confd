@@ -19,14 +19,12 @@
 
 from test_api import scenarios as s
 from test_api import errors as e
+from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 from test_api.helpers.user import generate_user
-from test_api.helpers.user_line import user_and_line_associated
-from test_api.helpers.line_extension import line_and_extension_associated
-from test_api.helpers.line_device import line_and_device_associated
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry, has_length
+from hamcrest import assert_that, equal_to, has_entries, has_entry
 
 FIELDS = ['firstname',
           'lastname',
@@ -84,9 +82,9 @@ class TestUserResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.Del
 @fixtures.extension()
 @fixtures.device()
 def test_updating_user_when_associated_to_user_and_line(user, line, extension, device):
-    with user_and_line_associated(user, line), \
-            line_and_extension_associated(line, extension), \
-            line_and_device_associated(line, device):
+    with a.user_line(user, line), \
+            a.line_extension(line, extension), \
+            a.line_device(line, device):
 
         response = confd.users(user['id']).put(firstname='foobar')
         response.assert_ok()

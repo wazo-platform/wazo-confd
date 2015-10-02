@@ -18,10 +18,9 @@
 
 from hamcrest import assert_that, has_items, has_entries
 
-from test_api.helpers.user_line import user_and_line_associated as u_l_association
-from test_api.helpers.line_extension import line_and_extension_associated as l_e_association
 from test_api import confd
 from test_api import fixtures
+from test_api import associations as a
 
 
 @fixtures.user()
@@ -50,7 +49,7 @@ def test_associate_extension_then_line_then_user(user, line, extension):
 @fixtures.line()
 @fixtures.extension()
 def test_dissociate_user_then_line_then_extension(user, line, extension):
-    with u_l_association(user, line, check=False), l_e_association(line, extension, check=False):
+    with a.user_line(user, line, check=False), a.line_extension(line, extension, check=False):
 
         response = confd.users(user['id']).lines(line['id']).delete()
         response.assert_ok()
@@ -63,7 +62,7 @@ def test_dissociate_user_then_line_then_extension(user, line, extension):
 @fixtures.line()
 @fixtures.extension()
 def test_dissociate_extension_then_line_then_user(user, line, extension):
-    with u_l_association(user, line, check=False), l_e_association(line, extension, check=False):
+    with a.user_line(user, line, check=False), a.line_extension(line, extension, check=False):
 
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_ok()
@@ -83,7 +82,7 @@ def test_get_line_extension_associations(user, line, internal, incall):
                                       'extension_id': incall['id']})
                          )
 
-    with u_l_association(user, line), l_e_association(line, internal), l_e_association(line, incall):
+    with a.user_line(user, line), a.line_extension(line, internal), a.line_extension(line, incall):
         response = confd.lines(line['id']).extensions.get()
         assert_that(response.items, expected)
 
@@ -96,7 +95,7 @@ def test_associate_line_and_incall(user, line, internal, incall):
     expected = has_entries({'line_id': line['id'],
                             'extension_id': incall['id']})
 
-    with u_l_association(user, line):
+    with a.user_line(user, line):
         response = confd.lines(line['id']).extensions.post(extension_id=incall['id'])
         assert_that(response.item, expected)
 
@@ -106,6 +105,6 @@ def test_associate_line_and_incall(user, line, internal, incall):
 @fixtures.extension(context='default')
 @fixtures.extension(context='from-extern')
 def test_dissociate_line_and_incall(user, line, internal, incall):
-    with u_l_association(user, line), l_e_association(line, incall, check=False):
+    with a.user_line(user, line), a.line_extension(line, incall, check=False):
         response = confd.lines(line['id']).extensions(incall['id']).delete()
         response.assert_ok()
