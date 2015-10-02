@@ -13,5 +13,6 @@ def delete_line(line_id, check=False):
         response.assert_ok()
 
 
-def generate_line():
-    return add_line(context=config.CONTEXT)
+def generate_line(**params):
+    params.setdefault('context', config.CONTEXT)
+    return add_line(**params)

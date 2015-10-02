@@ -65,7 +65,7 @@ def test_delete_errors(line):
 
 
 def test_create_line_with_fake_context():
-    response = confd.lines_sip.post(context='fakecontext')
+    response = confd.lines.post(context='fakecontext')
     response.assert_match(400, e.not_found('Context'))
 
 
@@ -117,11 +117,11 @@ def test_create_line_with_provisioning_code_already_taken(line):
 
 @fixtures.line()
 def test_update_line_with_fake_context(line):
-    response = confd.lines_sip(line['id']).put(context='fakecontext')
+    response = confd.lines(line['id']).put(context='fakecontext')
     response.assert_match(400, e.not_found('Context'))
 
 
-@fixtures.line(caller_name=u"Fodé Sanderson", caller_num="1000")
+@fixtures.line()
 @fixtures.context()
 def test_update_all_parameters_on_line(line, context):
     url = confd.lines(line['id'])
