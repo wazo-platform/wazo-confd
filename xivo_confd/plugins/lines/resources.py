@@ -53,8 +53,8 @@ class LineList(LineResource):
     parser.add_argument('context', required=True)
     parser.add_argument('provisioning_code', type=DigitStr(6))
     parser.add_argument('position', type=inputs.positive, default=1)
-    parser.add_argument('caller_id_name')
-    parser.add_argument('caller_id_num', type=DigitStr())
+    parser.add_argument('caller_id_name', store_missing=False)
+    parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
 
     def get(self):
         params = {key: request.args[key] for key in request.args}
