@@ -25,7 +25,6 @@ from xivo_confd.resources.cti_profiles import actions as cti_profiles_actions
 from xivo_confd.resources.devices import actions as devices_actions
 from xivo_confd.resources.extensions import actions as extensions_actions
 from xivo_confd.resources.infos import actions as infos_actions
-from xivo_confd.resources.lines import actions as lines_actions
 from xivo_confd.resources.queue_members import actions as queue_members_actions
 from xivo_confd.resources.users import actions as users_actions
 from xivo_confd.resources.voicemails import actions as voicemails_actions
@@ -48,7 +47,6 @@ class LegacyPlugins(object):
         self.load_resource(devices_actions, core)
         self.load_resource(extensions_actions, core)
         self.load_resource(infos_actions, core)
-        self.load_resource(lines_actions, core)
         self.load_resource(queue_members_actions, core)
         self.load_resource(users_actions, core)
         self.load_resource(voicemails_actions, core)

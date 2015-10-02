@@ -17,7 +17,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
+from flask import Blueprint
 
+from xivo_confd import config
 from xivo_confd.resources.line_extension import services as line_extension_services
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
@@ -71,7 +73,7 @@ class LineExtensionService(object):
 
 
 def load(core_rest_api):
-    line_blueprint = core_rest_api.blueprint('lines')
+    line_blueprint = Blueprint('lines', __name__, url_prefix='/%s/lines' % config.API_VERSION)
     extension_blueprint = core_rest_api.blueprint('extensions')
 
     document = core_rest_api.content_parser.document(
