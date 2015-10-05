@@ -76,7 +76,6 @@ def _create_user_in_database(user):
 def edit(user):
     validator.validate_edit(user)
     user_dao.edit(user)
-    update_voicemail_fullname(user)
     line_services.update_callerid(user)
     notifier.edited(user)
 
@@ -106,10 +105,3 @@ def delete_line(user):
         return
     else:
         line_services.delete(line)
-
-
-def update_voicemail_fullname(user):
-    if hasattr(user, 'voicemail_id') and user.voicemail_id is not None:
-        voicemail = voicemail_dao.get(user.voicemail_id)
-        voicemail.name = user.fullname
-        voicemail_dao.edit(voicemail)
