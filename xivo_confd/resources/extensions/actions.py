@@ -31,23 +31,7 @@ from xivo_confd.resources.extensions import validator, notifier
 
 
 class ExtensionService(CRUDService):
-
-    def __init__(self, dao, line_extension_dao, line_dao,
-                 validator, notifier):
-        super(ExtensionService, self).__init__(dao, validator, notifier)
-        self.line_extension_dao = line_extension_dao
-        self.line_dao = line_dao
-
-    def edit(self, extension):
-        self.validator.validate_edit(extension)
-        self.dao.edit(extension)
-        self.update_line(extension)
-        self.notifier.edited(extension)
-
-    def update_line(self, extension):
-        line_extension = self.line_extension_dao.find_by_extension_id(extension.id)
-        if line_extension:
-            self.line_dao.associate_extension(extension, line_extension.line_id)
+    pass
 
 
 def load(core_rest_api):
