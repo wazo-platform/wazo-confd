@@ -20,9 +20,9 @@ from xivo_dao.resources.incall.model import Incall
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.resources.user_line_extension import services as ule_services
 from xivo_confd.resources.line_extension import validator as line_extension_validator
 from xivo_confd.resources.line_device import validator as line_device_validator
 from xivo_confd.resources.extensions import validator as extension_validator
@@ -30,7 +30,7 @@ from xivo_confd.resources.extensions import validator as extension_validator
 
 def build_manager():
     incall = IncallAssociator(line_extension_validator, user_line_dao, incall_dao, extension_dao)
-    internal = InternalAssociator(ule_services,
+    internal = InternalAssociator(line_extension_dao,
                                   extension_validator,
                                   line_extension_validator,
                                   line_device_validator)
@@ -74,8 +74,8 @@ class AssociationManager(object):
 
 class InternalAssociator(object):
 
-    def __init__(self, ule_services, extension_validator, line_extension_validator, line_device_validator):
-        self.ule_services = ule_services
+    def __init__(self, line_extension_dao, extension_validator, line_extension_validator, line_device_validator):
+        self.line_extension_dao = line_extension_dao
         self.extension_validator = extension_validator
         self.line_extension_validator = line_extension_validator
         self.line_device_validator = line_device_validator
@@ -83,11 +83,11 @@ class InternalAssociator(object):
     def associate(self, line_extension):
         self.line_extension_validator.validate_line_not_associated_to_extension(line_extension)
         self.extension_validator.validate_extension_not_associated(line_extension.extension_id)
-        self.ule_services.associate_line_extension(line_extension)
+        self.line_extension_dao.associate(line_extension)
 
     def dissociate(self, line_extension):
         self.line_device_validator.validate_no_device(line_extension.line_id)
-        self.ule_services.dissociate_line_extension(line_extension)
+        self.line_extension_dao.dissociate(line_extension)
 
 
 class IncallAssociator(object):

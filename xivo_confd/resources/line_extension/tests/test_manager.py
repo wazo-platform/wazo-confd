@@ -37,7 +37,7 @@ class TestBuildManager(unittest.TestCase):
     @patch('xivo_confd.resources.line_extension.manager.extension_dao')
     @patch('xivo_confd.resources.line_extension.manager.incall_dao')
     @patch('xivo_confd.resources.line_extension.manager.user_line_dao')
-    @patch('xivo_confd.resources.line_extension.manager.ule_services')
+    @patch('xivo_confd.resources.line_extension.manager.line_extension_dao')
     @patch('xivo_confd.resources.line_extension.manager.context_dao')
     @patch('xivo_confd.resources.line_extension.manager.line_extension_validator')
     @patch('xivo_confd.resources.line_extension.manager.IncallAssociator')
@@ -49,7 +49,7 @@ class TestBuildManager(unittest.TestCase):
                            IncallAssociator,
                            line_extension_validator,
                            context_dao,
-                           ule_services,
+                           line_extension_dao,
                            user_line_dao,
                            incall_dao,
                            extension_dao,
@@ -66,7 +66,7 @@ class TestBuildManager(unittest.TestCase):
         AssociationManager.assert_called_once_with(context_dao, line_extension_validator, {
             'internal': internal_association, 'incall': incall_association})
 
-        InternalAssociator.assert_called_once_with(ule_services,
+        InternalAssociator.assert_called_once_with(line_extension_dao,
                                                    extension_validator,
                                                    line_extension_validator,
                                                    line_device_validator)
@@ -166,9 +166,9 @@ class TestInternalAssociator(unittest.TestCase):
         self.extension_validator = Mock()
         self.line_extension_validator = Mock()
         self.line_device_validator = Mock()
-        self.ule_dao = Mock()
+        self.line_extension_dao = Mock()
         self.line_extension = Mock(LineExtension, line_id=12, extension_id=15)
-        self.associator = InternalAssociator(self.ule_dao,
+        self.associator = InternalAssociator(self.line_extension_dao,
                                              self.extension_validator,
                                              self.line_extension_validator,
                                              self.line_device_validator)
@@ -186,7 +186,7 @@ class TestInternalAssociator(unittest.TestCase):
     def test_when_associating_then_creates_ule(self):
         self.associator.associate(self.line_extension)
 
-        self.ule_dao.associate_line_extension.assert_called_once_with(self.line_extension)
+        self.line_extension_dao.associate.assert_called_once_with(self.line_extension)
 
     def test_when_dissociating_then_validates_not_associated_to_device(self):
         self.associator.dissociate(self.line_extension)
@@ -196,7 +196,7 @@ class TestInternalAssociator(unittest.TestCase):
     def test_when_dissociating_then_deletes_ule(self):
         self.associator.dissociate(self.line_extension)
 
-        self.ule_dao.dissociate_line_extension.assert_called_once_with(self.line_extension)
+        self.line_extension_dao.dissociate.assert_called_once_with(self.line_extension)
 
 
 class TestIncallAssociator(unittest.TestCase):

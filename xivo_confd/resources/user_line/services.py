@@ -18,7 +18,6 @@
 from xivo_dao.resources.user_line import dao
 
 from xivo_confd.resources.user_line import validator, notifier
-from xivo_confd.resources.user_line_extension import services as ule_service
 
 
 def get_by_user_id_and_line_id(user_id, line_id):
@@ -37,7 +36,7 @@ def associate(user_line):
     validator.validate_association(user_line)
 
     _adjust_optional_parameters(user_line)
-    ule_service.associate_user_line(user_line)
+    dao.associate(user_line)
 
     notifier.associated(user_line)
     return user_line
@@ -45,7 +44,7 @@ def associate(user_line):
 
 def dissociate(user_line):
     validator.validate_dissociation(user_line)
-    ule_service.dissociate_user_line(user_line)
+    dao.dissociate(user_line)
     notifier.dissociated(user_line)
 
 

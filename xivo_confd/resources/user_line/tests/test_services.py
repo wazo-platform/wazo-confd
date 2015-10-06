@@ -57,7 +57,7 @@ class TestUserLineAssociate(TestCase):
 
     @patch('xivo_dao.resources.user_line.dao.find_main_user_line', Mock(return_value=None))
     @patch('xivo_confd.resources.user_line.notifier.associated')
-    @patch('xivo_confd.resources.user_line_extension.services.associate_user_line')
+    @patch('xivo_dao.resources.user_line.dao.associate')
     @patch('xivo_confd.resources.user_line.validator.validate_association')
     def test_associate(self,
                        validate_association,
@@ -75,7 +75,7 @@ class TestUserLineAssociate(TestCase):
 
     @patch('xivo_dao.resources.user_line.dao.find_main_user_line')
     @patch('xivo_confd.resources.user_line.notifier.associated')
-    @patch('xivo_confd.resources.user_line_extension.services.associate_user_line')
+    @patch('xivo_dao.resources.user_line.dao.associate')
     @patch('xivo_confd.resources.user_line.validator.validate_association')
     def test_associate_main_user(self,
                                  validate_association,
@@ -99,7 +99,7 @@ class TestUserLineAssociate(TestCase):
 
     @patch('xivo_dao.resources.user_line.dao.find_main_user_line')
     @patch('xivo_confd.resources.user_line.notifier.associated')
-    @patch('xivo_confd.resources.user_line_extension.services.associate_user_line')
+    @patch('xivo_dao.resources.user_line.dao.associate')
     @patch('xivo_confd.resources.user_line.validator.validate_association')
     def test_associate_with_main_user_already_associated_to_this_line(self,
                                                                       validate_association,
@@ -128,7 +128,7 @@ class TestUserLineAssociate(TestCase):
 class TestUserLineDissociate(TestCase):
 
     @patch('xivo_confd.resources.user_line.notifier.dissociated')
-    @patch('xivo_confd.resources.user_line_extension.services.dissociate_user_line')
+    @patch('xivo_dao.resources.user_line.dao.dissociate')
     @patch('xivo_confd.resources.user_line.validator.validate_dissociation')
     def test_dissociate(self,
                         validate_dissociation,
