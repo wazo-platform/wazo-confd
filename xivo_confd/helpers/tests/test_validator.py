@@ -21,11 +21,11 @@ from hamcrest import assert_that, raises, calling, equal_to
 from mock import Mock, sentinel
 
 from xivo_dao.helpers.new_model import NewModel
-from xivo_dao.helpers.exception import InputError, NotFoundError
+from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
 from xivo_confd.helpers.validator import RequiredFields, GetResource, \
     ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
-    ValidationGroup, AssociationValidator, MissingFields
+    ValidationGroup, AssociationValidator, MissingFields, UniqueField
 
 
 class TestRequiredFields(unittest.TestCase):
@@ -108,6 +108,28 @@ class TestFindResource(unittest.TestCase):
         self.validator.validate(model)
 
         self.dao_find.assert_called_once_with(model.field)
+
+
+class TestUniqueField(unittest.TestCase):
+
+    def setUp(self):
+        self.dao_find = Mock()
+        self.validator = UniqueField('field', self.dao_find)
+
+    def test_given_model_with_field_not_found_then_validation_passes(self):
+        model = Mock(field=sentinel.field)
+
+        self.dao_find.return_value = None
+
+        self.validator.validate(model)
+
+    def test_given_model_with_field_was_found_then_validation_fails(self):
+        model = Mock(field=sentinel.field)
+
+        self.dao_find.return_value = model
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(ResourceError))
 
 
 class TestResourceExists(unittest.TestCase):

@@ -67,6 +67,21 @@ class GetResource(Validator):
             raise errors.param_not_found(self.field, self.resource, **metadata)
 
 
+class UniqueField(Validator):
+
+    def __init__(self, field, dao_find, resource='Resource'):
+        self.field = field
+        self.dao_find = dao_find
+        self.resource = resource
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        found = self.dao_find(value)
+        if found is not None:
+            metadata = {self.field: value}
+            raise errors.resource_exists(self.resource, **metadata)
+
+
 class FindResource(Validator):
 
     def __init__(self, field, dao_find, resource='Resource'):
