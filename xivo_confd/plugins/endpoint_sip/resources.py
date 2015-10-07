@@ -19,7 +19,7 @@
 from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
-    option_list
+    option
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 
 
@@ -43,7 +43,8 @@ sip_parser.add_argument('secret',
 sip_parser.add_argument('type', default='friend')
 sip_parser.add_argument('host', default='dynamic')
 sip_parser.add_argument('options',
-                        type=option_list,
+                        type=option,
+                        action='append',
                         store_missing=False)
 
 

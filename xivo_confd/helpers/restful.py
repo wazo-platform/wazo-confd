@@ -23,18 +23,15 @@ from xivo_confd.helpers.common import handle_error
 from xivo_confd.authentication.confd_auth import ConfdAuth
 
 
-def option_list(value):
-    if not isinstance(value, list):
-        raise ValueError("options must be a list of paired string tuples")
-    for pair in value:
-        if not isinstance(pair, list):
-            raise ValueError("options must be a list of paired string tuples")
-        if len(pair) != 2:
-            raise ValueError("item '{}' is not a pair of strings".format(pair))
-        for i in pair:
-            if not isinstance(i, (str, unicode)):
-                raise ValueError("value '{}' is not a string".format(i))
-    return value
+def option(option):
+    if not isinstance(option, list):
+        raise ValueError("item '{}' must be a pair of strings".format(option))
+    if len(option) != 2:
+        raise ValueError("item '{}' must be a pair of strings".format(option))
+    for i in option:
+        if not isinstance(i, (str, unicode)):
+            raise ValueError("value '{}' is not a string".format(i))
+    return option
 
 
 class DigitStr(object):
