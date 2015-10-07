@@ -28,7 +28,7 @@ class Plugin(object):
 
         api.add_resource(SipItem,
                          '/endpoints/sip/<int:id>',
-                         endpoint='lines',
+                         endpoint='endpoint_sip',
                          resource_class_args=(service,)
                          )
         api.add_resource(SipList,
