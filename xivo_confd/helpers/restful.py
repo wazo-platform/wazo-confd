@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import url_for
-from flask_restful import Resource, Api, fields
+from flask import url_for, request
+from flask_restful import Resource, Api, fields, marshal
 
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.authentication.confd_auth import ConfdAuth
@@ -47,6 +47,45 @@ class ConfdApi(Api):
 
 class ConfdResource(Resource):
     method_decorators = [ConfdAuth().login_required]
+
+
+class ListResource(ConfdResource):
+
+    def __init__(self, service):
+        super(ListResource, self).__init__()
+        self.service = service
+
+    def get(self):
+        params = {key: request.args[key] for key in request.args}
+        total, items = self.service.search(params)
+        return {'total': total,
+                'items': [marshal(item, self.fields) for item in items]}
+
+    def post(self):
+        form = self.parser.parse_args()
+        model = self.model(**form)
+        model = self.service.create(model)
+        return marshal(model, self.fields)
+
+
+class ItemResource(ConfdResource):
+
+    def get(self, id):
+        model = self.service.get(id)
+        return marshal(model, self.fields)
+
+    def put(self, id):
+        model = self.service.get(id)
+        form = self.parser.parse_args()
+        for name, value in form.iteritems():
+            setattr(model, name, value)
+        self.service.edit(model)
+        return '', 204
+
+    def delete(self, id):
+        model = self.service.get(id)
+        self.service.delete(model)
+        return '', 204
 
 
 class FieldList(fields.Raw):

@@ -17,10 +17,10 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from flask import request
-from flask_restful import reqparse, inputs, fields, marshal, marshal_with
+from flask_restful import reqparse, inputs, fields
 
-from xivo_confd.helpers.restful import ConfdResource, FieldList, Link, DigitStr
+from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
+    ListResource, ItemResource
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
@@ -40,14 +40,11 @@ line_fields = {
 }
 
 
-class LineResource(ConfdResource):
+class LineList(ListResource):
 
-    def __init__(self, service):
-        super(LineResource, self).__init__()
-        self.service = service
+    model = Line
 
-
-class LineList(LineResource):
+    fields = line_fields
 
     parser = reqparse.RequestParser()
     parser.add_argument('context', required=True)
@@ -56,21 +53,10 @@ class LineList(LineResource):
     parser.add_argument('caller_id_name', store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
 
-    def get(self):
-        params = {key: request.args[key] for key in request.args}
-        total, items = self.service.search(params)
-        return {'total': total,
-                'items': [marshal(l, line_fields) for l in items]}
 
-    @marshal_with(line_fields)
-    def post(self):
-        form = self.parser.parse_args()
-        line = Line(**form)
-        line = self.service.create(line)
-        return line
+class LineItem(ItemResource):
 
-
-class LineItem(LineResource):
+    fields = line_fields
 
     parser = reqparse.RequestParser()
     parser.add_argument('context', store_missing=False)
@@ -78,20 +64,3 @@ class LineItem(LineResource):
     parser.add_argument('position', type=inputs.positive, store_missing=False)
     parser.add_argument('caller_id_name', store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
-
-    @marshal_with(line_fields)
-    def get(self, id):
-        return self.service.get(id)
-
-    def put(self, id):
-        line = self.service.get(id)
-        form = self.parser.parse_args()
-        for name, value in form.iteritems():
-            setattr(line, name, value)
-        self.service.edit(line)
-        return '', 204
-
-    def delete(self, id):
-        line = self.service.get(id)
-        self.service.delete(line)
-        return '', 204
