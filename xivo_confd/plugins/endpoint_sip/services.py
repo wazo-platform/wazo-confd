@@ -16,11 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.resources.sip_endpoint import dao
+from xivo_dao.resources.endpoint_sip import dao
 
 from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.sip_endpoint.validator import build_validator
-from xivo_confd.plugins.sip_endpoint.notifier import build_notifier
+from xivo_confd.plugins.endpoint_sip.validator import build_validator
+from xivo_confd.plugins.endpoint_sip.notifier import build_notifier
 
 
 def build_service():

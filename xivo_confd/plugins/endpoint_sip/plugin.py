@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.plugins.sip_endpoint.services import build_service
-from xivo_confd.plugins.sip_endpoint.resources import SipItem, SipList
+from xivo_confd.plugins.endpoint_sip.services import build_service
+from xivo_confd.plugins.endpoint_sip.resources import SipItem, SipList
 
 
 class Plugin(object):

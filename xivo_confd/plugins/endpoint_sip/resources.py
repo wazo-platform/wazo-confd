@@ -30,7 +30,7 @@ sip_fields = {
     'type': fields.String,
     'host': fields.String,
     'options': fields.List(fields.List(fields.String)),
-    'links': FieldList(Link('sip_endpoints'))
+    'links': FieldList(Link('endpoint_sip'))
 }
 
 sip_parser = reqparse.RequestParser()

@@ -19,7 +19,7 @@
 from xivo_confd.helpers.sysconfd_connector import new_client
 from xivo_confd.helpers import bus_manager
 
-from xivo_bus.resources.sip_endpoint.event import CreateSipEndpointEvent, \
+from xivo_bus.resources.endpoint_sip.event import CreateSipEndpointEvent, \
     EditSipEndpointEvent, DeleteSipEndpointEvent
 
 
