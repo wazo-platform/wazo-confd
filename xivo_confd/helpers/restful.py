@@ -81,6 +81,10 @@ class ListResource(ConfdResource):
 
 class ItemResource(ConfdResource):
 
+    def __init__(self, service):
+        super(ItemResource, self).__init__()
+        self.service = service
+
     def get(self, id):
         model = self.service.get(id)
         return marshal(model, self.fields)
