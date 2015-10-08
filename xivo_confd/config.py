@@ -82,7 +82,8 @@ DEFAULT_CONFIG = {
     'extra_plugins': [],
     'enabled_plugins': ['legacy_plugins',
                         'lines_plugin',
-                        'endpoint_sip_plugin'],
+                        'endpoint_sip_plugin',
+                        'lines_sip_plugin'],
 }
 
 
