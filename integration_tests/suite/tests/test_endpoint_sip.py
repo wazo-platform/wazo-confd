@@ -22,8 +22,8 @@ from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
 
-from hamcrest import assert_that, has_entries, has_length, contains, has_items
-
+from hamcrest import assert_that, has_entries, has_length, has_items, \
+    instance_of
 
 ALL_OPTIONS = [
     ['buggymwi', '1'],
@@ -41,11 +41,10 @@ ALL_OPTIONS = [
     ['unsolicited_mailbox', '1000@default'],
     ['fromuser', 'field-user'],
     ['useclientcode', '1'],
-    ['call-limit', '0'],
+    ['call-limit', '1'],
     ['progressinband', 'yes'],
     ['transport', 'udp'],
     ['directmedia', 'update'],
-    ['host', 'dynamic'],
     ['promiscredir', '1'],
     ['allowoverlap', '1'],
     ['dtmfmode', 'info'],
@@ -53,7 +52,6 @@ ALL_OPTIONS = [
     ['usereqphone', '1'],
     ['qualify', '500'],
     ['trustrpid', '1'],
-    ['context', 'default'],
     ['timert1', '1'],
     ['session-refresher', 'uas'],
     ['allowsubscribe', '1'],
@@ -62,9 +60,7 @@ ALL_OPTIONS = [
     ['callcounter', '0'],
     ['callerid', '"customcallerid" <1234>'],
     ['encryption', '1'],
-    ['secret', '4J34TG'],
     ['use_q850_reason', '1'],
-    ['type', 'friend'],
     ['disallowed_methods', 'disallowsip'],
     ['rfc2833compensate', '1'],
     ['g726nonstandard', '1'],
@@ -88,12 +84,27 @@ ALL_OPTIONS = [
     ['allow', 'g723'],
     ['allow', 'gsm'],
     ['setvar', 'setvar'],
-    ['ccnr_available_timer', '900'],
-    ['ccbs_available_timer', '900'],
-    ['cc_agent_policy', 'generic'],
-    ['cc_offer_timer', '30'],
-    ['cc_recall_timer', '20'],
-    ['cc_monitor_policy', 'generic'],
+    ['accountcode', 'accountcode'],
+    ['md5secret', 'abcdefg'],
+    ['mohinterpret', 'mohinterpret'],
+    ['vmexten', '1000'],
+    ['callingpres', '1'],
+    ['parkinglot', '700'],
+    ['fullcontact', 'fullcontact'],
+    ['fullname', 'fullname'],
+    ['defaultip', '127.0.0.1'],
+    ['qualifyfreq', '5000'],
+    ['protocol', 'sip'],
+    ['regexten', 'regexten'],
+    ['regseconds', '60'],
+    ['regserver', '127.0.0.1'],
+    ['ipaddr', '127.0.0.1'],
+    ['lastms', '500'],
+    ['cid_number', '0123456789'],
+    ['callbackextension', '0123456789'],
+    ['port', '10000'],
+    ['outboundproxy', '127.0.0.1'],
+    ['remotesecret', 'remotesecret'],
 ]
 
 
@@ -114,16 +125,16 @@ def test_put_errors(sip):
     for check in error_checks(url):
         yield check
 
+    yield s.check_bogus_field_returns_error, url, 'username', None
+    yield s.check_bogus_field_returns_error, url, 'secret', None
+    yield s.check_bogus_field_returns_error, url, 'type', None
+    yield s.check_bogus_field_returns_error, url, 'host', None
+
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'username', None
     yield s.check_bogus_field_returns_error, url, 'username', 123
-    yield s.check_bogus_field_returns_error, url, 'secret', None
     yield s.check_bogus_field_returns_error, url, 'secret', 123
-    yield s.check_bogus_field_returns_error, url, 'type', None
     yield s.check_bogus_field_returns_error, url, 'type', 123
-    yield s.check_bogus_field_returns_error, url, 'host', None
-    yield s.check_bogus_field_returns_error, url, 'host', 123
     yield s.check_bogus_field_returns_error, url, 'options', [['bogus', 'bogus']]
 
 
@@ -135,11 +146,11 @@ def test_delete_errors(sip):
 
 
 def test_create_sip_with_minimal_parameters():
-    expected = has_entries({'username': has_length(6),
-                            'secret': has_length(6),
+    expected = has_entries({'username': has_length(8),
+                            'secret': has_length(8),
                             'type': 'friend',
                             'host': 'dynamic',
-                            'options': contains()
+                            'options': instance_of(list),
                             })
 
     response = confd.endpoints.sip.post()
@@ -149,14 +160,14 @@ def test_create_sip_with_minimal_parameters():
 def test_create_sip_with_all_parameters():
     expected = has_entries({'username': 'myusername',
                             'secret': 'mysecret',
-                            'type': 'static',
+                            'type': 'peer',
                             'host': '127.0.0.1',
                             'options': has_items(*ALL_OPTIONS)
                             })
 
     response = confd.endpoints.sip.post(username="myusername",
                                         secret="mysecret",
-                                        type="static",
+                                        type="peer",
                                         host="127.0.0.1",
                                         options=ALL_OPTIONS)
 
@@ -175,20 +186,19 @@ def test_update_required_parameters(sip):
 
     response = url.put(username="updatedusername",
                        secret="updatedsecret",
-                       type="static",
+                       type="peer",
                        host="127.0.0.1")
     response.assert_ok()
 
     response = url.get()
     assert_that(response.item, has_entries({'username': 'updatedusername',
                                             'secret': 'updatedsecret',
-                                            'type': 'static',
+                                            'type': 'peer',
                                             'host': '127.0.0.1',
-                                            'options': contains(),
                                             }))
 
 
-@fixtures.sip(options=[["allow", "gsm"], ["nat", "rport,comedia"]])
+@fixtures.sip(options=[["allow", "gsm"], ["nat", "force_rport,comedia"]])
 def test_update_options(sip):
     options = [
         ["allow", "g723"],
@@ -200,7 +210,7 @@ def test_update_options(sip):
     response.assert_ok()
 
     response = url.get()
-    assert_that(response.item, has_entries({'options': has_items(*options)}))
+    assert_that(response.item['options'], has_items(*options))
 
 
 @fixtures.sip()
