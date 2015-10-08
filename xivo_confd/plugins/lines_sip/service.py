@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers import errors
+
 from xivo_confd.plugins.lines_sip.model import LineSip
 
 from xivo_confd.plugins.lines.service import build_service as build_line_service
@@ -30,8 +32,16 @@ class LineSipService(object):
 
     def get(self, id):
         line = self.line_service.get(id)
-        sip = self.sip_service.get(line.protocolid)
-        return LineSip.from_line_and_sip(line, sip)
+        if line.protocol != 'sip':
+            raise errors.not_found('LineSIP', id=id)
+        return LineSip.from_line_and_sip(line, line.sip_endpoint)
+
+    def search(self, params):
+        total, items = self.line_service.search(params)
+        items = (LineSip.from_line_and_sip(line, line.sip_endpoint)
+                 for line in items
+                 if line.protocol == 'sip')
+        return total, items
 
     def create(self, line_sip):
         sip = self.create_sip(line_sip)
