@@ -19,16 +19,30 @@
 from functools import partial
 
 from xivo_confd.helpers.validator import ValidationGroup, RequiredFields, Optional, UniqueField
-from xivo_dao.resources.sip_endpoint import dao
+from xivo_dao.resources.endpoint_sip import dao
+
+
+class UsernameChanged(UniqueField):
+
+    def __init__(self, dao_find, dao_get):
+        super(UsernameChanged, self).__init__('username', dao_find, 'SIPEndpoint')
+        self.dao_get = dao_get
+
+    def validate(self, model):
+        existing = self.dao_get(model.id)
+        if existing.username != model.username:
+            super(UsernameChanged, self).validate(model)
 
 
 def build_validator():
     return ValidationGroup(
         create=[
             Optional('username',
-                     UniqueField('username', partial(dao.find_by, 'username')))
+                     UniqueField('username',
+                                 partial(dao.find_by, 'username')))
         ],
         edit=[
             RequiredFields('username', 'secret', 'type', 'host'),
-            UniqueField('username', partial(dao.find_by, 'username'))
+            UsernameChanged(partial(dao.find_by, 'username'),
+                            dao.get),
         ])
