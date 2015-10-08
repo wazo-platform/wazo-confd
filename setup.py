@@ -42,10 +42,10 @@ setup(
         'xivo_confd.plugins': [
             'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
             'legacy_plugins = xivo_confd.plugins.legacy_plugins:LegacyPlugins',
-            'lines_plugin = xivo_confd.plugins.lines.plugin:Plugin',
+            'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
             'endpoint_sip_plugin = xivo_confd.plugins.endpoint_sip.plugin:Plugin',
-            'lines_sip_plugin = xivo_confd.plugins.lines_sip.plugin:Plugin',
-            'user_lines_plugin = xivo_confd.plugins.user_lines.plugin:Plugin',
+            'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
+            'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',
         ]
     }
 )

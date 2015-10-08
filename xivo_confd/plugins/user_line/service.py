@@ -19,7 +19,7 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_confd.plugins.user_lines import validator, notifier
+from xivo_confd.plugins.user_line import validator, notifier
 
 
 class UserLineService(object):

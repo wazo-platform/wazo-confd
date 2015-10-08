@@ -20,7 +20,7 @@ from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
     ListResource, ItemResource
-from xivo_confd.plugins.lines_sip.model import LineSip
+from xivo_confd.plugins.line_sip.model import LineSip
 
 
 fields = {

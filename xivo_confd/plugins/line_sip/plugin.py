@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.plugins.lines_sip.service import build_service
-from xivo_confd.plugins.lines_sip.resource import LineSipItem, LineSipList
+from xivo_confd.plugins.line_sip.service import build_service
+from xivo_confd.plugins.line_sip.resource import LineSipItem, LineSipList
 
 
 class Plugin(object):

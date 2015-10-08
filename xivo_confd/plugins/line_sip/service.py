@@ -18,9 +18,9 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.plugins.lines_sip.model import LineSip
+from xivo_confd.plugins.line_sip.model import LineSip
 
-from xivo_confd.plugins.lines.service import build_service as build_line_service
+from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 
 

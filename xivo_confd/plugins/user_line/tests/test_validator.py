@@ -21,7 +21,7 @@ import unittest
 from xivo_dao.helpers.exception import InputError
 from xivo_dao.helpers.exception import ResourceError
 from xivo_dao.helpers.exception import NotFoundError
-from xivo_confd.plugins.user_lines import validator
+from xivo_confd.plugins.user_line import validator
 from xivo_dao.resources.user_line.model import UserLine
 
 

@@ -22,7 +22,7 @@ from mock import Mock
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.helpers.exception import ResourceError
 
-from xivo_confd.plugins.lines.validator import ProvCodeAvailable, ProvCodeChanged
+from xivo_confd.plugins.line.validator import ProvCodeAvailable, ProvCodeChanged
 
 
 class TestProvCodeAvailble(unittest.TestCase):

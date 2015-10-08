@@ -23,7 +23,7 @@ from xivo_bus.resources.line.event import CreateLineEvent, \
     EditLineEvent, DeleteLineEvent
 
 from xivo_confd.helpers.sysconfd_connector import SysconfdClient
-from xivo_confd.plugins.lines.notifier import LineNotifier
+from xivo_confd.plugins.line.notifier import LineNotifier
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 

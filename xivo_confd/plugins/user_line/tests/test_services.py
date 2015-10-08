@@ -20,7 +20,7 @@ from hamcrest import assert_that, equal_to
 
 from xivo_dao.tests.test_case import TestCase
 
-from xivo_confd.plugins.user_lines import service as user_line_services
+from xivo_confd.plugins.user_line import service as user_line_services
 
 
 class TestUserLineService(TestCase):

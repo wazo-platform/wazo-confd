@@ -16,18 +16,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.resources.line import dao
-
-from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.lines.validator import build_validator
-from xivo_confd.plugins.lines.notifier import build_notifier
+from xivo_confd.plugins.user_line.service import build_service
+from xivo_confd.plugins.user_line.resource import UserLineList, UserLineItem
 
 
-class LineService(CRUDService):
-    pass
+class Plugin(object):
 
+    def load(self, core):
+        api = core.api
+        service = build_service()
 
-def build_service():
-    return LineService(dao,
-                       build_validator(),
-                       build_notifier())
+        api.add_resource(UserLineItem,
+                         '/users/<int:user_id>/lines/<int:line_id>',
+                         endpoint='user_lines',
+                         resource_class_args=(service,)
+                         )
+        api.add_resource(UserLineList,
+                         '/users/<int:user_id>/lines',
+                         resource_class_args=(service,)
+                         )
