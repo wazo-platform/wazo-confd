@@ -38,7 +38,7 @@ sip_parser.add_argument('username',
                         type=inputs.regex(r"^[a-zA-Z0-9]+$"),
                         store_missing=False)
 sip_parser.add_argument('secret',
-                        type=inputs.regex(r"^\w+$"),
+                        type=inputs.regex(r"^[a-zA-Z0-9]+$"),
                         store_missing=False)
 sip_parser.add_argument('type',
                         choices=('friend', 'peer', 'user'),
