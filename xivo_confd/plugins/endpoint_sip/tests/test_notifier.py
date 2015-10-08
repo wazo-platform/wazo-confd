@@ -19,11 +19,11 @@
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.sip_endpoint.event import CreateSipEndpointEvent, \
+from xivo_bus.resources.endpoint_sip.event import CreateSipEndpointEvent, \
     EditSipEndpointEvent, DeleteSipEndpointEvent
 
 from xivo_confd.helpers.sysconfd_connector import SysconfdClient
-from xivo_confd.plugins.lines.notifier import SipEndpointNotifier
+from xivo_confd.plugins.endpoint_sip.notifier import SipEndpointNotifier
 
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 
