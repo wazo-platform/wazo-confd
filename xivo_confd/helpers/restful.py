@@ -115,15 +115,15 @@ class FieldList(fields.Raw):
 
 class Link(fields.Raw):
 
-    def __init__(self, endpoint, field_name='id', **kwargs):
+    def __init__(self, resource, route=None, field='id', target=None, **kwargs):
         super(Link, self).__init__(**kwargs)
-        self.endpoint = endpoint
-        self.field_name = field_name
+        self.resource = resource
+        self.route = route or resource
+        self.field = field
+        self.target = target or field
 
     def output(self, key, obj):
-        value = getattr(obj, self.field_name)
-        options = {self.field_name: value,
-                   '_external': True}
-        url = url_for(self.endpoint, **options)
-        return {'rel': self.endpoint,
-                'href': url}
+        value = getattr(obj, self.field)
+        options = {self.target: value, '_external': True}
+        url = url_for(self.route, **options)
+        return {'rel': self.resource, 'href': url}
