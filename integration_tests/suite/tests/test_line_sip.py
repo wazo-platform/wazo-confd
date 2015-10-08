@@ -39,13 +39,12 @@ def test_post_errors():
     line_post = confd.lines_sip(context=config.CONTEXT, device_slot=1).post
 
     yield s.check_missing_required_field_returns_error, empty_post, 'context'
-    yield s.check_missing_required_field_returns_error, empty_post, 'device_slot'
 
     yield s.check_bogus_field_returns_error, line_post, 'context', 123
-    yield s.check_bogus_field_returns_error, line_post, 'device_slot', '1'
+    yield s.check_bogus_field_returns_error, line_post, 'device_slot', 'slot'
     yield s.check_bogus_field_returns_error, line_post, 'callerid', 'invalidcallerid'
-    yield s.check_bogus_field_returns_error, line_post, 'secret', 123
-    yield s.check_bogus_field_returns_error, line_post, 'username', 123
+    yield s.check_bogus_field_returns_error, line_post, 'secret', [{}]
+    yield s.check_bogus_field_returns_error, line_post, 'username', [{}]
 
 
 @fixtures.line_sip()
