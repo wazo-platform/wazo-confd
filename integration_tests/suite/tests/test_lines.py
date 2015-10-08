@@ -25,7 +25,8 @@ from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
 
-from hamcrest import assert_that, has_entries, none, has_length
+from hamcrest import assert_that, has_entries, none, has_length, has_items, \
+    has_entry, contains
 
 
 def test_get_errors():
@@ -62,6 +63,39 @@ def test_delete_errors(line):
     line_url = confd.lines(line['id'])
     line_url.delete()
     yield s.check_resource_not_found, line_url.get, 'Line'
+
+
+@fixtures.line(context=config.CONTEXT)
+def test_get(line):
+    expected = has_entries({'context': config.CONTEXT,
+                            'position': 1,
+                            'device_slot': 1,
+                            'name': none(),
+                            'protocol': none(),
+                            'device_id': none(),
+                            'caller_id_name': none(),
+                            'caller_id_num': none(),
+                            'provisioning_code': has_length(6),
+                            'provisioning_extension': has_length(6)}
+                           )
+
+    response = confd.lines(line['id']).get()
+    assert_that(response.item, expected)
+
+
+@fixtures.line()
+@fixtures.line()
+def test_search(line1, line2):
+    expected = has_items(has_entry('id', line1['id']),
+                         has_entry('id', line2['id']))
+
+    response = confd.lines.get()
+    assert_that(response.items, expected)
+
+    expected = contains(has_entry('id', line1['id']))
+
+    response = confd.lines.get(search=line1['provisioning_code'])
+    assert_that(response.items, expected)
 
 
 def test_create_line_with_fake_context():

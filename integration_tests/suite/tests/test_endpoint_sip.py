@@ -23,7 +23,7 @@ from test_api import scenarios as s
 from test_api import errors as e
 
 from hamcrest import assert_that, has_entries, has_length, has_items, \
-    instance_of
+    instance_of, contains, has_entry
 
 ALL_OPTIONS = [
     ['buggymwi', '1'],
@@ -143,6 +143,34 @@ def test_delete_errors(sip):
     url = confd.endpoints.sip(sip['id'])
     url.delete()
     yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+
+
+@fixtures.sip()
+def test_get(sip):
+    expected = has_entries({'username': has_length(8),
+                            'secret': has_length(8),
+                            'type': 'friend',
+                            'host': 'dynamic',
+                            'options': instance_of(list),
+                            })
+
+    response = confd.endpoints.sip(sip['id']).get()
+    assert_that(response.item, expected)
+
+
+@fixtures.sip()
+@fixtures.sip()
+def test_list(sip1, sip2):
+    expected = has_items(has_entry('id', sip1['id']),
+                         has_entry('id', sip2['id']))
+
+    response = confd.endpoints.sip.get()
+    assert_that(response.items, expected)
+
+    expected = contains(has_entry('id', sip1['id']))
+
+    response = confd.endpoints.sip.get(search=sip1['username'])
+    assert_that(response.items, expected)
 
 
 def test_create_sip_with_minimal_parameters():
