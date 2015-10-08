@@ -30,7 +30,6 @@ from xivo_confd.resources.users import actions as users_actions
 from xivo_confd.resources.voicemails import actions as voicemails_actions
 from xivo_confd.resources.line_extension import actions as line_extension_actions
 from xivo_confd.resources.user_cti_profile import actions as user_cti_profile_actions
-from xivo_confd.resources.user_line import actions as user_line_actions
 from xivo_confd.resources.user_voicemail import actions as user_voicemail_actions
 from xivo_confd.resources.func_keys import actions as func_keys_actions
 
@@ -52,7 +51,6 @@ class LegacyPlugins(object):
         self.load_resource(voicemails_actions, core)
         self.load_resource(line_extension_actions, core)
         self.load_resource(user_cti_profile_actions, core)
-        self.load_resource(user_line_actions, core)
         self.load_resource(user_voicemail_actions, core)
         self.load_resource(func_keys_actions, core)
 
