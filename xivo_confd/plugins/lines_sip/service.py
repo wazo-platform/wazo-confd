@@ -70,7 +70,7 @@ class LineSipService(object):
         line = self.line_service.get(line_sip.id)
         sip = self.sip_service.get(line.protocolid)
         self.sip_service.delete(sip)
-        self.sip_service.delete(line)
+        self.line_service.delete(line)
 
 
 def build_service():
