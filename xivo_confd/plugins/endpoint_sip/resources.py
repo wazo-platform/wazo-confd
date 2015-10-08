@@ -40,7 +40,9 @@ sip_parser.add_argument('username',
 sip_parser.add_argument('secret',
                         type=inputs.regex(r"^\w+$"),
                         store_missing=False)
-sip_parser.add_argument('type', default='friend')
+sip_parser.add_argument('type',
+                        choices=('friend', 'peer', 'user'),
+                        default='friend')
 sip_parser.add_argument('host', default='dynamic')
 sip_parser.add_argument('options',
                         type=option,
