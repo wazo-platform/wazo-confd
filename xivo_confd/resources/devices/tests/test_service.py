@@ -132,7 +132,7 @@ class TestLineDeviceUpdater(unittest.TestCase):
                       'configregistrar': 'registrar'}
         parameters.update(kwargs)
         line = Line(**parameters)
-        self.line_dao.find_all_by_device_id.return_value = [line]
+        self.line_dao.find_all_by.return_value = [line]
         return line
 
     def build_extension(self, **kwargs):
@@ -150,14 +150,14 @@ class TestLineDeviceUpdater(unittest.TestCase):
         return line_extension
 
     def test_given_no_lines_then_lines_on_device_are_emptied(self):
-        self.line_dao.find_all_by_device_id.return_value = []
+        self.line_dao.find_all_by.return_value = []
 
         self.service.update(self.device)
 
         self.device_dao.update_lines.assert_called_once_with(self.device, [])
 
     def test_given_no_lines_then_resets_device_to_autoprov(self):
-        self.line_dao.find_all_by_device_id.return_value = []
+        self.line_dao.find_all_by.return_value = []
 
         self.service.update(self.device)
 
@@ -179,7 +179,7 @@ class TestLineDeviceUpdater(unittest.TestCase):
         self.device_dao.update_lines.assert_called_once_with(self.device, [expected_converter])
 
         self.device_dao.get_registrar.assert_called_once_with(line.configregistrar)
-        self.line_dao.find_all_by_device_id.assert_called_once_with(line.device_id)
+        self.line_dao.find_all_by.assert_called_once_with('device', line.device_id)
 
     def test_given_sip_line_without_extension_then_does_not_update_lines(self):
         self.build_line(protocol='sip')
@@ -201,6 +201,6 @@ class TestLineDeviceUpdater(unittest.TestCase):
         self.device_dao.update_lines.assert_called_once_with(self.device, [expected_converter])
 
         self.device_dao.get_registrar.assert_called_once_with(line.configregistrar)
-        self.line_dao.find_all_by_device_id.assert_called_once_with(line.device_id)
+        self.line_dao.find_all_by.assert_called_once_with('device', line.device_id)
         self.line_extension_dao.find_by_line_id.assert_called_once_with(line.id)
         self.extension_dao.get.assert_called_once_with(extension.id)
