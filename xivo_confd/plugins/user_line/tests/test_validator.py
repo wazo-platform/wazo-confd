@@ -91,7 +91,7 @@ class TestValidator(unittest.TestCase):
 
         validator.validate_association(user_line)
         user_get.assert_called_once_with(user_line.user_id)
-        line_get.assert_called_once_with(user_line.line_id)
+        line_get.assert_called_with(user_line.line_id)
         user_line_find_all_by_user_id.assert_called_once_with(user_line.user_id)
 
     @patch('xivo_dao.resources.user_line.dao.line_has_secondary_user')
