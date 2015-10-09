@@ -37,14 +37,14 @@ class TestProvCodeAvailble(unittest.TestCase):
 
         self.validator.validate(line)
 
-        self.dao.find_by.assert_called_once_with("provisioningid", 123456)
+        self.dao.find_by.assert_called_once_with(provisioningid=123456)
 
     def test_given_line_with_same_code_exists_then_validation_fails(self):
         line = Mock(Line, provisioning_code="123456", provisioningid=123456)
         self.dao.find_by.return_value = line
 
         self.assertRaises(ResourceError, self.validator.validate, line)
-        self.dao.find_by.assert_called_once_with("provisioningid", 123456)
+        self.dao.find_by.assert_called_once_with(provisioningid=123456)
 
 
 class TestProvCodeChanged(unittest.TestCase):
@@ -71,7 +71,7 @@ class TestProvCodeChanged(unittest.TestCase):
         self.validator.validate(new_line)
 
         self.dao.get.assert_called_once_with(new_line.id)
-        self.dao.find_by.assert_called_once_with("provisioningid", 234567)
+        self.dao.find_by.assert_called_once_with(provisioningid=234567)
 
     def test_given_code_has_changed_and_same_code_exists_then_validation_fails(self):
         old_line = Mock(Line, id=1, provisioning_code="123456", provisioningid=123456)
@@ -84,4 +84,4 @@ class TestProvCodeChanged(unittest.TestCase):
         self.assertRaises(ResourceError, self.validator.validate, new_line)
 
         self.dao.get.assert_called_once_with(new_line.id)
-        self.dao.find_by.assert_called_once_with("provisioningid", 234567)
+        self.dao.find_by.assert_called_once_with(provisioningid=234567)

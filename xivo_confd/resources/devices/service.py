@@ -109,7 +109,7 @@ class FuncKeyDeviceUpdater(object):
             self.device_dao.update_funckeys(device, funckeys)
 
     def user_line_pairs_for_device(self, device):
-        lines = self.line_dao.find_all_by('device', device.id)
+        lines = self.line_dao.find_all_by(device=device.id)
         for line in lines:
             main_user_line = self.user_line_dao.find_main_user_line(line.id)
             user = self.user_dao.get(main_user_line.user_id)
@@ -146,7 +146,7 @@ class LineDeviceUpdater(object):
 
     def get_converters(self, device):
         converters = []
-        lines = self.line_dao.find_all_by('device', device.id)
+        lines = self.line_dao.find_all_by(device=device.id)
         for line in lines:
             converter = self.build_line_converter(line)
             if converter:
@@ -249,7 +249,7 @@ class DeviceValidator(object):
             self._check_mac_already_exists(device)
 
     def _check_device_is_not_linked_to_line(self, device):
-        linked_lines = self.line_dao.find_all_by('device', device.id)
+        linked_lines = self.line_dao.find_all_by(device=device.id)
         if linked_lines:
             ids = tuple(l.id for l in linked_lines)
             raise errors.resource_associated('Device', 'Line',

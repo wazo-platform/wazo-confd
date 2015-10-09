@@ -24,7 +24,12 @@ from xivo_confd.plugins.line.notifier import build_notifier
 
 
 class LineService(CRUDService):
-    pass
+
+    def find_by(self, **criteria):
+        return self.dao.find_by(**criteria)
+
+    def find_all_by(self, **criteria):
+        return self.dao.find_all_by(**criteria)
 
 
 def build_service():

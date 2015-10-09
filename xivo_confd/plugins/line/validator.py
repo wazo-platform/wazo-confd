@@ -28,7 +28,7 @@ class ProvCodeAvailable(Validator):
         self.dao = dao
 
     def validate(self, line):
-        existing = self.dao.find_by('provisioningid', (line.provisioningid))
+        existing = self.dao.find_by(provisioningid=line.provisioningid)
         if existing:
             raise errors.resource_exists('Line', provisioning_code=line.provisioning_code)
 
