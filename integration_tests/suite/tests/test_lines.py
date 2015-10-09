@@ -129,13 +129,13 @@ def test_create_line_with_all_parameters():
                             'device_id': none(),
                             'caller_id_name': none(),
                             'caller_id_num': none(),
-                            'provisioning_code': "987654",
-                            'provisioning_extension': "987654"}
+                            'provisioning_code': "887865",
+                            'provisioning_extension': "887865"}
                            )
 
     response = confd.lines.post(context=config.CONTEXT,
                                 position=2,
-                                provisioning_code="987654")
+                                provisioning_code="887865")
 
     assert_that(response.item, expected)
 
@@ -148,10 +148,10 @@ def test_create_line_with_caller_id_raises_error():
     response.assert_status(400)
 
 
-@fixtures.line(provisioning_code="123456")
+@fixtures.line(provisioning_code="135246")
 def test_create_line_with_provisioning_code_already_taken(line):
     response = confd.lines.post(context=config.CONTEXT,
-                                provisioning_code="123456")
+                                provisioning_code="135246")
     response.assert_status(400, re.compile("provisioning_code"))
 
 
@@ -169,11 +169,11 @@ def test_update_all_parameters_on_line(line, context):
                             'position': 2,
                             'caller_id_name': none(),
                             'caller_id_num': none(),
-                            'provisioning_code': '234567'})
+                            'provisioning_code': '243546'})
 
     response = url.put(context=context['name'],
                        position=2,
-                       provisioning_code='234567')
+                       provisioning_code='243546')
     response.assert_ok()
 
     response = url.get()
