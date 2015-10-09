@@ -202,15 +202,13 @@ class TestCreate(TestCase):
 
 class TestEdit(TestCase):
 
-    @patch('xivo_confd.resources.lines.services.update_callerid')
     @patch('xivo_confd.resources.users.notifier.edited')
     @patch('xivo_dao.resources.user.dao.edit')
     @patch('xivo_confd.resources.users.validator.validate_edit')
     def test_edit(self,
                   user_validate_edit,
                   user_dao_edit,
-                  user_notifier_edited,
-                  line_services_update_callerid):
+                  user_notifier_edited):
         user = User(id=1, firstname='user', lastname='toto')
 
         user_services.edit(user)
@@ -218,7 +216,6 @@ class TestEdit(TestCase):
         user_validate_edit.assert_called_once_with(user)
         user_dao_edit.assert_called_once_with(user)
         user_notifier_edited.assert_called_once_with(user)
-        line_services_update_callerid.assert_called_once_with(user)
 
 
 class TestDelete(TestCase):
