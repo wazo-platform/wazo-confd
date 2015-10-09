@@ -21,6 +21,7 @@ from contextlib import contextmanager
 from test_api.helpers import user_line as ul
 from test_api.helpers import line_extension as le
 from test_api.helpers import line_device as ld
+from test_api.helpers import line_endpoint_sip as l_endpoint_sip
 
 
 @contextmanager
@@ -46,3 +47,10 @@ def line_device(line, device, check=True):
     except Exception as e:
         if check:
             raise e
+
+
+@contextmanager
+def line_endpoint_sip(line, sip, check=True):
+    l_endpoint_sip.associate(line['id'], sip['id'], check)
+    yield
+    l_endpoint_sip.dissociate(line['id'], sip['id'], check)
