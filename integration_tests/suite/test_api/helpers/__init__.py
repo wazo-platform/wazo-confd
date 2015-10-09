@@ -1,5 +1,6 @@
 import user
 import line
+import line_sip
 import extension
 import device
 import voicemail
