@@ -123,7 +123,10 @@ class Link(fields.Raw):
         self.target = target or field
 
     def output(self, key, obj):
-        value = getattr(obj, self.field)
+        if isinstance(obj, dict):
+            value = obj.get(self.field)
+        else:
+            value = getattr(obj, self.field)
         options = {self.target: value, '_external': True}
         url = url_for(self.route, **options)
         return {'rel': self.resource, 'href': url}
