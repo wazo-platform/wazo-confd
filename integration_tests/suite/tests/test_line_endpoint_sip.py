@@ -114,3 +114,21 @@ def test_dissociate(line, sip):
 def test_dissociate_when_not_associated(line, sip):
     response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
     response.assert_status(400)
+
+
+@fixtures.line()
+@fixtures.sip()
+@fixtures.user()
+def test_dissociate_when_associated_to_user(line, sip, user):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line):
+        response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
+        response.assert_match(400, e.resource_associated('Line', 'User'))
+
+
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_dissociate_when_associated_to_extension(line, sip, extension):
+    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension):
+        response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
+        response.assert_match(400, e.resource_associated('Line', 'Extension'))

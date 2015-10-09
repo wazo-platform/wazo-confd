@@ -69,6 +69,14 @@ def validate_associated(line_extension):
                                          extension_id=line_extension.extension_id)
 
 
+def validate_line_has_endpoint(line_extension):
+    line = line_dao.get(line_extension.line_id)
+    if line.endpoint is None or line.endpoint_id is None:
+        raise errors.missing_association('Line',
+                                         'Endpoint',
+                                         line_id=line.id)
+
+
 def _all_line_extensions(line_id):
     return (line_extension_dao.find_all_by_line_id(line_id) +
             incall_dao.find_all_line_extensions_by_line_id(line_id))

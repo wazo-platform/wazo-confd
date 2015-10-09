@@ -4,7 +4,7 @@ from hamcrest import assert_that, contains, has_entries
 
 from test_api import scenarios as s
 from test_api.helpers.user import generate_user, delete_user
-from test_api.helpers.line import generate_line, delete_line
+from test_api.helpers.line_sip import generate_line, delete_line
 from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
@@ -41,7 +41,7 @@ class TestUserLineAssociation(s.AssociationScenarios, s.DissociationCollectionSc
 
 
 @fixtures.user
-@fixtures.line
+@fixtures.line_sip
 def test_associate_user_line(user, line):
     response = confd.users(user['id']).lines.put(line_id=line['id'])
     response.assert_ok()
@@ -50,7 +50,7 @@ def test_associate_user_line(user, line):
 @fixtures.user()
 @fixtures.user()
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 def test_associate_muliple_users_to_line(user1, user2, user3, line):
     response = confd.users(user1['id']).lines.post(line_id=line['id'])
     response.assert_ok()
@@ -63,7 +63,7 @@ def test_associate_muliple_users_to_line(user1, user2, user3, line):
 
 
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 def test_get_line_associated_to_user(user, line):
     expected = contains(has_entries({'user_id': user['id'],
                                      'line_id': line['id'],
@@ -76,7 +76,7 @@ def test_get_line_associated_to_user(user, line):
 
 
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 def test_associate_when_user_already_associated_to_same_line(user, line):
     with a.user_line(user, line):
         response = confd.users(user['id']).lines.post(line_id=line['id'])
@@ -84,8 +84,8 @@ def test_associate_when_user_already_associated_to_same_line(user, line):
 
 
 @fixtures.user()
-@fixtures.line()
-@fixtures.line()
+@fixtures.line_sip()
+@fixtures.line_sip()
 def test_associate_when_user_already_associated_to_another_line(user, first_line, second_line):
     with a.user_line(user, first_line):
         response = confd.users(user['id']).lines.post(line_id=first_line['id'])
@@ -93,8 +93,25 @@ def test_associate_when_user_already_associated_to_another_line(user, first_line
 
 
 @fixtures.user()
+@fixtures.line()
+def test_associate_user_to_line_without_endpoint(user, line):
+    response = confd.users(user['id']).lines.post(line_id=line['id'])
+    response.assert_match(400, e.missing_association('Line', 'Endpoint'))
+
+
 @fixtures.user()
 @fixtures.line()
+@fixtures.sip()
+def test_associate_user_to_line_with_endpoint(user, line, sip):
+    with a.line_endpoint_sip(line, sip):
+        response = confd.users(user['id']).lines.post(line_id=line['id'])
+        assert_that(response.item, has_entries({'user_id': user['id'],
+                                                'line_id': line['id']}))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
 def test_dissociate_second_user_then_first(first_user, second_user, line):
     with a.user_line(first_user, line, check=False), \
             a.user_line(second_user, line, check=False):
@@ -107,7 +124,7 @@ def test_dissociate_second_user_then_first(first_user, second_user, line):
 
 @fixtures.user()
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 def test_dissociate_second_user_before_first(first_user, second_user, line):
     with a.user_line(first_user, line), a.user_line(second_user, line):
         response = confd.users(first_user['id']).lines(line['id']).delete()
@@ -115,7 +132,7 @@ def test_dissociate_second_user_before_first(first_user, second_user, line):
 
 
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 @fixtures.device()
 def test_dissociate_user_line_when_device_is_associated(user, line, device):
     with a.user_line(user, line), a.line_device(line, device):
@@ -124,7 +141,7 @@ def test_dissociate_user_line_when_device_is_associated(user, line, device):
 
 
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 def test_delete_user_when_user_and_line_associated(user, line):
     with a.user_line(user, line):
         response = confd.users(user['id']).delete()

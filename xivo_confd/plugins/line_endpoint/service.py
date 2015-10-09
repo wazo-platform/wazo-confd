@@ -16,14 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from collections import namedtuple
-
 from xivo_dao.helpers import errors
 
 from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
-
-LineEndpointSip = namedtuple('LineEndpointSip', ['line_id', 'sip_id'])
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 
 class LineEndpointService(object):
@@ -73,14 +71,31 @@ class LineEndpointService(object):
         self.line_service.edit(line)
 
     def dissociate(self, line, sip):
+        self.validate_line(line, sip)
+        line.endpoint = None
+        line.endpoint_id = None
+        self.line_service.edit(line)
+
+    def validate_line(self, line, sip):
         if line.endpoint != 'sip' and line.endpoint_id != sip.id:
             raise errors.resource_not_associated('Line', 'Endpoint',
                                                  line_id=line.id,
                                                  endpoint='sip',
                                                  endpoint_id=sip.id)
-        line.endpoint = None
-        line.endpoint_id = None
-        self.line_service.edit(line)
+
+        user_lines = user_line_dao.find_all_by_line_id(line.id)
+        if user_lines:
+            user_ids = ','.join(str(ul.user_id) for ul in user_lines)
+            raise errors.resource_associated('Line', 'User',
+                                             line_id=line.id,
+                                             user_ids=user_ids)
+
+        line_extensions = line_extension_dao.find_all_by_line_id(line.id)
+        if line_extensions:
+            extension_ids = ','.join(str(le.extension_id) for le in line_extensions)
+            raise errors.resource_associated('Line', 'Extension',
+                                             line_id=line.id,
+                                             extension_ids=extension_ids)
 
 
 def build_service():

@@ -29,6 +29,7 @@ def validate_association(user_line):
     _validate_invalid_parameters(user_line)
     _validate_user_id(user_line)
     _validate_line_id(user_line)
+    _validate_line_has_endpoint(user_line)
     _validate_user_not_associated_with_line(user_line)
 
 
@@ -87,6 +88,12 @@ def _validate_user_not_associated_with_line(user_line):
                                          'Line',
                                          user_id=user_line.user_id,
                                          line_id=user_line.line_id)
+
+
+def _validate_line_has_endpoint(user_line):
+    line = line_dao.get(user_line.line_id)
+    if line.endpoint is None or line.endpoint_id is None:
+        raise errors.missing_association('Line', 'Endpoint', line_id=line.id)
 
 
 def _is_allowed_to_dissociate(user_line):

@@ -82,6 +82,7 @@ class InternalAssociator(object):
 
     def associate(self, line_extension):
         self.line_extension_validator.validate_line_not_associated_to_extension(line_extension)
+        self.line_extension_validator.validate_line_has_endpoint(line_extension)
         self.extension_validator.validate_extension_not_associated(line_extension.extension_id)
         self.line_extension_dao.associate(line_extension)
 
