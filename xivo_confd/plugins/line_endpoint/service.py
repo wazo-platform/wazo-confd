@@ -98,7 +98,7 @@ class LineEndpointService(object):
                                              extension_ids=extension_ids)
 
 
-def build_service():
-    line_service = build_line_service()
-    sip_service = build_sip_service()
+def build_service(provd_client):
+    line_service = build_line_service(provd_client)
+    sip_service = build_sip_service(provd_client)
     return LineEndpointService(line_service, sip_service)

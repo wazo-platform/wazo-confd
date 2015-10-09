@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_confd.resources.devices import builder as device_builder
+
 from xivo_dao.resources.endpoint_sip import dao
 
 from xivo_confd.helpers.resource import CRUDService
@@ -23,7 +25,22 @@ from xivo_confd.plugins.endpoint_sip.validator import build_validator
 from xivo_confd.plugins.endpoint_sip.notifier import build_notifier
 
 
-def build_service():
-    return CRUDService(dao,
-                       build_validator(),
-                       build_notifier())
+class SipEndpointService(CRUDService):
+
+    def __init__(self, dao, validator, notifier, device_updater):
+        super(SipEndpointService, self).__init__(dao, validator, notifier)
+        self.device_updater = device_updater
+
+    def edit(self, sip):
+        super(SipEndpointService, self).edit(sip)
+        self.device_updater.update_for_endpoint_sip(sip)
+
+
+def build_service(provd_client):
+    device_dao = device_builder.build_dao(provd_client)
+    device_updater = device_builder.build_device_updater(device_dao)
+
+    return SipEndpointService(dao,
+                              build_validator(),
+                              build_notifier(),
+                              device_updater)

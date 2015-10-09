@@ -73,6 +73,6 @@ class LineSipService(object):
         self.line_service.delete(line)
 
 
-def build_service():
-    return LineSipService(build_line_service(),
-                          build_sip_service())
+def build_service(provd_client):
+    return LineSipService(build_line_service(provd_client),
+                          build_sip_service(provd_client))

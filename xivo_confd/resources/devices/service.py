@@ -87,6 +87,11 @@ class DeviceUpdater(object):
             device = self.device_dao.get(device_id)
             self.update_device(device)
 
+    def update_for_endpoint_sip(self, sip):
+        line = self.line_dao.find_by(protocol='sip', protocolid=sip.id)
+        if line:
+            self.update_for_line(line)
+
     def update_device(self, device):
         self.line_updater.update(device)
         self.funckey_updater.update(device)

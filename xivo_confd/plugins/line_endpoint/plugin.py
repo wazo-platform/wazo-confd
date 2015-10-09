@@ -26,7 +26,9 @@ class Plugin(object):
 
     def load(self, core):
         api = core.api
-        service = build_service()
+        provd_client = core.provd_client()
+
+        service = build_service(provd_client)
 
         api.add_resource(LineEndpointAssociation,
                          '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',

@@ -21,9 +21,14 @@ from xivo_dao.resources.line import dao
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.plugins.line.validator import build_validator
 from xivo_confd.plugins.line.notifier import build_notifier
+from xivo_confd.resources.devices import builder as device_builder
 
 
 class LineService(CRUDService):
+
+    def __init__(self, dao, validator, notifier, device_updater):
+        super(LineService, self).__init__(dao, validator, notifier)
+        self.device_updater = device_updater
 
     def find_by(self, **criteria):
         return self.dao.find_by(**criteria)
@@ -31,8 +36,17 @@ class LineService(CRUDService):
     def find_all_by(self, **criteria):
         return self.dao.find_all_by(**criteria)
 
+    def edit(self, line):
+        super(LineService, self).edit(line)
+        self.device_updater.update_for_line(line)
 
-def build_service():
+
+def build_service(provd_client):
+
+    device_dao = device_builder.build_dao(provd_client)
+    device_updater = device_builder.build_device_updater(device_dao)
+
     return LineService(dao,
                        build_validator(),
-                       build_notifier())
+                       build_notifier(),
+                       device_updater)
