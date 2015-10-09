@@ -219,15 +219,11 @@ class TestIncallAssociator(unittest.TestCase):
         expected_incall = Incall(destination='user',
                                  destination_id=main_user_line.user_id,
                                  extension_id=self.line_extension.extension_id)
-        new_incall = self.incall_dao.create.return_value
 
         self.associator.associate(self.line_extension)
 
         self.user_line_dao.find_main_user_line.assert_called_once_with(self.line_extension.line_id)
         self.incall_dao.create.assert_called_once_with(expected_incall)
-        self.extension_dao.associate_destination.assert_called_once_with(self.line_extension.extension_id,
-                                                                         'incall',
-                                                                         new_incall.id)
 
     def test_when_dissociating_then_deletes_incall(self):
         incall = self.incall_dao.find_by_extension_id.return_value = Mock(Incall)
@@ -236,8 +232,3 @@ class TestIncallAssociator(unittest.TestCase):
 
         self.incall_dao.find_by_extension_id.assert_called_once_with(self.line_extension.extension_id)
         self.incall_dao.delete.assert_called_once_with(incall)
-
-    def test_when_dissociating_then_dissociates_extension(self):
-        self.associator.dissociate(self.line_extension)
-
-        self.extension_dao.dissociate_extension.assert_called_once_with(self.line_extension.extension_id)

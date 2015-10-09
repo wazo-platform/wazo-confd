@@ -106,10 +106,8 @@ class IncallAssociator(object):
         main_user_line = self.user_line_dao.find_main_user_line(line_extension.line_id)
         incall = Incall.user_destination(main_user_line.user_id,
                                          line_extension.extension_id)
-        created_incall = self.incall_dao.create(incall)
-        self.extension_dao.associate_destination(line_extension.extension_id, 'incall', created_incall.id)
+        self.incall_dao.create(incall)
 
     def dissociate(self, line_extension):
         incall = self.incall_dao.find_by_extension_id(line_extension.extension_id)
         self.incall_dao.delete(incall)
-        self.extension_dao.dissociate_extension(line_extension.extension_id)
