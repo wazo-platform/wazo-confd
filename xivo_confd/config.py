@@ -85,7 +85,8 @@ DEFAULT_CONFIG = {
                         'endpoint_sip_plugin',
                         'line_sip_plugin',
                         'user_line_plugin',
-                        'line_extension_plugin'],
+                        'line_extension_plugin',
+                        'line_endpoint_plugin'],
 }
 
 
