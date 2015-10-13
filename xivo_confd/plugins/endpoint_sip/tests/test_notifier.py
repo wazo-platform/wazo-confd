@@ -30,7 +30,7 @@ from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'dird': [],
-                     'ipbx': ['sip reload'],
+                     'ipbx': ['sip reload', 'dialplan reload'],
                      'agentbus': []}
 
 

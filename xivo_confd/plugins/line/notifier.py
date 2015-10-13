@@ -32,7 +32,7 @@ class LineNotifier(object):
     def send_sysconfd_handlers(self):
         handlers = {'ctibus': [],
                     'dird': [],
-                    'ipbx': ['sip reload'],
+                    'ipbx': ['sip reload', 'dialplan reload'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
