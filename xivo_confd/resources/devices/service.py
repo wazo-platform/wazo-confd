@@ -38,7 +38,13 @@ class DeviceService(CRUDService):
 
     def reset_autoprov(self, device):
         self.dao.reset_autoprov(device)
-        self.line_dao.reset_device(device.id)
+        self.reset_line(device)
+
+    def reset_line(self, device):
+        line = self.line_dao.find_by(device=device.id)
+        if line:
+            line.device_id = None
+            self.line_dao.edit(line)
 
 
 class LineDeviceAssociationService(object):
