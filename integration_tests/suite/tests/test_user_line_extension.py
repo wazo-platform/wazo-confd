@@ -145,3 +145,25 @@ def test_update_device_associated_to_endpoint(provd, user, line, sip, extension,
         sip_line = provd_config['raw_config']['sip_lines']['1']
         assert_that(sip_line, has_entries({'username': 'myusername',
                                            'password': 'mysecret'}))
+
+
+@fixtures.user(firstname="John", lastname="Smith")
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_caller_name_on_line(user, line, sip, extension):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
+                                                'caller_id_num': extension['exten']}))
+
+
+@fixtures.user(caller_id='"John Smith" <1000>')
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_caller_id_on_line(user, line, sip, extension):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
+                                                'caller_id_num': '1000'}))
