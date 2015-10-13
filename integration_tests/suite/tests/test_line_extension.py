@@ -125,8 +125,9 @@ def test_associate_line_without_endpoint(line, extension):
 @fixtures.sip()
 @fixtures.extension()
 def test_associate_line_with_endpoint(line, sip, extension):
-    with a.line_endpoint_sip(line, sip):
-        response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
+    with a.line_endpoint_sip(line, sip, check=False):
+        url = confd.lines(line['id']).extensions
+        response = url.post(extension_id=extension['id'])
         assert_that(response.item, has_entries({'line_id': line['id'],
                                                 'extension_id': extension['id']}))
 

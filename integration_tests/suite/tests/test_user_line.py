@@ -103,7 +103,7 @@ def test_associate_user_to_line_without_endpoint(user, line):
 @fixtures.line()
 @fixtures.sip()
 def test_associate_user_to_line_with_endpoint(user, line, sip):
-    with a.line_endpoint_sip(line, sip):
+    with a.line_endpoint_sip(line, sip, check=False):
         response = confd.users(user['id']).lines.post(line_id=line['id'])
         assert_that(response.item, has_entries({'user_id': user['id'],
                                                 'line_id': line['id']}))
