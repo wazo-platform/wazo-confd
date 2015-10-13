@@ -32,7 +32,7 @@ class LineSipService(object):
 
     def get(self, id):
         line = self.line_service.get(id)
-        if line.protocol != 'sip':
+        if line.sip_endpoint is None:
             raise errors.not_found('LineSIP', id=id)
         return LineSip.from_line_and_sip(line, line.sip_endpoint)
 
@@ -40,12 +40,16 @@ class LineSipService(object):
         total, items = self.line_service.search(params)
         items = (LineSip.from_line_and_sip(line, line.sip_endpoint)
                  for line in items
-                 if line.protocol == 'sip')
+                 if line.sip_endpoint is not None)
         return total, items
 
     def create(self, line_sip):
         sip = self.create_sip(line_sip)
-        line = self.create_line(line_sip, sip)
+        try:
+            line = self.create_line(line_sip, sip)
+        except Exception:
+            self.sip_service.delete(sip)
+            raise
         return LineSip.from_line_and_sip(line, sip)
 
     def create_sip(self, line_sip):
@@ -69,8 +73,8 @@ class LineSipService(object):
     def delete(self, line_sip):
         line = self.line_service.get(line_sip.id)
         sip = self.sip_service.get(line.protocolid)
-        self.sip_service.delete(sip)
         self.line_service.delete(line)
+        self.sip_service.delete(sip)
 
 
 def build_service(provd_client):

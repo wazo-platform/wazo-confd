@@ -41,7 +41,7 @@ class LineSip(object):
     @classmethod
     def from_line_and_sip(cls, line, sip):
         return cls(id=line.id,
-                   context=sip.context,
+                   context=line.context,
                    username=sip.username,
                    secret=sip.secret,
                    callerid=sip.callerid,
