@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, none
 
 from mock import Mock, sentinel
 from xivo_confd.resources.devices.service import DeviceService, DeviceValidator, SearchEngine, LineDeviceUpdater, DeviceUpdater, LineDeviceAssociationService
@@ -63,9 +63,12 @@ class TestDeviceService(unittest.TestCase):
 
     def test_when_resetting_to_autoprov_then_resets_line_associated_to_device(self):
         device = Device(id=sentinel.device_id)
+        line = self.line_dao.find_by.return_value
+
         self.service.reset_autoprov(device)
 
-        self.line_dao.reset_device.assert_called_once_with(sentinel.device_id)
+        self.line_dao.edit.assert_called_once_with(line)
+        assert_that(line.device_id, none())
 
 
 class TestLineDeviceAssociationService(unittest.TestCase):
