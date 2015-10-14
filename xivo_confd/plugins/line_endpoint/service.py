@@ -70,18 +70,18 @@ class LineEndpointService(object):
         line.endpoint_id = sip.id
         self.line_service.edit(line)
 
-    def dissociate(self, line, sip):
-        self.validate_line(line, sip)
+    def dissociate(self, line, sip_id):
+        self.validate_line(line, sip_id)
         line.endpoint = None
         line.endpoint_id = None
         self.line_service.edit(line)
 
-    def validate_line(self, line, sip):
-        if line.endpoint != 'sip' and line.endpoint_id != sip.id:
+    def validate_line(self, line, sip_id):
+        if line.endpoint != 'sip' and line.endpoint_id != sip_id:
             raise errors.resource_not_associated('Line', 'Endpoint',
                                                  line_id=line.id,
                                                  endpoint='sip',
-                                                 endpoint_id=sip.id)
+                                                 endpoint_id=sip_id)
 
         user_lines = user_line_dao.find_all_by_line_id(line.id)
         if user_lines:
