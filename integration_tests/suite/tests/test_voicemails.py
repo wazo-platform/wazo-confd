@@ -6,6 +6,7 @@ from test_api import scenarios as s
 from test_api import errors as e
 
 from test_api.helpers import voicemail as vm_helper
+from test_api.helpers import context as context_helper
 
 from hamcrest import assert_that, has_items, contains, has_entries
 
@@ -119,7 +120,7 @@ def test_create_minimal_voicemail():
 
 def test_create_voicemails_same_number_different_contexts():
     number, context = vm_helper.new_number_and_context('vmctx1')
-    other_context = vm_helper.new_context('vmctx2')
+    other_context = context_helper.new_context('vmctx2')
 
     response = confd.voicemails.post(name='samenumber1',
                                      number=number,

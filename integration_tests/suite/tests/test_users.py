@@ -78,7 +78,7 @@ class TestUserResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.Del
 
 
 @fixtures.user()
-@fixtures.line()
+@fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
 def test_updating_user_when_associated_to_user_and_line(user, line, extension, device):

@@ -209,10 +209,11 @@ class LineSIPConverter(LineConverter):
         self.extension = extension
 
     def build(self):
-        slot = {'auth_username': self.line.name,
-                'username': self.line.name,
-                'password': self.line.secret,
-                'display_name': self.line.extract_displayname(),
+        sip = self.line.sip_endpoint
+        slot = {'auth_username': sip.username,
+                'username': sip.username,
+                'password': sip.secret,
+                'display_name': self.line.caller_id_name,
                 'number': self.extension.exten,
                 'registrar_ip': self.registrar['registrar_main'],
                 'proxy_ip': self.registrar['proxy_main']}

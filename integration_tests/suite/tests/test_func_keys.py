@@ -20,7 +20,7 @@ class TestFuncKey(unittest.TestCase):
         self.device = self.setup_device(self.user['id'], '1000')
 
     def setup_device(self, user_id, exten):
-        line = helpers.line.generate_line()
+        line = helpers.line_sip.generate_line()
         extension = helpers.extension.add_extension(exten=exten,
                                                     context='default')
         device = helpers.device.generate_device()

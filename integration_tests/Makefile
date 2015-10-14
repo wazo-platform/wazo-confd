@@ -1,4 +1,4 @@
-.PHONY: test-image test-setup distclean
+.PHONY: test-setup distclean
 
 PROVD_DIR=../../xivo-provisioning
 MANAGE_DB_DIR=../../xivo-manage-db/

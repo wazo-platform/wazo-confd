@@ -67,5 +67,11 @@ sysconfd:
 
 # Activate confd plugins
 # This is the recommended way to add plugins.
-# enabled_plugins:
-#     - plugin_list
+enabled_plugins:
+   - legacy_plugins
+   - line_plugin
+   - endpoint_sip_plugin
+   - line_sip_plugin
+   - user_line_plugin
+   - line_extension_plugin
+   - line_endpoint_plugin

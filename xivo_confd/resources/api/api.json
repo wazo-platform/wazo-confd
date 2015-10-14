@@ -492,6 +492,216 @@
                 }
             }
         },
+        "/endpoints/sip": {
+            "get": {
+                "operationId": "list_endpoints_sip",
+                "summary": "List SIP endpoints",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SIP endpoint list",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSipItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_endpoint_sip",
+                "summary": "Create SIP endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "SIP Endpoint to create",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "SIP endpoint created",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/endpoints/sip/{sip_id}": {
+            "get": {
+                "operationId": "get_endpoint_sip",
+                "summary": "Get SIP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SIP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_endpoint_sip",
+                "summary": "Update SIP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_endpoint_sip",
+                "summary": "Delete SIP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/endpoints/sip/{sip_id}/lines": {
+            "get": {
+                "operationId": "get_endpoint_sip_line",
+                "summary": "Get Line associated to SIP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between SIP Endpoint and Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpointSip"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/extensions": {
             "get": {
                 "operationId": "list_extensions",
@@ -836,7 +1046,7 @@
         },
         "/funckeys/templates/{template_id}/users": {
             "get": {
-                "operationId": "list_user_func_key_template_associations",
+                "operationId": "list_func_key_template_user_associations",
                 "summary": "List users associated to template",
                 "tags": [
                     "funckeys",
@@ -1012,6 +1222,21 @@
                 ],
                 "parameters": [
                     {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
@@ -1021,6 +1246,249 @@
                         "schema": {
                             "$ref": "#/definitions/LineItems"
                         }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_line",
+                "summary": "Create line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Line"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Line created",
+                        "schema": {
+                            "$ref": "#/definitions/LineView"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}": {
+            "get": {
+                "operationId": "get_line",
+                "summary": "Get line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineView"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_line",
+                "summary": "Update line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Line"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_line",
+                "summary": "Delete line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/sip": {
+            "get": {
+                "operationId": "get_line_endpoint_sip",
+                "summary": "Get SIP endpoint associated to Line",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Line and SIP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpointSip"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/sip/{sip_id}": {
+            "put": {
+                "operationId": "associate_line_endpoint_sip",
+                "summary": "Associate line and SIP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and SIP endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_endpoint_sip",
+                "summary": "Dissociate line and SIP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and SIP endpoint dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             }
@@ -1248,44 +1716,14 @@
                 }
             }
         },
-        "/lines/{line_id}": {
-            "get": {
-                "operationId": "get_line",
-                "summary": "Get line",
-                "tags": [
-                    "lines"
-                ],
-                "parameters": [
-                    {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Line",
-                        "schema": {
-                            "$ref": "#/definitions/Line"
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
         "/lines_sip": {
             "get": {
                 "operationId": "list_line_sip",
                 "summary": "List SIP Lines",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1304,9 +1742,10 @@
             "post": {
                 "operationId": "create_line_sip",
                 "summary": "Create SIP line",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1339,9 +1778,10 @@
             "get": {
                 "operationId": "get_line_sip",
                 "summary": "Get SIP line",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1369,9 +1809,10 @@
             "put": {
                 "operationId": "update_line_sip",
                 "summary": "Update SIP line",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1407,8 +1848,10 @@
             "delete": {
                 "operationId": "delete_line_sip",
                 "summary": "Delete SIP line",
+                "deprecated": true,
                 "tags": [
-                    "lines_sip"
+                    "lines",
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -2695,7 +3138,7 @@
         "DeviceOptions": {
             "title": "DeviceOptions",
             "properties": {
-                "switchboard":{
+                "switchboard": {
                     "type": "boolean",
                     "description": "Indicate if this device is a switchboard"
                 }
@@ -2717,6 +3160,40 @@
             "required": [
                 "total"
             ]
+        },
+        "EndpointSipItems": {
+            "title": "SIP Endpoints",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/EndpointSip"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "EndpointSip": {
+            "title": "SIP Endpoint",
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "description": "SIP username"
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "SIP secret/password"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Type of SIP account"
+                },
+                "host": {
+                    "type": "string",
+                    "description": "Hosts that are allowed to use this SIP account"
+                }
+            }
         },
         "Error": {
             "type": "array",
@@ -2850,7 +3327,7 @@
                 }
             }
         },
-        "Line": {
+        "LineView": {
             "title": "Line",
             "properties": {
                 "id": {
@@ -2883,6 +3360,64 @@
                 "provisioning_extension": {
                     "type": "string",
                     "description": "Code used to provision a device"
+                },
+                "provisioning_code": {
+                    "type": "string",
+                    "description": "Code used to provision a device"
+                },
+                "position": {
+                    "type": "integer",
+                    "description": "Line's position on the device"
+                },
+                "caller_id_name": {
+                    "type": "string",
+                    "description": "Name to display when calling"
+                },
+                "caller_id_num": {
+                    "type": "string",
+                    "description": "Number to display when calling"
+                }
+            }
+        },
+        "Line": {
+            "title": "Line",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Line ID (read-only)"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "The name of an internal context"
+                },
+                "position": {
+                    "type": "integer",
+                    "description": "Line's position on the device"
+                },
+                "caller_id_name": {
+                    "type": "string",
+                    "description": "Name to display when calling"
+                },
+                "caller_id_num": {
+                    "type": "string",
+                    "description": "Number to display when calling"
+                },
+                "provisioning_code": {
+                    "type": "string",
+                    "description": "Code used to provision a device"
+                }
+            }
+        },
+        "LineEndpointSip": {
+            "title": "LineEndpointSip",
+            "properties": {
+                "line_id": {
+                    "type": "integer",
+                    "description": "Line ID"
+                },
+                "sip_id": {
+                    "type": "integer",
+                    "description": "SIP Endpoint ID"
                 }
             }
         },
@@ -2924,7 +3459,7 @@
             "properties": {
                 "items": {
                     "items": {
-                        "$ref": "#/definitions/Line"
+                        "$ref": "#/definitions/LineView"
                     },
                     "type": "array"
                 },

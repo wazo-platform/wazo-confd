@@ -31,12 +31,24 @@ class Validator(object):
         return
 
 
-class RequiredFields(Validator):
+class MissingFields(Validator):
 
     def validate(self, model):
         missing = model.missing_parameters()
         if missing:
             raise errors.missing(*missing)
+
+
+class RequiredFields(Validator):
+
+    def __init__(self, *fields):
+        self.fields = fields
+
+    def validate(self, model):
+        required = [field for field in self.fields
+                    if getattr(model, field) is None]
+        if required:
+            raise errors.missing(*required)
 
 
 class GetResource(Validator):
@@ -53,6 +65,21 @@ class GetResource(Validator):
         except NotFoundError:
             metadata = {self.field: value}
             raise errors.param_not_found(self.field, self.resource, **metadata)
+
+
+class UniqueField(Validator):
+
+    def __init__(self, field, dao_find, resource='Resource'):
+        self.field = field
+        self.dao_find = dao_find
+        self.resource = resource
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        found = self.dao_find(value)
+        if found is not None:
+            metadata = {self.field: value}
+            raise errors.resource_exists(self.resource, **metadata)
 
 
 class FindResource(Validator):

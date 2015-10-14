@@ -27,16 +27,11 @@ class TestUserVoicemailAssociation(s.AssociationScenarios,
 
     def create_resources(self):
         self.user_id = h.user.generate_user()['id']
-        self.line_id = h.line.generate_line()['id']
-        h.user_line.associate(self.user_id, self.line_id)
-
         self.voicemail_id = h.voicemail.generate_voicemail()['id']
         return self.user_id, self.voicemail_id
 
     def delete_resources(self, user_id, voicemail_id):
         h.voicemail.delete_voicemail(self.voicemail_id)
-
-        h.user_line.dissociate(self.user_id, self.line_id)
         h.user.delete_user(self.user_id)
         h.voicemail.delete_voicemail(self.voicemail_id)
 

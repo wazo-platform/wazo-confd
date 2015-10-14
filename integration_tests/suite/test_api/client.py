@@ -44,15 +44,11 @@ class ConfdClient(object):
     def get(self, url, **parameters):
         return self.request('GET', url, parameters=parameters)
 
-    def post(self, url, data=None, **kwargs):
-        data = data or {}
-        data.update(kwargs)
-        return self.request('POST', url, data=data)
+    def post(self, url, body):
+        return self.request('POST', url, data=body)
 
-    def put(self, url, data=None, **kwargs):
-        data = data or {}
-        data.update(kwargs)
-        return self.request('PUT', url, data=data)
+    def put(self, url, body):
+        return self.request('PUT', url, data=body)
 
     def delete(self, url):
         return self.request('DELETE', url)
@@ -72,28 +68,53 @@ class ConfdClient(object):
 
 class RestUrlClient(UrlFragment):
 
-    def __init__(self, client, fragments):
+    def __init__(self, client, fragments, body=None):
         super(RestUrlClient, self).__init__(fragments)
         self.client = client
+        self.body = body or {}
 
-    def _build(self, fragments):
-        return RestUrlClient(self.client, fragments)
+    def __repr__(self):
+        return "<Client '{}'>".format('/'.join(self.fragments))
 
     def get(self, **params):
         url = str(self)
         return self.client.get(url, **params)
 
-    def post(self, data=None, **params):
+    def post(self, body=None, **params):
         url = str(self)
-        return self.client.post(url, data, **params)
+        params = self._merge_params(params, body, self.body)
+        return self.client.post(url, params)
 
-    def put(self, data=None, **params):
+    def put(self, body=None, **params):
         url = str(self)
-        return self.client.put(url, data, **params)
+        params = self._merge_params(params, body, self.body)
+        return self.client.put(url, params)
 
     def delete(self):
         url = str(self)
         return self.client.delete(url)
+
+    def _copy(self):
+        return self.__class__(self.client, list(self.fragments), dict(self.body))
+
+    def _add_body(self, body):
+        self.body.update(body)
+        return self
+
+    def _merge_params(self, *maps):
+        params = {}
+        for mapping in reversed(maps):
+            if mapping:
+                params.update(mapping)
+        return params
+
+    def __call__(self, fragment=None, **body):
+        url = self._copy()
+        if fragment:
+            url._add(fragment)
+        if body:
+            url._add_body(body)
+        return url
 
 
 class Response(object):

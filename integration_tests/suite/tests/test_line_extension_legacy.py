@@ -24,7 +24,7 @@ from test_api import associations as a
 from hamcrest import assert_that, has_entries
 
 
-@f.line()
+@f.line_sip()
 @f.extension()
 def test_associate_line_and_extension(line, extension):
     expected = has_entries({'line_id': line['id'],
@@ -35,7 +35,7 @@ def test_associate_line_and_extension(line, extension):
 
 
 @f.user()
-@f.line()
+@f.line_sip()
 @f.extension()
 def test_associate_user_line_extension(user, line, extension):
     expected = has_entries({'line_id': line['id'],
@@ -47,7 +47,7 @@ def test_associate_user_line_extension(user, line, extension):
 
 
 @f.user()
-@f.line()
+@f.line_sip()
 @f.extension()
 def test_dissociate_user_line_extension(user, line, extension):
     with a.user_line(user, line), a.line_extension(line, extension, check=False):
@@ -55,7 +55,7 @@ def test_dissociate_user_line_extension(user, line, extension):
         response.assert_ok()
 
 
-@f.line()
+@f.line_sip()
 @f.extension()
 def test_get_line_from_extension(line, extension):
     expected = has_entries({'line_id': line['id'],
@@ -66,7 +66,7 @@ def test_get_line_from_extension(line, extension):
         assert_that(response.item, expected)
 
 
-@f.line()
+@f.line_sip()
 @f.extension()
 def test_get_extension_from_line(line, extension):
     expected = has_entries({'line_id': line['id'],
@@ -77,7 +77,7 @@ def test_get_extension_from_line(line, extension):
         assert_that(response.item, expected)
 
 
-@f.line()
+@f.line_sip()
 @f.extension()
 @f.device()
 def test_dissociate_when_line_associated_to_device(line, extension, device):

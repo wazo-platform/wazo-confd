@@ -1,4 +1,4 @@
-from test_api.helpers.line import generate_line, delete_line
+from test_api.helpers.line_sip import generate_line, delete_line
 from test_api.helpers.extension import generate_extension, delete_extension
 from test_api import scenarios as s
 from test_api import errors as e
@@ -66,13 +66,13 @@ class TestLineExtensionAssociation(s.AssociationScenarios, s.DissociationScenari
         return confd.lines(line_id).extension.get()
 
 
-@fixtures.line()
+@fixtures.line_sip()
 def test_get_associations_when_not_associated(line):
     response = confd.lines(line['id']).extensions.get()
     assert_that(response.items, contains())
 
 
-@fixtures.line()
+@fixtures.line_sip()
 @fixtures.extension()
 def test_get_line_from_extension_when_not_associated(line, extension):
     response = confd.extensions(extension['id']).line.get()
@@ -84,7 +84,7 @@ def test_get_line_from_fake_extension():
     response.assert_match(404, e.not_found('Extension'))
 
 
-@fixtures.line()
+@fixtures.line_sip()
 @fixtures.extension()
 def test_associate_line_and_internal_extension(line, extension):
     expected = has_entries({'line_id': line['id'],
@@ -95,7 +95,7 @@ def test_associate_line_and_internal_extension(line, extension):
 
 
 @fixtures.extension('from-extern')
-@fixtures.line()
+@fixtures.line_sip()
 def test_associate_incall_to_line_without_user(incall, line):
     response = confd.lines(line['id']).extensions.post(extension_id=incall['id'])
     response.assert_match(400, e.missing_association('Line', 'User'))
@@ -103,7 +103,7 @@ def test_associate_incall_to_line_without_user(incall, line):
 
 @fixtures.extension()
 @fixtures.extension()
-@fixtures.line()
+@fixtures.line_sip()
 def test_associate_two_internal_extensions_to_same_line(first_extension, second_extension, line):
     associate = confd.lines(line['id']).extensions
 
@@ -116,13 +116,31 @@ def test_associate_two_internal_extensions_to_same_line(first_extension, second_
 
 @fixtures.line()
 @fixtures.extension()
+def test_associate_line_without_endpoint(line, extension):
+    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
+    response.assert_match(400, e.missing_association('Line', 'Endpoint'))
+
+
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_associate_line_with_endpoint(line, sip, extension):
+    with a.line_endpoint_sip(line, sip, check=False):
+        url = confd.lines(line['id']).extensions
+        response = url.post(extension_id=extension['id'])
+        assert_that(response.item, has_entries({'line_id': line['id'],
+                                                'extension_id': extension['id']}))
+
+
+@fixtures.line_sip()
+@fixtures.extension()
 def test_dissociate_line_and_extension(line, extension):
     with a.line_extension(line, extension, check=False):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_ok()
 
 
-@fixtures.line()
+@fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
 def test_dissociate_line_associated_to_a_device(line, extension, device):
@@ -131,7 +149,7 @@ def test_dissociate_line_associated_to_a_device(line, extension, device):
         response.assert_status(400, e.resource_associated('Line', 'Device'))
 
 
-@fixtures.line()
+@fixtures.line_sip()
 @fixtures.extension()
 def test_delete_extension_associated_to_line(line, extension):
     with a.line_extension(line, extension):

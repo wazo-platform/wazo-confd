@@ -7,11 +7,11 @@ class UrlFragment(object):
     def __init__(self, fragments):
         self.fragments = fragments
 
-    def __call__(self, fragment=None, p=None):
-        return self._build(self._add(fragment, p))
+    def __call__(self, fragment):
+        return self._copy()._add(fragment)
 
-    def __getattr__(self, name):
-        return self._build(self._add(name))
+    def __getattr__(self, fragment):
+        return self._copy()._add(fragment)
 
     def __str__(self):
         return '/'.join(self.fragments)
@@ -20,23 +20,15 @@ class UrlFragment(object):
         return "<{} '{}' {}>".format(self.__class__.__name__, str(self), self.fragments)
 
     def __enter__(self):
-        return self
+        return self._copy()
 
     def __exit__(self, *args):
         pass
 
-    def apply(self, **kwargs):
-        fragments = [f.format(**kwargs) for f in self.fragments]
-        return self._build(fragments)
+    def _add(self, fragment):
+        fragment = str(fragment)
+        self.fragments.append(fragment)
+        return self
 
-    def _build(self, fragments):
-        return UrlFragment(fragments)
-
-    def _add(self, fragment=None, p=None):
-        if fragment and p:
-            raise ValueError("fragment and param are mutually exclusive")
-        if fragment:
-            return self.fragments + [str(fragment)]
-        if p:
-            return self.fragments + ['{{{}}}'.format(p)]
-        return self.fragments
+    def _copy(self):
+        return self.__class__(list(self.fragments))

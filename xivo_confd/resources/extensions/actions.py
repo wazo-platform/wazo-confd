@@ -19,8 +19,6 @@ from flask import Blueprint
 
 from xivo_dao.resources.extension import dao
 from xivo_dao.resources.extension.model import Extension
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
@@ -31,23 +29,7 @@ from xivo_confd.resources.extensions import validator, notifier
 
 
 class ExtensionService(CRUDService):
-
-    def __init__(self, dao, line_extension_dao, line_dao,
-                 validator, notifier):
-        super(ExtensionService, self).__init__(dao, validator, notifier)
-        self.line_extension_dao = line_extension_dao
-        self.line_dao = line_dao
-
-    def edit(self, extension):
-        self.validator.validate_edit(extension)
-        self.dao.edit(extension)
-        self.update_line(extension)
-        self.notifier.edited(extension)
-
-    def update_line(self, extension):
-        line_extension = self.line_extension_dao.find_by_extension_id(extension.id)
-        if line_extension:
-            self.line_dao.associate_extension(extension, line_extension.line_id)
+    pass
 
 
 def load(core_rest_api):
@@ -63,7 +45,7 @@ def load(core_rest_api):
     )
     converter = Converter.resource(document, Extension)
 
-    service = ExtensionService(dao, line_extension_dao, line_dao, validator, notifier)
+    service = ExtensionService(dao, validator, notifier)
     resource = CRUDResource(service, converter, ['type'])
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

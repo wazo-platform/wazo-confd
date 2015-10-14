@@ -22,7 +22,6 @@ from xivo_dao.resources.dial_action import dao as dial_action_dao
 from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_confd.resources.users import notifier, validator
-from xivo_confd.resources.lines import services as line_services
 from xivo_confd.resources.func_key import services as func_key_service
 
 
@@ -76,8 +75,6 @@ def _create_user_in_database(user):
 def edit(user):
     validator.validate_edit(user)
     user_dao.edit(user)
-    update_voicemail_fullname(user)
-    line_services.update_callerid(user)
     notifier.edited(user)
 
 
@@ -97,19 +94,3 @@ def delete_voicemail(user):
         return
     else:
         voicemail_dao.delete(voicemail)
-
-
-def delete_line(user):
-    try:
-        line = line_services.get_by_user_id(user.id)
-    except NotFoundError:
-        return
-    else:
-        line_services.delete(line)
-
-
-def update_voicemail_fullname(user):
-    if hasattr(user, 'voicemail_id') and user.voicemail_id is not None:
-        voicemail = voicemail_dao.get(user.voicemail_id)
-        voicemail.name = user.fullname
-        voicemail_dao.edit(voicemail)

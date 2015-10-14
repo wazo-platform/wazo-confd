@@ -29,7 +29,9 @@ from xivo import http_helpers
 from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
+from xivo_confd.helpers.restful import ConfdApi
 from xivo_confd import plugin_manager
+
 
 from xivo_provd_client import new_provisioning_client_from_config
 
@@ -49,6 +51,8 @@ class CoreRestApi(object):
         self.app.secret_key = os.urandom(24)
         self.app.config['auth'] = config['auth']
         self.auth = ConfdAuth()
+
+        self.api = ConfdApi(self.app, prefix='/1.1')
 
         self.load_cors()
 

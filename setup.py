@@ -42,6 +42,12 @@ setup(
         'xivo_confd.plugins': [
             'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
             'legacy_plugins = xivo_confd.plugins.legacy_plugins:LegacyPlugins',
+            'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
+            'endpoint_sip_plugin = xivo_confd.plugins.endpoint_sip.plugin:Plugin',
+            'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
+            'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',
+            'line_extension_plugin = xivo_confd.plugins.line_extension.plugin:Plugin',
+            'line_endpoint_plugin = xivo_confd.plugins.line_endpoint.plugin:Plugin',
         ]
     }
 )

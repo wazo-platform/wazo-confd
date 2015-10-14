@@ -312,6 +312,10 @@ class DatabaseQueries(object):
 
         return name
 
+    def delete_context(self, name):
+        query = text("DELETE FROM context WHERE name = :name")
+        self.connection.execute(query, name=name)
+
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)

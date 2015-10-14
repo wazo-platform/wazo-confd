@@ -1,3 +1,5 @@
+import re
+
 from contextlib import contextmanager
 
 from hamcrest import assert_that, contains, equal_to
@@ -80,7 +82,7 @@ class EditScenarios(Scenarios):
     def test_unknown_parameter_on_put(self):
         with self.generated_url() as url:
             error = e.unknown_parameters('invalid')
-            response = client.put(url, invalid='invalidvalue')
+            response = client.put(url, {'invalid': 'invalidvalue'})
             response.assert_match(400, error)
 
     def test_wrong_parameter_type_on_put(self):
@@ -93,7 +95,7 @@ class EditScenarios(Scenarios):
         self.delete_resource(resource_id)
 
         error = e.not_found(resource=self.resource)
-        response = client.put(self.generate_url(resource_id), param='param')
+        response = client.put(self.generate_url(resource_id), {'param': 'param'})
 
         response.assert_match(404, error)
 
@@ -203,3 +205,18 @@ class DissociationCollectionScenarios(DissociationScenarios):
             error = e.not_found(resource=self.right_resource)
             response = self.dissociate_resources(left_id, self.FAKE_ID)
             response.assert_match(404, error)
+
+
+def check_resource_not_found(request, resource):
+    response = request()
+    response.assert_match(404, e.not_found(resource=resource))
+
+
+def check_missing_required_field_returns_error(request, field):
+    response = request({field: None})
+    response.assert_match(400, re.compile(re.escape(field)))
+
+
+def check_bogus_field_returns_error(request, field, bogus):
+    response = request({field: bogus})
+    response.assert_match(400, re.compile(re.escape(field)))
