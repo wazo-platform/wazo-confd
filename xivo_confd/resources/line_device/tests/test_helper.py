@@ -19,16 +19,16 @@ from mock import Mock, patch, sentinel
 from unittest import TestCase
 
 from xivo_dao.helpers.exception import ResourceError
-from xivo_dao.resources.line.model import LineSIP
 
 from xivo_confd.resources.line_device import validator
+from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
 class TestLineDeviceValidator(TestCase):
 
     @patch('xivo_dao.resources.line.dao.get')
     def test_validate_no_device_when_no_device_associated(self, line_get):
-        line_get.return_value = Mock(LineSIP, device_id=None)
+        line_get.return_value = Mock(Line, device_id=None)
 
         validator.validate_no_device(sentinel.line_id)
 
@@ -36,7 +36,7 @@ class TestLineDeviceValidator(TestCase):
 
     @patch('xivo_dao.resources.line.dao.get')
     def test_validate_no_device_when_device_associated(self, line_get):
-        line_get.return_value = Mock(LineSIP, device_id='1234abcdefghijklmnopquesrtlkjh')
+        line_get.return_value = Mock(Line, device_id='1234abcdefghijklmnopquesrtlkjh')
 
         self.assertRaises(ResourceError, validator.validate_no_device, sentinel.line_id)
 

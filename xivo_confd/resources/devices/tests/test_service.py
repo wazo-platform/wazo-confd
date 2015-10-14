@@ -24,9 +24,9 @@ from xivo_confd.resources.devices.dao import DeviceDao
 from xivo_confd.resources.devices.model import LineSCCPConverter, LineSIPConverter
 
 from xivo_dao.resources.device.model import Device
-from xivo_dao.resources.line.model import Line
 from xivo_dao.resources.extension.model import Extension
 from xivo_dao.resources.line_extension.model import LineExtension
+from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
 class TestDeviceService(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestLineDeviceAssociationService(unittest.TestCase):
 
     def test_when_associating_a_line_to_a_device_then_updates_device_id_on_line(self):
         device = Device(id=sentinel.device_id)
-        line = Line()
+        line = Mock(Line)
 
         self.service.associate(line, device)
 
@@ -89,7 +89,7 @@ class TestLineDeviceAssociationService(unittest.TestCase):
 
     def test_when_associating_a_line_to_a_device_then_updates_lines_on_device(self):
         device = Device(id=sentinel.device_id)
-        line = Line()
+        line = Mock(Line)
 
         self.service.associate(line, device)
 
@@ -97,7 +97,7 @@ class TestLineDeviceAssociationService(unittest.TestCase):
 
     def test_when_dissociating_a_line_to_a_device_then_removes_device_id_on_line(self):
         device = Device(id=sentinel.device_id)
-        line = Line(device_id=sentinel.device_id)
+        line = Mock(device_id=sentinel.device_id)
 
         self.service.dissociate(line, device)
 
@@ -106,7 +106,7 @@ class TestLineDeviceAssociationService(unittest.TestCase):
 
     def test_when_dissociating_a_line_to_a_device_then_updates_lines_on_device(self):
         device = Device(id=sentinel.device_id)
-        line = Line()
+        line = Mock(Line)
 
         self.service.dissociate(line, device)
 
@@ -134,7 +134,7 @@ class TestLineDeviceUpdater(unittest.TestCase):
                       'device_id': sentinel.device_id,
                       'configregistrar': 'registrar'}
         parameters.update(kwargs)
-        line = Line(**parameters)
+        line = Mock(Line, **parameters)
         self.line_dao.find_all_by.return_value = [line]
         return line
 
