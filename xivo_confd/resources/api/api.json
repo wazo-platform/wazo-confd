@@ -1012,6 +1012,21 @@
                 ],
                 "parameters": [
                     {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
@@ -1021,6 +1036,134 @@
                         "schema": {
                             "$ref": "#/definitions/LineItems"
                         }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_line",
+                "summary": "Create line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Line"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Line created",
+                        "schema": {
+                            "$ref": "#/definitions/LineView"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}": {
+            "get": {
+                "operationId": "get_line",
+                "summary": "Get line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineView"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_line",
+                "summary": "Update line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Line"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_line",
+                "summary": "Delete line",
+                "tags": [
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             }
@@ -1241,37 +1384,6 @@
                     },
                     "400": {
                         "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
-        "/lines/{line_id}": {
-            "get": {
-                "operationId": "get_line",
-                "summary": "Get line",
-                "tags": [
-                    "lines"
-                ],
-                "parameters": [
-                    {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Line",
-                        "schema": {
-                            "$ref": "#/definitions/Line"
-                        }
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -2695,7 +2807,7 @@
         "DeviceOptions": {
             "title": "DeviceOptions",
             "properties": {
-                "switchboard":{
+                "switchboard": {
                     "type": "boolean",
                     "description": "Indicate if this device is a switchboard"
                 }
@@ -2850,7 +2962,7 @@
                 }
             }
         },
-        "Line": {
+        "LineView": {
             "title": "Line",
             "properties": {
                 "id": {
@@ -2881,6 +2993,51 @@
                     "description": "Line's protocol"
                 },
                 "provisioning_extension": {
+                    "type": "string",
+                    "description": "Code used to provision a device"
+                },
+                "provisioning_code": {
+                    "type": "string",
+                    "description": "Code used to provision a device"
+                },
+                "position": {
+                    "type": "integer",
+                    "description": "Line's position on the device"
+                },
+                "caller_id_name": {
+                    "type": "string",
+                    "description": "Name to display when calling"
+                },
+                "caller_id_num": {
+                    "type": "string",
+                    "description": "Number to display when calling"
+                }
+            }
+        },
+        "Line": {
+            "title": "Line",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Line ID (read-only)"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "The name of an internal context"
+                },
+                "position": {
+                    "type": "integer",
+                    "description": "Line's position on the device"
+                },
+                "caller_id_name": {
+                    "type": "string",
+                    "description": "Name to display when calling"
+                },
+                "caller_id_num": {
+                    "type": "string",
+                    "description": "Number to display when calling"
+                },
+                "provisioning_code": {
                     "type": "string",
                     "description": "Code used to provision a device"
                 }
@@ -2924,7 +3081,7 @@
             "properties": {
                 "items": {
                     "items": {
-                        "$ref": "#/definitions/Line"
+                        "$ref": "#/definitions/LineView"
                     },
                     "type": "array"
                 },
