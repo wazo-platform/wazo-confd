@@ -836,7 +836,7 @@
         },
         "/funckeys/templates/{template_id}/users": {
             "get": {
-                "operationId": "list_user_func_key_template_associations",
+                "operationId": "list_func_key_template_user_associations",
                 "summary": "List users associated to template",
                 "tags": [
                     "funckeys",
