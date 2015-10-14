@@ -663,6 +663,46 @@
                 }
             }
         },
+        "/endpoints/sip/{sip_id}/lines": {
+            "get": {
+                "operationId": "get_endpoint_sip_line",
+                "summary": "Get Line associated to SIP endpoint",
+                "deprecated": true,
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between SIP Endpoint and Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpointSip"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/extensions": {
             "get": {
                 "operationId": "list_extensions",
@@ -1332,6 +1372,122 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/sip": {
+            "get": {
+                "operationId": "get_line_endpoint_sip",
+                "summary": "Get SIP endpoint associated to Line",
+                "deprecated": true,
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Line and SIP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpointSip"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/sip/{sip_id}": {
+            "put": {
+                "operationId": "associate_line_endpoint_sip",
+                "summary": "Associate line and SIP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and SIP endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_endpoint_sip",
+                "summary": "Dissociate line and SIP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and SIP endpoint dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -3245,6 +3401,19 @@
                 "provisioning_code": {
                     "type": "string",
                     "description": "Code used to provision a device"
+                }
+            }
+        },
+        "LineEndpointSip": {
+            "title": "LineEndpointSip",
+            "properties": {
+                "line_id": {
+                    "type": "integer",
+                    "description": "Line ID"
+                },
+                "sip_id": {
+                    "type": "integer",
+                    "description": "SIP Endpoint ID"
                 }
             }
         },
