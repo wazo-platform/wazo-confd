@@ -667,7 +667,6 @@
             "get": {
                 "operationId": "get_endpoint_sip_line",
                 "summary": "Get Line associated to SIP endpoint",
-                "deprecated": true,
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1383,7 +1382,6 @@
             "get": {
                 "operationId": "get_line_endpoint_sip",
                 "summary": "Get SIP endpoint associated to Line",
-                "deprecated": true,
                 "tags": [
                     "lines",
                     "endpoints",
