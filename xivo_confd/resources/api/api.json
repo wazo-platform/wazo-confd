@@ -1722,9 +1722,10 @@
             "get": {
                 "operationId": "list_line_sip",
                 "summary": "List SIP Lines",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1743,9 +1744,10 @@
             "post": {
                 "operationId": "create_line_sip",
                 "summary": "Create SIP line",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1778,9 +1780,10 @@
             "get": {
                 "operationId": "get_line_sip",
                 "summary": "Get SIP line",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1808,9 +1811,10 @@
             "put": {
                 "operationId": "update_line_sip",
                 "summary": "Update SIP line",
+                "deprecated": true,
                 "tags": [
                     "lines",
-                    "lines_sip"
+                    "sip"
                 ],
                 "parameters": [
                     {
@@ -1846,8 +1850,10 @@
             "delete": {
                 "operationId": "delete_line_sip",
                 "summary": "Delete SIP line",
+                "deprecated": true,
                 "tags": [
-                    "lines_sip"
+                    "lines",
+                    "sip"
                 ],
                 "parameters": [
                     {
