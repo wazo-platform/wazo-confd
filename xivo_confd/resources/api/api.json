@@ -492,6 +492,177 @@
                 }
             }
         },
+        "/endpoints/sip": {
+            "get": {
+                "operationId": "list_endpoints_sip",
+                "summary": "List SIP endpoints",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SIP endpoint list",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSipItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_endpoint_sip",
+                "summary": "Create SIP endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "SIP Endpoint to create",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "SIP endpoint created",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/endpoints/sip/{sip_id}": {
+            "get": {
+                "operationId": "get_endpoint_sip",
+                "summary": "Get SIP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SIP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_endpoint_sip",
+                "summary": "Update SIP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSip"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_endpoint_sip",
+                "summary": "Delete SIP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sip_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/extensions": {
             "get": {
                 "operationId": "list_extensions",
@@ -2829,6 +3000,40 @@
             "required": [
                 "total"
             ]
+        },
+        "EndpointSipItems": {
+            "title": "SIP Endpoints",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/EndpointSip"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "EndpointSip": {
+            "title": "SIP Endpoint",
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "description": "SIP username"
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "SIP secret/password"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Type of SIP account"
+                },
+                "host": {
+                    "type": "string",
+                    "description": "Hosts that are allowed to use this SIP account"
+                }
+            }
         },
         "Error": {
             "type": "array",
