@@ -24,25 +24,28 @@ from xivo_dao.resources.endpoint_sip import dao
 
 class UsernameChanged(UniqueField):
 
-    def __init__(self, dao_find, dao_get):
-        super(UsernameChanged, self).__init__('username', dao_find, 'SIPEndpoint')
+    def __init__(self, field, dao_find, dao_get):
+        super(UsernameChanged, self).__init__(field, dao_find, 'SIPEndpoint')
         self.dao_get = dao_get
 
     def validate(self, model):
         existing = self.dao_get(model.id)
-        if existing.username != model.username:
+        existing_value = getattr(existing, self.field)
+        new_value = getattr(model, self.field)
+        if existing_value != new_value:
             super(UsernameChanged, self).validate(model)
 
 
 def build_validator():
     return ValidationGroup(
         create=[
-            Optional('username',
-                     UniqueField('username',
-                                 partial(dao.find_by, 'username')))
+            Optional('name',
+                     UniqueField('name',
+                                 partial(dao.find_by, 'name')))
         ],
         edit=[
-            RequiredFields('username', 'secret', 'type', 'host'),
-            UsernameChanged(partial(dao.find_by, 'username'),
+            RequiredFields('name', 'secret', 'type', 'host'),
+            UsernameChanged('name',
+                            partial(dao.find_by, 'name'),
                             dao.get),
         ])

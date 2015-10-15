@@ -28,7 +28,7 @@ class TestUniqueField(unittest.TestCase):
     def setUp(self):
         self.dao_find = Mock()
         self.dao_get = Mock()
-        self.validator = UsernameChanged(self.dao_find, self.dao_get)
+        self.validator = UsernameChanged('username', self.dao_find, self.dao_get)
 
     def test_given_username_has_not_changed_then_validation_passes(self):
         model = Mock(id=sentinel.id, username=sentinel.username)

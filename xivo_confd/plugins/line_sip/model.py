@@ -42,14 +42,14 @@ class LineSip(object):
     def from_line_and_sip(cls, line, sip):
         return cls(id=line.id,
                    context=line.context,
-                   username=sip.username,
+                   username=sip.name,
                    secret=sip.secret,
                    callerid=sip.callerid,
                    provisioning_extension=line.provisioning_code,
                    device_slot=line.position)
 
     def build_sip(self):
-        return SIP(username=self.username,
+        return SIP(name=self.username,
                    secret=self.secret,
                    callerid=self.callerid,
                    context=self.context)
@@ -62,7 +62,7 @@ class LineSip(object):
                     protocolid=sip.id)
 
     def update_sip(self, sip):
-        sip.username = self.username
+        sip.name = self.username
         sip.secret = self.secret
         sip.callerid = self.callerid
         sip.context = self.context

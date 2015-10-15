@@ -210,8 +210,8 @@ class LineSIPConverter(LineConverter):
 
     def build(self):
         sip = self.line.sip_endpoint
-        slot = {'auth_username': sip.username,
-                'username': sip.username,
+        slot = {'auth_username': sip.name,
+                'username': sip.name,
                 'password': sip.secret,
                 'display_name': self.line.caller_id_name,
                 'number': self.extension.exten,

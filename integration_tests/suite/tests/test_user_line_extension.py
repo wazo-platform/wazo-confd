@@ -141,7 +141,6 @@ def test_update_device_associated_to_endpoint(provd, user, line, sip, extension,
         response.assert_ok()
 
         provd_config = provd.configs.get(device['id'])
-        print provd_config
         sip_line = provd_config['raw_config']['sip_lines']['1']
         assert_that(sip_line, has_entries({'username': 'myusername',
                                            'password': 'mysecret'}))

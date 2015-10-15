@@ -25,7 +25,7 @@ from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 
 sip_fields = {
     'id': fields.Integer,
-    'username': fields.String,
+    'username': fields.String(attribute='name'),
     'secret': fields.String,
     'type': fields.String,
     'host': fields.String,
@@ -36,6 +36,7 @@ sip_fields = {
 sip_parser = reqparse.RequestParser()
 sip_parser.add_argument('username',
                         type=inputs.regex(r"^[a-zA-Z0-9]+$"),
+                        dest='name',
                         store_missing=False)
 sip_parser.add_argument('secret',
                         type=inputs.regex(r"^[a-zA-Z0-9]+$"),
