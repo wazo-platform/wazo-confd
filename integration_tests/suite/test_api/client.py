@@ -158,10 +158,10 @@ class Response(object):
     def assert_ok(self):
         self.assert_status(*self.STATUS_OK)
 
-    def assert_created(self, location=None, *resources):
+    def assert_created(self, *resources, **kwargs):
         self.assert_status(201)
         for resource in resources:
-            self.assert_location(location or resource)
+            self.assert_location(kwargs.get('location', resource))
             self.assert_link(resource)
 
     def assert_location(self, resource):

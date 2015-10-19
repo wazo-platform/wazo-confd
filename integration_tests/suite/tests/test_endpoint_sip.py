@@ -183,7 +183,7 @@ def test_create_sip_with_minimal_parameters():
 
     response = confd.endpoints.sip.post()
 
-    response.assert_created('endpoints/sip', 'endpoint_sip')
+    response.assert_created('endpoint_sip', location='endpoints/sip')
     assert_that(response.item, expected)
 
 
