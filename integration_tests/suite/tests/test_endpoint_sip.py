@@ -182,6 +182,8 @@ def test_create_sip_with_minimal_parameters():
                             })
 
     response = confd.endpoints.sip.post()
+
+    response.assert_created('endpoints/sip', 'endpoint_sip')
     assert_that(response.item, expected)
 
 
@@ -216,7 +218,7 @@ def test_update_required_parameters(sip):
                        secret="updatedsecret",
                        type="peer",
                        host="127.0.0.1")
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item, has_entries({'username': 'updatedusername',
@@ -235,7 +237,7 @@ def test_update_options(sip):
 
     url = confd.endpoints.sip(sip['id'])
     response = url.put(options=options)
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item['options'], has_items(*options))
@@ -244,4 +246,4 @@ def test_update_options(sip):
 @fixtures.sip()
 def test_delete_sip(sip):
     response = confd.endpoints.sip(sip['id']).delete()
-    response.assert_ok()
+    response.assert_deleted()

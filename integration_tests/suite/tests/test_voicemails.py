@@ -109,6 +109,7 @@ def test_create_minimal_voicemail():
                                      number=number,
                                      context=context)
 
+    response.assert_created('voicemails')
     assert_that(response.item, has_entries({'name': 'minimal',
                                             'number': number,
                                             'context': context,
@@ -170,6 +171,7 @@ def test_create_voicemail_with_all_parameters():
                             })
 
     response = confd.voicemails.post(parameters)
+    response.assert_created('voicemails')
     assert_that(response.item, expected)
 
 
@@ -213,7 +215,7 @@ def test_edit_voicemail(voicemail):
     url = confd.voicemails(voicemail['id'])
 
     response = url.put(parameters)
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item, expected)
@@ -226,7 +228,7 @@ def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
 
     response = confd.voicemails(voicemail['id']).put(number=number,
                                                      context=context)
-    response.assert_ok()
+    response.assert_updated()
 
     sysconfd.assert_request('/move_voicemail',
                             query={'old_mailbox': voicemail['number'],
@@ -238,14 +240,14 @@ def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
 @fixtures.voicemail()
 def test_delete_voicemail(voicemail):
     response = confd.voicemails(voicemail['id']).delete()
-    response.assert_ok()
+    response.assert_deleted()
 
 
 @fixtures.voicemail()
 @mocks.sysconfd()
 def test_delete_voicemail_deletes_on_disk(voicemail, sysconfd):
     response = confd.voicemails(voicemail['id']).delete()
-    response.assert_ok()
+    response.assert_deleted()
 
     sysconfd.assert_request('/delete_voicemail',
                             query={'mailbox': voicemail['number'],
@@ -275,7 +277,7 @@ def test_update_fields_with_null_value(voicemail):
                        timezone=None,
                        max_messages=None,
                        attach_audio=None)
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item, has_entries({'password': None,

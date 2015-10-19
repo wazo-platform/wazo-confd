@@ -49,7 +49,7 @@ class TestUserVoicemailAssociation(s.AssociationScenarios,
 @fixtures.voicemail()
 def test_associate(user, voicemail):
     response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
-    response.assert_ok()
+    response.assert_created('users', 'voicemail')
 
 
 @fixtures.user()
@@ -65,10 +65,10 @@ def test_associate_when_already_associated(user, voicemail):
 @fixtures.voicemail()
 def test_associate_multiple_users_to_voicemail(user1, user2, voicemail):
     response = confd.users(user1['id']).voicemail.post(voicemail_id=voicemail['id'])
-    response.assert_ok()
+    response.assert_created('users', 'voicemail')
 
     response = confd.users(user2['id']).voicemail.post(voicemail_id=voicemail['id'])
-    response.assert_ok()
+    response.assert_created('users', 'voicemail')
 
 
 @fixtures.user()
@@ -93,7 +93,7 @@ def test_get_user_voicemail_association(user, voicemail):
 def test_dissociate(user, voicemail):
     with user_and_voicemail_associated(user, voicemail):
         response = confd.users(user['id']).voicemail.delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @fixtures.user()
@@ -124,7 +124,7 @@ def test_edit_voicemail_when_still_associated(user, voicemail):
     number = h.voicemail.find_available_number(voicemail['context'])
     with user_and_voicemail_associated(user, voicemail):
         response = confd.voicemails(voicemail['id']).put(number=number)
-        response.assert_ok()
+        response.assert_updated()
 
 
 def test_get_users_associated_to_voicemail_when_voicemail_does_not_exist():

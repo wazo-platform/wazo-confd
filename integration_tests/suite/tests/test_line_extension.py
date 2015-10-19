@@ -91,6 +91,8 @@ def test_associate_line_and_internal_extension(line, extension):
                             'extension_id': extension['id']})
 
     response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
+
+    response.assert_created('lines', 'extensions')
     assert_that(response.item, expected)
 
 
@@ -108,7 +110,7 @@ def test_associate_two_internal_extensions_to_same_line(first_extension, second_
     associate = confd.lines(line['id']).extensions
 
     response = associate.post(extension_id=first_extension['id'])
-    response.assert_status(201)
+    response.assert_created('lines', 'extensions')
 
     response = associate.post(extension_id=second_extension['id'])
     response.assert_match(400, e.resource_associated('Line', 'Extension'))
@@ -128,6 +130,7 @@ def test_associate_line_with_endpoint(line, sip, extension):
     with a.line_endpoint_sip(line, sip, check=False):
         url = confd.lines(line['id']).extensions
         response = url.post(extension_id=extension['id'])
+        response.assert_created('lines', 'extensions')
         assert_that(response.item, has_entries({'line_id': line['id'],
                                                 'extension_id': extension['id']}))
 
@@ -137,7 +140,7 @@ def test_associate_line_with_endpoint(line, sip, extension):
 def test_dissociate_line_and_extension(line, extension):
     with a.line_extension(line, extension, check=False):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @fixtures.line_sip()

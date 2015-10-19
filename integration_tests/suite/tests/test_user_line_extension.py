@@ -29,10 +29,10 @@ from test_api import associations as a
 @fixtures.extension()
 def test_associate_user_then_line_then_extension(user, line, extension):
     response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_ok()
+    response.assert_created('users', 'lines')
 
     response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_ok()
+    response.assert_created('lines', 'extensions')
 
 
 @fixtures.user()
@@ -40,10 +40,10 @@ def test_associate_user_then_line_then_extension(user, line, extension):
 @fixtures.extension()
 def test_associate_extension_then_line_then_user(user, line, extension):
     response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_ok()
+    response.assert_created('lines', 'extensions')
 
     response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_ok()
+    response.assert_created('users', 'lines')
 
 
 @fixtures.user()
@@ -53,10 +53,10 @@ def test_dissociate_user_then_line_then_extension(user, line, extension):
     with a.user_line(user, line, check=False), a.line_extension(line, extension, check=False):
 
         response = confd.users(user['id']).lines(line['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
         response = confd.lines(line['id']).extensions(extension['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @fixtures.user()
@@ -66,10 +66,10 @@ def test_dissociate_extension_then_line_then_user(user, line, extension):
     with a.user_line(user, line, check=False), a.line_extension(line, extension, check=False):
 
         response = confd.lines(line['id']).extensions(extension['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
         response = confd.users(user['id']).lines(line['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @fixtures.user()
@@ -108,7 +108,7 @@ def test_associate_line_and_incall(user, line, internal, incall):
 def test_dissociate_line_and_incall(user, line, internal, incall):
     with a.user_line(user, line), a.line_extension(line, incall, check=False):
         response = confd.lines(line['id']).extensions(incall['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @mocks.provd()
@@ -119,7 +119,7 @@ def test_dissociate_line_and_incall(user, line, internal, incall):
 def test_update_device_associated_to_line(provd, user, line, extension, device):
     with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).put(caller_id_name="John Smith")
-        response.assert_ok()
+        response.assert_updated()
 
         provd_config = provd.configs.get(device['id'])
         sip_line = provd_config['raw_config']['sip_lines']['1']
@@ -138,7 +138,7 @@ def test_update_device_associated_to_endpoint(provd, user, line, sip, extension,
 
         response = confd.endpoints.sip(sip['id']).put(username="myusername",
                                                       secret="mysecret")
-        response.assert_ok()
+        response.assert_updated()
 
         provd_config = provd.configs.get(device['id'])
         sip_line = provd_config['raw_config']['sip_lines']['1']

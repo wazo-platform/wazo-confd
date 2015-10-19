@@ -31,6 +31,7 @@ def test_associate_line_and_extension(line, extension):
                             'extension_id': extension['id']})
 
     response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
+    response.assert_created('lines', 'extension')
     assert_that(response.item, expected)
 
 
@@ -43,6 +44,7 @@ def test_associate_user_line_extension(user, line, extension):
 
     with a.user_line(user, line, check=False):
         response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
+        response.assert_created('lines', 'extension')
         assert_that(response.item, expected)
 
 
@@ -52,7 +54,7 @@ def test_associate_user_line_extension(user, line, extension):
 def test_dissociate_user_line_extension(user, line, extension):
     with a.user_line(user, line), a.line_extension(line, extension, check=False):
         response = confd.lines(line['id']).extension.delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @f.line_sip()

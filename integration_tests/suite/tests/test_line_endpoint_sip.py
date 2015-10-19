@@ -81,7 +81,7 @@ def test_get_line_associated_to_a_sip_endpoint(line, sip):
 @fixtures.sip()
 def test_associate(line, sip):
     response = confd.lines(line['id']).endpoints.sip(sip['id']).put()
-    response.assert_ok()
+    response.assert_updated()
 
 
 @fixtures.line()
@@ -106,7 +106,7 @@ def test_associate_with_another_endpoint_when_already_associated(line, sip1, sip
 def test_dissociate(line, sip):
     with a.line_endpoint_sip(line, sip, check=False):
         response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @fixtures.line()

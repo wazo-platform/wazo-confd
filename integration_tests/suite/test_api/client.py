@@ -2,7 +2,7 @@ import json
 import logging
 import pprint
 
-from hamcrest import assert_that, is_in, has_key
+from hamcrest import assert_that, is_in, has_key, has_entry, contains_string, has_item
 import requests
 from urls import UrlFragment
 
@@ -157,6 +157,27 @@ class Response(object):
 
     def assert_ok(self):
         self.assert_status(*self.STATUS_OK)
+
+    def assert_created(self, location=None, *resources):
+        self.assert_status(201)
+        for resource in resources:
+            self.assert_location(location or resource)
+            self.assert_link(resource)
+
+    def assert_location(self, resource):
+        headers = {key.lower(): value for key, value in self.response.headers.iteritems()}
+        expected = has_entry('location', contains_string(resource))
+        assert_that(headers, expected, 'Location header not found')
+
+    def assert_link(self, resource):
+        expected = has_entry('links', has_item(has_entry('rel', contains_string(resource))))
+        assert_that(self.json, expected, 'Resource link not found')
+
+    def assert_updated(self):
+        self.assert_status(204)
+
+    def assert_deleted(self):
+        self.assert_status(204)
 
     def assert_match(self, status, assertion):
         self.assert_status(status)
