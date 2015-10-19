@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
+from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
 from xivo_dao.resources.line_extension.model import LineExtension
@@ -55,7 +55,14 @@ class LineExtensionList(ListResource):
         form = parser.parse_args()
         line_extension = LineExtension(**form)
         line_extension = self.service.associate(line_extension)
-        return marshal(line_extension, fields), 201
+        return marshal(line_extension, fields), 201, self.build_headers(line_extension)
+
+    def build_headers(self, model):
+        url = url_for('line_extensions',
+                      extension_id=model.extension_id,
+                      line_id=model.line_id,
+                      _external=True)
+        return {'Location': url}
 
 
 class LineExtensionItem(ItemResource):
@@ -86,13 +93,19 @@ class LineExtensionLegacy(ItemResource):
         form = parser.parse_args()
         line_extension = LineExtension(**form)
         line_extension = self.service.associate(line_extension)
-        return marshal(line_extension, fields), 201
+        return marshal(line_extension, fields), 201, self.build_headers(line_extension)
 
     def delete(self, line_id):
         self.service.validate_parent(line_id)
         line_extension = self.service.get_by_parent(line_id)
         self.service.dissociate(line_extension)
         return '', 204
+
+    def build_headers(self, model):
+        url = url_for('line_extension_legacy',
+                      line_id=model.line_id,
+                      _external=True)
+        return {'Location': url}
 
 
 class ExtensionLineLegacy(ItemResource):

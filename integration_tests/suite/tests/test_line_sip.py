@@ -112,6 +112,8 @@ def test_create_line_with_minimal_parameters():
 
     response = confd.lines_sip.post(context=config.CONTEXT,
                                     device_slot=1)
+
+    response.assert_created('lines_sip')
     assert_that(response.item, expected)
 
 
@@ -164,7 +166,7 @@ def test_update_all_parameters_on_line(line, context):
                        provisioning_extension='234567',
                        secret='newsecret',
                        username='newusername')
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item, expected)
@@ -175,7 +177,7 @@ def test_update_null_parameters(line):
     url = confd.lines_sip(line['id'])
 
     response = url.put(callerid=None)
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item['callerid'], none())
@@ -184,4 +186,4 @@ def test_update_null_parameters(line):
 @fixtures.line_sip()
 def test_delete_line(line):
     response = confd.lines_sip(line['id']).delete()
-    response.assert_ok()
+    response.assert_deleted()

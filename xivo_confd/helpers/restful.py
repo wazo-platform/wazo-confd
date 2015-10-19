@@ -76,7 +76,10 @@ class ListResource(ConfdResource):
         form = self.parser.parse_args()
         model = self.model(**form)
         model = self.service.create(model)
-        return marshal(model, self.fields)
+        return marshal(model, self.fields), 201, self.build_headers(model)
+
+    def build_headers(self, model):
+        raise NotImplementedError()
 
 
 class ItemResource(ConfdResource):

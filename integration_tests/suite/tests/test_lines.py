@@ -117,6 +117,8 @@ def test_create_line_with_minimal_parameters():
                            )
 
     response = confd.lines.post(context=config.CONTEXT)
+
+    response.assert_created('lines')
     assert_that(response.item, expected)
 
 
@@ -174,7 +176,7 @@ def test_update_all_parameters_on_line(line, context):
     response = url.put(context=context['name'],
                        position=2,
                        provisioning_code='243546')
-    response.assert_ok()
+    response.assert_updated()
 
     response = url.get()
     assert_that(response.item, expected)
@@ -190,4 +192,4 @@ def test_update_caller_id_on_line_without_endpoint_raises_error(line):
 @fixtures.line()
 def test_delete_line(line):
     response = confd.lines(line['id']).delete()
-    response.assert_ok()
+    response.assert_deleted()

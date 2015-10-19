@@ -84,7 +84,7 @@ class TestUserWithFuncKey(TestFuncKey):
                          'line': 1,
                          'value': '701'}
 
-        self.funckey_url.put(**modified_funckey).assert_ok()
+        self.funckey_url.put(**modified_funckey).assert_updated()
 
         self.check_provd_has_funckey(self.pos, provd_funckey)
 
@@ -254,8 +254,8 @@ class TestTemplateAssociation(TestFuncKey):
             self.check_provd_has_funckey(pos, funckey)
 
     def test_when_template_dissociated_then_func_key_removed_from_provd(self):
-        self.association_url.put().assert_ok()
-        self.association_url.delete().assert_ok()
+        self.association_url.put().assert_updated()
+        self.association_url.delete().assert_deleted()
 
         for pos in self.provd_funckeys.keys():
             self.check_provd_does_not_have_funckey(pos)
@@ -269,17 +269,17 @@ class TestTemplateAssociation(TestFuncKey):
         third_provd_fundkey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*10'}
 
         with confd.users(self.user['id']).funckeys as url:
-            url(2).put(**second_funckey).assert_ok()
-            url(3).put(**third_funckey).assert_ok()
+            url(2).put(**second_funckey).assert_updated()
+            url(3).put(**third_funckey).assert_updated()
 
-        self.association_url.put().assert_ok()
+        self.association_url.put().assert_updated()
 
         self.check_provd_has_funckey('1', first_provd_funckey)
         self.check_provd_has_funckey('2', second_provd_funckey)
         self.check_provd_has_funckey('3', third_provd_fundkey)
 
     def test_given_template_associated_when_deleting_then_removes_funckeys(self):
-        self.association_url.put().assert_ok()
+        self.association_url.put().assert_updated()
 
         response = confd.funckeys.templates(self.template['id']).delete()
         response.assert_ok()
@@ -288,7 +288,7 @@ class TestTemplateAssociation(TestFuncKey):
             self.check_provd_does_not_have_funckey(pos)
 
     def test_given_template_associated_when_getting_func_key_then_fetches_from_unified_template(self):
-        self.association_url.put().assert_ok()
+        self.association_url.put().assert_updated()
 
         response = confd.users(self.user['id']).funckeys(1).get()
 
@@ -297,7 +297,7 @@ class TestTemplateAssociation(TestFuncKey):
         assert_that(response.item['destination'], has_entries(expected_destination))
 
     def test_given_template_associated_when_getting_association_then_user_associated(self):
-        self.association_url.put().assert_ok()
+        self.association_url.put().assert_updated()
 
         response = confd.users(self.user['id']).funckeys.templates.get()
 
@@ -307,7 +307,7 @@ class TestTemplateAssociation(TestFuncKey):
         assert_that(response.items, contains(has_entries(expected_association)))
 
     def test_given_template_associated_when_getting_association_then_template_associated(self):
-        self.association_url.put().assert_ok()
+        self.association_url.put().assert_updated()
 
         response = confd.funckeys.templates(self.template['id']).users.get()
 

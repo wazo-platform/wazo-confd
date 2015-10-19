@@ -20,6 +20,12 @@ build-postgres:
 build-provd:
 	docker build -t xivo/xivo-provd $(PROVD_DIR)
 
+restart-confd:
+	cd assets/base && \
+	docker-compose kill confd && \
+	docker-compose rm -f confd && \
+	docker-compose run --rm --service-ports tests
+
 stop:
 	cd assets/base && \
 	docker-compose kill && \

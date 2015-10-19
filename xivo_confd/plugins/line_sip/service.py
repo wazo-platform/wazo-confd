@@ -54,7 +54,8 @@ class LineSipService(object):
 
     def create_sip(self, line_sip):
         sip = line_sip.build_sip()
-        return self.sip_service.create(sip)
+        created_sip = self.sip_service.create(sip)
+        return created_sip
 
     def create_line(self, line_sip, sip):
         line = line_sip.build_line(sip)

@@ -44,7 +44,7 @@ class TestUserLineAssociation(s.AssociationScenarios, s.DissociationCollectionSc
 @fixtures.line_sip
 def test_associate_user_line(user, line):
     response = confd.users(user['id']).lines.put(line_id=line['id'])
-    response.assert_ok()
+    response.assert_updated()
 
 
 @fixtures.user()
@@ -53,13 +53,13 @@ def test_associate_user_line(user, line):
 @fixtures.line_sip()
 def test_associate_muliple_users_to_line(user1, user2, user3, line):
     response = confd.users(user1['id']).lines.post(line_id=line['id'])
-    response.assert_ok()
+    response.assert_created('users', 'lines')
 
     response = confd.users(user2['id']).lines.post(line_id=line['id'])
-    response.assert_ok()
+    response.assert_created('users', 'lines')
 
     response = confd.users(user3['id']).lines.post(line_id=line['id'])
-    response.assert_ok()
+    response.assert_created('users', 'lines')
 
 
 @fixtures.user()
@@ -105,6 +105,7 @@ def test_associate_user_to_line_without_endpoint(user, line):
 def test_associate_user_to_line_with_endpoint(user, line, sip):
     with a.line_endpoint_sip(line, sip, check=False):
         response = confd.users(user['id']).lines.post(line_id=line['id'])
+        response.assert_created('users', 'lines')
         assert_that(response.item, has_entries({'user_id': user['id'],
                                                 'line_id': line['id']}))
 
@@ -116,10 +117,10 @@ def test_dissociate_second_user_then_first(first_user, second_user, line):
     with a.user_line(first_user, line, check=False), \
             a.user_line(second_user, line, check=False):
         response = confd.users(second_user['id']).lines(line['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
         response = confd.users(first_user['id']).lines(line['id']).delete()
-        response.assert_ok()
+        response.assert_deleted()
 
 
 @fixtures.user()

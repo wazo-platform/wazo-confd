@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
+from flask import url_for
 from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
@@ -52,6 +52,9 @@ class LineList(ListResource):
     parser.add_argument('position', type=inputs.positive, default=1)
     parser.add_argument('caller_id_name', store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
+
+    def build_headers(self, line):
+        return {'Location': url_for('lines', id=line.id, _external=True)}
 
 
 class LineItem(ItemResource):

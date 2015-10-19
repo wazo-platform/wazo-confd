@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
+from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
 from xivo_dao.resources.user_line.model import UserLine
@@ -59,7 +59,14 @@ class UserLineList(ListResource):
                              line_id=form['line_id'])
         user_line = self.service.associate(user_line)
 
-        return marshal(user_line, fields), 201
+        return marshal(user_line, fields), 201, self.build_headers(user_line)
+
+    def build_headers(self, model):
+        url = url_for('user_lines',
+                      user_id=model.user_id,
+                      line_id=model.line_id,
+                      _external=True)
+        return {'Location': url}
 
 
 class UserLineItem(ItemResource):
