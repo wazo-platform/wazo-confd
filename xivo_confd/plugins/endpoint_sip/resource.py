@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import url_for
 from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
@@ -56,6 +57,9 @@ class SipList(ListResource):
     model = SIPEndpoint
     fields = sip_fields
     parser = sip_parser
+
+    def build_headers(self, sip):
+        return {'Location': url_for('endpoint_sip', id=sip.id, _external=True)}
 
 
 class SipItem(ItemResource):
