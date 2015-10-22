@@ -17,7 +17,31 @@
 
 import abc
 
-from xivo_dao.resources.device.model import Device
+
+class Device(object):
+
+    FIELDS = (
+        'id',
+        'ip',
+        'mac',
+        'sn',
+        'plugin',
+        'vendor',
+        'model',
+        'version',
+        'description',
+        'status',
+        'options',
+        'template_id',
+    )
+
+    def __init__(self, **parameters):
+        for field in self.FIELDS:
+            setattr(self, field, None)
+        for name, value in parameters.iteritems():
+            if name not in self.FIELDS:
+                raise ValueError("Invalid parameter for device: {}".format(name))
+            setattr(self, name, value)
 
 
 class ProvdDevice(object):
