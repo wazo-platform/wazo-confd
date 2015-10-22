@@ -43,6 +43,7 @@ confd:
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"
+    - "/home/gregory/p/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
 testdeps:
   # This image checks that all the links are up by pinging the ports.
   # Used to make sure everything is ready before executing tests

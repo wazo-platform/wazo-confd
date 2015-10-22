@@ -31,6 +31,8 @@ from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 from xivo_confd.helpers.restful import ConfdApi
 from xivo_confd import plugin_manager
 
+from xivo_dao.helpers.db_manager import Session
+
 
 from xivo_provd_client import new_provisioning_client_from_config
 
@@ -77,10 +79,21 @@ class CoreRestApi(object):
 
         @self.app.after_request
         def after_request(response):
+            commit_database()
             return http_helpers.log_request(response)
+
+        def commit_database():
+            try:
+                Session.commit()
+            except:
+                Session.rollback()
+                raise
+            finally:
+                Session.remove()
 
         @self.app.errorhandler(Exception)
         def error_handler(error):
+            Session.rollback()
             return handle_error(error)
 
     def load_cors(self):
