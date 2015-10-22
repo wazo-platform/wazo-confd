@@ -20,7 +20,6 @@ import os
 import urllib
 
 from flask import Flask
-from flask import g
 from flask import request
 from flask_cors import CORS
 from werkzeug.contrib.fixers import ProxyFix
@@ -77,9 +76,7 @@ class CoreRestApi(object):
                 logger.info("%(method)s %(url)s", params)
 
         @self.app.after_request
-        def per_request_callbacks(response):
-            for func in getattr(g, 'call_after_request', ()):
-                response = func(response)
+        def after_request(response):
             return http_helpers.log_request(response)
 
         @self.app.errorhandler(Exception)
