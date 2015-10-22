@@ -45,11 +45,7 @@ class LineSipService(object):
 
     def create(self, line_sip):
         sip = self.create_sip(line_sip)
-        try:
-            line = self.create_line(line_sip, sip)
-        except Exception:
-            self.sip_service.delete(sip)
-            raise
+        line = self.create_line(line_sip, sip)
         return LineSip.from_line_and_sip(line, sip)
 
     def create_sip(self, line_sip):
