@@ -17,7 +17,11 @@
 
 import logging
 import sys
+import os
 import xivo_dao
+
+from werkzeug.contrib.fixers import ProxyFix
+from cherrypy import wsgiserver
 
 from xivo.chain_map import ChainMap
 from xivo.daemonize import pidfile_context
@@ -26,9 +30,12 @@ from xivo import xivo_logging
 from xivo_dao.resources.infos import dao as info_dao
 
 from xivo_confd.config import load as load_config
-from xivo_confd.controller import Controller
 from xivo_confd.helpers.bus_manager import init_bus_from_config
 from xivo_confd.helpers.sysconfd_connector import setup_sysconfd
+from xivo_confd import create_app
+
+
+logger = logging.getLogger(__name__)
 
 
 def main(argv):
@@ -45,10 +52,28 @@ def main(argv):
     init_bus_from_config(ChainMap(config, {'uuid': info_dao.get().uuid}))
     setup_sysconfd(config['sysconfd']['host'], config['sysconfd']['port'])
 
-    controller = Controller(config)
-
     with pidfile_context(config['pid_filename'], config['foreground']):
-        controller.run()
+        run(config)
+
+
+def run(config):
+    logger.debug('xivo-confd running...')
+    app = create_app(config)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    bind_addr = (config['rest_api']['listen'], config['rest_api']['port'])
+
+    wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
+    server = wsgiserver.CherryPyWSGIServer(bind_addr=bind_addr,
+                                           wsgi_app=wsgi_app)
+
+    logger.debug('WSGIServer starting... uid: %s, listen: %s:%s',
+                 os.getuid(), bind_addr[0], bind_addr[1])
+
+    try:
+        server.start()
+    except KeyboardInterrupt:
+        server.stop()
 
 
 if __name__ == '__main__':
