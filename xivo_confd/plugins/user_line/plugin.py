@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_confd import api
 from xivo_confd.plugins.user_line.service import build_service
 from xivo_confd.plugins.user_line.resource import UserLineList, UserLineItem
 
@@ -23,7 +24,6 @@ from xivo_confd.plugins.user_line.resource import UserLineList, UserLineItem
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
         service = build_service()
 
         api.add_resource(UserLineItem,

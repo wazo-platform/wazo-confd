@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_confd import api
 from xivo_confd.plugins.endpoint_sip.service import build_service
 from xivo_confd.plugins.endpoint_sip.resource import SipItem, SipList
 
@@ -23,7 +24,6 @@ from xivo_confd.plugins.endpoint_sip.resource import SipItem, SipList
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
         provd_client = core.provd_client()
 
         service = build_service(provd_client)
