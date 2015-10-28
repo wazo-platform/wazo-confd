@@ -22,6 +22,7 @@ import urllib
 from flask import Flask
 from flask import request
 from flask_cors import CORS
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.contrib.fixers import ProxyFix
 from xivo import http_helpers
 
@@ -85,7 +86,7 @@ class CoreRestApi(object):
         def commit_database():
             try:
                 Session.commit()
-            except:
+            except SQLAlchemyError:
                 Session.rollback()
                 raise
             finally:
