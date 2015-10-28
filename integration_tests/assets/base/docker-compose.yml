@@ -58,10 +58,6 @@ testdeps:
 tests:
   image: n3llyb0y/wait
   links:
-    - rabbitmq
-    - postgres
-    - provd
-    - sysconfd
     - confd
   environment:
-    PORTS: "5672 5432 8666 8668 9486"
+    PORTS: "9486"

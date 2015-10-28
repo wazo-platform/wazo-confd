@@ -20,9 +20,9 @@ import os
 import urllib
 
 from flask import Flask
-from flask import g
 from flask import request
 from flask_cors import CORS
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.contrib.fixers import ProxyFix
 from xivo import http_helpers
 
@@ -31,6 +31,8 @@ from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
 from xivo_confd.helpers.restful import ConfdApi
 from xivo_confd import plugin_manager
+
+from xivo_dao.helpers.db_manager import Session
 
 
 from xivo_provd_client import new_provisioning_client_from_config
@@ -77,13 +79,22 @@ class CoreRestApi(object):
                 logger.info("%(method)s %(url)s", params)
 
         @self.app.after_request
-        def per_request_callbacks(response):
-            for func in getattr(g, 'call_after_request', ()):
-                response = func(response)
+        def after_request(response):
+            commit_database()
             return http_helpers.log_request(response)
+
+        def commit_database():
+            try:
+                Session.commit()
+            except SQLAlchemyError:
+                Session.rollback()
+                raise
+            finally:
+                Session.remove()
 
         @self.app.errorhandler(Exception)
         def error_handler(error):
+            Session.rollback()
             return handle_error(error)
 
     def load_cors(self):

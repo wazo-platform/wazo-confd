@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import Blueprint
-from xivo_dao.resources.device.model import Device
+from xivo_confd.resources.devices.model import Device
 from xivo_confd.resources.devices import builder
 
 from xivo_confd import config

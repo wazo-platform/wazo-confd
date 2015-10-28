@@ -23,7 +23,7 @@ from xivo_confd.resources.devices.service import DeviceService, DeviceValidator,
 from xivo_confd.resources.devices.dao import DeviceDao
 from xivo_confd.resources.devices.model import LineSCCPConverter, LineSIPConverter
 
-from xivo_dao.resources.device.model import Device
+from xivo_confd.resources.devices.model import Device
 from xivo_dao.resources.extension.model import Extension
 from xivo_dao.resources.line_extension.model import LineExtension
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
