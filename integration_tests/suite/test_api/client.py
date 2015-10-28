@@ -78,6 +78,7 @@ class RestUrlClient(UrlFragment):
 
     def get(self, **params):
         url = str(self)
+        params = self._merge_params(params, self.body)
         return self.client.get(url, **params)
 
     def post(self, body=None, **params):
