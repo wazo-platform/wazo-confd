@@ -22,6 +22,7 @@ from test_api import confd
 from test_api import fixtures
 from test_api import mocks
 from test_api import associations as a
+from test_api import errors as e
 
 
 @fixtures.user()
@@ -116,7 +117,7 @@ def test_dissociate_line_and_incall(user, line, internal, incall):
 @fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
-def test_update_device_associated_to_line(provd, user, line, extension, device):
+def test_update_device_associated_to_sip_line(provd, user, line, extension, device):
     with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).put(caller_id_name="John Smith")
         response.assert_updated()
@@ -132,7 +133,7 @@ def test_update_device_associated_to_line(provd, user, line, extension, device):
 @fixtures.sip()
 @fixtures.extension()
 @fixtures.device()
-def test_update_device_associated_to_endpoint(provd, user, line, sip, extension, device):
+def test_update_device_associated_to_sip_endpoint(provd, user, line, sip, extension, device):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
             a.line_extension(line, extension), a.line_device(line, device):
 
@@ -150,7 +151,7 @@ def test_update_device_associated_to_endpoint(provd, user, line, sip, extension,
 @fixtures.line()
 @fixtures.sip()
 @fixtures.extension()
-def test_caller_name_on_line(user, line, sip, extension):
+def test_caller_name_on_sip_line(user, line, sip, extension):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
         assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
@@ -161,8 +162,21 @@ def test_caller_name_on_line(user, line, sip, extension):
 @fixtures.line()
 @fixtures.sip()
 @fixtures.extension()
-def test_caller_id_on_line(user, line, sip, extension):
+def test_caller_id_on_sip_line(user, line, sip, extension):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
         assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
                                                 'caller_id_num': '1000'}))
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.device()
+def test_dissociate_sip_endpoint_associated_to_device(user, line, sip, extension, device):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
+            a.line_extension(line, extension), a.line_device(line, device):
+
+        response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
+        response.assert_status(400, e.resource_associated('Line', 'Device'))
