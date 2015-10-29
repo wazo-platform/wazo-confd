@@ -24,7 +24,7 @@ from test_api import confd
 from test_api import fixtures
 from test_api.helpers.user import generate_user
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry
+from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item
 
 FIELDS = ['firstname',
           'lastname',
@@ -148,3 +148,71 @@ def test_that_users_can_be_edited_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     assert_that(response.item, has_entries(firstname='Foo', lastname='Bar'))
+
+
+@fixtures.user(firstname="Legacy", lastname="User")
+def test_search_using_legacy_parameter(user):
+    response = confd.users.get(q="legacy user")
+
+    assert_that(response.items, has_item(has_entries(firstname="Legacy", lastname="User")))
+
+
+@fixtures.user(firstname="Leeroy",
+               lastname="Jenkins",
+               outgoing_caller_id='"Mystery Man" <5551234567>',
+               username="leeroyjenkins",
+               music_on_hold="leeroy_music_on_hold",
+               mobile_phone_number="5552423232",
+               userfield="leeroy jenkins userfield",
+               description="Leeroy Jenkin's bio",
+               preprocess_subroutine="leeroy_preprocess")
+def test_search_on_user_view(user):
+    url = confd.users
+    searches = {
+        'firstname': 'leeroy',
+        'lastname': 'jenkins',
+        'music_on_hold': 'leeroy_music',
+        'outgoing_caller_id': '5551234567',
+        'mobile_phone_number': '2423232',
+        'userfield': 'jenkins userfield',
+        'description': "jenkin's bio",
+        'preprocess_subroutine': 'roy_preprocess',
+    }
+
+    for field, term in searches.items():
+        yield check_search, url, user, field, term
+
+
+@fixtures.user(firstname="Moustapha",
+               lastname="Bangoura",
+               mobile_phone_number="5559284759",
+               userfield="Moustapha userfield",
+               description="Moustapha the greatest dancer")
+def test_search_on_directory_view(user):
+    url = confd.users(view='directory')
+
+    searches = {
+        'firstname': 'moustapha',
+        'lastname': 'bangoura',
+        'mobile_phone_number': '928475',
+        'userfield': 'moustapha userfield',
+        'description': "greatest dancer",
+    }
+
+    for field, term in searches.items():
+        yield check_search, url, user, field, term
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.extension()
+def test_search_on_users_extension(user, line, extension):
+    with a.user_line(user, line), a.line_extension(line, extension):
+        response = confd.users.get(search=extension['exten'], view='directory')
+        assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
+
+
+def check_search(url, user, field, term):
+    expected = has_item(has_entry(field, user[field]))
+    response = url.get(search=term)
+    assert_that(response.items, expected)
