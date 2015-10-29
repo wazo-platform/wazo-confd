@@ -33,14 +33,14 @@ fields = {
 }
 
 
-class LineEndpoint(ConfdResource):
+class LineEndpointSip(ConfdResource):
 
     def __init__(self, service):
-        super(LineEndpoint, self).__init__()
+        super(LineEndpointSip, self).__init__()
         self.service = service
 
 
-class LineEndpointAssociation(LineEndpoint):
+class LineEndpointSipAssociation(LineEndpointSip):
 
     def put(self, line_id, endpoint_id):
         line = self.service.get_line(line_id)
@@ -54,7 +54,7 @@ class LineEndpointAssociation(LineEndpoint):
         return '', 204
 
 
-class LineEndpointGet(LineEndpoint):
+class LineEndpointSipGet(LineEndpointSip):
 
     @marshal_with(fields)
     def get(self, line_id):
@@ -62,7 +62,7 @@ class LineEndpointGet(LineEndpoint):
         return line_endpoint
 
 
-class EndpointLineGet(LineEndpoint):
+class EndpointSipLineGet(LineEndpointSip):
 
     @marshal_with(fields)
     def get(self, endpoint_id):

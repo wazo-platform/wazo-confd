@@ -16,10 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.plugins.line_endpoint.service import build_service
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociation
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointGet
-from xivo_confd.plugins.line_endpoint.resource import EndpointLineGet
+from xivo_confd.plugins.line_endpoint_sip.service import build_service
+from xivo_confd.plugins.line_endpoint_sip.resource import LineEndpointSipAssociation
+from xivo_confd.plugins.line_endpoint_sip.resource import LineEndpointSipGet
+from xivo_confd.plugins.line_endpoint_sip.resource import EndpointSipLineGet
 
 
 class Plugin(object):
@@ -30,18 +30,18 @@ class Plugin(object):
 
         service = build_service(provd_client)
 
-        api.add_resource(LineEndpointAssociation,
+        api.add_resource(LineEndpointSipAssociation,
                          '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',
                          endpoint='line_endpoints',
                          resource_class_args=(service,)
                          )
 
-        api.add_resource(LineEndpointGet,
+        api.add_resource(LineEndpointSipGet,
                          '/lines/<int:line_id>/endpoints/sip',
                          resource_class_args=(service,)
                          )
 
-        api.add_resource(EndpointLineGet,
+        api.add_resource(EndpointSipLineGet,
                          '/endpoints/sip/<int:endpoint_id>/lines',
                          resource_class_args=(service,)
                          )

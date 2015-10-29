@@ -24,7 +24,7 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 
-class LineEndpointService(object):
+class LineEndpointSipService(object):
 
     def __init__(self, line_service, sip_service):
         self.line_service = line_service
@@ -42,7 +42,7 @@ class LineEndpointService(object):
         if not line:
             raise errors.not_found('Line', id=line_id)
         if line.endpoint != 'sip' or line.endpoint_id is None:
-            raise errors.not_found('LineEndpoint', line_id=line_id)
+            raise errors.not_found('LineEndpointSip', line_id=line_id)
 
         return {'line_id': line.id,
                 'sip_id': line.endpoint_id}
