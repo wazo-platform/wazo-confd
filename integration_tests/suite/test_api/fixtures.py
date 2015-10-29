@@ -1,6 +1,6 @@
 from wrappers import IsolatedAction
 
-from helpers import line, line_sip, endpoint_sip
+from helpers import line, line_sip, endpoint_sip, endpoint_sccp
 from helpers.user import generate_user, delete_user
 from helpers.extension import generate_extension, delete_extension
 from helpers.device import generate_device, delete_device
@@ -30,6 +30,12 @@ class sip(IsolatedAction):
 
     actions = {'generate': endpoint_sip.generate_sip,
                'delete': endpoint_sip.delete_sip}
+
+
+class sccp(IsolatedAction):
+
+    actions = {'generate': endpoint_sccp.generate_sccp,
+               'delete': endpoint_sccp.delete_sccp}
 
 
 class extension(IsolatedAction):
