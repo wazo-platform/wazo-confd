@@ -50,7 +50,8 @@ class LineEndpointSipAssociation(LineEndpointSip):
 
     def delete(self, line_id, endpoint_id):
         line = self.service.get_line(line_id)
-        self.service.dissociate(line, endpoint_id)
+        sip = self.service.get_sip(endpoint_id)
+        self.service.dissociate(line, sip)
         return '', 204
 
 
