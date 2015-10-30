@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from hamcrest import assert_that, has_items, has_entries, has_entry, has_key
+from hamcrest import assert_that, has_items, has_entries
 
 from test_api import confd
 from test_api import fixtures
@@ -180,42 +180,6 @@ def test_dissociate_sip_endpoint_associated_to_device(user, line, sip, extension
 
         response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
         response.assert_status(400, e.resource_associated('Line', 'Device'))
-
-
-@mocks.provd()
-@fixtures.user()
-@fixtures.line()
-@fixtures.sccp()
-@fixtures.extension()
-@fixtures.device()
-def test_update_device_associated_to_sccp_line(provd, user, line, sccp, extension, device):
-    with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), \
-            a.line_extension(line, extension), a.line_device(line, device):
-
-        response = confd.lines(line['id']).put(caller_id_name="John Smith")
-        response.assert_updated()
-
-        provd_config = provd.configs.get(device['id'])
-        assert_that(provd_config, has_entry('raw_config',
-                                            has_key('sccp_call_managers')))
-
-
-@mocks.provd()
-@fixtures.user()
-@fixtures.line()
-@fixtures.sccp()
-@fixtures.extension()
-@fixtures.device()
-def test_update_device_associated_to_sccp_endpoint(provd, user, line, sccp, extension, device):
-    with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), \
-            a.line_extension(line, extension), a.line_device(line, device):
-
-        response = confd.endpoints.sccp(sccp['id']).put(options=[["allow", "gsm"]])
-        response.assert_updated()
-
-        provd_config = provd.configs.get(device['id'])
-        assert_that(provd_config, has_entry('raw_config',
-                                            has_key('sccp_call_managers')))
 
 
 @fixtures.user(firstname="John", lastname="Smith")
