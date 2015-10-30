@@ -210,6 +210,7 @@ def test_caller_id_on_sccp_line(user, line, sccp, extension):
 @fixtures.extension()
 @fixtures.device()
 def test_dissociate_sccp_endpoint_associated_to_device(user, line, sccp, extension, device):
-    with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
+    with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), \
+            a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
-        response.assert_status(e.resource_associated('Line', 'Device'))
+        response.assert_status(400, e.resource_associated('Line', 'Device'))
