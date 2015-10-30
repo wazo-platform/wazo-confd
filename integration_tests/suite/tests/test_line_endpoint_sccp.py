@@ -32,7 +32,7 @@ def test_associate_errors(line, sccp):
     fake_sccp = confd.lines(line['id']).endpoints.sccp(999999999).put
 
     yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sccp, 'SccpEndpoint'
+    yield s.check_resource_not_found, fake_sccp, 'SCCPEndpoint'
 
 
 @fixtures.line()
@@ -42,7 +42,7 @@ def test_dissociate_errors(line, sccp):
     fake_sccp = confd.lines(line['id']).endpoints.sccp(999999999).delete
 
     yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sccp, 'SccpEndpoint'
+    yield s.check_resource_not_found, fake_sccp, 'SCCPEndpoint'
 
 
 def test_get_errors():
@@ -50,7 +50,7 @@ def test_get_errors():
     fake_sccp = confd.endpoints.sccp(999999999).lines.get
 
     yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sccp, 'SccpEndpoint'
+    yield s.check_resource_not_found, fake_sccp, 'SCCPEndpoint'
 
 
 @fixtures.line()
