@@ -32,7 +32,7 @@ class Plugin(object):
 
         api.add_resource(LineEndpointSipAssociation,
                          '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',
-                         endpoint='line_endpoints',
+                         endpoint='line_endpoint_sip',
                          resource_class_args=(service,)
                          )
 
