@@ -23,7 +23,7 @@ from xivo_confd.helpers.validator import Validator
 
 class ValidateLineAssociation(Validator):
 
-    def validate(self, line):
+    def validate(self, line, endpoint):
         if line.is_associated():
             raise errors.resource_associated('Line', 'Endpoint',
                                              line_id=line.id,

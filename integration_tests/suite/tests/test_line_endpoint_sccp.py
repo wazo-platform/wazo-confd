@@ -62,7 +62,8 @@ def test_get_sccp_endpoint_associated_to_line(line, sccp):
     with a.line_endpoint_sccp(line, sccp):
         response = confd.lines(line['id']).endpoints.sccp.get()
         assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'sccp_id': sccp['id']}))
+                                                'endpoint_id': sccp['id'],
+                                                'endpoint': 'sccp'}))
 
 
 @fixtures.line()
@@ -74,7 +75,8 @@ def test_get_line_associated_to_a_sccp_endpoint(line, sccp):
     with a.line_endpoint_sccp(line, sccp):
         response = confd.endpoints.sccp(sccp['id']).lines.get()
         assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'sccp_id': sccp['id']}))
+                                                'endpoint_id': sccp['id'],
+                                                'endpoint': 'sccp'}))
 
 
 @fixtures.line()

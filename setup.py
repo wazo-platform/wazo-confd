@@ -48,8 +48,7 @@ setup(
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',
             'line_extension_plugin = xivo_confd.plugins.line_extension.plugin:Plugin',
-            'line_endpoint_sip_plugin = xivo_confd.plugins.line_endpoint_sip.plugin:Plugin',
-            'line_endpoint_sccp_plugin = xivo_confd.plugins.line_endpoint_sccp.plugin:Plugin',
+            'line_endpoint_plugin = xivo_confd.plugins.line_endpoint.plugin:Plugin',
         ]
     }
 )
