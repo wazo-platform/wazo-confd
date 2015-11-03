@@ -18,7 +18,7 @@
 import json
 from mock import patch, Mock
 from unittest import TestCase
-from xivo_confd.helpers.sysconfd_connector import SysconfdClient
+from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 
 
 class TestSysconfdClient(TestCase):
@@ -26,45 +26,57 @@ class TestSysconfdClient(TestCase):
     def setUp(self):
         self.dao = Mock()
         self.url = "http://localhost:8668"
-        self.client = SysconfdClient(self.url, self.dao)
-        session_init_patch = patch('xivo_confd.helpers.sysconfd_connector.requests.Session')
+        self.client = SysconfdPublisher(self.url, self.dao)
+        session_init_patch = patch('xivo_confd.helpers.sysconfd_publisher.requests.Session')
         session_init = session_init_patch.start()
         self.session = session_init.return_value
         self.addCleanup(session_init.stop)
 
     def test_delete_voicemail_storage(self):
-        self.session.get.return_value = Mock(status_code=200)
+        self.session.request.return_value = Mock(status_code=200)
 
         self.client.delete_voicemail("123", "default")
+        self.client.flush()
 
         url = "http://localhost:8668/delete_voicemail"
-        self.session.get.assert_called_once_with(url, params={'mailbox': '123', 'context': 'default'})
+        self.session.request.assert_called_once_with('GET',
+                                                     url,
+                                                     params={'mailbox': '123', 'context': 'default'},
+                                                     data=None)
 
     def test_move_voicemail_storage(self):
-        self.session.get.return_value = Mock(status_code=200)
+        self.session.request.return_value = Mock(status_code=200)
 
         self.client.move_voicemail("100", "default", "2000", "newcontext")
+        self.client.flush()
 
         url = "http://localhost:8668/move_voicemail"
         params = {'old_mailbox': '100',
                   'old_context': 'default',
                   'new_mailbox': '2000',
                   'new_context': 'newcontext'}
-        self.session.get.assert_called_once_with(url, params=params)
+        self.session.request.assert_called_once_with('GET',
+                                                     url,
+                                                     params=params,
+                                                     data=None)
 
     def test_exec_request_handlers_live_reload_enabled(self):
-        self.session.post.return_value = Mock(status_code=200)
+        self.session.request.return_value = Mock(status_code=200)
         self.dao.is_live_reload_enabled.return_value = True
 
         commands = {'ctibus': [],
                     'ipbx': []}
 
         self.client.exec_request_handlers(commands)
+        self.client.flush()
 
-        call = self.session.post.call_args_list[0]
-        url, body = call[0][0], call[1]['data']
+        call = self.session.request.call_args_list[0]
+        method = call[0][0]
+        url = call[0][1]
+        body = call[1]['data']
 
         expected_url = "http://localhost:8668/exec_request_handlers"
+        self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
         self.assertEquals(json.loads(body), commands)
 
@@ -77,6 +89,7 @@ class TestSysconfdClient(TestCase):
                     'ipbx': []}
 
         self.client.exec_request_handlers(commands)
+        self.client.flush()
 
         self.assertFalse(self.session.post.called)
         self.dao.is_live_reload_enabled.assert_called_once_with()
