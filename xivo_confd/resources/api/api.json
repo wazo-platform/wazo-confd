@@ -2140,6 +2140,14 @@
                         "description": "The user's ID or UUID"
                     },
                     {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
