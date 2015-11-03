@@ -18,7 +18,7 @@
 
 from flask import Blueprint
 
-from xivo_confd.helpers.sysconfd_connector import new_client
+from xivo_confd import sysconfd
 from xivo_dao.resources.voicemail import dao
 from xivo_dao.resources.voicemail.model import Voicemail
 
@@ -57,10 +57,9 @@ def load(core_rest_api):
     )
 
     converter = Converter.resource(document, Voicemail)
-    sysconfd_client = new_client()
     validator = build_validators()
 
-    service = VoicemailService(dao, validator, notifier, sysconfd_client)
+    service = VoicemailService(dao, validator, notifier, sysconfd)
     resource = CRUDResource(service, converter)
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

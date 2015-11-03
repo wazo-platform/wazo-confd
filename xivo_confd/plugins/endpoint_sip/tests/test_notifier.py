@@ -22,7 +22,7 @@ from mock import Mock
 from xivo_bus.resources.endpoint_sip.event import CreateSipEndpointEvent, \
     EditSipEndpointEvent, DeleteSipEndpointEvent
 
-from xivo_confd.helpers.sysconfd_connector import SysconfdClient
+from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.endpoint_sip.notifier import SipEndpointNotifier
 
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
@@ -37,7 +37,7 @@ SYSCONFD_HANDLERS = {'ctibus': [],
 class TestSipEndpointNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdClient)
+        self.sysconfd = Mock(SysconfdPublisher)
         self.bus = Mock()
         self.sip_endpoint = Mock(SIPEndpoint, id=1234)
 

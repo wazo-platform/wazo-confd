@@ -20,7 +20,7 @@ import os
 import logging
 import urllib
 
-from flask import Flask, request
+from flask import Flask, request, g
 from flask_cors import CORS
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -34,6 +34,8 @@ from xivo_confd.core_rest_api import CoreRestApi
 from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.restful import ConfdApi
+from xivo_confd.helpers.bus_publisher import BusPublisher
+from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +44,20 @@ app = Flask('xivo_confd')
 api = ConfdApi(app, prefix="/1.1")
 
 auth = ConfdAuth()
+
+
+def get_bus_publisher():
+    publisher = g.get('bus_publisher')
+    if not publisher:
+        publisher = g.bus_publisher = BusPublisher.from_config(app.config)
+    return publisher
+
+
+def get_sysconfd_publisher():
+    publisher = g.get('sysconfd_publisher')
+    if not publisher:
+        publisher = g.sysconfd_publisher = SysconfdPublisher.from_config(app.config)
+    return publisher
 
 
 @app.before_request
@@ -62,6 +78,8 @@ def log_requests():
 @app.after_request
 def after_request(response):
     commit_database()
+    flush_sysconfd()
+    flush_bus()
     return http_helpers.log_request(response)
 
 
@@ -73,6 +91,18 @@ def commit_database():
         raise
     finally:
         Session.remove()
+
+
+def flush_sysconfd():
+    publisher = g.get('sysconfd_publisher')
+    if publisher:
+        publisher.flush()
+
+
+def flush_bus():
+    publisher = g.get('bus_publisher')
+    if publisher:
+        publisher.flush()
 
 
 @app.errorhandler(Exception)
