@@ -132,3 +132,14 @@ def test_dissociate_when_associated_to_extension(line, sip, extension):
     with a.line_endpoint_sip(line, sip), a.line_extension(line, extension):
         response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
+
+
+@fixtures.line()
+@fixtures.sip()
+def test_delete_endpoint_dissociates_line(line, sip):
+    with a.line_endpoint_sip(line, sip, check=False):
+        response = confd.endpoints.sip(sip['id']).delete()
+        response.assert_deleted()
+
+        response = confd.lines(line['id']).endpoints.sip.get()
+        response.assert_status(404)
