@@ -17,23 +17,13 @@
 
 import logging
 import sys
-import os
-import xivo_dao
 
-from werkzeug.contrib.fixers import ProxyFix
-from cherrypy import wsgiserver
-
-from xivo.chain_map import ChainMap
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
 from xivo import xivo_logging
 
-from xivo_dao.resources.infos import dao as info_dao
-from xivo_dao.helpers.db_utils import session_scope
-
-
 from xivo_confd.config import load as load_config
-from xivo_confd import create_app
+from xivo_confd.controller import Controller
 
 
 logger = logging.getLogger(__name__)
@@ -49,32 +39,10 @@ def main(argv):
     if config['user']:
         change_user(config['user'])
 
-    xivo_dao.init_db_from_config(config)
-    with session_scope():
-        config = ChainMap(config, {'uuid': info_dao.get().uuid})
+    controller = Controller(config)
 
     with pidfile_context(config['pid_filename'], config['foreground']):
-        run(config)
-
-
-def run(config):
-    logger.debug('xivo-confd running...')
-    app = create_app(config)
-    app.wsgi_app = ProxyFix(app.wsgi_app)
-
-    bind_addr = (config['rest_api']['listen'], config['rest_api']['port'])
-
-    wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
-    server = wsgiserver.CherryPyWSGIServer(bind_addr=bind_addr,
-                                           wsgi_app=wsgi_app)
-
-    logger.debug('WSGIServer starting... uid: %s, listen: %s:%s',
-                 os.getuid(), bind_addr[0], bind_addr[1])
-
-    try:
-        server.start()
-    except KeyboardInterrupt:
-        server.stop()
+        controller.run()
 
 
 if __name__ == '__main__':
