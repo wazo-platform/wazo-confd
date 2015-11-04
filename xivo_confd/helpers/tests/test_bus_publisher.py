@@ -46,8 +46,10 @@ class TestBusContext(unittest.TestCase):
     def test_send_messages(self):
         publish_func = Mock()
         publisher = BusPublisher.from_config(CONFIG)
+        marshaler = Mock()
+        marshaler.marshal_message.return_value = sentinel.event
 
-        publisher.send_bus_event(sentinel.event, sentinel.routing_key)
-        publisher.send_messages(publish_func)
+        publisher.send_bus_event(sentinel.unmarshaled_event, sentinel.routing_key)
+        publisher.send_messages(marshaler, publish_func)
 
         publish_func.assert_called_once_with(sentinel.event, routing_key=sentinel.routing_key)

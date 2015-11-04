@@ -91,5 +91,5 @@ class TestSysconfdClient(TestCase):
         self.client.exec_request_handlers(commands)
         self.client.flush()
 
-        self.assertFalse(self.session.post.called)
+        self.assertFalse(self.session.request.called)
         self.dao.is_live_reload_enabled.assert_called_once_with()
