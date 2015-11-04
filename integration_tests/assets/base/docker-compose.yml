@@ -20,7 +20,7 @@ rabbitmq:
   expose:
     - "5672"
 sysconfd:
-  image: nickstenning/flask
+  image: p0bailey/docker-flask
   expose:
     - "8668"
   ports:
