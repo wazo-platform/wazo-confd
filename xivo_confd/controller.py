@@ -16,18 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-import os
 
 import xivo_dao
-
-from werkzeug.contrib.fixers import ProxyFix
-from cherrypy import wsgiserver
 
 from xivo.chain_map import ChainMap
 
 from xivo_dao.resources.infos import dao as info_dao
 from xivo_dao.helpers.db_utils import session_scope
 
+from xivo_confd import run as start_wsgi_server
 from xivo_confd import setup_app
 
 logger = logging.getLogger(__name__)
@@ -46,19 +43,4 @@ class Controller(object):
             config = ChainMap(self.config, {'uuid': info_dao.get().uuid})
 
         app = setup_app(config)
-        app.wsgi_app = ProxyFix(app.wsgi_app)
-
-        bind_addr = (config['rest_api']['listen'],
-                     config['rest_api']['port'])
-
-        wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
-        server = wsgiserver.CherryPyWSGIServer(bind_addr=bind_addr,
-                                               wsgi_app=wsgi_app)
-
-        logger.debug('WSGIServer starting... uid: %s, listen: %s:%s',
-                     os.getuid(), bind_addr[0], bind_addr[1])
-
-        try:
-            server.start()
-        except KeyboardInterrupt:
-            server.stop()
+        start_wsgi_server(app, config)

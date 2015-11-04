@@ -20,10 +20,11 @@ import os
 import logging
 import urllib
 
+from cherrypy import wsgiserver
 from flask import Flask, request, g
 from flask_cors import CORS
-
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.contrib.fixers import ProxyFix
 
 from xivo import http_helpers
 
@@ -132,3 +133,22 @@ def load_cors(app):
     enabled = cors_config.pop('enabled', False)
     if enabled:
         CORS(app, **cors_config)
+
+
+def run(app, config):
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    bind_addr = (config['rest_api']['listen'],
+                 config['rest_api']['port'])
+
+    wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
+    server = wsgiserver.CherryPyWSGIServer(bind_addr=bind_addr,
+                                           wsgi_app=wsgi_app)
+
+    logger.debug('WSGIServer starting... uid: %s, listen: %s:%s',
+                 os.getuid(), bind_addr[0], bind_addr[1])
+
+    try:
+        server.start()
+    except KeyboardInterrupt:
+        server.stop()
