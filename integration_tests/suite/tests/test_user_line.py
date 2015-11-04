@@ -3,8 +3,6 @@ import re
 from hamcrest import assert_that, contains, has_entries, has_item
 
 from test_api import scenarios as s
-from test_api.helpers.user import generate_user, delete_user
-from test_api.helpers.line_sip import generate_line, delete_line
 from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
@@ -16,28 +14,32 @@ secondary_user_regex = re.compile(r"There are secondary users associated to the 
 FAKE_ID = 999999999
 
 
-class TestUserLineAssociation(s.AssociationScenarios, s.DissociationCollectionScenarios, s.AssociationGetCollectionScenarios):
+@fixtures.user()
+@fixtures.line_sip()
+def test_associate_errors(user, line):
+    fake_user = confd.users(FAKE_ID).lines(line_id=line['id']).post
+    fake_line = confd.users(user['id']).lines(line_id=FAKE_ID).post
 
-    left_resource = "User"
-    right_resource = "Line"
+    yield s.check_resource_not_found, fake_user, 'User'
+    yield s.check_resource_not_found, fake_line, 'Line'
 
-    def create_resources(self):
-        user = generate_user()
-        line = generate_line()
-        return user['id'], line['id']
 
-    def delete_resources(self, user_id, line_id):
-        delete_user(user_id)
-        delete_line(line_id)
+@fixtures.user()
+@fixtures.line_sip()
+def test_dissociate_errors(user, line):
+    fake_user = confd.users(FAKE_ID).lines(line_id=line['id']).delete
+    fake_line = confd.users(user['id']).lines(line_id=FAKE_ID).delete
 
-    def associate_resources(self, user_id, line_id):
-        return confd.users(user_id).lines.post(line_id=line_id)
+    yield s.check_resource_not_found, fake_user, 'User'
+    yield s.check_resource_not_found, fake_line, 'Line'
 
-    def dissociate_resources(self, user_id, line_id):
-        return confd.users(user_id).lines(line_id).delete()
 
-    def get_association(self, user_id, line_id):
-        return confd.users(user_id).lines.get()
+def test_get_errors():
+    fake_user = confd.users(FAKE_ID).lines.get
+    fake_line = confd.lines(FAKE_ID).users.get
+
+    yield s.check_resource_not_found, fake_user, 'User'
+    yield s.check_resource_not_found, fake_line, 'Line'
 
 
 @fixtures.user
