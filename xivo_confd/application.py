@@ -111,7 +111,7 @@ def error_handler(error):
     return handle_error(error)
 
 
-def create_app(config):
+def setup_app(config):
     app.secret_key = os.urandom(24)
     app.config.update(config)
 

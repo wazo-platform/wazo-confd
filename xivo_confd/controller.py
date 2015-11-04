@@ -28,7 +28,7 @@ from xivo.chain_map import ChainMap
 from xivo_dao.resources.infos import dao as info_dao
 from xivo_dao.helpers.db_utils import session_scope
 
-from xivo_confd import create_app
+from xivo_confd import setup_app
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class Controller(object):
         with session_scope():
             config = ChainMap(self.config, {'uuid': info_dao.get().uuid})
 
-        app = create_app(config)
+        app = setup_app(config)
         app.wsgi_app = ProxyFix(app.wsgi_app)
 
         bind_addr = (config['rest_api']['listen'],
