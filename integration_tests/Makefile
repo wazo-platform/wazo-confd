@@ -33,7 +33,6 @@ stop:
 
 start:
 	cd assets/base && \
-	docker-compose run --service-ports --rm testdeps && \
 	docker-compose run --service-ports --rm tests
 
 test:

@@ -50,7 +50,6 @@ def cleanup_docker():
 
 def start_docker():
     os.chdir(ASSET_PATH)
-    run_cmd(('docker-compose', 'run', '--rm', '--service-ports', 'testdeps'))
     run_cmd(('docker-compose', 'run', '--rm', '--service-ports', 'tests'))
 
 
