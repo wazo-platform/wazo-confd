@@ -29,6 +29,8 @@ from werkzeug.contrib.fixers import ProxyFix
 from xivo import http_helpers
 
 from xivo_dao.helpers.db_manager import Session
+from xivo_dao.helpers.db_utils import session_scope
+from xivo_dao.resources.infos import dao as info_dao
 
 from xivo_confd import plugin_manager
 from xivo_confd.core_rest_api import CoreRestApi
@@ -82,6 +84,12 @@ def after_request(response):
     flush_sysconfd()
     flush_bus()
     return http_helpers.log_request(response)
+
+
+@app.before_first_request
+def load_uuid():
+    with session_scope():
+        app.config['uuid'] = info_dao.get().uuid
 
 
 def commit_database():
