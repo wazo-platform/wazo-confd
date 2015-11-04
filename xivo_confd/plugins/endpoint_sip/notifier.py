@@ -16,8 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.sysconfd_connector import new_client
-from xivo_confd.helpers import bus_manager
+from xivo_confd import bus, sysconfd
 
 from xivo_bus.resources.endpoint_sip.event import CreateSipEndpointEvent, \
     EditSipEndpointEvent, DeleteSipEndpointEvent
@@ -52,5 +51,4 @@ class SipEndpointNotifier(object):
 
 
 def build_notifier():
-    return SipEndpointNotifier(new_client(),
-                               bus_manager)
+    return SipEndpointNotifier(sysconfd, bus)

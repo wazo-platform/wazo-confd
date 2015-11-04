@@ -16,21 +16,26 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import unittest
+
 from flask import Flask
 from flask import Response
 from mock import patch
 from werkzeug.exceptions import Forbidden
 
 from xivo_confd.helpers.request_bouncer import limit_to_localhost
-from xivo_confd.helpers.tests import test_resources
 
 
-class TestRequestBouncer(test_resources.TestResources):
+class TestRequestBouncer(unittest.TestCase):
 
     def setUp(self):
         app = Flask('test')
-        ctx = app.test_request_context('')
-        ctx.push()
+        self.ctx = app.test_request_context('')
+        self.ctx.push()
+        self.app = app.test_client()
+
+    def tearDown(self):
+        self.ctx.pop()
 
     @patch('xivo_confd.helpers.request_bouncer.request')
     def test_limit_to_localhost_accepted(self, request):

@@ -17,8 +17,15 @@
 
 import logging
 
-from xivo_confd.core_rest_api import CoreRestApi
+import xivo_dao
 
+from xivo.chain_map import ChainMap
+
+from xivo_dao.resources.infos import dao as info_dao
+from xivo_dao.helpers.db_utils import session_scope
+
+from xivo_confd import run as start_wsgi_server
+from xivo_confd import setup_app
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +33,14 @@ logger = logging.getLogger(__name__)
 class Controller(object):
     def __init__(self, config):
         self.config = config
-        self.rest_api = CoreRestApi(self.config)
 
     def run(self):
         logger.debug('xivo-confd running...')
-        self.rest_api.run()
+
+        xivo_dao.init_db_from_config(self.config)
+
+        with session_scope():
+            config = ChainMap(self.config, {'uuid': info_dao.get().uuid})
+
+        app = setup_app(config)
+        start_wsgi_server(app, config)
