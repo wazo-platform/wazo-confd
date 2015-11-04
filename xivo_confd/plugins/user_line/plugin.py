@@ -18,7 +18,7 @@
 
 from xivo_confd import api
 from xivo_confd.plugins.user_line.service import build_service
-from xivo_confd.plugins.user_line.resource import UserLineList, UserLineItem
+from xivo_confd.plugins.user_line.resource import UserLineList, UserLineItem, LineUserList
 
 
 class Plugin(object):
@@ -33,5 +33,9 @@ class Plugin(object):
                          )
         api.add_resource(UserLineList,
                          '/users/<int:user_id>/lines',
+                         resource_class_args=(service,)
+                         )
+        api.add_resource(LineUserList,
+                         '/lines/<int:line_id>/users',
                          resource_class_args=(service,)
                          )

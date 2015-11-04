@@ -83,3 +83,12 @@ class UserLineItem(ItemResource):
         user_line = self.service.get(user_id, line_id)
         self.service.dissociate(user_line)
         return '', 204
+
+
+class LineUserList(ListResource):
+
+    def get(self, line_id):
+        self.service.validate_resource(line_id)
+        items = self.service.list_by_line(line_id)
+        return {'total': len(items),
+                'items': [marshal(item, fields) for item in items]}

@@ -1,6 +1,6 @@
 import re
 
-from hamcrest import assert_that, contains, has_entries
+from hamcrest import assert_that, contains, has_entries, has_item
 
 from test_api import scenarios as s
 from test_api.helpers.user import generate_user, delete_user
@@ -72,6 +72,33 @@ def test_get_line_associated_to_user(user, line):
 
     with a.user_line(user, line):
         response = confd.users(user['id']).lines.get()
+        assert_that(response.items, expected)
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_user_associated_to_line(user, line):
+    expected = contains(has_entries({'user_id': user['id'],
+                                     'line_id': line['id'],
+                                     'main_user': True,
+                                     'main_line': True}))
+
+    with a.user_line(user, line):
+        response = confd.lines(line['id']).users.get()
+        assert_that(response.items, expected)
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_secondary_user_associated_to_line(main_user, other_user, line):
+    expected = has_item(has_entries({'user_id': other_user['id'],
+                                     'line_id': line['id'],
+                                     'main_user': False,
+                                     'main_line': True}))
+
+    with a.user_line(main_user, line), a.user_line(other_user, line):
+        response = confd.lines(line['id']).users.get()
         assert_that(response.items, expected)
 
 

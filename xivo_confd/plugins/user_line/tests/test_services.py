@@ -59,6 +59,14 @@ class TestUserLineService(TestCase):
         self.dao.find_all_by_user_id.assert_called_once_with(sentinel.user_id)
         assert_that(result, equal_to(expected_user_lines))
 
+    def test_when_listing_associations_by_line_then_dao_is_called(self):
+        expected_user_lines = self.dao.find_all_by_line_id.return_value
+
+        result = self.service.list_by_line(sentinel.line_id)
+
+        self.dao.find_all_by_line_id.assert_called_once_with(sentinel.line_id)
+        assert_that(result, equal_to(expected_user_lines))
+
     def test_when_getting_association_then_dao_is_called(self):
         expected_user_line = self.dao.get_by_user_id_and_line_id.return_value
 
