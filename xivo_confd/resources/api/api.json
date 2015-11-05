@@ -1893,6 +1893,14 @@
                         "in": "path"
                     },
                     {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueCreate"
+                        }
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
@@ -1918,14 +1926,6 @@
                     "queues"
                 ],
                 "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/AgentQueueCreate"
-                        }
-                    },
                     {
                         "required": true,
                         "type": "integer",
@@ -1974,6 +1974,14 @@
                         "in": "path"
                     },
                     {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueUpdate"
+                        }
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
@@ -1997,14 +2005,6 @@
                     "queues"
                 ],
                 "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/AgentQueueUpdate"
-                        }
-                    },
                     {
                         "required": true,
                         "type": "integer",
