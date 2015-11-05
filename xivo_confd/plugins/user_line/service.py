@@ -40,6 +40,9 @@ class UserLineService(object):
     def list(self, user_id):
         return self.dao.find_all_by_user_id(user_id)
 
+    def list_by_line(self, line_id):
+        return self.dao.find_all_by_line_id(line_id)
+
     def get(self, user_id, line_id):
         return self.dao.get_by_user_id_and_line_id(user_id, line_id)
 

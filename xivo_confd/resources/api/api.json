@@ -1716,6 +1716,38 @@
                 }
             }
         },
+        "/lines/{line_id}/users": {
+            "get": {
+                "operationId": "get_line_user_associations",
+                "summary": "List users associated to lines",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users associated to a Line",
+                        "schema": {
+                            "$ref": "#/definitions/UserLineItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/lines_sip": {
             "get": {
                 "operationId": "list_line_sip",
