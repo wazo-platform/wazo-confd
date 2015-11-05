@@ -1893,6 +1893,14 @@
                         "in": "path"
                     },
                     {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueCreate"
+                        }
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
@@ -1964,6 +1972,14 @@
                         "type": "integer",
                         "name": "agent_id",
                         "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueUpdate"
+                        }
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -3076,6 +3092,41 @@
                     "format": "int32",
                     "description": "Queue's ID"
                 },
+                "penalty": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0,
+                    "description": "Agent's penalty. A priority used for distributing calls."
+                }
+            }
+        },
+        "AgentQueueCreate": {
+            "title": "AgentQueue",
+            "description": "An association between an agent and a queue. Agents associated to a Queue will receive calls when they are logged in.",
+            "required": [
+                "agent_id"
+            ],
+            "properties": {
+                "agent_id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Agent's ID"
+                },
+                "penalty": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0,
+                    "description": "Agent's penalty. A priority used for distributing calls."
+                }
+            }
+        },
+        "AgentQueueUpdate": {
+            "title": "AgentQueue",
+            "description": "An association between an agent and a queue. Agents associated to a Queue will receive calls when they are logged in.",
+            "required": [
+                "penalty"
+            ],
+            "properties": {
                 "penalty": {
                     "type": "integer",
                     "format": "int32",
