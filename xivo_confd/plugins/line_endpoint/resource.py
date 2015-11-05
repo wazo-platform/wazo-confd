@@ -17,18 +17,35 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from flask_restful import fields, marshal_with
+from flask_restful import marshal
 
-from xivo_confd.helpers.restful import ConfdResource, Link, FieldList
+from flask_restful import fields
+from xivo_confd.helpers.restful import ConfdResource
+from xivo_confd.helpers.restful import Link, FieldList
 
-fields = {
+
+sccp_fields = {
     'line_id': fields.Integer,
-    'sip_id': fields.Integer,
+    'endpoint_id': fields.Integer,
+    'endpoint': fields.String,
+    'links': FieldList(Link('lines',
+                            field='line_id',
+                            target='id'),
+                       Link('endpoint_sccp',
+                            field='endpoint_id',
+                            target='id'))
+}
+
+
+sip_fields = {
+    'line_id': fields.Integer,
+    'endpoint_id': fields.Integer,
+    'endpoint': fields.String,
     'links': FieldList(Link('lines',
                             field='line_id',
                             target='id'),
                        Link('endpoint_sip',
-                            field='sip_id',
+                            field='endpoint_id',
                             target='id'))
 }
 
@@ -44,27 +61,50 @@ class LineEndpointAssociation(LineEndpoint):
 
     def put(self, line_id, endpoint_id):
         line = self.service.get_line(line_id)
-        sip = self.service.get_sip(endpoint_id)
-        self.service.associate(line, sip)
+        endpoint = self.service.get_endpoint(endpoint_id)
+        self.service.associate(line, endpoint)
         return '', 204
 
     def delete(self, line_id, endpoint_id):
         line = self.service.get_line(line_id)
-        self.service.dissociate(line, endpoint_id)
+        endpoint = self.service.get_endpoint(endpoint_id)
+        self.service.dissociate(line, endpoint)
         return '', 204
 
 
 class LineEndpointGet(LineEndpoint):
 
-    @marshal_with(fields)
     def get(self, line_id):
         line_endpoint = self.service.get_association_from_line(line_id)
-        return line_endpoint
+        return marshal(line_endpoint, self.fields)
 
 
 class EndpointLineGet(LineEndpoint):
 
-    @marshal_with(fields)
     def get(self, endpoint_id):
         line_endpoint = self.service.get_association_from_endpoint(endpoint_id)
-        return line_endpoint
+        return marshal(line_endpoint, self.fields)
+
+
+class LineEndpointAssociationSip(LineEndpointAssociation):
+    pass
+
+
+class LineEndpointGetSip(LineEndpointGet):
+    fields = sip_fields
+
+
+class EndpointLineGetSip(EndpointLineGet):
+    fields = sip_fields
+
+
+class LineEndpointAssociationSccp(LineEndpointAssociation):
+    pass
+
+
+class LineEndpointGetSccp(LineEndpointGet):
+    fields = sccp_fields
+
+
+class EndpointLineGetSccp(EndpointLineGet):
+    fields = sccp_fields

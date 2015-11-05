@@ -250,6 +250,22 @@ class TestAssociationValidator(unittest.TestCase):
         common.validate.assert_called_once_with(model)
         association.validate.assert_called_once_with(model)
 
+    def test_when_validating_multiple_models_then_all_models_passed_to_validator(self):
+        common = Mock(Validator)
+        association = Mock(Validator)
+        dissociation = Mock(Validator)
+        model1 = Mock()
+        model2 = Mock()
+
+        validator = AssociationValidator(common=[common], association=[association], dissociation=[dissociation])
+
+        validator.validate_association(model1, model2)
+        validator.validate_dissociation(model1, model2)
+
+        common.validate.assert_called_with(model1, model2)
+        association.validate.assert_called_once_with(model1, model2)
+        dissociation.validate.assert_called_once_with(model1, model2)
+
     def test_when_validating_dissociation_then_calls_common_and_dissociation_validators(self):
         common = Mock(Validator)
         dissociation = Mock(Validator)

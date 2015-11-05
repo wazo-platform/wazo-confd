@@ -22,6 +22,7 @@ from test_api.helpers import user_line as ul
 from test_api.helpers import line_extension as le
 from test_api.helpers import line_device as ld
 from test_api.helpers import line_endpoint_sip as l_endpoint_sip
+from test_api.helpers import line_endpoint_sccp as l_endpoint_sccp
 
 
 @contextmanager
@@ -54,3 +55,10 @@ def line_endpoint_sip(line, sip, check=True):
     l_endpoint_sip.associate(line['id'], sip['id'], check)
     yield
     l_endpoint_sip.dissociate(line['id'], sip['id'], check)
+
+
+@contextmanager
+def line_endpoint_sccp(line, sccp, check=True):
+    l_endpoint_sccp.associate(line['id'], sccp['id'], check)
+    yield
+    l_endpoint_sccp.dissociate(line['id'], sccp['id'], check)

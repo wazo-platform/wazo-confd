@@ -492,6 +492,216 @@
                 }
             }
         },
+        "/endpoints/sccp": {
+            "get": {
+                "operationId": "list_endpoints_sccp",
+                "summary": "List SCCP endpoints",
+                "tags": [
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SCCP endpoint list",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSccpItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_endpoint_sccp",
+                "summary": "Create SCCP endpoint",
+                "tags": [
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "SCCP Endpoint to create",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSccp"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "SCCP endpoint created",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSccp"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/endpoints/sccp/{sccp_id}": {
+            "get": {
+                "operationId": "get_endpoint_sccp",
+                "summary": "Get SCCP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sccp_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SCCP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSccp"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_endpoint_sccp",
+                "summary": "Update SCCP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sccp_id",
+                        "in": "path"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointSccp"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_endpoint_sccp",
+                "summary": "Delete SCCP Endpoint",
+                "tags": [
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sccp_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/endpoints/sccp/{sccp_id}/lines": {
+            "get": {
+                "operationId": "get_endpoint_sccp_line",
+                "summary": "Get Line associated to SCCP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sccp_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between SCCP Endpoint and Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/endpoints/sip": {
             "get": {
                 "operationId": "list_endpoints_sip",
@@ -687,7 +897,7 @@
                     "200": {
                         "description": "Association between SIP Endpoint and Line",
                         "schema": {
-                            "$ref": "#/definitions/LineEndpointSip"
+                            "$ref": "#/definitions/LineEndpoint"
                         }
                     },
                     "400": {
@@ -1378,6 +1588,121 @@
                 }
             }
         },
+        "/lines/{line_id}/endpoints/sccp": {
+            "get": {
+                "operationId": "get_line_endpoint_sccp",
+                "summary": "Get SCCP endpoint associated to Line",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Line and SCCP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/sccp/{sccp_id}": {
+            "put": {
+                "operationId": "associate_line_endpoint_sccp",
+                "summary": "Associate line and SCCP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sccp_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and SCCP endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_endpoint_sccp",
+                "summary": "Dissociate line and SCCP endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "sccp"
+                ],
+                "parameters": [
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "line_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "type": "integer",
+                        "name": "sccp_id",
+                        "in": "path"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and SCCP endpoint dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/lines/{line_id}/endpoints/sip": {
             "get": {
                 "operationId": "get_line_endpoint_sip",
@@ -1402,7 +1727,7 @@
                     "200": {
                         "description": "Association between Line and SIP Endpoint",
                         "schema": {
-                            "$ref": "#/definitions/LineEndpointSip"
+                            "$ref": "#/definitions/LineEndpoint"
                         }
                     },
                     "400": {
@@ -3283,6 +3608,32 @@
                 "host": {
                     "type": "string",
                     "description": "Hosts that are allowed to use this SIP account"
+                },
+                "options": {
+                    "type": "object",
+                    "description": "Advanced configuration options"
+                }
+            }
+        },
+        "EndpointSccpItems": {
+            "title": "SCCP Endpoints",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/EndpointSccp"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "EndpointSccp": {
+            "title": "SCCP Endpoint",
+            "properties": {
+                "options": {
+                    "type": "object",
+                    "description": "Advanced configuration options"
                 }
             }
         },
@@ -3499,16 +3850,20 @@
                 }
             }
         },
-        "LineEndpointSip": {
-            "title": "LineEndpointSip",
+        "LineEndpoint": {
+            "title": "LineEndpoint",
             "properties": {
                 "line_id": {
                     "type": "integer",
                     "description": "Line ID"
                 },
-                "sip_id": {
+                "endpoint_id": {
                     "type": "integer",
-                    "description": "SIP Endpoint ID"
+                    "description": "Endpoint ID"
+                },
+                "endpoint": {
+                    "type": "string",
+                    "description": "Type of endpoint (either SIP or SCCP)"
                 }
             }
         },

@@ -167,10 +167,10 @@ class AssociationValidator(object):
         self.association = association or []
         self.dissociation = dissociation or []
 
-    def validate_association(self, model):
+    def validate_association(self, *models):
         for validator in self.common + self.association:
-            validator.validate(model)
+            validator.validate(*models)
 
-    def validate_dissociation(self, model):
+    def validate_dissociation(self, *models):
         for validator in self.common + self.dissociation:
-            validator.validate(model)
+            validator.validate(*models)

@@ -83,6 +83,7 @@ DEFAULT_CONFIG = {
     'enabled_plugins': ['legacy_plugins',
                         'line_plugin',
                         'endpoint_sip_plugin',
+                        'endpoint_sccp_plugin',
                         'line_sip_plugin',
                         'user_line_plugin',
                         'line_extension_plugin',

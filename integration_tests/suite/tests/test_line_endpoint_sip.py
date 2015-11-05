@@ -62,7 +62,8 @@ def test_get_sip_endpoint_associated_to_line(line, sip):
     with a.line_endpoint_sip(line, sip):
         response = confd.lines(line['id']).endpoints.sip.get()
         assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'sip_id': sip['id']}))
+                                                'endpoint': 'sip',
+                                                'endpoint_id': sip['id']}))
 
 
 @fixtures.line()
@@ -74,7 +75,8 @@ def test_get_line_associated_to_a_sip_endpoint(line, sip):
     with a.line_endpoint_sip(line, sip):
         response = confd.endpoints.sip(sip['id']).lines.get()
         assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'sip_id': sip['id']}))
+                                                'endpoint': 'sip',
+                                                'endpoint_id': sip['id']}))
 
 
 @fixtures.line()
