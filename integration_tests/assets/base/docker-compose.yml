@@ -43,7 +43,7 @@ confd:
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"
-testdeps:
+tests:
   # This image checks that all the links are up by pinging the ports.
   # Used to make sure everything is ready before executing tests
   image: n3llyb0y/wait
@@ -52,12 +52,7 @@ testdeps:
     - postgres
     - provd
     - sysconfd
-  environment:
-    PORTS: "5672 5432 8666 8668"
-    TIMEOUT: "60"
-tests:
-  image: n3llyb0y/wait
-  links:
     - confd
   environment:
-    PORTS: "9486"
+    PORTS: "5432 5672 8666 8668 9486"
+    TIMEOUT: "60"

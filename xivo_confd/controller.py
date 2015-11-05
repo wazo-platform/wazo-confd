@@ -19,13 +19,8 @@ import logging
 
 import xivo_dao
 
-from xivo.chain_map import ChainMap
-
-from xivo_dao.resources.infos import dao as info_dao
-from xivo_dao.helpers.db_utils import session_scope
-
-from xivo_confd import run as start_wsgi_server
 from xivo_confd import setup_app
+from xivo_confd import run as start_wsgi_server
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +34,5 @@ class Controller(object):
 
         xivo_dao.init_db_from_config(self.config)
 
-        with session_scope():
-            config = ChainMap(self.config, {'uuid': info_dao.get().uuid})
-
-        app = setup_app(config)
-        start_wsgi_server(app, config)
+        app = setup_app(self.config)
+        start_wsgi_server(app, self.config)
