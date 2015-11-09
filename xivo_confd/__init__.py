@@ -22,7 +22,6 @@ from xivo_confd.application import auth
 from xivo_confd.application import setup_app
 from xivo_confd.application import get_bus_publisher
 from xivo_confd.application import get_sysconfd_publisher
-from xivo_confd.application import run
 
 bus = LocalProxy(get_bus_publisher)
 sysconfd = LocalProxy(get_sysconfd_publisher)

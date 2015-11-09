@@ -20,7 +20,7 @@ import logging
 import xivo_dao
 
 from xivo_confd import setup_app
-from xivo_confd import run as start_wsgi_server
+from xivo_confd.server import run_server
 
 logger = logging.getLogger(__name__)
 
@@ -35,4 +35,4 @@ class Controller(object):
         xivo_dao.init_db_from_config(self.config)
 
         app = setup_app(self.config)
-        start_wsgi_server(app, self.config)
+        run_server(app)

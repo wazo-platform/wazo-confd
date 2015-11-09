@@ -24,7 +24,11 @@ case "$1" in
 
         chown www-data: "$LOG_FILENAME"
 
-        invoke-rc.d nginx reload
+        previous_version="$2"
+        if dpkg --compare-versions "$previous_version" "<<" "15.18~20151109"; then
+            invoke-rc.d nginx reload
+        fi
+
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
 
