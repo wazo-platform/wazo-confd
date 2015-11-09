@@ -10,7 +10,7 @@ Homepage: http://wiki.xivo.io
 
 Package: xivo-confd
 Architecture: all
-Depends: ${python:Depends}, ${misc:Depends}, xivo-libconfd (>= 13.15), nginx
+Depends: ${python:Depends}, ${misc:Depends}, xivo-libconfd (>= 13.15)
 Provides: xivo-restapi
 Conflicts: xivo-restapi
 Replaces: xivo-restapi
