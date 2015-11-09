@@ -21,22 +21,10 @@ DAEMON_ARGS=$2
 DAEMON=/usr/bin/$DAEMONNAME
 PIDDIR=/var/run/$DAEMONNAME
 PIDFILE=$PIDDIR/$DAEMONNAME.pid
-XIVO_DEFAULT_FILE="/etc/default/xivo"
 
 . /lib/lsb/init-functions
 
 test -x $DAEMON || exit 0
-
-is_enabled() {
-    # Check if startup variable is set to 1, if not we exit.
-    if [ -f $XIVO_DEFAULT_FILE ]; then
-        . $XIVO_DEFAULT_FILE
-        if [ "$startup" != "yes" ]; then
-           echo "${name} startup is disabled in $XIVO_DEFAULT_FILE"
-           exit 0
-        fi
-    fi
-}
 
 for dir in "$PIDDIR" ; do
     [ -d "$dir" ] || install -d -o "$USER" -g "$GROUP" "$dir"
@@ -44,7 +32,6 @@ done
 
 case "$1" in
   start)
-    is_enabled
     log_daemon_msg "Starting" "$DAEMONNAME"
     if start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS;
     then
