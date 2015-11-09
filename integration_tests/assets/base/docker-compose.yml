@@ -43,6 +43,7 @@ confd:
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"
+    - "./etc/ssl:/usr/share/xivo-certs"
 tests:
   # This image checks that all the links are up by pinging the ports.
   # Used to make sure everything is ready before executing tests

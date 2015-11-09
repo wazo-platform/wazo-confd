@@ -18,7 +18,7 @@ def new_client(headers=None):
     xivo_confd_port = os.environ.get('PORT', 9486)
     xivo_confd_login = os.environ.get('LOGIN', 'admin')
     xivo_confd_password = os.environ.get('PASSWORD', 'proformatique')
-    xivo_https = bool(os.environ.get('HTTPS', ''))
+    xivo_https = bool(os.environ.get('HTTPS', '1'))
     client = ConfdClient.from_options(host=xivo_host,
                                       port=xivo_confd_port,
                                       username=xivo_confd_login,
