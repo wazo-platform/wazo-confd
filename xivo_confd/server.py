@@ -30,7 +30,7 @@ def run_server(app):
             _check_file_readable(https_config['certificate'])
             _check_file_readable(https_config['private_key'])
 
-            bind_addr_https = (https_config['host'], https_config['port'])
+            bind_addr_https = (https_config['listen'], https_config['port'])
             ssl_adapter = BuiltinSSLAdapter(https_config['certificate'],
                                             https_config['private_key'])
             server_https = CherryPyWSGIServer(bind_addr=bind_addr_https,
@@ -46,7 +46,7 @@ def run_server(app):
         logger.debug('HTTPS server is disabled')
 
     if http_config['enabled']:
-        bind_addr_http = (http_config['host'], http_config['port'])
+        bind_addr_http = (http_config['listen'], http_config['port'])
         server_http = CherryPyWSGIServer(bind_addr=bind_addr_http,
                                          wsgi_app=wsgi_app)
         ServerAdapter(cherrypy.engine, server_http).subscribe()
