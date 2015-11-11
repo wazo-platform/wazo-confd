@@ -21,7 +21,7 @@ def run_server(app):
     cherrypy.server.unsubscribe()
     cherrypy.config.update({'environment': 'production'})
 
-    if not (http_config['enabled'] and https_config['enabled']):
+    if not (http_config['enabled'] or https_config['enabled']):
         logger.critical('No HTTP/HTTPS server enabled')
         exit()
 
