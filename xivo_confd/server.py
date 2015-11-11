@@ -18,13 +18,11 @@ def run_server(app):
     app.wsgi_app = ProxyFix(app.wsgi_app)
     wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
 
-    bind_addr_https = (https_config['host'], https_config['port'])
-
     cherrypy.server.unsubscribe()
     cherrypy.config.update({'environment': 'production'})
 
     if not (http_config['enabled'] and https_config['enabled']):
-        logger.critical('No HTTP server enabled')
+        logger.critical('No HTTP/HTTPS server enabled')
         exit()
 
     if https_config['enabled']:
