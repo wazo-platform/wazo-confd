@@ -25,12 +25,12 @@ rest_api:
 
   http:
     enabled: true
-    host: 127.0.0.1
+    listen: 127.0.0.1
     port: 9487
 
   https:
     enabled: true
-    host: 0.0.0.0
+    listen: 0.0.0.0
     port: 9486
 
     certificate: /usr/share/xivo-certs/server.crt
