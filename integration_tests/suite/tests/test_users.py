@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import unicode_literals
+
 
 from test_api import scenarios as s
 from test_api import errors as e
@@ -44,7 +46,7 @@ REQUIRED = ['firstname']
 
 BOGUS = [(f, 123, 'unicode string') for f in FIELDS]
 
-NULL_USER = {"firstname": "John",
+NULL_USER = {"firstname": "Jôhn",
              "lastname": None,
              "username": None,
              "mobile_phone_number": None,
@@ -70,7 +72,7 @@ class TestUserResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.Del
         return user['id']
 
     def test_invalid_mobile_phone_number(self):
-        response = confd.users.post(firstname='firstname',
+        response = confd.users.post(firstname='fîrstname',
                                     mobile_phone_number='ai67cba74cba6kw4acwbc6w7')
         error = e.wrong_type(field='mobile_phone_number',
                              type='numeric phone number')
@@ -86,7 +88,7 @@ def test_updating_user_when_associated_to_user_and_line(user, line, extension, d
             a.line_extension(line, extension), \
             a.line_device(line, device):
 
-        response = confd.users(user['id']).put(firstname='foobar')
+        response = confd.users(user['id']).put(firstname='fôobar')
         response.assert_ok()
 
 
@@ -105,12 +107,12 @@ def test_update_user_with_all_parameters_null(user):
 
 
 def test_create_user_generates_appropriate_caller_id():
-    expected_caller_id = '"John"'
-    response = confd.users.post(firstname='John')
+    expected_caller_id = '"Jôhn"'
+    response = confd.users.post(firstname='Jôhn')
     assert_that(response.item, has_entry('caller_id', expected_caller_id))
 
-    expected_caller_id = '"John Doe"'
-    response = confd.users.post(firstname='John', lastname='Doe')
+    expected_caller_id = '"Jôhn Doe"'
+    response = confd.users.post(firstname='Jôhn', lastname='Doe')
     assert_that(response.item['caller_id'], equal_to(expected_caller_id))
 
 
@@ -122,13 +124,13 @@ def test_that_the_directory_view_works_with_unicode_characters(user):
     assert_that(response.items[0]['id'], equal_to(user['id']))
 
 
-@fixtures.user()
+@fixtures.user(firstname="Snôm", lastname="Whîte")
 @fixtures.user()
 @fixtures.user()
 def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
     result = confd.users(user_1['uuid']).get()
 
-    assert_that(result.item, has_entries(firstname='John', lastname='Doe'))
+    assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
 
 
 @fixtures.user()
@@ -142,35 +144,35 @@ def test_that_users_can_be_deleted_by_uuid(user):
 
 @fixtures.user()
 def test_that_users_can_be_edited_by_uuid(user):
-    response = confd.users(user['uuid']).put({'firstname': 'Foo',
-                                              'lastname': 'Bar'})
+    response = confd.users(user['uuid']).put({'firstname': 'Fôo',
+                                              'lastname': 'Bâr'})
     response.assert_ok()
 
     response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(firstname='Foo', lastname='Bar'))
+    assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
 
 
-@fixtures.user(firstname="Legacy", lastname="User")
+@fixtures.user(firstname="Lègacy", lastname="Usér")
 def test_search_using_legacy_parameter(user):
-    response = confd.users.get(q="legacy user")
+    response = confd.users.get(q="lègacy usér")
 
-    assert_that(response.items, has_item(has_entries(firstname="Legacy", lastname="User")))
+    assert_that(response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér")))
 
 
-@fixtures.user(firstname="Leeroy",
-               lastname="Jenkins",
+@fixtures.user(firstname="Léeroy",
+               lastname="Jénkins",
                outgoing_caller_id='"Mystery Man" <5551234567>',
                username="leeroyjenkins",
                music_on_hold="leeroy_music_on_hold",
                mobile_phone_number="5552423232",
                userfield="leeroy jenkins userfield",
-               description="Leeroy Jenkin's bio",
+               description="Léeroy Jénkin's bio",
                preprocess_subroutine="leeroy_preprocess")
 def test_search_on_user_view(user):
     url = confd.users
     searches = {
-        'firstname': 'leeroy',
-        'lastname': 'jenkins',
+        'firstname': 'léeroy',
+        'lastname': 'jénkins',
         'music_on_hold': 'leeroy_music',
         'outgoing_caller_id': '5551234567',
         'mobile_phone_number': '2423232',
@@ -183,8 +185,8 @@ def test_search_on_user_view(user):
         yield check_search, url, user, field, term
 
 
-@fixtures.user(firstname="Moustapha",
-               lastname="Bangoura",
+@fixtures.user(firstname="Môustapha",
+               lastname="Bângoura",
                mobile_phone_number="5559284759",
                userfield="Moustapha userfield",
                description="Moustapha the greatest dancer")
@@ -192,8 +194,8 @@ def test_search_on_directory_view(user):
     url = confd.users(view='directory')
 
     searches = {
-        'firstname': 'moustapha',
-        'lastname': 'bangoura',
+        'firstname': 'môustapha',
+        'lastname': 'bângoura',
         'mobile_phone_number': '928475',
         'userfield': 'moustapha userfield',
         'description': "greatest dancer",
