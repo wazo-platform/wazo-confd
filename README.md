@@ -44,6 +44,6 @@ integration_tests/assets/base/docker-compose.yml
 If you need to run tests more than once (e.g. when developing):
 
 ```
-make stop test-image start
+make stop start
 DOCKER=0 nosetests suite
 ```

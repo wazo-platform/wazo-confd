@@ -31,13 +31,9 @@ stop:
 	docker-compose kill && \
 	docker-compose rm -f
 
-start: rundeps
+start:
 	cd assets/base && \
 	docker-compose run --service-ports --rm tests
-
-rundeps:
-	cd assets/base && \
-	docker-compose run --service-ports --rm testdeps
 
 runconfd:
 	cd assets/base && \
