@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import unicode_literals
+
 from hamcrest import assert_that, has_items, has_entries
 
 from test_api import confd
@@ -119,12 +121,12 @@ def test_dissociate_line_and_incall(user, line, internal, incall):
 @fixtures.device()
 def test_update_device_associated_to_sip_line(provd, user, line, extension, device):
     with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
-        response = confd.lines(line['id']).put(caller_id_name="John Smith")
+        response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth")
         response.assert_updated()
 
         provd_config = provd.configs.get(device['id'])
         sip_line = provd_config['raw_config']['sip_lines']['1']
-        assert_that(sip_line, has_entries({'display_name': 'John Smith'}))
+        assert_that(sip_line, has_entries({'display_name': 'Jôhn Smîth'}))
 
 
 @mocks.provd()
@@ -147,25 +149,25 @@ def test_update_device_associated_to_sip_endpoint(provd, user, line, sip, extens
                                            'password': 'mysecret'}))
 
 
-@fixtures.user(firstname="John", lastname="Smith")
+@fixtures.user(firstname="Jôhn", lastname="Smîth")
 @fixtures.line()
 @fixtures.sip()
 @fixtures.extension()
 def test_caller_name_on_sip_line(user, line, sip, extension):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
+        assert_that(response.item, has_entries({'caller_id_name': 'Jôhn Smîth',
                                                 'caller_id_num': extension['exten']}))
 
 
-@fixtures.user(caller_id='"John Smith" <1000>')
+@fixtures.user(caller_id='"Jôhn Smîth" <1000>')
 @fixtures.line()
 @fixtures.sip()
 @fixtures.extension()
 def test_caller_id_on_sip_line(user, line, sip, extension):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
+        assert_that(response.item, has_entries({'caller_id_name': 'Jôhn Smîth',
                                                 'caller_id_num': '1000'}))
 
 
@@ -182,25 +184,25 @@ def test_dissociate_sip_endpoint_associated_to_device(user, line, sip, extension
         response.assert_status(400, e.resource_associated('Line', 'Device'))
 
 
-@fixtures.user(firstname="John", lastname="Smith")
+@fixtures.user(firstname="Jôhn", lastname="Smîth")
 @fixtures.line()
 @fixtures.sccp()
 @fixtures.extension()
 def test_caller_name_on_sccp_line(user, line, sccp, extension):
     with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
+        assert_that(response.item, has_entries({'caller_id_name': 'Jôhn Smîth',
                                                 'caller_id_num': extension['exten']}))
 
 
-@fixtures.user(caller_id='"John Smith" <1000>')
+@fixtures.user(caller_id='"Jôhn Smîth" <1000>')
 @fixtures.line()
 @fixtures.sccp()
 @fixtures.extension()
 def test_caller_id_on_sccp_line(user, line, sccp, extension):
     with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entries({'caller_id_name': 'John Smith',
+        assert_that(response.item, has_entries({'caller_id_name': 'Jôhn Smîth',
                                                 'caller_id_num': '1000'}))
 
 

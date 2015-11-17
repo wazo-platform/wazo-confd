@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import unicode_literals
+
 
 import re
 
@@ -144,7 +146,7 @@ def test_create_line_with_all_parameters():
 
 def test_create_line_with_caller_id_raises_error():
     response = confd.lines.post(context=config.CONTEXT,
-                                caller_id_name="John Smith",
+                                caller_id_name="Jôhn Smîth",
                                 caller_id_num="1000")
 
     response.assert_status(400)
@@ -184,7 +186,7 @@ def test_update_all_parameters_on_line(line, context):
 
 @fixtures.line()
 def test_update_caller_id_on_line_without_endpoint_raises_error(line):
-    response = confd.lines(line['id']).put(caller_id_name="John Smith",
+    response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth",
                                            caller_id_num="1000")
     response.assert_status(400)
 
