@@ -124,16 +124,10 @@ class ProvdDeviceDao(object):
         return self.device_manager.find(sort=(order, sort_direction))
 
     def create(self):
-        device_id = self.device_manager.add({})
+        config_id = self.config_manager.autocreate()
+        device_id = self.device_manager.add({u'config': config_id})
         logger.debug("new device %s created", device_id)
 
-        config = {'id': device_id,
-                  'parent_ids': ['base'],
-                  'deletable': True,
-                  'raw_config': {}}
-
-        logger.debug("adding config %s", config)
-        self.config_manager.add(config)
         return self.find_by('id', device_id)
 
     def edit(self, provd_device):
