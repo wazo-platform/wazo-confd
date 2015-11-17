@@ -97,6 +97,20 @@ class ProvdHelper(object):
 
         return self.configs.add(config)
 
+    def associate_line_device(self, device_id):
+        # line <-> device association is an operation that is currently performed
+        # "completely" only by the web-interface -- fake a minimum amount of work here
+        config = {
+            u'id': device_id,
+            u'parent_ids': [],
+            u'raw_config': {},
+        }
+        self.configs.add(config)
+
+        device = self.devices.get(device_id)
+        device[u'config'] = device_id
+        self.devices.update(device)
+
     def assert_config_does_not_exist(self, config_id):
         try:
             self.configs.get(config_id)
