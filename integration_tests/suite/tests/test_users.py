@@ -20,31 +20,12 @@ from __future__ import unicode_literals
 
 
 from test_api import scenarios as s
-from test_api import errors as e
 from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
-from test_api.helpers.user import generate_user
 
 from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item
 
-FIELDS = ['firstname',
-          'lastname',
-          'timezone',
-          'language',
-          'description',
-          'caller_id',
-          'outgoing_caller_id',
-          'mobile_phone_number',
-          'username',
-          'password',
-          'music_on_hold',
-          'preprocess_subroutine',
-          'userfield']
-
-REQUIRED = ['firstname']
-
-BOGUS = [(f, 123, 'unicode string') for f in FIELDS]
 
 NULL_USER = {"firstname": "Jôhn",
              "lastname": None,
@@ -60,23 +41,49 @@ NULL_USER = {"firstname": "Jôhn",
              "description": None}
 
 
-class TestUserResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.DeleteScenarios):
+def test_get_errors():
+    fake_get = confd.users(999999).get
+    yield s.check_resource_not_found, fake_get, 'User'
 
-    url = "/users"
-    resource = "User"
-    required = REQUIRED
-    bogus_fields = BOGUS
 
-    def create_resource(self):
-        user = generate_user()
-        return user['id']
+def test_post_errors():
+    empty_post = confd.users.post
+    user_post = confd.users(firstname="Jôhn").post
 
-    def test_invalid_mobile_phone_number(self):
-        response = confd.users.post(firstname='fîrstname',
-                                    mobile_phone_number='ai67cba74cba6kw4acwbc6w7')
-        error = e.wrong_type(field='mobile_phone_number',
-                             type='numeric phone number')
-        response.assert_match(400, error)
+    yield s.check_missing_required_field_returns_error, empty_post, 'firstname'
+    for check in error_checks(user_post):
+        yield check
+
+
+def error_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'firstname', 123
+    yield s.check_bogus_field_returns_error, url, 'lastname', 123
+    yield s.check_bogus_field_returns_error, url, 'timezone', 123
+    yield s.check_bogus_field_returns_error, url, 'language', 123
+    yield s.check_bogus_field_returns_error, url, 'description', 123
+    yield s.check_bogus_field_returns_error, url, 'caller_id', 123
+    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', 123
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 123
+    yield s.check_bogus_field_returns_error, url, 'username', 123
+    yield s.check_bogus_field_returns_error, url, 'password', 123
+    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
+    yield s.check_bogus_field_returns_error, url, 'userfield', 123
+
+
+@fixtures.user()
+def test_put_errors(user):
+    user_put = confd.users(user['id']).put
+
+    for check in error_checks(user_put):
+        yield check
+
+
+@fixtures.user()
+def test_delete_errors(user):
+    user_url = confd.users(user['id'])
+    user_url.delete()
+    yield s.check_resource_not_found, user_url.get, 'User'
 
 
 @fixtures.user()
