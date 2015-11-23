@@ -1,8 +1,28 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2015 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+import unittest
+
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
 from test_api import fixtures
 from test_api import confd
+from test_api import provd
 
 from test_api.helpers.device import generate_device
 
@@ -33,6 +53,27 @@ class TestDeviceResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.D
     def create_resource(self):
         device = generate_device()
         return device['id']
+
+
+class TestDeviceCreateWithTemplate(unittest.TestCase):
+
+    def setUp(self):
+        self.provd = provd.create_helper()
+        self.template_id = self.provd.add_device_template()
+
+    def tearDown(self):
+        self.provd.reset()
+
+    def test_create_device_with_template(self):
+        response = confd.devices.post(template_id=self.template_id)
+        response.assert_status(201)
+
+        device_id = response.json[u'id']
+        device = self.provd.devices.get(device_id)
+        config = self.provd.configs.get(device[u'config'])
+        provd.assert_device_has_autoprov_config(device)
+        provd.assert_config_use_device_template(config, self.template_id)
+        self.provd.assert_config_does_not_exist(device_id)
 
 
 @fixtures.device()

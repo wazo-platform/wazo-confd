@@ -18,7 +18,8 @@
 
 import os
 
-from xivo_provd_client import new_provisioning_client
+from hamcrest import assert_that, equal_to, has_item, starts_with
+from xivo_provd_client import new_provisioning_client, NotFoundError
 
 
 class ProvdHelper(object):
@@ -84,6 +85,48 @@ class ProvdHelper(object):
     def add_default_configs(self):
         for config in self.DEFAULT_CONFIGS:
             self.configs.add(config)
+
+    def add_device_template(self):
+        config = {
+            u'X_type': u'device',
+            u'deletable': True,
+            u'label': u'black-label',
+            u'parent_ids': [],
+            u'raw_config': {},
+        }
+
+        return self.configs.add(config)
+
+    def associate_line_device(self, device_id):
+        # line <-> device association is an operation that is currently performed
+        # "completely" only by the web-interface -- fake a minimum amount of work here
+        config = {
+            u'id': device_id,
+            u'parent_ids': [],
+            u'raw_config': {},
+        }
+        self.configs.add(config)
+
+        device = self.devices.get(device_id)
+        device[u'config'] = device_id
+        self.devices.update(device)
+
+    def assert_config_does_not_exist(self, config_id):
+        try:
+            self.configs.get(config_id)
+        except NotFoundError:
+            return
+        else:
+            raise AssertionError('config "{}" exists in xivo-provd'.format(config_id))
+
+
+def assert_device_has_autoprov_config(device):
+    assert_that(device[u'config'], starts_with(u'autoprov'))
+
+
+def assert_config_use_device_template(config, template_id):
+    assert_that(config[u'configdevice'], equal_to(template_id))
+    assert_that(config[u'parent_ids'], has_item(template_id))
 
 
 def create_helper():

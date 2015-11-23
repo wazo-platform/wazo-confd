@@ -16,16 +16,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api.database import create_helper
+from test_api.database import create_helper as database_create_helper
+from test_api.provd import create_helper as provd_create_helper
 
 
 def associate(line_id, device_id):
-    database = create_helper()
+    database = database_create_helper()
     with database.queries() as queries:
         queries.associate_line_device(line_id, device_id)
 
+    provd = provd_create_helper()
+    provd.associate_line_device(device_id)
+
 
 def dissociate(line_id, device_id):
-    database = create_helper()
+    database = database_create_helper()
     with database.queries() as queries:
         queries.dissociate_line_device(line_id, device_id)
