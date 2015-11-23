@@ -4022,6 +4022,10 @@
                     "type": "string",
                     "description": "Phone number for the user’s mobile device"
                 },
+                "voicemail_number": {
+                    "type": "string",
+                    "description": "User's voicemail number"
+                },
                 "username": {
                     "type": "string",
                     "description": "Username for connecting to the CTI"
