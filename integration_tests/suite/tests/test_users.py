@@ -27,6 +27,21 @@ from test_api import fixtures
 from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item
 
 
+FULL_USER = {"firstname": "Jôhn",
+             "lastname": "Smêth",
+             "username": "jsmeth",
+             "mobile_phone_number": "+4185551234*2",
+             "userfield": "userfield",
+             "caller_id": '"Jôhnny Smith" <4185551234>',
+             "outgoing_caller_id": '"Johnny" <123>',
+             "music_on_hold": "default",
+             "language": "fr_FR",
+             "timezone": "America/Montreal",
+             "preprocess_subroutine": "preprocess_subroutine",
+             "password": "password",
+             "description": "John's description"}
+
+
 NULL_USER = {"firstname": "Jôhn",
              "lastname": None,
              "username": None,
@@ -69,6 +84,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'userfield', 123
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
 
 
 @fixtures.user()
@@ -86,77 +102,12 @@ def test_delete_errors(user):
     yield s.check_resource_not_found, user_url.get, 'User'
 
 
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension()
-@fixtures.device()
-def test_updating_user_when_associated_to_user_and_line(user, line, extension, device):
-    with a.user_line(user, line), \
-            a.line_extension(line, extension), \
-            a.line_device(line, device):
-
-        response = confd.users(user['id']).put(firstname='fôobar')
-        response.assert_ok()
-
-
-def test_create_user_with_all_parameters_null():
-    response = confd.users.post(**NULL_USER)
-    assert_that(response.item, has_entries(NULL_USER))
-
-
-@fixtures.user()
-def test_update_user_with_all_parameters_null(user):
-    response = confd.users(user['id']).put(**NULL_USER)
-    response.assert_ok()
-
-    response = confd.users(user['id']).get()
-    assert_that(response.item, has_entries(**NULL_USER))
-
-
-def test_create_user_generates_appropriate_caller_id():
-    expected_caller_id = '"Jôhn"'
-    response = confd.users.post(firstname='Jôhn')
-    assert_that(response.item, has_entry('caller_id', expected_caller_id))
-
-    expected_caller_id = '"Jôhn Doe"'
-    response = confd.users.post(firstname='Jôhn', lastname='Doe')
-    assert_that(response.item['caller_id'], equal_to(expected_caller_id))
-
-
 @fixtures.user(firstname=u'Éric')
 def test_that_the_directory_view_works_with_unicode_characters(user):
     response = confd.users.get(view='directory', q=u'éric')
     response.assert_ok()
 
     assert_that(response.items[0]['id'], equal_to(user['id']))
-
-
-@fixtures.user(firstname="Snôm", lastname="Whîte")
-@fixtures.user()
-@fixtures.user()
-def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
-    result = confd.users(user_1['uuid']).get()
-
-    assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
-
-
-@fixtures.user()
-def test_that_users_can_be_deleted_by_uuid(user):
-    response = confd.users(user['uuid']).delete()
-    response.assert_ok()
-
-    response = confd.users(user['uuid']).get()
-    response.assert_status(404)
-
-
-@fixtures.user()
-def test_that_users_can_be_edited_by_uuid(user):
-    response = confd.users(user['uuid']).put({'firstname': 'Fôo',
-                                              'lastname': 'Bâr'})
-    response.assert_ok()
-
-    response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
 
 
 @fixtures.user(firstname="Lègacy", lastname="Usér")
@@ -225,3 +176,107 @@ def check_search(url, user, field, term):
     expected = has_item(has_entry(field, user[field]))
     response = url.get(search=term)
     assert_that(response.items, expected)
+
+
+@fixtures.user(firstname="Snôm", lastname="Whîte")
+@fixtures.user()
+@fixtures.user()
+def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
+    result = confd.users(user_1['uuid']).get()
+
+    assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
+
+
+def test_create_minimal_parameters():
+    response = confd.users.post(firstname="Roger")
+
+    response.assert_created('users')
+    assert_that(response.item, has_entry("firstname", "Roger"))
+
+
+def test_create_user_with_all_parameters():
+    response = confd.users.post(**FULL_USER)
+
+    response.assert_created('users')
+    assert_that(response.item, has_entries(FULL_USER))
+
+
+def test_create_user_with_all_parameters_null():
+    response = confd.users.post(**NULL_USER)
+    assert_that(response.item, has_entries(NULL_USER))
+
+
+def test_create_user_generates_appropriate_caller_id():
+    expected_caller_id = '"Jôhn"'
+    response = confd.users.post(firstname='Jôhn')
+    assert_that(response.item, has_entry('caller_id', expected_caller_id))
+
+    expected_caller_id = '"Jôhn Doe"'
+    response = confd.users.post(firstname='Jôhn', lastname='Doe')
+    assert_that(response.item['caller_id'], equal_to(expected_caller_id))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.extension()
+@fixtures.device()
+def test_updating_user_when_associated_to_user_and_line(user, line, extension, device):
+    with a.user_line(user, line), \
+            a.line_extension(line, extension), \
+            a.line_device(line, device):
+
+        response = confd.users(user['id']).put(firstname='fôobar')
+        response.assert_updated()
+
+
+@fixtures.user(firstname="Léeroy",
+               lastname="Jénkins",
+               outgoing_caller_id='"Mystery Man" <5551234567>',
+               username="leeroyjenkins",
+               music_on_hold="leeroy_music_on_hold",
+               mobile_phone_number="5552423232",
+               userfield="leeroy jenkins userfield",
+               description="Léeroy Jénkin's bio",
+               preprocess_subroutine="leeroy_preprocess")
+def test_update_user_with_all_parameters(user):
+    user_url = confd.users(user['id'])
+
+    response = user_url.put(**FULL_USER)
+    response.assert_updated()
+
+    response = user_url.get()
+    assert_that(response.item, has_entries(FULL_USER))
+
+
+@fixtures.user()
+def test_update_user_with_all_parameters_null(user):
+    response = confd.users(user['id']).put(**NULL_USER)
+    response.assert_updated()
+
+    response = confd.users(user['id']).get()
+    assert_that(response.item, has_entries(**NULL_USER))
+
+
+@fixtures.user()
+def test_that_users_can_be_edited_by_uuid(user):
+    response = confd.users(user['uuid']).put({'firstname': 'Fôo',
+                                              'lastname': 'Bâr'})
+    response.assert_updated()
+
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
+
+
+@fixtures.user()
+def test_delete(user):
+    response = confd.users(user['id']).delete()
+    response.assert_deleted()
+
+
+@fixtures.user()
+def test_that_users_can_be_deleted_by_uuid(user):
+    response = confd.users(user['uuid']).delete()
+    response.assert_deleted()
+
+    response = confd.users(user['uuid']).get()
+    response.assert_status(404)
