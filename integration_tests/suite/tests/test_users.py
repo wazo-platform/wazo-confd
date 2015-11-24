@@ -84,6 +84,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'userfield', 123
+    yield s.check_bogus_field_returns_error, url, 'caller_id', 'callerid'
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
 
 
@@ -102,9 +103,9 @@ def test_delete_errors(user):
     yield s.check_resource_not_found, user_url.get, 'User'
 
 
-@fixtures.user(firstname=u'Éric')
+@fixtures.user(firstname=u'ÉricDir')
 def test_that_the_directory_view_works_with_unicode_characters(user):
-    response = confd.users.get(view='directory', q=u'éric')
+    response = confd.users.get(view='directory', search=u'éricdir')
     response.assert_ok()
 
     assert_that(response.items[0]['id'], equal_to(user['id']))
