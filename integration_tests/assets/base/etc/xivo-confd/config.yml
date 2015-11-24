@@ -74,7 +74,7 @@ sysconfd:
 # Activate confd plugins
 # This is the recommended way to add plugins.
 enabled_plugins:
-   - legacy_plugins
+   - user_plugin
    - line_plugin
    - endpoint_sip_plugin
    - endpoint_sccp_plugin
@@ -82,3 +82,4 @@ enabled_plugins:
    - user_line_plugin
    - line_extension_plugin
    - line_endpoint_plugin
+   - legacy_plugins
