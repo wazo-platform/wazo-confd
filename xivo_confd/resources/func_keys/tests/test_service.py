@@ -19,12 +19,13 @@
 
 import unittest
 
-from mock import Mock, sentinel
+from mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to
 
 from xivo_confd.resources.func_keys.service import TemplateService
 from xivo_confd.resources.devices.service import DeviceUpdater
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 
 class TestTemplateService(unittest.TestCase):
@@ -34,7 +35,7 @@ class TestTemplateService(unittest.TestCase):
         self.template_dao = Mock()
 
         self.user_dao = Mock()
-        self.user_dao.find_all_by_template_id.return_value = []
+        self.user_dao.find_all_by.return_value = []
 
         self.notifier = Mock()
         self.device_updater = Mock(DeviceUpdater)
@@ -107,14 +108,15 @@ class TestTemplateService(unittest.TestCase):
 
         self.validator.validate_delete.assert_called_once_with(self.template)
 
-    def test_when_deleting_then_updates_devices_associated_to_users(self):
-        expected_user = Mock()
-        self.user_dao.find_all_by_template_id.return_value = [expected_user]
+    @patch('xivo_dao.helpers.db_manager.Session.expire')
+    def test_when_deleting_then_updates_devices_associated_to_users(self, session_expire):
+        expected_user = User(func_key_template_id=sentinel.func_key_template_id)
+        self.user_dao.find_all_by.return_value = [expected_user]
 
         self.service.delete(self.template)
 
         self.device_updater.update_for_user.assert_called_once_with(expected_user)
-        self.user_dao.find_all_by_template_id.assert_called_once_with(self.template.id)
+        self.user_dao.find_all_by.assert_called_once_with(func_key_template_id=self.template.id)
 
     def test_when_deleting_then_deletes_template_in_database(self):
         self.service.delete(self.template)
