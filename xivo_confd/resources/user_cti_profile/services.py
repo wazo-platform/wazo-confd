@@ -25,8 +25,8 @@ from xivo_confd.resources.user_cti_profile import validator, notifier
 def get(user_id):
     cti_profile = dao.find_profile_by_userid(user_id)
     cti_profile_id = None if cti_profile is None else cti_profile.id
-    enabled = user_dao.is_cti_enabled(user_id)
-    return UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id, enabled=enabled)
+    user = user_dao.get(user_id)
+    return UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id, enabled=user.cti_enabled)
 
 
 def edit(user_cti_profile):

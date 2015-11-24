@@ -16,10 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import Blueprint
 from flask import Response
 from flask import request
 from flask_negotiate import consumes
 from flask_negotiate import produces
+
+from xivo_confd import config
 from xivo_confd.resources.user_cti_profile import services as user_cti_profile_services
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.user import dao as user_dao
@@ -29,7 +32,10 @@ from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
 
 
 def load(core_rest_api):
-    user_blueprint = core_rest_api.blueprint('users')
+    user_blueprint = Blueprint('users',
+                               __name__,
+                               url_prefix='/%s/users' % config.API_VERSION)
+
     document = core_rest_api.content_parser.document(
         Field('user_id', Int()),
         Field('cti_profile_id', Int()),
