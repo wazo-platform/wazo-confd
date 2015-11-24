@@ -34,9 +34,8 @@ fields = {
                             field='line_id',
                             target='id'),
                        Link('users',
-                            route='users.get',
                             field='user_id',
-                            target='resource_id'))
+                            target='id'))
 }
 
 parser = reqparse.RequestParser()

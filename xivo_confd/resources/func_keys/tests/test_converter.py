@@ -359,7 +359,7 @@ class TestUserDestinationBuilder(unittest.TestCase):
         result = self.builder.url(dest)
 
         assert_that(result, equal_to(expected))
-        url_for.assert_called_once_with('users.get', _external=True, resource_id=sentinel.user_id)
+        url_for.assert_called_once_with('users', _external=True, id=sentinel.user_id)
 
 
 class TestGroupDestinationBuilder(unittest.TestCase):

@@ -121,26 +121,39 @@ class RequestParser(Parser):
         return mapping
 
 
+class LinkGenerator(object):
+
+    def __init__(self, rel, route=None, id_name='resource_id', field_name='id'):
+        self.rel = rel
+        self.route = route or (rel + '.get')
+        self.id_name = id_name
+        self.field_name = field_name
+
+    def generate(self, mapping):
+        parameters = {'_external': True,
+                      self.id_name: mapping[self.field_name]}
+
+        return {'rel': self.rel,
+                'href': helpers.url_for(self.route, **parameters)}
+
+    def can_generate(self, mapping):
+        return mapping.get(self.field_name) is not None
+
+
 class ResourceSerializer(Serializer):
 
-    def __init__(self, resources):
-        self.resources = resources
+    def __init__(self, generators):
+        self.generators = generators
 
     def serialize(self, mapping):
         mapping = self._map_item(mapping)
         return json.dumps(mapping)
 
     def _map_item(self, mapping):
-        mapping['links'] = [self._generate_link(resource, mapping[resource_id])
-                            for resource, resource_id in self.resources.iteritems()
-                            if mapping.get(resource_id) is not None]
+        mapping['links'] = [generator.generate(mapping)
+                            for generator in self.generators
+                            if generator.can_generate(mapping)]
         return mapping
-
-    def _generate_link(self, resource, resource_id):
-        return {'rel': resource,
-                'href': helpers.url_for(resource + '.get',
-                                        resource_id=resource_id,
-                                        _external=True)}
 
     def serialize_list(self, items, total=None):
         result = {'total': total or len(items),
@@ -192,7 +205,7 @@ class Converter(object):
 
     @classmethod
     def association(cls, document, model, links=None, rename=None):
-        links = links or {}
+        links = links or []
         rename = rename or {}
         parser = RequestParser(document, rename.keys())
         mapper = DocumentMapper(document, rename)
@@ -204,7 +217,7 @@ class Converter(object):
     def resource(cls, document, model, resource_name=None, resource_id=None):
         resource_name = resource_name or model.__name__.lower() + 's'
         resource_id = resource_id or 'id'
-        links = {resource_name: resource_id}
+        links = [LinkGenerator(resource_name, field_name=resource_id)]
 
         parser = DocumentParser(document)
         mapper = DocumentMapper(document)

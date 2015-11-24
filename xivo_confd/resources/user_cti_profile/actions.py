@@ -24,7 +24,7 @@ from xivo_confd.resources.user_cti_profile import services as user_cti_profile_s
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.converter import Converter, LinkGenerator
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
 
 
@@ -35,8 +35,11 @@ def load(core_rest_api):
         Field('cti_profile_id', Int()),
         Field('enabled', Boolean())
     )
-    converter = Converter.association(document, UserCtiProfile, {'users': 'user_id',
-                                                                 'cti_profiles': 'cti_profile_id'})
+
+    links = [LinkGenerator('users', route='users', id_name='id', field_name='user_id'),
+             LinkGenerator('cti_profiles', id_name='resource_id', field_name='cti_profile_id')]
+
+    converter = Converter.association(document, UserCtiProfile, links=links)
 
     @user_blueprint.route('/<int:user_id>/cti', methods=['PUT'])
     @core_rest_api.auth.login_required
