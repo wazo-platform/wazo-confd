@@ -485,10 +485,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sccp_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sccpid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -515,10 +512,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sccp_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sccpid"
                     },
                     {
                         "name": "body",
@@ -553,10 +547,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sccp_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sccpid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -586,10 +577,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sccp_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sccpid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -695,10 +683,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sip_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sipid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -725,10 +710,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sip_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sipid"
                     },
                     {
                         "name": "body",
@@ -763,10 +745,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sip_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sipid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -796,10 +775,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sip_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sipid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -924,10 +900,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "extension_id",
-                        "in": "path"
+                        "$ref": "#/parameters/extensionid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -953,13 +926,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                        "name": "extension_id",
-                        "in": "path"
+                        "$ref": "#/parameters/extensionid"
                     },
                     {
                         "name": "body",
@@ -994,10 +961,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "extension_id",
-                        "in": "path"
+                        "$ref": "#/parameters/extensionid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1025,10 +989,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "extension_id",
-                        "in": "path"
+                        "$ref": "#/parameters/extensionid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1135,10 +1096,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1164,10 +1122,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1196,10 +1151,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1227,17 +1179,10 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "position",
-                        "in": "path",
-                        "description": "position of the funckey"
+                        "$ref": "#/parameters/funckeyposition"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1263,17 +1208,10 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "position",
-                        "in": "path",
-                        "description": "position of the funckey"
+                        "$ref": "#/parameters/funckeyposition"
                     },
                     {
                         "name": "body",
@@ -1304,17 +1242,10 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "position",
-                        "in": "path",
-                        "description": "position of the funckey"
+                        "$ref": "#/parameters/funckeyposition"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1561,10 +1492,7 @@
                         "$ref": "#/parameters/lineid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sccp_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sccpid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1595,10 +1523,7 @@
                         "$ref": "#/parameters/lineid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sccp_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sccpid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1667,10 +1592,7 @@
                         "$ref": "#/parameters/lineid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sip_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sipid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1701,10 +1623,7 @@
                         "$ref": "#/parameters/lineid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "sip_id",
-                        "in": "path"
+                        "$ref": "#/parameters/sipid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1805,10 +1724,7 @@
                         "$ref": "#/parameters/lineid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "extension_id",
-                        "in": "path"
+                        "$ref": "#/parameters/extensionid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2198,11 +2114,7 @@
                         "$ref": "#/parameters/userid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "position",
-                        "in": "path",
-                        "description": "position of the funckey"
+                        "$ref": "#/parameters/funckeyposition"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2232,11 +2144,7 @@
                         "$ref": "#/parameters/userid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "position",
-                        "in": "path",
-                        "description": "position of the funckey"
+                        "$ref": "#/parameters/funckeyposition"
                     },
                     {
                         "name": "body",
@@ -2271,11 +2179,7 @@
                         "$ref": "#/parameters/userid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "position",
-                        "in": "path",
-                        "description": "position of the funckey"
+                        "$ref": "#/parameters/funckeyposition"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2336,10 +2240,7 @@
                         "$ref": "#/parameters/userid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2369,10 +2270,7 @@
                         "$ref": "#/parameters/userid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "template_id",
-                        "in": "path"
+                        "$ref": "#/parameters/templateid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2728,10 +2626,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "voicemail_id",
-                        "in": "path"
+                        "$ref": "#/parameters/voicemailid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2758,10 +2653,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "voicemail_id",
-                        "in": "path"
+                        "$ref": "#/parameters/voicemailid"
                     },
                     {
                         "name": "body",
@@ -2796,10 +2688,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "voicemail_id",
-                        "in": "path"
+                        "$ref": "#/parameters/voicemailid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2828,10 +2717,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "voicemail_id",
-                        "in": "path"
+                        "$ref": "#/parameters/voicemailid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -3199,6 +3085,19 @@
             ],
             "description": "Sort list of items in 'asc' (ascending) or 'desc' (descending) order"
         },
+        "extensionid": {
+            "required": true,
+            "type": "integer",
+            "name": "extension_id",
+            "in": "path"
+        },
+        "funckeyposition": {
+            "required": true,
+            "type": "integer",
+            "name": "position",
+            "in": "path",
+            "description": "position of the funckey"
+        },
         "lineid": {
             "required": true,
             "type": "integer",
@@ -3233,12 +3132,30 @@
             "in": "path",
             "description": "Queue’s ID"
         },
+        "sccpid": {
+            "required": true,
+            "type": "integer",
+            "name": "sccp_id",
+            "in": "path"
+        },
         "search": {
             "required": false,
             "name": "search",
             "in": "query",
             "type": "string",
             "description": "Search term for filtering a list of items. Only items with a field containing the search term will be returned."
+        },
+        "sipid": {
+            "required": true,
+            "type": "integer",
+            "name": "sip_id",
+            "in": "path"
+        },
+        "templateid": {
+            "required": true,
+            "type": "integer",
+            "name": "template_id",
+            "in": "path"
         },
         "token": {
             "required": false,
@@ -3267,6 +3184,12 @@
             "in": "query",
             "type": "string",
             "description": "Different view of the list of users. Acceptable value: directory."
+        },
+        "voicemailid": {
+            "required": true,
+            "type": "integer",
+            "name": "voicemail_id",
+            "in": "path"
         }
     },
     "responses": {
