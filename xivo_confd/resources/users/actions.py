@@ -113,6 +113,7 @@ def load(core_rest_api):
         Field('lastname', Unicode()),
         Field('exten', Unicode()),
         Field('mobile_phone_number', Unicode()),
+        Field('voicemail_number', Unicode()),
         Field('userfield', Unicode()),
         Field('description', Unicode()),
     )
