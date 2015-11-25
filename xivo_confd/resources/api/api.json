@@ -404,74 +404,6 @@
                 }
             }
         },
-        "/devices/{device_id}/associate_line/{line_id}": {
-            "get": {
-                "operationId": "associate_line_device",
-                "summary": "Associate line and device",
-                "deprecated": true,
-                "description": "***WARNING:*** This feature is not yet accessible nor functional",
-                "tags": [
-                    "devices",
-                    "lines"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Device associated"
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
-        "/devices/{device_id}/remove_line/{line_id}": {
-            "get": {
-                "operationId": "dissociate_line_device",
-                "summary": "Dissociate line and device",
-                "deprecated": true,
-                "description": "***WARNING:*** This feature is not yet accessible nor functional",
-                "tags": [
-                    "devices",
-                    "lines"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Device dissociated"
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
         "/endpoints/sccp": {
             "get": {
                 "operationId": "list_endpoints_sccp",
@@ -1791,109 +1723,6 @@
                 }
             }
         },
-        "/lines/{line_id}/extension": {
-            "get": {
-                "operationId": "get_line_extension_legacy",
-                "summary": "Get extension associated to line",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "extensions"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Line-Extension association",
-                        "schema": {
-                            "$ref": "#/definitions/LineExtension"
-                        }
-                    },
-                    "400": {
-                        "description": "No extension associated to line",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
-            "post": {
-                "operationId": "associate_line_extension_legacy",
-                "summary": "Associate line and extension",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "extensions"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "required": true,
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/LineExtension"
-                        }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Line and Extension associated",
-                        "schema": {
-                            "$ref": "#/definitions/LineExtension"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
-            "delete": {
-                "operationId": "dissociate_line_extension_legacy",
-                "summary": "Dissociate line and extension",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "extensions"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Line and Extension dissociated"
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
         "/lines/{line_id}/extensions": {
             "get": {
                 "operationId": "get_line_extension_association",
@@ -2020,167 +1849,6 @@
                         "schema": {
                             "$ref": "#/definitions/UserLineItems"
                         }
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
-        "/lines_sip": {
-            "get": {
-                "operationId": "list_line_sip",
-                "summary": "List SIP Lines",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "sip"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of SIP Lines",
-                        "schema": {
-                            "$ref": "#/definitions/LineSipItems"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "operationId": "create_line_sip",
-                "summary": "Create SIP line",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "sip"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "SIP Line to create",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/LineSip"
-                        }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "SIP Line created",
-                        "schema": {
-                            "$ref": "#/definitions/LineSip"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/CreateError"
-                    }
-                }
-            }
-        },
-        "/lines_sip/{line_id}": {
-            "get": {
-                "operationId": "get_line_sip",
-                "summary": "Get SIP line",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "sip"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "SIP Line",
-                        "schema": {
-                            "$ref": "#/definitions/LineSip"
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
-            "put": {
-                "operationId": "update_line_sip",
-                "summary": "Update SIP line",
-                "deprecated": true,
-                "tags": [
-                    "lines",
-                    "sip"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/LineSip"
-                        }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/responses/ResourceUpdated"
-                    },
-                    "400": {
-                        "$ref": "#/responses/UpdateError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
-            "delete": {
-                "operationId": "delete_line_sip",
-                "summary": "Delete SIP line",
-                "deprecated": true,
-                "description": "A SIP line can not be deleted if it is still associated with a user, an extesion, or a device. Any user, extension, or device attached to the line must be dissociated first.",
-                "tags": [
-                    "lines",
-                    "sip"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/AgentQueueCreate"
-                        }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/responses/ResourceDeleted"
-                    },
-                    "400": {
-                        "$ref": "#/responses/DeleteError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -3175,6 +2843,328 @@
                         "schema": {
                             "$ref": "#/definitions/UserVoicemailItems"
                         }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}/associate_line/{line_id}": {
+            "get": {
+                "operationId": "associate_line_device",
+                "summary": "Associate line and device",
+                "deprecated": true,
+                "description": "***WARNING:*** This feature is not yet accessible nor functional",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/deviceid"
+                    },
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Device associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/devices/{device_id}/remove_line/{line_id}": {
+            "get": {
+                "operationId": "dissociate_line_device",
+                "summary": "Dissociate line and device",
+                "deprecated": true,
+                "description": "***WARNING:*** This feature is not yet accessible nor functional",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/deviceid"
+                    },
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Device dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines_sip": {
+            "get": {
+                "operationId": "list_line_sip",
+                "summary": "List SIP Lines",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of SIP Lines",
+                        "schema": {
+                            "$ref": "#/definitions/LineSipItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_line_sip",
+                "summary": "Create SIP line",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "SIP Line to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "SIP Line created",
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/extension": {
+            "get": {
+                "operationId": "get_line_extension_legacy",
+                "summary": "Get extension associated to line",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line-Extension association",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "400": {
+                        "description": "No extension associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_line_extension_legacy",
+                "summary": "Associate line and extension",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "required": true,
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Line and Extension associated",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_extension_legacy",
+                "summary": "Dissociate line and extension",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and Extension dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines_sip/{line_id}": {
+            "get": {
+                "operationId": "get_line_sip",
+                "summary": "Get SIP line",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SIP Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_line_sip",
+                "summary": "Update SIP line",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_line_sip",
+                "summary": "Delete SIP line",
+                "deprecated": true,
+                "description": "A SIP line can not be deleted if it is still associated with a user, an extesion, or a device. Any user, extension, or device attached to the line must be dissociated first.",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueCreate"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
