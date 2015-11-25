@@ -40,31 +40,28 @@
             "get": {
                 "operationId": "list_call_logs",
                 "summary": "List call logs",
-                "description": "List call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"",
+                "description": "List call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"\n\nWhere Period is the number of seconds of the call. Default: 0 if not answered",
                 "tags": [
                     "call_logs"
                 ],
-                "consumes": [
-                    "text/csv"
-                ],
                 "produces": [
-                    "text/csv"
+                    "text/csv; charset=utf-8"
                 ],
                 "parameters": [
                     {
                         "name": "start_date",
-                        "description": "filter call logs after start date",
+                        "description": "filter call logs after start date. Format YYYY-MM-DDTHH:MM:SS",
                         "in": "query",
                         "type": "string",
-                        "format": "datetime",
+                        "format": "date-time",
                         "required": false
                     },
                     {
                         "name": "end_date",
-                        "description": "filter call logs before end date",
+                        "description": "filter call logs before end date. Format YYYY-MM-DDTHH:MM:SS",
                         "in": "query",
                         "type": "string",
-                        "format": "datetime",
+                        "format": "date-time",
                         "required": false
                     },
                     {
@@ -221,6 +218,9 @@
                         "schema": {
                             "$ref": "#/definitions/DeviceItems"
                         }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
                     }
                 }
             },
@@ -266,10 +266,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -295,10 +292,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
                         "name": "body",
@@ -327,15 +321,13 @@
             "delete": {
                 "operationId": "delete_device",
                 "summary": "Delete device",
+                "description": "A device can not be deleted if it is linked to a line. You must dissociate the line and the device first.",
                 "tags": [
                     "devices"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -358,15 +350,13 @@
             "get": {
                 "operationId": "reset_device_autoprov",
                 "summary": "Reset device to autoprov",
+                "description": "The device’s configuration will be lost when reset to autoprov mode.",
                 "tags": [
                     "devices"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -389,15 +379,13 @@
             "get": {
                 "operationId": "synchronize_device",
                 "summary": "Synchronize device",
+                "description": "Synchronize a device’s configuration. Used when a configuration has been modified and the changes need to be sent to the device.",
                 "tags": [
                     "devices"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -420,22 +408,18 @@
             "get": {
                 "operationId": "associate_line_device",
                 "summary": "Associate line and device",
+                "deprecated": true,
+                "description": "***WARNING:*** This feature is not yet accessible nor functional",
                 "tags": [
                     "devices",
                     "lines"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -458,22 +442,18 @@
             "get": {
                 "operationId": "dissociate_line_device",
                 "summary": "Dissociate line and device",
+                "deprecated": true,
+                "description": "***WARNING:*** This feature is not yet accessible nor functional",
                 "tags": [
                     "devices",
                     "lines"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "device_id",
-                        "in": "path"
+                        "$ref": "#/parameters/deviceid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -939,7 +919,11 @@
                         "name": "type",
                         "in": "query",
                         "type": "string",
-                        "description": "Filter extensions of a certain type. Types allowed: internal, incall"
+                        "enum": [
+                            "internal",
+                            "incall"
+                        ],
+                        "description": "Filter extensions of a certain type. Internal: Used for calling a line with an internal number (e.g. “1000@default”). Incall: Used for calling a line from the outside (e.g. “from-extern” with a DID)"
                     },
                     {
                         "name": "exten",
@@ -1039,6 +1023,9 @@
                     {
                         "required": true,
                         "type": "integer",
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
                         "name": "extension_id",
                         "in": "path"
                     },
@@ -1069,6 +1056,7 @@
             "delete": {
                 "operationId": "delete_extension",
                 "summary": "Delete extension",
+                "description": "An extension can not be deleted if it is associated to a line. You must delete the association first.",
                 "tags": [
                     "extensions"
                 ],
@@ -1512,10 +1500,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1541,10 +1526,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "name": "body",
@@ -1578,10 +1560,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1611,10 +1590,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1650,10 +1626,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -1687,10 +1660,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -1726,10 +1696,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1765,10 +1732,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -1802,10 +1766,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -1841,10 +1802,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1878,10 +1836,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -1920,10 +1875,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1952,10 +1904,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -1976,16 +1925,14 @@
             "post": {
                 "operationId": "associate_line_extension",
                 "summary": "Associate line and extension",
+                "description": "Because of technical limitations, a line can only have a single ‘internal’ extension associated (i.e. an extension with a context of type ‘internal’)",
                 "tags": [
                     "lines",
                     "extensions"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -2019,16 +1966,14 @@
             "delete": {
                 "operationId": "dissociate_line_extension",
                 "summary": "Dissociate line and extension",
+                "description": "Any devices that are attached to a line must be removed before dissociating an extension from its line. A device can be dissociated by resetting it to autoprov mode.",
                 "tags": [
                     "lines",
                     "extensions"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "required": true,
@@ -2063,10 +2008,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2154,10 +2096,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2185,10 +2124,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "name": "body",
@@ -2218,16 +2154,14 @@
                 "operationId": "delete_line_sip",
                 "summary": "Delete SIP line",
                 "deprecated": true,
+                "description": "A SIP line can not be deleted if it is still associated with a user, an extesion, or a device. Any user, extension, or device attached to the line must be dissociated first.",
                 "tags": [
                     "lines",
                     "sip"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "name": "body",
@@ -2258,16 +2192,22 @@
             "post": {
                 "operationId": "associate_agent_queue",
                 "summary": "Associate an agent and queue",
+                "description": "Position in queue is set to max position + 1 or 0 if it is the first member of the queue",
                 "tags": [
                     "agents",
                     "queues"
                 ],
                 "parameters": [
                     {
+                        "$ref": "#/parameters/queueid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
                         "required": true,
-                        "type": "integer",
-                        "name": "queue_id",
-                        "in": "path"
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueUpdate"
+                        }
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2299,24 +2239,10 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "queue_id",
-                        "in": "path"
+                        "$ref": "#/parameters/queueid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "agent_id",
-                        "in": "path"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/AgentQueueUpdate"
-                        }
+                        "$ref": "#/parameters/agentid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2343,16 +2269,18 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "queue_id",
-                        "in": "path"
+                        "$ref": "#/parameters/queueid"
                     },
                     {
+                        "$ref": "#/parameters/agentid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
                         "required": true,
-                        "type": "integer",
-                        "name": "agent_id",
-                        "in": "path"
+                        "schema": {
+                            "$ref": "#/definitions/AgentQueueUpdate"
+                        }
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2379,16 +2307,10 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "queue_id",
-                        "in": "path"
+                        "$ref": "#/parameters/queueid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "agent_id",
-                        "in": "path"
+                        "$ref": "#/parameters/agentid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2396,7 +2318,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "Agent and Queue associated"
+                        "description": "Agent and Queue dissociated"
                     },
                     "400": {
                         "$ref": "#/responses/GenericError"
@@ -2488,11 +2410,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "user_id",
-                        "in": "path",
-                        "description": "The user's ID or UUID"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2513,16 +2431,13 @@
             "put": {
                 "operationId": "update_user",
                 "summary": "Update user",
+                "description": "If the firstname or the lastname is modified, the name of associated voicemail is also updated.",
                 "tags": [
                     "users"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "user_id",
-                        "in": "path",
-                        "description": "The user's ID or UUID"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "name": "body",
@@ -2551,16 +2466,13 @@
             "delete": {
                 "operationId": "delete_user",
                 "summary": "Delete user",
+                "description": "A user can not be deleted if he is associated to a line or a voicemail. Any line or voicemail attached to the user must be dissociated first. The user will also be removed from all queues, groups or other XiVO entities whom he is member.",
                 "tags": [
                     "users"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "string",
-                        "name": "user_id",
-                        "in": "path",
-                        "description": "The user's ID or UUID"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2589,10 +2501,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2618,10 +2527,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "required": true,
@@ -2655,10 +2561,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "required": true,
@@ -2697,10 +2600,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "required": true,
@@ -2736,10 +2636,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2768,10 +2665,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "required": true,
@@ -2804,10 +2698,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "required": true,
@@ -2842,10 +2733,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2872,10 +2760,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "name": "body",
@@ -2909,22 +2794,17 @@
             "delete": {
                 "operationId": "dissociate_user_line",
                 "summary": "Dissociate user and line",
+                "description": "Any devices that are attached the line must be removed before dissociating a user from its line. A device can be dissociated be resetting it to autoprov mode.",
                 "tags": [
                     "users",
                     "lines"
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "line_id",
-                        "in": "path"
+                        "$ref": "#/parameters/lineid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2953,10 +2833,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2983,10 +2860,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "name": "body",
@@ -3025,10 +2899,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -3057,10 +2928,7 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -3087,17 +2955,14 @@
                 ],
                 "parameters": [
                     {
-                        "required": true,
-                        "type": "integer",
-                        "name": "user_id",
-                        "in": "path"
+                        "$ref": "#/parameters/userid"
                     },
                     {
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserCtiProfilePut"
+                            "$ref": "#/definitions/UserCtiProfile"
                         }
                     },
                     {
@@ -3219,6 +3084,7 @@
             "put": {
                 "operationId": "update_voicemail",
                 "summary": "Update voicemail",
+                "descriptions": "A voicemail can only be updated if it isn’t associated to a user.",
                 "tags": [
                     "voicemails"
                 ],
@@ -3256,6 +3122,7 @@
             "delete": {
                 "operationId": "delete_voicemail",
                 "summary": "Delete voicemail",
+                "description": "A voicemail can not be deleted if it is still attached to a user. The user must be dissociated first. Any extension that redirects to the voicemail (e.g. an Incoming call) will be disabled after deletion.",
                 "tags": [
                     "voicemails"
                 ],
@@ -3317,12 +3184,19 @@
         }
     },
     "parameters": {
-        "order": {
-            "required": false,
-            "name": "order",
-            "in": "query",
+        "agentid": {
+            "required": true,
+            "type": "integer",
+            "name": "agent_id",
+            "in": "path",
+            "description": "Agent’s ID"
+        },
+        "deviceid": {
+            "required": true,
             "type": "string",
-            "description": "Name of the field to use for sorting the list of items returned."
+            "name": "device_id",
+            "in": "path",
+            "description": "Device's ID"
         },
         "direction": {
             "required": false,
@@ -3334,6 +3208,12 @@
                 "desc"
             ],
             "description": "Sort list of items in 'asc' (ascending) or 'desc' (descending) order"
+        },
+        "lineid": {
+            "required": true,
+            "type": "integer",
+            "name": "line_id",
+            "in": "path"
         },
         "limit": {
             "required": false,
@@ -3349,6 +3229,20 @@
             "type": "integer",
             "description": "Number of items to skip over in the list. Useful for pagination."
         },
+        "order": {
+            "required": false,
+            "name": "order",
+            "in": "query",
+            "type": "string",
+            "description": "Name of the field to use for sorting the list of items returned."
+        },
+        "queueid": {
+            "required": true,
+            "name": "queue_id",
+            "type": "integer",
+            "in": "path",
+            "description": "Queue’s ID"
+        },
         "search": {
             "required": false,
             "name": "search",
@@ -3356,19 +3250,33 @@
             "type": "string",
             "description": "Search term for filtering a list of items. Only items with a field containing the search term will be returned."
         },
-        "view": {
-            "required": false,
-            "name": "view",
-            "in": "query",
-            "type": "string",
-            "description": "Different view of the list of users. Acceptable value: directory."
-        },
         "token": {
             "required": false,
             "name": "X-Auth-Token",
             "in": "header",
             "type": "string",
             "description": "Authentication token obtained from xivo-auth."
+        },
+        "userid": {
+            "required": true,
+            "type": "integer",
+            "name": "user_id",
+            "in": "path",
+            "description": "the user's ID"
+        },
+        "useriduuid": {
+            "required": true,
+            "type": "integer",
+            "name": "user_id",
+            "in": "path",
+            "description": "the user's ID or UUID"
+        },
+        "view": {
+            "required": false,
+            "name": "view",
+            "in": "query",
+            "type": "string",
+            "description": "Different view of the list of users. Acceptable value: directory."
         }
     },
     "responses": {
@@ -3809,7 +3717,7 @@
                     "enum": [
                         "sip"
                     ],
-                    "description": "Line's protocol"
+                    "description": "(read-only) Line's protocol"
                 },
                 "provisioning_extension": {
                     "type": "string",
@@ -3938,6 +3846,7 @@
                 },
                 "callerid": {
                     "type": "string",
+                    "default": "null",
                     "description": "Caller id that appears on a phone when calling. Formatted as \"Firstname Lastname\" < number >"
                 },
                 "context": {
@@ -3950,14 +3859,17 @@
                 },
                 "provisioning_extension": {
                     "type": "string",
+                    "default": "autogenerated",
                     "description": "Code used to provision a device"
                 },
                 "secret": {
                     "type": "string",
+                    "default": "autogenerated",
                     "description": "SIP account password"
                 },
                 "username": {
                     "type": "string",
+                    "default": "autogenerated",
                     "description": "SIP account username"
                 }
             },
@@ -4028,6 +3940,11 @@
                 },
                 "outgoing_caller_id": {
                     "type": "string",
+                    "enum": [
+                        "default",
+                        "anonymous",
+                        "custom"
+                    ],
                     "description": "Name that appears on the phone when calling"
                 },
                 "mobile_phone_number": {
@@ -4074,17 +3991,6 @@
                 },
                 "user_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "UserCtiProfilePut": {
-            "title": "UserCtiProfile",
-            "properties": {
-                "cti_profile_id": {
-                    "type": "integer"
-                },
-                "enabled": {
-                    "type": "boolean"
                 }
             },
             "required": [
@@ -4163,6 +4069,7 @@
                 },
                 "enabled": {
                     "type": "boolean",
+                    "default": true,
                     "description": "Whether the user can use this voicemail or not"
                 }
             },
@@ -4226,7 +4133,7 @@
                 },
                 "email": {
                     "type": "string",
-                    "description": "Email address. Notifications and audio attachements will be sent to this address."
+                    "description": "Email address. Notifications and audio attachements will be sent to this address"
                 },
                 "pager": {
                     "type": "string",
@@ -4234,28 +4141,33 @@
                 },
                 "language": {
                     "type": "string",
-                    "description": "Language used for the voicemail menu prompt."
+                    "default": "The system default language",
+                    "description": "Language used for the voicemail menu prompt"
                 },
                 "timezone": {
                     "type": "string",
-                    "description": "Timezone used for announcing at what time a message was recorded."
+                    "default": "The system default timezone",
+                    "description": "Timezone used for announcing at what time a message was recorded"
                 },
                 "max_messages": {
                     "type": "integer",
-                    "description": "Maximum number of messages to store."
+                    "enum": [
+                        1,10,15,20,25,50,75,100,125,150,175,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,9999
+                    ],
+                    "description": "Maximum number of messages to store"
                 },
                 "attach_audio": {
                     "type": "boolean",
-                    "description": "Attach an audio file of the recorded message when sending an email."
+                    "description": "Attach an audio file of the recorded message when sending an email"
                 },
                 "delete_messages": {
                     "type": "boolean",
-                    "description": "Delete messages once they have been listened to.",
+                    "description": "Delete messages once they have been listened to",
                     "default": false
                 },
                 "ask_password": {
                     "type": "boolean",
-                    "description": "Ask for password when accessing the voicemail menu.",
+                    "description": "Ask for password when accessing the voicemail menu",
                     "default": true
                 },
                 "enabled": {
@@ -4263,7 +4175,12 @@
                     "description": "Voicemail can be used when it is enabled",
                     "default": true
                 }
-            }
+            },
+            "required": [
+                "name",
+                "number",
+                "context"
+            ]
         },
         "VoicemailItems": {
             "title": "VoicemailItems",
