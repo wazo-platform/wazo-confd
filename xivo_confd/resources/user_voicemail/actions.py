@@ -22,7 +22,7 @@ from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
-from xivo_confd.helpers.converter import Converter
+from xivo_confd.helpers.converter import Converter, LinkGenerator
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
 from xivo_confd.helpers.resource import DecoratorChain
 
@@ -41,9 +41,12 @@ def load(core_rest_api):
         Field('voicemail_id', Int()),
         Field('enabled', Boolean())
     )
+
+    links = [LinkGenerator('users', route='users', id_name='id', field_name='user_id'),
+             LinkGenerator('voicemails', id_name='resource_id', field_name='voicemail_id')]
+
     converter = Converter.association(document, UserVoicemail,
-                                      links={'users': 'user_id',
-                                             'voicemails': 'voicemail_id'},
+                                      links=links,
                                       rename={'parent_id': 'user_id'})
     validator = build_validator()
 

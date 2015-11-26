@@ -34,6 +34,12 @@ def option(option):
     return option
 
 
+def strict_unicode(value):
+    if not isinstance(value, unicode):
+        raise ValueError("value '{}' must be a unicode string".format(value))
+    return value
+
+
 class DigitStr(object):
 
     def __init__(self, length=None):
@@ -94,11 +100,14 @@ class ItemResource(ConfdResource):
 
     def put(self, id):
         model = self.service.get(id)
+        self.parse_and_update(model)
+        return '', 204
+
+    def parse_and_update(self, model):
         form = self.parser.parse_args()
         for name, value in form.iteritems():
             setattr(model, name, value)
         self.service.edit(model)
-        return '', 204
 
     def delete(self, id):
         model = self.service.get(id)

@@ -27,7 +27,7 @@ from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 from xivo_dao.resources.func_key.model import FuncKey, \
     ServiceDestination, ForwardDestination, TransferDestination, \
     AgentDestination, ParkPositionDestination, CustomDestination, BSFilterDestination
-from xivo_dao.resources.user.model import User
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.resources.bsfilter.model import FilterMember
 
 from xivo_dao.helpers.exception import InputError, ResourceError

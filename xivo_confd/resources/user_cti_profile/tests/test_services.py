@@ -24,39 +24,41 @@ from xivo_confd.resources.user_cti_profile import services as user_cti_profile_s
 
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.cti_profile.model import CtiProfile
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from hamcrest import none
 
 
 class TestUserCtiProfile(unittest.TestCase):
 
-    @patch('xivo_dao.resources.user.dao.is_cti_enabled')
+    @patch('xivo_dao.resources.user.dao.get')
     @patch('xivo_dao.resources.user_cti_profile.dao.find_profile_by_userid')
-    def test_get(self, dao_find_profile_by_userid, dao_is_cti_enabled):
+    def test_get(self, dao_find_profile_by_userid, dao_user_get):
         userid = 1
         cti_profile = CtiProfile(id=2)
         dao_find_profile_by_userid.return_value = cti_profile
-        dao_is_cti_enabled.return_value = True
+        dao_user_get.return_value = Mock(User, cti_enabled=True)
 
         result = user_cti_profile_services.get(userid)
 
         assert_that(result.user_id, equal_to(userid))
         assert_that(result.cti_profile_id, equal_to(cti_profile.id))
         self.assertTrue(result.enabled)
-        dao_is_cti_enabled.assert_called_with(userid)
+        dao_user_get.assert_called_with(userid)
 
-    @patch('xivo_dao.resources.user.dao.is_cti_enabled')
+    @patch('xivo_dao.resources.user.dao.get')
     @patch('xivo_dao.resources.user_cti_profile.dao.find_profile_by_userid')
-    def test_get_not_found(self, dao_find_profile_by_userid, dao_is_cti_enabled):
+    def test_get_not_found(self, dao_find_profile_by_userid, dao_user_get):
         userid = 1
         dao_find_profile_by_userid.return_value = None
-        dao_is_cti_enabled.return_value = True
+        dao_user_get.return_value = Mock(User, cti_enabled=True)
 
         result = user_cti_profile_services.get(userid)
 
         assert_that(result.user_id, equal_to(userid))
         assert_that(result.cti_profile_id, none())
         self.assertTrue(result.enabled)
+        dao_user_get.assert_called_with(userid)
 
     @patch('xivo_confd.resources.user_cti_profile.validator.validate_edit')
     @patch('xivo_dao.resources.user_cti_profile.dao.edit')

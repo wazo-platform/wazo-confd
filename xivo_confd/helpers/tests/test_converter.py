@@ -19,9 +19,9 @@ import unittest
 import json
 
 from mock import Mock, patch
-from hamcrest import assert_that, equal_to, has_entries, instance_of, has_items, has_entry, contains
+from hamcrest import assert_that, equal_to, has_entries, has_item, contains
 
-from xivo_confd.helpers.converter import Converter, Mapper, Serializer, Parser, Builder
+from xivo_confd.helpers.converter import Converter, Mapper, Serializer, Parser, Builder, LinkGenerator
 from xivo_confd.helpers.converter import DocumentMapper, DocumentParser, ResourceSerializer, RequestParser, ModelBuilder
 from xivo_confd.helpers.mooltiparse.document import Document, DocumentProxy
 
@@ -139,45 +139,6 @@ class TestConverter(unittest.TestCase):
 
         self.builder.update.assert_called_once_with(model, mapped_request)
 
-    def test_resource_creates_resource_converter(self):
-        document = Mock()
-
-        class Model(object):
-            pass
-
-        converter = Converter.resource(document, Model)
-
-        assert_that(converter.parser, instance_of(DocumentParser))
-        assert_that(converter.mapper, instance_of(DocumentMapper))
-        assert_that(converter.serializer, instance_of(ResourceSerializer))
-        assert_that(converter.builder, instance_of(ModelBuilder))
-        assert_that(converter.serializer.resources, has_entry('models', 'id'))
-
-    def test_resource_replaces_resource_name_and_resource_id(self):
-        document = Mock()
-
-        class Model(object):
-            pass
-
-        converter = Converter.resource(document, Model, 'resource_name', 'resource_id')
-
-        assert_that(converter.serializer.resources, has_entry('resource_name', 'resource_id'))
-
-    def test_association_creates_request_converter(self):
-        document = Mock()
-
-        class Model(object):
-            pass
-
-        links = {'users': 'user_id', 'lines': 'line_id'}
-        converter = Converter.association(document, Model, links)
-
-        assert_that(converter.parser, instance_of(RequestParser))
-        assert_that(converter.mapper, instance_of(DocumentMapper))
-        assert_that(converter.serializer, instance_of(ResourceSerializer))
-        assert_that(converter.builder, instance_of(ModelBuilder))
-        assert_that(converter.serializer.resources, has_entries(links))
-
 
 class TestDocumentMapper(unittest.TestCase):
 
@@ -256,30 +217,46 @@ class TestRequestParser(unittest.TestCase):
         document.parse.assert_called_once_with(request)
 
 
-class TestResourceSerializer(unittest.TestCase):
+@patch('flask.helpers.url_for')
+class TestLinkGenerator(unittest.TestCase):
 
     def setUp(self):
-        self.serializer = ResourceSerializer({'resources': 'id'})
+        self.generator = LinkGenerator('users')
 
-    @patch('flask.helpers.url_for')
-    def test_given_mapping_then_generates_all_links(self, url_for):
+    def test_given_mapping_then_generates_link(self, url_for):
         url_for.side_effect = lambda r, resource_id, _external: 'http://localhost/{}/{}'.format(r.split('.')[0], resource_id)
-        serializer = ResourceSerializer({'users': 'user_id', 'lines': 'line_id'})
+
+        mapping = {'id': 1}
+        expected_link = {'rel': 'users', 'href': 'http://localhost/users/1'}
+
+        result = self.generator.generate(mapping)
+
+        assert_that(result, has_entries(expected_link))
+
+
+class TestResourceSerializer(unittest.TestCase):
+
+    def test_given_mapping_then_generates_links(self):
+        generator = Mock(LinkGenerator)
+        serializer = ResourceSerializer([generator])
+
+        user_link = {'rel': 'users', 'href': 'http://localhost/users/1'}
+        generator.generate.return_value = user_link
 
         mapping = {'user_id': 1, 'line_id': 2}
-        user_link = {'rel': 'users', 'href': 'http://localhost/users/1'}
-        line_link = {'rel': 'lines', 'href': 'http://localhost/lines/2'}
 
         result = serializer.serialize(mapping)
 
         decoded_result = json.loads(result)
 
         assert_that(decoded_result, has_entries(mapping))
-        assert_that(decoded_result['links'], has_items(user_link, line_link))
+        assert_that(decoded_result['links'], has_item(user_link))
 
     def test_given_resource_id_is_none_then_does_not_add_link(self):
-        serializer = ResourceSerializer({'users': 'user_id'})
+        generator = Mock(LinkGenerator)
+        serializer = ResourceSerializer([generator])
 
+        generator.can_generate.return_value = False
         mapping = {'user_id': None}
 
         result = serializer.serialize(mapping)
@@ -290,15 +267,17 @@ class TestResourceSerializer(unittest.TestCase):
         assert_that(decoded_result['links'], contains())
 
     def test_given_list_of_items_then_adds_total(self):
+        generator = Mock(LinkGenerator)
+        serializer = ResourceSerializer(generator)
         mapping = Mock()
 
         item = {'id': 1,
                 'links': [{'rel': 'resources',
                            'href': 'http://localhost/resources/1'}]}
 
-        with patch.object(self.serializer, '_map_item') as mock_serialize:
+        with patch.object(serializer, '_map_item') as mock_serialize:
             mock_serialize.return_value = item
-            result = self.serializer.serialize_list([mapping])
+            result = serializer.serialize_list([mapping])
 
         expected_entries = {'total': 1,
                             'items': [item]}
@@ -307,15 +286,18 @@ class TestResourceSerializer(unittest.TestCase):
         assert_that(decoded_result, has_entries(expected_entries))
 
     def test_given_list_of_items_with_additional_total_then_replaces_total(self):
+        generator = Mock(LinkGenerator)
+        serializer = ResourceSerializer(generator)
+
         mapping = Mock()
 
         item = {'id': 1,
                 'links': [{'rel': 'resources',
                            'href': 'http://localhost/resources/1'}]}
 
-        with patch.object(self.serializer, '_map_item') as mock_serialize:
+        with patch.object(serializer, '_map_item') as mock_serialize:
             mock_serialize.return_value = item
-            result = self.serializer.serialize_list([mapping], total=5)
+            result = serializer.serialize_list([mapping], total=5)
 
         expected_entries = {'total': 5,
                             'items': [item]}

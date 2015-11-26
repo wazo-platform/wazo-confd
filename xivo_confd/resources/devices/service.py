@@ -78,8 +78,9 @@ class DeviceUpdater(object):
         self.device_dao = device_dao
 
     def update_for_template(self, template):
-        users = self.user_dao.find_all_by_template_id(template.id)
-        for user in users:
+        private_users = self.user_dao.find_all_by(func_key_private_template_id=template.id)
+        public_users = self.user_dao.find_all_by(func_key_template_id=template.id)
+        for user in private_users + public_users:
             self.update_for_user(user)
 
     def update_for_user(self, user):

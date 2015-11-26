@@ -140,6 +140,12 @@ class CRUDService(object):
     def get(self, resource_id):
         return self.dao.get(resource_id)
 
+    def find_by(self, **criteria):
+        return self.dao.find_by(**criteria)
+
+    def get_by(self, **criteria):
+        return self.dao.get_by(**criteria)
+
     def create(self, resource):
         self.validator.validate_create(resource)
         created_resource = self.dao.create(resource)

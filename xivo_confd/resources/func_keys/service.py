@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
+from xivo_dao.helpers.db_manager import Session
+
 
 class TemplateService(object):
 
@@ -61,9 +63,10 @@ class TemplateService(object):
 
     def delete(self, template):
         self.validator.validate_delete(template)
-        users = self.user_dao.find_all_by_template_id(template.id)
+        users = self.user_dao.find_all_by(func_key_template_id=template.id)
         self.template_dao.delete(template)
         for user in users:
+            Session.expire(user, ['func_key_template_id'])
             self.device_updater.update_for_user(user)
         self.notifier.deleted(template)
 

@@ -18,7 +18,7 @@
 
 import unittest
 from mock import sentinel, Mock
-from hamcrest import assert_that, equal_to, is_not, has_key, calling, raises, contains
+from hamcrest import assert_that, equal_to, is_not, has_key, calling, raises, contains, none
 
 from xivo_confd.helpers.converter import Converter
 
@@ -28,7 +28,7 @@ from xivo_confd.resources.func_keys.validator import BSFilterValidator
 from xivo_confd.resources.devices.service import DeviceUpdater
 
 from xivo_dao.helpers.exception import ResourceError, NotFoundError
-from xivo_dao.resources.user.model import User
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.resources.func_key.model import FuncKey
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate, UserTemplate
 
@@ -83,15 +83,12 @@ class TestFuncKeyManipulator(unittest.TestCase):
 
     def test_when_associating_template_then_adds_template_to_user(self):
         self.service.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id)
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
-                                              private_template_id=sentinel.private_template_id)
-
-        expected_user = User(id=sentinel.user_id,
-                             private_template_id=sentinel.private_template_id,
-                             func_key_template_id=sentinel.public_template_id)
+        expected_user = self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                                              private_template_id=sentinel.private_template_id)
 
         self.manipulator.associate_user(sentinel.template_id, sentinel.user_id)
 
+        assert_that(expected_user.func_key_template_id, equal_to(sentinel.public_template_id))
         self.user_dao.edit.assert_called_once_with(expected_user)
         self.device_updater.update_for_user.assert_called_once_with(expected_user)
 
@@ -105,16 +102,13 @@ class TestFuncKeyManipulator(unittest.TestCase):
             raises(ResourceError))
 
     def test_when_dissociating_public_template_then_removes_template_from_user(self):
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
-                                              private_template_id=sentinel.private_template_id,
-                                              func_key_template_id=sentinel.public_template_id)
-
-        expected_user = User(id=sentinel.user_id,
-                             private_template_id=sentinel.private_template_id,
-                             func_key_template_id=None)
+        expected_user = self.user_dao.get.return_value = User(id=sentinel.user_id,
+                                                              func_key_private_template_id=sentinel.private_template_id,
+                                                              func_key_template_id=sentinel.public_template_id)
 
         self.manipulator.dissociate_user(sentinel.public_template_id, sentinel.user_id)
 
+        assert_that(expected_user.func_key_template_id, none())
         self.user_dao.edit.assert_called_once_with(expected_user)
         self.device_updater.update_for_user.assert_called_once_with(expected_user)
 
@@ -181,8 +175,8 @@ class TestFuncKeyManipulator(unittest.TestCase):
         assert_that(result, contains(expected_association))
 
     def test_given_template_has_users_associated_when_getting_associations_then_returns_association(self):
-        self.user_dao.find_all_by_template_id.return_value = [User(id=sentinel.user_id,
-                                                                   func_key_template_id=sentinel.public_template_id)]
+        self.user_dao.find_all_by.return_value = [User(id=sentinel.user_id,
+                                                       func_key_template_id=sentinel.public_template_id)]
 
         expected_association = UserTemplate(user_id=sentinel.user_id,
                                             template_id=sentinel.public_template_id)
@@ -190,7 +184,7 @@ class TestFuncKeyManipulator(unittest.TestCase):
         result = self.manipulator.find_associations_by_template(sentinel.public_template_id)
 
         assert_that(result, contains(expected_association))
-        self.user_dao.find_all_by_template_id.assert_called_once_with(sentinel.public_template_id, private=False)
+        self.user_dao.find_all_by.assert_called_once_with(func_key_template_id=sentinel.public_template_id)
 
 
 class TestUserFuncKeyResource(unittest.TestCase):

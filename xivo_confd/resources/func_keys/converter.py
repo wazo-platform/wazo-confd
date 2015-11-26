@@ -42,7 +42,7 @@ from xivo_confd.helpers.mooltiparse import Document, Field, \
     Int, Boolean, Unicode, Dict, \
     Required, Choice, Regexp
 
-from xivo_confd.helpers.converter import Converter, ResourceSerializer
+from xivo_confd.helpers.converter import Converter, ResourceSerializer, LinkGenerator
 
 
 EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
@@ -270,7 +270,7 @@ class UserDestinationBuilder(DestinationBuilder):
         return UserDestination(user_id=destination['user_id'])
 
     def url(self, destination):
-        return url_for('users.get', resource_id=destination.user_id, _external=True)
+        return url_for('users', id=destination.user_id, _external=True)
 
 
 class GroupDestinationBuilder(DestinationBuilder):
@@ -479,7 +479,7 @@ def build_funckey_converter(exclude=None):
     funckey_validator = FuncKeyValidator(destinations)
     funckey_mapper = FuncKeyMapper(destinations)
     funckey_builder = FuncKeyBuilder(funckey_validator, destinations)
-    serializer = ResourceSerializer({})
+    serializer = ResourceSerializer([])
     return FuncKeyConverter(parser, funckey_mapper, serializer, funckey_builder)
 
 
@@ -489,7 +489,7 @@ def build_template_converter(funckey_converter):
     template_validator = TemplateValidator(funckey_converter.builder.validator)
     template_mapper = TemplateMapper(funckey_converter.mapper)
     template_builder = TemplateBuilder(template_validator, funckey_converter.builder)
-    serializer = ResourceSerializer({'func_key_templates': 'id'})
+    serializer = ResourceSerializer([LinkGenerator('func_key_templates', field_name='id')])
 
     converter = Converter(parser, template_mapper, serializer, template_builder)
 
@@ -503,7 +503,7 @@ def build_association_converter(content_parser):
     )
 
     converter = Converter.association(document, UserTemplate,
-                                      links={'users': 'user_id',
-                                             'func_key_templates': 'template_id'})
+                                      links=[LinkGenerator('users', route='users', id_name='id', field_name='user_id'),
+                                             LinkGenerator('func_key_templates', field_name='template_id')])
 
     return converter

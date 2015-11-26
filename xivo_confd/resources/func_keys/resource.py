@@ -79,7 +79,7 @@ class TemplateManipulator(object):
         return []
 
     def find_associations_by_template(self, template_id):
-        users = self.user_dao.find_all_by_template_id(template_id, private=False)
+        users = self.user_dao.find_all_by(func_key_template_id=template_id)
         return [UserTemplate(user_id=user.id,
                              template_id=user.func_key_template_id)
                 for user in users]
