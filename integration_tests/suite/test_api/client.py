@@ -53,12 +53,17 @@ class ConfdClient(object):
     def request(self, method, url, parameters=None, data=None):
         full_url = self._build_url(url)
         data = self.encode(data)
+        self.log_request(method, full_url, parameters, data)
 
-        logger.info('%s %s params: %s body: %s', method, full_url, parameters, data)
         response = self.session.request(method, full_url, params=parameters, data=data)
-
         logger.debug('Response - %s %s', response.status_code, response.text)
+
         return Response(response)
+
+    def log_request(self, method, url, parameters, data):
+        if isinstance(data, str):
+            data = data.decode('utf8')
+        logger.info(u'%s %s params: %s body: %s', method, parameters, url, data)
 
     def get(self, url, **parameters):
         return self.request('GET', url, parameters=parameters)
