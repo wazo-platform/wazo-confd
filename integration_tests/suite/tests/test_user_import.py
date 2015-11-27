@@ -324,3 +324,44 @@ def test_given_csv_incall_has_errors_then_errors_returned():
 
     response = client.post("/users/import", csv)
     assert_error_message(response, 'context')
+
+
+def test_given_csv_has_all_resources_then_all_relations_created():
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    incall_exten = h.extension.find_available_exten('from-extern')
+    vm_number = h.voicemail.find_available_number(config.CONTEXT)
+
+    csv = [{"firstname": "Frânçois",
+            "exten": exten,
+            "context": config.CONTEXT,
+            "line_protocol": "sip",
+            "incall_exten": incall_exten,
+            "incall_context": 'from-extern',
+            "voicemail_name": "francois",
+            "voicemail_number": vm_number,
+            "voicemail_context": config.CONTEXT,
+            }]
+
+    response = client.post("/users/import", csv)
+    assert_response_has_id(response, 'user_id')
+    assert_response_has_id(response, 'line_id')
+    assert_response_has_id(response, 'voicemail_id')
+    assert_response_has_id(response, 'extension_id')
+    assert_response_has_id(response, 'incall_extension_id')
+    assert_response_has_id(response, 'sip_id')
+
+    entry = response.item['created'][0]
+
+    response = confd.users(entry['user_id']).lines.get()
+    assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
+
+    response = confd.lines(entry['line_id']).extensions.get()
+    assert_that(response.items, has_items(has_entries(extension_id=entry['extension_id']),
+                                          has_entries(extension_id=entry['incall_extension_id'])))
+
+    response = confd.users(entry['user_id']).voicemail.get()
+    assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
+
+    response = confd.lines(entry['line_id']).endpoints.sip.get()
+    assert_that(response.item, has_entries(endpoint='sip',
+                                           endpoint_id=entry['sip_id']))
