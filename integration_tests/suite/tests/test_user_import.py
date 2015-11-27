@@ -274,6 +274,16 @@ def test_given_csv_has_extension_fields_then_extension_created():
                                        context=config.CONTEXT))
 
 
+def test_given_csv_extension_has_errors_then_errors_returned():
+    csv = [{"firstname": "Géorge",
+            "line_protocol": "sip",
+            "exten": "9999",
+            "context": "invalid"}]
+
+    response = client.post("/users/import", csv)
+    assert_error_message(response, 'context')
+
+
 def test_given_csv_has_minimal_incall_fields_then_incall_created():
     exten = h.extension.find_available_exten('from-extern')
     csv = [{"firstname": "Pâscal",
