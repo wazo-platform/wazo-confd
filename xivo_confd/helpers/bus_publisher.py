@@ -47,3 +47,6 @@ class BusPublisher(object):
     def publish_error(self, exc, interval):
         logger.error('Error: %s', exc, exc_info=1)
         logger.info('Retry in %s seconds...', interval)
+
+    def rollback(self):
+        self.messages = []

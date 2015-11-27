@@ -64,3 +64,6 @@ class SysconfdPublisher(object):
         for action, url, params, data in self.requests:
             response = session.request(action, url, params=params, data=data)
             self.check_for_errors(response)
+
+    def rollback(self):
+        self.requests = []
