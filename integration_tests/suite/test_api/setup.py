@@ -13,7 +13,7 @@ ASSETS_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 ASSET_PATH = os.path.join(ASSETS_ROOT, 'base')
 
 
-def new_client(headers=None):
+def new_client(headers=None, encoder=None):
     xivo_host = os.environ.get('HOST', 'localhost')
     xivo_confd_port = os.environ.get('PORT', 9486)
     xivo_confd_login = os.environ.get('LOGIN', 'admin')
@@ -24,7 +24,8 @@ def new_client(headers=None):
                                       username=xivo_confd_login,
                                       password=xivo_confd_password,
                                       https=xivo_https,
-                                      headers=headers)
+                                      headers=headers,
+                                      encoder=encoder)
     return client
 
 

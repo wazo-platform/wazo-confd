@@ -36,14 +36,15 @@ class ConfdClient(object):
                        'Content-Type': 'application/json'}
 
     @classmethod
-    def from_options(cls, host, port, username, password, https=True, headers=None):
+    def from_options(cls, host, port, username, password, https=True, headers=None, encoder=None):
         scheme = 'https' if https else 'http'
         url = "{}://{}:{}/1.1".format(scheme, host, port)
         logger.info('CONFD URL: %s', url)
-        return cls(url, username, password, headers)
+        return cls(url, username, password, headers, encoder)
 
-    def __init__(self, base_url, username, password, headers=None):
+    def __init__(self, base_url, username, password, headers=None, encoder=None):
         self.base_url = base_url
+        self.encode = encoder or self._encode_dict
         self.session = requests.Session()
         self.session.verify = False
         self.session.auth = requests.auth.HTTPDigestAuth(username, password)
@@ -51,7 +52,7 @@ class ConfdClient(object):
 
     def request(self, method, url, parameters=None, data=None):
         full_url = self._build_url(url)
-        data = self._encode_dict(data)
+        data = self.encode(data)
 
         logger.info('%s %s params: %s body: %s', method, full_url, parameters, data)
         response = self.session.request(method, full_url, params=parameters, data=data)
