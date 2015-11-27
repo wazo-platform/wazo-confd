@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import json
+
+from hamcrest import assert_that, equal_to, has_items, has_entries
 from mock import patch, Mock
 from unittest import TestCase
 from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
@@ -70,10 +72,7 @@ class TestSysconfdClient(TestCase):
         self.client.exec_request_handlers(commands)
         self.client.flush()
 
-        call = self.session.request.call_args_list[0]
-        method = call[0][0]
-        url = call[0][1]
-        body = call[1]['data']
+        method, url, body = self.extract_request()
 
         expected_url = "http://localhost:8668/exec_request_handlers"
         self.assertEquals(method, "POST")
@@ -81,6 +80,13 @@ class TestSysconfdClient(TestCase):
         self.assertEquals(json.loads(body), commands)
 
         self.dao.is_live_reload_enabled.assert_called_once_with()
+
+    def extract_request(self):
+        call = self.session.request.call_args_list[0]
+        method = call[0][0]
+        url = call[0][1]
+        body = call[1]['data']
+        return method, url, body
 
     def test_exec_request_handlers_live_reload_disabled(self):
         self.dao.is_live_reload_enabled.return_value = False
@@ -93,3 +99,26 @@ class TestSysconfdClient(TestCase):
 
         self.assertFalse(self.session.request.called)
         self.dao.is_live_reload_enabled.assert_called_once_with()
+
+    def test_exec_request_handlers_merges_commands_sent(self):
+        self.session.request.return_value = Mock(status_code=200)
+        self.dao.is_live_reload_enabled.return_value = True
+
+        self.client.exec_request_handlers({'ctibus': ['command1'],
+                                           'ipbx': ['command2']})
+        self.client.exec_request_handlers({'ctibus': ['command1', 'command3', 'command4'],
+                                           'ipbx': ['command5'],
+                                           'bus': ['command6']})
+        self.client.flush()
+
+        method, url, body = self.extract_request()
+        body = json.loads(body)
+
+        expected_url = "http://localhost:8668/exec_request_handlers"
+        expected_body = has_entries(ctibus=has_items('command1', 'command3', 'command4'),
+                                    ipbx=has_items('command2', 'command5'),
+                                    bus=has_items('command6'))
+
+        assert_that(method, equal_to("POST"))
+        assert_that(url, equal_to(expected_url))
+        assert_that(body, expected_body)
