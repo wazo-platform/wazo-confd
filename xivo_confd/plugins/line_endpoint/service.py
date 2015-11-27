@@ -69,4 +69,4 @@ class LineEndpointService(object):
 def build_service(provd_client, endpoint, endpoint_service):
     validator = build_validator()
     line_service = build_line_service(provd_client)
-    return LineEndpointService('sip', line_service, endpoint_service, validator)
+    return LineEndpointService(endpoint, line_service, endpoint_service, validator)
