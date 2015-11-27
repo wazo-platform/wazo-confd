@@ -16,9 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_confd.helpers.validator import AssociationValidator
+from xivo_confd.helpers.validator import Validator
+
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_dao.helpers import errors
-from xivo_confd.helpers.validator import Validator
 
 
 class ValidateLineAssociation(Validator):
@@ -63,3 +67,15 @@ class VaildateLineDissociation(Validator):
             raise errors.resource_associated('Line', 'Extension',
                                              line_id=line.id,
                                              extension_ids=extension_ids)
+
+
+def build_validator():
+    return AssociationValidator(
+        association=[
+            ValidateLineAssociation(),
+        ],
+        dissociation=[
+            VaildateLineDissociation(user_line_dao,
+                                     line_extension_dao)
+        ]
+    )

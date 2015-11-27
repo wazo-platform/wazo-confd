@@ -24,16 +24,9 @@ from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociationScc
 from xivo_confd.plugins.line_endpoint.resource import LineEndpointGetSccp
 from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetSccp
 
-from xivo_confd.plugins.line_endpoint.service import LineEndpointService
-from xivo_confd.plugins.line.service import build_service as build_line_service
-from xivo_confd.plugins.line_endpoint.validator import ValidateLineAssociation, VaildateLineDissociation
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
-
-from xivo_confd.helpers.validator import AssociationValidator
-
-from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_confd.plugins.line_endpoint.service import build_service
 
 
 class Plugin(object):
@@ -83,24 +76,9 @@ class Plugin(object):
                          )
 
     def build_sip_service(self, provd_client):
-        validator = self.build_validator()
-        line_service = build_line_service(provd_client)
         sip_service = build_sip_service(provd_client)
-        return LineEndpointService('sip', line_service, sip_service, validator)
+        return build_service(provd_client, 'sip', sip_service)
 
     def build_sccp_service(self, provd_client):
-        validator = self.build_validator()
-        line_service = build_line_service(provd_client)
         sccp_service = build_sccp_service()
-        return LineEndpointService('sccp', line_service, sccp_service, validator)
-
-    def build_validator(self):
-        return AssociationValidator(
-            association=[
-                ValidateLineAssociation(),
-            ],
-            dissociation=[
-                VaildateLineDissociation(user_line_dao,
-                                         line_extension_dao)
-            ]
-        )
+        return build_service(provd_client, 'sccp', sccp_service)

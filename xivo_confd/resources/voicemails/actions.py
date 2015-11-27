@@ -18,17 +18,13 @@
 
 from flask import Blueprint
 
-from xivo_confd import sysconfd
-from xivo_dao.resources.voicemail import dao
 from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean, Regexp
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
-from xivo_confd.resources.voicemails import notifier
-from xivo_confd.resources.voicemails.validator import build_validators
-from xivo_confd.resources.voicemails.services import VoicemailService
+from xivo_confd.resources.voicemails.services import build_service
 from xivo_confd.resources.voicemails.mooltiparse import OptionType
 
 
@@ -57,9 +53,8 @@ def load(core_rest_api):
     )
 
     converter = Converter.resource(document, Voicemail)
-    validator = build_validators()
 
-    service = VoicemailService(dao, validator, notifier, sysconfd)
+    service = build_service()
     resource = CRUDResource(service, converter)
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

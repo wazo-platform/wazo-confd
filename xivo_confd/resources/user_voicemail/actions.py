@@ -16,20 +16,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.voicemail import dao as voicemail_dao
-from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
-
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_confd.helpers.converter import Converter, LinkGenerator
 from xivo_confd.helpers.mooltiparse import Field, Int, Boolean
 from xivo_confd.helpers.resource import DecoratorChain
 
-from xivo_confd.resources.user_voicemail.services import UserVoicemailService
+from xivo_confd.resources.user_voicemail.services import build_service
 from xivo_confd.resources.user_voicemail.resource import UserVoicemailResource
-from xivo_confd.resources.user_voicemail.validator import build_validator
-from xivo_confd.resources.user_voicemail import notifier
 
 
 def load(core_rest_api):
@@ -48,13 +42,8 @@ def load(core_rest_api):
     converter = Converter.association(document, UserVoicemail,
                                       links=links,
                                       rename={'parent_id': 'user_id'})
-    validator = build_validator()
 
-    service = UserVoicemailService(user_dao,
-                                   voicemail_dao,
-                                   user_voicemail_dao,
-                                   validator,
-                                   notifier)
+    service = build_service()
     resource = UserVoicemailResource(service, converter)
 
     user_chain = DecoratorChain(core_rest_api, user_blueprint)
