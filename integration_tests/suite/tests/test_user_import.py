@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import csv
 from cStringIO import StringIO
 
-from hamcrest import assert_that, contains, has_entries, contains_string, instance_of
+from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items
 
 from test_api import confd
 from test_api import config
@@ -293,10 +293,34 @@ def test_given_csv_has_minimal_incall_fields_then_incall_created():
             "incall_context": "from-extern"}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'incall_id')
+    assert_response_has_id(response, 'incall_extension_id')
 
-    incall_id = response.item['created'][0]['incall_id']
-    extension = confd.extensions(incall_id).get().item
+    incall_extension_id = response.item['created'][0]['incall_extension_id']
+    extension = confd.extensions(incall_extension_id).get().item
 
     assert_that(extension, has_entries(exten=exten,
                                        context="from-extern"))
+
+
+def test_given_csv_has_all_incall_fields_then_incall_created():
+    exten = h.extension.find_available_exten('from-extern')
+    csv = [{"firstname": "Pâscal",
+            "line_protocol": "sccp",
+            "context": config.CONTEXT,
+            "incall_exten": exten,
+            "incall_context": "from-extern",
+            "incall_ring_seconds": "10"}]
+
+    response = client.post("/users/import", csv)
+    assert_response_has_id(response, 'incall_extension_id')
+
+
+def test_given_csv_incall_has_errors_then_errors_returned():
+    csv = [{"firstname": "Géorge",
+            "line_protocol": "sip",
+            "context": config.CONTEXT,
+            "incall_exten": "9999",
+            "incall_context": "invalid"}]
+
+    response = client.post("/users/import", csv)
+    assert_error_message(response, 'context')

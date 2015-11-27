@@ -33,7 +33,7 @@ entry_fields = {
     'sip_id': fields.Integer,
     'sccp_id': fields.Integer,
     'extension_id': fields.Integer,
-    'incall_id': fields.Integer,
+    'incall_extension_id': fields.Integer,
 }
 
 

@@ -39,7 +39,7 @@ class Entry(object):
         self.line = None
         self.sip = None
         self.extension = None
-        self.incall = None
+        self.incall_extension = None
         self.incall_ring_seconds = None
 
     @property
@@ -67,8 +67,8 @@ class Entry(object):
         return self.extension.id if self.extension else None
 
     @property
-    def incall_id(self):
-        return self.incall.id if self.incall else None
+    def incall_extension_id(self):
+        return self.incall_extension.id if self.incall_extension else None
 
 
 class ImportService(object):
@@ -119,7 +119,7 @@ class ImportService(object):
         if 'extension' in row:
             entry.extension = self.create_extension(row['extension'])
         if 'incall' in row:
-            entry.incall = self.create_incall(entry.user, row['incall'])
+            entry.incall_extension = self.create_incall_extension(row['incall'])
             entry.incall_ring_seconds = row['incall']['ring_seconds']
 
         return entry
@@ -152,7 +152,7 @@ class ImportService(object):
         extension = self.extension_service.create(extension)
         return extension
 
-    def create_incall(self, user, fields):
+    def create_incall_extension(self, fields):
         extension = Extension(exten=fields['exten'],
                               context=fields['context'])
         return self.extension_service.create(extension)
@@ -168,7 +168,7 @@ class ImportService(object):
             self.associate_user_line(entry)
         if entry.line and entry.extension:
             self.associate_line_extension(entry)
-        if entry.line and entry.incall:
+        if entry.line and entry.incall_extension:
             self.associate_incall(entry)
 
     def associate_user_voicemail(self, entry):
@@ -194,6 +194,6 @@ class ImportService(object):
 
     def associate_incall(self, entry):
         incall = Incall.user_destination(entry.user_id,
-                                         entry.incall_id,
+                                         entry.incall_extension_id,
                                          ring_seconds=entry.incall_ring_seconds)
         self.incall_dao.create(incall)
