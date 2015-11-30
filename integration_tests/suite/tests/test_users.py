@@ -179,6 +179,12 @@ def check_search(url, user, field, term):
     assert_that(response.items, expected)
 
 
+@fixtures.user(**FULL_USER)
+def test_get_user(user):
+    response = confd.users(user['id']).get()
+    assert_that(response.item, has_entries(FULL_USER))
+
+
 @fixtures.user(firstname="Snôm", lastname="Whîte")
 @fixtures.user()
 @fixtures.user()
