@@ -5,7 +5,7 @@ XiVO CONFD
 
 XiVO CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
 service for configuring and managing a XiVO server. Further details on how to use the API can be found on
-the [XiVO documentation web site](http://documentation.xivo.io/production/api_sdk/rest_api/rest_api.html)
+the [XiVO documentation web site](http://api.xivo.io)
 
 
 Installing CONFD
