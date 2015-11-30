@@ -22,6 +22,8 @@ from flask_restful import Resource, Api, fields, marshal
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.authentication.confd_auth import ConfdAuth
 
+from xivo_dao.helpers import errors
+
 
 def option(option):
     if not isinstance(option, list):
@@ -79,10 +81,27 @@ class ListResource(ConfdResource):
         self.service = service
 
     def get(self):
-        params = {key: request.args[key] for key in request.args}
+        params = self.search_params()
         total, items = self.service.search(params)
         return {'total': total,
                 'items': [marshal(item, self.fields) for item in items]}
+
+    def search_params(self):
+        args = ((key, request.args[key]) for key in request.args)
+        params = {}
+
+        for key, value in args:
+            if key in ("limit", "skip"):
+                params[key] = self.convert_numeric(key, value)
+            else:
+                params[key] = value
+
+        return params
+
+    def convert_numeric(self, key, value):
+        if not value.isdigit():
+            raise errors.wrong_type("limit", "positive numeric string")
+        return int(value)
 
     def post(self):
         form = self.parser.parse_args()

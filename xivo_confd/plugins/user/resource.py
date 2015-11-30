@@ -95,7 +95,7 @@ class UserList(ListResource):
         else:
             fields = user_fields
 
-        params = {key: request.args[key] for key in request.args}
+        params = self.search_params()
         total, items = self.service.search(params)
 
         return {'total': total,
