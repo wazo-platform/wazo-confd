@@ -32,8 +32,10 @@ from xivo_confd.plugins.line_extension import service as line_extension_service
 from xivo_confd.resources.user_voicemail.services import build_service as build_uv_service
 from xivo_confd.resources.voicemails.services import build_service as build_voicemail_service
 from xivo_confd.resources.extensions.services import build_service as build_extension_service
+from xivo_confd.resources.user_cti_profile import services as user_cti_profile_service
 
 from xivo_dao.resources.incall import dao as incall_dao
+from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 
 
 class Plugin(object):
@@ -63,7 +65,9 @@ class Plugin(object):
                                 extension_service,
                                 line_extension_service,
                                 user_line_service,
-                                incall_dao)
+                                incall_dao,
+                                cti_profile_dao,
+                                user_cti_profile_service)
 
         api.add_resource(UserImportResource,
                          '/users/import',

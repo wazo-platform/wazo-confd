@@ -104,6 +104,12 @@ class CsvRow(object):
                 'ring_seconds': self.parse_unicode('incall_ring_seconds'),
             }
 
+        if self.columns_have_values('cti_profile_name'):
+            parsed['cti_profile'] = {
+                'name': self.parse_unicode('cti_profile_name'),
+                'enabled': self.parse_bool('cti_profile_enabled')
+            }
+
         return parsed
 
     def columns_have_values(self, *columns):

@@ -26,6 +26,7 @@ from xivo_dao.resources.line_extension.model import LineExtension
 from xivo_dao.resources.user_line.model import UserLine
 from xivo_dao.resources.voicemail.model import Voicemail
 from xivo_dao.resources.incall.model import Incall
+from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 
 from xivo_dao.helpers.exception import ServiceError
 
@@ -41,6 +42,7 @@ class Entry(object):
         self.extension = None
         self.incall_extension = None
         self.incall_ring_seconds = None
+        self.user_cti_profile = None
 
     @property
     def user_id(self):
@@ -70,13 +72,17 @@ class Entry(object):
     def incall_extension_id(self):
         return self.incall_extension.id if self.incall_extension else None
 
+    @property
+    def cti_profile_id(self):
+        return self.user_cti_profile.cti_profile_id if self.user_cti_profile else None
+
 
 class ImportService(object):
 
     def __init__(self, user_service, voicemail_service, user_voicemail_service,
                  line_service, sip_service, sccp_service, line_sip_service,
                  line_sccp_service, extension_service, line_extension_service,
-                 user_line_service, incall_dao):
+                 user_line_service, incall_dao, cti_profile_dao, user_cti_profile_service):
         self.user_service = user_service
         self.voicemail_service = voicemail_service
         self.user_voicemail_service = user_voicemail_service
@@ -89,6 +95,8 @@ class ImportService(object):
         self.line_extension_service = line_extension_service
         self.user_line_service = user_line_service
         self.incall_dao = incall_dao
+        self.cti_profile_dao = cti_profile_dao
+        self.user_cti_profile_service = user_cti_profile_service
 
     def import_rows(self, parser):
         created = []
@@ -118,6 +126,9 @@ class ImportService(object):
             entry.sccp = self.create_sccp(row['sccp'])
         if 'extension' in row:
             entry.extension = self.create_extension(row['extension'])
+        if 'cti_profile' in row:
+            entry.user_cti_profile = self.build_user_cti_profile(user, row['cti_profile'])
+            print "CTI PROFILE", entry.user_cti_profile
         if 'incall' in row:
             entry.incall_extension = self.create_incall_extension(row['incall'])
             entry.incall_ring_seconds = row['incall']['ring_seconds']
@@ -157,6 +168,12 @@ class ImportService(object):
                               context=fields['context'])
         return self.extension_service.create(extension)
 
+    def build_user_cti_profile(self, user, fields):
+        cti_profile_id = self.cti_profile_dao.get_id_by_name(fields['name'])
+        return UserCtiProfile(user_id=user.id,
+                              cti_profile_id=cti_profile_id,
+                              enabled=fields['enabled'])
+
     def create_associations(self, entry):
         if entry.user and entry.voicemail:
             self.associate_user_voicemail(entry)
@@ -170,6 +187,8 @@ class ImportService(object):
             self.associate_line_extension(entry)
         if entry.line and entry.incall_extension:
             self.associate_incall(entry)
+        if entry.user and entry.user_cti_profile:
+            self.associate_user_cti_profile(entry)
 
     def associate_user_voicemail(self, entry):
         user_voicemail = UserVoicemail(user_id=entry.user_id,
@@ -197,3 +216,6 @@ class ImportService(object):
                                          entry.incall_extension_id,
                                          ring_seconds=entry.incall_ring_seconds)
         self.incall_dao.create(incall)
+
+    def associate_user_cti_profile(self, entry):
+        self.user_cti_profile_service.edit(entry.user_cti_profile)

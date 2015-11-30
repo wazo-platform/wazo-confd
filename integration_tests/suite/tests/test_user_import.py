@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import csv
 from cStringIO import StringIO
 
-from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items
+from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than
 
 from test_api import confd
 from test_api import config
@@ -51,7 +51,7 @@ def generate_csv(rows):
 
 def assert_response_has_id(response, field, row_number=1):
     expected_entry = has_entries({'row_number': row_number,
-                                  field: instance_of(int)})
+                                  field: greater_than(0)})
     assert_that(response.item['created'], contains(expected_entry))
 
 
@@ -326,6 +326,34 @@ def test_given_csv_incall_has_errors_then_errors_returned():
     assert_error_message(response, 'context')
 
 
+def test_given_csv_has_cti_fields_then_cti_profile_associated():
+    csv = [{"firstname": "Thômas",
+            "username": "thomas",
+            "password": "secret",
+            "cti_profile_enabled": "1",
+            "cti_profile_name": "Client"}]
+
+    response = client.post("/users/import", csv)
+    assert_response_has_id(response, 'cti_profile_id')
+
+    user_id = response.item['created'][0]['user_id']
+    user_cti_profile = confd.users(user_id).cti.get().item
+
+    assert_that(user_cti_profile, has_entries(cti_profile_id=greater_than(0),
+                                              enabled=True))
+
+
+def test_given_csv_cti_profile_has_errors_then_errors_returned():
+    csv = [{"firstname": "Thômas",
+            "username": "thomas",
+            "password": "secret",
+            "cti_profile_enabled": "1",
+            "cti_profile_name": "InvalidProfile"}]
+
+    response = client.post("/users/import", csv)
+    assert_error_message(response, 'CtiProfile')
+
+
 def test_given_csv_has_all_resources_then_all_relations_created():
     exten = h.extension.find_available_exten(config.CONTEXT)
     incall_exten = h.extension.find_available_exten('from-extern')
@@ -340,6 +368,7 @@ def test_given_csv_has_all_resources_then_all_relations_created():
             "voicemail_name": "francois",
             "voicemail_number": vm_number,
             "voicemail_context": config.CONTEXT,
+            "cti_profile_name": "Client",
             }]
 
     response = client.post("/users/import", csv)
@@ -349,6 +378,7 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     assert_response_has_id(response, 'extension_id')
     assert_response_has_id(response, 'incall_extension_id')
     assert_response_has_id(response, 'sip_id')
+    assert_response_has_id(response, 'cti_profile_id')
 
     entry = response.item['created'][0]
 
@@ -365,3 +395,6 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     response = confd.lines(entry['line_id']).endpoints.sip.get()
     assert_that(response.item, has_entries(endpoint='sip',
                                            endpoint_id=entry['sip_id']))
+
+    response = confd.users(entry['user_id']).cti.get()
+    assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))

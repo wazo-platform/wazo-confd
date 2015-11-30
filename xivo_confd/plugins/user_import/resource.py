@@ -34,6 +34,7 @@ entry_fields = {
     'sccp_id': fields.Integer,
     'extension_id': fields.Integer,
     'incall_extension_id': fields.Integer,
+    'cti_profile_id': fields.Integer,
 }
 
 
