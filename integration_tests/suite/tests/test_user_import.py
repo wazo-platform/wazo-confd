@@ -28,8 +28,6 @@ from test_api import config
 from test_api.setup import new_client
 from test_api import helpers as h
 
-from nose.plugins.skip import SkipTest
-
 
 def generate_csv(rows):
     header = set()
@@ -125,12 +123,11 @@ def test_given_csv_column_has_wrong_type_then_error_returned():
 
 
 def test_given_user_contains_error_then_error_returned():
-    raise SkipTest("missing validation rules on user service")
     csv = [{"firstname": "richard",
-            "language": "blah"}]
+            "mobile_phone_number": "blah"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'language')
+    assert_error_message(response, 'mobile_phone_number')
 
 
 def test_given_csv_has_minimal_voicemail_fields_then_voicemail_imported():
