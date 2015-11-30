@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import abc
+import re
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -80,6 +81,23 @@ class UniqueField(Validator):
         if found is not None:
             metadata = {self.field: value}
             raise errors.resource_exists(self.resource, **metadata)
+
+
+class RegexField(Validator):
+
+    @classmethod
+    def compile(cls, field, text):
+        return cls(field, re.compile(text))
+
+    def __init__(self, field, regex):
+        self.field = field
+        self.regex = regex
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        if not self.regex.match(value):
+            msg = "string matching regex ''".format(self.regex.pattern)
+            raise errors.wrong_type(self.field, msg)
 
 
 class FindResource(Validator):
