@@ -30,8 +30,8 @@ user_fields = {
 
 directory_fields = {
     'id': fields.Integer,
-    'line_id': fields.Integer,
-    'agent_id': fields.Integer,
+    'line_id': fields.Integer(default=None),
+    'agent_id': fields.Integer(default=None),
     'firstname': fields.String,
     'lastname': fields.String,
     'exten': fields.String,
