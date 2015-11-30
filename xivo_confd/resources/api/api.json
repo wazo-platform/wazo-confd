@@ -40,7 +40,7 @@
             "get": {
                 "operationId": "list_call_logs",
                 "summary": "List call logs",
-                "description": "List call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"\n\nWhere Period is the number of seconds of the call. Default: 0 if not answered",
+                "description": "List call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"\n\nField names are listed on the first line.\n\nCall Date: Formatted as YYYY-MM-DDTHH:MM:SS\n\nPeriod: number of seconds of the call. Default: 0 if not answered",
                 "tags": [
                     "call_logs"
                 ],
@@ -105,6 +105,7 @@
             "put": {
                 "operationId": "update_configuration",
                 "summary": "Update live reload status",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "configuration"
                 ],
@@ -287,6 +288,7 @@
             "put": {
                 "operationId": "update_device",
                 "summary": "Update device",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "devices"
                 ],
@@ -350,7 +352,7 @@
             "get": {
                 "operationId": "reset_device_autoprov",
                 "summary": "Reset device to autoprov",
-                "description": "The device’s configuration will be lost when reset to autoprov mode.",
+                "description": "Resets a device into ‘autoprov’ mode. Once in autoprov, a device can be reprovisionned using another provisioning code. The device’s configuration will be lost when reset to autoprov mode.",
                 "tags": [
                     "devices"
                 ],
@@ -506,6 +508,7 @@
             "put": {
                 "operationId": "update_endpoint_sccp",
                 "summary": "Update SCCP Endpoint",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -704,6 +707,7 @@
             "put": {
                 "operationId": "update_endpoint_sip",
                 "summary": "Update SIP Endpoint",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -861,6 +865,7 @@
             "post": {
                 "operationId": "create_extension",
                 "summary": "Create extension",
+                "description": "The extension number must be included in one of the extension ranges for the given context.",
                 "tags": [
                     "extensions"
                 ],
@@ -921,6 +926,7 @@
             "put": {
                 "operationId": "update_extension",
                 "summary": "Update extension",
+                "description": "The update does not need to set all the fields of the edited extension. The update only needs to set the modified fields. The new extension number must be included in one of the extension ranges for the new context.\n\nOnly the fields that need to be modified can be set.",
                 "tags": [
                     "extensions"
                 ],
@@ -1203,6 +1209,7 @@
             "put": {
                 "operationId": "update_func_key",
                 "summary": "Add/Replace a func key in a template",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "funckeys"
                 ],
@@ -1384,6 +1391,7 @@
             "put": {
                 "operationId": "update_line",
                 "summary": "Update line",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "lines"
                 ],
@@ -1482,6 +1490,7 @@
             "put": {
                 "operationId": "associate_line_endpoint_sccp",
                 "summary": "Associate line and SCCP endpoint",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1582,6 +1591,7 @@
             "put": {
                 "operationId": "associate_line_endpoint_sip",
                 "summary": "Associate line and SIP endpoint",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1790,7 +1800,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/AgentQueueUpdate"
+                            "$ref": "#/definitions/AgentQueue"
                         }
                     },
                     {
@@ -1847,6 +1857,7 @@
             "put": {
                 "operationId": "update_agent_queue_association",
                 "summary": "Update Agent-Queue association",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "agents",
                     "queues"
@@ -1863,7 +1874,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/AgentQueueUpdate"
+                            "$ref": "#/definitions/AgentQueue"
                         }
                     },
                     {
@@ -2015,7 +2026,7 @@
             "put": {
                 "operationId": "update_user",
                 "summary": "Update user",
-                "description": "If the firstname or the lastname is modified, the name of associated voicemail is also updated.",
+                "description": "If the firstname or the lastname is modified, the name of associated voicemail is also updated.\n\nOnly the fields that need to be modified can be set.",
                 "tags": [
                     "users"
                 ],
@@ -2135,6 +2146,7 @@
             "put": {
                 "operationId": "update_user_func_key",
                 "summary": "Add/Replace a func key for a user",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2231,6 +2243,7 @@
             "put": {
                 "operationId": "associate_user_func_key_template",
                 "summary": "Associate a func key template to a user",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2515,6 +2528,7 @@
             "put": {
                 "operationId": "update_user_cti_profile_association",
                 "summary": "Update User-CtiProfile association",
+                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "users",
                     "cti_profiles"
@@ -2647,7 +2661,7 @@
             "put": {
                 "operationId": "update_voicemail",
                 "summary": "Update voicemail",
-                "descriptions": "A voicemail can only be updated if it isn’t associated to a user.",
+                "descriptions": "A voicemail can only be updated if it isn’t associated to a user.\n\nOnly the fields that need to be modified can be set.",
                 "tags": [
                     "voicemails"
                 ],
@@ -2989,6 +3003,7 @@
             "put": {
                 "operationId": "update_line_sip",
                 "summary": "Update SIP line",
+                "description": "Only the fields that need to be modified can be set.",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3038,7 +3053,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/AgentQueueCreate"
+                            "$ref": "#/definitions/AgentQueue"
                         }
                     },
                     {
@@ -3235,9 +3250,7 @@
             "title": "AgentQueue",
             "description": "An association between an agent and a queue. Agents associated to a Queue will receive calls when they are logged in.",
             "required": [
-                "agent_id",
-                "queue_id",
-                "penalty"
+                "agent_id"
             ],
             "properties": {
                 "agent_id": {
@@ -3248,43 +3261,8 @@
                 "queue_id": {
                     "type": "integer",
                     "format": "int32",
-                    "description": "Queue's ID"
+                    "description": "Queue's ID (read-only)"
                 },
-                "penalty": {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 0,
-                    "description": "Agent's penalty. A priority used for distributing calls."
-                }
-            }
-        },
-        "AgentQueueCreate": {
-            "title": "AgentQueue",
-            "description": "An association between an agent and a queue. Agents associated to a Queue will receive calls when they are logged in.",
-            "required": [
-                "agent_id"
-            ],
-            "properties": {
-                "agent_id": {
-                    "type": "integer",
-                    "format": "int32",
-                    "description": "Agent's ID"
-                },
-                "penalty": {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 0,
-                    "description": "Agent's penalty. A priority used for distributing calls."
-                }
-            }
-        },
-        "AgentQueueUpdate": {
-            "title": "AgentQueue",
-            "description": "An association between an agent and a queue. Agents associated to a Queue will receive calls when they are logged in.",
-            "required": [
-                "penalty"
-            ],
-            "properties": {
                 "penalty": {
                     "type": "integer",
                     "format": "int32",
@@ -3368,7 +3346,7 @@
                         "configured",
                         "not_configured"
                     ],
-                    "description": "(read-only) Device status"
+                    "description": "(read-only) Device status. autoprov: Device can be provisionned using a provisioning code, configured: Device is configured and ready to be used, not_configured : Device has not been completely configured"
                 },
                 "template_id": {
                     "type": "string",
@@ -3705,7 +3683,7 @@
             "properties": {
                 "line_id": {
                     "type": "integer",
-                    "description": "Line's ID"
+                    "description": "Line's ID (read-only)"
                 },
                 "extension_id": {
                     "type": "integer",
@@ -3849,14 +3827,14 @@
                 },
                 "caller_id": {
                     "type": "string",
-                    "description": "Name that appears on the phone when calling"
+                    "description": "Name that appears on the phone when calling. Formatted as \"Firstname Lastname\" < number >"
                 },
                 "outgoing_caller_id": {
                     "type": "string",
                     "enum": [
                         "default",
                         "anonymous",
-                        "custom"
+                        "\"Firstname Lastname\" < number >"
                     ],
                     "description": "Name that appears on the phone when calling"
                 },
@@ -3864,16 +3842,13 @@
                     "type": "string",
                     "description": "Phone number for the user’s mobile device"
                 },
-                "voicemail_number": {
-                    "type": "string",
-                    "description": "User's voicemail number"
-                },
                 "username": {
                     "type": "string",
                     "description": "Username for connecting to the CTI"
                 },
                 "password": {
                     "type": "string",
+                    "minLength": 4,
                     "description": "Password for connecting to the CTI"
                 },
                 "music_on_hold": {
@@ -3897,7 +3872,8 @@
             "title": "UserCtiProfile",
             "properties": {
                 "cti_profile_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "(read-only)"
                 },
                 "enabled": {
                     "type": "boolean"
