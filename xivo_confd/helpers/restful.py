@@ -34,10 +34,16 @@ def option(option):
     return option
 
 
-def strict_unicode(value):
-    if not isinstance(value, unicode):
-        raise ValueError("value '{}' must be a unicode string".format(value))
-    return value
+class Strict(object):
+
+    def __init__(self, typecast):
+        self.typecast = typecast
+
+    def __call__(self, value):
+        if not isinstance(value, self.typecast):
+            name = self.typecase.__name__
+            raise ValueError("value '{}' must be a {}".format(name))
+        return value
 
 
 class DigitStr(object):
