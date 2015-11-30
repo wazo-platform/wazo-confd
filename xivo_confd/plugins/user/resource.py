@@ -1,12 +1,8 @@
 from flask import url_for, request
-from flask_restful import reqparse, inputs, fields, marshal
+from flask_restful import reqparse, fields, marshal
 
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, Strict
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-
-
-MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
-CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
 
 
 user_fields = {
@@ -61,10 +57,8 @@ parser.add_argument('call_transfer_enabled', type=Strict(bool), store_missing=Fa
 parser.add_argument('supervision_enabled', type=Strict(bool), store_missing=False)
 parser.add_argument('ring_seconds', type=int, store_missing=False)
 parser.add_argument('simultaneous_calls', type=int, store_missing=False)
-parser.add_argument('caller_id',
-                    store_missing=False, type=inputs.regex(CALLER_ID_REGEX))
-parser.add_argument('mobile_phone_number',
-                    store_missing=False, type=inputs.regex(MOBILE_PHONE_NUMBER_REGEX))
+parser.add_argument('caller_id', store_missing=False, type=Strict(unicode))
+parser.add_argument('mobile_phone_number', store_missing=False, type=Strict(unicode))
 
 
 class UserList(ListResource):
@@ -84,8 +78,8 @@ class UserList(ListResource):
     parser.add_argument('music_on_hold', type=Strict(unicode))
     parser.add_argument('preprocess_subroutine', type=Strict(unicode))
     parser.add_argument('userfield', type=Strict(unicode))
-    parser.add_argument('caller_id', type=inputs.regex(CALLER_ID_REGEX))
-    parser.add_argument('mobile_phone_number', type=inputs.regex(MOBILE_PHONE_NUMBER_REGEX))
+    parser.add_argument('caller_id', type=Strict(unicode))
+    parser.add_argument('mobile_phone_number', type=Strict(unicode))
     parser.add_argument('call_transfer_enabled', type=Strict(bool))
     parser.add_argument('supervision_enabled', type=Strict(bool))
     parser.add_argument('ring_seconds', type=int)
