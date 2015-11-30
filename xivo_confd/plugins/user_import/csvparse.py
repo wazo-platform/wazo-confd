@@ -54,7 +54,6 @@ class CsvRow(object):
                 'language': self.parse_unicode('language'),
                 'outgoing_caller_id': self.parse_unicode('outgoing_caller_id'),
                 'mobile_phone_number': self.parse_unicode('mobile_phone_number'),
-                'cti_enabled': self.parse_bool('cti_enabled'),
                 'supervision_enabled': self.parse_bool('supervision_enabled'),
                 'call_transfer_enabled': self.parse_bool('call_transfer_enabled'),
                 'entity_id': self.parse_int('entity_id'),
