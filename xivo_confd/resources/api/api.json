@@ -942,6 +942,18 @@
                         "description": "Filter extensions of a certain type. Types allowed: internal, incall"
                     },
                     {
+                        "name": "exten",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter extensions by exten number"
+                    },
+                    {
+                        "name": "context",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter extensions by context name"
+                    },
+                    {
                         "$ref": "#/parameters/token"
                     }
                 ],
