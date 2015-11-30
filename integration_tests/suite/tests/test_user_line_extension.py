@@ -216,3 +216,18 @@ def test_dissociate_sccp_endpoint_associated_to_device(user, line, sccp, extensi
             a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
         response.assert_status(400, e.resource_associated('Line', 'Device'))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.line()
+@fixtures.line()
+@fixtures.sccp()
+@fixtures.sccp()
+def test_associating_two_sccp_lines_with_users_does_not_make_the_db_fail(user1, user2, line1, line2, sccp1, sccp2):
+    with a.line_endpoint_sccp(line1, sccp1, check=False), a.line_endpoint_sccp(line2, sccp2, check=False):
+        response = confd.users(user1['id']).lines.post(line_id=line1['id'])
+        response.assert_ok()
+
+        response = confd.users(user2['id']).lines.post(line_id=line2['id'])
+        response.assert_ok()
