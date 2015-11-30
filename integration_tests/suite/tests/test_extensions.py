@@ -1,4 +1,25 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2015 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
 import re
+
+from hamcrest import assert_that
+from hamcrest import contains
+from hamcrest import contains_inanyorder
 
 from test_api import confd
 from test_api import scenarios as s
@@ -66,3 +87,36 @@ def test_edit_extension_with_fake_context(extension):
     response = confd.extensions(extension['id']).put(exten='1234',
                                                        context='fakecontext')
     response.assert_match(400, e.not_found('Context'))
+
+
+@fixtures.extension(exten='1001', context='default')
+@fixtures.extension(exten='1001', context='from-extern')
+@fixtures.extension(exten='1002', context='from-extern')
+def test_search_extensions(extension1, extension2, extension3):
+    expected = contains_inanyorder(extension1, extension2)
+
+    response = confd.extensions.get(search='1001')
+
+    assert_that(response.items, expected)
+
+
+@fixtures.extension(exten='1001', context='default')
+@fixtures.extension(exten='1001', context='from-extern')
+@fixtures.extension(exten='1002', context='from-extern')
+def test_search_extensions_in_context(extension1, extension2, extension3):
+    expected = contains(extension2)
+
+    response = confd.extensions.get(search='1001', context='from-extern')
+
+    assert_that(response.items, expected)
+
+
+@fixtures.extension(exten='1001', context='default')
+@fixtures.extension(exten='1001', context='from-extern')
+@fixtures.extension(exten='1002', context='from-extern')
+def test_search_list_extensions_in_context(extension1, extension2, extension3):
+    expected = contains(extension2, extension3)
+
+    response = confd.extensions.get(context='from-extern')
+
+    assert_that(response.items, expected)

@@ -46,6 +46,6 @@ def load(core_rest_api):
     converter = Converter.resource(document, Extension)
 
     service = ExtensionService(dao, validator, notifier)
-    resource = CRUDResource(service, converter, ['type'])
+    resource = CRUDResource(service, converter, list(document.field_names()) + ['type'])
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)
