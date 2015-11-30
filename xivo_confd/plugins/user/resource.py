@@ -38,7 +38,8 @@ directory_fields = {
     'mobile_phone_number': fields.String,
     'voicemail_number': fields.String,
     'userfield': fields.String,
-    'description': fields.String
+    'description': fields.String,
+    'context': fields.String,
 }
 
 parser = reqparse.RequestParser()

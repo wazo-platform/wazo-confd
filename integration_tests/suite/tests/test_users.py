@@ -18,7 +18,6 @@
 
 from __future__ import unicode_literals
 
-
 from test_api import scenarios as s
 from test_api import associations as a
 from test_api import confd
@@ -171,6 +170,19 @@ def test_search_on_users_extension(user, line, extension):
     with a.user_line(user, line), a.line_extension(line, extension):
         response = confd.users.get(search=extension['exten'], view='directory')
         assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
+
+
+@fixtures.user(firstname='Alicé')
+@fixtures.line_sip()
+@fixtures.extension()
+def test_search_on_users_with_context_filter(user, line, extension):
+    with a.user_line(user, line), a.line_extension(line, extension):
+        response = confd.users.get(search='ali', view='directory', context='default')
+        assert_that(response.total, equal_to(1))
+        assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
+
+        response = confd.users.get(search='ali', view='directory', context='other')
+        assert_that(response.total, equal_to(0))
 
 
 def check_search(url, user, field, term):
