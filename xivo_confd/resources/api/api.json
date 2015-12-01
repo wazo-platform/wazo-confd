@@ -926,7 +926,7 @@
             "put": {
                 "operationId": "update_extension",
                 "summary": "Update extension",
-                "description": "The update does not need to set all the fields of the edited extension. The update only needs to set the modified fields. The new extension number must be included in one of the extension ranges for the new context.\n\nOnly the fields that need to be modified can be set.",
+                "description": "The new extension number must be included in one of the extension ranges for the new context.\n\nOnly the fields that need to be modified can be set.",
                 "tags": [
                     "extensions"
                 ],
