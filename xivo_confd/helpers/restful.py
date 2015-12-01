@@ -91,7 +91,7 @@ class ListResource(ConfdResource):
         params = {}
 
         for key, value in args:
-            if key in ("limit", "skip"):
+            if key in ("limit", "skip", "offset"):
                 params[key] = self.convert_numeric(key, value)
             else:
                 params[key] = value
