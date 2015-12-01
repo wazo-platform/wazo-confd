@@ -25,7 +25,7 @@ from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
 from xivo_confd.helpers.validator import RequiredFields, GetResource, \
     ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
-    ValidationGroup, AssociationValidator, MissingFields, UniqueField
+    ValidationGroup, AssociationValidator, MissingFields, UniqueField, RegexField
 
 
 class TestRequiredFields(unittest.TestCase):
@@ -130,6 +130,25 @@ class TestUniqueField(unittest.TestCase):
 
         assert_that(calling(self.validator.validate).with_args(model),
                     raises(ResourceError))
+
+
+class TestRegexField(unittest.TestCase):
+
+    def setUp(self):
+        self.regex = Mock()
+        self.model = Mock(field=sentinel.field)
+        self.validator = RegexField('field', self.regex)
+
+    def test_given_regex_matches_then_validation_passes(self):
+        self.validator.validate(self.model)
+
+        self.regex.match.assert_called_once_with(sentinel.field)
+
+    def test_given_regex_does_not_match_then_validation_fails(self):
+        self.regex.match.return_value = None
+
+        assert_that(calling(self.validator.validate).with_args(self.model),
+                    raises(InputError))
 
 
 class TestResourceExists(unittest.TestCase):
