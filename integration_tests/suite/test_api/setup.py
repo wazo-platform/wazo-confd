@@ -4,6 +4,7 @@ import logging
 
 from client import ConfdClient
 from sysconfd import SysconfdMock
+from .config import confd_host, confd_port, confd_https
 import provd
 import database
 
@@ -14,11 +15,11 @@ ASSET_PATH = os.path.join(ASSETS_ROOT, 'base')
 
 
 def new_client(headers=None, encoder=None):
-    xivo_host = os.environ.get('HOST', 'localhost')
-    xivo_confd_port = os.environ.get('PORT', 9486)
+    xivo_host = confd_host()
+    xivo_confd_port = confd_port()
     xivo_confd_login = os.environ.get('LOGIN', 'admin')
     xivo_confd_password = os.environ.get('PASSWORD', 'proformatique')
-    xivo_https = bool(os.environ.get('HTTPS', '1'))
+    xivo_https = confd_https()
     client = ConfdClient.from_options(host=xivo_host,
                                       port=xivo_confd_port,
                                       username=xivo_confd_login,
