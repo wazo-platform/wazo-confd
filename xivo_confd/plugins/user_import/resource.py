@@ -26,15 +26,15 @@ from xivo_confd.plugins.user_import import csvparse
 from xivo_confd import sysconfd, bus
 
 entry_fields = {
-    'row_number': fields.Integer,
-    'user_id': fields.Integer,
-    'voicemail_id': fields.Integer,
-    'line_id': fields.Integer,
-    'sip_id': fields.Integer,
-    'sccp_id': fields.Integer,
-    'extension_id': fields.Integer,
-    'incall_extension_id': fields.Integer,
-    'cti_profile_id': fields.Integer,
+    'row_number': fields.Integer(default=None),
+    'user_id': fields.Integer(default=None),
+    'voicemail_id': fields.Integer(default=None),
+    'line_id': fields.Integer(default=None),
+    'sip_id': fields.Integer(default=None),
+    'sccp_id': fields.Integer(default=None),
+    'extension_id': fields.Integer(default=None),
+    'incall_extension_id': fields.Integer(default=None),
+    'cti_profile_id': fields.Integer(default=None),
 }
 
 
