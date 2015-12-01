@@ -23,7 +23,13 @@ from xivo_confd.helpers.resource import CRUDService
 from xivo_dao.resources.user import dao as user_dao
 
 
+class UserService(CRUDService):
+
+    def legacy_search(self, term):
+        return self.dao.legacy_search(term)
+
+
 def build_service():
-    return CRUDService(user_dao,
+    return UserService(user_dao,
                        build_validator(),
                        build_notifier())

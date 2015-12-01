@@ -30,8 +30,8 @@ user_fields = {
 
 directory_fields = {
     'id': fields.Integer,
-    'line_id': fields.Integer,
-    'agent_id': fields.Integer,
+    'line_id': fields.Integer(default=None),
+    'agent_id': fields.Integer(default=None),
     'firstname': fields.String,
     'lastname': fields.String,
     'exten': fields.String,
@@ -90,16 +90,27 @@ class UserList(ListResource):
         return {'Location': url_for('users', id=user.id, _external=True)}
 
     def get(self):
+        if 'q' in request.args:
+            return self.legacy_search()
+        else:
+            return self.user_search()
+
+    def legacy_search(self):
+        result = self.service.legacy_search(request.args['q'])
+        return {'total': result.total,
+                'items': [marshal(item, user_fields) for item in result.items]}
+
+    def user_search(self):
         if request.args.get('view') == 'directory':
             fields = directory_fields
         else:
             fields = user_fields
 
-        params = {key: request.args[key] for key in request.args}
-        total, items = self.service.search(params)
+        params = self.search_params()
+        result = self.service.search(params)
 
-        return {'total': total,
-                'items': [marshal(item, fields) for item in items]}
+        return {'total': result.total,
+                'items': [marshal(item, fields) for item in result.items]}
 
 
 class UserItem(ItemResource):
