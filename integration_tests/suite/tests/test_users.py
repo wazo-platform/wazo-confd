@@ -145,7 +145,7 @@ def test_search_on_user_view(user):
 
 @fixtures.user(firstname="Môustapha",
                lastname="Bângoura",
-               mobile_phone_number="5559284759",
+               mobile_phone_number="+5559284759",
                userfield="Moustapha userfield",
                description="Moustapha the greatest dancer")
 def test_search_on_directory_view(user):
