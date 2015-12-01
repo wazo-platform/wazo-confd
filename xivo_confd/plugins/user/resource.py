@@ -90,16 +90,27 @@ class UserList(ListResource):
         return {'Location': url_for('users', id=user.id, _external=True)}
 
     def get(self):
+        if 'q' in request.args:
+            return self.legacy_search()
+        else:
+            return self.user_search()
+
+    def legacy_search(self):
+        result = self.service.legacy_search(request.args['q'])
+        return {'total': result.total,
+                'items': [marshal(item, user_fields) for item in result.items]}
+
+    def user_search(self):
         if request.args.get('view') == 'directory':
             fields = directory_fields
         else:
             fields = user_fields
 
         params = self.search_params()
-        total, items = self.service.search(params)
+        result = self.service.search(params)
 
-        return {'total': total,
-                'items': [marshal(item, fields) for item in items]}
+        return {'total': result.total,
+                'items': [marshal(item, fields) for item in result.items]}
 
 
 class UserItem(ItemResource):

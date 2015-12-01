@@ -23,7 +23,7 @@ from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item
+from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not
 
 
 FULL_USER = {"firstname": "Jôhn",
@@ -123,10 +123,15 @@ def test_that_the_directory_view_works_with_unicode_characters(user):
 
 
 @fixtures.user(firstname="Lègacy", lastname="Usér")
-def test_search_using_legacy_parameter(user):
+@fixtures.user(firstname="Hîde", lastname="Mé")
+def test_search_using_legacy_parameter(user1, user2):
+    expected_found = has_item(has_entries(firstname="Lègacy", lastname="Usér"))
+    expected_hidden = has_item(has_entries(firstname="Hîde", lastname="Mé"))
+
     response = confd.users.get(q="lègacy usér")
 
-    assert_that(response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér")))
+    assert_that(response.items, expected_found)
+    assert_that(response.items, is_not(expected_hidden))
 
 
 @fixtures.user(firstname="Léeroy",
