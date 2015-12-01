@@ -19,8 +19,6 @@
 from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
-from xivo_dao.resources.user_line.model import UserLine
-
 from xivo_confd.helpers.restful import FieldList, Link, \
     ListResource, ItemResource
 
@@ -51,12 +49,11 @@ class UserLineList(ListResource):
                 'items': [marshal(item, fields) for item in items]}
 
     def post(self, user_id):
-        self.service.validate_parent(user_id)
         form = parser.parse_args()
+        user = self.service.validate_parent(user_id)
+        line = self.service.validate_resource(form['line_id'])
 
-        user_line = UserLine(user_id=user_id,
-                             line_id=form['line_id'])
-        user_line = self.service.associate(user_line)
+        user_line = self.service.associate(user, line)
 
         return marshal(user_line, fields), 201, self.build_headers(user_line)
 
@@ -77,10 +74,9 @@ class UserLineItem(ItemResource):
         return marshal(user_line, fields)
 
     def delete(self, user_id, line_id):
-        self.service.validate_parent(user_id)
-        self.service.validate_resource(line_id)
-        user_line = self.service.get(user_id, line_id)
-        self.service.dissociate(user_line)
+        user = self.service.validate_parent(user_id)
+        line = self.service.validate_resource(line_id)
+        self.service.dissociate(user, line)
         return '', 204
 
 
