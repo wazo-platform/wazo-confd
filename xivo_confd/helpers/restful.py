@@ -100,7 +100,7 @@ class ListResource(ConfdResource):
 
     def convert_numeric(self, key, value):
         if not value.isdigit():
-            raise errors.wrong_type("limit", "positive numeric string")
+            raise errors.wrong_type(key, "positive number")
         return int(value)
 
     def post(self):
