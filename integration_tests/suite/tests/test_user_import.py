@@ -259,8 +259,7 @@ def test_given_csv_has_minimal_sccp_fields_then_sccp_endpoint_created():
     sccp_id = response.item['created'][0]['sccp_id']
 
     sccp = confd.endpoints.sccp(sccp_id).get().item
-    assert_that(sccp, has_entries(id=sccp_id,
-                                  context=config.CONTEXT))
+    assert_that(sccp, has_entries(id=sccp_id))
 
 
 def test_given_csv_has_extension_fields_then_extension_created():
