@@ -19,7 +19,7 @@ import unittest
 from mock import Mock
 
 from xivo_dao.resources.voicemail.model import Voicemail
-from xivo_confd.resources.voicemails.actions import VoicemailService
+from xivo_confd.resources.voicemails.services import VoicemailService
 
 
 class TestVoicemailService(unittest.TestCase):
