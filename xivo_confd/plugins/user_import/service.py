@@ -128,7 +128,6 @@ class ImportService(object):
             entry.extension = self.create_extension(row['extension'])
         if 'cti_profile' in row:
             entry.user_cti_profile = self.build_user_cti_profile(user, row['cti_profile'])
-            print "CTI PROFILE", entry.user_cti_profile
         if 'incall' in row:
             entry.incall_extension = self.create_incall_extension(row['incall'])
             entry.incall_ring_seconds = row['incall']['ring_seconds']
