@@ -23,6 +23,7 @@ import pprint
 from hamcrest import assert_that, is_in, has_key, has_entry, contains_string, has_item
 import requests
 from urls import UrlFragment
+from .config import confd_base_url
 
 requests.packages.urllib3.disable_warnings()
 
@@ -37,8 +38,7 @@ class ConfdClient(object):
 
     @classmethod
     def from_options(cls, host, port, username, password, https=True, headers=None, encoder=None):
-        scheme = 'https' if https else 'http'
-        url = "{}://{}:{}/1.1".format(scheme, host, port)
+        url = confd_base_url(host, port, https)
         logger.info('CONFD URL: %s', url)
         return cls(url, username, password, headers, encoder)
 

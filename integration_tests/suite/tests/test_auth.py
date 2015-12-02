@@ -15,30 +15,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os
+import unittest
+import requests
 
-CONTEXT = 'default'
-EXTENSION_RANGE = range(1000, 5001)
-
-
-def confd_host():
-    return os.environ.get('HOST', 'localhost')
+from hamcrest import assert_that, equal_to
+from test_api.config import confd_base_url
 
 
-def confd_port():
-    return int(os.environ.get('PORT', 9486))
+class TestAuthentication(unittest.TestCase):
 
+    def setUp(self):
+        self.session = requests.Session()
+        self.session.verify = False
+        self.session.headers['Accept'] = 'application/json'
 
-def confd_https():
-    return os.environ.get('HTTPS', '1') == '1'
+    def test_ignore_x_forwarded_for_header(self):
+        url = confd_base_url() + '/infos'
 
+        r = self.session.get(url, headers={'X-Forwarded-For': '127.0.0.1'})
 
-def confd_base_url(host=None, port=None, https=None):
-    if host is None:
-        host = confd_host()
-    if port is None:
-        port = confd_port()
-    if https is None:
-        https = confd_https()
-    scheme = 'https' if https else 'http'
-    return '{}://{}:{}/1.1'.format(scheme, host, port)
+        assert_that(r.status_code, equal_to(401))
