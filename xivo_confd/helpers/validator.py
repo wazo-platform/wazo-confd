@@ -96,8 +96,33 @@ class RegexField(Validator):
     def validate(self, model):
         value = getattr(model, self.field)
         if not self.regex.match(value):
-            msg = "string matching regex ''".format(self.regex.pattern)
+            msg = "string matching regex '{}'".format(self.regex.pattern)
             raise errors.wrong_type(self.field, msg)
+
+
+class NumberRange(Validator):
+
+    def __init__(self, field, minimum=None, maximum=None, step=1):
+        self.field = field
+        self.minimum = minimum
+        self.maximum = maximum
+        self.step = step
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        print "VALUE", value
+        if self.minimum is not None and value < self.minimum:
+            self.raise_error()
+        if self.maximum is not None and value > self.maximum:
+            self.raise_error()
+        if value % self.step != 0:
+            self.raise_error()
+
+    def raise_error(self):
+        raise errors.outside_range(self.field,
+                                   min=self.minimum,
+                                   max=self.maximum,
+                                   step=self.step)
 
 
 class FindResource(Validator):
@@ -132,14 +157,15 @@ class ResourceExists(Validator):
 
 class Optional(Validator):
 
-    def __init__(self, field, validator):
+    def __init__(self, field, *validators):
         self.field = field
-        self.validator = validator
+        self.validators = validators
 
     def validate(self, model):
         value = getattr(model, self.field)
         if value is not None:
-            self.validator.validate(model)
+            for validator in self.validators:
+                validator.validate(model)
 
 
 class MemberOfSequence(Validator):

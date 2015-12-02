@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
+from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+
+from xivo_confd.resources.user_voicemail.validator import build_validator
+from xivo_confd.resources.user_voicemail import notifier
+
 
 class UserVoicemailService(object):
 
@@ -47,3 +54,12 @@ class UserVoicemailService(object):
         self.validator.validate_dissociation(association)
         self.user_voicemail_dao.dissociate(association)
         self.notifier.dissociated(association)
+
+
+def build_service():
+    validator = build_validator()
+    return UserVoicemailService(user_dao,
+                                voicemail_dao,
+                                user_voicemail_dao,
+                                validator,
+                                notifier)

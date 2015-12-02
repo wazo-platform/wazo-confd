@@ -24,13 +24,16 @@ class SysconfdPublisher(object):
     def __init__(self, base_url, dao):
         self.base_url = base_url
         self.dao = dao
-        self.requests = []
+        self.rollback()
 
     def exec_request_handlers(self, args):
         if self.dao.is_live_reload_enabled():
-            url = "{}/exec_request_handlers".format(self.base_url)
-            body = json.dumps(args)
-            self.add_request('POST', url, data=body)
+            self.add_handlers(args)
+
+    def add_handlers(self, args):
+        for service, new_commands in args.iteritems():
+            commands = self.handlers.setdefault(service, set())
+            commands.update(set(new_commands))
 
     def move_voicemail(self, old_number, old_context, number, context):
         params = {'old_mailbox': old_number,
@@ -61,6 +64,22 @@ class SysconfdPublisher(object):
 
     def flush(self):
         session = self._session()
+        self.flush_handlers(session)
+        self.flush_requests(session)
+
+    def flush_handlers(self, session):
+        if len(self.handlers) > 0:
+            url = "{}/exec_request_handlers".format(self.base_url)
+            body = {key: tuple(commands)
+                    for key, commands in self.handlers.iteritems()}
+            response = session.request('POST', url, data=json.dumps(body))
+            self.check_for_errors(response)
+
+    def flush_requests(self, session):
         for action, url, params, data in self.requests:
             response = session.request(action, url, params=params, data=data)
             self.check_for_errors(response)
+
+    def rollback(self):
+        self.requests = []
+        self.handlers = {}

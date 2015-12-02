@@ -21,7 +21,7 @@ from hamcrest import assert_that, equal_to
 
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
-from xivo_confd.resources.user_voicemail.actions import UserVoicemailService
+from xivo_confd.resources.user_voicemail.services import UserVoicemailService
 from xivo_confd.helpers.validator import AssociationValidator
 
 

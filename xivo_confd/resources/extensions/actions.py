@@ -17,19 +17,14 @@
 
 from flask import Blueprint
 
-from xivo_dao.resources.extension import dao
 from xivo_dao.resources.extension.model import Extension
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
-from xivo_confd.helpers.resource import CRUDResource, CRUDService, DecoratorChain
+from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
 
-from xivo_confd.resources.extensions import validator, notifier
-
-
-class ExtensionService(CRUDService):
-    pass
+from xivo_confd.resources.extensions import services
 
 
 def load(core_rest_api):
@@ -45,7 +40,7 @@ def load(core_rest_api):
     )
     converter = Converter.resource(document, Extension)
 
-    service = ExtensionService(dao, validator, notifier)
+    service = services.build_service()
     resource = CRUDResource(service, converter, list(document.field_names()) + ['type'])
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

@@ -16,10 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import re
+import string
+
 from functools import partial
 
-from xivo_confd.helpers.validator import ValidationGroup, RequiredFields, Optional, UniqueField
+from xivo_confd.helpers.validator import ValidationGroup, RequiredFields, Optional, UniqueField, RegexField
 from xivo_dao.resources.endpoint_sip import dao
+
+NAME_REGEX = r"^[a-zA-Z0-9_-]{1,40}$"
+SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 
 
 class UsernameChanged(UniqueField):
@@ -41,7 +47,11 @@ def build_validator():
         create=[
             Optional('name',
                      UniqueField('name',
-                                 partial(dao.find_by, 'name')))
+                                 partial(dao.find_by, 'name')),
+                     RegexField.compile('name', NAME_REGEX)
+                     ),
+            Optional('secret',
+                     RegexField.compile('secret', SECRET_REGEX))
         ],
         edit=[
             RequiredFields('name', 'secret', 'type', 'host'),

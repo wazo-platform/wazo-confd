@@ -16,7 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.resources.voicemail import dao
+
 from xivo_confd.helpers.resource import CRUDService
+from xivo_confd import sysconfd
+from xivo_confd.resources.voicemails import notifier
+from xivo_confd.resources.voicemails.validator import build_validators
 
 
 class VoicemailService(CRUDService):
@@ -46,3 +51,8 @@ class VoicemailService(CRUDService):
         if old.number_at_context != new.number_at_context:
             self.sysconf.move_voicemail(old.number, old.context,
                                         new.number, new.context)
+
+
+def build_service():
+    validator = build_validators()
+    return VoicemailService(dao, validator, notifier, sysconfd)

@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_confd.plugins.line.service import build_service as build_line_service
+from xivo_confd.plugins.line_endpoint.validator import build_validator
+
 from xivo_dao.helpers import errors
 
 
@@ -61,3 +64,9 @@ class LineEndpointService(object):
         self.validator.validate_dissociation(line, endpoint)
         line.remove_endpoint()
         self.line_service.edit(line)
+
+
+def build_service(provd_client, endpoint, endpoint_service):
+    validator = build_validator()
+    line_service = build_line_service(provd_client)
+    return LineEndpointService(endpoint, line_service, endpoint_service, validator)

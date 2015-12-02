@@ -88,7 +88,8 @@ DEFAULT_CONFIG = {
                         'line_sip_plugin',
                         'user_line_plugin',
                         'line_extension_plugin',
-                        'line_endpoint_plugin'],
+                        'line_endpoint_plugin',
+                        'user_import_plugin']
 }
 
 
