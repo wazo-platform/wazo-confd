@@ -25,7 +25,8 @@ from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
 from xivo_confd.helpers.validator import RequiredFields, GetResource, \
     ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
-    ValidationGroup, AssociationValidator, MissingFields, UniqueField, RegexField
+    ValidationGroup, AssociationValidator, MissingFields, UniqueField, RegexField, \
+    NumberRange
 
 
 class TestRequiredFields(unittest.TestCase):
@@ -149,6 +150,45 @@ class TestRegexField(unittest.TestCase):
 
         assert_that(calling(self.validator.validate).with_args(self.model),
                     raises(InputError))
+
+
+class TestNumberRange(unittest.TestCase):
+
+    def test_given_value_lower_than_minimum_then_validation_fails(self):
+        validator = NumberRange('field', minimum=1)
+        model = Mock(field=0)
+
+        self.assertRaises(InputError, validator.validate, model)
+
+    def test_given_value_higher_or_equal_than_minimum_then_validation_passes(self):
+        validator = NumberRange('field', minimum=1)
+
+        validator.validate(Mock(field=1))
+        validator.validate(Mock(field=2))
+
+    def test_given_value_higher_than_maximum_then_validation_fails(self):
+        validator = NumberRange('field', maximum=1)
+        model = Mock(field=2)
+
+        self.assertRaises(InputError, validator.validate, model)
+
+    def test_given_value_lower_or_equal_than_maximum_then_validation_passes(self):
+        validator = NumberRange('field', maximum=1)
+
+        validator.validate(Mock(field=0))
+        validator.validate(Mock(field=1))
+
+    def test_given_value_not_a_multiple_of_step_then_validation_fails(self):
+        validator = NumberRange('field', step=2)
+        model = Mock(field=1)
+
+        self.assertRaises(InputError, validator.validate, model)
+
+    def test_given_value_is_a_multiple_of_step_then_validation_passes(self):
+        validator = NumberRange('field', step=2)
+        model = Mock(field=4)
+
+        validator.validate(model)
 
 
 class TestResourceExists(unittest.TestCase):

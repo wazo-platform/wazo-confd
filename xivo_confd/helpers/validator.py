@@ -100,6 +100,31 @@ class RegexField(Validator):
             raise errors.wrong_type(self.field, msg)
 
 
+class NumberRange(Validator):
+
+    def __init__(self, field, minimum=None, maximum=None, step=1):
+        self.field = field
+        self.minimum = minimum
+        self.maximum = maximum
+        self.step = step
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        print "VALUE", value
+        if self.minimum is not None and value < self.minimum:
+            self.raise_error()
+        if self.maximum is not None and value > self.maximum:
+            self.raise_error()
+        if value % self.step != 0:
+            self.raise_error()
+
+    def raise_error(self):
+        raise errors.outside_range(self.field,
+                                   min=self.minimum,
+                                   max=self.maximum,
+                                   step=self.step)
+
+
 class FindResource(Validator):
 
     def __init__(self, field, dao_find, resource='Resource'):
