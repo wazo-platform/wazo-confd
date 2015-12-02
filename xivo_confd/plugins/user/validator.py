@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import Validator, ValidationGroup, RequiredFields, RegexField, Optional
+from xivo_confd.helpers.validator import Validator, ValidationGroup, RequiredFields, RegexField, Optional, NumberRange
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user_line import dao as user_line_dao
@@ -23,6 +23,7 @@ from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
+USERNAME_PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]+$"
 
 
 class NoVoicemailAssociated(Validator):
@@ -58,7 +59,15 @@ def build_validator():
             Optional('mobile_phone_number',
                      RegexField.compile('mobile_phone_number', MOBILE_PHONE_NUMBER_REGEX)),
             Optional('caller_id',
-                     RegexField.compile('caller_id', CALLER_ID_REGEX))
+                     RegexField.compile('caller_id', CALLER_ID_REGEX)),
+            Optional('username',
+                     RegexField.compile('username', USERNAME_PASSWORD_REGEX)),
+            Optional('password',
+                     RegexField.compile('password', USERNAME_PASSWORD_REGEX)),
+            Optional('ring_seconds',
+                     NumberRange('ring_seconds', minimum=0, maximum=60, step=5)),
+            Optional('simultaneous_calls',
+                     NumberRange('simultaneous_calls', minimum=1, maximum=20)),
         ],
         delete=[
             NoVoicemailAssociated(user_voicemail_dao),

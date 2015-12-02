@@ -97,6 +97,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 'sixty'
+    yield s.check_bogus_field_returns_error, url, 'username', 'ûsername',
+    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', -1
+    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 21
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 6
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 65
 
 
 @fixtures.user()
