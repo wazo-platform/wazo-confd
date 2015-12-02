@@ -35,7 +35,7 @@ class ValidateLineAssociation(Validator):
                                              endpoint_id=line.endpoint_id)
 
 
-class VaildateLineDissociation(Validator):
+class ValidateLineDissociation(Validator):
 
     def __init__(self, user_line_dao, line_extension_dao):
         self.user_line_dao = user_line_dao
@@ -75,7 +75,7 @@ def build_validator():
             ValidateLineAssociation(),
         ],
         dissociation=[
-            VaildateLineDissociation(user_line_dao,
+            ValidateLineDissociation(user_line_dao,
                                      line_extension_dao)
         ]
     )

@@ -177,6 +177,7 @@ def test_given_csv_has_all_voicemail_fields_then_voicemail_imported():
                                        number=number,
                                        context=context,
                                        password="1234",
+                                       email='email@example.com',
                                        attach_audio=False,
                                        delete_messages=True,
                                        ask_password=False))
@@ -203,7 +204,8 @@ def test_given_csv_has_minimal_line_fields_then_line_created():
     line_id = response.item['created'][0]['line_id']
 
     line = confd.lines(line_id).get().item
-    assert_that(line, has_entries(context=config.CONTEXT))
+    assert_that(line, has_entries(context=config.CONTEXT,
+                                  protocol='sip'))
 
 
 def test_given_line_has_error_then_error_returned():
