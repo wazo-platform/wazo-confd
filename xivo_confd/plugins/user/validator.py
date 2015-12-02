@@ -15,11 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import Validator, ValidationGroup, RequiredFields, RegexField, Optional, NumberRange
+from xivo_confd.helpers.validator import Validator, ValidationGroup,  \
+    RequiredFields, RegexField, Optional, NumberRange, MemberOfSequence
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+from xivo_dao.resources.language import dao as language_dao
+
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
@@ -68,6 +71,9 @@ def build_validator():
                      NumberRange('ring_seconds', minimum=0, maximum=60, step=5)),
             Optional('simultaneous_calls',
                      NumberRange('simultaneous_calls', minimum=1, maximum=20)),
+            Optional('language',
+                     MemberOfSequence('language', language_dao.find_all))
+
         ],
         delete=[
             NoVoicemailAssociated(user_voicemail_dao),
