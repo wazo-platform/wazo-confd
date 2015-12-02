@@ -22,7 +22,7 @@ from hamcrest import assert_that, equal_to
 from test_api.config import confd_base_url
 
 
-class TestAuthentitcation(unittest.TestCase):
+class TestAuthentication(unittest.TestCase):
 
     def setUp(self):
         self.session = requests.Session()
