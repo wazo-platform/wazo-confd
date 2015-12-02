@@ -94,7 +94,10 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
             "mobile_phone_number": "4181234567",
             "supervision_enabled": "1",
-            "call_transfer_enabled": "0"
+            "call_transfer_enabled": "0",
+            "simultaneous_calls": "5",
+            "ring_seconds": "10",
+            "userfield": "userfield",
             }]
 
     response = client.post("/users/import", csv)
@@ -111,7 +114,10 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
                                   outgoing_caller_id='"Rîchy Cool" <4185551234>',
                                   mobile_phone_number="4181234567",
                                   supervision_enabled=True,
-                                  call_transfer_enabled=False))
+                                  call_transfer_enabled=False,
+                                  simultaneous_calls=5,
+                                  ring_seconds=10,
+                                  userfield="userfield"))
 
 
 def test_given_csv_column_has_wrong_type_then_error_returned():

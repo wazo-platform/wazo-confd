@@ -57,6 +57,9 @@ class CsvRow(object):
                 'supervision_enabled': self.parse_bool('supervision_enabled'),
                 'call_transfer_enabled': self.parse_bool('call_transfer_enabled'),
                 'entity_id': self.parse_int('entity_id'),
+                'ring_seconds': self.parse_int('ring_seconds'),
+                'simultaneous_calls': self.parse_int('simultaneous_calls'),
+                'userfield': self.parse_unicode('userfield'),
             }
         else:
             raise errors.missing('firstname')
