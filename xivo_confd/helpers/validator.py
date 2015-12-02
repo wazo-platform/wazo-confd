@@ -96,7 +96,7 @@ class RegexField(Validator):
     def validate(self, model):
         value = getattr(model, self.field)
         if not self.regex.match(value):
-            msg = "string matching regex ''".format(self.regex.pattern)
+            msg = "string matching regex '{}'".format(self.regex.pattern)
             raise errors.wrong_type(self.field, msg)
 
 
