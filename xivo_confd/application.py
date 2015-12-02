@@ -114,8 +114,20 @@ def flush_bus():
 
 @app.errorhandler(Exception)
 def error_handler(error):
-    Session.rollback()
+    rollback()
     return handle_error(error)
+
+
+def rollback():
+    Session.rollback()
+
+    sysconfd = g.get('sysconfd_publisher')
+    if sysconfd:
+        sysconfd.rollback()
+
+    bus = g.get('bus_publisher')
+    if bus:
+        bus.rollback()
 
 
 def setup_app(config):
