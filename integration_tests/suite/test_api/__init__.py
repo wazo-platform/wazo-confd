@@ -21,16 +21,21 @@ from setup import setup_docker, stop_docker, new_client, new_confd, \
     setup_provd, setup_database
 
 
-class FactoryProxy(object):
+class SingletonProxy(object):
 
-    def __init__(self, factory_func):
-        self.factory_func = factory_func
+    def __init__(self, func):
+        self.func = func
+        self.obj = None
 
     def __getattr__(self, name):
-        return getattr(self.factory_func(), name)
+        if self.obj is None:
+            self.obj = self.func()
+        return getattr(self.obj, name)
 
-    def __call__(self):
-        return self.factory_func()
+    def __call__(self, *args, **kwargs):
+        if self.obj is None:
+            self.obj = self.func()
+        return self.obj(*args, **kwargs)
 
 
 def setup():
@@ -45,5 +50,5 @@ def teardown():
         stop_docker()
 
 
-confd = FactoryProxy(new_confd)
-client = FactoryProxy(new_client)
+confd = SingletonProxy(new_confd)
+client = SingletonProxy(new_client)
