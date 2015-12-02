@@ -235,6 +235,17 @@ class TestOptional(unittest.TestCase):
 
         self.child_validator.validate.assert_called_once_with(model)
 
+    def test_given_multiple_validators_for_field_then_all_validators_called(self):
+        child_validator1 = Mock()
+        child_validator2 = Mock()
+        model = Mock(field='field')
+        validator = Optional('field', child_validator1, child_validator2)
+
+        validator.validate(model)
+
+        child_validator1.validate.assert_called_once_with(model)
+        child_validator2.validate.assert_called_once_with(model)
+
 
 class TestMemberOfSequence(unittest.TestCase):
 

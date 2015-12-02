@@ -157,14 +157,15 @@ class ResourceExists(Validator):
 
 class Optional(Validator):
 
-    def __init__(self, field, validator):
+    def __init__(self, field, *validators):
         self.field = field
-        self.validator = validator
+        self.validators = validators
 
     def validate(self, model):
         value = getattr(model, self.field)
         if value is not None:
-            self.validator.validate(model)
+            for validator in self.validators:
+                validator.validate(model)
 
 
 class MemberOfSequence(Validator):
