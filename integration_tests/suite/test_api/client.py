@@ -61,9 +61,9 @@ class ConfdClient(object):
         return Response(response)
 
     def log_request(self, method, url, parameters, data):
-        if isinstance(data, str):
-            data = data.decode('utf8')
-        logger.info(u'%s %s params: %s body: %s', method, parameters, url, data)
+        if data is not None:
+            data = unicode(data, encoding='utf8')
+        logger.info(u'%s %s params: %s body: %s', method, url, parameters, data)
 
     def get(self, url, **parameters):
         return self.request('GET', url, parameters=parameters)
