@@ -2089,6 +2089,8 @@
         "/users/import": {
             "post": {
                 "operationId": "import_users_csv",
+                "summary": "Mass import users and associated resources",
+                "description": "Mass import users and associated resources using CSV data.\n\nFields\n======\n\nAll fields, except the entity_id and firstname, are optional. \nA related resource will only be associated to the user if the group of fields required \nfor creating said resource is present.\n\nUser fields\n-----------\n\n* entity_id\n* firstname\n* lastname\n* mobile_phone_number\n* ring_seconds\n* simultaneous_calls\n* language\n* outgoing_caller_id\n* userfield\n* supervision_enabled\n* call_tranfer_enabled\n\nCTI fields\n----------\n* cti_profile_enabled\n* cti_profile_name\n* username\n* password\n\nExtension fields\n----------------\n\n* exten\n* context\n\nLine fields\n-----------\n\n* line_protocol (currently supported: sip or sccp)\n\nSIP fields\n----------\n\n* sip_username\n* sip_secret\n\nIncall fields\n-------------\n\n* incall_exten\n* incall_context\n* incall_ring_seconds\n\nVoicemail\n---------\n\n* voicemail_name\n* voicemail_number\n* voicemail_context\n* voicemail_password\n* voicemail_email\n* voicemail_attach_audio\n* voicemail_delete_messages\n* voicemail_ask_password\n",
                 "consumes": [
                     "text/csv; charset=utf-8"
                 ],
@@ -2103,7 +2105,8 @@
                         "name": "body",
                         "in": "body",
                         "required": true,
-                        "description": "CSV data to import.",
+                        "description": "CSV data must respect the following conditions:\n* The encoding must be set in the Content-Type header, via the `charset=` option.\n* The first line of the CSV data must contain a list of header fields.\n* Fields must be separated with `,`\n* Fields must be quoted with `\"`\n* Double-quotes can be escaped by writing them twice (e.g. `Robert \"\"Bob\"\" Jenkins)`\n* Boolean value is `\"1\"` (true) or `\"0\"` (false)\n* Empty fields or headers that are not defined will be considered null.",
+
                         "schema": {
                             "type": "string"
                         }
@@ -2122,8 +2125,7 @@
                             "$ref": "#/definitions/UserImportError"
                         }
                     }
-                },
-                "description": "Mass import users and associated resources using CSV data. \n\nCSV Data\n========\n\nData must be encoded in UTF-8. \nThe header ```Content-Type: text/csv; charset=utf-8``` must also be set when sending the request. \nFields must be seperated by a comma (,) and quoted with a double-quote (\").\nDouble-quotes can be escaped by writing them twice (e.g \"\" becomes \").\nLines must be separated by a return feed and newline (\\\\r\\\\n)\nThe first line of the CSV data must contain a list of header fields (defined below)\nBoolean values are represented by \"1\" for true and \"0\" for false. \nEmpty fields or headers that are not defined will be considered null. \n\nFields\n======\n\nAll fields, except the entity_id and firstname, are optional. \nA related resource will only be associated to the user if the group of fields required \nfor creating said resource is present.\n\nUser fields\n-----------\n\n* entity_id\n* firstname\n* lastname\n* language\n* username\n* password\n* supervision_enabled\n* call_tranfer_enabled\n* ring_seconds\n* simultaneous_calls\n\nExtension fields\n----------------\n\n* exten\n* context\n\nLine fields\n-----------\n\n* line_protocol (currently supported: sip or sccp)\n\nSIP fields\n----------\n\n* sip_name\n* sip_secret\n\nIncall fields\n-------------\n\n* incall_exten\n* incall_context\n* incall_ringseconds\n\nVoicemail\n---------\n\n* voicemail_name\n* voicemail_number\n* voicemail_context\n* voicemail_password\n* voicemail_email\n* voicemail_attach_audio\n* voicemail_delete_messages\n* voicemail_ask_password\n"
+                }
             }
         },
         "/users/{user_id}/funckeys": {
@@ -3949,6 +3951,7 @@
                 "created": {
                     "type": "array",
                     "items": {
+                        "title": "UserImportIDs",
                         "type": "object",
                         "properties": {
                             "extension_id": {
