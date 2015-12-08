@@ -20,13 +20,14 @@ def new_number_and_context(context):
     return find_available_number(context), context
 
 
-def find_available_number(context=config.CONTEXT):
+def find_available_number(context=config.CONTEXT, exclude=None):
+    exclude = {int(n) for n in exclude} if exclude else set()
     response = confd.voicemails.get()
     numbers = [int(v['number'])
                for v in response.items
                if v['context'] == context and v['number'].isdigit()]
 
-    available_numbers = set(config.EXTENSION_RANGE) - set(numbers)
+    available_numbers = set(config.EXTENSION_RANGE) - set(numbers) - exclude
     return str(available_numbers.pop())
 
 
