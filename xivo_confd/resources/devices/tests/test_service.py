@@ -25,7 +25,7 @@ from xivo_confd.resources.devices.model import LineSCCPConverter, LineSIPConvert
 
 from xivo_confd.resources.devices.model import Device
 from xivo_dao.resources.extension.model import Extension
-from xivo_dao.resources.line_extension.model import LineExtension
+from xivo_confd.plugins.line_extension.manager import LineExtension
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 

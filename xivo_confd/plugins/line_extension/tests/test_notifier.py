@@ -18,7 +18,7 @@
 import unittest
 from mock import patch, Mock
 
-from xivo_dao.resources.line_extension.model import LineExtension
+from xivo_confd.plugins.line_extension.manager import LineExtension
 from xivo_dao.resources.user_line.model import UserLine
 
 from xivo_confd.plugins.line_extension import notifier
