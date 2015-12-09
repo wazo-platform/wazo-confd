@@ -1,4 +1,4 @@
-xivo-confd (14.16~20140826.174122.43b3a6e-2) stable; urgency=low
+xivo-confd (14.16~20140826.174122.43b3a6e) xivo-dev; urgency=low
 
   * rename package restapi to confd
 
