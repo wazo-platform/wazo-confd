@@ -15,68 +15,83 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao.helpers.db_manager import Session
+from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.extension import Extension
+
+from xivo_confd.resources.line_device import validator as line_device_validator
+
 from xivo_dao.helpers import errors
-from xivo_dao.helpers.exception import NotFoundError
 
-from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.incall import dao as incall_dao
-from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_confd.helpers.validator import Validator, AssociationValidator
 
 
-def validate_model(line_extension):
-    missing = line_extension.missing_parameters()
-    if missing:
-        raise errors.missing(*missing)
+class InternalAssociationValidator(Validator):
+
+    def validate(self, line, extension):
+        self.validate_line_has_endpoint(line)
+        self.validate_line_has_no_extension(line)
+        self.validate_extension_not_associated(extension)
+
+    def validate_line_has_endpoint(self, line):
+        if not line.is_associated():
+            raise errors.missing_association('Line', 'Endpoint',
+                                             line_id=line.id)
+
+    def validate_line_has_no_extension(self, line):
+        extension_id = (Session.query(UserLine.extension_id)
+                        .filter(UserLine.line_id == line.id)
+                        .filter(UserLine.extension_id != None)  # noqa
+                        .scalar())
+
+        if extension_id:
+            raise errors.resource_associated('Line', 'Extension',
+                                             line_id=line.id,
+                                             extension_id=extension_id)
+
+    def validate_extension_not_associated(self, extension):
+        row = (Session.query(Extension.type.label('resource'),
+                             Extension.typeval.label('resource_id'))
+               .filter(Extension.id == extension.id)
+               .first())
+
+        if not (row.resource == 'user' and row.resource_id == '0'):
+            raise errors.resource_associated('Extension',
+                                             row.resource,
+                                             id=extension.id,
+                                             associated_id=row.resource_id)
 
 
-def validate_line(line_extension):
-    try:
-        line_dao.get(line_extension.line_id)
-    except NotFoundError:
-        raise errors.param_not_found('line_id', 'Line')
+class InternalDissociationValidator(Validator):
+
+    def validate(self, line, extension):
+        line_device_validator.validate_no_device(line.id)
 
 
-def validate_extension(line_extension):
-    try:
-        extension_dao.get(line_extension.extension_id)
-    except NotFoundError:
-        raise errors.param_not_found('extension_id', 'Extension')
+class IncallAssociationValidator(Validator):
+
+    def validate(self, line, extension):
+        self.validate_line_has_user(line)
+
+    def validate_line_has_user(self, line):
+        query = (Session.query(UserLine)
+                 .filter(UserLine.line_id == line.id)
+                 .filter(UserLine.user_id != None)  # noqa
+                 .exists())
+
+        exists = Session.query(query).scalar()
+        if not exists:
+            raise errors.missing_association('Line', 'User')
 
 
-def validate_line_not_associated_to_extension(line_extension):
-    line_extension = line_extension_dao.find_by_line_id(line_extension.line_id)
-    if line_extension:
-        raise errors.resource_associated('Line',
-                                         'Extension',
-                                         line_id=line_extension.line_id,
-                                         extension_id=line_extension.extension_id)
+def build_internal_validator():
+    return AssociationValidator(
+        association=[InternalAssociationValidator()],
+        dissociation=[InternalDissociationValidator()]
+    )
 
 
-def validate_associated_to_user(line_extension):
-    user_lines = user_line_dao.find_all_by_line_id(line_extension.line_id)
-    if not user_lines:
-        raise errors.missing_association('Line', 'User', line_id=line_extension.line_id)
-
-
-def validate_associated(line_extension):
-    line_extensions = _all_line_extensions(line_extension.line_id)
-    if line_extension not in line_extensions:
-        raise errors.missing_association('Line',
-                                         'Extension',
-                                         line_id=line_extension.line_id,
-                                         extension_id=line_extension.extension_id)
-
-
-def validate_line_has_endpoint(line_extension):
-    line = line_dao.get(line_extension.line_id)
-    if line.endpoint is None or line.endpoint_id is None:
-        raise errors.missing_association('Line',
-                                         'Endpoint',
-                                         line_id=line.id)
-
-
-def _all_line_extensions(line_id):
-    return (line_extension_dao.find_all_by_line_id(line_id) +
-            incall_dao.find_all_line_extensions_by_line_id(line_id))
+def build_incall_validator():
+    return AssociationValidator(
+        association=[IncallAssociationValidator()]
+    )

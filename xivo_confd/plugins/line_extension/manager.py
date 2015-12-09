@@ -15,80 +15,141 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.incall.model import Incall
+import abc
+
+from sqlalchemy import Integer
+from sqlalchemy.sql import and_, cast
+
+from xivo_dao.helpers.db_manager import Session
+from xivo_dao.helpers import errors
+
+from xivo_dao.alchemy.context import Context
+from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.extension import Extension
+from xivo_dao.alchemy.incall import Incall
+from xivo_dao.alchemy.dialaction import Dialaction
+
+from xivo_dao.resources.incall.model import Incall as IncallModel
 
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
-from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.plugins.line_extension import validator as line_extension_validator
-from xivo_confd.resources.line_device import validator as line_device_validator
-from xivo_confd.resources.extensions import validator as extension_validator
+from xivo_confd.plugins.line_extension import validator
+
+
+class LineExtension(object):
+
+    @classmethod
+    def from_models(cls, line, extension):
+        return cls(line.id, extension.id)
+
+    def __init__(self, line_id, extension_id):
+        self.line_id = line_id
+        self.extension_id = extension_id
 
 
 def build_manager():
-    incall = IncallAssociator(line_extension_validator, user_line_dao, incall_dao, extension_dao)
-    internal = InternalAssociator(line_extension_dao,
-                                  extension_validator,
-                                  line_extension_validator,
-                                  line_device_validator)
+    incall = IncallAssociator(validator.build_incall_validator(),
+                              user_line_dao,
+                              incall_dao,
+                              extension_dao)
+
+    internal = InternalAssociator(validator.build_internal_validator(),
+                                  line_extension_dao)
+
     associators = {'incall': incall, 'internal': internal}
-    return AssociationManager(context_dao, line_extension_validator, associators)
+    return AssociationManager(associators)
 
 
 class AssociationManager(object):
 
-    def __init__(self, context_dao, validator, associators):
-        self.context_dao = context_dao
-        self.validator = validator
+    def __init__(self, associators):
         self.associators = associators
 
-    def associate(self, line_extension):
-        self.validate(line_extension)
+    def list(self, line_id):
+        user_line_query = (Session.query(UserLine.line_id,
+                                         UserLine.extension_id)
+                           .filter(UserLine.line_id == line_id)
+                           .filter(UserLine.extension_id != None)  # noqa
+                           .distinct())
 
-        associator = self._get_associator(line_extension)
-        associator.associate(line_extension)
+        incall_query = (Session.query(UserLine.line_id,
+                                      Extension.id.label('extension_id'))
+                        .join(Dialaction,
+                              and_(Dialaction.action == 'user',
+                                   cast(Dialaction.actionarg1, Integer) == UserLine.user_id,
+                                   UserLine.main_line == True))  # noqa
+                        .join(Incall,
+                              and_(Dialaction.category == 'incall',
+                                   cast(Dialaction.categoryval, Integer) == Incall.id))
+                        .join(Extension,
+                              and_(Incall.exten == Extension.exten,
+                                   Incall.context == Extension.context))
+                        .filter(UserLine.line_id == line_id))
 
-    def _get_associator(self, line_extension):
-        context = self.context_dao.get_by_extension_id(line_extension.extension_id)
+        return [LineExtension(row.line_id, row.extension_id)
+                for row in user_line_query.union(incall_query)]
 
-        if context.type not in self.associators:
-            raise NotImplementedError("Associator for contexts of type '%s' not implemented" % context.type)
+    def associate(self, line, extension):
+        associator = self._get_associator(extension)
+        return associator.associate(line, extension)
 
-        return self.associators[context.type]
+    def _get_associator(self, extension):
+        context_type = (Session.query(Context.contexttype)
+                        .filter(Context.name == extension.context)
+                        .scalar())
 
-    def validate(self, line_extension):
-        self.validator.validate_model(line_extension)
-        self.validator.validate_line(line_extension)
-        self.validator.validate_extension(line_extension)
+        if context_type not in self.associators:
+            raise NotImplementedError("Cannot associate extension with context type '{}'".format(context_type))
 
-    def dissociate(self, line_extension):
-        self.validate(line_extension)
-        self.validator.validate_associated(line_extension)
+        return self.associators[context_type]
 
-        associator = self._get_associator(line_extension)
-        associator.dissociate(line_extension)
+    def dissociate(self, line, extension):
+        associator = self._get_associator(extension)
+        return associator.dissociate(line, extension)
+
+    def get_association(self, line, extension):
+        associator = self._get_associator(extension)
+        return associator.get_association(line, extension)
+
+
+class AssociationService(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def associate(self, line, extension):
+        return
+
+    @abc.abstractmethod
+    def dissociate(self, line, extension):
+        return
+
+    @abc.abstractmethod
+    def get_association(self, line, extension):
+        return
 
 
 class InternalAssociator(object):
 
-    def __init__(self, line_extension_dao, extension_validator, line_extension_validator, line_device_validator):
-        self.line_extension_dao = line_extension_dao
-        self.extension_validator = extension_validator
-        self.line_extension_validator = line_extension_validator
-        self.line_device_validator = line_device_validator
+    def __init__(self, validator, dao):
+        self.validator = validator
+        self.dao = dao
 
-    def associate(self, line_extension):
-        self.line_extension_validator.validate_line_not_associated_to_extension(line_extension)
-        self.line_extension_validator.validate_line_has_endpoint(line_extension)
-        self.extension_validator.validate_extension_not_associated(line_extension.extension_id)
-        self.line_extension_dao.associate(line_extension)
+    def associate(self, line, extension):
+        self.validator.validate_association(line, extension)
+        self.dao.associate(line, extension)
+        return LineExtension.from_models(line, extension)
 
-    def dissociate(self, line_extension):
-        self.line_device_validator.validate_no_device(line_extension.line_id)
-        self.line_extension_dao.dissociate(line_extension)
+    def dissociate(self, line, extension):
+        self.validator.validate_dissociation(line, extension)
+        self.dao.dissociate(line, extension)
+
+    def get_association(self, line, extension):
+        self.dao.get_by(line_id=line.id, extension_id=extension.id)
+        return LineExtension.from_models(line, extension)
 
 
 class IncallAssociator(object):
@@ -99,16 +160,24 @@ class IncallAssociator(object):
         self.incall_dao = incall_dao
         self.extension_dao = extension_dao
 
-    def associate(self, line_extension):
-        self.validator.validate_associated_to_user(line_extension)
-        self._create_incall(line_extension)
+    def associate(self, line, extension):
+        self.validator.validate_association(line, extension)
+        self._create_incall(line, extension)
+        return LineExtension.from_models(line, extension)
 
-    def _create_incall(self, line_extension):
-        main_user_line = self.user_line_dao.find_main_user_line(line_extension.line_id)
-        incall = Incall.user_destination(main_user_line.user_id,
-                                         line_extension.extension_id)
+    def _create_incall(self, line, extension):
+        main_user_line = self.user_line_dao.get_by(main_user=True, line_id=line.id)
+        incall = IncallModel.user_destination(main_user_line.user_id,
+                                              extension.id)
         self.incall_dao.create(incall)
 
-    def dissociate(self, line_extension):
-        incall = self.incall_dao.find_by_extension_id(line_extension.extension_id)
+    def dissociate(self, line, extension):
+        self.validator.validate_dissociation(line, extension)
+        incall = self.incall_dao.find_by_extension_id(extension.id)
         self.incall_dao.delete(incall)
+
+    def get_association(self, line, extension):
+        association = self.incall_dao.find_line_extension_by_extension_id(extension.id)
+        if association.line_id != line.id:
+            raise errors.not_found('LineExtension', line_id=line.id, extension_id=extension.id)
+        return LineExtension(association.line_id, association.extension_id)
