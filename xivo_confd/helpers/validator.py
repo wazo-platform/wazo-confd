@@ -110,7 +110,6 @@ class NumberRange(Validator):
 
     def validate(self, model):
         value = getattr(model, self.field)
-        print "VALUE", value
         if self.minimum is not None and value < self.minimum:
             self.raise_error()
         if self.maximum is not None and value > self.maximum:
