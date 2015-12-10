@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "XiVO Confd",
-        "description": "Confd exposes an API for managing core resources on a XiVO server such as users, extensions, devices, voicemails, queues, etc. Resources can be associated together to provide additional functionality. For example: By associating a voicemail with a user, calls will automatically fallback on to the voicemail when the user cannot answer.",
+        "description": "Confd exposes an API for managing core resources on a XiVO server such as users, extensions, devices, voicemails, queues, etc. Resources can be associated together to provide additional functionality. For example: By associating a voicemail with a user, calls will automatically fallback on to the voicemail when the user cannot answer.\n\nImplementation notes\n====================\n\nErrors\n------\n\nResponses containing errors will have a status code in the 400 or 500 class. A list of error messages will be returned in the body of the response as a JSON-encoded array:\n\n~~~\n[\n    \"Input error - User not found\",\n    \"Resource error - User not associated to a line\"\n]\n~~~\n\n\nUpdating resources via PUT\n--------------------------\n\nWhen updating a resource, all fields become optional. In other words, only values that have been changed need to be sent to the server. Please note that this behavior may change in future versions of the API.",
         "version": "1.1",
         "license": {
             "name": "GPL v3",
@@ -105,7 +105,6 @@
             "put": {
                 "operationId": "update_configuration",
                 "summary": "Update live reload status",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "configuration"
                 ],
@@ -288,7 +287,6 @@
             "put": {
                 "operationId": "update_device",
                 "summary": "Update device",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "devices"
                 ],
@@ -508,7 +506,6 @@
             "put": {
                 "operationId": "update_endpoint_sccp",
                 "summary": "Update SCCP Endpoint",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -707,7 +704,6 @@
             "put": {
                 "operationId": "update_endpoint_sip",
                 "summary": "Update SIP Endpoint",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -926,7 +922,7 @@
             "put": {
                 "operationId": "update_extension",
                 "summary": "Update extension",
-                "description": "The new extension number must be included in one of the extension ranges for the new context.\n\nOnly the fields that need to be modified can be set.",
+                "description": "The new extension number must be included in one of the extension ranges for the new context.",
                 "tags": [
                     "extensions"
                 ],
@@ -1209,7 +1205,6 @@
             "put": {
                 "operationId": "update_func_key",
                 "summary": "Add/Replace a func key in a template",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "funckeys"
                 ],
@@ -1391,7 +1386,6 @@
             "put": {
                 "operationId": "update_line",
                 "summary": "Update line",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "lines"
                 ],
@@ -1490,7 +1484,6 @@
             "put": {
                 "operationId": "associate_line_endpoint_sccp",
                 "summary": "Associate line and SCCP endpoint",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1591,7 +1584,6 @@
             "put": {
                 "operationId": "associate_line_endpoint_sip",
                 "summary": "Associate line and SIP endpoint",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1857,7 +1849,6 @@
             "put": {
                 "operationId": "update_agent_queue_association",
                 "summary": "Update Agent-Queue association",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "agents",
                     "queues"
@@ -2026,7 +2017,7 @@
             "put": {
                 "operationId": "update_user",
                 "summary": "Update user",
-                "description": "If the firstname or the lastname is modified, the name of associated voicemail is also updated.\n\nOnly the fields that need to be modified can be set.",
+                "description": "If the firstname or the lastname is modified, the name of associated voicemail is also updated.",
                 "tags": [
                     "users"
                 ],
@@ -2188,7 +2179,6 @@
             "put": {
                 "operationId": "update_user_func_key",
                 "summary": "Add/Replace a func key for a user",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2285,7 +2275,6 @@
             "put": {
                 "operationId": "associate_user_func_key_template",
                 "summary": "Associate a func key template to a user",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2570,7 +2559,6 @@
             "put": {
                 "operationId": "update_user_cti_profile_association",
                 "summary": "Update User-CtiProfile association",
-                "description": "Only the fields that need to be modified can be set.",
                 "tags": [
                     "users",
                     "cti_profiles"
@@ -2703,7 +2691,6 @@
             "put": {
                 "operationId": "update_voicemail",
                 "summary": "Update voicemail",
-                "descriptions": "A voicemail can only be updated if it isn’t associated to a user.\n\nOnly the fields that need to be modified can be set.",
                 "tags": [
                     "voicemails"
                 ],
@@ -3045,7 +3032,6 @@
             "put": {
                 "operationId": "update_line_sip",
                 "summary": "Update SIP line",
-                "description": "Only the fields that need to be modified can be set.",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3240,7 +3226,7 @@
             "name": "view",
             "in": "query",
             "type": "string",
-            "description": "Different view of the list of users. Acceptable value: directory."
+            "description": "Different view of the list of users. Acceptable values: user, directory."
         },
         "voicemailid": {
             "required": true,
@@ -4175,9 +4161,6 @@
                 },
                 "max_messages": {
                     "type": "integer",
-                    "enum": [
-                        1,10,15,20,25,50,75,100,125,150,175,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,9999
-                    ],
                     "description": "Maximum number of messages to store"
                 },
                 "attach_audio": {
