@@ -34,7 +34,7 @@ Depends: ${python:Depends},
          python-flask-negotiate,
          python-flask-restful,
          python-cherrypy3,
-         python-requests
+         python-requests (>= 2.4.3)
 Provides: xivo-librestapi
 Conflicts: xivo-librestapi
 Replaces: xivo-librestapi
