@@ -104,6 +104,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
     assert_response_has_id(response, 'user_id')
 
     user_id = response.item['created'][0]['user_id']
+    user_uuid = response.item['created'][0]['user_uuid']
+
     user = confd.users(user_id).get().item
 
     assert_that(user, has_entries(firstname="Rîchard",
@@ -117,7 +119,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
                                   call_transfer_enabled=False,
                                   simultaneous_calls=5,
                                   ring_seconds=10,
-                                  userfield="userfield"))
+                                  userfield="userfield",
+                                  uuid=user_uuid))
 
 
 def test_given_csv_column_has_wrong_type_then_error_returned():

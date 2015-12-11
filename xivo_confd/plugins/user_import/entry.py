@@ -46,6 +46,7 @@ class Entry(object):
         return {
             'row_number': self.row_number,
             'user_id': self.user.id if self.user else None,
+            'user_uuid': self.user.uuid if self.user else None,
             'voicemail_id': self.voicemail.id if self.voicemail else None,
             'line_id': self.line.id if self.line else None,
             'sip_id': self.sip.id if self.sip else None,
