@@ -28,23 +28,22 @@ from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 
 class Entry(object):
 
-    def __init__(self, row_number, user=None, voicemail=None, line=None, sip=None,
-                 sccp=None, extension=None, incall_extension=None, user_cti_profile=None,
-                 incall_ring_seconds=None):
-        self.row_number = row_number
-        self.user = user
-        self.voicemail = voicemail
-        self.line = line
-        self.sip = sip
-        self.sccp = sccp
-        self.extension = extension
-        self.incall_extension = incall_extension
-        self.incall_ring_seconds = incall_ring_seconds
-        self.user_cti_profile = user_cti_profile
+    def __init__(self, number, row):
+        self.number = number
+        self.row = row
+        self.user = None
+        self.voicemail = None
+        self.line = None
+        self.sip = None
+        self.sccp = None
+        self.extension = None
+        self.incall_extension = None
+        self.incall_ring_seconds = None
+        self.user_cti_profile = None
 
     def extract_ids(self):
         return {
-            'row_number': self.row_number,
+            'row_number': self.number,
             'user_id': self.user.id if self.user else None,
             'user_uuid': self.user.uuid if self.user else None,
             'voicemail_id': self.voicemail.id if self.voicemail else None,
@@ -55,6 +54,67 @@ class Entry(object):
             'incall_extension_id': self.incall_extension.id if self.incall_extension else None,
             'cti_profile_id': self.user_cti_profile.cti_profile_id if self.user_cti_profile else None,
         }
+
+    def create(self, resource, model_class, service):
+        fields = self.row[resource]
+        setattr(self, resource, service.create(model_class(**fields)))
+
+    def create_user(self, service):
+        if self.row['user']:
+            self.create('user', User, service)
+
+    def create_voicemail(self, service):
+        if self.row['voicemail']:
+            self.create('voicemail', Voicemail, service)
+
+    def create_line(self, service):
+        if self.row['line']:
+            self.create('line', Line, service)
+
+    def create_sip(self, service):
+        if self.row['endpoint'] == 'sip':
+            self.create('sip', SIPEndpoint, service)
+
+    def create_sccp(self, service):
+        if self.row['endpoint'] == 'sccp':
+            self.create('sccp', SCCPEndpoint, service)
+
+    def create_extension(self, service):
+        extension = self.row['extension']
+        if 'exten' in extension and 'context' in extension:
+            self.create('extension', Extension, service)
+
+    def create_incall_extension(self, service):
+        fields = self.row['incall']
+        if fields:
+            extension = Extension(exten=self.row['incall']['exten'],
+                                  context=self.row['incall']['context'])
+            self.incall_extension = service.create(extension)
+
+    def create_cti_profile(self, cti_profile_dao):
+        fields = self.row['cti_profile']
+        if fields:
+            cti_profile_id = cti_profile_dao.get_id_by_name(fields['name'])
+            self.user_cti_profile = UserCtiProfile(user_id=self.user.id,
+                                                   cti_profile_id=cti_profile_id,
+                                                   enabled=fields.get('enabled'))
+
+    def associate(self, left, right, associator):
+        left_resource = getattr(self, left)
+        right_resource = getattr(self, right)
+        if left_resource and right_resource:
+            associator(left_resource, right_resource)
+
+    def associate_incall(self, incall_dao):
+        if self.user and self.incall_extension:
+            incall = Incall.user_destination(self.user.id,
+                                             self.incall_extension.id,
+                                             ring_seconds=self.row['incall'].get('ring_seconds'))
+            incall_dao.create(incall)
+
+    def associate_cti_profile(self, service):
+        if self.user and self.user_cti_profile:
+            service.edit(self.user_cti_profile)
 
 
 class EntryCreator(object):
@@ -73,53 +133,16 @@ class EntryCreator(object):
 
     def create(self, line):
         row = line.parse()
-        entry = Entry(line.position)
-        entry.user = self.create_user(row['user'])
-        entry.voicemail = self.create_voicemail(row['voicemail'])
-        entry.line = self.create_line(row['line'])
-        entry.extension = self.create_extension(row['extension'])
-        entry.incall_extension = self.create_incall_extension(row['incall'])
-        entry.user_cti_profile = self.create_profile(entry.user, row['cti_profile'])
-
-        if row['endpoint'] == 'sip':
-            entry.sip = self.create_sip(row['sip'])
-        elif row['endpoint'] == 'sccp':
-            entry.sccp = self.create_sccp(row['sccp'])
-
+        entry = Entry(line.position, row)
+        entry.create_user(self.user_service)
+        entry.create_voicemail(self.voicemail_service)
+        entry.create_line(self.line_service)
+        entry.create_sip(self.sip_service)
+        entry.create_sccp(self.sccp_service)
+        entry.create_extension(self.extension_service)
+        entry.create_incall_extension(self.extension_service)
+        entry.create_cti_profile(self.cti_profile_dao)
         return entry
-
-    def create_user(self, fields):
-        return self.user_service.create(User(**fields))
-
-    def create_voicemail(self, fields):
-        if fields:
-            return self.voicemail_service.create(Voicemail(**fields))
-
-    def create_line(self, fields):
-        if fields:
-            return self.line_service.create(Line(**fields))
-
-    def create_sip(self, fields):
-        return self.sip_service.create(SIPEndpoint(**fields))
-
-    def create_sccp(self, fields):
-        return self.sccp_service.create(SCCPEndpoint(**fields))
-
-    def create_extension(self, fields):
-        if 'exten' in fields and 'context' in fields:
-            return self.extension_service.create(Extension(**fields))
-
-    def create_incall_extension(self, fields):
-        if 'exten' in fields and 'context' in fields:
-            return self.extension_service.create(Extension(exten=fields['exten'],
-                                                           context=fields['context']))
-
-    def create_profile(self, user, fields):
-        if 'name' in fields:
-            cti_profile_id = self.cti_profile_dao.get_id_by_name(fields['name'])
-            return UserCtiProfile(user_id=user.id,
-                                  cti_profile_id=cti_profile_id,
-                                  enabled=fields.get('enabled'))
 
 
 class EntryAssociator(object):
@@ -136,26 +159,10 @@ class EntryAssociator(object):
         self.user_cti_profile_service = user_cti_profile_service
 
     def associate(self, entry):
-        if entry.user and entry.voicemail:
-            self.user_voicemail_service.associate_models(entry.user, entry.voicemail)
-        if entry.line and entry.sip:
-            self.line_sip_service.associate(entry.line, entry.sip)
-        elif entry.line and entry.sccp:
-            self.line_sccp_service.associate(entry.line, entry.sccp)
-        if entry.user and entry.line:
-            self.user_line_service.associate(entry.user, entry.line)
-        if entry.line and entry.extension:
-            self.line_extension_service.associate(entry.line, entry.extension)
-        if entry.line and entry.incall_extension:
-            self.associate_incall(entry.user, entry.incall_extension, entry.incall_ring_seconds)
-        if entry.user and entry.user_cti_profile:
-            self.associate_user_cti_profile(entry.user_cti_profile)
-
-    def associate_incall(self, user, extension, ring_seconds=None):
-        incall = Incall.user_destination(user.id,
-                                         extension.id,
-                                         ring_seconds=ring_seconds)
-        self.incall_dao.create(incall)
-
-    def associate_user_cti_profile(self, user_cti_profile):
-        self.user_cti_profile_service.edit(user_cti_profile)
+        entry.associate('user', 'voicemail', self.user_voicemail_service.associate_models)
+        entry.associate('line', 'sip', self.line_sip_service.associate)
+        entry.associate('line', 'sccp', self.line_sccp_service.associate)
+        entry.associate('line', 'extension', self.line_extension_service.associate)
+        entry.associate('user', 'line', self.user_line_service.associate)
+        entry.associate_incall(self.incall_dao)
+        entry.associate_cti_profile(self.user_cti_profile_service)
