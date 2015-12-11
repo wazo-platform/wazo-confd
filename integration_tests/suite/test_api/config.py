@@ -18,6 +18,7 @@
 import os
 
 CONTEXT = 'default'
+INCALL_CONTEXT = 'from-extern'
 EXTENSION_RANGE = range(1000, 5001)
 
 
