@@ -33,3 +33,10 @@ def edit(user_cti_profile):
     validator.validate_edit(user_cti_profile)
     dao.edit(user_cti_profile)
     notifier.edited(user_cti_profile)
+
+
+def associate(user, cti_profile):
+    profile = UserCtiProfile(user_id=user.id,
+                             cti_profile_id=cti_profile.id,
+                             enabled=user.cti_enabled)
+    edit(profile)
