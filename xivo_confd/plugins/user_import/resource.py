@@ -17,25 +17,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from flask_restful import fields, marshal
-
 from xivo_dao.helpers.db_manager import Session
 
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.plugins.user_import import csvparse
 from xivo_confd import sysconfd, bus
-
-entry_fields = {
-    'row_number': fields.Integer(default=None),
-    'user_id': fields.Integer(default=None),
-    'voicemail_id': fields.Integer(default=None),
-    'line_id': fields.Integer(default=None),
-    'sip_id': fields.Integer(default=None),
-    'sccp_id': fields.Integer(default=None),
-    'extension_id': fields.Integer(default=None),
-    'incall_extension_id': fields.Integer(default=None),
-    'cti_profile_id': fields.Integer(default=None),
-}
 
 
 class UserImportResource(ConfdResource):
@@ -53,7 +39,7 @@ class UserImportResource(ConfdResource):
             self.rollback()
         else:
             status_code = 201
-            response = {'created': [marshal(entry, entry_fields) for entry in entries]}
+            response = {'created': [entry.extract_ids() for entry in entries]}
 
         return response, status_code
 
