@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from collections import namedtuple
 import time
 
 from xivo_dao.helpers import errors
@@ -24,132 +25,153 @@ from xivo.unicode_csv import UnicodeDictReader
 from flask import request
 
 
+ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])
+
+
 class CsvParser(object):
 
     def __init__(self, lines, encoding):
         self.reader = UnicodeDictReader(lines, encoding=encoding)
 
     def __iter__(self):
-        return self
+        return CsvIterator(self.reader)
+
+
+class CsvIterator(object):
+
+    def __init__(self, reader):
+        self.reader = reader
+        self.position = 0
 
     def next(self):
         row = next(self.reader)
-        return CsvRow(row)
+        self.position += 1
+        return CsvRow(row, self.position)
 
 
-class CsvRow(object):
+class Rule(object):
 
-    def __init__(self, fields):
-        self.fields = fields
+    def __init__(self, csv_name, name):
+        self.csv_name = csv_name
+        self.name = name
 
-    def parse(self):
-        parsed = {}
+    def insert(self, fields, entry):
+        if self.csv_name in fields:
+            value = fields.get(self.csv_name, "")
+            entry[self.name] = self.parse(value)
 
-        if self.columns_have_values('firstname'):
-            parsed['user'] = {
-                'firstname': self.parse_unicode('firstname'),
-                'lastname': self.parse_unicode('lastname'),
-                'username': self.parse_unicode('username'),
-                'password': self.parse_unicode('password'),
-                'language': self.parse_unicode('language'),
-                'outgoing_caller_id': self.parse_unicode('outgoing_caller_id'),
-                'mobile_phone_number': self.parse_unicode('mobile_phone_number'),
-                'supervision_enabled': self.parse_bool('supervision_enabled'),
-                'call_transfer_enabled': self.parse_bool('call_transfer_enabled'),
-                'entity_id': self.parse_int('entity_id'),
-                'ring_seconds': self.parse_int('ring_seconds'),
-                'simultaneous_calls': self.parse_int('simultaneous_calls'),
-                'userfield': self.parse_unicode('userfield'),
-            }
-        else:
-            raise errors.missing('firstname')
 
-        if self.columns_have_values('voicemail_name', 'voicemail_number', 'voicemail_context'):
-            parsed['voicemail'] = {
-                'name': self.parse_unicode('voicemail_name'),
-                'number': self.parse_unicode('voicemail_number'),
-                'context': self.parse_unicode('voicemail_context'),
-                'password': self.parse_unicode('voicemail_password'),
-                'email': self.parse_unicode('voicemail_email'),
-                'attach_audio': self.parse_bool('voicemail_attach_audio'),
-                'delete_messages': self.parse_bool('voicemail_delete_messages'),
-                'ask_password': self.parse_bool('voicemail_ask_password'),
-            }
+class UnicodeRule(Rule):
 
-        if self.columns_have_values('line_protocol'):
-            protocol = self.fields.get('line_protocol')
-
-            parsed['line'] = {
-                'context': self.parse_unicode('context')
-            }
-
-            if protocol == 'sip':
-                parsed['sip'] = {
-                    'name': self.parse_unicode('sip_username'),
-                    'secret': self.parse_unicode('sip_secret')
-                }
-            elif protocol == 'sccp':
-                parsed['sccp'] = {}
-            else:
-                raise errors.invalid_choice('line_protocol', ['sip', 'sccp'])
-
-        if self.columns_have_values('exten'):
-            parsed['extension'] = {
-                'exten': self.parse_unicode('exten'),
-                'context': self.parse_unicode('context')
-            }
-
-        if self.columns_have_values('incall_exten', 'incall_context'):
-            parsed['incall'] = {
-                'exten': self.parse_unicode('incall_exten'),
-                'context': self.parse_unicode('incall_context'),
-                'ring_seconds': self.parse_unicode('incall_ring_seconds'),
-            }
-
-        if self.columns_have_values('cti_profile_name'):
-            parsed['cti_profile'] = {
-                'name': self.parse_unicode('cti_profile_name'),
-                'enabled': self.parse_bool('cti_profile_enabled')
-            }
-
-        return parsed
-
-    def columns_have_values(self, *columns):
-        columns = set(columns)
-        has_columns = set(self.fields.keys()).issuperset(columns)
-
-        values = set(self.fields.get(column, "") for column in columns)
-        has_values = values != set([""])
-
-        return has_columns and has_values
-
-    def parse_unicode(self, field):
-        value = self.fields.get(field, "")
+    def parse(self, value):
         if value != "":
             return value
         return None
 
-    def parse_bool(self, field):
-        value = self.fields.get(field, "")
+
+class BooleanRule(Rule):
+
+    def parse(self, value):
         if value == "":
             return None
         if value not in ("0", "1"):
-            raise errors.invalid_choice(field, ["0", "1"])
+            raise errors.invalid_choice(self.csv_name, ["0", "1"])
         return value == "1"
 
-    def parse_int(self, field):
-        value = self.fields.get(field, "")
+
+class IntRule(Rule):
+
+    def parse(self, value):
         if value == "":
             return None
         if not value.isdigit():
-            raise errors.wrong_type(field, 'integer')
+            raise errors.wrong_type(self.csv_name, 'integer')
         return int(value)
 
-    def format_error(self, position, exc):
+
+class CsvRow(object):
+
+    USER_RULES = (
+        UnicodeRule('firstname', 'firstname'),
+        UnicodeRule('lastname', 'lastname'),
+        UnicodeRule('username', 'username'),
+        UnicodeRule('password', 'password'),
+        UnicodeRule('language', 'language'),
+        UnicodeRule('outgoing_caller_id', 'outgoing_caller_id'),
+        UnicodeRule('mobile_phone_number', 'mobile_phone_number'),
+        UnicodeRule('userfield', 'userfield'),
+        BooleanRule('supervision_enabled', 'supervision_enabled'),
+        BooleanRule('call_transfer_enabled', 'call_transfer_enabled'),
+        IntRule('entity_id', 'entity_id'),
+        IntRule('ring_seconds', 'ring_seconds'),
+        IntRule('simultaneous_calls', 'simultaneous_calls'),
+    )
+
+    VOICEMAIL_RULES = (
+        UnicodeRule('voicemail_name', 'name'),
+        UnicodeRule('voicemail_number', 'number'),
+        UnicodeRule('voicemail_context', 'context'),
+        UnicodeRule('voicemail_password', 'password'),
+        UnicodeRule('voicemail_email', 'email'),
+        BooleanRule('voicemail_attach_audio', 'attach_audio'),
+        BooleanRule('voicemail_delete_messages', 'delete_messages'),
+        BooleanRule('voicemail_ask_password', 'ask_password'),
+    )
+
+    LINE_RULES = (
+        UnicodeRule('context', 'context'),
+    )
+
+    SIP_RULES = (
+        UnicodeRule('sip_username', 'name'),
+        UnicodeRule('sip_secret', 'secret'),
+    )
+
+    EXTENSION_RULES = (
+        UnicodeRule('exten', 'exten'),
+        UnicodeRule('context', 'context'),
+    )
+
+    CTI_PROFILE_RULES = (
+        UnicodeRule('cti_profile_name', 'name'),
+        BooleanRule('cti_profile_enabled', 'enabled'),
+    )
+
+    INCALL_RULES = (
+        UnicodeRule('incall_exten', 'exten'),
+        UnicodeRule('incall_context', 'context'),
+        IntRule('incall_ring_seconds', 'ring_seconds'),
+    )
+
+    def __init__(self, fields, position):
+        self.fields = fields
+        self.position = position
+
+    def parse(self):
+        return {
+            'user': self.parse_rules(self.USER_RULES),
+            'voicemail': self.parse_rules(self.VOICEMAIL_RULES),
+            'line': self.parse_rules(self.LINE_RULES),
+            'sip': self.parse_rules(self.SIP_RULES),
+            'extension': self.parse_rules(self.EXTENSION_RULES),
+            'incall': self.parse_rules(self.INCALL_RULES),
+            'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
+            'extension': self.parse_rules(self.EXTENSION_RULES),
+            'endpoint': self.fields.get('line_protocol', "") or None,
+            'sccp': {},
+        }
+
+    def parse_rules(self, rules):
+        entry = {}
+        for rule in rules:
+            rule.insert(self.fields, entry)
+        return entry
+
+    def format_error(self, exc):
         return {'message': unicode(exc),
                 'timestamp': int(time.time()),
                 'details': {'row': self.fields,
-                            'row_number': position}}
+                            'row_number': self.position}}
 
 
 def parse():
