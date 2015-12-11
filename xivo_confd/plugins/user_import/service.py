@@ -16,12 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers import errors as error_msg
+
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 from xivo_dao.resources.extension.model import Extension
-from xivo_dao.resources.user_voicemail.model import UserVoicemail
 from xivo_dao.resources.voicemail.model import Voicemail
 from xivo_dao.resources.incall.model import Incall
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
@@ -31,16 +32,18 @@ from xivo_dao.helpers.exception import ServiceError
 
 class Entry(object):
 
-    def __init__(self, row_number, user):
+    def __init__(self, row_number, user=None, voicemail=None, line=None, sip=None,
+                 sccp=None, extension=None, incall_extension=None, user_cti_profile=None):
         self.row_number = row_number
         self.user = user
-        self.voicemail = None
-        self.line = None
-        self.sip = None
-        self.extension = None
-        self.incall_extension = None
+        self.voicemail = voicemail
+        self.line = line
+        self.sip = sip
+        self.sccp = sccp
+        self.extension = extension
+        self.incall_extension = incall_extension
         self.incall_ring_seconds = None
-        self.user_cti_profile = None
+        self.user_cti_profile = user_cti_profile
 
     @property
     def user_id(self):
@@ -100,115 +103,96 @@ class ImportService(object):
         created = []
         errors = []
 
-        for position, row in enumerate(parser, 1):
+        for line in parser:
             try:
-                entry = self.create_entry(position, row.parse())
-                self.create_associations(entry)
+                entry = self.import_row(line)
                 created.append(entry)
             except ServiceError as e:
-                errors.append(row.format_error(position, e))
+                errors.append(line.format_error(e))
 
         return created, errors
 
-    def create_entry(self, position, row):
-        user = self.create_user(row['user'])
-        entry = Entry(position, user)
+    def import_row(self, line):
+        entry = self.create_entry(line)
+        self.create_associations(entry)
+        return entry
 
-        if 'voicemail' in row:
-            entry.voicemail = self.create_voicemail(row['voicemail'])
-        if 'line' in row:
-            entry.line = self.create_line(row['line'])
-        if 'sip' in row:
+    def create_entry(self, line):
+        row = line.parse()
+        entry = Entry(line.position)
+        entry.user = self.create_user(row['user'])
+        entry.voicemail = self.create_voicemail(row['voicemail'])
+        entry.line = self.create_line(row['line'])
+        entry.extension = self.create_extension(row['extension'])
+        entry.incall_extension = self.create_incall_extension(row['incall'])
+        entry.user_cti_profile = self.create_profile(entry.user, row['cti_profile'])
+
+        if row['endpoint'] == 'sip':
             entry.sip = self.create_sip(row['sip'])
-        if 'sccp' in row:
+        elif row['endpoint'] == 'sccp':
             entry.sccp = self.create_sccp(row['sccp'])
-        if 'extension' in row:
-            entry.extension = self.create_extension(row['extension'])
-        if 'cti_profile' in row:
-            entry.user_cti_profile = self.build_user_cti_profile(user, row['cti_profile'])
-        if 'incall' in row:
-            entry.incall_extension = self.create_incall_extension(row['incall'])
-            entry.incall_ring_seconds = row['incall']['ring_seconds']
 
         return entry
 
     def create_user(self, fields):
-        user = User(**fields)
-        return self.user_service.create(user)
+        return self.user_service.create(User(**fields))
 
     def create_voicemail(self, fields):
-        voicemail = Voicemail(**fields)
-        voicemail = self.voicemail_service.create(voicemail)
-        return voicemail
+        if fields:
+            return self.voicemail_service.create(Voicemail(**fields))
 
     def create_line(self, fields):
-        line = Line(**fields)
-        return self.line_service.create(line)
+        if fields:
+            return self.line_service.create(Line(**fields))
 
     def create_sip(self, fields):
-        sip = SIPEndpoint(**fields)
-        sip = self.sip_service.create(sip)
-        return sip
+        return self.sip_service.create(SIPEndpoint(**fields))
 
     def create_sccp(self, fields):
-        sccp = SCCPEndpoint(**fields)
-        sccp = self.sccp_service.create(sccp)
-        return sccp
+        return self.sccp_service.create(SCCPEndpoint(**fields))
 
     def create_extension(self, fields):
-        extension = Extension(**fields)
-        extension = self.extension_service.create(extension)
-        return extension
+        if 'exten' in fields and 'context' in fields:
+            return self.extension_service.create(Extension(**fields))
 
     def create_incall_extension(self, fields):
-        extension = Extension(exten=fields['exten'],
-                              context=fields['context'])
-        return self.extension_service.create(extension)
+        if 'exten' in fields and 'context' in fields:
+            return self.extension_service.create(Extension(exten=fields['exten'],
+                                                           context=fields['context']))
 
-    def build_user_cti_profile(self, user, fields):
-        cti_profile_id = self.cti_profile_dao.get_id_by_name(fields['name'])
-        return UserCtiProfile(user_id=user.id,
-                              cti_profile_id=cti_profile_id,
-                              enabled=fields['enabled'])
+    def create_profile(self, user, fields):
+        if 'name' in fields:
+            cti_profile_id = self.cti_profile_dao.get_id_by_name(fields['name'])
+            return UserCtiProfile(user_id=user.id,
+                                  cti_profile_id=cti_profile_id,
+                                  enabled=fields.get('enabled'))
 
     def create_associations(self, entry):
         if entry.user and entry.voicemail:
-            self.associate_user_voicemail(entry)
+            self.user_voicemail_service.associate_models(entry.user, entry.voicemail)
         if entry.line and entry.sip:
-            self.associate_line_sip(entry)
+            self.line_sip_service.associate(entry.line, entry.sip)
         elif entry.line and entry.sccp:
-            self.associate_line_sccp(entry)
+            self.line_sccp_service.associate(entry.line, entry.sccp)
         if entry.user and entry.line:
-            self.associate_user_line(entry)
+            self.user_line_service.associate(entry.user, entry.line)
         if entry.line and entry.extension:
-            self.associate_line_extension(entry)
+            self.line_extension_service.associate(entry.line, entry.extension)
         if entry.line and entry.incall_extension:
-            self.associate_incall(entry)
+            self.associate_incall(entry.user, entry.incall_extension, entry.incall_ring_seconds)
         if entry.user and entry.user_cti_profile:
-            self.associate_user_cti_profile(entry)
+            self.associate_user_cti_profile(entry.user_cti_profile)
 
-    def associate_user_voicemail(self, entry):
-        user_voicemail = UserVoicemail(user_id=entry.user_id,
-                                       voicemail_id=entry.voicemail_id)
-        self.user_voicemail_service.associate(user_voicemail)
-
-    def associate_line_sip(self, entry):
-        self.line_sip_service.associate(entry.line, entry.sip)
-
-    def associate_line_sccp(self, entry):
-        self.line_sccp_service.associate(entry.line, entry.sccp)
-
-    def associate_line_extension(self, entry):
-        self.line_extension_service.associate(entry.line, entry.extension)
-
-    def associate_user_line(self, entry):
-        self.user_line_service.associate(entry.user, entry.line)
-
-    def associate_incall(self, entry):
-        incall = Incall.user_destination(entry.user_id,
-                                         entry.incall_extension_id,
-                                         ring_seconds=entry.incall_ring_seconds)
+    def associate_incall(self, user, extension, ring_seconds=None):
+        incall = Incall.user_destination(user.id,
+                                         extension.id,
+                                         ring_seconds=ring_seconds)
         self.incall_dao.create(incall)
 
-    def associate_user_cti_profile(self, entry):
-        self.user_cti_profile_service.edit(entry.user_cti_profile)
+    def associate_user_cti_profile(self, user_cti_profile):
+        self.user_cti_profile_service.edit(user_cti_profile)
+
+
+
+
+
