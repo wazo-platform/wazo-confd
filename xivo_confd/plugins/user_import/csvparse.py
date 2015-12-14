@@ -119,6 +119,7 @@ class CsvRow(object):
     )
 
     LINE_RULES = (
+        UnicodeRule('line_protocol', 'endpoint'),
         UnicodeRule('context', 'context'),
     )
 
@@ -157,7 +158,6 @@ class CsvRow(object):
             'incall': self.parse_rules(self.INCALL_RULES),
             'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
             'extension': self.parse_rules(self.EXTENSION_RULES),
-            'endpoint': self.fields.get('line_protocol', "") or None,
             'sccp': {},
         }
 
