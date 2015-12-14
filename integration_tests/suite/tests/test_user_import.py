@@ -18,33 +18,15 @@
 
 from __future__ import unicode_literals
 
-import csv
-from cStringIO import StringIO
-
 from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than, equal_to
 
 from test_api import confd
 from test_api import config
-from test_api.setup import new_client
 from test_api import helpers as h
+from test_api import fixtures
 
 
-def generate_csv(rows):
-    header = set()
-    for row in rows:
-        keys = set(key.encode("utf8") for key in row.keys())
-        header.update(keys)
-
-    output = StringIO()
-    writer = csv.DictWriter(output, header)
-    writer.writeheader()
-
-    for row in rows:
-        row = {key.encode("utf8"): value.encode("utf8")
-               for key, value in row.iteritems()}
-        writer.writerow(row)
-
-    return output.getvalue()
+client = h.user_import.csv_client()
 
 
 def assert_response_has_id(response, field, row_number=1):
@@ -59,10 +41,6 @@ def assert_error_message(response, message, row_number=1):
                                   'details': has_entries(row_number=row_number),
                                   'message': contains_string(message)})
     assert_that(response.json['errors'], contains(expected_error))
-
-
-client = new_client(headers={"Content-Type": "text/csv; charset=utf-8"},
-                    encoder=generate_csv)
 
 
 def test_given_required_fields_missing_then_error_returned():
@@ -347,7 +325,8 @@ def test_given_csv_has_cti_fields_then_cti_profile_associated():
     user_id = response.item['created'][0]['user_id']
     user_cti_profile = confd.users(user_id).cti.get().item
 
-    assert_that(user_cti_profile, has_entries(cti_profile_id=greater_than(0),
+    cti_profile_id = h.cti_profile.find_id_for_profile("Client")
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
                                               enabled=True))
 
 
@@ -483,3 +462,416 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
     response = client.post("/users/import", csv)
 
     assert_that(len(response.item['created']), equal_to(2))
+
+
+@fixtures.csv_entry()
+def test_when_updating_user_fields_then_user_resource_updated(entry):
+    csv = [{"uuid": entry['user_uuid'],
+            "firstname": "Joël",
+            "lastname": "Làchance",
+            "language": "fr_FR",
+            "username": "joellachance",
+            "password": "secret",
+            "outgoing_caller_id": '"Joël Spîffy" <4185551234>',
+            "mobile_phone_number": "4181234567",
+            "supervision_enabled": "1",
+            "call_transfer_enabled": "0",
+            "simultaneous_calls": "5",
+            "ring_seconds": "10",
+            "userfield": "userfield",
+            }]
+
+    response = client.put("/users/import", csv)
+    response.assert_ok()
+
+    user_id = response.item['updated'][0]['user_id']
+    user_uuid = response.item['updated'][0]['user_uuid']
+    user = confd.users(user_id).get().item
+
+    assert_that(user, has_entries(firstname="Joël",
+                                  lastname="Làchance",
+                                  language="fr_FR",
+                                  username="joellachance",
+                                  password="secret",
+                                  outgoing_caller_id='"Joël Spîffy" <4185551234>',
+                                  mobile_phone_number="4181234567",
+                                  supervision_enabled=True,
+                                  call_transfer_enabled=False,
+                                  simultaneous_calls=5,
+                                  ring_seconds=10,
+                                  userfield="userfield",
+                                  uuid=user_uuid))
+
+
+@fixtures.csv_entry(voicemail=True)
+def test_when_updating_voicemail_fields_then_voicemail_updated(entry):
+    number = h.voicemail.find_available_number(config.CONTEXT)
+
+    csv = [{"uuid": entry["user_uuid"],
+            "voicemail_name": "Jôey VM",
+            "voicemail_number": number,
+            "voicemail_context": config.CONTEXT,
+            "voicemail_password": "1234",
+            "voicemail_email": "email@example.com",
+            "voicemail_attach_audio": "0",
+            "voicemail_delete_messages": "1",
+            "voicemail_ask_password": "0",
+            }]
+
+    response = client.put("/users/import", csv)
+    response.assert_ok()
+
+    voicemail_id = response.item['updated'][0]['voicemail_id']
+    voicemail = confd.voicemails(voicemail_id).get().item
+
+    assert_that(voicemail, has_entries(name="Jôey VM",
+                                       number=number,
+                                       context=config.CONTEXT,
+                                       password="1234",
+                                       email='email@example.com',
+                                       attach_audio=False,
+                                       delete_messages=True,
+                                       ask_password=False))
+
+
+@fixtures.csv_entry()
+def test_when_adding_voicemail_fields_then_voicemail_created(entry):
+    number = h.voicemail.find_available_number(config.CONTEXT)
+
+    csv = [{"uuid": entry['user_uuid'],
+            "voicemail_name": "Jôey VM",
+            "voicemail_number": number,
+            "voicemail_context": config.CONTEXT,
+            "voicemail_password": "1234",
+            "voicemail_email": "email@example.com",
+            "voicemail_attach_audio": "0",
+            "voicemail_delete_messages": "1",
+            "voicemail_ask_password": "0",
+            }]
+
+    response = client.put("/users/import", csv)
+    response.assert_ok()
+
+    voicemail_id = response.item['updated'][0]['voicemail_id']
+    voicemail = confd.voicemails(voicemail_id).get().item
+
+    assert_that(voicemail, has_entries(name="Jôey VM",
+                                       number=number,
+                                       context=config.CONTEXT,
+                                       password="1234",
+                                       email='email@example.com',
+                                       attach_audio=False,
+                                       delete_messages=True,
+                                       ask_password=False))
+
+
+@fixtures.csv_entry(line_protocol="sip")
+def test_when_updating_sip_line_fields_then_sip_updated(entry):
+    csv = [{"uuid": entry["user_uuid"],
+            "sip_username": "mynewsipusername",
+            "sip_secret": "mynewsippassword",
+            }]
+
+    response = client.put("/users/import", csv)
+
+    sip_id = response.item['updated'][0]['sip_id']
+    sip = confd.endpoints.sip(sip_id).get().item
+
+    assert_that(sip, has_entries(username="mynewsipusername",
+                                 secret="mynewsippassword"))
+
+
+@fixtures.csv_entry()
+def test_when_adding_sip_line_then_sip_created(entry):
+    csv = [{"uuid": entry["user_uuid"],
+            "line_protocol": "sip",
+            "sip_username": "createdsipusername",
+            "sip_secret": "createdsippassword",
+            }]
+
+    response = client.put("/users/import", csv)
+
+    sip_id = response.item['updated'][0]['sip_id']
+    sip = confd.endpoints.sip(sip_id).get().item
+
+    assert_that(sip, has_entries(username="createdsipusername",
+                                 secret="createdsippassword"))
+
+
+@fixtures.csv_entry()
+def test_when_adding_sccp_line_then_sccp_created(entry):
+    csv = [{"uuid": entry["user_uuid"],
+            "line_protocol": "sccp",
+            }]
+
+    response = client.put("/users/import", csv)
+
+    sccp_id = response.item['updated'][0]['sccp_id']
+    sccp = confd.endpoints.sccp(sccp_id).get().item
+
+    assert_that(sccp, has_entries(id=sccp_id))
+
+
+@fixtures.csv_entry(line_protocol="sip")
+def test_when_changing_line_protocol_then_error_raised(entry):
+    csv = [{"uuid": entry["user_uuid"],
+            "line_protocol": "sccp",
+            }]
+
+    response = client.put("/users/import", csv)
+
+    assert_error_message(response, 'endpoint')
+
+
+@fixtures.csv_entry(extension=True)
+def test_when_updating_extension_then_extension_updated(entry):
+    exten = h.extension.find_available_exten(config.CONTEXT)
+
+    csv = [{"uuid": entry["user_uuid"],
+            "exten": exten,
+            "context": config.CONTEXT,
+            }]
+
+    response = client.put("/users/import", csv)
+
+    extension_id = response.item['updated'][0]['extension_id']
+    extension = confd.extensions(extension_id).get().item
+
+    assert_that(extension, has_entries(exten=exten,
+                                       context=config.CONTEXT))
+
+
+@fixtures.csv_entry(line_protocol="sip")
+def test_when_adding_extension_then_extension_created(entry):
+    exten = h.extension.find_available_exten(config.CONTEXT)
+
+    csv = [{"uuid": entry["user_uuid"],
+            "exten": exten,
+            "context": config.CONTEXT,
+            }]
+
+    response = client.put("/users/import", csv)
+
+    extension_id = response.item['updated'][0]['extension_id']
+    extension = confd.extensions(extension_id).get().item
+
+    assert_that(extension, has_entries(exten=exten,
+                                       context=config.CONTEXT))
+
+
+@fixtures.csv_entry(incall=True)
+def test_when_updating_incall_fields_then_incall_updated(entry):
+    exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
+
+    csv = [{"uuid": entry["user_uuid"],
+            "incall_exten": exten,
+            "incall_context": config.INCALL_CONTEXT,
+            "incall_ring_seconds": "10"}]
+
+    response = client.put("/users/import", csv)
+
+    incall_id = response.item['updated'][0]['incall_extension_id']
+    extension = confd.extensions(incall_id).get().item
+
+    assert_that(extension, has_entries(exten=exten,
+                                       context=config.INCALL_CONTEXT))
+
+
+@fixtures.csv_entry(line_protocol="sip", extension=True)
+def test_when_adding_incall_then_incall_created(entry):
+    exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
+
+    csv = [{"uuid": entry["user_uuid"],
+            "incall_exten": exten,
+            "incall_context": config.INCALL_CONTEXT,
+            "incall_ring_seconds": "10"}]
+
+    response = client.put("/users/import", csv)
+
+    incall_id = response.item['updated'][0]['incall_extension_id']
+    extension = confd.extensions(incall_id).get().item
+
+    assert_that(extension, has_entries(exten=exten,
+                                       context=config.INCALL_CONTEXT))
+
+
+@fixtures.csv_entry(cti_profile=True,
+                    cti_profile_name="Client")
+def test_when_updating_cti_profile_fields_then_csv_profile_updated(entry):
+    csv = [{"uuid": entry['user_uuid'],
+            "cti_profile_name": "Agent"}]
+
+    response = client.put("/users/import", csv)
+
+    user_id = response.item['updated'][0]['user_id']
+    cti_profile_id = h.cti_profile.find_id_for_profile("Agent")
+
+    user_cti_profile = confd.users(user_id).cti.get().item
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
+                                              enabled=True))
+
+
+@fixtures.csv_entry()
+def test_when_adding_cti_profile_fields_then_csv_profile_added(entry):
+    csv = [{"uuid": entry['user_uuid'],
+            "cti_profile_name": "Agent",
+            "cti_profile_enabled": "1"}]
+
+    response = client.put("/users/import", csv)
+
+    user_id = response.item['updated'][0]['user_id']
+    cti_profile_id = h.cti_profile.find_id_for_profile("Agent")
+
+    user_cti_profile = confd.users(user_id).cti.get().item
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
+                                              enabled=True))
+
+
+def check_error_on_update(entry, fields, error):
+    entry = dict(entry)
+    entry.update(fields)
+    entry['uuid'] = entry['user_uuid']
+    response = client.put("/users/import", [entry])
+    assert_error_message(response, error)
+
+
+def test_given_csv_has_errors_then_errors_returned():
+    with fixtures.csv_entry(voicemail=True, incall=True,
+                            cti_profile=True, line_protocol="sip") as entry:
+        yield check_error_on_update, entry, {'firstname': ''}, 'firstname'
+        yield check_error_on_update, entry, {'voicemail_number': '^]'}, 'number'
+        yield check_error_on_update, entry, {'sip_username': '^]'}, 'name'
+        yield check_error_on_update, entry, {'cti_profile_name': '^]'}, 'CtiProfile'
+
+
+@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip")
+@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sccp")
+def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
+    exten1 = h.extension.find_available_exten(config.CONTEXT)
+    incall_exten1 = h.extension.find_available_exten(config.INCALL_CONTEXT)
+    vm_number1 = h.voicemail.find_available_number(config.CONTEXT)
+
+    exten2 = h.extension.find_available_exten(config.CONTEXT, exclude=[exten1])
+    incall_exten2 = h.extension.find_available_exten(config.INCALL_CONTEXT, exclude=[incall_exten1])
+    vm_number2 = h.voicemail.find_available_number(config.CONTEXT, exclude=[vm_number1])
+
+    csv = [
+        {"uuid": entry1["user_uuid"],
+         "entity_id": "1",
+         "exten": exten1,
+         "context": config.CONTEXT,
+         "firstname": "Géorge",
+         "lastname": "Bâptiste",
+         "mobile_phone_number": "5551234567",
+         "ring_seconds": "15",
+         "simultaneous_calls": "10",
+         "language": "fr_FR",
+         "outgoing_caller_id": '"Géorge Le Grand" <5557654321>',
+         "userfield": "userfield",
+         "supervision_enabled": "1",
+         "call_transfer_enabled": "1",
+         "sip_username": "georgesipusername",
+         "sip_password": "georgesippassword",
+         "incall_exten": incall_exten1,
+         "incall_context": config.INCALL_CONTEXT,
+         "incall_ring_seconds": "10",
+         "voicemail_name": "george",
+         "voicemail_number": vm_number1,
+         "voicemail_context": config.CONTEXT,
+         "voicemail_password": "1234",
+         "voicemail_email": "test@example.com",
+         "voicemail_attach_audio": "1",
+         "voicemail_delete_messages": "1",
+         "voicemail_ask_password": "1",
+         "cti_profile_name": "Agent",
+         "cti_profile_enabled": "1",
+         "username": "george",
+         "password": "secret"},
+        {"uuid": entry2['user_uuid'],
+         "entity_id": "1",
+         "firstname": "Moùssa",
+         "lastname": "Nôbamgo",
+         "mobile_phone_number": "5553456789",
+         "ring_seconds": "20",
+         "simultaneous_calls": "8",
+         "language": "fr_FR",
+         "outgoing_caller_id": '"Mousssssssaaaa" <5557654321>',
+         "userfield": "userfield",
+         "supervision_enabled": "1",
+         "call_transfer_enabled": "1",
+         "exten": exten2,
+         "context": config.CONTEXT,
+         "incall_exten": incall_exten2,
+         "incall_context": 'from-extern',
+         "incall_ring_seconds": "12",
+         "voicemail_name": "moussa",
+         "voicemail_number": vm_number2,
+         "voicemail_context": config.CONTEXT,
+         "voicemail_password": "2345",
+         "voicemail_email": "test2@example.com",
+         "voicemail_attach_audio": "1",
+         "voicemail_delete_messages": "1",
+         "voicemail_ask_password": "1",
+         "cti_profile_name": "Agent",
+         "cti_profile_enabled": "1",
+         "username": "moussa",
+         "password": "secret"},
+    ]
+
+    response = client.put("/users/import", csv)
+    entry = response.item['updated']
+
+    assert_that(entry, has_items(has_entries(user_id=entry1['user_id'],
+                                             line_id=entry1['line_id'],
+                                             extension_id=entry1['extension_id'],
+                                             voicemail_id=entry1['voicemail_id'],
+                                             cti_profile_id=entry1['cti_profile_id'],
+                                             sip_id=entry1['sip_id'],
+                                             incall_extension_id=entry1['incall_extension_id']),
+                                 has_entries(user_id=entry2['user_id'],
+                                             line_id=entry2['line_id'],
+                                             extension_id=entry2['extension_id'],
+                                             voicemail_id=entry2['voicemail_id'],
+                                             cti_profile_id=entry2['cti_profile_id'],
+                                             sccp_id=entry2['sccp_id'],
+                                             incall_extension_id=entry2['incall_extension_id'])))
+
+
+@fixtures.user()
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.extension(context=config.INCALL_CONTEXT)
+@fixtures.voicemail()
+def test_given_resources_not_associated_when_updating_then_resources_associated(user, sip, extension, incall, voicemail):
+    csv = [{"uuid": user['uuid'],
+            "exten": extension['exten'],
+            "context": extension['context'],
+            "line_protocol": "sip",
+            "sip_username": sip['username'],
+            "incall_exten": incall['exten'],
+            "incall_context": incall['context'],
+            "voicemail_number": voicemail['number'],
+            "voicemail_context": voicemail['context'],
+            "cti_profile_name": "Client",
+            }]
+
+    response = client.put("/users/import", csv)
+
+    entry = response.item['updated'][0]
+
+    response = confd.users(entry['user_id']).lines.get()
+    assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
+
+    response = confd.lines(entry['line_id']).extensions.get()
+    assert_that(response.items, has_items(has_entries(extension_id=entry['extension_id']),
+                                          has_entries(extension_id=entry['incall_extension_id'])))
+
+    response = confd.users(entry['user_id']).voicemail.get()
+    assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
+
+    response = confd.lines(entry['line_id']).endpoints.sip.get()
+    assert_that(response.item, has_entries(endpoint='sip',
+                                           endpoint_id=entry['sip_id']))
+
+    response = confd.users(entry['user_id']).cti.get()
+    assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
