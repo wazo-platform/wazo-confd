@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from collections import OrderedDict
+
 from xivo_confd import api
 
 from xivo_confd.plugins.user.service import build_service as build_user_service
@@ -26,6 +28,8 @@ from xivo_confd.plugins.line_endpoint.service import build_service as build_le_s
 from xivo_confd.plugins.user_import.service import ImportService
 from xivo_confd.plugins.user_import.resource import UserImportResource
 from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator
+from xivo_confd.plugins.user_import.middleware import ExtensionCreator, IncallCreator, CtiProfileCreator, LineCreator, UserCreator, VoicemailCreator, SipCreator, SccpCreator
+from xivo_confd.plugins.user_import.middleware import BaseAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 
@@ -55,22 +59,29 @@ class Plugin(object):
         user_line_service = build_ul_service()
         line_extension_service = build_line_extension_service()
 
-        entry_creator = EntryCreator(user_service,
-                                     voicemail_service,
-                                     line_service,
-                                     sip_service,
-                                     sccp_service,
-                                     extension_service,
-                                     cti_profile_dao,
-                                     user_cti_profile_service)
+        creators = {'user': UserCreator(user_service),
+                    'line': LineCreator(line_service),
+                    'voicemail': VoicemailCreator(voicemail_service),
+                    'sip': SipCreator(sip_service),
+                    'sccp': SccpCreator(sccp_service),
+                    'extension': ExtensionCreator(extension_service),
+                    'incall': IncallCreator(extension_service),
+                    'cti_profile': CtiProfileCreator(cti_profile_dao)
+                    }
 
-        entry_associator = EntryAssociator(user_voicemail_service,
-                                           user_line_service,
-                                           line_sip_service,
-                                           line_sccp_service,
-                                           line_extension_service,
-                                           incall_dao,
-                                           user_cti_profile_service)
+        entry_creator = EntryCreator(creators)
+
+        associators = OrderedDict([
+            ('voicemail', VoicemailAssociator(user_voicemail_service)),
+            ('cti_profile', CtiProfileAssociator(user_cti_profile_service)),
+            ('sip', BaseAssociator('line', 'sip', line_sip_service)),
+            ('sccp', BaseAssociator('line', 'sccp', line_sccp_service)),
+            ('line', BaseAssociator('user', 'line', user_line_service)),
+            ('extension', BaseAssociator('line', 'extension', line_extension_service)),
+            ('incall', IncallAssociator(incall_dao))
+        ])
+
+        entry_associator = EntryAssociator(associators)
 
         service = ImportService(entry_creator, entry_associator)
 
