@@ -6,6 +6,7 @@ from test_api import associations as a
 from test_api import helpers as h
 from test_api import confd
 from test_api import fixtures
+from test_api import config
 
 from hamcrest import assert_that, contains, has_entries, has_item, equal_to
 
@@ -77,6 +78,13 @@ def test_get_associations_when_not_associated(line):
 @fixtures.extension()
 def test_get_line_from_extension_when_not_associated(line, extension):
     response = confd.extensions(extension['id']).line.get()
+    response.assert_match(404, e.not_found('LineExtension'))
+
+
+@fixtures.line_sip()
+@fixtures.extension(context=config.INCALL_CONTEXT)
+def test_get_line_from_incall_when_not_associated(line, incall):
+    response = confd.extensions(incall['id']).line.get()
     response.assert_match(404, e.not_found('LineExtension'))
 
 
