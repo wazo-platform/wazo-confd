@@ -52,7 +52,8 @@ def build_validator():
             Optional('name',
                      UniqueField('name',
                                  lambda v: dao.find_by(name=v),
-                                 'SIPEndpoint')
+                                 'SIPEndpoint'),
+                     RegexField.compile('name', NAME_REGEX)
                      ),
             Optional('secret',
                      RegexField.compile('secret', SECRET_REGEX)
