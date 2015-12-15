@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers import errors
+
 
 class Entry(object):
 
@@ -49,8 +51,27 @@ class Entry(object):
         fields = self.row[resource]
         setattr(self, resource, creator.create(fields))
 
+    def find_or_create(self, resource, creator):
+        model = self.get_resource(resource)
+        if not model:
+            fields = self.row[resource]
+            model = creator.find(fields)
+            if model:
+                setattr(self, resource, model)
+            else:
+                self.create(resource, creator)
+
+    def update(self, resource, creator):
+        fields = self.row[resource]
+        resource = self.get_resource(resource)
+        if resource:
+            creator.update(fields, resource)
+
     def associate(self, associator):
         associator.associate(self)
+
+    def update_association(self, associator):
+        associator.update(self)
 
     def extract_field(self, resource, fieldname):
         return self.row.get(resource, {}).get(fieldname)
@@ -92,3 +113,93 @@ class EntryAssociator(object):
     def associate(self, entry):
         for associator in self.associators.values():
             associator.associate(entry)
+
+
+class EntryFinder(object):
+
+    def __init__(self, user_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
+                 user_cti_profile_dao, line_dao, user_line_dao, sip_dao, sccp_dao,
+                 extension_dao, incall_dao):
+        self.user_dao = user_dao
+        self.voicemail_dao = voicemail_dao
+        self.user_voicemail_dao = user_voicemail_dao
+        self.cti_profile_dao = cti_profile_dao
+        self.user_cti_profile_dao = user_cti_profile_dao
+        self.line_dao = line_dao
+        self.user_line_dao = user_line_dao
+        self.sip_dao = sip_dao
+        self.sccp_dao = sccp_dao
+        self.extension_dao = extension_dao
+        self.incall_dao = incall_dao
+
+    def get_entry(self, line):
+        row = line.parse()
+        entry = Entry(line.position, row)
+        uuid = entry.extract_field('user', 'uuid')
+        user = entry.user = self.user_dao.get_by(uuid=uuid)
+
+        entry.cti_profile = self.user_cti_profile_dao.find_profile_by_userid(user.id)
+
+        user_voicemail = self.user_voicemail_dao.find_by_user_id(user.id)
+        if user_voicemail:
+            entry.voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
+
+        user_line = self.user_line_dao.find_by(user_id=user.id)
+        if user_line:
+            self.attach_line_resources(entry, user_line)
+
+        return entry
+
+    def attach_line_resources(self, entry, user_line):
+        entry.line = self.line_dao.get(user_line.line_id)
+        if user_line.extension_id:
+            entry.extension = self.extension_dao.get(user_line.extension_id)
+
+        if entry.line.endpoint == "sip":
+            entry.sip = self.sip_dao.get(entry.line.endpoint_id)
+        elif entry.line.endpoint == "sccp":
+            entry.sccp = self.sccp_dao.get(entry.line.endpoint_id)
+
+        line_incalls = self.incall_dao.find_all_line_extensions_by_line_id(user_line.line_id)
+        if len(line_incalls) > 1:
+            raise errors.not_permitted('Cannot update when user has multiple incalls')
+        elif len(line_incalls) == 1:
+            entry.incall = self.extension_dao.get(line_incalls[0].extension_id)
+
+
+class EntryUpdater(object):
+
+    def __init__(self, creators, associators, finder):
+        self.creators = creators
+        self.associators = associators
+        self.finder = finder
+
+    def update_row(self, line):
+        entry = self.finder.get_entry(line)
+        self.create_missing_resources(entry)
+        self.associate_resources(entry)
+        self.update_resources(entry)
+        return entry
+
+    def create_missing_resources(self, entry):
+        entry.find_or_create('voicemail', self.creators['voicemail'])
+        entry.find_or_create('extension', self.creators['extension'])
+        entry.find_or_create('incall', self.creators['incall'])
+        entry.find_or_create('cti_profile', self.creators['cti_profile'])
+        entry.find_or_create('line', self.creators['line'])
+        self.find_or_create_endpoint(entry)
+
+    def find_or_create_endpoint(self, entry):
+        endpoint = entry.extract_field('line', 'endpoint')
+        if endpoint == 'sip':
+            entry.find_or_create('sip', self.creators['sip'])
+        elif endpoint == 'sccp':
+            entry.find_or_create('sccp', self.creators['sccp'])
+
+    def associate_resources(self, entry):
+        for associator in self.associators.values():
+            entry.update_association(associator)
+
+    def update_resources(self, entry):
+        for resource, creator in self.creators.iteritems():
+            entry.update(resource, creator)

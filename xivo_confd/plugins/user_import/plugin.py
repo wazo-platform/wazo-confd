@@ -92,7 +92,21 @@ class Plugin(object):
 
         entry_associator = EntryAssociator(associators)
 
-        service = ImportService(entry_creator, entry_associator)
+        entry_finder = EntryFinder(user_dao,
+                                   voicemail_dao,
+                                   user_voicemail_dao,
+                                   cti_profile_dao,
+                                   user_cti_profile_dao,
+                                   line_dao,
+                                   user_line_dao,
+                                   sip_dao,
+                                   sccp_dao,
+                                   extension_dao,
+                                   incall_dao)
+
+        entry_updater = EntryUpdater(creators, associators, entry_finder)
+
+        service = ImportService(entry_creator, entry_associator, entry_updater)
 
         api.add_resource(UserImportResource,
                          '/users/import',

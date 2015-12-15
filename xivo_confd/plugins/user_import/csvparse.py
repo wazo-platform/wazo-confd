@@ -92,6 +92,7 @@ class IntRule(Rule):
 class CsvRow(object):
 
     USER_RULES = (
+        UnicodeRule('uuid', 'uuid'),
         UnicodeRule('firstname', 'firstname'),
         UnicodeRule('lastname', 'lastname'),
         UnicodeRule('username', 'username'),
