@@ -19,8 +19,6 @@
 import re
 import string
 
-from functools import partial
-
 from xivo_confd.helpers.validator import ValidationGroup, RequiredFields, Optional, UniqueField, RegexField
 from xivo_dao.resources.endpoint_sip import dao
 
@@ -44,17 +42,25 @@ class UsernameChanged(UniqueField):
 
 def build_validator():
     return ValidationGroup(
+        common=[
+            Optional('name',
+                     RegexField.compile('name', NAME_REGEX)),
+            Optional('secret',
+                     RegexField.compile('secret', SECRET_REGEX))
+        ],
         create=[
             Optional('name',
                      UniqueField('name',
-                                 partial(dao.find_by, 'name'),
-                                 'SIPEndpoint')),
+                                 lambda v: dao.find_by(name=v),
+                                 'SIPEndpoint')
+                     ),
             Optional('secret',
-                     RegexField.compile('secret', SECRET_REGEX))
+                     RegexField.compile('secret', SECRET_REGEX)
+                     ),
         ],
         edit=[
             RequiredFields('name', 'secret', 'type', 'host'),
             UsernameChanged('name',
-                            partial(dao.find_by, 'name'),
+                            lambda v: dao.find_by(name=v),
                             dao.get),
         ])
