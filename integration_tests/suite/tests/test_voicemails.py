@@ -73,6 +73,17 @@ def test_fake_fields(voicemail):
             yield response.assert_match, 400, e.not_found(error_field)
 
 
+def test_validation_on_digit_fields():
+    url = confd.voicemails.post
+    yield s.check_bogus_field_returns_error, url, 'number', 'one'
+    yield s.check_bogus_field_returns_error, url, 'password', 'one'
+
+    with fixtures.voicemail() as voicemail:
+        url = confd.voicemails(voicemail['id']).put
+        yield s.check_bogus_field_returns_error, url, 'number', 'one'
+        yield s.check_bogus_field_returns_error, url, 'password', 'one'
+
+
 @fixtures.voicemail()
 def test_create_voicemail_with_same_number_and_context(voicemail):
     response = confd.voicemails.post(name='testvoicemail',
