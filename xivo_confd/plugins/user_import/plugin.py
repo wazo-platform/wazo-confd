@@ -27,9 +27,9 @@ from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
 from xivo_confd.plugins.user_import.service import ImportService
 from xivo_confd.plugins.user_import.resource import UserImportResource
-from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator
+from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from xivo_confd.plugins.user_import.middleware import ExtensionCreator, IncallCreator, CtiProfileCreator, LineCreator, UserCreator, VoicemailCreator, SipCreator, SccpCreator
-from xivo_confd.plugins.user_import.middleware import BaseAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
+from xivo_confd.plugins.user_import.middleware import LineAssociator, SipAssociator, SccpAssociator, ExtensionAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 
@@ -40,6 +40,15 @@ from xivo_confd.resources.user_cti_profile import services as user_cti_profile_s
 
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.endpoint_sip import dao as sip_dao
+from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
+from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
+from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+from xivo_dao.resources.user_cti_profile import dao as user_cti_profile_dao
 
 
 class Plugin(object):
@@ -73,12 +82,12 @@ class Plugin(object):
 
         associators = OrderedDict([
             ('voicemail', VoicemailAssociator(user_voicemail_service)),
-            ('cti_profile', CtiProfileAssociator(user_cti_profile_service)),
-            ('sip', BaseAssociator('line', 'sip', line_sip_service)),
-            ('sccp', BaseAssociator('line', 'sccp', line_sccp_service)),
-            ('line', BaseAssociator('user', 'line', user_line_service)),
-            ('extension', BaseAssociator('line', 'extension', line_extension_service)),
-            ('incall', IncallAssociator(incall_dao))
+            ('cti_profile', CtiProfileAssociator(user_cti_profile_service, cti_profile_dao)),
+            ('sip', SipAssociator(line_sip_service)),
+            ('sccp', SccpAssociator(line_sccp_service)),
+            ('line', LineAssociator(user_line_service)),
+            ('extension', ExtensionAssociator(line_extension_service)),
+            ('incall', IncallAssociator(line_extension_service))
         ])
 
         entry_associator = EntryAssociator(associators)

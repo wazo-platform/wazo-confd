@@ -18,15 +18,18 @@
 
 import abc
 
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers.db_manager import Session
+
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
+from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.resources.extension.model import Extension
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
-from xivo_dao.resources.incall.model import Incall
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 
@@ -97,78 +100,128 @@ class CtiProfileCreator(Creator):
 
 class IncallCreator(Creator):
 
-    def __init__(self, service):
-        self.service = service
-
     def create(self, fields):
+        fields = self.extract_extension_fields(fields)
         if fields:
-            extension = Extension(exten=fields['exten'],
-                                  context=fields['context'])
+            extension = Extension(**fields)
             return self.service.create(extension)
+
+
+    def extract_extension_fields(self, fields):
+        return {key: fields[key] for key in ('exten', 'context') if key in fields}
 
 
 class Associator(object):
 
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, service):
+        self.service = service
+
     @abc.abstractmethod
     def associate(self, entry):
         return
 
 
-class BaseAssociator(Associator):
 
-    def __init__(self, left, right, service):
-        self.left = left
-        self.right = right
-        self.service = service
+class LineAssociator(Associator):
 
     def associate(self, entry):
-        left_resource = entry.get_resource(self.left)
-        right_resource = entry.get_resource(self.right)
-        if left_resource and right_resource:
-            self.service.associate(left_resource, right_resource)
+        user = entry.get_resource('user')
+        line = entry.get_resource('line')
+        if user and line:
+            self.service.associate(user, line)
+
+
+
+class ExtensionAssociator(Associator):
+
+    def associate(self, entry):
+        line = entry.get_resource('line')
+        extension = entry.get_resource('extension')
+        if line and extension:
+            self.service.associate(line, extension)
+
+
+class SipAssociator(Associator):
+
+    def associate(self, entry):
+        line = entry.get_resource('line')
+        sip = entry.get_resource('sip')
+        if line and sip:
+            self.service.associate(line, sip)
+
+
+class SccpAssociator(Associator):
+
+    def associate(self, entry):
+        line = entry.get_resource('line')
+        sccp = entry.get_resource('sccp')
+        if line and sccp:
+            self.service.associate(line, sccp)
 
 
 class VoicemailAssociator(Associator):
-
-    def __init__(self, service):
-        self.service = service
 
     def associate(self, entry):
         user = entry.get_resource('user')
         voicemail = entry.get_resource('voicemail')
         if user and voicemail:
-            association = UserVoicemail(user_id=user.id,
-                                        voicemail_id=voicemail.id)
-            self.service.associate(association)
+            self.create_and_associate(user, voicemail)
+
+    def create_and_associate(self, user, voicemail):
+        association = UserVoicemail(user_id=user.id,
+                                    voicemail_id=voicemail.id)
+        self.service.associate(association)
+
+        user = entry.get_resource('user')
+        voicemail = entry.get_resource('voicemail')
+        if user and voicemail:
+            user_voicemail = self.service.find_by(user_id=user.id, voicemail_id=voicemail.id)
+            if not user_voicemail:
+                self.create_and_associate(user, voicemail)
 
 
 class CtiProfileAssociator(Associator):
 
-    def __init__(self, service):
+    def __init__(self, service, dao):
         self.service = service
+        self.dao = dao
 
     def associate(self, entry):
-        user = entry.get_resource('user')
         cti_profile = entry.get_resource('cti_profile')
-        if user and cti_profile:
-            association = UserCtiProfile(user_id=user.id,
-                                         cti_profile_id=cti_profile.id,
-                                         enabled=entry.extract_field('cti_profile', 'enabled'))
-            self.service.edit(association)
+        if cti_profile:
+            self.associate_profile(entry)
+
+
+    def associate_profile(self, entry):
+        user = entry.get_resource('user')
+        name = entry.extract_field('cti_profile', 'name')
+        cti_profile_id = self.dao.get_id_by_name(name)
+        association = UserCtiProfile(user_id=user.id,
+                                     cti_profile_id=cti_profile_id,
+                                     enabled=entry.extract_field('cti_profile', 'enabled'))
+        self.service.edit(association)
 
 
 class IncallAssociator(Associator):
 
-    def __init__(self, dao):
-        self.dao = dao
-
     def associate(self, entry):
-        user = entry.get_resource('user')
-        extension = entry.get_resource('incall')
-        if user and extension:
-            incall = Incall.user_destination(user.id,
-                                             extension.id,
-                                             entry.extract_field('incall', 'ring_seconds'))
-            self.dao.create(incall)
+        line = entry.get_resource('line')
+        incall = entry.get_resource('incall')
+        if line and incall:
+            self.service.associate(line, incall)
+            self.update_ring_seconds(entry)
+
+    def update_ring_seconds(self, entry):
+        ring_seconds = entry.extract_field('incall', 'ring_seconds')
+        if ring_seconds:
+            user = entry.get_resource('user')
+            (Session.query(Dialaction)
+             .filter_by(event='answer',
+                        category='incall',
+                        action='user',
+                        actionarg1=str(user.id))
+             .update({'actionarg2': str(ring_seconds)})
+             )
+
