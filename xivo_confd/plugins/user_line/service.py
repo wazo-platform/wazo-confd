@@ -16,9 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.helpers.exception import NotFoundError
-from xivo_dao.helpers import errors
-
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
@@ -48,7 +45,10 @@ class UserLineService(object):
         return self.dao.find_all_by_line_id(line_id)
 
     def get(self, user_id, line_id):
-        return self.dao.get_by_user_id_and_line_id(user_id, line_id)
+        return self.dao.get_by(user_id=user_id, line_id=line_id)
+
+    def find_by(self, **criteria):
+        return self.dao.find_by(**criteria)
 
     def associate(self, user, line):
         self.validator.validate_association(user, line)
@@ -58,7 +58,7 @@ class UserLineService(object):
 
     def dissociate(self, user, line):
         self.validator.validate_dissociation(user, line)
-        user_line = self.dao.get_by_user_id_and_line_id(user.id, line.id)
+        user_line = self.dao.get_by(user_id=user.id, line_id=line.id)
         self.notifier.dissociated(user_line)
         self.dao.dissociate(user, line)
 
