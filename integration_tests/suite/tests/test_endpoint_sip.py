@@ -209,7 +209,7 @@ def test_create_sip_with_all_parameters():
 @fixtures.sip(username="dupusername")
 def test_create_sip_with_username_already_taken(sip):
     response = confd.endpoints.sip.post(username="dupusername")
-    response.assert_status(400, e.resource_exists('SIPEndpoint'))
+    response.assert_match(400, e.resource_exists('SIPEndpoint'))
 
 
 @fixtures.sip()

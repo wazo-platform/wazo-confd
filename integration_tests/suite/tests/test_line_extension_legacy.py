@@ -85,4 +85,4 @@ def test_get_extension_from_line(line, extension):
 def test_dissociate_when_line_associated_to_device(line, extension, device):
     with a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).extension.delete()
-        response.assert_status(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated('Line', 'Device'))

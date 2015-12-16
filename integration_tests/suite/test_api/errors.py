@@ -14,8 +14,11 @@ class RegexError(object):
         self.items = items
         self.group = group
 
+    def __str__(self):
+        return "<{} {} {}>".format(self.__class__.__name__, self.regex.pattern, self.group)
+
     def __repr__(self):
-        "<{} {} {}>".format(self.__class__.__name__, self.regex.pattern, self.group)
+        return str(self)
 
     def assert_match(self, errors):
         match = self.find_error(errors)

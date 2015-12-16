@@ -181,7 +181,7 @@ def test_dissociate_sip_endpoint_associated_to_device(user, line, sip, extension
             a.line_extension(line, extension), a.line_device(line, device):
 
         response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
-        response.assert_status(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 @fixtures.user(firstname="Jôhn", lastname="Smîth")
@@ -215,7 +215,7 @@ def test_dissociate_sccp_endpoint_associated_to_device(user, line, sccp, extensi
     with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), \
             a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
-        response.assert_status(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 @fixtures.user()
