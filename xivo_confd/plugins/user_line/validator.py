@@ -16,9 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_dao.helpers.db_manager import Session
-
-from xivo_dao.alchemy.user_line import UserLine
+from xivo_confd.database import user_line as user_line_db
 
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
@@ -40,10 +38,7 @@ class UserLineAssociationValidator(Validator):
                                              line_id=line.id)
 
     def validate_user_not_already_associated(self, user):
-        line_id = (Session.query(UserLine.user_id)
-                   .filter_by(user_id=user.id)
-                   .scalar())
-
+        line_id = user_line_db.find_line_id_for_user(user.id)
         if line_id:
             raise errors.resource_associated('User', 'Line',
                                              user_id=user.id,
@@ -57,13 +52,7 @@ class UserLineDissociationValidator(Validator):
         line_device_validator.validate_no_device(line.id)
 
     def validate_no_secondary_users(self, user, line):
-        exists_query = (Session.query(UserLine)
-                        .filter(UserLine.line_id == line.id)
-                        .filter(UserLine.user_id != user.id)
-                        .filter(UserLine.main_user == False)  # noqa
-                        .exists())
-
-        exists = Session.query(exists_query).scalar()
+        exists = user_line_db.has_secondary_users(user.id, line.id)
         if exists:
             raise errors.secondary_users(line_id=line.id)
 

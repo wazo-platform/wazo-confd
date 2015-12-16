@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.db_manager import Session
-from xivo_dao.alchemy.user_line import UserLine
-from xivo_dao.alchemy.extension import Extension
+from xivo_confd.database import user_line as user_line_db
+from xivo_confd.database import extension as extension_db
 
 from xivo_confd.resources.line_device import validator as line_device_validator
 
@@ -39,27 +38,19 @@ class InternalAssociationValidator(Validator):
                                              line_id=line.id)
 
     def validate_line_has_no_extension(self, line):
-        extension_id = (Session.query(UserLine.extension_id)
-                        .filter(UserLine.line_id == line.id)
-                        .filter(UserLine.extension_id != None)  # noqa
-                        .scalar())
-
+        extension_id = user_line_db.find_extension_id_for_line(line.id)
         if extension_id:
             raise errors.resource_associated('Line', 'Extension',
                                              line_id=line.id,
                                              extension_id=extension_id)
 
     def validate_extension_not_associated(self, extension):
-        row = (Session.query(Extension.type.label('resource'),
-                             Extension.typeval.label('resource_id'))
-               .filter(Extension.id == extension.id)
-               .first())
-
-        if not (row.resource == 'user' and row.resource_id == '0'):
+        resource, resource_id = extension_db.get_associated_resource(extension.id)
+        if not (resource == 'user' and resource_id == '0'):
             raise errors.resource_associated('Extension',
-                                             row.resource,
+                                             resource,
                                              id=extension.id,
-                                             associated_id=row.resource_id)
+                                             associated_id=resource_id)
 
 
 class InternalDissociationValidator(Validator):
@@ -74,12 +65,7 @@ class IncallAssociationValidator(Validator):
         self.validate_line_has_user(line)
 
     def validate_line_has_user(self, line):
-        query = (Session.query(UserLine)
-                 .filter(UserLine.line_id == line.id)
-                 .filter(UserLine.user_id != None)  # noqa
-                 .exists())
-
-        exists = Session.query(query).scalar()
+        exists = user_line_db.check_line_has_users(line.id)
         if not exists:
             raise errors.missing_association('Line', 'User')
 
