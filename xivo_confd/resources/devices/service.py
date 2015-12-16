@@ -124,8 +124,9 @@ class FuncKeyDeviceUpdater(object):
         lines = self.line_dao.find_all_by(device=device.id)
         for line in lines:
             main_user_line = self.user_line_dao.find_main_user_line(line.id)
-            user = self.user_dao.get(main_user_line.user_id)
-            yield user, line
+            if main_user_line:
+                user = self.user_dao.get(main_user_line.user_id)
+                yield user, line
 
     def get_unified_template(self, user):
         private_template = self.template_dao.get(user.private_template_id)
