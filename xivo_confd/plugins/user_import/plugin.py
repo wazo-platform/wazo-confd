@@ -27,7 +27,7 @@ from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
 from xivo_confd.plugins.user_import.service import ImportService
 from xivo_confd.plugins.user_import.resource import UserImportResource
-from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
+from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator
 from xivo_confd.plugins.user_import.middleware import ExtensionCreator, IncallCreator, CtiProfileCreator, LineCreator, UserCreator, VoicemailCreator, SipCreator, SccpCreator
 from xivo_confd.plugins.user_import.middleware import LineAssociator, SipAssociator, SccpAssociator, ExtensionAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service

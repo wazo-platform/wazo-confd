@@ -18,7 +18,6 @@
 
 import abc
 
-from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers.db_manager import Session
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
@@ -106,7 +105,6 @@ class IncallCreator(Creator):
             extension = Extension(**fields)
             return self.service.create(extension)
 
-
     def extract_extension_fields(self, fields):
         return {key: fields[key] for key in ('exten', 'context') if key in fields}
 
@@ -123,7 +121,6 @@ class Associator(object):
         return
 
 
-
 class LineAssociator(Associator):
 
     def associate(self, entry):
@@ -131,7 +128,6 @@ class LineAssociator(Associator):
         line = entry.get_resource('line')
         if user and line:
             self.service.associate(user, line)
-
 
 
 class ExtensionAssociator(Associator):
@@ -174,8 +170,6 @@ class VoicemailAssociator(Associator):
                                     voicemail_id=voicemail.id)
         self.service.associate(association)
 
-        user = entry.get_resource('user')
-        voicemail = entry.get_resource('voicemail')
         if user and voicemail:
             user_voicemail = self.service.find_by(user_id=user.id, voicemail_id=voicemail.id)
             if not user_voicemail:
@@ -192,7 +186,6 @@ class CtiProfileAssociator(Associator):
         cti_profile = entry.get_resource('cti_profile')
         if cti_profile:
             self.associate_profile(entry)
-
 
     def associate_profile(self, entry):
         user = entry.get_resource('user')
@@ -224,4 +217,3 @@ class IncallAssociator(Associator):
                         actionarg1=str(user.id))
              .update({'actionarg2': str(ring_seconds)})
              )
-
