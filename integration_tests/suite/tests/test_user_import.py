@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import csv
 from cStringIO import StringIO
 
-from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than
+from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than, equal_to
 
 from test_api import confd
 from test_api import config
@@ -403,3 +403,80 @@ def test_given_csv_has_all_resources_then_all_relations_created():
 
     response = confd.users(entry['user_id']).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
+
+
+def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
+    exten1 = h.extension.find_available_exten(config.CONTEXT)
+    incall_exten1 = h.extension.find_available_exten('from-extern')
+    vm_number1 = h.voicemail.find_available_number(config.CONTEXT)
+
+    exten2 = h.extension.find_available_exten(config.CONTEXT, exclude=[exten1])
+    incall_exten2 = h.extension.find_available_exten('from-extern', exclude=[incall_exten1])
+    vm_number2 = h.voicemail.find_available_number(config.CONTEXT, exclude=[vm_number1])
+
+    csv = [
+        {"entity_id": "1",
+         "firstname": "Jèan",
+         "lastname": "Bâptiste",
+         "mobile_phone_number": "5551234567",
+         "ring_seconds": "15",
+         "simultaneous_calls": "10",
+         "language": "fr_FR",
+         "outgoing_caller_id": '"Jean Le Grand" <5557654321>',
+         "userfield": "userfield",
+         "supervision_enabled": "1",
+         "call_transfer_enabled": "1",
+         "exten": exten1,
+         "context": config.CONTEXT,
+         "line_protocol": "sip",
+         "sip_username": "jeansipusername",
+         "sip_password": "jeansippassword",
+         "incall_exten": incall_exten1,
+         "incall_context": 'from-extern',
+         "incall_ring_seconds": "10",
+         "voicemail_name": "jean",
+         "voicemail_number": vm_number1,
+         "voicemail_context": config.CONTEXT,
+         "voicemail_password": "1234",
+         "voicemail_email": "test@example.com",
+         "voicemail_attach_audio": "1",
+         "voicemail_delete_messages": "1",
+         "voicemail_ask_password": "1",
+         "cti_profile_name": "Client",
+         "cti_profile_enabled": "1",
+         "username": "jean",
+         "password": "secret"},
+        {"entity_id": "1",
+         "firstname": "Moùssa",
+         "lastname": "Nôbamgo",
+         "mobile_phone_number": "5553456789",
+         "ring_seconds": "20",
+         "simultaneous_calls": "8",
+         "language": "fr_FR",
+         "outgoing_caller_id": '"Mousssssssaaaa" <5557654321>',
+         "userfield": "userfield",
+         "supervision_enabled": "1",
+         "call_transfer_enabled": "1",
+         "exten": exten2,
+         "context": config.CONTEXT,
+         "line_protocol": "sccp",
+         "incall_exten": incall_exten2,
+         "incall_context": 'from-extern',
+         "incall_ring_seconds": "12",
+         "voicemail_name": "moussa",
+         "voicemail_number": vm_number2,
+         "voicemail_context": config.CONTEXT,
+         "voicemail_password": "2345",
+         "voicemail_email": "test2@example.com",
+         "voicemail_attach_audio": "1",
+         "voicemail_delete_messages": "1",
+         "voicemail_ask_password": "1",
+         "cti_profile_name": "Client",
+         "cti_profile_enabled": "1",
+         "username": "moussa",
+         "password": "secret"},
+    ]
+
+    response = client.post("/users/import", csv)
+
+    assert_that(len(response.item['created']), equal_to(2))
