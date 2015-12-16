@@ -10,12 +10,20 @@ from hamcrest import assert_that, has_entries, has_items
 FAKE_ID = 999999999
 
 
-@contextmanager
-def user_and_voicemail_associated(user, voicemail):
+def associate(user, voicemail):
     response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
     response.assert_ok()
-    yield
+
+
+def dissociate(user, voicemail):
     confd.users(user['id']).voicemail.delete()
+
+
+@contextmanager
+def user_and_voicemail_associated(user, voicemail):
+    associate(user, voicemail)
+    yield
+    dissociate(user, voicemail)
 
 
 class TestUserVoicemailAssociation(s.AssociationScenarios,
@@ -86,6 +94,16 @@ def test_get_user_voicemail_association(user, voicemail):
     with user_and_voicemail_associated(user, voicemail):
         response = confd.users(user['id']).voicemail.get()
         assert_that(response.item, expected)
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_user_voicemail_after_dissociation(user, voicemail):
+    associate(user, voicemail)
+    dissociate(user, voicemail)
+
+    response = confd.users(user['id']).voicemail.get()
+    response.assert_match(404, e.not_found('UserVoicemail'))
 
 
 @fixtures.user()

@@ -3,10 +3,11 @@ from test_api.helpers.extension import generate_extension, delete_extension
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
+from test_api import helpers as h
 from test_api import confd
 from test_api import fixtures
 
-from hamcrest import assert_that, contains, has_entries
+from hamcrest import assert_that, contains, has_entries, has_item, equal_to
 
 import re
 
@@ -158,3 +159,24 @@ def test_delete_extension_associated_to_line(line, extension):
     with a.line_extension(line, extension):
         response = confd.extensions(extension['id']).delete()
         response.assert_match(400, e.resource_associated('Extension', 'Line'))
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_get_line_extension(line, extension):
+    expected = has_item(has_entries(line_id=line['id'],
+                                    extension_id=extension['id']))
+
+    with a.line_extension(line, extension):
+        response = confd.lines(line['id']).extensions.get()
+        assert_that(response.items, expected)
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_get_line_extension_after_dissociation(line, extension):
+    h.line_extension.associate(line['id'], extension['id'])
+    h.line_extension.dissociate(line['id'], extension['id'])
+
+    response = confd.lines(line['id']).extensions.get()
+    assert_that(len(response.items), equal_to(0))

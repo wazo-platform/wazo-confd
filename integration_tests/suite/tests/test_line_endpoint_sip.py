@@ -23,6 +23,7 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
+from test_api import helpers as h
 
 
 @fixtures.line()
@@ -64,6 +65,16 @@ def test_get_sip_endpoint_associated_to_line(line, sip):
         assert_that(response.item, has_entries({'line_id': line['id'],
                                                 'endpoint': 'sip',
                                                 'endpoint_id': sip['id']}))
+
+
+@fixtures.line()
+@fixtures.sip()
+def test_get_sip_endpoint_after_dissociation(line, sip):
+    h.line_endpoint_sip.associate(line['id'], sip['id'])
+    h.line_endpoint_sip.dissociate(line['id'], sip['id'])
+
+    response = confd.lines(line['id']).endpoints.sip.get()
+    response.assert_status(404)
 
 
 @fixtures.line()
