@@ -2093,14 +2093,7 @@
                         "$ref": "#/parameters/token"
                     },
                     {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "description": "CSV data must respect the following conditions:\n* The encoding must be set in the Content-Type header, via the `charset=` option.\n* The first line of the CSV data must contain a list of header fields.\n* Fields must be separated with `,`\n* Fields must be quoted with `\"`\n* Double-quotes can be escaped by writing them twice (e.g. `Robert \"\"Bob\"\" Jenkins)`\n* Boolean value is `\"1\"` (true) or `\"0\"` (false)\n* Empty fields or headers that are not defined will be considered null.",
-
-                        "schema": {
-                            "type": "string"
-                        }
+                        "$ref": "#/parameters/csvbody"
                     }
                 ],
                 "responses": {
@@ -2112,6 +2105,39 @@
                     },
                     "400": {
                         "description": "Errors occured during import",
+                        "schema": {
+                            "$ref": "#/definitions/UserImportError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "import_users_csv",
+                "summary": "Mass import users and associated resources",
+                "description": "Mass update users and associated resources using CSV data.\n\nSteps\n=====\n\nThe updater will go through the following steps when updating:\n\n1. Using the UUID, find the user\n2. For each resource group in the CSV, search if it already exists\n3. If an existing resource was found, associate it with the user. Otherwise, create it.\n4. Update all resources using CSV data\n\nFields\n======\n\nField list is the same as for ```/users/import``` with the addition of ```uuid```.\n\nRestrictions\n============\n\n1. The column ```uuid```, the user's UUID, is required during update.\n2. Columns that are not included in the CSV header will not be updated.\n3. A field that is empty (i.e, ```\"\"```) will be converted to NULL, which will unset the value.\n2. A line's protocol cannot be changed (i.e you cannot go from \"sip\" to \"sccp\" or vice-versa).\n3. An incall cannot be updated if the user has more than one incall associated.",
+                "consumes": [
+                    "text/csv; charset=utf-8"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    },
+                    {
+                        "$ref": "#/parameters/csvbody"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users updated sucessfully",
+                        "schema": {
+                            "$ref": "#/definitions/UserUpdate"
+                        }
+                    },
+                    "400": {
+                        "description": "Errors occured during update",
                         "schema": {
                             "$ref": "#/definitions/UserImportError"
                         }
@@ -3110,6 +3136,15 @@
             "in": "path",
             "description": "Agent’s ID"
         },
+        "csvbody": {
+            "required": true,
+            "name": "body",
+            "in": "body",
+            "description": "CSV data must respect the following conditions:\n* The encoding must be set in the Content-Type header, via the `charset=` option.\n* The first line of the CSV data must contain a list of header fields.\n* Fields must be separated with `,`\n* Fields must be quoted with `\"`\n* Double-quotes can be escaped by writing them twice (e.g. `Robert \"\"Bob\"\" Jenkins)`\n* Boolean value is `\"1\"` (true) or `\"0\"` (false)\n* Empty fields or headers that are not defined will be considered null.",
+            "schema": {
+                "type": "string"
+            }
+        },
         "deviceid": {
             "required": true,
             "type": "string",
@@ -3938,6 +3973,49 @@
                     "type": "array",
                     "items": {
                         "title": "UserImportIDs",
+                        "type": "object",
+                        "properties": {
+                            "extension_id": {
+                                "type": "integer",
+                                "description": "Extension ID"
+                            },
+                            "user_id": {
+                                "type": "integer",
+                                "description": "User ID"
+                            },
+                            "line_id": {
+                                "type": "integer",
+                                "description": "Line ID"
+                            },
+                            "sip_id": {
+                                "type": "integer",
+                                "description": "SIP ID"
+                            },
+                            "voicemail_id": {
+                                "type": "integer",
+                                "description": "Voicemail ID"
+                            },
+                            "incall_extension_id": {
+                                "type": "integer",
+                                "description": "ID of the Extension used for incoming calls"
+                            },
+                            "row_number": {
+                                "type": "integer",
+                                "description": "Line number corresponding to the CSV data"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "UserUpdate": {
+            "title": "UserUpdate",
+            "description": "List of users sucessfully updated",
+            "properties": {
+                "updated": {
+                    "type": "array",
+                    "items": {
+                        "title": "UserUpdateIDs",
                         "type": "object",
                         "properties": {
                             "extension_id": {
