@@ -39,7 +39,7 @@ def load_plugins(core):
 
 
 def launch_plugin(ext, core):
-    logger.debug('Loading dynamic plugin: %s', ext.name)
+    logger.info('Loading dynamic plugin: %s', ext.name)
     ext.obj.load(core)
 
 

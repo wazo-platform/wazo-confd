@@ -51,5 +51,5 @@ class LegacyPlugins(object):
         self.load_resource(func_keys_actions, core)
 
     def load_resource(self, module, core):
-        logger.info("Loading %s", module.__name__)
+        logger.info("Loading legacy plugin: %s", module.__name__)
         module.load(core)
