@@ -3898,6 +3898,14 @@
                     "type": "string",
                     "description": "Name of the MOH category to use for music on hold"
                 },
+                "ring_seconds": {
+                    "type": "integer",
+                    "description": "Number of seconds a user's phone will ring before fallbacking"
+                },
+                "simultaneous_calls": {
+                    "type": "integer",
+                    "description": "Number of allowed simultaneous calls on a user's phone"
+                },
                 "preprocess_subroutine": {
                     "type": "string",
                     "description": "Name of the subroutine to execute in asterisk before receiving a call"
