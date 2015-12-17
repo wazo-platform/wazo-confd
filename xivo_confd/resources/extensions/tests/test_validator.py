@@ -25,7 +25,7 @@ from xivo_dao.helpers.exception import ResourceError
 
 from xivo_dao.resources.extension.model import Extension
 from xivo_dao.resources.context.model import ContextRange, ContextRangeType
-from xivo_dao.resources.line_extension.model import LineExtension
+from xivo_confd.plugins.line_extension.manager import LineExtension
 
 from xivo_confd.resources.extensions import validator
 

@@ -19,6 +19,8 @@
 from xivo_confd.helpers.validator import AssociationValidator
 from xivo_confd.helpers.validator import Validator
 
+from xivo_confd.resources.line_device import validator as line_device_validator
+
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
@@ -45,6 +47,7 @@ class ValidateLineDissociation(Validator):
         self.validate_endpoint(line, endpoint)
         self.validate_users(line)
         self.validate_extensions(line)
+        line_device_validator.validate_no_device(line.id)
 
     def validate_endpoint(self, line, endpoint):
         if not line.is_associated_with(endpoint):

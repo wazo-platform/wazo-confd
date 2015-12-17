@@ -21,6 +21,7 @@ from hamcrest import assert_that, has_entries
 from test_api import scenarios as s
 from test_api import confd
 from test_api import errors as e
+from test_api import helpers as h
 from test_api import fixtures
 from test_api import associations as a
 
@@ -64,6 +65,16 @@ def test_get_sccp_endpoint_associated_to_line(line, sccp):
         assert_that(response.item, has_entries({'line_id': line['id'],
                                                 'endpoint_id': sccp['id'],
                                                 'endpoint': 'sccp'}))
+
+
+@fixtures.line()
+@fixtures.sccp()
+def test_get_sccp_endpoint_after_dissociation(line, sccp):
+    h.line_endpoint_sccp.associate(line['id'], sccp['id'])
+    h.line_endpoint_sccp.dissociate(line['id'], sccp['id'])
+
+    response = confd.lines(line['id']).endpoints.sccp.get()
+    response.assert_status(404)
 
 
 @fixtures.line()

@@ -22,8 +22,6 @@ from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 from xivo_dao.resources.extension.model import Extension
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
-from xivo_dao.resources.line_extension.model import LineExtension
-from xivo_dao.resources.user_line.model import UserLine
 from xivo_dao.resources.voicemail.model import Voicemail
 from xivo_dao.resources.incall.model import Incall
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
@@ -201,14 +199,10 @@ class ImportService(object):
         self.line_sccp_service.associate(entry.line, entry.sccp)
 
     def associate_line_extension(self, entry):
-        line_extension = LineExtension(line_id=entry.line_id,
-                                       extension_id=entry.extension_id)
-        self.line_extension_service.associate(line_extension)
+        self.line_extension_service.associate(entry.line, entry.extension)
 
     def associate_user_line(self, entry):
-        user_line = UserLine(user_id=entry.user_id,
-                             line_id=entry.line_id)
-        self.user_line_service.associate(user_line)
+        self.user_line_service.associate(entry.user, entry.line)
 
     def associate_incall(self, entry):
         incall = Incall.user_destination(entry.user_id,

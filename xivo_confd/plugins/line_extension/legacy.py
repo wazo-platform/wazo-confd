@@ -24,7 +24,6 @@ from flask_restful import reqparse, fields, marshal
 
 from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
-
 fields = {
     'line_id': fields.Integer,
     'extension_id': fields.Integer,
@@ -42,13 +41,14 @@ parser.add_argument('line_id', type=int, required=True, location='view_args')
 parser.add_argument('extension_id', type=int, required=True)
 
 
-class LineExtensionResource(ConfdResource):
+class LegacyResource(ConfdResource):
 
-    def __init__(self, service, line_dao, extension_dao):
+    def __init__(self, service, line_dao, extension_dao, line_extension_dao):
         super(ConfdResource, self).__init__()
         self.service = service
         self.line_dao = line_dao
         self.extension_dao = extension_dao
+        self.line_extension_dao = line_extension_dao
 
     def get_extension_or_fail(self):
         form = parser.parse_args()
@@ -56,41 +56,39 @@ class LineExtensionResource(ConfdResource):
             return self.extension_dao.get(form['extension_id'])
         except NotFoundError:
             raise errors.param_not_found('extension_id', 'Extension')
+        pass
 
 
-class LineExtensionList(LineExtensionResource):
+class LineExtensionLegacy(LegacyResource):
 
     def get(self, line_id):
         line = self.line_dao.get(line_id)
-        items = self.service.list(line.id)
-        return {'total': len(items),
-                'items': [marshal(item, fields) for item in items]}
+        line_extension = self.line_extension_dao.get_by(line_id=line.id)
+        return marshal(line_extension, fields)
 
     def post(self, line_id):
         line = self.line_dao.get(line_id)
         extension = self.get_extension_or_fail()
         line_extension = self.service.associate(line, extension)
-        headers = self.build_headers(line_extension)
-        return marshal(line_extension, fields), 201, headers
+        return marshal(line_extension, fields), 201, self.build_headers(line_extension)
+
+    def delete(self, line_id):
+        line = self.line_dao.get(line_id)
+        line_extension = self.line_extension_dao.get_by(line_id=line.id)
+        extension = self.extension_dao.get(line_extension.extension_id)
+        self.service.dissociate(line, extension)
+        return '', 204
 
     def build_headers(self, model):
-        url = url_for('line_extensions',
-                      extension_id=model.extension_id,
+        url = url_for('line_extension_legacy',
                       line_id=model.line_id,
                       _external=True)
         return {'Location': url}
 
 
-class LineExtensionItem(LineExtensionResource):
+class ExtensionLineLegacy(LegacyResource):
 
-    def get(self, line_id, extension_id):
-        line = self.line_dao.get(line_id)
+    def get(self, extension_id):
         extension = self.extension_dao.get(extension_id)
-        line_extension = self.service.get(line, extension)
+        line_extension = self.line_extension_dao.get_by(extension_id=extension.id)
         return marshal(line_extension, fields)
-
-    def delete(self, line_id, extension_id):
-        line = self.line_dao.get(line_id)
-        extension = self.extension_dao.get(extension_id)
-        self.service.dissociate(line, extension)
-        return '', 204

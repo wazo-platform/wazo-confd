@@ -28,6 +28,7 @@ API_VERSION = '1.1'
 DEFAULT_CONFIG = {
     'foreground': False,
     'debug': False,
+    'profile': None,
     'user': 'www-data',
     'log_level': 'info',
     'config_file': '/etc/xivo-confd/config.yml',
@@ -124,6 +125,10 @@ def _parse_cli_args(argv):
                         '--user',
                         action='store',
                         help="The owner of the process.")
+    parser.add_argument('-p',
+                        '--profile',
+                        help="Write profiling stats to directory (for debugging performance issues)",
+                        action='store')
     parsed_args = parser.parse_args(argv)
 
     result = {}
@@ -131,6 +136,8 @@ def _parse_cli_args(argv):
         result['config_file'] = parsed_args.config_file
     if parsed_args.debug:
         result['debug'] = parsed_args.debug
+    if parsed_args.profile:
+        result['profile'] = parsed_args.profile
     if parsed_args.foreground:
         result['foreground'] = parsed_args.foreground
     if parsed_args.log_level:

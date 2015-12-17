@@ -140,7 +140,7 @@ def test_create_line_with_all_parameters():
 def test_create_line_with_provisioning_code_already_taken(line):
     response = confd.lines_sip.post(context=config.CONTEXT,
                                     provisioning_extension="123456")
-    response.assert_status(400, re.compile("provisioning_extension"))
+    response.assert_match(400, re.compile("provisioning_code"))
 
 
 @fixtures.line_sip()

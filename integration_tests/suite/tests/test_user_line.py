@@ -1,10 +1,15 @@
 import re
 
-from hamcrest import assert_that, contains, has_entries, has_item
+from hamcrest import assert_that
+from hamcrest import contains
+from hamcrest import empty
+from hamcrest import has_entries
+from hamcrest import has_item
 
 from test_api import scenarios as s
 from test_api import confd
 from test_api import errors as e
+from test_api import helpers as h
 from test_api import fixtures
 from test_api import associations as a
 
@@ -75,6 +80,16 @@ def test_get_line_associated_to_user(user, line):
     with a.user_line(user, line):
         response = confd.users(user['id']).lines.get()
         assert_that(response.items, expected)
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_line_after_dissociation(user, line):
+    h.user_line.associate(user['id'], line['id'])
+    h.user_line.dissociate(user['id'], line['id'])
+
+    response = confd.users(user['id']).lines.get()
+    assert_that(response.items, empty())
 
 
 @fixtures.user()

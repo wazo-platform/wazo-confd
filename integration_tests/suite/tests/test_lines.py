@@ -156,7 +156,7 @@ def test_create_line_with_caller_id_raises_error():
 def test_create_line_with_provisioning_code_already_taken(line):
     response = confd.lines.post(context=config.CONTEXT,
                                 provisioning_code="135246")
-    response.assert_status(400, re.compile("provisioning_code"))
+    response.assert_match(400, re.compile("provisioning_code"))
 
 
 @fixtures.line()

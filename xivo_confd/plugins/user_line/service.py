@@ -19,7 +19,8 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_confd.plugins.user_line import validator, notifier
+from xivo_confd.plugins.user_line import notifier
+from xivo_confd.plugins.user_line.validator import build_validator
 
 
 class UserLineService(object):
@@ -32,10 +33,10 @@ class UserLineService(object):
         self.notifier = notifier
 
     def validate_parent(self, user_id):
-        self.user_dao.get(user_id)
+        return self.user_dao.get(user_id)
 
     def validate_resource(self, line_id):
-        self.line_dao.get(line_id)
+        return self.line_dao.get(line_id)
 
     def list(self, user_id):
         return self.dao.find_all_by_user_id(user_id)
@@ -44,27 +45,26 @@ class UserLineService(object):
         return self.dao.find_all_by_line_id(line_id)
 
     def get(self, user_id, line_id):
-        return self.dao.get_by_user_id_and_line_id(user_id, line_id)
+        return self.dao.get_by(user_id=user_id, line_id=line_id)
 
-    def associate(self, user_line):
-        self.validator.validate_association(user_line)
-        self._adjust_optional_parameters(user_line)
-        user_line = self.dao.associate(user_line)
+    def find_by(self, **criteria):
+        return self.dao.find_by(**criteria)
+
+    def associate(self, user, line):
+        self.validator.validate_association(user, line)
+        user_line = self.dao.associate(user, line)
         self.notifier.associated(user_line)
         return user_line
 
-    def dissociate(self, user_line):
-        self.validator.validate_dissociation(user_line)
-        self.dao.dissociate(user_line)
+    def dissociate(self, user, line):
+        self.validator.validate_dissociation(user, line)
+        user_line = self.dao.get_by(user_id=user.id, line_id=line.id)
         self.notifier.dissociated(user_line)
-
-    def _adjust_optional_parameters(self, user_line):
-        user_line_main_user = self.dao.find_main_user_line(user_line.line_id)
-        if user_line_main_user is not None:
-            user_line.main_user = (user_line.user_id == user_line_main_user.user_id)
+        self.dao.dissociate(user, line)
 
 
 def build_service():
+    validator = build_validator()
     return UserLineService(user_line_dao,
                            user_dao,
                            line_dao,

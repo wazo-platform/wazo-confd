@@ -20,7 +20,7 @@ import json
 import logging
 import pprint
 
-from hamcrest import assert_that, is_in, has_key, has_entry, contains_string, has_item
+from hamcrest import assert_that, is_in, has_key, has_entry, contains_string, has_item, instance_of, only_contains
 import requests
 from urls import UrlFragment
 from .config import confd_base_url
@@ -184,6 +184,7 @@ class Response(object):
         return self.json['total']
 
     def assert_status(self, *statuses):
+        assert_that(statuses, only_contains(instance_of(int)))
         assert_that(self.response.status_code, is_in(statuses), self.response.text)
 
     def assert_ok(self):

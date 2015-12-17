@@ -171,17 +171,13 @@ def test_caller_id_on_sip_line(user, line, sip, extension):
                                                 'caller_id_num': '1000'}))
 
 
-@fixtures.user()
 @fixtures.line()
 @fixtures.sip()
-@fixtures.extension()
 @fixtures.device()
-def test_dissociate_sip_endpoint_associated_to_device(user, line, sip, extension, device):
-    with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
-            a.line_extension(line, extension), a.line_device(line, device):
-
+def test_dissociate_sip_endpoint_associated_to_device(line, sip, device):
+    with a.line_endpoint_sip(line, sip), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
-        response.assert_status(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 @fixtures.user(firstname="Jôhn", lastname="Smîth")
@@ -206,16 +202,13 @@ def test_caller_id_on_sccp_line(user, line, sccp, extension):
                                                 'caller_id_num': '1000'}))
 
 
-@fixtures.user()
 @fixtures.line()
 @fixtures.sccp()
-@fixtures.extension()
 @fixtures.device()
-def test_dissociate_sccp_endpoint_associated_to_device(user, line, sccp, extension, device):
-    with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), \
-            a.line_extension(line, extension), a.line_device(line, device):
+def test_dissociate_sccp_endpoint_associated_to_device(line, sccp, device):
+    with a.line_endpoint_sccp(line, sccp), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
-        response.assert_status(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 @fixtures.user()

@@ -23,12 +23,18 @@ from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
 from cherrypy.process.servers import ServerAdapter
 from cherrypy.wsgiserver import CherryPyWSGIServer
 
+from werkzeug.contrib.profiler import ProfilerMiddleware
+
 logger = logging.getLogger(__name__)
 
 
 def run_server(app):
     http_config = app.config['rest_api']['http']
     https_config = app.config['rest_api']['https']
+
+    if app.config['profile']:
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
+                                          profile_dir=app.config['profile'])
 
     wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
 
