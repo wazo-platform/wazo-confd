@@ -1,6 +1,10 @@
 import re
 
-from hamcrest import assert_that, contains, has_entries, has_item, equal_to
+from hamcrest import assert_that
+from hamcrest import contains
+from hamcrest import empty
+from hamcrest import has_entries
+from hamcrest import has_item
 
 from test_api import scenarios as s
 from test_api import confd
@@ -85,7 +89,7 @@ def test_get_line_after_dissociation(user, line):
     h.user_line.dissociate(user['id'], line['id'])
 
     response = confd.users(user['id']).lines.get()
-    assert_that(len(response.items), equal_to(0))
+    assert_that(response.items, empty())
 
 
 @fixtures.user()

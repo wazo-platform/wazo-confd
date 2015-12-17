@@ -7,7 +7,11 @@ from test_api import helpers as h
 from test_api import confd
 from test_api import fixtures
 
-from hamcrest import assert_that, contains, has_entries, has_item, equal_to
+from hamcrest import assert_that
+from hamcrest import contains
+from hamcrest import empty
+from hamcrest import has_entries
+from hamcrest import has_item
 
 import re
 
@@ -179,4 +183,4 @@ def test_get_line_extension_after_dissociation(line, extension):
     h.line_extension.dissociate(line['id'], extension['id'])
 
     response = confd.lines(line['id']).extensions.get()
-    assert_that(len(response.items), equal_to(0))
+    assert_that(response.items, empty())
