@@ -178,6 +178,8 @@ class IncallAssociator(object):
 
     def get_association(self, line, extension):
         association = self.incall_dao.find_line_extension_by_extension_id(extension.id)
+        if not association:
+            raise errors.not_found('LineExtension', line_id=line.id, extension_id=extension.id)
         if association.line_id != line.id:
             raise errors.not_found('LineExtension', line_id=line.id, extension_id=extension.id)
         return LineExtension(association.line_id, association.extension_id)

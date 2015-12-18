@@ -19,31 +19,13 @@
 
 from xivo_dao.helpers.db_manager import Session
 
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.plugins.user_import import csvparse
-from xivo_confd import sysconfd, bus
+from xivo_dao.alchemy.extension import Extension
 
 
-class UserImportResource(ConfdResource):
+def get_associated_resource(extension_id):
+    row = (Session.query(Extension.type.label('resource'),
+                         Extension.typeval.label('resource_id'))
+           .filter(Extension.id == extension_id)
+           .first())
 
-    def __init__(self, service):
-        self.service = service
-
-    def post(self):
-        parser = csvparse.parse()
-        entries, errors = self.service.import_rows(parser)
-
-        if errors:
-            status_code = 400
-            response = {'errors': errors}
-            self.rollback()
-        else:
-            status_code = 201
-            response = {'created': [entry.extract_ids() for entry in entries]}
-
-        return response, status_code
-
-    def rollback(self):
-        Session.rollback()
-        sysconfd.rollback()
-        bus.rollback()
+    return row.resource, row.resource_id

@@ -104,6 +104,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
     assert_response_has_id(response, 'user_id')
 
     user_id = response.item['created'][0]['user_id']
+    user_uuid = response.item['created'][0]['user_uuid']
+
     user = confd.users(user_id).get().item
 
     assert_that(user, has_entries(firstname="Rîchard",
@@ -117,7 +119,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
                                   call_transfer_enabled=False,
                                   simultaneous_calls=5,
                                   ring_seconds=10,
-                                  userfield="userfield"))
+                                  userfield="userfield",
+                                  uuid=user_uuid))
 
 
 def test_given_csv_column_has_wrong_type_then_error_returned():
@@ -290,12 +293,12 @@ def test_given_csv_extension_has_errors_then_errors_returned():
 
 
 def test_given_csv_has_minimal_incall_fields_then_incall_created():
-    exten = h.extension.find_available_exten('from-extern')
+    exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     csv = [{"firstname": "Pâscal",
             "line_protocol": "sccp",
             "context": config.CONTEXT,
             "incall_exten": exten,
-            "incall_context": "from-extern"}]
+            "incall_context": config.INCALL_CONTEXT}]
 
     response = client.post("/users/import", csv)
     assert_response_has_id(response, 'incall_extension_id')
@@ -304,16 +307,16 @@ def test_given_csv_has_minimal_incall_fields_then_incall_created():
     extension = confd.extensions(incall_extension_id).get().item
 
     assert_that(extension, has_entries(exten=exten,
-                                       context="from-extern"))
+                                       context=config.INCALL_CONTEXT))
 
 
 def test_given_csv_has_all_incall_fields_then_incall_created():
-    exten = h.extension.find_available_exten('from-extern')
+    exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     csv = [{"firstname": "Pâscal",
             "line_protocol": "sccp",
             "context": config.CONTEXT,
             "incall_exten": exten,
-            "incall_context": "from-extern",
+            "incall_context": config.INCALL_CONTEXT,
             "incall_ring_seconds": "10"}]
 
     response = client.post("/users/import", csv)
@@ -361,7 +364,7 @@ def test_given_csv_cti_profile_has_errors_then_errors_returned():
 
 def test_given_csv_has_all_resources_then_all_relations_created():
     exten = h.extension.find_available_exten(config.CONTEXT)
-    incall_exten = h.extension.find_available_exten('from-extern')
+    incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     vm_number = h.voicemail.find_available_number(config.CONTEXT)
 
     csv = [{"firstname": "Frânçois",
@@ -369,7 +372,7 @@ def test_given_csv_has_all_resources_then_all_relations_created():
             "context": config.CONTEXT,
             "line_protocol": "sip",
             "incall_exten": incall_exten,
-            "incall_context": 'from-extern',
+            "incall_context": config.INCALL_CONTEXT,
             "voicemail_name": "francois",
             "voicemail_number": vm_number,
             "voicemail_context": config.CONTEXT,

@@ -1,5 +1,6 @@
 
 from test_api import confd
+from test_api import config
 from test_api import fixtures
 from test_api import mocks
 from test_api import scenarios as s
@@ -71,6 +72,30 @@ def test_fake_fields(voicemail):
             fields[field] = value
             response = request(fields)
             yield response.assert_match, 400, e.not_found(error_field)
+
+
+def digit_field_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'number', 'one'
+    yield s.check_bogus_field_returns_error, url, 'number', '#1234'
+    yield s.check_bogus_field_returns_error, url, 'number', '*1234'
+    yield s.check_bogus_field_returns_error, url, 'password', 'one'
+    yield s.check_bogus_field_returns_error, url, 'password', '#1234'
+    yield s.check_bogus_field_returns_error, url, 'password', '*1234'
+
+
+def test_validation_on_digit_fields():
+    number = vm_helper.find_available_number()
+    url = confd.voicemails(number=number,
+                           name="test",
+                           context=config.CONTEXT).post
+
+    for check in digit_field_checks(url):
+        yield check
+
+    with fixtures.voicemail() as voicemail:
+        url = confd.voicemails(voicemail['id']).put
+        for check in digit_field_checks(url):
+            yield check
 
 
 @fixtures.voicemail()

@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao.resources.user_voicemail.model import UserVoicemail
+
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
@@ -44,16 +46,29 @@ class UserVoicemailService(object):
     def list_by_child(self, voicemail_id):
         return self.user_voicemail_dao.find_all_by_voicemail_id(voicemail_id)
 
+    def find_by(self, **criteria):
+        return self.user_voicemail_dao.find_by(**criteria)
+
     def associate(self, association):
         self.validator.validate_association(association)
         self.user_voicemail_dao.associate(association)
         self.notifier.associated(association)
         return association
 
+    def associate_models(self, user, voicemail):
+        association = UserVoicemail(user_id=user.id,
+                                    voicemail_id=voicemail.id)
+        return self.associate(association)
+
     def dissociate(self, association):
         self.validator.validate_dissociation(association)
         self.user_voicemail_dao.dissociate(association)
         self.notifier.dissociated(association)
+
+    def dissociate_models(self, user, voicemail):
+        association = UserVoicemail(user_id=user.id,
+                                    voicemail_id=voicemail.id)
+        return self.dissociate(association)
 
 
 def build_service():
