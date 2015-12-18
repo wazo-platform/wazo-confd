@@ -26,8 +26,8 @@ from xivo_confd.helpers.validator import Validator, ValidationGroup, \
     MissingFields, FindResource, MemberOfSequence, Optional, RegexField
 
 
-NUMBER_REGEX = r"^[0-9#\*]{1,40}$"
-PASSWORD_REGEX = r"^[0-9#\*]{1,80}$"
+NUMBER_REGEX = r"^[0-9]{1,40}$"
+PASSWORD_REGEX = r"^[0-9]{1,80}$"
 
 
 class NumberContextExists(Validator):
@@ -77,7 +77,7 @@ def build_validators():
         common=[
             MissingFields(),
             FindResource('context', context_dao.get, 'Context'),
-            RegexField.compile('number', NUMBER_REGEX),
+            RegexField.compile('number', NUMBER_REGEX, "numeric string (max length: 40)"),
             Optional('language', MemberOfSequence(
                 'language',
                 language_dao.find_all,
@@ -87,7 +87,8 @@ def build_validators():
                 voicemail_dao.find_all_timezone,
                 'Timezone')),
             Optional('password',
-                     RegexField.compile('password', PASSWORD_REGEX)),
+                     RegexField.compile('password', PASSWORD_REGEX, "numeric string (max length: 80)")
+                     ),
         ],
         create=[
             NumberContextExists(voicemail_dao)
