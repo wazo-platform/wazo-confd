@@ -19,6 +19,8 @@
 from contextlib import contextmanager
 
 from test_api.helpers import user_line as ul
+from test_api.helpers import user_cti_profile as uc
+from test_api.helpers import user_voicemail as uv
 from test_api.helpers import line_extension as le
 from test_api.helpers import line_device as ld
 from test_api.helpers import line_endpoint_sip as l_endpoint_sip
@@ -30,6 +32,20 @@ def user_line(user, line, check=True):
     ul.associate(user['id'], line['id'], check)
     yield
     ul.dissociate(user['id'], line['id'], check)
+
+
+@contextmanager
+def user_voicemail(user, voicemail, check=True):
+    uv.associate(user['id'], voicemail['id'], check)
+    yield
+    uv.dissociate(user['id'], voicemail['id'], check)
+
+
+@contextmanager
+def user_cti_profile(user, cti_profile, check=True):
+    uc.associate(user['id'], cti_profile['id'])
+    yield
+    uc.dissociate(user['id'], cti_profile['id'])
 
 
 @contextmanager
