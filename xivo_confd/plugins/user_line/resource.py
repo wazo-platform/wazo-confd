@@ -16,11 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers import errors
+
 from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
-from xivo_confd.helpers.restful import FieldList, Link, \
-    ListResource, ItemResource
+from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
 
 fields = {
@@ -40,19 +42,33 @@ parser = reqparse.RequestParser()
 parser.add_argument('line_id', type=int, required=True)
 
 
-class UserLineList(ListResource):
+class UserLineResource(ConfdResource):
+
+    def __init__(self, service, user_dao, line_dao):
+        super(ConfdResource, self).__init__()
+        self.service = service
+        self.user_dao = user_dao
+        self.line_dao = line_dao
+
+    def get_line_or_fail(self):
+        form = parser.parse_args()
+        try:
+            return self.line_dao.get(form['line_id'])
+        except NotFoundError:
+            raise errors.param_not_found('line_id', 'Line')
+
+
+class UserLineList(UserLineResource):
 
     def get(self, user_id):
-        self.service.validate_parent(user_id)
-        items = self.service.list(user_id)
+        user = self.user_dao.get(user_id)
+        items = self.service.find_all_by(user_id=user.id)
         return {'total': len(items),
                 'items': [marshal(item, fields) for item in items]}
 
     def post(self, user_id):
-        form = parser.parse_args()
-        user = self.service.validate_parent(user_id)
-        line = self.service.validate_resource(form['line_id'])
-
+        user = self.user_dao.get(user_id)
+        line = self.get_line_or_fail()
         user_line = self.service.associate(user, line)
 
         return marshal(user_line, fields), 201, self.build_headers(user_line)
@@ -65,25 +81,25 @@ class UserLineList(ListResource):
         return {'Location': url}
 
 
-class UserLineItem(ItemResource):
+class UserLineItem(UserLineResource):
 
     def get(self, user_id, line_id):
-        self.service.validate_parent(user_id)
-        self.service.validate_resource(line_id)
-        user_line = self.service.get(user_id, line_id)
+        user = self.user_dao.get(user_id)
+        line = self.line_dao.get(line_id)
+        user_line = self.service.get(user, line)
         return marshal(user_line, fields)
 
     def delete(self, user_id, line_id):
-        user = self.service.validate_parent(user_id)
-        line = self.service.validate_resource(line_id)
+        user = self.user_dao.get(user_id)
+        line = self.line_dao.get(line_id)
         self.service.dissociate(user, line)
         return '', 204
 
 
-class LineUserList(ListResource):
+class LineUserList(UserLineResource):
 
     def get(self, line_id):
-        self.service.validate_resource(line_id)
-        items = self.service.list_by_line(line_id)
+        line = self.line_dao.get(line_id)
+        items = self.service.find_all_by(line_id=line.id)
         return {'total': len(items),
                 'items': [marshal(item, fields) for item in items]}

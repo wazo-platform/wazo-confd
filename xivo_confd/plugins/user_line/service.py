@@ -16,8 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_confd.plugins.user_line import notifier
 from xivo_confd.plugins.user_line.validator import build_validator
@@ -25,30 +23,19 @@ from xivo_confd.plugins.user_line.validator import build_validator
 
 class UserLineService(object):
 
-    def __init__(self, dao, user_dao, line_dao, validator, notifier):
+    def __init__(self, dao, validator, notifier):
         self.dao = dao
-        self.user_dao = user_dao
-        self.line_dao = line_dao
         self.validator = validator
         self.notifier = notifier
 
-    def validate_parent(self, user_id):
-        return self.user_dao.get(user_id)
-
-    def validate_resource(self, line_id):
-        return self.line_dao.get(line_id)
-
-    def list(self, user_id):
-        return self.dao.find_all_by_user_id(user_id)
-
-    def list_by_line(self, line_id):
-        return self.dao.find_all_by_line_id(line_id)
-
-    def get(self, user_id, line_id):
-        return self.dao.get_by(user_id=user_id, line_id=line_id)
+    def find_all_by(self, **criteria):
+        return self.dao.find_all_by(**criteria)
 
     def find_by(self, **criteria):
         return self.dao.find_by(**criteria)
+
+    def get(self, user, line):
+        return self.dao.get_by(user_id=user.id, line_id=line.id)
 
     def associate(self, user, line):
         self.validator.validate_association(user, line)
@@ -66,7 +53,5 @@ class UserLineService(object):
 def build_service():
     validator = build_validator()
     return UserLineService(user_line_dao,
-                           user_dao,
-                           line_dao,
                            validator,
                            notifier)
