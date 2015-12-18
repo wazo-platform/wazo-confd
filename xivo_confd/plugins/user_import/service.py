@@ -32,14 +32,14 @@ class ImportService(object):
 
         for line in parser:
             try:
-                entry = self.import_row(line)
+                entry = self.create_entry(line)
                 created.append(entry)
             except ServiceError as e:
                 errors.append(line.format_error(e))
 
         return created, errors
 
-    def import_row(self, line):
+    def create_entry(self, line):
         entry = self.entry_creator.create(line)
         self.entry_associator.associate(entry)
         return entry
