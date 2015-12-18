@@ -56,22 +56,27 @@ class UserVoicemailResource(ConfdResource):
         except NotFoundError:
             raise errors.param_not_found('voicemail_id', 'Voicemail')
 
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
 
 class UserVoicemailRoot(UserVoicemailResource):
 
     def get(self, user_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         user_voicemail = self.service.get_by(user_id=user.id)
         return marshal(user_voicemail, fields)
 
     def post(self, user_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         voicemail = self.get_voicemail_or_fail()
         user_voicemail = self.service.associate(user, voicemail)
         return marshal(user_voicemail, fields), 201, self.build_headers(user_voicemail)
 
     def delete(self, user_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         user_voicemail = self.service.get_by(user_id=user.id)
         voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
         self.service.dissociate(user, voicemail)

@@ -31,6 +31,7 @@ class Plugin(object):
 
         api.add_resource(UserVoicemailRoot,
                          '/users/<int:user_id>/voicemail',
+                         '/users/<uuid:user_id>/voicemail',
                          endpoint='user_voicemails',
                          resource_class_args=(service, user_dao, voicemail_dao)
                          )
