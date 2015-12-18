@@ -64,9 +64,9 @@ class Rule(object):
 class UnicodeRule(Rule):
 
     def parse(self, value):
-        if value != "":
-            return value
-        return None
+        if value == "":
+            return None
+        return value
 
 
 class BooleanRule(Rule):
