@@ -2077,6 +2077,27 @@
                 }
             }
         },
+        "/users/export": {
+            "get": {
+                "operationId": "export_users_csv",
+                "summary": "Mass export users and associated resources",
+                "description": "List of users and associated resources in CSV format.\nBoolean values will be converted to ```1``` for true and ```0``` for false.\n\nUser fields\n===========\n\n* entity_id\n* uuid \n* firstname\n* lastanme\n* cti_enabled\n* call_transfer_enabled\n* simultaneous_calls\n* ring_seconds\n\nCTI fields\n==========\n\n* cti_profile_enabled\n* cti_profile_name\n* username\n* password\n\nExtension fields\n================\n\n* exten\n* context\n\nLine fields\n===========\n\n* line_protocol\n\nSIP fields\n==========\n\n* sip_username\n* sip_secret\n\nIncall fields\n=============\n\n* incall_exten\n* incall_context\n* incall_ring_seconds\n\nVoicemail fields\n================\n\n* voicemail_name\n* voicemail_number\n* voicemail_context\n* voicemail_password\n* voicemail_email\n* voicemail_attach_audio\n* voicemail_delete_messages\n* voicemail_ask_password",
+                "tags": [
+                    "users"
+                ],
+                "produces": [
+                    "text/csv; charset=utf-8"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Users imported sucessfully",
+                        "schema": {
+                            "$ref": "#/definitions/UserExport"
+                        }
+                    }
+                }
+            }
+        },
         "/users/import": {
             "post": {
                 "operationId": "import_users_csv",
@@ -3929,6 +3950,10 @@
                 "cti_profile_id",
                 "enabled"
             ]
+        },
+        "UserExport": {
+            "title": "UserExport",
+            "type": "string"
         },
         "UserImport": {
             "title": "UserImport",
