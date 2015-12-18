@@ -72,6 +72,13 @@ def test_associate_user_line(user, line):
     response.assert_updated()
 
 
+@fixtures.user
+@fixtures.line_sip
+def test_associate_using_uuid(user, line):
+    response = confd.users(user['uuid']).lines.put(line_id=line['id'])
+    response.assert_updated()
+
+
 @fixtures.user()
 @fixtures.user()
 @fixtures.user()
@@ -99,6 +106,9 @@ def test_get_line_associated_to_user(user, line):
         response = confd.users(user['id']).lines.get()
         assert_that(response.items, expected)
 
+        response = confd.users(user['uuid']).lines.get()
+        assert_that(response.items, expected)
+
 
 @fixtures.user()
 @fixtures.line_sip()
@@ -107,6 +117,9 @@ def test_get_line_after_dissociation(user, line):
     h.user_line.dissociate(user['id'], line['id'])
 
     response = confd.users(user['id']).lines.get()
+    assert_that(response.items, empty())
+
+    response = confd.users(user['uuid']).lines.get()
     assert_that(response.items, empty())
 
 
@@ -170,6 +183,14 @@ def test_associate_user_to_line_with_endpoint(user, line, sip):
         response.assert_created('users', 'lines')
         assert_that(response.item, has_entries({'user_id': user['id'],
                                                 'line_id': line['id']}))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_dissociate_using_uuid(user, line):
+    with a.user_line(user, line, check=False):
+        response = confd.users(user['uuid']).lines(line['id']).delete()
+        response.assert_deleted()
 
 
 @fixtures.user()

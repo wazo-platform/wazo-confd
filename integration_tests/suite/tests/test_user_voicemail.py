@@ -46,6 +46,13 @@ def test_associate(user, voicemail):
 
 @fixtures.user()
 @fixtures.voicemail()
+def test_associate_using_uuid(user, voicemail):
+    response = confd.users(user['uuid']).voicemail.post(voicemail_id=voicemail['id'])
+    response.assert_created('users', 'voicemail')
+
+
+@fixtures.user()
+@fixtures.voicemail()
 def test_associate_when_already_associated(user, voicemail):
     with a.user_voicemail(user, voicemail):
         response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
@@ -79,6 +86,9 @@ def test_get_user_voicemail_association(user, voicemail):
         response = confd.users(user['id']).voicemail.get()
         assert_that(response.item, expected)
 
+        response = confd.users(user['uuid']).voicemail.get()
+        assert_that(response.item, expected)
+
 
 @fixtures.user()
 @fixtures.voicemail()
@@ -89,12 +99,23 @@ def test_get_user_voicemail_after_dissociation(user, voicemail):
     response = confd.users(user['id']).voicemail.get()
     response.assert_match(404, e.not_found('UserVoicemail'))
 
+    response = confd.users(user['uuid']).voicemail.get()
+    response.assert_match(404, e.not_found('UserVoicemail'))
+
 
 @fixtures.user()
 @fixtures.voicemail()
 def test_dissociate(user, voicemail):
-    with a.user_voicemail(user, voicemail, False):
+    with a.user_voicemail(user, voicemail, check=False):
         response = confd.users(user['id']).voicemail.delete()
+        response.assert_deleted()
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_dissociate_using_uuid(user, voicemail):
+    with a.user_voicemail(user, voicemail, check=False):
+        response = confd.users(user['uuid']).voicemail.delete()
         response.assert_deleted()
 
 

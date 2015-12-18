@@ -58,6 +58,8 @@ class TestUserWithFuncKey(TestFuncKey):
         self.pos = '1'
 
         self.funckey_url = confd.users(self.user['id']).funckeys(self.pos)
+        self.uuid_url = confd.users(self.user['uuid']).funckeys(self.pos)
+
         self.funckey_url.put(destination=self.destination).assert_ok()
 
     def test_when_getting_position_then_func_key_returned(self):
@@ -73,23 +75,47 @@ class TestUserWithFuncKey(TestFuncKey):
         assert_that(response.item, has_entries(expected_funckey))
         assert_that(response.item['destination'], has_entries(expected_destination))
 
+        response = self.uuid_url.get()
+
+        assert_that(response.item, has_entries(expected_funckey))
+        assert_that(response.item['destination'], has_entries(expected_destination))
+
     def test_when_updating_position_then_func_key_modified_in_provd(self):
         modified_funckey = {'blf': False,
                             'label': 'myfunckey',
                             'destination': {'type': 'park_position',
                                             'position': 701}}
+        uuid_funckey = {'blf': False,
+                        'label': 'myfunckey',
+                        'destination': {'type': 'park_position',
+                                        'position': 702}}
 
         provd_funckey = {'label': 'myfunckey',
                          'type': 'speeddial',
                          'line': 1,
                          'value': '701'}
+        provd_uuid_funckey = {'label': 'myfunckey',
+                              'type': 'speeddial',
+                              'line': 1,
+                              'value': '702'}
 
         self.funckey_url.put(**modified_funckey).assert_updated()
-
         self.check_provd_has_funckey(self.pos, provd_funckey)
+
+        self.uuid_url.put(**uuid_funckey).assert_updated()
+        self.check_provd_has_funckey(self.pos, provd_uuid_funckey)
 
     def test_when_deleting_position_then_func_key_removed(self):
         response = self.funckey_url.delete()
+        response.assert_ok()
+
+        response = self.funckey_url.get()
+        response.assert_status(404)
+
+        self.check_provd_does_not_have_funckey(self.pos)
+
+    def test_when_deleting_position_using_uuid_then_func_key_removed(self):
+        response = self.uuid_url.delete()
         response.assert_ok()
 
         response = self.funckey_url.get()
@@ -246,6 +272,7 @@ class TestTemplateAssociation(TestFuncKey):
         self.template = response.item
 
         self.association_url = confd.users(self.user['id']).funckeys.templates(self.template['id'])
+        self.uuid_url = confd.users(self.user['uuid']).funckeys.template(self.template['id'])
 
     def test_given_template_has_func_key_when_associated_then_func_key_added_to_provd(self):
         self.association_url.put().assert_ok()
@@ -253,9 +280,22 @@ class TestTemplateAssociation(TestFuncKey):
         for pos, funckey in self.provd_funckeys.items():
             self.check_provd_has_funckey(pos, funckey)
 
+    def test_given_template_has_func_key_when_associated_using_uuid_then_func_key_added_to_provd(self):
+        self.uuid_url.put().assert_ok()
+
+        for pos, funckey in self.provd_funckeys.items():
+            self.check_provd_has_funckey(pos, funckey)
+
     def test_when_template_dissociated_then_func_key_removed_from_provd(self):
         self.association_url.put().assert_updated()
         self.association_url.delete().assert_deleted()
+
+        for pos in self.provd_funckeys.keys():
+            self.check_provd_does_not_have_funckey(pos)
+
+    def test_when_template_dissociated_using_uuid_then_func_key_removed_from_provd(self):
+        self.uuid_url.put().assert_updated()
+        self.uuid_url.delete().assert_deleted()
 
         for pos in self.provd_funckeys.keys():
             self.check_provd_does_not_have_funckey(pos)
@@ -296,10 +336,29 @@ class TestTemplateAssociation(TestFuncKey):
         assert_that(response.item, has_entry('inherited', True))
         assert_that(response.item['destination'], has_entries(expected_destination))
 
+    def test_given_template_associated_when_getting_func_key_using_uuid_then_fetches_from_unified_template(self):
+        self.uuid_url.put().assert_updated()
+
+        response = confd.users(self.user['uuid']).funckeys(1).get()
+
+        expected_destination = self.funckeys['1']['destination']
+        assert_that(response.item, has_entry('inherited', True))
+        assert_that(response.item['destination'], has_entries(expected_destination))
+
     def test_given_template_associated_when_getting_association_then_user_associated(self):
         self.association_url.put().assert_updated()
 
         response = confd.users(self.user['id']).funckeys.templates.get()
+
+        expected_association = {'user_id': self.user['id'],
+                                'template_id': self.template['id']}
+
+        assert_that(response.items, contains(has_entries(expected_association)))
+
+    def test_given_template_associated_when_getting_association_using_uuid_then_user_associated(self):
+        self.uuid_url.put().assert_updated()
+
+        response = confd.users(self.user['uuid']).funckeys.templates.get()
 
         expected_association = {'user_id': self.user['id'],
                                 'template_id': self.template['id']}

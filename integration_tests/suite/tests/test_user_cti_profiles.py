@@ -69,6 +69,13 @@ def test_associate_user_with_cti_profile(user, cti_profile):
 
 @fixtures.user(username="username", password="password")
 @fixtures.cti_profile("Client")
+def test_associate_using_uuid(user, cti_profile):
+    response = confd.users(user['uuid']).cti.put(cti_profile_id=cti_profile['id'])
+    response.assert_updated()
+
+
+@fixtures.user(username="username", password="password")
+@fixtures.cti_profile("Client")
 def test_get_user_cti_profile_when_associated(user, cti_profile):
     with a.user_cti_profile(user, cti_profile):
         response = confd.users(user['id']).cti.get()
@@ -78,3 +85,12 @@ def test_get_user_cti_profile_when_associated(user, cti_profile):
         assert_that(response.item, has_entries(user_id=user['id'],
                                                cti_profile_id=cti_profile['id'],
                                                enabled=True))
+
+
+@fixtures.user(username="username", password="password")
+@fixtures.cti_profile("Client")
+def test_get_association_using_uuid(user, cti_profile):
+    with a.user_cti_profile(user, cti_profile):
+        response = confd.users(user['uuid']).cti.get()
+        assert_that(response.item, has_entries(cti_profile_id=cti_profile['id'],
+                                               user_id=user['id']))
