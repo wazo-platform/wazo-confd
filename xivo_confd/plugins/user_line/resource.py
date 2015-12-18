@@ -57,17 +57,22 @@ class UserLineResource(ConfdResource):
         except NotFoundError:
             raise errors.param_not_found('line_id', 'Line')
 
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
 
 class UserLineList(UserLineResource):
 
     def get(self, user_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         items = self.service.find_all_by(user_id=user.id)
         return {'total': len(items),
                 'items': [marshal(item, fields) for item in items]}
 
     def post(self, user_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         line = self.get_line_or_fail()
         user_line = self.service.associate(user, line)
 
@@ -84,13 +89,13 @@ class UserLineList(UserLineResource):
 class UserLineItem(UserLineResource):
 
     def get(self, user_id, line_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         line = self.line_dao.get(line_id)
         user_line = self.service.get(user, line)
         return marshal(user_line, fields)
 
     def delete(self, user_id, line_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         line = self.line_dao.get(line_id)
         self.service.dissociate(user, line)
         return '', 204
