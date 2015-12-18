@@ -86,18 +86,22 @@ class UniqueField(Validator):
 class RegexField(Validator):
 
     @classmethod
-    def compile(cls, field, text):
-        return cls(field, re.compile(text))
+    def compile(cls, field, text, message=None):
+        return cls(field, re.compile(text), message)
 
-    def __init__(self, field, regex):
+    def __init__(self, field, regex, message=None):
         self.field = field
         self.regex = regex
+        self.message = message
 
     def validate(self, model):
         value = getattr(model, self.field)
         if not self.regex.match(value):
-            msg = "string matching regex '{}'".format(self.regex.pattern)
-            raise errors.wrong_type(self.field, msg)
+            if self.message:
+                message = self.message
+            else:
+                message = "string matching regex '{}'".format(self.regex.pattern)
+            raise errors.wrong_type(self.field, message)
 
 
 class NumberRange(Validator):

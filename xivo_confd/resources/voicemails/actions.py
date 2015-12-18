@@ -22,7 +22,7 @@ from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_confd import config
 from xivo_confd.helpers.converter import Converter
-from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean, Regexp
+from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
 from xivo_confd.resources.voicemails.services import build_service
 from xivo_confd.resources.voicemails.mooltiparse import OptionType
@@ -33,13 +33,9 @@ def load(core_rest_api):
     document = core_rest_api.content_parser.document(
         Field('id', Int()),
         Field('name', Unicode()),
-        Field('number',
-              Unicode(),
-              Regexp.compile(r"\d+", "wrong type. Should be a numeric string")),
+        Field('number', Unicode()),
         Field('context', Unicode()),
-        Field('password',
-              Unicode(),
-              Regexp.compile(r"\d+", "wrong type. Should be a numeric string")),
+        Field('password', Unicode()),
         Field('email', Unicode()),
         Field('language', Unicode()),
         Field('timezone', Unicode()),
