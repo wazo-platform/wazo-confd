@@ -16,11 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import csv
+
+from cStringIO import StringIO
+from flask import make_response
 
 from xivo_dao.helpers.db_manager import Session
 
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.plugins.user_import import csvparse
+from xivo_confd.database import user_export as user_export_db
 from xivo_confd import sysconfd, bus
 
 
@@ -61,3 +66,24 @@ class UserImportResource(ConfdResource):
         Session.rollback()
         sysconfd.rollback()
         bus.rollback()
+
+
+class UserExportResource(ConfdResource):
+
+    def get(self):
+        header, query = user_export_db.export_query()
+        content = self.format_csv(header, query)
+        return make_response((content,
+                              200,
+                              [('Content-Type', 'text/csv; charset=utf-8')]))
+
+    def format_csv(self, header, query):
+        content = StringIO()
+        writer = csv.writer(content)
+        writer.writerow(header)
+
+        for row in query:
+            encoded_row = tuple((v or "").encode('utf8') for v in row)
+            writer.writerow(encoded_row)
+
+        return content.getvalue()

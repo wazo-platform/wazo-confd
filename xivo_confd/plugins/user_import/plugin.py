@@ -26,7 +26,7 @@ from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_s
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
 from xivo_confd.plugins.user_import.service import ImportService
-from xivo_confd.plugins.user_import.resource import UserImportResource
+from xivo_confd.plugins.user_import.resource import UserImportResource, UserExportResource
 from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from xivo_confd.plugins.user_import.middleware import ExtensionCreator, IncallCreator, CtiProfileCreator, LineCreator, UserCreator, VoicemailCreator, SipCreator, SccpCreator
 from xivo_confd.plugins.user_import.middleware import LineAssociator, SipAssociator, SccpAssociator, ExtensionAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
@@ -112,3 +112,6 @@ class Plugin(object):
                          '/users/import',
                          resource_class_args=(service,)
                          )
+
+        api.add_resource(UserExportResource,
+                         '/users/export')
