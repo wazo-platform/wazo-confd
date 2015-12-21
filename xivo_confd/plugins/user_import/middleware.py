@@ -215,11 +215,11 @@ class LineAssociator(Associator):
     def update(self, entry):
         user = entry.get_resource('user')
         line = entry.get_resource('line')
-        if user and line:
-            user_line = self.service.find_by(user_id=user.id,
-                                             line_id=line.id)
-            if not user_line:
-                self.service.associate(user, line)
+        if user and line and not self.associated(user, line):
+            self.service.associate(user, line)
+
+    def associated(self, user, line):
+        return self.service.find_by(user_id=user.id, line_id=line.id) is not None
 
 
 class ExtensionAssociator(Associator):
@@ -290,10 +290,11 @@ class VoicemailAssociator(Associator):
     def update(self, entry):
         user = entry.get_resource('user')
         voicemail = entry.get_resource('voicemail')
-        if user and voicemail:
-            user_voicemail = self.service.find_by(user_id=user.id, voicemail_id=voicemail.id)
-            if not user_voicemail:
-                self.create_and_associate(user, voicemail)
+        if user and voicemail and not self.associated(user, voicemail):
+            self.create_and_associate(user, voicemail)
+
+    def associated(self, user, voicemail):
+        return self.service.find_by(user_id=user.id, voicemail_id=voicemail.id) is not None
 
 
 class CtiProfileAssociator(Associator):
