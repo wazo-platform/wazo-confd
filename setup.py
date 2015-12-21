@@ -48,6 +48,7 @@ setup(
             'endpoint_sccp_plugin = xivo_confd.plugins.endpoint_sccp.plugin:Plugin',
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'user_voicemail_plugin = xivo_confd.plugins.user_voicemail.plugin:Plugin',
+            'user_cti_profile_plugin = xivo_confd.plugins.user_cti_profile.plugin:Plugin',
             'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',
             'line_extension_plugin = xivo_confd.plugins.line_extension.plugin:Plugin',
             'line_endpoint_plugin = xivo_confd.plugins.line_endpoint.plugin:Plugin',
