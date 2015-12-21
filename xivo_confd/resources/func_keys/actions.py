@@ -97,15 +97,15 @@ def load(core_rest_api):
     user_chain = DecoratorChain(core_rest_api, user_blueprint)
 
     # /users/:id/funckeys
-    user_chain.get("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.get_funckey)
-    user_chain.edit("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.update_funckey)
-    user_chain.delete("/<int:user_id>/funckeys/<int:position>").decorate(user_funckey_resource.remove_funckey)
+    user_chain.get("/<user_id>/funckeys/<int:position>").decorate(user_funckey_resource.get_funckey)
+    user_chain.edit("/<user_id>/funckeys/<int:position>").decorate(user_funckey_resource.update_funckey)
+    user_chain.delete("/<user_id>/funckeys/<int:position>").decorate(user_funckey_resource.remove_funckey)
 
     # /users/:id/funckeys/templates
-    user_chain.get("/<int:user_id>/funckeys").decorate(user_template_resource.get_unified_template)
-    user_chain.edit("/<int:user_id>/funckeys/templates/<int:template_id>").decorate(user_template_resource.associate_template)
-    user_chain.delete("/<int:user_id>/funckeys/templates/<int:template_id>").decorate(user_template_resource.dissociate_template)
-    user_chain.get("/<int:user_id>/funckeys/templates").decorate(user_template_resource.get_associations)
+    user_chain.get("/<user_id>/funckeys").decorate(user_template_resource.get_unified_template)
+    user_chain.edit("/<user_id>/funckeys/templates/<int:template_id>").decorate(user_template_resource.associate_template)
+    user_chain.delete("/<user_id>/funckeys/templates/<int:template_id>").decorate(user_template_resource.dissociate_template)
+    user_chain.get("/<user_id>/funckeys/templates").decorate(user_template_resource.get_associations)
 
     core_rest_api.register(blueprint)
     core_rest_api.register(user_blueprint)
