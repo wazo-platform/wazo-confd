@@ -697,7 +697,7 @@ def test_when_adding_incall_then_incall_created(entry):
 
 @fixtures.csv_entry(cti_profile=True,
                     cti_profile_name="Client")
-def test_when_updating_cti_profile_fields_then_csv_profile_updated(entry):
+def test_when_updating_cti_profile_fields_then_cti_profile_updated(entry):
     csv = [{"uuid": entry['user_uuid'],
             "cti_profile_name": "Agent"}]
 
@@ -712,7 +712,7 @@ def test_when_updating_cti_profile_fields_then_csv_profile_updated(entry):
 
 
 @fixtures.csv_entry()
-def test_when_adding_cti_profile_fields_then_csv_profile_added(entry):
+def test_when_adding_cti_profile_fields_then_cti_profile_added(entry):
     csv = [{"uuid": entry['user_uuid'],
             "cti_profile_name": "Agent",
             "cti_profile_enabled": "1"}]
