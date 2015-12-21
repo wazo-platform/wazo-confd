@@ -21,9 +21,9 @@ from xivo_dao.helpers import errors
 
 class Entry(object):
 
-    def __init__(self, number, row):
+    def __init__(self, number, entry_dict):
         self.number = number
-        self.row = row
+        self.entry_dict = entry_dict
         self.user = None
         self.voicemail = None
         self.line = None
@@ -48,33 +48,29 @@ class Entry(object):
         }
 
     def create(self, resource, creator):
-        fields = self.row[resource]
+        fields = self.entry_dict[resource]
         setattr(self, resource, creator.create(fields))
 
     def find_or_create(self, resource, creator):
         model = self.get_resource(resource)
-        if not model:
-            fields = self.row[resource]
-            model = creator.find(fields)
-            if model:
-                setattr(self, resource, model)
-            else:
-                self.create(resource, creator)
+        if model:
+            return
+
+        fields = self.entry_dict[resource]
+        model = creator.find(fields)
+        if model:
+            setattr(self, resource, model)
+        else:
+            self.create(resource, creator)
 
     def update(self, resource, creator):
-        fields = self.row[resource]
-        resource = self.get_resource(resource)
-        if resource:
-            creator.update(fields, resource)
-
-    def associate(self, associator):
-        associator.associate(self)
-
-    def update_association(self, associator):
-        associator.update(self)
+        model = self.get_resource(resource)
+        if model:
+            fields = self.entry_dict[resource]
+            creator.update(fields, model)
 
     def extract_field(self, resource, fieldname):
-        return self.row.get(resource, {}).get(fieldname)
+        return self.entry_dict.get(resource, {}).get(fieldname)
 
     def get_resource(self, resource):
         return getattr(self, resource, None)
@@ -85,9 +81,9 @@ class EntryCreator(object):
     def __init__(self, creators):
         self.creators = creators
 
-    def create(self, line):
-        row = line.parse()
-        entry = Entry(line.position, row)
+    def create(self, row):
+        entry_dict = row.parse()
+        entry = Entry(row.position, entry_dict)
         entry.create('user', self.creators['user'])
         entry.create('voicemail', self.creators['voicemail'])
         entry.create('line', self.creators['line'])
@@ -132,9 +128,9 @@ class EntryFinder(object):
         self.extension_dao = extension_dao
         self.incall_dao = incall_dao
 
-    def get_entry(self, line):
-        row = line.parse()
-        entry = Entry(line.position, row)
+    def get_entry(self, row):
+        entry_dict = row.parse()
+        entry = Entry(row.position, entry_dict)
         uuid = entry.extract_field('user', 'uuid')
         user = entry.user = self.user_dao.get_by(uuid=uuid)
 
@@ -174,8 +170,8 @@ class EntryUpdater(object):
         self.associators = associators
         self.finder = finder
 
-    def update_row(self, line):
-        entry = self.finder.get_entry(line)
+    def update_row(self, row):
+        entry = self.finder.get_entry(row)
         self.create_missing_resources(entry)
         self.associate_resources(entry)
         self.update_resources(entry)
@@ -198,7 +194,7 @@ class EntryUpdater(object):
 
     def associate_resources(self, entry):
         for associator in self.associators.values():
-            entry.update_association(associator)
+            associator.update(entry)
 
     def update_resources(self, entry):
         for resource, creator in self.creators.iteritems():

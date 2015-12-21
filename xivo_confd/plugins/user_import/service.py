@@ -31,17 +31,17 @@ class ImportService(object):
         created = []
         errors = []
 
-        for line in parser:
+        for row in parser:
             try:
-                entry = self.import_row(line)
+                entry = self.import_row(row)
                 created.append(entry)
             except ServiceError as e:
-                errors.append(line.format_error(e))
+                errors.append(row.format_error(e))
 
         return created, errors
 
-    def import_row(self, line):
-        entry = self.entry_creator.create(line)
+    def import_row(self, row):
+        entry = self.entry_creator.create(row)
         self.entry_associator.associate(entry)
         return entry
 
@@ -49,15 +49,15 @@ class ImportService(object):
         updated = []
         errors = []
 
-        for line in parser:
+        for row in parser:
             try:
-                entry = self.update_row(line)
+                entry = self.update_row(row)
                 updated.append(entry)
             except ServiceError as e:
-                errors.append(line.format_error(e))
+                errors.append(row.format_error(e))
 
         return updated, errors
 
-    def update_row(self, line):
-        entry = self.entry_updater.update_row(line)
+    def update_row(self, row):
+        entry = self.entry_updater.update_row(row)
         return entry

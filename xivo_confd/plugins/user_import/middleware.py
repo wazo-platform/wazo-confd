@@ -338,8 +338,7 @@ class IncallAssociator(Associator):
                         category='incall',
                         action='user',
                         actionarg1=str(user.id))
-             .update({'actionarg2': str(ring_seconds)})
-             )
+             .update({'actionarg2': str(ring_seconds)}))
 
     def update(self, entry):
         line = entry.get_resource('line')
