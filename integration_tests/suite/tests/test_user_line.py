@@ -32,8 +32,8 @@ def test_associate_errors(user, line):
 @fixtures.user()
 @fixtures.line_sip()
 def test_dissociate_errors(user, line):
-    fake_user = confd.users(FAKE_ID).lines(line_id=line['id']).delete
-    fake_line = confd.users(user['id']).lines(line_id=FAKE_ID).delete
+    fake_user = confd.users(FAKE_ID).lines(line['id']).delete
+    fake_line = confd.users(user['id']).lines(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_line, 'Line'
