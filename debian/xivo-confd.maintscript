@@ -1,1 +1,0 @@
-rm_conffile /etc/init.d/xivo-confd 15.20
