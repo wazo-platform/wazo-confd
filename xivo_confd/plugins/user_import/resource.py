@@ -43,6 +43,20 @@ class UserImportResource(ConfdResource):
 
         return response, status_code
 
+    def put(self):
+        parser = csvparse.parse()
+        entries, errors = self.service.update_rows(parser)
+
+        if errors:
+            status_code = 400
+            response = {'errors': errors}
+            self.rollback()
+        else:
+            status_code = 201
+            response = {'updated': [entry.extract_ids() for entry in entries]}
+
+        return response, status_code
+
     def rollback(self):
         Session.rollback()
         sysconfd.rollback()

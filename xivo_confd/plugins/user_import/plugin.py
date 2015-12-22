@@ -27,7 +27,7 @@ from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
 from xivo_confd.plugins.user_import.service import ImportService
 from xivo_confd.plugins.user_import.resource import UserImportResource
-from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator
+from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from xivo_confd.plugins.user_import.middleware import ExtensionCreator, IncallCreator, CtiProfileCreator, LineCreator, UserCreator, VoicemailCreator, SipCreator, SccpCreator
 from xivo_confd.plugins.user_import.middleware import LineAssociator, SipAssociator, SccpAssociator, ExtensionAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
@@ -92,7 +92,21 @@ class Plugin(object):
 
         entry_associator = EntryAssociator(associators)
 
-        service = ImportService(entry_creator, entry_associator)
+        entry_finder = EntryFinder(user_dao,
+                                   voicemail_dao,
+                                   user_voicemail_dao,
+                                   cti_profile_dao,
+                                   user_cti_profile_dao,
+                                   line_dao,
+                                   user_line_dao,
+                                   sip_dao,
+                                   sccp_dao,
+                                   extension_dao,
+                                   incall_dao)
+
+        entry_updater = EntryUpdater(creators, associators, entry_finder)
+
+        service = ImportService(entry_creator, entry_associator, entry_updater)
 
         api.add_resource(UserImportResource,
                          '/users/import',

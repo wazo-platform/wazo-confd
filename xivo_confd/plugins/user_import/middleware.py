@@ -19,6 +19,7 @@
 import abc
 
 from xivo_dao.helpers.db_manager import Session
+from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.usersip import UserSIP as SIP
@@ -40,11 +41,27 @@ class Creator(object):
         self.service = service
 
     @abc.abstractmethod
+    def find(self, fields):
+        pass
+
+    @abc.abstractmethod
     def create(self, fields):
         pass
 
+    def update(self, fields, model):
+        self.update_model(fields, model)
+        self.service.edit(model)
+
+    def update_model(self, fields, model):
+        for key, value in fields.iteritems():
+            setattr(model, key, value)
+
 
 class UserCreator(Creator):
+
+    def find(self, fields):
+        if 'uuid' in fields:
+            return self.service.get_by(uuid=fields['uuid'])
 
     def create(self, fields):
         if fields:
@@ -53,12 +70,31 @@ class UserCreator(Creator):
 
 class VoicemailCreator(Creator):
 
+    def find(self, fields):
+        number = fields.get('number')
+        context = fields.get('context')
+        if number and context:
+            try:
+                return self.service.dao.get_by_number_context(number, context)
+            except NotFoundError:
+                return None
+
     def create(self, fields):
         if fields:
             return self.service.create(Voicemail(**fields))
 
 
 class LineCreator(Creator):
+
+    def find(self, fields):
+        return None
+
+    def update(self, fields, line):
+        fields = dict(fields)
+        if 'endpoint' in fields:
+            del fields['endpoint']
+            self.update_model(fields, line)
+            self.service.edit(line)
 
     def create(self, fields):
         fields = dict(fields)
@@ -69,17 +105,34 @@ class LineCreator(Creator):
 
 class SipCreator(Creator):
 
+    def find(self, fields):
+        name = fields.get('name')
+        if name:
+            return self.service.find_by(name=name)
+
     def create(self, fields):
         return self.service.create(SIP(**fields))
 
 
 class SccpCreator(Creator):
 
+    def find(self, fields):
+        return None
+
     def create(self, fields):
         return self.service.create(SCCP(**fields))
 
 
 class ExtensionCreator(Creator):
+
+    def find(self, fields):
+        exten = fields.get('exten')
+        context = fields.get('context')
+        if exten and context:
+            try:
+                return self.service.dao.get_by_exten_context(exten, context)
+            except NotFoundError:
+                return None
 
     def create(self, fields):
         if 'exten' in fields and 'context' in fields:
@@ -91,6 +144,18 @@ class CtiProfileCreator(Creator):
     def __init__(self, dao):
         self.dao = dao
 
+    def find(self, fields):
+        name = fields.get('name')
+        if name:
+            try:
+                cti_profile_id = self.dao.get_id_by_name(name)
+                return self.dao.get(cti_profile_id)
+            except NotFoundError:
+                return None
+
+    def update(self, fields, resource):
+        pass
+
     def create(self, fields):
         if fields:
             cti_profile_id = self.dao.get_id_by_name(fields['name'])
@@ -99,11 +164,25 @@ class CtiProfileCreator(Creator):
 
 class IncallCreator(Creator):
 
+    def find(self, fields):
+        exten = fields.get('exten')
+        context = fields.get('context')
+        if exten and context:
+            try:
+                return self.service.dao.get_by_exten_context(exten, context)
+            except NotFoundError:
+                return None
+
     def create(self, fields):
         fields = self.extract_extension_fields(fields)
         if fields:
             extension = Extension(**fields)
             return self.service.create(extension)
+
+    def update(self, fields, resource):
+        extension_fields = self.extract_extension_fields(fields)
+        self.update_model(extension_fields, resource)
+        self.service.edit(resource)
 
     def extract_extension_fields(self, fields):
         return {key: fields[key] for key in ('exten', 'context') if key in fields}
@@ -120,6 +199,10 @@ class Associator(object):
     def associate(self, entry):
         return
 
+    @abc.abstractmethod
+    def update(self, entry):
+        return
+
 
 class LineAssociator(Associator):
 
@@ -128,6 +211,15 @@ class LineAssociator(Associator):
         line = entry.get_resource('line')
         if user and line:
             self.service.associate(user, line)
+
+    def update(self, entry):
+        user = entry.get_resource('user')
+        line = entry.get_resource('line')
+        if user and line and not self.associated(user, line):
+            self.service.associate(user, line)
+
+    def associated(self, user, line):
+        return self.service.find_by(user_id=user.id, line_id=line.id) is not None
 
 
 class ExtensionAssociator(Associator):
@@ -138,6 +230,19 @@ class ExtensionAssociator(Associator):
         if line and extension:
             self.service.associate(line, extension)
 
+    def update(self, entry):
+        line = entry.get_resource('line')
+        extension = entry.get_resource('extension')
+        if line and extension and not self.associated(line, extension):
+            self.service.associate(line, extension)
+
+    def associated(self, line, extension):
+        try:
+            self.service.get(line, extension)
+        except NotFoundError:
+            return False
+        return True
+
 
 class SipAssociator(Associator):
 
@@ -147,6 +252,12 @@ class SipAssociator(Associator):
         if line and sip:
             self.service.associate(line, sip)
 
+    def update(self, entry):
+        line = entry.get_resource('line')
+        sip = entry.get_resource('sip')
+        if line and sip and not line.is_associated_with(sip):
+                self.service.associate(line, sip)
+
 
 class SccpAssociator(Associator):
 
@@ -155,6 +266,12 @@ class SccpAssociator(Associator):
         sccp = entry.get_resource('sccp')
         if line and sccp:
             self.service.associate(line, sccp)
+
+    def update(self, entry):
+        line = entry.get_resource('line')
+        sccp = entry.get_resource('sccp')
+        if line and sccp and not line.is_associated_with(sccp):
+                self.service.associate(line, sccp)
 
 
 class VoicemailAssociator(Associator):
@@ -170,10 +287,14 @@ class VoicemailAssociator(Associator):
                                     voicemail_id=voicemail.id)
         self.service.associate(association)
 
-        if user and voicemail:
-            user_voicemail = self.service.find_by(user_id=user.id, voicemail_id=voicemail.id)
-            if not user_voicemail:
-                self.create_and_associate(user, voicemail)
+    def update(self, entry):
+        user = entry.get_resource('user')
+        voicemail = entry.get_resource('voicemail')
+        if user and voicemail and not self.associated(user, voicemail):
+            self.create_and_associate(user, voicemail)
+
+    def associated(self, user, voicemail):
+        return self.service.find_by(user_id=user.id, voicemail_id=voicemail.id) is not None
 
 
 class CtiProfileAssociator(Associator):
@@ -186,6 +307,9 @@ class CtiProfileAssociator(Associator):
         cti_profile = entry.get_resource('cti_profile')
         if cti_profile:
             self.associate_profile(entry)
+
+    def update(self, entry):
+        self.associate(entry)
 
     def associate_profile(self, entry):
         user = entry.get_resource('user')
@@ -215,5 +339,18 @@ class IncallAssociator(Associator):
                         category='incall',
                         action='user',
                         actionarg1=str(user.id))
-             .update({'actionarg2': str(ring_seconds)})
-             )
+             .update({'actionarg2': str(ring_seconds)}))
+
+    def update(self, entry):
+        line = entry.get_resource('line')
+        incall = entry.get_resource('incall')
+        if line and incall and not self.associated(line, incall):
+            self.service.associate(line, incall)
+            self.update_ring_seconds(entry)
+
+    def associated(self, line, extension):
+        try:
+            self.service.get(line, extension)
+        except NotFoundError:
+            return False
+        return True

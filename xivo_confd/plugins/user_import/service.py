@@ -22,24 +22,42 @@ from xivo_dao.helpers.exception import ServiceError
 
 class ImportService(object):
 
-    def __init__(self, entry_creator, entry_associator):
+    def __init__(self, entry_creator, entry_associator, entry_updater):
         self.entry_creator = entry_creator
         self.entry_associator = entry_associator
+        self.entry_updater = entry_updater
 
     def import_rows(self, parser):
         created = []
         errors = []
 
-        for line in parser:
+        for row in parser:
             try:
-                entry = self.create_entry(line)
+                entry = self.create_entry(row)
                 created.append(entry)
             except ServiceError as e:
-                errors.append(line.format_error(e))
+                errors.append(row.format_error(e))
 
         return created, errors
 
-    def create_entry(self, line):
-        entry = self.entry_creator.create(line)
+    def create_entry(self, row):
+        entry = self.entry_creator.create(row)
         self.entry_associator.associate(entry)
+        return entry
+
+    def update_rows(self, parser):
+        updated = []
+        errors = []
+
+        for row in parser:
+            try:
+                entry = self.update_row(row)
+                updated.append(entry)
+            except ServiceError as e:
+                errors.append(row.format_error(e))
+
+        return updated, errors
+
+    def update_row(self, row):
+        entry = self.entry_updater.update_row(row)
         return entry
