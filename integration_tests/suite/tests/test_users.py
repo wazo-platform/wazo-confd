@@ -159,7 +159,7 @@ def test_search_on_user_view(user):
         'outgoing_caller_id': '5551234567',
         'mobile_phone_number': '2423232',
         'userfield': 'jenkins userfield',
-        'description': "jenkin's bio",
+        'description': "jénkin's bio",
         'preprocess_subroutine': 'roy_preprocess',
     }
 
