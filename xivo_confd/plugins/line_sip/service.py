@@ -62,9 +62,9 @@ class LineSipService(object):
         sip = self.sip_service.get(line.protocolid)
 
         line_sip.update_sip(sip)
-        line_sip.update_line(line)
-
         self.sip_service.edit(sip)
+
+        line_sip.update_line(line)
         self.line_service.edit(line)
 
     def delete(self, line_sip):

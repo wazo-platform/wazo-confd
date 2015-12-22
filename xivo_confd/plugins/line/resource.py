@@ -20,7 +20,7 @@ from flask import url_for
 from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
-    ListResource, ItemResource
+    ListResource, ItemResource, Strict
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
@@ -50,7 +50,7 @@ class LineList(ListResource):
     parser.add_argument('context', required=True)
     parser.add_argument('provisioning_code', type=DigitStr(6))
     parser.add_argument('position', type=inputs.positive, default=1)
-    parser.add_argument('caller_id_name', store_missing=False)
+    parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
 
     def build_headers(self, line):
@@ -65,5 +65,5 @@ class LineItem(ItemResource):
     parser.add_argument('context', store_missing=False)
     parser.add_argument('provisioning_code', type=DigitStr(6), store_missing=False)
     parser.add_argument('position', type=inputs.positive, store_missing=False)
-    parser.add_argument('caller_id_name', store_missing=False)
+    parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)

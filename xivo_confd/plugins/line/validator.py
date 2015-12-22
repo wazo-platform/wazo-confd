@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import ValidationGroup, FindResource, RequiredFields, Validator, Optional
+from xivo_confd.helpers.validator import ValidationGroup, FindResource, RequiredFields, Validator, Optional, NumberRange
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.helpers import errors
@@ -45,12 +45,18 @@ def build_validator():
     return ValidationGroup(
         common=[
             RequiredFields('context'),
-            FindResource('context', context_dao.find, 'Context')
+            FindResource('context', context_dao.find, 'Context'),
         ],
         create=[
-            Optional('provisioning_code', ProvCodeAvailable(line_dao))
+            Optional('provisioning_code',
+                     ProvCodeAvailable(line_dao)
+                     ),
+            Optional('position',
+                     NumberRange('position', minimum=1)
+                     )
         ],
         edit=[
             ProvCodeChanged(line_dao),
-            RequiredFields('provisioning_code', 'position')
+            RequiredFields('provisioning_code', 'position'),
+            NumberRange('position', minimum=1)
         ])

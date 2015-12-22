@@ -26,6 +26,7 @@ from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
+from test_api import associations as a
 
 from hamcrest import assert_that, has_entries, none, has_length, has_items, \
     has_entry, contains
@@ -48,7 +49,8 @@ def test_post_errors():
 
 
 @fixtures.line()
-def test_put_errors(line):
+@fixtures.sip()
+def test_put_errors(line, sip):
     line_put = confd.lines(line['id']).put
 
     yield s.check_missing_required_field_returns_error, line_put, 'context'
@@ -56,8 +58,10 @@ def test_put_errors(line):
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 'number'
     yield s.check_bogus_field_returns_error, line_put, 'position', 'one'
-    yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'
-    yield s.check_bogus_field_returns_error, line_put, 'caller_id_name', 123456
+
+    with a.line_endpoint_sip(line, sip):
+        yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'
+        yield s.check_bogus_field_returns_error, line_put, 'caller_id_name', 123456
 
 
 @fixtures.line()
