@@ -16,9 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import csv
 import json
 import logging
 import pprint
+from cStringIO import StringIO
 
 from hamcrest import assert_that, is_in, has_key, has_entry, contains_string, has_item, instance_of, only_contains
 import requests
@@ -182,6 +184,16 @@ class Response(object):
         self.assert_ok()
         assert_that(self.json, has_key('total'))
         return self.json['total']
+
+    def csv(self):
+        self.assert_ok()
+        lines = []
+        content = StringIO(self.response.content)
+        reader = csv.DictReader(content)
+        for row in reader:
+            lines.append({key.decode('utf8'): value.decode('utf8')
+                          for key, value in row.iteritems()})
+        return lines
 
     def assert_status(self, *statuses):
         assert_that(statuses, only_contains(instance_of(int)))

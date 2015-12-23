@@ -20,12 +20,13 @@
 from test_api import confd
 
 
-def find_by_name(name):
-    profiles = confd.cti_profiles.get().items
-    found = [p for p in profiles if p['name'] == name]
-    return found[0] if found else None
+def associate(user_id, voicemail_id, check=True):
+    response = confd.users(user_id).voicemail.post(voicemail_id=voicemail_id)
+    if check:
+        response.assert_ok()
 
 
-def find_id_for_profile(name):
-    profile = find_by_name(name)
-    return profile['id'] if profile else None
+def dissociate(user_id, voicemail_id, check=True):
+    response = confd.users(user_id).voicemail.delete()
+    if check:
+        response.assert_ok()

@@ -16,16 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
 from test_api import confd
 
 
-def find_by_name(name):
-    profiles = confd.cti_profiles.get().items
-    found = [p for p in profiles if p['name'] == name]
-    return found[0] if found else None
+def associate(user_id, cti_profile_id, check=True):
+    response = confd.users(user_id).cti.put(enabled=True,
+                                            cti_profile_id=cti_profile_id)
+    if check:
+        response.assert_ok()
 
 
-def find_id_for_profile(name):
-    profile = find_by_name(name)
-    return profile['id'] if profile else None
+def dissociate(user_id, cti_profile_id, check=True):
+    response = confd.users(user_id).cti.put(enabled=False,
+                                            cti_profile_id=None)
+    if check:
+        response.assert_ok()
