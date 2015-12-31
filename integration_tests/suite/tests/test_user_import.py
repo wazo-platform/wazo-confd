@@ -50,6 +50,14 @@ def test_given_required_fields_missing_then_error_returned():
     assert_error_message(response, "firstname")
 
 
+def test_given_entity_id_does_not_exist_then_error_returned():
+    csv = [{"firstname": "entityfirstname",
+            "entity_id": "999999999"}]
+
+    response = client.post("/users/import", csv)
+    assert_error_message(response, "entity")
+
+
 def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
     csv = [{"firstname": "Rîchard"}]
 
