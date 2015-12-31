@@ -20,7 +20,7 @@ from flask import url_for
 from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
-    ListResource, ItemResource
+    ListResource, ItemResource, Strict
 from xivo_confd.plugins.line_sip.model import LineSip
 
 
@@ -49,7 +49,7 @@ parser.add_argument('provisioning_extension',
                     type=DigitStr(6),
                     store_missing=False)
 parser.add_argument('device_slot',
-                    type=inputs.positive,
+                    type=Strict(int),
                     default=1)
 parser.add_argument('callerid',
                     type=inputs.regex(r'"[^"]+"(\s+<[+0-9]>)?'),

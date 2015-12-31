@@ -44,7 +44,7 @@ def build_validator():
     return ValidationGroup(
         common=[
             Optional('name',
-                     RegexField.compile('name', NAME_REGEX)),
+                     RegexField.compile('name', NAME_REGEX, "username must only use alphanumeric characters")),
             Optional('secret',
                      RegexField.compile('secret', SECRET_REGEX))
         ],

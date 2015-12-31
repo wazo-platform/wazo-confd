@@ -20,7 +20,9 @@ import json
 
 from werkzeug.exceptions import HTTPException
 from flask_restful.utils import http_status_message
+from flask import g
 
+from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import ServiceError
 from xivo_dao.helpers.exception import NotFoundError
@@ -39,6 +41,8 @@ NOT_FOUND_ERRORS = (NotFoundError,)
 
 
 def handle_error(error):
+    rollback()
+
     exc_info = True
     code = 500
 
@@ -58,6 +62,18 @@ def handle_error(error):
 
     logger.error(error, exc_info=exc_info)
     return error_response(messages, code)
+
+
+def rollback():
+    Session.rollback()
+
+    sysconfd = g.get('sysconfd_publisher')
+    if sysconfd:
+        sysconfd.rollback()
+
+    bus = g.get('bus_publisher')
+    if bus:
+        bus.rollback()
 
 
 def extract_http_messages(error):
