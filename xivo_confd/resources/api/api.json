@@ -2085,6 +2085,11 @@
                 "tags": [
                     "users"
                 ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
                 "produces": [
                     "text/csv; charset=utf-8"
                 ],
