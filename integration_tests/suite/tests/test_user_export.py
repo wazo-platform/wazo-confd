@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -101,6 +101,7 @@ def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fiel
 def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(user, line, sip):
     expected = has_entries(uuid=user['uuid'],
                            line_protocol="sip",
+                           provisioning_code=line['provisioning_code'],
                            context=line['context'],
                            sip_username=sip['username'],
                            sip_secret=sip['secret'])
