@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
 
 from xivo_dao.helpers.exception import ServiceError
+
+logger = logging.getLogger(__name__)
 
 
 class ImportService(object):
@@ -36,6 +39,7 @@ class ImportService(object):
                 entry = self.create_entry(row)
                 created.append(entry)
             except ServiceError as e:
+                logger.warn("Error importing CSV row %s: %s", row.position, e)
                 errors.append(row.format_error(e))
 
         return created, errors
@@ -54,6 +58,7 @@ class ImportService(object):
                 entry = self.update_row(row)
                 updated.append(entry)
             except ServiceError as e:
+                logger.warn("ERROR importing CSV row %s: %s", row.position, e)
                 errors.append(row.format_error(e))
 
         return updated, errors
