@@ -18,7 +18,7 @@
 import unittest
 from mock import patch, Mock
 
-from xivo_confd.resources.user_cti_profile import notifier
+from xivo_confd.plugins.user_cti_profile import notifier
 
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 

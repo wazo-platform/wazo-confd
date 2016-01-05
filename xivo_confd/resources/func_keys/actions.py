@@ -74,7 +74,7 @@ def load(core_rest_api):
 
     blueprint = Blueprint('func_key_templates', __name__, url_prefix='/%s/funckeys/templates' % config.API_VERSION)
     fk_blueprint = Blueprint('func_keys', __name__, url_prefix='/%s/funckeys' % config.API_VERSION)
-    user_blueprint = core_rest_api.blueprint('users')
+    user_blueprint = Blueprint('users', __name__, url_prefix='/%s/users' % config.API_VERSION)
 
     chain = DecoratorChain(core_rest_api, blueprint)
     fk_chain = DecoratorChain(core_rest_api, fk_blueprint)

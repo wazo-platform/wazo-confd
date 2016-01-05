@@ -20,7 +20,7 @@ import unittest
 from hamcrest import assert_that, equal_to
 from mock import patch, Mock
 
-from xivo_confd.resources.user_cti_profile import services as user_cti_profile_services
+from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_services
 
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.cti_profile.model import CtiProfile
@@ -60,9 +60,9 @@ class TestUserCtiProfile(unittest.TestCase):
         self.assertTrue(result.enabled)
         dao_user_get.assert_called_with(userid)
 
-    @patch('xivo_confd.resources.user_cti_profile.validator.validate_edit')
+    @patch('xivo_confd.plugins.user_cti_profile.validator.validate_edit')
     @patch('xivo_dao.resources.user_cti_profile.dao.edit')
-    @patch('xivo_confd.resources.user_cti_profile.notifier.edited')
+    @patch('xivo_confd.plugins.user_cti_profile.notifier.edited')
     def test_edit(self, notifier_edited, dao_edit, validate_edit):
         user_cti_profile = Mock(UserCtiProfile)
 

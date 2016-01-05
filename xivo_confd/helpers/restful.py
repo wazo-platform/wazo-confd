@@ -147,7 +147,12 @@ class FieldList(fields.Raw):
         self.links = links
 
     def output(self, key, obj):
-        return [link.output(key, obj) for link in self.links]
+        fields = []
+        for link in self.links:
+            output = link.output(key, obj)
+            if output:
+                fields.append(output)
+        return fields
 
 
 class Link(fields.Raw):
@@ -160,10 +165,13 @@ class Link(fields.Raw):
         self.target = target or field
 
     def output(self, key, obj):
+        value = self.extract_value(obj)
+        if value:
+            options = {self.target: value, '_external': True}
+            url = url_for(self.route, **options)
+            return {'rel': self.resource, 'href': url}
+
+    def extract_value(self, obj):
         if isinstance(obj, dict):
-            value = obj.get(self.field)
-        else:
-            value = getattr(obj, self.field)
-        options = {self.target: value, '_external': True}
-        url = url_for(self.route, **options)
-        return {'rel': self.resource, 'href': url}
+            return obj.get(self.field)
+        return getattr(obj, self.field)

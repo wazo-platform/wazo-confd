@@ -24,7 +24,6 @@ from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
-from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 
 class Associator(object):
@@ -119,18 +118,13 @@ class VoicemailAssociator(Associator):
         user = entry.get_resource('user')
         voicemail = entry.get_resource('voicemail')
         if user and voicemail:
-            self.create_and_associate(user, voicemail)
-
-    def create_and_associate(self, user, voicemail):
-        association = UserVoicemail(user_id=user.id,
-                                    voicemail_id=voicemail.id)
-        self.service.associate(association)
+            self.service.associate(user, voicemail)
 
     def update(self, entry):
         user = entry.get_resource('user')
         voicemail = entry.get_resource('voicemail')
         if user and voicemail and not self.associated(user, voicemail):
-            self.create_and_associate(user, voicemail)
+            self.service.associate(user, voicemail)
 
     def associated(self, user, voicemail):
         return self.service.find_by(user_id=user.id, voicemail_id=voicemail.id) is not None

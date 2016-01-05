@@ -21,13 +21,13 @@ from mock import patch, Mock
 from xivo_dao.resources.user_line.model import UserLine
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
-from xivo_confd.resources.user_voicemail import notifier
+from xivo_confd.plugins.user_voicemail import notifier
 
 
 class TestUserVoicemailNotifier(unittest.TestCase):
 
-    @patch('xivo_confd.resources.user_voicemail.notifier.sysconf_command_association_updated')
-    @patch('xivo_confd.resources.user_voicemail.notifier.bus_event_associated')
+    @patch('xivo_confd.plugins.user_voicemail.notifier.sysconf_command_association_updated')
+    @patch('xivo_confd.plugins.user_voicemail.notifier.bus_event_associated')
     def test_associated(self, bus_event_associated, sysconf_command_association_updated):
         user_voicemail = UserVoicemail(user_id=1, voicemail_id=2)
 
@@ -71,8 +71,8 @@ class TestUserVoicemailNotifier(unittest.TestCase):
                                                             user_voicemail.enabled)
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
 
-    @patch('xivo_confd.resources.user_voicemail.notifier.sysconf_command_association_updated')
-    @patch('xivo_confd.resources.user_voicemail.notifier.bus_event_dissociated')
+    @patch('xivo_confd.plugins.user_voicemail.notifier.sysconf_command_association_updated')
+    @patch('xivo_confd.plugins.user_voicemail.notifier.bus_event_dissociated')
     def test_dissociated(self, bus_event_dissociated, sysconf_command_association_updated):
         user_voicemail = UserVoicemail(user_id=1, voicemail_id=2)
 

@@ -25,7 +25,7 @@ from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
-from xivo_confd.resources.user_cti_profile import validator
+from xivo_confd.plugins.user_cti_profile import validator
 
 
 class TestUserCtiProfileValidator(unittest.TestCase):

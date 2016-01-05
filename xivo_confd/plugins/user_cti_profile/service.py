@@ -19,7 +19,7 @@ from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_cti_profile import dao
 
-from xivo_confd.resources.user_cti_profile import validator, notifier
+from xivo_confd.plugins.user_cti_profile import validator, notifier
 
 
 def get(user_id):

@@ -16,13 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.resource import SingleAssociationResource, build_response
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.cti_profile import dao as cti_profile_dao
+
+from xivo_confd import api
+from xivo_confd.plugins.user_cti_profile import service
+from xivo_confd.plugins.user_cti_profile.resource import UserCtiProfileRoot
 
 
-class UserVoicemailResource(SingleAssociationResource):
+class Plugin(object):
 
-    def list_associations_by_child(self, voicemail_id):
-        self.service.validate_resource(voicemail_id)
-        associations = self.service.list_by_child(voicemail_id)
-        response = self.converter.encode_list(associations)
-        return build_response(response)
+    def load(self, core):
+        api.add_resource(UserCtiProfileRoot,
+                         '/users/<int:user_id>/cti',
+                         endpoint='user_cti_profiles',
+                         resource_class_args=(service, user_dao, cti_profile_dao)
+                         )

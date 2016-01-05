@@ -27,8 +27,6 @@ from xivo_confd.resources.extensions import actions as extensions_actions
 from xivo_confd.resources.infos import actions as infos_actions
 from xivo_confd.resources.queue_members import actions as queue_members_actions
 from xivo_confd.resources.voicemails import actions as voicemails_actions
-from xivo_confd.resources.user_cti_profile import actions as user_cti_profile_actions
-from xivo_confd.resources.user_voicemail import actions as user_voicemail_actions
 from xivo_confd.resources.func_keys import actions as func_keys_actions
 
 logger = logging.getLogger(__name__)
@@ -46,8 +44,6 @@ class LegacyPlugins(object):
         self.load_resource(infos_actions, core)
         self.load_resource(queue_members_actions, core)
         self.load_resource(voicemails_actions, core)
-        self.load_resource(user_cti_profile_actions, core)
-        self.load_resource(user_voicemail_actions, core)
         self.load_resource(func_keys_actions, core)
 
     def load_resource(self, module, core):

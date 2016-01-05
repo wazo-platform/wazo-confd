@@ -7,6 +7,7 @@ from helpers.device import generate_device, delete_device
 from helpers.voicemail import generate_voicemail, delete_voicemail
 from helpers.context import generate_context, delete_context
 from helpers import user_import
+from helpers.cti_profile import find_by_name
 
 
 class user(IsolatedAction):
@@ -66,3 +67,8 @@ class context(IsolatedAction):
 class csv_entry(IsolatedAction):
 
     actions = {'generate': user_import.generate_entry}
+
+
+class cti_profile(IsolatedAction):
+
+    actions = {'generate': find_by_name}

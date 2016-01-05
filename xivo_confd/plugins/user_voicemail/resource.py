@@ -27,79 +27,68 @@ from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
 fields = {
     'user_id': fields.Integer,
-    'line_id': fields.Integer,
-    'main_user': fields.Boolean,
-    'main_line': fields.Boolean,
-    'links': FieldList(Link('lines',
-                            field='line_id',
-                            target='id'),
+    'voicemail_id': fields.Integer,
+    'links': FieldList(Link('voicemails',
+                            route='voicemails.get',
+                            field='voicemail_id',
+                            target='resource_id'),
                        Link('users',
                             field='user_id',
                             target='id'))
 }
 
 parser = reqparse.RequestParser()
-parser.add_argument('line_id', type=int, required=True)
+parser.add_argument('voicemail_id', type=int, required=True)
 
 
-class UserLineResource(ConfdResource):
+class UserVoicemailResource(ConfdResource):
 
-    def __init__(self, service, user_dao, line_dao):
+    def __init__(self, service, user_dao, voicemail_dao):
         super(ConfdResource, self).__init__()
         self.service = service
         self.user_dao = user_dao
-        self.line_dao = line_dao
+        self.voicemail_dao = voicemail_dao
 
-    def get_line_or_fail(self):
+    def get_voicemail_or_fail(self):
         form = parser.parse_args()
         try:
-            return self.line_dao.get(form['line_id'])
+            return self.voicemail_dao.get(form['voicemail_id'])
         except NotFoundError:
-            raise errors.param_not_found('line_id', 'Line')
+            raise errors.param_not_found('voicemail_id', 'Voicemail')
 
 
-class UserLineList(UserLineResource):
+class UserVoicemailRoot(UserVoicemailResource):
 
     def get(self, user_id):
         user = self.user_dao.get(user_id)
-        items = self.service.find_all_by(user_id=user.id)
-        return {'total': len(items),
-                'items': [marshal(item, fields) for item in items]}
+        user_voicemail = self.service.get_by(user_id=user.id)
+        return marshal(user_voicemail, fields)
 
     def post(self, user_id):
         user = self.user_dao.get(user_id)
-        line = self.get_line_or_fail()
-        user_line = self.service.associate(user, line)
+        voicemail = self.get_voicemail_or_fail()
+        user_voicemail = self.service.associate(user, voicemail)
+        return marshal(user_voicemail, fields), 201, self.build_headers(user_voicemail)
 
-        return marshal(user_line, fields), 201, self.build_headers(user_line)
+    def delete(self, user_id):
+        user = self.user_dao.get(user_id)
+        user_voicemail = self.service.get_by(user_id=user.id)
+        voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
+        self.service.dissociate(user, voicemail)
+        return '', 204
 
     def build_headers(self, model):
-        url = url_for('user_lines',
+        url = url_for('user_voicemails',
                       user_id=model.user_id,
-                      line_id=model.line_id,
+                      voicemail_id=model.voicemail_id,
                       _external=True)
         return {'Location': url}
 
 
-class UserLineItem(UserLineResource):
+class VoicemailUserList(UserVoicemailResource):
 
-    def get(self, user_id, line_id):
-        user = self.user_dao.get(user_id)
-        line = self.line_dao.get(line_id)
-        user_line = self.service.get(user, line)
-        return marshal(user_line, fields)
-
-    def delete(self, user_id, line_id):
-        user = self.user_dao.get(user_id)
-        line = self.line_dao.get(line_id)
-        self.service.dissociate(user, line)
-        return '', 204
-
-
-class LineUserList(UserLineResource):
-
-    def get(self, line_id):
-        line = self.line_dao.get(line_id)
-        items = self.service.find_all_by(line_id=line.id)
+    def get(self, voicemail_id):
+        voicemail = self.voicemail_dao.get(voicemail_id)
+        items = self.service.find_all_by(voicemail_id=voicemail.id)
         return {'total': len(items),
                 'items': [marshal(item, fields) for item in items]}

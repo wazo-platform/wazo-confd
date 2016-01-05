@@ -22,7 +22,7 @@ from mock import Mock
 from xivo_dao.helpers.exception import ResourceError
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
-from xivo_confd.resources.user_voicemail.validator import UserHasNoVoicemail
+from xivo_confd.plugins.user_voicemail.validator import UserHasNoVoicemail
 
 
 class TestUserHasNoVoicemail(unittest.TestCase):
