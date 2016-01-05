@@ -26,7 +26,7 @@ def test_associate_errors(user, line):
     fake_line = confd.users(user['id']).lines(line_id=FAKE_ID).post
 
     yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
+    yield s.check_bogus_field_returns_error, fake_line, 'line_id', FAKE_ID
 
 
 @fixtures.user()
