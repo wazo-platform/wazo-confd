@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ COLUMNS = ('uuid',
            'voicemail_delete_messages',
            'voicemail_ask_password',
            'line_protocol',
+           'provisioning_code',
            'context',
            'sip_username',
            'sip_secret',
@@ -119,6 +120,7 @@ def export_query(separator=";"):
         cast(Voicemail.deletevoicemail, String),
         cast(cast(Voicemail.ask_password, Integer), String),
         Line.endpoint,
+        Line.provisioning_code,
         func.coalesce(Extension.context, Line.context),
         SIP.name,
         SIP.secret,
