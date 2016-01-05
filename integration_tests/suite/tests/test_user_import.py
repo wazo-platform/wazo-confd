@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -393,6 +393,47 @@ def test_given_csv_has_all_resources_then_all_relations_created():
 
     response = confd.users(entry['user_id']).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
+
+
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.extension(context=config.INCALL_CONTEXT)
+@fixtures.voicemail()
+def test_given_resources_alreay_exist_when_importing_then_resources_associated(sip, extension, incall, voicemail):
+    cti_profile = h.cti_profile.find_by_name("Client")
+
+    csv = [{"firstname": "importassociate",
+            "exten": extension['exten'],
+            "context": extension['context'],
+            "line_protocol": "sip",
+            "sip_username": sip['username'],
+            "incall_exten": incall['exten'],
+            "incall_context": incall['context'],
+            "voicemail_number": voicemail['number'],
+            "voicemail_context": voicemail['context'],
+            "cti_profile_name": "Client",
+            }]
+
+    response = client.post("/users/import", csv)
+
+    entry = response.item['created'][0]
+
+    response = confd.users(entry['user_id']).lines.get()
+    assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
+
+    response = confd.lines(entry['line_id']).extensions.get()
+    assert_that(response.items, has_items(has_entries(extension_id=extension['id']),
+                                          has_entries(extension_id=incall['id'])))
+
+    response = confd.users(entry['user_id']).voicemail.get()
+    assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
+
+    response = confd.lines(entry['line_id']).endpoints.sip.get()
+    assert_that(response.item, has_entries(endpoint='sip',
+                                           endpoint_id=sip['id']))
+
+    response = confd.users(entry['user_id']).cti.get()
+    assert_that(response.item, has_entries(cti_profile_id=cti_profile['id']))
 
 
 def test_given_csv_has_more_than_one_entry_then_all_entries_imported():

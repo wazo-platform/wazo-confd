@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -85,20 +85,20 @@ class EntryCreator(object):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
         entry.create('user', self.creators['user'])
-        entry.create('voicemail', self.creators['voicemail'])
-        entry.create('line', self.creators['line'])
-        entry.create('extension', self.creators['extension'])
-        entry.create('incall', self.creators['incall'])
-        entry.create('cti_profile', self.creators['cti_profile'])
+        entry.find_or_create('voicemail', self.creators['voicemail'])
+        entry.find_or_create('line', self.creators['line'])
+        entry.find_or_create('extension', self.creators['extension'])
+        entry.find_or_create('incall', self.creators['incall'])
+        entry.find_or_create('cti_profile', self.creators['cti_profile'])
         self.create_endpoint(entry)
         return entry
 
     def create_endpoint(self, entry):
         endpoint = entry.extract_field('line', 'endpoint')
         if endpoint == 'sip':
-            entry.create('sip', self.creators['sip'])
+            entry.find_or_create('sip', self.creators['sip'])
         elif endpoint == 'sccp':
-            entry.create('sccp', self.creators['sccp'])
+            entry.find_or_create('sccp', self.creators['sccp'])
 
 
 class EntryAssociator(object):
