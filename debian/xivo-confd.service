@@ -1,6 +1,7 @@
 [Unit]
 Description=xivo-confd server
 After=network.target postgresql.service
+Before=monit.service
 Wants=postgresql.service
 
 [Service]
