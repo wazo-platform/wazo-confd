@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ from xivo_confd.plugins.user_import.associators import LineAssociator, SipAssoci
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
+from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_service
 
 from xivo_confd.resources.voicemails.services import build_service as build_voicemail_service
 from xivo_confd.resources.extensions.services import build_service as build_extension_service
-from xivo_confd.resources.user_cti_profile import services as user_cti_profile_service
 
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
