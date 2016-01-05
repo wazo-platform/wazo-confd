@@ -31,11 +31,13 @@ class Plugin(object):
 
         api.add_resource(UserLineItem,
                          '/users/<int:user_id>/lines/<int:line_id>',
+                         '/users/<uuid:user_id>/lines/<int:line_id>',
                          endpoint='user_lines',
                          resource_class_args=(service, user_dao, line_dao)
                          )
         api.add_resource(UserLineList,
                          '/users/<int:user_id>/lines',
+                         '/users/<uuid:user_id>/lines',
                          resource_class_args=(service, user_dao, line_dao)
                          )
         api.add_resource(LineUserList,

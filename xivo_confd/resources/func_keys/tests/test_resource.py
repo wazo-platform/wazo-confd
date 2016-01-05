@@ -83,10 +83,10 @@ class TestFuncKeyManipulator(unittest.TestCase):
 
     def test_when_associating_template_then_adds_template_to_user(self):
         self.service.get.return_value = FuncKeyTemplate(id=sentinel.public_template_id)
-        expected_user = self.user_dao.get.return_value = User(id=sentinel.user_id,
+        expected_user = self.user_dao.get.return_value = User(id='1234',
                                                               private_template_id=sentinel.private_template_id)
 
-        self.manipulator.associate_user(sentinel.template_id, sentinel.user_id)
+        self.manipulator.associate_user(sentinel.template_id, '1234')
 
         assert_that(expected_user.func_key_template_id, equal_to(sentinel.public_template_id))
         self.user_dao.edit.assert_called_once_with(expected_user)
@@ -95,34 +95,34 @@ class TestFuncKeyManipulator(unittest.TestCase):
     def test_when_associating_private_template_then_raises_error(self):
         self.service.get.return_value = FuncKeyTemplate(id=sentinel.private_template_id,
                                                         private=True)
-        self.user_dao.get.return_value = User(id=sentinel.user_id)
+        self.user_dao.get.return_value = User(id='1234')
 
         assert_that(
-            calling(self.manipulator.associate_user).with_args(sentinel.template_id, sentinel.user_id),
+            calling(self.manipulator.associate_user).with_args(sentinel.template_id, '1234'),
             raises(ResourceError))
 
     def test_when_dissociating_public_template_then_removes_template_from_user(self):
-        expected_user = self.user_dao.get.return_value = User(id=sentinel.user_id,
+        expected_user = self.user_dao.get.return_value = User(id='1234',
                                                               func_key_private_template_id=sentinel.private_template_id,
                                                               func_key_template_id=sentinel.public_template_id)
 
-        self.manipulator.dissociate_user(sentinel.public_template_id, sentinel.user_id)
+        self.manipulator.dissociate_user(sentinel.public_template_id, '1234')
 
         assert_that(expected_user.func_key_template_id, none())
         self.user_dao.edit.assert_called_once_with(expected_user)
         self.device_updater.update_for_user.assert_called_once_with(expected_user)
 
     def test_when_dissociating_unknown_template_then_raises_error(self):
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
+        self.user_dao.get.return_value = User(id='1234',
                                               private_template_id=sentinel.private_template_id,
                                               func_key_template_id=sentinel.other_template_id)
 
         assert_that(
-            calling(self.manipulator.dissociate_user).with_args(sentinel.template_id, sentinel.user_id),
+            calling(self.manipulator.dissociate_user).with_args(sentinel.template_id, '1234'),
             raises(NotFoundError))
 
     def test_when_fetching_unified_template_then_merges_funckeys(self):
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
+        self.user_dao.get.return_value = User(id='1234',
                                               private_template_id=sentinel.private_template_id,
                                               func_key_template_id=sentinel.public_template_id)
 
@@ -137,12 +137,12 @@ class TestFuncKeyManipulator(unittest.TestCase):
         expected_template = FuncKeyTemplate(keys={1: public_funckey,
                                                   2: private_funckey})
 
-        result = self.manipulator.get_unified_template(sentinel.user_id)
+        result = self.manipulator.get_unified_template('1234')
 
         assert_that(result, equal_to(expected_template))
 
     def test_given_no_template_associated_when_fetching_unified_template_then_returns_private_template(self):
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
+        self.user_dao.get.return_value = User(id='1234',
                                               private_template_id=sentinel.private_template_id,
                                               func_key_template_id=None)
 
@@ -150,27 +150,27 @@ class TestFuncKeyManipulator(unittest.TestCase):
         private_template = FuncKeyTemplate(keys={1: private_funckey})
         self.service.get.return_value = private_template
 
-        result = self.manipulator.get_unified_template(sentinel.user_id)
+        result = self.manipulator.get_unified_template('1234')
 
         assert_that(result, equal_to(private_template))
 
     def test_given_user_has_no_template_when_getting_associations_then_returns_empty_list(self):
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
+        self.user_dao.get.return_value = User(id='1234',
                                               func_key_template_id=None)
 
-        result = self.manipulator.find_associations_by_user(sentinel.user_id)
+        result = self.manipulator.find_associations_by_user('1234')
 
         assert_that(result, contains())
-        self.user_dao.get.assert_called_once_with(sentinel.user_id)
+        self.user_dao.get.assert_called_once_with(1234)
 
     def test_given_user_has_template_associated_when_getting_associations_then_returns_one_association(self):
-        self.user_dao.get.return_value = User(id=sentinel.user_id,
+        self.user_dao.get.return_value = User(id='1234',
                                               func_key_template_id=sentinel.public_template_id)
 
-        expected_association = UserTemplate(user_id=sentinel.user_id,
+        expected_association = UserTemplate(user_id='1234',
                                             template_id=sentinel.public_template_id)
 
-        result = self.manipulator.find_associations_by_user(sentinel.user_id)
+        result = self.manipulator.find_associations_by_user('1234')
 
         assert_that(result, contains(expected_association))
 
@@ -209,6 +209,6 @@ class TestUserFuncKeyResource(unittest.TestCase):
     def test_when_updating_func_key_then_calls_bsfilter_validator(self):
         funckey = self.fk_converter.decode.return_value = Mock(FuncKey)
 
-        self.resource.update_funckey(sentinel.user_id, 1)
+        self.resource.update_funckey('1234', 1)
 
         self.validator.validate.assert_called_once_with(self.user, funckey)

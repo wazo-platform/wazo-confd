@@ -48,17 +48,22 @@ class UserCtiProfileResource(ConfdResource):
         self.user_dao = user_dao
         self.cti_profile_dao = cti_profile_dao
 
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
 
 class UserCtiProfileRoot(UserCtiProfileResource):
 
     def get(self, user_id):
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         association = self.service.get(user.id)
         return marshal(association, fields)
 
     def put(self, user_id):
         form = parser.parse_args()
-        user = self.user_dao.get(user_id)
+        user = self.get_user(user_id)
         association = self.service.get(user.id)
         self.update_model(association, form)
         self.service.edit(association)

@@ -2181,7 +2181,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2207,7 +2207,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
@@ -2237,7 +2237,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
@@ -2272,7 +2272,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
@@ -2304,7 +2304,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2333,7 +2333,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/templateid"
@@ -2363,7 +2363,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/templateid"
@@ -2395,7 +2395,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2422,7 +2422,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "name": "body",
@@ -2463,7 +2463,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/lineid"
@@ -2495,7 +2495,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2522,7 +2522,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "name": "body",
@@ -2561,7 +2561,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2590,7 +2590,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/token"
@@ -2617,7 +2617,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/userid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "name": "body",
@@ -3268,16 +3268,9 @@
             "type": "string",
             "description": "Authentication token obtained from xivo-auth."
         },
-        "userid": {
-            "required": true,
-            "type": "integer",
-            "name": "user_id",
-            "in": "path",
-            "description": "the user's ID"
-        },
         "useriduuid": {
             "required": true,
-            "type": "integer",
+            "type": "string",
             "name": "user_id",
             "in": "path",
             "description": "the user's ID or UUID"

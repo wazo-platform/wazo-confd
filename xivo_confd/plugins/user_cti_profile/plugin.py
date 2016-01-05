@@ -29,6 +29,7 @@ class Plugin(object):
     def load(self, core):
         api.add_resource(UserCtiProfileRoot,
                          '/users/<int:user_id>/cti',
+                         '/users/<uuid:user_id>/cti',
                          endpoint='user_cti_profiles',
                          resource_class_args=(service, user_dao, cti_profile_dao)
                          )
