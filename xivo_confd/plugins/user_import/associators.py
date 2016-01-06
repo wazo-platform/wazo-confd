@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -147,11 +147,12 @@ class CtiProfileAssociator(Associator):
     def associate_profile(self, entry):
         user = entry.get_resource('user')
         name = entry.extract_field('cti_profile', 'name')
-        cti_profile_id = self.dao.get_id_by_name(name)
-        association = UserCtiProfile(user_id=user.id,
-                                     cti_profile_id=cti_profile_id,
-                                     enabled=entry.extract_field('cti_profile', 'enabled'))
-        self.service.edit(association)
+        if name:
+            cti_profile_id = self.dao.get_id_by_name(name)
+            association = UserCtiProfile(user_id=user.id,
+                                         cti_profile_id=cti_profile_id,
+                                         enabled=entry.extract_field('cti_profile', 'enabled'))
+            self.service.edit(association)
 
 
 class IncallAssociator(Associator):

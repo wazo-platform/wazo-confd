@@ -924,3 +924,50 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
 
     response = confd.users(entry['user_id']).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
+
+
+@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip")
+def test_given_field_updated_individually_then_entry_updated(entry):
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
+    vm_number = h.voicemail.find_available_number(config.CONTEXT)
+
+    fields = {"entity_id": "1",
+              "exten": exten,
+              "context": config.CONTEXT,
+              "firstname": "Fàbien",
+              "lastname": "Bâptiste",
+              "mobile_phone_number": "5551234567",
+              "ring_seconds": "15",
+              "simultaneous_calls": "10",
+              "language": "fr_FR",
+              "outgoing_caller_id": '"Fàbien Le Grand" <5557654321>',
+              "userfield": "userfield",
+              "supervision_enabled": "1",
+              "call_transfer_enabled": "1",
+              "sip_username": "fabiensipusername",
+              "sip_password": "fabiensippassword",
+              "incall_exten": incall_exten,
+              "incall_context": config.INCALL_CONTEXT,
+              "incall_ring_seconds": "10",
+              "voicemail_name": "fabien",
+              "voicemail_number": vm_number,
+              "voicemail_context": config.CONTEXT,
+              "voicemail_password": "1234",
+              "voicemail_email": "test@example.com",
+              "voicemail_attach_audio": "1",
+              "voicemail_delete_messages": "1",
+              "voicemail_ask_password": "1",
+              "cti_profile_name": "Agent",
+              "cti_profile_enabled": "1",
+              "username": "fabien",
+              "password": "secret"}
+
+    for name, value in fields.iteritems():
+        yield update_csv_field, entry['user_uuid'], name, value
+
+
+def update_csv_field(uuid, field, value):
+    csv = [{'uuid': uuid, field: value}]
+    response = client.put("/users/import", csv)
+    response.assert_ok()
