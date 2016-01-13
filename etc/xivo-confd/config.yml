@@ -33,6 +33,7 @@ rest_api:
 
     certificate: /usr/share/xivo-certs/server.crt
     private_key: /usr/share/xivo-certs/server.key
+    ciphers: "ALL:!aNULL:!eNULL:!LOW:!EXP:!RC4:!3DES:!SEED:+HIGH:+MEDIUM"
 
   cors:
     #CORS configuration. See Flask-CORS documentation for other values.
