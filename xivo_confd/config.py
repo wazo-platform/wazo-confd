@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import argparse
 
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
+from xivo.http_helpers import DEFAULT_CIPHERS
 from xivo.xivo_logging import get_log_level_by_name
 
 
@@ -36,8 +37,19 @@ DEFAULT_CONFIG = {
     'log_filename': '/var/log/xivo-confd.log',
     'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
     'rest_api': {
-        'listen': '127.0.0.1',
-        'port': 9487,
+        'http': {
+            'enabled': True,
+            'listen': '127.0.0.1',
+            'port': 9487,
+        },
+        'https': {
+            'enabled': True,
+            'listen': '0.0.0.0',
+            'port': 9486,
+            'certificate': '/usr/share/xivo-certs/server.crt',
+            'private_key': '/usr/share/xivo-certs/server.key',
+            'ciphers': DEFAULT_CIPHERS,
+        },
         'cors': {
             'enabled': True,
             'allow_headers': 'Content-Type',

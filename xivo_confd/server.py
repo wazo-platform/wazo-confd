@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@ import logging
 import cherrypy
 
 from cherrypy import wsgiserver
-from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
 from cherrypy.process.servers import ServerAdapter
 from cherrypy.wsgiserver import CherryPyWSGIServer
-
 from werkzeug.contrib.profiler import ProfilerMiddleware
+from xivo import http_helpers
 
 logger = logging.getLogger(__name__)
 
@@ -47,15 +46,12 @@ def run_server(app):
 
     if https_config['enabled']:
         try:
-            _check_file_readable(https_config['certificate'])
-            _check_file_readable(https_config['private_key'])
-
             bind_addr_https = (https_config['listen'], https_config['port'])
-            ssl_adapter = BuiltinSSLAdapter(https_config['certificate'],
-                                            https_config['private_key'])
             server_https = CherryPyWSGIServer(bind_addr=bind_addr_https,
                                               wsgi_app=wsgi_app)
-            server_https.ssl_adapter = ssl_adapter
+            server_https.ssl_adapter = http_helpers.ssl_adapter(https_config['certificate'],
+                                                                https_config['private_key'],
+                                                                https_config['ciphers'])
             ServerAdapter(cherrypy.engine, server_https).subscribe()
 
             logger.debug('HTTPS server starting on %s:%s', *bind_addr_https)
@@ -80,8 +76,3 @@ def run_server(app):
         cherrypy.engine.block()
     except KeyboardInterrupt:
         cherrypy.engine.stop()
-
-
-def _check_file_readable(file_path):
-    with open(file_path, 'r'):
-        pass
