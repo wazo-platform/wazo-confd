@@ -137,7 +137,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'secret', 123
     yield s.check_bogus_field_returns_error, url, 'secret', ']^',
     yield s.check_bogus_field_returns_error, url, 'type', 123
-    yield s.check_bogus_field_returns_error, url, 'options', [['bogus', 'bogus']]
     yield s.check_bogus_field_returns_error, url, 'username', 'ûsername'
     yield s.check_bogus_field_returns_error, url, 'secret', 'pâssword'
 
@@ -208,6 +207,16 @@ def test_create_sip_with_all_parameters():
     assert_that(response.item, expected)
 
 
+def test_create_sip_with_additional_options():
+    options = ALL_OPTIONS + [
+        ["foo", "bar"],
+        ["spam", "eggs"]
+    ]
+
+    response = confd.endpoints.sip.post(options=options)
+    assert_that(response.item['options'], has_items(*options))
+
+
 @fixtures.sip(username="dupusername")
 def test_create_sip_with_username_already_taken(sip):
     response = confd.endpoints.sip.post(username="dupusername")
@@ -237,6 +246,28 @@ def test_update_options(sip):
     options = [
         ["allow", "g723"],
         ["insecure", "port"]
+    ]
+
+    url = confd.endpoints.sip(sip['id'])
+    response = url.put(options=options)
+    response.assert_updated()
+
+    response = url.get()
+    assert_that(response.item['options'], has_items(*options))
+
+
+@fixtures.sip(options=[
+    ["allow", "gsm"],
+    ["foo", "bar"],
+    ["foo", "baz"],
+    ["spam", "eggs"]
+])
+def test_update_additional_options(sip):
+    options = [
+        ["allow", "g723"],
+        ["foo", "newbar"],
+        ["foo", "newbaz"],
+        ["spam", "neweggs"]
     ]
 
     url = confd.endpoints.sip(sip['id'])
