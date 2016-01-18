@@ -1,6 +1,6 @@
 INSERT INTO "entity" (name, displayname, description) VALUES ('xivotest', 'xivotest', '');
 
-INSERT INTO "accesswebservice" (name, login, passwd, obj, description) VALUES ('admin', 'admin', 'proformatique', '', '');
+INSERT INTO "accesswebservice" (name, login, passwd, description) VALUES ('admin', 'admin', 'proformatique', '');
 
 INSERT INTO "context" (name, displayname, contexttype, description, entity) 
 VALUES 
