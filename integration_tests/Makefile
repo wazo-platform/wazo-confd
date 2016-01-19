@@ -14,7 +14,7 @@ build-confd:
 	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
 build-postgres:
-	docker pull postgres:9.1
+	docker pull postgres:9.4
 	docker build -t xivo/xivo-postgres -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
