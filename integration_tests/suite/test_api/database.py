@@ -37,10 +37,10 @@ class DbHelper(object):
         engine = self.create_engine("postgres", isolate=True)
         connection = engine.connect()
         connection.execute("""
-                           SELECT pg_terminate_backend(pg_stat_activity.procpid)
+                           SELECT pg_terminate_backend(pg_stat_activity.pid)
                            FROM pg_stat_activity
                            WHERE pg_stat_activity.datname = '{db}'
-                           AND procpid <> pg_backend_pid()
+                           AND pid <> pg_backend_pid()
                            """.format(db=self.db))
         connection.execute("DROP DATABASE IF EXISTS {db}".format(db=self.db))
         connection.execute("CREATE DATABASE {db} TEMPLATE {template}".format(db=self.db,
