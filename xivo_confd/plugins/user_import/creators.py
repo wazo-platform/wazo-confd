@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,14 +69,16 @@ class VoicemailCreator(Creator):
     def find(self, fields):
         number = fields.get('number')
         context = fields.get('context')
-        if number and context:
+        if number or context:
             try:
                 return self.service.dao.get_by_number_context(number, context)
             except NotFoundError:
                 return None
 
     def create(self, fields):
-        if fields:
+        number = fields.get('number')
+        context = fields.get('context')
+        if number or context:
             return self.service.create(Voicemail(**fields))
 
 
@@ -94,8 +96,9 @@ class LineCreator(Creator):
 
     def create(self, fields):
         fields = dict(fields)
+        context = fields.get('context')
         endpoint = fields.pop('endpoint', None)
-        if 'context' in fields and endpoint in ('sip', 'sccp'):
+        if context and endpoint in ('sip', 'sccp'):
             return self.service.create(Line(**fields))
 
 
@@ -131,7 +134,9 @@ class ExtensionCreator(Creator):
                 return None
 
     def create(self, fields):
-        if 'exten' in fields and 'context' in fields:
+        exten = fields.get('exten')
+        context = fields.get('context')
+        if exten and context:
             return self.service.create(Extension(**fields))
 
 
@@ -153,8 +158,9 @@ class CtiProfileCreator(Creator):
         pass
 
     def create(self, fields):
-        if fields:
-            cti_profile_id = self.dao.get_id_by_name(fields['name'])
+        name = fields.get('name')
+        if name:
+            cti_profile_id = self.dao.get_id_by_name(name)
             return self.dao.get(cti_profile_id)
 
 
@@ -181,4 +187,6 @@ class IncallCreator(Creator):
         self.service.edit(resource)
 
     def extract_extension_fields(self, fields):
-        return {key: fields[key] for key in ('exten', 'context') if key in fields}
+        return {key: fields[key]
+                for key in ('exten', 'context')
+                if fields.get(key) is not None}
