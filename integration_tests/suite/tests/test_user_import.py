@@ -175,8 +175,8 @@ def test_given_csv_has_all_voicemail_fields_then_voicemail_imported():
 def test_given_voicemail_contains_error_then_error_returned():
     csv = [{"firstname": "Jôey",
             "voicemail_name": "Jôey VM",
-            "voicemail_number": "",
-            "voicemail_context": ""}]
+            "voicemail_number": "%%%$",
+            "voicemail_context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
     assert_error_message(response, 'number')
