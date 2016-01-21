@@ -18,7 +18,7 @@
 
 from __future__ import unicode_literals
 
-from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than, equal_to
+from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than, equal_to, none
 
 from test_api import confd
 from test_api import config
@@ -175,8 +175,8 @@ def test_given_csv_has_all_voicemail_fields_then_voicemail_imported():
 def test_given_voicemail_contains_error_then_error_returned():
     csv = [{"firstname": "Jôey",
             "voicemail_name": "Jôey VM",
-            "voicemail_number": "",
-            "voicemail_context": ""}]
+            "voicemail_number": "%%%$",
+            "voicemail_context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
     assert_error_message(response, 'number')
@@ -511,6 +511,49 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
     response = client.post("/users/import", csv)
 
     assert_that(len(response.item['created']), equal_to(2))
+
+
+def test_given_field_group_is_empty_then_resource_is_not_created():
+    group = {"cti_profile_enabled": "",
+             "cti_profile_name": "",
+             "username": "",
+             "password": ""}
+    yield import_empty_group, group, 'cti_profile_id'
+
+    group = {"voicemail_name": "",
+             "voicemail_number": "",
+             "voicemail_context": "",
+             "voicemail_password": "",
+             "voicemail_email": "",
+             "voicemail_attach_audio": "",
+             "voicemail_delete_messages": "",
+             "voicemail_ask_password": ""}
+    yield import_empty_group, group, 'voicemail_id'
+
+    group = {"line_protocol": ""}
+    yield import_empty_group, group, 'line_id'
+
+    group = {"line_protocol": "sip",
+             "exten": "",
+             "context": ""}
+    yield import_empty_group, group, 'extension_id'
+
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    group = {"line_protocol": "sip",
+             "exten": exten,
+             "context": config.CONTEXT,
+             "incall_exten": "",
+             "incall_context": ""}
+    yield import_empty_group, group, 'incall_extension_id'
+
+
+def import_empty_group(fields, parameter):
+    fields['firstname'] = "Abigaël"
+
+    response = client.post("/users/import", [fields])
+    entry = response.item['created'][0]
+
+    assert_that(entry, has_entries({parameter: none()}))
 
 
 @fixtures.csv_entry()
@@ -927,7 +970,7 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
 
 
 @fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip")
-def test_given_field_updated_individually_then_entry_updated(entry):
+def test_given_each_field_updated_individually_then_entry_updated(entry):
     exten = h.extension.find_available_exten(config.CONTEXT)
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     vm_number = h.voicemail.find_available_number(config.CONTEXT)
