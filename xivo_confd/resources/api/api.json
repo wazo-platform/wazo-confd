@@ -2094,8 +2094,8 @@
                     "text/csv; charset=utf-8"
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Users imported sucessfully",
+                    "200": {
+                        "description": "Users exported sucessfully",
                         "schema": {
                             "$ref": "#/definitions/UserExport"
                         }
