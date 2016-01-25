@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ from test_api.helpers import line_extension as le
 from test_api.helpers import line_device as ld
 from test_api.helpers import line_endpoint_sip as l_endpoint_sip
 from test_api.helpers import line_endpoint_sccp as l_endpoint_sccp
+from test_api.helpers import line_endpoint_custom as l_endpoint_custom
 
 
 @contextmanager
@@ -78,3 +79,10 @@ def line_endpoint_sccp(line, sccp, check=True):
     l_endpoint_sccp.associate(line['id'], sccp['id'], check)
     yield
     l_endpoint_sccp.dissociate(line['id'], sccp['id'], check)
+
+
+@contextmanager
+def line_endpoint_custom(line, custom, check=True):
+    l_endpoint_custom.associate(line['id'], custom['id'], check)
+    yield
+    l_endpoint_custom.dissociate(line['id'], custom['id'], check)
