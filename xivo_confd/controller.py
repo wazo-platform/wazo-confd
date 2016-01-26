@@ -17,9 +17,15 @@
 
 import logging
 
+from functools import partial
+from kombu import Connection, Exchange, Producer
 
+from xivo_bus import Marshaler, Publisher
+from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo_confd import setup_app
 from xivo_confd.server import run_server
+
+from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)
 
@@ -32,4 +38,14 @@ class Controller(object):
         logger.debug('xivo-confd running...')
 
         app = setup_app(self.config)
-        run_server(app)
+        check_fn = partial(self_check, self.config)
+        bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**self.config['bus'])
+        with Connection(bus_url) as conn:
+            producer = Producer(conn,
+                                exchange=Exchange(self.config['bus']['exchange_name'],
+                                                  self.config['bus']['exchange_type']),
+                                auto_declare=True)
+            marshaler = Marshaler(self.config['uuid'])
+            publisher = Publisher(producer, marshaler)
+            with ServiceCatalogRegistration('xivo-confd', self.config, publisher, check_fn):
+                run_server(app)
