@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 from xivo_confd.helpers.validator import RequiredFields, GetResource, \
     ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
     ValidationGroup, AssociationValidator, MissingFields, UniqueField, RegexField, \
-    NumberRange
+    NumberRange, UniqueFieldChanged
 
 
 class TestRequiredFields(unittest.TestCase):
@@ -128,6 +128,36 @@ class TestUniqueField(unittest.TestCase):
         model = Mock(field=sentinel.field)
 
         self.dao_find.return_value = model
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(ResourceError))
+
+
+class TestUniqueFieldChanged(unittest.TestCase):
+
+    def setUp(self):
+        self.dao = Mock()
+        self.validator = UniqueFieldChanged('field', self.dao)
+
+    def test_given_model_with_field_not_found_then_validation_passes(self):
+        model = Mock(field=sentinel.field)
+
+        self.dao.find_by.return_value = None
+
+        self.validator.validate(model)
+
+    def test_given_model_with_same_id_was_found_then_validation_fails(self):
+        model = Mock(field=sentinel.field, id=sentinel.id)
+
+        self.dao.find_by.return_value = model
+
+        self.validator.validate(model)
+
+    def test_given_model_with_different_id_was_found_then_validation_fails(self):
+        model = Mock(field=sentinel.field, id=sentinel.id)
+        other_model = Mock(field=sentinel.field, id=sentinel.other_id)
+
+        self.dao.find_by.return_value = other_model
 
         assert_that(calling(self.validator.validate).with_args(model),
                     raises(ResourceError))

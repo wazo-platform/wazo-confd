@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,6 +79,22 @@ class UniqueField(Validator):
         value = getattr(model, self.field)
         found = self.dao_find(value)
         if found is not None:
+            metadata = {self.field: value}
+            raise errors.resource_exists(self.resource, **metadata)
+
+
+class UniqueFieldChanged(Validator):
+
+    def __init__(self, field, dao, resource='Resource'):
+        self.field = field
+        self.dao = dao
+        self.resource = resource
+
+    def validate(self, model):
+        value = getattr(model, self.field)
+        query = {self.field: value}
+        found = self.dao.find_by(**query)
+        if found is not None and found.id != model.id:
             metadata = {self.field: value}
             raise errors.resource_exists(self.resource, **metadata)
 
