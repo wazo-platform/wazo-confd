@@ -40,6 +40,7 @@ class Controller(object):
         app = setup_app(self.config)
         check_fn = partial(self_check, self.config)
         bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**self.config['bus'])
+
         with Connection(bus_url) as conn:
             producer = Producer(conn,
                                 exchange=Exchange(self.config['bus']['exchange_name'],
