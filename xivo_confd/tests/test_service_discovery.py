@@ -39,7 +39,7 @@ class TestSelfCheck(unittest.TestCase):
 
         assert_that(result, equal_to(False))
 
-        get.assert_called_once_with('http://localhost:4242/1.1/infos')
+        self.assert_get_called(get, 'http://localhost:4242/1.1/infos')
 
     @patch('xivo_confd.service_discovery.requests.get', return_value=Mock(status_code=200))
     def test_that_self_check_returns_true_if_infos_returns_200(self, get):
@@ -47,7 +47,7 @@ class TestSelfCheck(unittest.TestCase):
 
         assert_that(result, equal_to(True))
 
-        get.assert_called_once_with('http://localhost:4242/1.1/infos')
+        self.assert_get_called(get, 'http://localhost:4242/1.1/infos')
 
     @patch('xivo_confd.service_discovery.requests.get', return_value=Mock(status_code=200))
     def test_that_https_is_used_if_http_is_not_enabled(self, get):
@@ -56,7 +56,7 @@ class TestSelfCheck(unittest.TestCase):
 
         assert_that(result, equal_to(True))
 
-        get.assert_called_once_with('https://localhost:4243/1.1/infos')
+        self.assert_get_called(get, 'https://localhost:4243/1.1/infos')
 
     @patch('xivo_confd.service_discovery.requests.get', side_effect=Exception)
     def test_that_self_check_returns_false_on_exception(self, get):
@@ -64,4 +64,7 @@ class TestSelfCheck(unittest.TestCase):
 
         assert_that(result, equal_to(False))
 
-        get.assert_called_once_with('http://localhost:4242/1.1/infos')
+        self.assert_get_called(get, 'http://localhost:4242/1.1/infos')
+
+    def assert_get_called(self, get, url):
+        get.assert_called_once_with(url, headers={'accept': 'application/json'})
