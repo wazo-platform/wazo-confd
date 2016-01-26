@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,9 +23,13 @@ from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetSip
 from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociationSccp
 from xivo_confd.plugins.line_endpoint.resource import LineEndpointGetSccp
 from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetSccp
+from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociationCustom
+from xivo_confd.plugins.line_endpoint.resource import LineEndpointGetCustom
+from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetCustom
 
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
+from xivo_confd.plugins.endpoint_custom.service import build_service as build_custom_service
 from xivo_confd.plugins.line_endpoint.service import build_service
 
 
@@ -36,6 +40,7 @@ class Plugin(object):
 
         self.load_sip(api, provd_client)
         self.load_sccp(api, provd_client)
+        self.load_custom(api, provd_client)
 
     def load_sip(self, api, provd_client):
         service = self.build_sip_service(provd_client)
@@ -75,6 +80,25 @@ class Plugin(object):
                          resource_class_args=(service,)
                          )
 
+    def load_custom(self, api, provd_client):
+        service = self.build_custom_service(provd_client)
+
+        api.add_resource(LineEndpointAssociationCustom,
+                         '/lines/<int:line_id>/endpoints/custom/<int:endpoint_id>',
+                         endpoint='line_endpoint_custom',
+                         resource_class_args=(service,)
+                         )
+
+        api.add_resource(LineEndpointGetCustom,
+                         '/lines/<int:line_id>/endpoints/custom',
+                         resource_class_args=(service,)
+                         )
+
+        api.add_resource(EndpointLineGetCustom,
+                         '/endpoints/custom/<int:endpoint_id>/lines',
+                         resource_class_args=(service,)
+                         )
+
     def build_sip_service(self, provd_client):
         sip_service = build_sip_service(provd_client)
         return build_service(provd_client, 'sip', sip_service)
@@ -82,3 +106,7 @@ class Plugin(object):
     def build_sccp_service(self, provd_client):
         sccp_service = build_sccp_service()
         return build_service(provd_client, 'sccp', sccp_service)
+
+    def build_custom_service(self, provd_client):
+        custom_service = build_custom_service()
+        return build_service(provd_client, 'custom', custom_service)
