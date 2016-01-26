@@ -60,6 +60,13 @@ bus:
     exchange_type: topic
     exchange_durable: True
 
+# Consul connection information
+consul:
+    scheme: https
+    host: localhost
+    port: 8500
+    verify: /usr/share/xivo-certs/server.crt
+
 # xivo-provd connection information
 provd:
     host: localhost

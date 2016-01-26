@@ -18,6 +18,9 @@
 
 import argparse
 
+import xivo_dao
+
+from xivo_dao.resources.infos import dao as infos_dao
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 from xivo.http_helpers import DEFAULT_CIPHERS
@@ -68,6 +71,12 @@ DEFAULT_CONFIG = {
         'exchange_type': 'topic',
         'exchange_durable': True,
     },
+    'consul': {
+        'scheme': 'https',
+        'host': 'localhost',
+        'port': 8500,
+        'verify': '/usr/share/xivo-certs/server.crt',
+    },
     'provd': {
     },
     'sysconfd': {
@@ -104,15 +113,25 @@ DEFAULT_CONFIG = {
                         'user_line_plugin',
                         'line_extension_plugin',
                         'line_endpoint_plugin',
-                        'user_import_plugin']
+                        'user_import_plugin'],
+    'service_discovery': {
+        'advertise_address': 'localhost',
+        'advertise_port': 9486,
+        'advertise_address_interface': 'eth0',
+        'refresh_interval': 25,
+        'retry_interval': 2,
+        'ttl_interval': 30,
+        'extra_tags': [],
+    },
 }
 
 
 def load(argv):
     cli_config = _parse_cli_args(argv)
     file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
-    reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
-    return ChainMap(reinterpreted_config, cli_config, file_config, DEFAULT_CONFIG)
+    db_config = _read_config_from_db(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
+    reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, db_config, DEFAULT_CONFIG))
+    return ChainMap(reinterpreted_config, cli_config, file_config, db_config, DEFAULT_CONFIG)
 
 
 def _parse_cli_args(argv):
@@ -170,3 +189,8 @@ def _get_reinterpreted_raw_values(config):
         result['log_level'] = get_log_level_by_name(log_level)
 
     return result
+
+
+def _read_config_from_db(config):
+    xivo_dao.init_db_from_config(config)
+    return {'uuid': infos_dao.get().uuid}
