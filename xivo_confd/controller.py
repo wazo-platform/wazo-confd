@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,15 @@
 
 import logging
 
-import xivo_dao
+from functools import partial
+from kombu import Connection, Exchange, Producer
 
+from xivo_bus import Marshaler, Publisher
+from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo_confd import setup_app
 from xivo_confd.server import run_server
+
+from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +37,16 @@ class Controller(object):
     def run(self):
         logger.debug('xivo-confd running...')
 
-        xivo_dao.init_db_from_config(self.config)
-
         app = setup_app(self.config)
-        run_server(app)
+        check_fn = partial(self_check, self.config)
+        bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**self.config['bus'])
+
+        with Connection(bus_url) as conn:
+            producer = Producer(conn,
+                                exchange=Exchange(self.config['bus']['exchange_name'],
+                                                  self.config['bus']['exchange_type']),
+                                auto_declare=True)
+            marshaler = Marshaler(self.config['uuid'])
+            publisher = Publisher(producer, marshaler)
+            with ServiceCatalogRegistration('xivo-confd', self.config, publisher, check_fn):
+                run_server(app)

@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import signal
 import logging
 import cherrypy
 
@@ -27,10 +28,15 @@ from xivo import http_helpers
 logger = logging.getLogger(__name__)
 
 
+def signal_handler(signum, frame):
+    cherrypy.engine.exit()
+
+
 def run_server(app):
     http_config = app.config['rest_api']['http']
     https_config = app.config['rest_api']['https']
 
+    signal.signal(signal.SIGTERM, signal_handler)
     if app.config['profile']:
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
                                           profile_dir=app.config['profile'])

@@ -60,6 +60,13 @@ bus:
     exchange_type: topic
     exchange_durable: True
 
+# Consul connection information
+consul:
+    scheme: https
+    host: localhost
+    port: 8500
+    verify: /usr/share/xivo-certs/server.crt
+
 # xivo-provd connection information
 provd:
     host: localhost
@@ -69,6 +76,25 @@ provd:
 sysconfd:
     host: localhost
     port: 8668
+
+# Service discovery configuration. all time intervals are in seconds
+service_discovery:
+  # the address that will be received by other services using service discovery.
+  # use "advertise_address: auto" to enable ip address detection based on
+  # advertise_address_interface
+  advertise_address: auto
+  # if advertise_address is "auto" this interface will be used to find the ip
+  # address to advertise. ignored otherwise
+  advertise_address_interface: eth0
+  advertise_port: 9487
+  # the number of seconds that consul will wait between 2 ttl messages to mark
+  # this service as up
+  ttl_interval: 30
+  # the time interval before the service sends a new ttl message to consul
+  refresh_interval: 27
+  # the time interval to detect that the service is running when starting
+  retry_interval: 2
+  extra_tags: []
 
 # Extra resources to load.
 # This is deprecated and for retro-compatibility only.
