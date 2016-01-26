@@ -16,3 +16,5 @@ cherrypy==3.7.0
 kombu==3.0.26
 stevedore==0.14.1
 requests==2.4.3
+python-consul==0.4.7
+netifaces
