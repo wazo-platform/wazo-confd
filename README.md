@@ -1,5 +1,5 @@
-XiVO CONFD
-=============
+XiVO confd
+==========
 
 [![Build Status](https://travis-ci.org/xivo-pbx/xivo-confd.png?branch=master)](https://travis-ci.org/xivo-pbx/xivo-confd)
 
@@ -8,30 +8,50 @@ service for configuring and managing a XiVO server. Further details on how to us
 the [XiVO API web site](http://api.xivo.io)
 
 
-Installing CONFD
--------------------
+Installing xivo-confd
+---------------------
 
 The server is already provided as a part of [XiVO](http://documentation.xivo.io).
 Please refer to [the documentation](ttp://documentation.xivo.io/production/installation/installsystem.html) for
 further details on installing one.
 
+
 Running unit tests
 ------------------
 
 1. Install libffi ```apt-get install libffi-dev```
-2. Install requirements with ```pip install -r requirements.txt```
-3. Run tests with ```nosetests xivo_confd```
+2. Install requirements with ```pip install -r requirements.txt -r test-requirements.txt```
+3. Run tests with ```nosetests```
 
 
-Running functional tests
-------------------------
+Running integration tests
+-------------------------
 
-1. [XiVO acceptance](https://github.com/xivo-pbx/xivo-acceptance)
-2. ```
+You need the repos xivo-manage-db and xivo-provisioning.
+
+To clone them:
+
+```
+git clone https://github.com/xivo-pbx/xivo-manage-db
+git clone https://github.com/xivo-pbx/xivo-provisioning
+```
+
+If you already have them:
+
+1. ensure they are up-to-date
+2. change the following paths accordingly
+
+Run the tests:
+
+```
 cd integration_tests
-make test-setup
+make test-setup PROVD_DIR=./xivo-provisioning MANAGE_DB_DIR=./xivo-manage-db
 nosetests
 ```
+
+
+Development
+-----------
 
 In case you need to mount xivo_dao inside the xivo-confd container, add the
 following line in confd volumes in
