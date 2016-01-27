@@ -129,9 +129,8 @@ DEFAULT_CONFIG = {
 def load(argv):
     cli_config = _parse_cli_args(argv)
     file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
-    db_config = _read_config_from_db(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
-    reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, db_config, DEFAULT_CONFIG))
-    return ChainMap(reinterpreted_config, cli_config, file_config, db_config, DEFAULT_CONFIG)
+    reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
+    return ChainMap(reinterpreted_config, cli_config, file_config, DEFAULT_CONFIG)
 
 
 def _parse_cli_args(argv):
@@ -189,8 +188,3 @@ def _get_reinterpreted_raw_values(config):
         result['log_level'] = get_log_level_by_name(log_level)
 
     return result
-
-
-def _read_config_from_db(config):
-    xivo_dao.init_db_from_config(config)
-    return {'uuid': infos_dao.get().uuid}

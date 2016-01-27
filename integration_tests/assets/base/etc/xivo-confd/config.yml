@@ -39,7 +39,7 @@ rest_api:
 
   cors:
     #CORS configuration. See Flask-CORS documentation for other values.
-    
+
     #Enabled by default
     enabled: true
 
@@ -87,3 +87,5 @@ enabled_plugins:
    - line_endpoint_plugin
    - legacy_plugins
    - user_import_plugin
+
+uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c

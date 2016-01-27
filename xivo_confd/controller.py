@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
+import xivo_dao
 
 from functools import partial
 from kombu import Connection, Exchange, Producer
@@ -36,6 +37,8 @@ class Controller(object):
 
     def run(self):
         logger.debug('xivo-confd running...')
+
+        xivo_dao.init_db_from_config(self.config)
 
         app = setup_app(self.config)
         check_fn = partial(self_check, self.config)
