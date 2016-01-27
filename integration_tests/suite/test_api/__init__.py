@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2014-2015 Avencall
+# Copyright (C) 2014-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 import os
 from setup import setup_docker, stop_docker, new_client, new_confd, \
     setup_provd, setup_database
+from provd import create_helper as create_provd_helper
 
 
 class SingletonProxy(object):
@@ -52,3 +53,4 @@ def teardown():
 
 confd = SingletonProxy(new_confd)
 client = SingletonProxy(new_client)
+provd = SingletonProxy(create_provd_helper)

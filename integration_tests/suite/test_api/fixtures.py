@@ -21,7 +21,7 @@ from wrappers import IsolatedAction
 from helpers import line, line_sip, endpoint_sip, endpoint_sccp, endpoint_custom
 from helpers.user import generate_user, delete_user
 from helpers.extension import generate_extension, delete_extension
-from helpers.device import generate_device, delete_device
+from helpers.device import generate_device, delete_device, generate_autoprov
 from helpers.voicemail import generate_voicemail, delete_voicemail
 from helpers.context import generate_context, delete_context
 from helpers import user_import
@@ -67,6 +67,12 @@ class extension(IsolatedAction):
 class device(IsolatedAction):
 
     actions = {'generate': generate_device,
+               'delete': delete_device}
+
+
+class autoprov(IsolatedAction):
+
+    actions = {'generate': generate_autoprov,
                'delete': delete_device}
 
 
