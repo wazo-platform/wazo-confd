@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2012-2015  Avencall
+# Copyright (C) 2012-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ setup(
             'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
             'endpoint_sip_plugin = xivo_confd.plugins.endpoint_sip.plugin:Plugin',
             'endpoint_sccp_plugin = xivo_confd.plugins.endpoint_sccp.plugin:Plugin',
+            'endpoint_custom_plugin = xivo_confd.plugins.endpoint_custom.plugin:Plugin',
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'user_voicemail_plugin = xivo_confd.plugins.user_voicemail.plugin:Plugin',
             'user_cti_profile_plugin = xivo_confd.plugins.user_cti_profile.plugin:Plugin',

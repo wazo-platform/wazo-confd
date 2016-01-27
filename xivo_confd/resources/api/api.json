@@ -404,6 +404,204 @@
                 }
             }
         },
+        "/endpoints/custom": {
+            "get": {
+                "operationId": "list_endpoints_custom",
+                "summary": "List Custom endpoints",
+                "tags": [
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Custom endpoint list",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointCustomItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_endpoint_custom",
+                "summary": "Create Custom endpoint",
+                "tags": [
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Custom Endpoint to create",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointCustom"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Custom endpoint created",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointCustom"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/endpoints/custom/{custom_id}": {
+            "get": {
+                "operationId": "get_endpoint_custom",
+                "summary": "Get Custom Endpoint",
+                "tags": [
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/customid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Custom Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/EndpointCustom"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_endpoint_custom",
+                "summary": "Update Custom Endpoint",
+                "tags": [
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/customid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EndpointCustom"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_endpoint_custom",
+                "summary": "Delete Custom Endpoint",
+                "tags": [
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/customid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/endpoints/custom/{custom_id}/lines": {
+            "get": {
+                "operationId": "get_endpoint_custom_line",
+                "summary": "Get Line associated to Custom endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/customid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Custom Endpoint and Line",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/endpoints/sccp": {
             "get": {
                 "operationId": "list_endpoints_sccp",
@@ -1437,6 +1635,106 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/custom": {
+            "get": {
+                "operationId": "get_line_endpoint_custom",
+                "summary": "Get Custom endpoint associated to Line",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Line and Custom Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/LineEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/endpoints/custom/{custom_id}": {
+            "put": {
+                "operationId": "associate_line_endpoint_custom",
+                "summary": "Associate line and Custom endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/customid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and Custom endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_endpoint_custom",
+                "summary": "Dissociate line and Custom endpoint",
+                "tags": [
+                    "lines",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/customid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and Custom endpoint dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -3174,15 +3472,17 @@
             "in": "path",
             "description": "Agent’s ID"
         },
-        "csvbody": {
+        "customid": {
             "required": true,
+            "type": "integer",
+            "name": "custom_id",
+            "in": "path"
+        },
+        "csvbody": {
             "name": "body",
             "in": "body",
+            "required": true,
             "description": "CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
-            "externalDocs": {
-                "url": "http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
-                "description": "Complete documentation on the CSV data format and fields"
-            },
             "schema": {
                 "type": "string"
             }
@@ -3489,6 +3789,37 @@
             "required": [
                 "total"
             ]
+        },
+        "EndpointCustomItems": {
+            "title": "Custom Endpoints",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/EndpointCustom"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "EndpointCustom": {
+            "title": "Custom Endpoint",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Custom Endpoint ID (read-only)"
+                },
+                "interface": {
+                    "type": "string",
+                    "description": "Asterisk interface to use. (e.g. 'dahdi/i1')"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Endpoint can be used when it is enabled",
+                    "default": true
+                }
+            }
         },
         "EndpointSipItems": {
             "title": "SIP Endpoints",

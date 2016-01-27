@@ -1,6 +1,24 @@
+# -*- coding: UTF-8 -*-
+
+# Copyright (C) 2016 Avencall
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 from wrappers import IsolatedAction
 
-from helpers import line, line_sip, endpoint_sip, endpoint_sccp
+from helpers import line, line_sip, endpoint_sip, endpoint_sccp, endpoint_custom
 from helpers.user import generate_user, delete_user
 from helpers.extension import generate_extension, delete_extension
 from helpers.device import generate_device, delete_device
@@ -72,3 +90,9 @@ class csv_entry(IsolatedAction):
 class cti_profile(IsolatedAction):
 
     actions = {'generate': find_by_name}
+
+
+class custom(IsolatedAction):
+
+    actions = {'generate': endpoint_custom.generate_custom,
+               'delete': endpoint_custom.delete_custom}

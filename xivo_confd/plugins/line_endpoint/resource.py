@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,18 @@ sip_fields = {
                             field='line_id',
                             target='id'),
                        Link('endpoint_sip',
+                            field='endpoint_id',
+                            target='id'))
+}
+
+custom_fields = {
+    'line_id': fields.Integer,
+    'endpoint_id': fields.Integer,
+    'endpoint': fields.String,
+    'links': FieldList(Link('lines',
+                            field='line_id',
+                            target='id'),
+                       Link('endpoint_custom',
                             field='endpoint_id',
                             target='id'))
 }
@@ -108,3 +120,15 @@ class LineEndpointGetSccp(LineEndpointGet):
 
 class EndpointLineGetSccp(EndpointLineGet):
     fields = sccp_fields
+
+
+class LineEndpointAssociationCustom(LineEndpointAssociation):
+    pass
+
+
+class LineEndpointGetCustom(LineEndpointGet):
+    fields = custom_fields
+
+
+class EndpointLineGetCustom(EndpointLineGet):
+    fields = custom_fields
