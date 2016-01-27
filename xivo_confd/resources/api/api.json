@@ -3359,7 +3359,8 @@
                 "queue_id": {
                     "type": "integer",
                     "format": "int32",
-                    "description": "Queue's ID (read-only)"
+                    "description": "Queue's ID",
+                    "readOnly": true
                 },
                 "penalty": {
                     "type": "integer",
@@ -3379,7 +3380,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "CtiProfile ID (read-only)"
+                    "description": "CtiProfile ID",
+                    "readOnly": true
                 },
                 "name": {
                     "type": "string",
@@ -3407,7 +3409,8 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "Device ID (read-only)"
+                    "description": "Device ID",
+                    "readOnly": true
                 },
                 "description": {
                     "type": "string"
@@ -3444,7 +3447,8 @@
                         "configured",
                         "not_configured"
                     ],
-                    "description": "(read-only) Device status. autoprov: Device can be provisionned using a provisioning code, configured: Device is configured and ready to be used, not_configured : Device has not been completely configured"
+                    "description": "Device status. autoprov: Device can be provisionned using a provisioning code, configured: Device is configured and ready to be used, not_configured : Device has not been completely configured",
+                    "readOnly": true
                 },
                 "template_id": {
                     "type": "string",
@@ -3563,7 +3567,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Extension ID (read-only)"
+                    "description": "Extension ID",
+                    "readOnly": true
                 },
                 "context": {
                     "type": "string"
@@ -3698,7 +3703,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Line ID (read-only)"
+                    "description": "Line ID",
+                    "readOnly": true
                 },
                 "context": {
                     "type": "string",
@@ -3721,7 +3727,8 @@
                     "enum": [
                         "sip"
                     ],
-                    "description": "(read-only) Line's protocol"
+                    "description": "Line's protocol",
+                    "readOnly": true
                 },
                 "provisioning_extension": {
                     "type": "string",
@@ -3750,7 +3757,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Line ID (read-only)"
+                    "description": "Line ID",
+                    "readOnly": true
                 },
                 "context": {
                     "type": "string",
@@ -3796,7 +3804,8 @@
             "properties": {
                 "line_id": {
                     "type": "integer",
-                    "description": "Line's ID (read-only)"
+                    "description": "Line's ID",
+                    "readOnly": true
                 },
                 "extension_id": {
                     "type": "integer",
@@ -3846,7 +3855,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Line ID (read-only)"
+                    "description": "Line ID",
+                    "readOnly": true
                 },
                 "callerid": {
                     "type": "string",
@@ -3912,11 +3922,13 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "User ID (read-only)"
+                    "description": "User ID",
+                    "readOnly": true
                 },
                 "uuid": {
                     "type": "string",
-                    "description": "User UUID (read-only). This ID is globally unique across multiple XiVO instances"
+                    "description": "User UUID. This ID is globally unique across multiple XiVO instances",
+                    "readOnly": true
                 },
                 "firstname": {
                     "type": "string",
@@ -3994,7 +4006,8 @@
             "properties": {
                 "cti_profile_id": {
                     "type": "integer",
-                    "description": "(read-only)"
+                    "description": "CTI profile ID",
+                    "readOnly": true
                 },
                 "enabled": {
                     "type": "boolean"
@@ -4159,15 +4172,18 @@
                 },
                 "main_line": {
                     "type": "boolean",
-                    "description": "To be implemented later. Always true (read-only)"
+                    "description": "To be implemented later. Always true",
+                    "readOnly": true
                 },
                 "main_user": {
                     "type": "boolean",
-                    "description": "True if the user is the first to have been associated to the line (read-only)"
+                    "description": "True if the user is the first to have been associated to the line",
+                    "readOnly": true
                 },
                 "user_id": {
                     "type": "integer",
-                    "description": "User's ID (read-only)"
+                    "description": "User's ID",
+                    "readOnly": true
                 }
             },
             "required": [
@@ -4248,7 +4264,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Voicemail ID (read-only)"
+                    "description": "Voicemail ID",
+                    "readOnly": true
                 },
                 "name": {
                     "type": "string",
