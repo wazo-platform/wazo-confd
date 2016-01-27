@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -119,14 +119,12 @@ class ProvdHelper(object):
         else:
             raise AssertionError('config "{}" exists in xivo-provd'.format(config_id))
 
+    def assert_device_has_autoprov_config(self, device):
+        assert_that(device[u'config'], starts_with(u'autoprov'))
 
-def assert_device_has_autoprov_config(device):
-    assert_that(device[u'config'], starts_with(u'autoprov'))
-
-
-def assert_config_use_device_template(config, template_id):
-    assert_that(config[u'configdevice'], equal_to(template_id))
-    assert_that(config[u'parent_ids'], has_item(template_id))
+    def assert_config_use_device_template(self, config, template_id):
+        assert_that(config[u'configdevice'], equal_to(template_id))
+        assert_that(config[u'parent_ids'], has_item(template_id))
 
 
 def create_helper():
