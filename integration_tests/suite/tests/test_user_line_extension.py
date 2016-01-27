@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ from test_api import fixtures
 from test_api import mocks
 from test_api import associations as a
 from test_api import errors as e
+
+from test_api.database import create_helper as database_create_helper
 
 
 @fixtures.user()
@@ -223,4 +225,42 @@ def test_associating_two_sccp_lines_with_users_does_not_make_the_db_fail(user1, 
         response.assert_ok()
 
         response = confd.users(user2['id']).lines.post(line_id=line2['id'])
+        response.assert_ok()
+
+
+@fixtures.line()
+@fixtures.sip()
+@fixtures.autoprov()
+def test_updating_line_associated_with_autoprov_device_does_not_fail(line, sip, device):
+    database = database_create_helper()
+    with a.line_endpoint_sip(line, sip, check=False):
+        with database.queries() as queries:
+            queries.associate_line_device(line['id'], device['id'])
+        response = confd.lines(line['id']).put()
+        response.assert_ok()
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.autoprov()
+def test_updating_user_line_or_extension_associated_with_autoprov_device_does_not_fail(user, line, sip, extension, device):
+    database = database_create_helper()
+    with a.line_endpoint_sip(line, sip, check=False), a.line_extension(line, extension, check=False), \
+            a.user_line(user, line, check=False):
+
+        with database.queries() as queries:
+            queries.associate_line_device(line['id'], device['id'])
+
+        response = confd.endpoints.sip(sip['id']).put()
+        response.assert_ok()
+
+        response = confd.lines(line['id']).put()
+        response.assert_ok()
+
+        response = confd.users(user['id']).put()
+        response.assert_ok()
+
+        response = confd.extensions(extension['id']).put()
         response.assert_ok()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ class ProvdDevice(object):
         self.config_converter = ConfigConverter(config)
 
     def update_lines(self, lines):
-        self.device_converter.update_config_id(self.device_id)
+        self.device_converter.update_lines(lines)
         self.config_converter.update_lines(lines)
 
     def update_funckeys(self, funckeys):
@@ -138,8 +138,9 @@ class DeviceConverter(object):
         self.device.pop('options', None)
         self.device['config'] = config_id
 
-    def update_config_id(self, config_id):
-        self.device['config'] = config_id
+    def update_lines(self, lines):
+        if not self.device['config'].startswith('autoprov'):
+            self.device['config'] = self.device['id']
 
 
 class ConfigConverter(object):
