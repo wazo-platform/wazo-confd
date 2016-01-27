@@ -146,7 +146,7 @@ class TestUniqueFieldChanged(unittest.TestCase):
 
         self.validator.validate(model)
 
-    def test_given_model_with_same_id_was_found_then_validation_fails(self):
+    def test_given_model_with_same_id_was_found_then_validation_passes(self):
         model = Mock(field=sentinel.field, id=sentinel.id)
 
         self.dao.find_by.return_value = model
