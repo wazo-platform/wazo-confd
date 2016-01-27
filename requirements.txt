@@ -1,7 +1,7 @@
 git+https://github.com/xivo-pbx/xivo-auth-client.git
 git+https://github.com/xivo-pbx/xivo-bus.git
 git+https://github.com/xivo-pbx/xivo-dao.git
-git+https://github.com/xivo-pbx/xivo-lib-python.git
+git+https://github.com/xivo-pbx/xivo-lib-python.git@disable-service-discovery
 git+https://github.com/xivo-pbx/xivo-lib-rest-client.git  # from xivo-auth-client
 git+https://github.com/xivo-pbx/xivo-provd-client.git
 sqlalchemy==0.9.8  # from xivo-dao

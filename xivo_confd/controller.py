@@ -21,7 +21,7 @@ import xivo_dao
 from functools import partial
 from kombu import Connection, Exchange, Producer
 
-from xivo_bus import Marshaler, Publisher
+from xivo_bus import ensure, Marshaler, Publisher
 from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo_confd import setup_app
 from xivo_confd.server import run_server
@@ -45,9 +45,10 @@ class Controller(object):
         bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**self.config['bus'])
 
         with Connection(bus_url) as conn:
+            conn.ensure_connection(errback=ensure.retry_message)
             producer = Producer(conn,
-                                exchange=Exchange(self.config['bus']['exchange_name'],
-                                                  self.config['bus']['exchange_type']),
+                                Exchange(self.config['bus']['exchange_name'],
+                                         self.config['bus']['exchange_type']),
                                 auto_declare=True)
             marshaler = Marshaler(self.config['uuid'])
             publisher = Publisher(producer, marshaler)
