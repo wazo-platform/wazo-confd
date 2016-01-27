@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,7 +58,8 @@ class TestDeviceResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.D
 class TestDeviceCreateWithTemplate(unittest.TestCase):
 
     def setUp(self):
-        self.provd = provd.create_helper()
+        self.provd = provd
+        self.provd.reset()
         self.template_id = self.provd.add_device_template()
 
     def tearDown(self):
@@ -71,8 +72,8 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
         device_id = response.json[u'id']
         device = self.provd.devices.get(device_id)
         config = self.provd.configs.get(device[u'config'])
-        provd.assert_device_has_autoprov_config(device)
-        provd.assert_config_use_device_template(config, self.template_id)
+        self.provd.assert_device_has_autoprov_config(device)
+        self.provd.assert_config_use_device_template(config, self.template_id)
         self.provd.assert_config_does_not_exist(device_id)
 
 

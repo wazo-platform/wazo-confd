@@ -11,10 +11,10 @@ class TestFuncKey(unittest.TestCase):
 
     def setUp(self):
         self.db = database.create_helper()
-        self.provd = provd.create_helper()
+        self.provd = provd
+        self.provd.reset()
 
         self.db.recreate()
-        self.provd.reset()
 
         self.user = helpers.user.generate_user()
         self.device = self.setup_device(self.user['id'], '1000')
