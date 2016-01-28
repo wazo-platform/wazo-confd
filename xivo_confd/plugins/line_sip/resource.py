@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ parser.add_argument('provisioning_extension',
                     store_missing=False)
 parser.add_argument('device_slot',
                     type=Strict(int),
-                    default=1)
+                    store_missing=False)
 parser.add_argument('callerid',
                     type=inputs.regex(r'"[^"]+"(\s+<[+0-9]>)?'),
                     store_missing=False)

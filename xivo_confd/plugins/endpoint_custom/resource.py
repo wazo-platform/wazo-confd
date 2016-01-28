@@ -38,7 +38,7 @@ class CustomList(ListResource):
 
     parser = reqparse.RequestParser()
     parser.add_argument('interface', required=True)
-    parser.add_argument('enabled', type=bool, default=True)
+    parser.add_argument('enabled', type=bool, store_missing=False)
 
     def build_headers(self, custom):
         return {'Location': url_for('endpoint_custom', id=custom.id, _external=True)}

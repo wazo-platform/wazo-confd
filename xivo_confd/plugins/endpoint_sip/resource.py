@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,11 +44,11 @@ sip_parser.add_argument('secret',
                         store_missing=False)
 sip_parser.add_argument('type',
                         choices=('friend', 'peer', 'user'),
-                        default='friend')
-sip_parser.add_argument('host', default='dynamic')
+                        store_missing=False)
+sip_parser.add_argument('host', store_missing=False)
 sip_parser.add_argument('options',
-                        type=option,
                         action='append',
+                        type=option,
                         store_missing=False)
 
 

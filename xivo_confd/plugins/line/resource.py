@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class LineList(ListResource):
     parser = reqparse.RequestParser()
     parser.add_argument('context', required=True)
     parser.add_argument('provisioning_code', type=DigitStr(6))
-    parser.add_argument('position', type=inputs.positive, default=1)
+    parser.add_argument('position', type=inputs.positive, store_missing=False)
     parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
 

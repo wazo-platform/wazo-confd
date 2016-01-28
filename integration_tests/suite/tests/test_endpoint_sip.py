@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ def test_put_errors(sip):
     yield s.check_bogus_field_returns_error, url, 'secret', None
     yield s.check_bogus_field_returns_error, url, 'type', None
     yield s.check_bogus_field_returns_error, url, 'host', None
+    yield s.check_bogus_field_returns_error, url, 'options', None
 
 
 def error_checks(url):
@@ -139,6 +140,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'type', 123
     yield s.check_bogus_field_returns_error, url, 'username', 'ûsername'
     yield s.check_bogus_field_returns_error, url, 'secret', 'pâssword'
+    yield s.check_bogus_field_returns_error, url, 'options', [None]
+    yield s.check_bogus_field_returns_error, url, 'options', ["", ""]
 
 
 @fixtures.sip()
