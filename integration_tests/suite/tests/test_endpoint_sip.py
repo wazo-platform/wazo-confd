@@ -281,6 +281,15 @@ def test_update_additional_options(sip):
     assert_that(response.item['options'], has_items(*options))
 
 
+@fixtures.sip(host="static")
+def test_update_values_other_than_host_does_not_touch_it(sip):
+    response = confd.endpoints.sip(sip['id']).put(username="testhost")
+    response.assert_ok()
+
+    response = confd.endpoints.sip(sip['id']).get()
+    assert_that(response.item, has_entries(host="static"))
+
+
 @fixtures.sip()
 def test_delete_sip(sip):
     response = confd.endpoints.sip(sip['id']).delete()
