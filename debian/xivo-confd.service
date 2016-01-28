@@ -1,8 +1,8 @@
 [Unit]
 Description=xivo-confd server
-After=network.target postgresql.service
+After=network.target postgresql.service xivo-confgend.service
 Before=monit.service
-Wants=postgresql.service
+Wants=postgresql.service xivo-confgend.service
 
 [Service]
 Type=forking
