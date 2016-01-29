@@ -20,7 +20,7 @@ Running unit tests
 ------------------
 
 1. Install libffi ```apt-get install libffi-dev```
-2. Install requirements with ```pip install -r requirements.txt -r test-requirements.txt```
+2. Install requirements with ```pip install -U -r requirements.txt -r test-requirements.txt```
 3. Run tests with ```nosetests```
 
 
@@ -39,14 +39,15 @@ git clone https://github.com/xivo-pbx/xivo-provisioning
 If you already have them:
 
 1. ensure they are up-to-date
-2. change the following paths accordingly
+2. change the values for ``PROVD_DIR`` and ``MANAGE_DB_DIR``
 
 Run the tests:
 
 ```
 cd integration_tests
-make test-setup PROVD_DIR=./xivo-provisioning MANAGE_DB_DIR=./xivo-manage-db
-nosetests
+pip install -U -r test-requirements.txt
+make test-setup PROVD_DIR=../../xivo-provisioning MANAGE_DB_DIR=../../xivo-manage-db
+make test
 ```
 
 
