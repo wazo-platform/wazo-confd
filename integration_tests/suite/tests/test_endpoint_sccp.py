@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,6 +46,11 @@ def test_post_errors():
 @fixtures.sccp()
 def test_put_errors(sccp):
     url = confd.endpoints.sccp(sccp['id']).put
+
+    yield s.check_bogus_field_returns_error, url, 'options', None
+    yield s.check_bogus_field_returns_error, url, 'options', [None]
+    yield s.check_bogus_field_returns_error, url, 'options', ["a", "b"]
+
     for check in error_checks(url):
         yield check
 

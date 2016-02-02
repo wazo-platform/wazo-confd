@@ -62,7 +62,7 @@ directory_fields = {
 }
 
 parser = reqparse.RequestParser()
-parser.add_argument('firstname', type=Strict(unicode), store_missing=False)
+parser.add_argument('firstname', type=Strict(unicode), store_missing=False, nullable=False)
 parser.add_argument('lastname', type=Strict(unicode), store_missing=False)
 parser.add_argument('email', type=Strict(unicode), store_missing=False)
 parser.add_argument('timezone', type=Strict(unicode), store_missing=False)

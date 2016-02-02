@@ -81,6 +81,7 @@ def test_post_errors():
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'firstname', 123
+    yield s.check_bogus_field_returns_error, url, 'firstname', None
     yield s.check_bogus_field_returns_error, url, 'lastname', 123
     yield s.check_bogus_field_returns_error, url, 'email', 123
     yield s.check_bogus_field_returns_error, url, 'timezone', 123

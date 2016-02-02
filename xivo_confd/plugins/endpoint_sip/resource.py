@@ -49,7 +49,8 @@ sip_parser.add_argument('host', store_missing=False)
 sip_parser.add_argument('options',
                         action='append',
                         type=option,
-                        store_missing=False)
+                        store_missing=False,
+                        nullable=False)
 
 
 class SipList(ListResource):

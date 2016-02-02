@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,9 @@ def test_put_errors(line, sip):
     yield s.check_bogus_field_returns_error, line_put, 'context', 123
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 'number'
+    yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', None
     yield s.check_bogus_field_returns_error, line_put, 'position', 'one'
+    yield s.check_bogus_field_returns_error, line_put, 'position', None
 
     with a.line_endpoint_sip(line, sip):
         yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'

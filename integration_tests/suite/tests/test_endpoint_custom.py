@@ -39,6 +39,9 @@ def test_post_errors():
 @fixtures.custom()
 def test_put_errors(custom):
     url = confd.endpoints.custom(custom['id']).put
+
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
+
     for check in error_checks(url):
         yield check
 

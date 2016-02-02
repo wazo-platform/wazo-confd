@@ -49,5 +49,5 @@ class CustomItem(ItemResource):
     fields = custom_fields
 
     parser = reqparse.RequestParser()
-    parser.add_argument('interface', store_missing=False)
-    parser.add_argument('enabled', type=bool, store_missing=False)
+    parser.add_argument('interface', store_missing=False, nullable=False)
+    parser.add_argument('enabled', type=bool, store_missing=False, nullable=False)

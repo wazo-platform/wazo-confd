@@ -63,7 +63,7 @@ class LineItem(ItemResource):
 
     parser = reqparse.RequestParser()
     parser.add_argument('context', store_missing=False)
-    parser.add_argument('provisioning_code', type=DigitStr(6), store_missing=False)
-    parser.add_argument('position', type=inputs.positive, store_missing=False)
+    parser.add_argument('provisioning_code', type=DigitStr(6), store_missing=False, nullable=False)
+    parser.add_argument('position', type=inputs.positive, store_missing=False, nullable=False)
     parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
