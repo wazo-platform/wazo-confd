@@ -197,6 +197,17 @@ def test_update_caller_id_on_line_without_endpoint_raises_error(line):
     response.assert_status(400)
 
 
+@fixtures.line(position=2)
+def test_when_updating_line_then_values_are_not_overwriten_with_defaults(line):
+    url = confd.lines(line['id'])
+
+    response = url.put(provisioning_code="768493")
+    response.assert_ok()
+
+    line = url.get().item
+    assert_that(line, has_entries(position=2, device_slot=2))
+
+
 @fixtures.line()
 def test_delete_line(line):
     response = confd.lines(line['id']).delete()

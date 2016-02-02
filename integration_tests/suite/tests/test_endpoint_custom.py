@@ -130,6 +130,17 @@ def test_when_updating_custom_with_interface_that_already_exists_then_error_rais
     response.assert_match(400, e.resource_exists('CustomEndpoint'))
 
 
+@fixtures.custom(enabled=False)
+def test_when_updating_endpoint_then_values_are_not_overwriten_with_defaults(custom):
+    url = confd.endpoints.custom(custom['id'])
+
+    response = url.put(interface="noupdateoverwrite")
+    response.assert_ok()
+
+    custom = url.get().item
+    assert_that(custom, has_entries(enabled=False))
+
+
 @fixtures.custom()
 def test_delete_custom(custom):
     response = confd.endpoints.custom(custom['id']).delete()
