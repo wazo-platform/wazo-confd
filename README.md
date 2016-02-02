@@ -19,7 +19,7 @@ further details on installing one.
 Running unit tests
 ------------------
 
-1. Install libffi ```apt-get install libffi-dev```
+1. Install system requirements ```apt-get install libpq-dev python-dev libffi-dev libyaml-0-2```
 2. Install requirements with ```pip install -U -r requirements.txt -r test-requirements.txt```
 3. Run tests with ```nosetests```
 
