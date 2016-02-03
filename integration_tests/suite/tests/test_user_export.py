@@ -29,6 +29,7 @@ from test_api import helpers as h
 
 @fixtures.user(firstname="Ûrsule",
                lastname="Wèrber",
+               email="ursule@werber.com",
                mobile_phone_number="5551234567",
                language="fr_FR",
                outgoing_caller_id="Hûrsule <4441234567>",
@@ -43,6 +44,7 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
     expected = has_entries(uuid=user['uuid'],
                            firstname="Ûrsule",
                            lastname="Wèrber",
+                           email="ursule@werber.com",
                            mobile_phone_number="5551234567",
                            language="fr_FR",
                            outgoing_caller_id="Hûrsule <4441234567>",

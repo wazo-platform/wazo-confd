@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is
 FULL_USER = {"firstname": "Jôhn",
              "lastname": "Smêth",
              "username": "jsmeth",
+             "email": "jsmeth@smeth.com",
              "mobile_phone_number": "+4185551234*2",
              "userfield": "userfield",
              "caller_id": '"Jôhnny Smith" <4185551234>',
@@ -48,6 +49,7 @@ FULL_USER = {"firstname": "Jôhn",
 NULL_USER = {"firstname": "Jôhn",
              "lastname": None,
              "username": None,
+             "email": None,
              "mobile_phone_number": None,
              "userfield": None,
              "outgoing_caller_id": None,
@@ -80,6 +82,7 @@ def test_post_errors():
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'firstname', 123
     yield s.check_bogus_field_returns_error, url, 'lastname', 123
+    yield s.check_bogus_field_returns_error, url, 'email', 123
     yield s.check_bogus_field_returns_error, url, 'timezone', 123
     yield s.check_bogus_field_returns_error, url, 'language', 123
     yield s.check_bogus_field_returns_error, url, 'description', 123
@@ -143,6 +146,7 @@ def test_search_using_legacy_parameter(user1, user2):
 
 @fixtures.user(firstname="Léeroy",
                lastname="Jénkins",
+               email="jenkins@leeroy.com",
                outgoing_caller_id='"Mystery Man" <5551234567>',
                username="leeroyjenkins",
                music_on_hold="leeroy_music_on_hold",
@@ -155,6 +159,7 @@ def test_search_on_user_view(user):
     searches = {
         'firstname': 'léeroy',
         'lastname': 'jénkins',
+        'email': 'jenkins@',
         'music_on_hold': 'leeroy_music',
         'outgoing_caller_id': '5551234567',
         'mobile_phone_number': '2423232',
@@ -169,6 +174,7 @@ def test_search_on_user_view(user):
 
 @fixtures.user(firstname="Môustapha",
                lastname="Bângoura",
+               email="moustapha@bangoura.com",
                mobile_phone_number="+5559284759",
                userfield="Moustapha userfield",
                description="Moustapha the greatest dancer")
@@ -178,6 +184,7 @@ def test_search_on_directory_view(user):
     searches = {
         'firstname': 'môustapha',
         'lastname': 'bângoura',
+        'email': 'moustapha@',
         'mobile_phone_number': '928475',
         'userfield': 'moustapha userfield',
         'description': "greatest dancer",
@@ -274,6 +281,7 @@ def test_updating_user_when_associated_to_user_and_line(user, line, extension, d
 
 @fixtures.user(firstname="Léeroy",
                lastname="Jénkins",
+               email="leeroy@jenkins.com",
                outgoing_caller_id='"Mystery Man" <5551234567>',
                username="leeroyjenkins",
                music_on_hold="leeroy_music_on_hold",
