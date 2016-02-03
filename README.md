@@ -19,13 +19,16 @@ further details on installing one.
 Running unit tests
 ------------------
 
-1. Install system requirements ```apt-get install libpq-dev python-dev libffi-dev libyaml-0-2```
-2. Install requirements with ```pip install -U -r requirements.txt -r test-requirements.txt```
-3. Run tests with ```nosetests```
-
+```
+apt-get install libpq-dev python-dev libffi-dev libyaml-dev
+pip install tox
+tox --recreate -e py27
+```
 
 Running integration tests
 -------------------------
+
+You need Docker installed.
 
 You need the repos xivo-manage-db and xivo-provisioning.
 
