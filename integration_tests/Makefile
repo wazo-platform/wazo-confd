@@ -2,7 +2,7 @@
 
 PROVD_DIR=../../xivo-provisioning
 MANAGE_DB_DIR=../../xivo-manage-db/
-POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/xivo-postgres/Dockerfile
+POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/postgres-test/Dockerfile
 
 
 test-setup: build-provd build-confd egg-info
