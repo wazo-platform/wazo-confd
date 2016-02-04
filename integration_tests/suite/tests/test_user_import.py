@@ -18,7 +18,15 @@
 
 from __future__ import unicode_literals
 
-from hamcrest import assert_that, contains, has_entries, contains_string, instance_of, has_items, greater_than, equal_to, none
+from hamcrest import (assert_that,
+                      contains,
+                      contains_string,
+                      equal_to,
+                      greater_than,
+                      has_entries,
+                      has_items,
+                      instance_of,
+                      none)
 
 from test_api import confd
 from test_api import config
@@ -73,6 +81,7 @@ def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
 def test_given_csv_has_all_fields_for_a_user_then_user_imported():
     csv = [{"firstname": "Rîchard",
             "lastname": "Lâpointe",
+            "email": "richard@lapointe.org",
             "entity_id": "1",
             "language": "fr_FR",
             "username": "richardlapointe",
@@ -96,6 +105,7 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
 
     assert_that(user, has_entries(firstname="Rîchard",
                                   lastname="Lâpointe",
+                                  email="richard@lapointe.org",
                                   language="fr_FR",
                                   username="richardlapointe",
                                   password="secret",
@@ -449,6 +459,7 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
         {"entity_id": "1",
          "firstname": "Jèan",
          "lastname": "Bâptiste",
+         "email": "jean@baptiste.st",
          "mobile_phone_number": "5551234567",
          "ring_seconds": "15",
          "simultaneous_calls": "10",
@@ -480,6 +491,7 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
         {"entity_id": "1",
          "firstname": "Moùssa",
          "lastname": "Nôbamgo",
+         "email": "moussa@nobamgo.ta",
          "mobile_phone_number": "5553456789",
          "ring_seconds": "20",
          "simultaneous_calls": "8",
@@ -562,6 +574,7 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
             "firstname": "Joël",
             "lastname": "Làchance",
             "language": "fr_FR",
+            "email": "joel@lachance.fr",
             "username": "joellachance",
             "password": "secret",
             "outgoing_caller_id": '"Joël Spîffy" <4185551234>',
@@ -582,6 +595,7 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
 
     assert_that(user, has_entries(firstname="Joël",
                                   lastname="Làchance",
+                                  email="joel@lachance.fr",
                                   language="fr_FR",
                                   username="joellachance",
                                   password="secret",
@@ -854,6 +868,7 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
          "context": config.CONTEXT,
          "firstname": "Géorge",
          "lastname": "Bâptiste",
+         "email": "george@baptiste.st",
          "mobile_phone_number": "5551234567",
          "ring_seconds": "15",
          "simultaneous_calls": "10",
@@ -883,6 +898,7 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
          "entity_id": "1",
          "firstname": "Moùssa",
          "lastname": "Nôbamgo",
+         "email": "moussa@nobamgo.sd",
          "mobile_phone_number": "5553456789",
          "ring_seconds": "20",
          "simultaneous_calls": "8",
@@ -980,6 +996,7 @@ def test_given_each_field_updated_individually_then_entry_updated(entry):
               "context": config.CONTEXT,
               "firstname": "Fàbien",
               "lastname": "Bâptiste",
+              "email": "fabien@baptiste.st",
               "mobile_phone_number": "5551234567",
               "ring_seconds": "15",
               "simultaneous_calls": "10",

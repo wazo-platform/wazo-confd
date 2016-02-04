@@ -4269,6 +4269,10 @@
                     "type": "string",
                     "description": "User lastname"
                 },
+                "email": {
+                    "type": "string",
+                    "description": "User's email"
+                },
                 "timezone": {
                     "type": "string",
                     "description": "User timezone"
