@@ -8,3 +8,7 @@ import user_line
 import line_extension
 import line_device
 import cti_profile
+import endpoint_sip
+import endpoint_sccp
+import endpoint_custom
+import user_import

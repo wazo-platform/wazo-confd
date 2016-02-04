@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from cStringIO import StringIO
 from test_api.helpers import words
 from test_api import config
 from test_api.setup import new_client
-from test_api import helpers
+from test_api.helpers import voicemail, extension
 
 
 def csv_client():
@@ -65,7 +65,7 @@ def make_entry(params):
 
     if params.get('voicemail'):
         name = "{e[firstname]} {e[lastname]}".format(e=entry)
-        number = helpers.voicemail.find_available_number(config.CONTEXT)
+        number = voicemail.find_available_number(config.CONTEXT)
 
         entry['voicemail_name'] = params.get('voicemail_name', name)
         entry['voicemail_number'] = params.get('voicemail_number', number)
@@ -82,13 +82,13 @@ def make_entry(params):
             entry['sip_password'] = params['sip_password']
 
     if params.get('extension'):
-        exten = helpers.extension.find_available_exten(config.CONTEXT)
+        exten = extension.find_available_exten(config.CONTEXT)
         entry.setdefault('line_protocol', 'sip')
         entry.setdefault('context', config.CONTEXT)
         entry['exten'] = params.get('exten', exten)
 
     if params.get('incall'):
-        exten = helpers.extension.find_available_exten(config.INCALL_CONTEXT)
+        exten = extension.find_available_exten(config.INCALL_CONTEXT)
         entry['incall_exten'] = params.get('incall_exten', exten)
         entry['incall_context'] = params.get('incall_context', config.INCALL_CONTEXT)
 

@@ -18,87 +18,80 @@
 
 from wrappers import IsolatedAction
 
-from helpers import line, line_sip, endpoint_sip, endpoint_sccp, endpoint_custom
-from helpers.user import generate_user, delete_user
-from helpers.extension import generate_extension, delete_extension
-from helpers.device import generate_device, delete_device, generate_autoprov
-from helpers.voicemail import generate_voicemail, delete_voicemail
-from helpers.context import generate_context, delete_context
-from helpers import user_import
-from helpers.cti_profile import find_by_name
+import helpers as h
 
 
 class user(IsolatedAction):
 
-    actions = {'generate': generate_user,
-               'delete': delete_user}
+    actions = {'generate': h.user.generate_user,
+               'delete': h.user.delete_user}
 
 
 class line(IsolatedAction):
 
-    actions = {'generate': line.generate_line,
-               'delete': line.delete_line}
+    actions = {'generate': h.line.generate_line,
+               'delete': h.line.delete_line}
 
 
 class line_sip(IsolatedAction):
 
-    actions = {'generate': line_sip.generate_line,
-               'delete': line_sip.delete_line}
+    actions = {'generate': h.line_sip.generate_line,
+               'delete': h.line_sip.delete_line}
 
 
 class sip(IsolatedAction):
 
-    actions = {'generate': endpoint_sip.generate_sip,
-               'delete': endpoint_sip.delete_sip}
+    actions = {'generate': h.endpoint_sip.generate_sip,
+               'delete': h.endpoint_sip.delete_sip}
 
 
 class sccp(IsolatedAction):
 
-    actions = {'generate': endpoint_sccp.generate_sccp,
-               'delete': endpoint_sccp.delete_sccp}
+    actions = {'generate': h.endpoint_sccp.generate_sccp,
+               'delete': h.endpoint_sccp.delete_sccp}
 
 
 class extension(IsolatedAction):
 
-    actions = {'generate': generate_extension,
-               'delete': delete_extension}
+    actions = {'generate': h.extension.generate_extension,
+               'delete': h.extension.delete_extension}
 
 
 class device(IsolatedAction):
 
-    actions = {'generate': generate_device,
-               'delete': delete_device}
+    actions = {'generate': h.device.generate_device,
+               'delete': h.device.delete_device}
 
 
 class autoprov(IsolatedAction):
 
-    actions = {'generate': generate_autoprov,
-               'delete': delete_device}
+    actions = {'generate': h.device.generate_autoprov,
+               'delete': h.device.delete_device}
 
 
 class voicemail(IsolatedAction):
 
-    actions = {'generate': generate_voicemail,
-               'delete': delete_voicemail}
+    actions = {'generate': h.voicemail.generate_voicemail,
+               'delete': h.voicemail.delete_voicemail}
 
 
 class context(IsolatedAction):
 
-    actions = {'generate': generate_context,
-               'delete': delete_context}
+    actions = {'generate': h.context.generate_context,
+               'delete': h.context.delete_context}
 
 
 class csv_entry(IsolatedAction):
 
-    actions = {'generate': user_import.generate_entry}
+    actions = {'generate': h.user_import.generate_entry}
 
 
 class cti_profile(IsolatedAction):
 
-    actions = {'generate': find_by_name}
+    actions = {'generate': h.cti_profile.find_by_name}
 
 
 class custom(IsolatedAction):
 
-    actions = {'generate': endpoint_custom.generate_custom,
-               'delete': endpoint_custom.delete_custom}
+    actions = {'generate': h.endpoint_custom.generate_custom,
+               'delete': h.endpoint_custom.delete_custom}
