@@ -25,8 +25,7 @@ from test_api import fixtures
 from test_api import mocks
 from test_api import associations as a
 from test_api import errors as e
-
-from test_api.database import create_helper as database_create_helper
+from test_api import db
 
 
 @fixtures.user()
@@ -232,9 +231,8 @@ def test_associating_two_sccp_lines_with_users_does_not_make_the_db_fail(user1, 
 @fixtures.sip()
 @fixtures.autoprov()
 def test_updating_line_associated_with_autoprov_device_does_not_fail(line, sip, device):
-    database = database_create_helper()
     with a.line_endpoint_sip(line, sip, check=False):
-        with database.queries() as queries:
+        with db.queries() as queries:
             queries.associate_line_device(line['id'], device['id'])
         response = confd.lines(line['id']).put()
         response.assert_ok()
@@ -246,11 +244,10 @@ def test_updating_line_associated_with_autoprov_device_does_not_fail(line, sip, 
 @fixtures.extension()
 @fixtures.autoprov()
 def test_updating_user_line_or_extension_associated_with_autoprov_device_does_not_fail(user, line, sip, extension, device):
-    database = database_create_helper()
     with a.line_endpoint_sip(line, sip, check=False), a.line_extension(line, extension, check=False), \
             a.user_line(user, line, check=False):
 
-        with database.queries() as queries:
+        with db.queries() as queries:
             queries.associate_line_device(line['id'], device['id'])
 
         response = confd.endpoints.sip(sip['id']).put()
