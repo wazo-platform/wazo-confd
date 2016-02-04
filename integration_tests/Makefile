@@ -5,26 +5,20 @@ MANAGE_DB_DIR=../../xivo-manage-db/
 POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/xivo-postgres/Dockerfile
 
 
-test-setup: build-postgres build-provd build-confd egg-info
+test-setup: build-provd build-confd egg-info
 	docker pull n3llyb0y/wait
 	docker pull rabbitmq
+	docker pull xivo/postgres-test
 
 build-confd:
 	docker build -t xivo/xivo-confd ..
 	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
-build-postgres:
-	docker pull postgres:9.4
-	docker build -t xivo/xivo-postgres -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
+update-db:
+	docker build -t xivo/postgres-test -f $(POSTGRES_TEST) $(MANAGE_DB_DIR)
 
 build-provd:
 	docker build -t xivo/xivo-provd $(PROVD_DIR)
-
-restart-confd:
-	cd assets/base && \
-	docker-compose kill confd && \
-	docker-compose rm -f confd && \
-	docker-compose run --rm --service-ports tests
 
 stop:
 	cd assets/base && \
@@ -35,16 +29,12 @@ start:
 	cd assets/base && \
 	docker-compose run --service-ports --rm tests
 
-runconfd:
-	cd assets/base && \
-	docker-compose run --service-ports --rm confd
-
 test:
 	nosetests suite
 
 distclean:
 	docker rmi xivo/xivo-provd
-	docker rmi xivo/xivo-postgres
+	docker rmi xivo/postgres-test
 	docker rmi xivo/xivo-confd
 	docker rmi xivo-confd-test
 
