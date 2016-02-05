@@ -190,3 +190,20 @@ class IncallCreator(Creator):
         return {key: fields[key]
                 for key in ('exten', 'context')
                 if fields.get(key) is not None}
+
+
+class CallPermissionCreator(Creator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def find(self, fields):
+        names = fields.get('names')
+        if names is not None:
+            return [self.dao.get_by(name=name) for name in names]
+
+    def create(self, fields):
+        return self.find(fields)
+
+    def update(self, fields, resource):
+        pass

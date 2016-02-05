@@ -32,6 +32,7 @@ class Entry(object):
         self.extension = None
         self.incall = None
         self.cti_profile = None
+        self.call_permissions = None
 
     def extract_ids(self):
         return {
@@ -45,7 +46,12 @@ class Entry(object):
             'extension_id': self.extension.id if self.extension else None,
             'incall_extension_id': self.incall.id if self.incall else None,
             'cti_profile_id': self.cti_profile.id if self.cti_profile else None,
+            'call_permission_ids': self.extract_call_permission_ids(),
         }
+
+    def extract_call_permission_ids(self):
+        permissions = self.call_permissions or []
+        return [permission.id for permission in permissions]
 
     def create(self, resource, creator):
         fields = self.entry_dict[resource]
@@ -86,6 +92,7 @@ class EntryCreator(object):
         entry = Entry(row.position, entry_dict)
         entry.create('user', self.creators['user'])
         entry.find_or_create('voicemail', self.creators['voicemail'])
+        entry.find_or_create('call_permissions', self.creators['call_permissions'])
         entry.find_or_create('line', self.creators['line'])
         entry.find_or_create('extension', self.creators['extension'])
         entry.find_or_create('incall', self.creators['incall'])
@@ -115,7 +122,7 @@ class EntryFinder(object):
 
     def __init__(self, user_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
                  user_cti_profile_dao, line_dao, user_line_dao, sip_dao, sccp_dao,
-                 extension_dao, incall_dao):
+                 extension_dao, incall_dao, call_permission_dao):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
@@ -127,6 +134,7 @@ class EntryFinder(object):
         self.sccp_dao = sccp_dao
         self.extension_dao = extension_dao
         self.incall_dao = incall_dao
+        self.call_permission_dao = call_permission_dao
 
     def get_entry(self, row):
         entry_dict = row.parse()
@@ -135,6 +143,8 @@ class EntryFinder(object):
         user = entry.user = self.user_dao.get_by(uuid=uuid)
 
         entry.cti_profile = self.user_cti_profile_dao.find_profile_by_userid(user.id)
+
+        entry.call_permissions = self.call_permission_dao.find_all_by_member('user', user.id)
 
         user_voicemail = self.user_voicemail_dao.find_by_user_id(user.id)
         if user_voicemail:
@@ -179,6 +189,7 @@ class EntryUpdater(object):
 
     def create_missing_resources(self, entry):
         entry.find_or_create('voicemail', self.creators['voicemail'])
+        entry.find_or_create('call_permissions', self.creators['call_permissions'])
         entry.find_or_create('extension', self.creators['extension'])
         entry.find_or_create('incall', self.creators['incall'])
         entry.find_or_create('cti_profile', self.creators['cti_profile'])
