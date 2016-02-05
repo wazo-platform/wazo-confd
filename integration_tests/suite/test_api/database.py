@@ -1,3 +1,21 @@
+# -*- coding: UTF-8 -*-
+
+# Copyright (C) 2015-2016 Avencall
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 import os
 import sqlalchemy as sa
 
@@ -323,6 +341,34 @@ class DatabaseQueries(object):
     def dissociate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = NULL WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)
+
+    def insert_call_permission(self, name):
+        query = text("INSERT INTO rightcall(name, description) VALUES (:name, '') RETURNING id")
+        return self.connection.execute(query, name=name).scalar()
+
+    def delete_call_permission(self, id):
+        query = text("DELETE FROM rightcallexten WHERE rightcallid = :id")
+        self.connection.execute(query, id=id)
+        query = text("DELETE FROM rightcallmember WHERE rightcallid = :id")
+        self.connection.execute(query, id=id)
+        query = text("DELETE FROM rightcall WHERE id = :id")
+        self.connection.execute(query, id=id)
+
+    def call_permission_has_user(self, call_permission_id, user_id):
+        query = text("""SELECT COUNT(*)
+                     FROM rightcallmember
+                     WHERE
+                        rightcallid = :call_permission_id
+                        AND type = 'user'
+                        AND typeval = :user_id
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          call_permission_id=call_permission_id,
+                          user_id=str(user_id))
+                 .scalar())
+
+        return count > 0
 
 
 def create_helper():

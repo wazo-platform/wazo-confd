@@ -26,13 +26,14 @@ from hamcrest import (assert_that,
                       has_items,
                       has_length,
                       not_none,
-                      none,
-                      instance_of)
+                      instance_of,
+                      empty)
 
 from test_api import confd
 from test_api import config
 from test_api import helpers as h
 from test_api import fixtures
+from test_api import db
 
 
 client = h.user_import.csv_client()
@@ -358,6 +359,53 @@ def test_given_csv_cti_profile_has_errors_then_errors_returned():
     assert_error(response, has_error_field('CtiProfile'))
 
 
+@fixtures.call_permission()
+def test_given_csv_has_call_permission_then_call_permission_associated(call_permission):
+    csv = [{"firstname": "Gërtrüde",
+            "call_permissions": call_permission['name']}]
+
+    expected = contains(
+        has_entries(
+            row_number=1,
+            call_permission_ids=contains(call_permission['id'])))
+
+    response = client.post("/users/import", csv)
+    assert_that(response.item['created'], expected)
+
+    user_id = response.item['created'][0]['user_id']
+    with db.queries() as queries:
+        assert_that(queries.call_permission_has_user(call_permission['id'], user_id))
+
+
+@fixtures.call_permission()
+@fixtures.call_permission()
+def test_given_csv_has_multiple_call_permissions_then_all_call_permission_associated(perm1, perm2):
+    permissions = "{perm1[name]};{perm2[name]}".format(perm1=perm1, perm2=perm2)
+    csv = [{"firstname": "Rônald",
+            "call_permissions": permissions}]
+
+    expected = contains(
+        has_entries(
+            row_number=1,
+            call_permission_ids=has_items(perm1['id'], perm2['id'])))
+
+    response = client.post("/users/import", csv)
+    assert_that(response.item['created'], expected)
+
+    user_id = response.item['created'][0]['user_id']
+    with db.queries() as queries:
+        assert_that(queries.call_permission_has_user(perm1['id'], user_id))
+        assert_that(queries.call_permission_has_user(perm2['id'], user_id))
+
+
+def test_given_call_permission_does_not_exist_then_error_raised():
+    csv = [{"firstname": "Trévor",
+            "call_permissions": "unknownperm"}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('CallPermission'))
+
+
 def test_given_csv_has_all_resources_then_all_relations_created():
     exten = h.extension.find_available_exten(config.CONTEXT)
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
@@ -407,7 +455,8 @@ def test_given_csv_has_all_resources_then_all_relations_created():
 @fixtures.extension()
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.voicemail()
-def test_given_resources_alreay_exist_when_importing_then_resources_associated(sip, extension, incall, voicemail):
+@fixtures.call_permission()
+def test_given_resources_already_exist_when_importing_then_resources_associated(sip, extension, incall, voicemail, call_permission):
     cti_profile = h.cti_profile.find_by_name("Client")
 
     csv = [{"firstname": "importassociate",
@@ -420,6 +469,7 @@ def test_given_resources_alreay_exist_when_importing_then_resources_associated(s
             "voicemail_number": voicemail['number'],
             "voicemail_context": voicemail['context'],
             "cti_profile_name": "Client",
+            "call_permissions": call_permission['name'],
             }]
 
     response = client.post("/users/import", csv)
@@ -444,8 +494,13 @@ def test_given_resources_alreay_exist_when_importing_then_resources_associated(s
     response = confd.users(user_id).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=cti_profile['id']))
 
+    with db.queries() as queries:
+        assert_that(queries.call_permission_has_user(call_permission['id'], user_id))
 
-def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
+
+@fixtures.call_permission()
+@fixtures.call_permission()
+def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm2):
     exten1 = h.extension.find_available_exten(config.CONTEXT)
     incall_exten1 = h.extension.find_available_exten('from-extern')
     vm_number1 = h.voicemail.find_available_number(config.CONTEXT)
@@ -486,7 +541,8 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
          "cti_profile_name": "Client",
          "cti_profile_enabled": "1",
          "username": "jean",
-         "password": "secret"},
+         "password": "secret",
+         "call_permissions": perm1['name']},
         {"entity_id": "1",
          "firstname": "Moùssa",
          "lastname": "Nôbamgo",
@@ -516,7 +572,8 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported():
          "cti_profile_name": "Client",
          "cti_profile_enabled": "1",
          "username": "moussa",
-         "password": "secret"},
+         "password": "secret",
+         "call_permissions": perm2['name']},
     ]
 
     response = client.post("/users/import", csv)
@@ -557,11 +614,15 @@ def test_given_field_group_is_empty_then_resource_is_not_created():
              "incall_context": ""}
     yield import_empty_group, group, 'incall_extension_id'
 
+    group = {"call_permissions": ""}
+    yield import_empty_group, group, 'call_permission_ids', []
 
-def import_empty_group(fields, parameter):
+
+def import_empty_group(fields, parameter, expected=None):
     fields['firstname'] = "Abigaël"
     response = client.post("/users/import", [fields])
-    assert_that(response.item['created'][0], has_entries({parameter: none()}))
+    entry = response.item['created'][0]
+    assert_that(entry, has_entries({parameter: expected}))
 
 
 @fixtures.csv_entry()
@@ -814,6 +875,71 @@ def test_when_adding_cti_profile_fields_then_cti_profile_added(entry):
                                               enabled=True))
 
 
+@fixtures.csv_entry(call_permissions=2)
+@fixtures.call_permission()
+@fixtures.call_permission()
+def test_when_updating_call_permission_field_then_call_permissions_updated(entry, perm1, perm2):
+    permissions = "{perm1[name]};{perm2[name]}".format(perm1=perm1, perm2=perm2)
+    csv = [{"uuid": entry['user_uuid'],
+            "call_permissions": permissions}]
+
+    response = client.put("/users/import", csv)
+
+    expected = contains(
+        has_entries(
+            row_number=1,
+            call_permission_ids=has_items(perm1['id'], perm2['id'])))
+
+    assert_that(response.item['updated'], expected)
+
+    old_perm_id1, old_perm_id2 = entry['call_permission_ids']
+    user_id = response.item['updated'][0]['user_id']
+
+    with db.queries() as q:
+        assert_that(q.call_permission_has_user(perm1['id'], user_id), equal_to(True))
+        assert_that(q.call_permission_has_user(perm2['id'], user_id), equal_to(True))
+        assert_that(q.call_permission_has_user(old_perm_id1, user_id), equal_to(False))
+        assert_that(q.call_permission_has_user(old_perm_id2, user_id), equal_to(False))
+
+
+@fixtures.csv_entry(call_permissions=1)
+def test_when_call_permission_column_is_empty_then_call_permission_is_removed(entry):
+    csv = [{"uuid": entry['user_uuid'],
+            "call_permissions": ""}]
+
+    response = client.put("/users/import", csv)
+
+    expected = contains(
+        has_entries(
+            row_number=1,
+            call_permission_ids=empty()))
+
+    assert_that(response.item['updated'], expected)
+
+    old_perm_id = entry['call_permission_ids'][0]
+    user_id = response.item['updated'][0]['user_id']
+
+    with db.queries() as q:
+        assert_that(q.call_permission_has_user(old_perm_id, user_id), equal_to(False))
+
+
+@fixtures.csv_entry(call_permissions=1)
+def test_when_call_permission_column_is_not_in_csv_then_call_permission_remains_unchanged(entry):
+    csv = [{"uuid": entry['user_uuid']}]
+
+    perm_id = entry['call_permission_ids'][0]
+
+    response = client.put("/users/import", csv)
+
+    expected = contains(
+        has_entries(
+            row_number=1,
+            call_permission_ids=contains(perm_id)))
+
+    print response.item['updated'][0]
+    assert_that(response.item['updated'], expected)
+
+
 def check_error_on_update(entry, fields, error):
     entry = dict(entry)
     entry.update(fields)
@@ -931,7 +1057,8 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
 @fixtures.extension()
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.voicemail()
-def test_given_resources_not_associated_when_updating_then_resources_associated(user, sip, extension, incall, voicemail):
+@fixtures.call_permission()
+def test_given_resources_not_associated_when_updating_then_resources_associated(user, sip, extension, incall, voicemail, call_permission):
     csv = [{"uuid": user['uuid'],
             "exten": extension['exten'],
             "context": extension['context'],
@@ -942,6 +1069,7 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
             "voicemail_number": voicemail['number'],
             "voicemail_context": voicemail['context'],
             "cti_profile_name": "Client",
+            "call_permissions": call_permission['name'],
             }]
 
     response = client.put("/users/import", csv)
@@ -965,9 +1093,13 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     response = confd.users(entry['user_id']).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
 
+    with db.queries() as queries:
+        assert_that(queries.call_permission_has_user(call_permission['id'], entry['user_id']))
 
-@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip")
-def test_given_each_field_updated_individually_then_entry_updated(entry):
+
+@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip", call_permissions=1)
+@fixtures.call_permission()
+def test_given_each_field_updated_individually_then_entry_updated(entry, call_permission):
     exten = h.extension.find_available_exten(config.CONTEXT)
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     vm_number = h.voicemail.find_available_number(config.CONTEXT)
@@ -1002,6 +1134,7 @@ def test_given_each_field_updated_individually_then_entry_updated(entry):
               "cti_profile_name": "Agent",
               "cti_profile_enabled": "1",
               "username": "fabien",
+              "call_permissions": call_permission['name'],
               "password": "secret"}
 
     for name, value in fields.iteritems():
