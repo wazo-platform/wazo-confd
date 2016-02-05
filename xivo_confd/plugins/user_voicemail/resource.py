@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ from xivo_dao.helpers import errors
 from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
 
@@ -64,17 +65,20 @@ class UserVoicemailResource(ConfdResource):
 
 class UserVoicemailRoot(UserVoicemailResource):
 
+    @required_acl('confd.users.{user_id}.voicemail.read')
     def get(self, user_id):
         user = self.get_user(user_id)
         user_voicemail = self.service.get_by(user_id=user.id)
         return marshal(user_voicemail, fields)
 
+    @required_acl('confd.users.{user_id}.voicemail.create')
     def post(self, user_id):
         user = self.get_user(user_id)
         voicemail = self.get_voicemail_or_fail()
         user_voicemail = self.service.associate(user, voicemail)
         return marshal(user_voicemail, fields), 201, self.build_headers(user_voicemail)
 
+    @required_acl('confd.users.{user_id}.voicemail.delete')
     def delete(self, user_id):
         user = self.get_user(user_id)
         user_voicemail = self.service.get_by(user_id=user.id)
@@ -92,6 +96,7 @@ class UserVoicemailRoot(UserVoicemailResource):
 
 class VoicemailUserList(UserVoicemailResource):
 
+    @required_acl('confd.voicemail.{voicemail_id}.users.read')
     def get(self, voicemail_id):
         voicemail = self.voicemail_dao.get(voicemail_id)
         items = self.service.find_all_by(voicemail_id=voicemail.id)

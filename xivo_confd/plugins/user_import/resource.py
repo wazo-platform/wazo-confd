@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ from flask import make_response
 
 from xivo_dao.helpers.db_manager import Session
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.plugins.user_import import csvparse
 from xivo_confd.database import user_export as user_export_db
@@ -34,6 +35,7 @@ class UserImportResource(ConfdResource):
     def __init__(self, service):
         self.service = service
 
+    @required_acl('confd.users.import.create')
     def post(self):
         parser = csvparse.parse()
         entries, errors = self.service.import_rows(parser)
@@ -48,6 +50,7 @@ class UserImportResource(ConfdResource):
 
         return response, status_code
 
+    @required_acl('confd.users.import.update')
     def put(self):
         parser = csvparse.parse()
         entries, errors = self.service.update_rows(parser)
@@ -70,6 +73,7 @@ class UserImportResource(ConfdResource):
 
 class UserExportResource(ConfdResource):
 
+    @required_acl('confd.users.export.read')
     def get(self):
         header, query = user_export_db.export_query()
         content = self.format_csv(header, query)

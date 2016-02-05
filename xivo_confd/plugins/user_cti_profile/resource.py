@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 from flask_restful import reqparse, fields, marshal
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
 
@@ -56,11 +57,13 @@ class UserCtiProfileResource(ConfdResource):
 
 class UserCtiProfileRoot(UserCtiProfileResource):
 
+    @required_acl('confd.users.{user_id}.cti.read')
     def get(self, user_id):
         user = self.get_user(user_id)
         association = self.service.get(user.id)
         return marshal(association, fields)
 
+    @required_acl('confd.users.{user_id}.cti.update')
     def put(self, user_id):
         form = parser.parse_args()
         user = self.get_user(user_id)

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ from xivo_dao.helpers import errors
 from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
 
@@ -65,12 +66,14 @@ class UserLineResource(ConfdResource):
 
 class UserLineList(UserLineResource):
 
+    @required_acl('confd.users.{user_id}.lines.read')
     def get(self, user_id):
         user = self.get_user(user_id)
         items = self.service.find_all_by(user_id=user.id)
         return {'total': len(items),
                 'items': [marshal(item, fields) for item in items]}
 
+    @required_acl('confd.users.{user_id}.lines.create')
     def post(self, user_id):
         user = self.get_user(user_id)
         line = self.get_line_or_fail()
@@ -88,12 +91,14 @@ class UserLineList(UserLineResource):
 
 class UserLineItem(UserLineResource):
 
+    @required_acl('confd.users.{user_id}.lines.{line_id}.read')
     def get(self, user_id, line_id):
         user = self.get_user(user_id)
         line = self.line_dao.get(line_id)
         user_line = self.service.get(user, line)
         return marshal(user_line, fields)
 
+    @required_acl('confd.users.{user_id}.lines.{line_id}.delete')
     def delete(self, user_id, line_id):
         user = self.get_user(user_id)
         line = self.line_dao.get(line_id)
@@ -103,6 +108,7 @@ class UserLineItem(UserLineResource):
 
 class LineUserList(UserLineResource):
 
+    @required_acl('confd.lines.{line_id}.users.read')
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         items = self.service.find_all_by(line_id=line.id)
