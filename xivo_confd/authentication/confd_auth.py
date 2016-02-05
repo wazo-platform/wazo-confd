@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014-2015 Avencall
+# Copyright (C) 2014-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,10 +24,12 @@ from flask_httpauth import HTTPDigestAuth
 from functools import wraps
 
 from xivo_dao import accesswebservice_dao
-from xivo_auth_client import Client as AuthClient
+from xivo.auth_verifier import AuthVerifier, required_acl
 
 
 logger = logging.getLogger(__name__)
+
+required_acl = required_acl
 
 
 class ConfdAuth(HTTPDigestAuth):
@@ -37,6 +39,7 @@ class ConfdAuth(HTTPDigestAuth):
     def __init__(self):
         super(ConfdAuth, self).__init__()
         self.get_password(accesswebservice_dao.get_password)
+        self.auth_verifier = AuthVerifier()
 
     def login_required(self, func):
         auth_func = super(ConfdAuth, self).login_required(func)
@@ -45,7 +48,7 @@ class ConfdAuth(HTTPDigestAuth):
         def decorated(*args, **kwargs):
             if self._remote_address_allowed():
                 return func(*args, **kwargs)
-            elif self._valid_token():
+            elif self._verify_token(func, *args, **kwargs):
                 return func(*args, **kwargs)
             return auth_func(*args, **kwargs)
 
@@ -58,12 +61,22 @@ class ConfdAuth(HTTPDigestAuth):
             return True
         return remote_addr in accesswebservice_dao.get_allowed_hosts()
 
-    def _valid_token(self):
+    def _verify_token(self, func, *args, **kwargs):
         auth_config = current_app.config['auth']
-        token = request.headers.get('X-Auth-Token', '')
+        self.auth_verifier.set_config(auth_config)
         try:
-            return AuthClient(**auth_config).token.is_valid(token, required_acl='confd.#')
+            token = self.auth_verifier.token()
+            required_acl = self._acl(func, *args, **kwargs)
+            token_is_valid = self.auth_verifier.client().token.is_valid(token, required_acl)
         except requests.RequestException as e:
             message = 'Authentication server on {host}:{port} unreachable: {error}'
             logger.error(message.format(host=auth_config['host'], port=auth_config['port'], error=e))
             return False
+
+        return token_is_valid
+
+    def _acl(self, func, *args, **kwargs):
+        required_acl = self.auth_verifier.acl(func, *args, **kwargs)
+        if not required_acl:
+            return 'confd.#'
+        return required_acl
