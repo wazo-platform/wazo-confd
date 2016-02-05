@@ -43,19 +43,22 @@ def assert_response_has_id(response, field, row_number=1):
     assert_that(response.item['created'], contains(expected_entry))
 
 
-def assert_error_message(response, message, row_number=1):
+def assert_error(response, expect):
     response.assert_status(400)
-    expected_error = has_entries({'timestamp': instance_of(int),
-                                  'details': has_entries(row_number=row_number),
-                                  'message': contains_string(message)})
-    assert_that(response.json['errors'], contains(expected_error))
+    assert_that(response.json, has_entries(errors=expect))
+
+
+def has_error_field(fieldname, row_number=1):
+    return contains(has_entries(timestamp=instance_of(int),
+                                details=has_entries(row_number=row_number),
+                                message=contains_string(fieldname)))
 
 
 def test_given_required_fields_missing_then_error_returned():
     csv = [{"lastname": "missingfirstname"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, "firstname")
+    assert_error(response, has_error_field("firstname"))
 
 
 def test_given_entity_id_does_not_exist_then_error_returned():
@@ -63,7 +66,7 @@ def test_given_entity_id_does_not_exist_then_error_returned():
             "entity_id": "999999999"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, "entity")
+    assert_error(response, has_error_field("entity"))
 
 
 def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
@@ -124,7 +127,7 @@ def test_given_csv_column_has_wrong_type_then_error_returned():
             'supervision_enabled': 'yeah'}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'supervision_enabled')
+    assert_error(response, has_error_field('supervision_enabled'))
 
 
 def test_given_user_contains_error_then_error_returned():
@@ -132,7 +135,7 @@ def test_given_user_contains_error_then_error_returned():
             "mobile_phone_number": "blah"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'mobile_phone_number')
+    assert_error(response, has_error_field('mobile_phone_number'))
 
 
 def test_given_csv_has_minimal_voicemail_fields_then_voicemail_imported():
@@ -189,7 +192,7 @@ def test_given_voicemail_contains_error_then_error_returned():
             "voicemail_context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'number')
+    assert_error(response, has_error_field('number'))
 
 
 def test_given_csv_has_minimal_line_fields_then_line_created():
@@ -213,7 +216,7 @@ def test_given_line_has_error_then_error_returned():
             "context": 'invalidcontext'}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'context')
+    assert_error(response, has_error_field('context'))
 
 
 def test_given_csv_has_minimal_sip_fields_then_sip_endpoint_created():
@@ -285,7 +288,7 @@ def test_given_csv_extension_has_errors_then_errors_returned():
             "context": "invalid"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'context')
+    assert_error(response, has_error_field('context'))
 
 
 def test_given_csv_has_minimal_incall_fields_then_incall_created():
@@ -327,7 +330,7 @@ def test_given_csv_incall_has_errors_then_errors_returned():
             "incall_context": "invalid"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'context')
+    assert_error(response, has_error_field('context'))
 
 
 def test_given_csv_has_cti_fields_then_cti_profile_associated():
@@ -356,7 +359,7 @@ def test_given_csv_cti_profile_has_errors_then_errors_returned():
             "cti_profile_name": "InvalidProfile"}]
 
     response = client.post("/users/import", csv)
-    assert_error_message(response, 'CtiProfile')
+    assert_error(response, has_error_field('CtiProfile'))
 
 
 def test_given_csv_has_all_resources_then_all_relations_created():
@@ -726,7 +729,7 @@ def test_when_changing_line_protocol_then_error_raised(entry):
 
     response = client.put("/users/import", csv)
 
-    assert_error_message(response, 'endpoint')
+    assert_error(response, has_error_field('endpoint'))
 
 
 @fixtures.csv_entry(extension=True)
@@ -838,7 +841,7 @@ def check_error_on_update(entry, fields, error):
     entry.update(fields)
     entry['uuid'] = entry['user_uuid']
     response = client.put("/users/import", [entry])
-    assert_error_message(response, error)
+    assert_error(response, has_error_field(error))
 
 
 def test_given_csv_has_errors_then_errors_returned():
