@@ -25,8 +25,10 @@ from hamcrest import (assert_that,
                       greater_than,
                       has_entries,
                       has_items,
-                      instance_of,
-                      none)
+                      has_length,
+                      not_none,
+                      none,
+                      instance_of)
 
 from test_api import confd
 from test_api import config
@@ -35,6 +37,20 @@ from test_api import fixtures
 
 
 client = h.user_import.csv_client()
+
+
+def get_import_field(response, fieldname, row_number=1):
+    rows = response.item['created']
+    assert_that(rows,
+                has_length(row_number),
+                "CSV import did not create enough rows")
+
+    row = rows[row_number - 1]
+    assert_that(row,
+                has_entries({'row_number': row_number,
+                             fieldname: not_none()}))
+
+    return row[fieldname]
 
 
 def assert_response_has_id(response, field, row_number=1):
@@ -73,12 +89,11 @@ def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
     csv = [{"firstname": "Rîchard"}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'user_id')
+    user_id = get_import_field(response, 'user_id')
+    user_uuid = get_import_field(response, 'user_uuid')
 
-    user_id = response.item['created'][0]['user_id']
     user = confd.users(user_id).get().item
-
-    assert_that(user, has_entries(firstname="Rîchard"))
+    assert_that(user, has_entries(firstname="Rîchard", uuid=user_uuid))
 
 
 def test_given_csv_has_all_fields_for_a_user_then_user_imported():
@@ -99,13 +114,10 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             }]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'user_id')
-
-    user_id = response.item['created'][0]['user_id']
-    user_uuid = response.item['created'][0]['user_uuid']
+    user_id = get_import_field(response, 'user_id')
+    user_uuid = get_import_field(response, 'user_uuid')
 
     user = confd.users(user_id).get().item
-
     assert_that(user, has_entries(firstname="Rîchard",
                                   lastname="Lâpointe",
                                   email="richard@lapointe.org",
@@ -146,11 +158,9 @@ def test_given_csv_has_minimal_voicemail_fields_then_voicemail_imported():
             "voicemail_context": context}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'voicemail_id')
+    voicemail_id = get_import_field(response, 'voicemail_id')
 
-    voicemail_id = response.item['created'][0]['voicemail_id']
     voicemail = confd.voicemails(voicemail_id).get().item
-
     assert_that(voicemail, has_entries(name="Jôey VM",
                                        number=number,
                                        context=context))
@@ -170,11 +180,9 @@ def test_given_csv_has_all_voicemail_fields_then_voicemail_imported():
             }]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'voicemail_id')
+    voicemail_id = get_import_field(response, 'voicemail_id')
 
-    voicemail_id = response.item['created'][0]['voicemail_id']
     voicemail = confd.voicemails(voicemail_id).get().item
-
     assert_that(voicemail, has_entries(name="Jôey VM",
                                        number=number,
                                        context=context,
@@ -201,9 +209,7 @@ def test_given_csv_has_minimal_line_fields_then_line_created():
             "context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'line_id')
-
-    line_id = response.item['created'][0]['line_id']
+    line_id = get_import_field(response, 'line_id')
 
     line = confd.lines(line_id).get().item
     assert_that(line, has_entries(context=config.CONTEXT,
@@ -225,9 +231,7 @@ def test_given_csv_has_minimal_sip_fields_then_sip_endpoint_created():
             "context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'sip_id')
-
-    sip_id = response.item['created'][0]['sip_id']
+    sip_id = get_import_field(response, 'sip_id')
 
     sip = confd.endpoints.sip(sip_id).get().item
     assert_that(sip, has_entries(id=sip_id))
@@ -241,9 +245,7 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
             "sip_secret": "sipsecret"}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'sip_id')
-
-    sip_id = response.item['created'][0]['sip_id']
+    sip_id = get_import_field(response, 'sip_id')
 
     sip = confd.endpoints.sip(sip_id).get().item
     assert_that(sip, has_entries(username="sipusername",
@@ -256,9 +258,7 @@ def test_given_csv_has_minimal_sccp_fields_then_sccp_endpoint_created():
             "context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'sccp_id')
-
-    sccp_id = response.item['created'][0]['sccp_id']
+    sccp_id = get_import_field(response, 'sccp_id')
 
     sccp = confd.endpoints.sccp(sccp_id).get().item
     assert_that(sccp, has_entries(id=sccp_id))
@@ -272,11 +272,9 @@ def test_given_csv_has_extension_fields_then_extension_created():
             "context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'extension_id')
+    extension_id = get_import_field(response, 'extension_id')
 
-    extension_id = response.item['created'][0]['extension_id']
     extension = confd.extensions(extension_id).get().item
-
     assert_that(extension, has_entries(exten=exten,
                                        context=config.CONTEXT))
 
@@ -300,11 +298,9 @@ def test_given_csv_has_minimal_incall_fields_then_incall_created():
             "incall_context": config.INCALL_CONTEXT}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'incall_extension_id')
+    incall_extension_id = get_import_field(response, 'incall_extension_id')
 
-    incall_extension_id = response.item['created'][0]['incall_extension_id']
     extension = confd.extensions(incall_extension_id).get().item
-
     assert_that(extension, has_entries(exten=exten,
                                        context=config.INCALL_CONTEXT))
 
@@ -319,7 +315,7 @@ def test_given_csv_has_all_incall_fields_then_incall_created():
             "incall_ring_seconds": "10"}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'incall_extension_id')
+    get_import_field(response, 'incall_extension_id')
 
 
 def test_given_csv_incall_has_errors_then_errors_returned():
@@ -341,12 +337,10 @@ def test_given_csv_has_cti_fields_then_cti_profile_associated():
             "cti_profile_name": "Client"}]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'cti_profile_id')
+    cti_profile_id = get_import_field(response, 'cti_profile_id')
+    user_id = get_import_field(response, 'user_id')
 
-    user_id = response.item['created'][0]['user_id']
     user_cti_profile = confd.users(user_id).cti.get().item
-
-    cti_profile_id = h.cti_profile.find_id_for_profile("Client")
     assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
                                               enabled=True))
 
@@ -380,32 +374,31 @@ def test_given_csv_has_all_resources_then_all_relations_created():
             }]
 
     response = client.post("/users/import", csv)
-    assert_response_has_id(response, 'user_id')
-    assert_response_has_id(response, 'line_id')
-    assert_response_has_id(response, 'voicemail_id')
-    assert_response_has_id(response, 'extension_id')
-    assert_response_has_id(response, 'incall_extension_id')
-    assert_response_has_id(response, 'sip_id')
-    assert_response_has_id(response, 'cti_profile_id')
 
-    entry = response.item['created'][0]
+    user_id = get_import_field(response, 'user_id')
+    line_id = get_import_field(response, 'line_id')
+    voicemail_id = get_import_field(response, 'voicemail_id')
+    extension_id = get_import_field(response, 'extension_id')
+    incall_extension_id = get_import_field(response, 'incall_extension_id')
+    sip_id = get_import_field(response, 'sip_id')
+    cti_profile_id = get_import_field(response, 'cti_profile_id')
 
-    response = confd.users(entry['user_id']).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
+    response = confd.users(user_id).lines.get()
+    assert_that(response.items, contains(has_entries(line_id=line_id)))
 
-    response = confd.lines(entry['line_id']).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=entry['extension_id']),
-                                          has_entries(extension_id=entry['incall_extension_id'])))
+    response = confd.lines(line_id).extensions.get()
+    assert_that(response.items, has_items(has_entries(extension_id=extension_id),
+                                          has_entries(extension_id=incall_extension_id)))
 
-    response = confd.users(entry['user_id']).voicemail.get()
-    assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
+    response = confd.users(user_id).voicemail.get()
+    assert_that(response.item, has_entries(voicemail_id=voicemail_id))
 
-    response = confd.lines(entry['line_id']).endpoints.sip.get()
+    response = confd.lines(line_id).endpoints.sip.get()
     assert_that(response.item, has_entries(endpoint='sip',
-                                           endpoint_id=entry['sip_id']))
+                                           endpoint_id=sip_id))
 
-    response = confd.users(entry['user_id']).cti.get()
-    assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
+    response = confd.users(user_id).cti.get()
+    assert_that(response.item, has_entries(cti_profile_id=cti_profile_id))
 
 
 @fixtures.sip()
@@ -429,23 +422,24 @@ def test_given_resources_alreay_exist_when_importing_then_resources_associated(s
 
     response = client.post("/users/import", csv)
 
-    entry = response.item['created'][0]
+    user_id = get_import_field(response, 'user_id')
+    line_id = get_import_field(response, 'line_id')
 
-    response = confd.users(entry['user_id']).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
+    response = confd.users(user_id).lines.get()
+    assert_that(response.items, contains(has_entries(line_id=line_id)))
 
-    response = confd.lines(entry['line_id']).extensions.get()
+    response = confd.lines(line_id).extensions.get()
     assert_that(response.items, has_items(has_entries(extension_id=extension['id']),
                                           has_entries(extension_id=incall['id'])))
 
-    response = confd.users(entry['user_id']).voicemail.get()
+    response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
 
-    response = confd.lines(entry['line_id']).endpoints.sip.get()
+    response = confd.lines(line_id).endpoints.sip.get()
     assert_that(response.item, has_entries(endpoint='sip',
                                            endpoint_id=sip['id']))
 
-    response = confd.users(entry['user_id']).cti.get()
+    response = confd.users(user_id).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=cti_profile['id']))
 
 
