@@ -15,7 +15,7 @@ build-confd:
 	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
 update-db:
-	docker build -t xivo/postgres-test -f $(POSTGRES_TEST) $(MANAGE_DB_DIR)
+	docker build --no-cache -t xivo/postgres-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
 	docker build -t xivo/xivo-provd $(PROVD_DIR)
