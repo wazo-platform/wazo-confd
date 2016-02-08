@@ -17,6 +17,9 @@
 
 import unittest
 
+from datetime import datetime
+
+from test_api import mocks
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
@@ -26,7 +29,14 @@ from test_api import provd
 
 from test_api.helpers.device import generate_device
 
-from hamcrest import assert_that, has_entry, none
+from hamcrest import (assert_that,
+                      has_entry,
+                      has_entries,
+                      has_key,
+                      none,
+                      not_none,
+                      is_not,
+                      starts_with)
 
 
 BOGUS = [
@@ -126,12 +136,35 @@ def test_dissociate_line_to_a_device(device, line):
     response.assert_status(403)
 
 
+@mocks.provd()
 @fixtures.device()
 @fixtures.line()
-def test_reset_to_autoprov_device_associated_to_line(device, line):
+def test_reset_to_autoprov_device_associated_to_line(provd, device, line):
     with a.line_device(line, device, check=False):
         response = confd.devices(device['id']).autoprov.get()
         response.assert_ok()
 
         response = confd.lines(line['id']).get()
         assert_that(response.item, has_entry('device_id', none()))
+
+        device_cfg = provd.devices.get(device['id'])
+        assert_that(device_cfg, has_entries(config=starts_with('autoprov')))
+        assert_that(device_cfg, is_not(has_key('options')))
+
+        config_cfg = provd.configs.get(device_cfg['config'])
+        assert_that(config_cfg, not_none())
+
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries(device_id=none()))
+
+
+@mocks.provd()
+@fixtures.device()
+def test_synchronize_device(provd, device):
+    timestamp = datetime.utcnow()
+
+    response = confd.devices(device['id']).synchronize.get()
+    response.assert_ok()
+
+    synchonized = provd.has_synchronized(device['id'], timestamp)
+    assert_that(synchonized, "Device was not synchronized")
