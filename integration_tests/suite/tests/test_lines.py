@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,9 @@ def test_put_errors(line, sip):
     yield s.check_bogus_field_returns_error, line_put, 'context', 123
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', 'number'
+    yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', None
     yield s.check_bogus_field_returns_error, line_put, 'position', 'one'
+    yield s.check_bogus_field_returns_error, line_put, 'position', None
 
     with a.line_endpoint_sip(line, sip):
         yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'
@@ -193,6 +195,17 @@ def test_update_caller_id_on_line_without_endpoint_raises_error(line):
     response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth",
                                            caller_id_num="1000")
     response.assert_status(400)
+
+
+@fixtures.line(position=2)
+def test_when_updating_line_then_values_are_not_overwriten_with_defaults(line):
+    url = confd.lines(line['id'])
+
+    response = url.put(provisioning_code="768493")
+    response.assert_ok()
+
+    line = url.get().item
+    assert_that(line, has_entries(position=2, device_slot=2))
 
 
 @fixtures.line()

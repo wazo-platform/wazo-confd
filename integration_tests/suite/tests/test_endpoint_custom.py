@@ -39,6 +39,9 @@ def test_post_errors():
 @fixtures.custom()
 def test_put_errors(custom):
     url = confd.endpoints.custom(custom['id']).put
+
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
+
     for check in error_checks(url):
         yield check
 
@@ -125,6 +128,17 @@ def test_update_custom(custom):
 def test_when_updating_custom_with_interface_that_already_exists_then_error_raised(custom, duplicate):
     response = confd.endpoints.custom(custom['id']).put(interface=duplicate['interface'])
     response.assert_match(400, e.resource_exists('CustomEndpoint'))
+
+
+@fixtures.custom(enabled=False)
+def test_when_updating_endpoint_then_values_are_not_overwriten_with_defaults(custom):
+    url = confd.endpoints.custom(custom['id'])
+
+    response = url.put(interface="noupdateoverwrite")
+    response.assert_ok()
+
+    custom = url.get().item
+    assert_that(custom, has_entries(enabled=False))
 
 
 @fixtures.custom()

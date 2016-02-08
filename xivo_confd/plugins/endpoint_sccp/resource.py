@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ sccp_parser = reqparse.RequestParser()
 sccp_parser.add_argument('options',
                          type=option,
                          action='append',
-                         store_missing=False)
+                         store_missing=False,
+                         nullable=False)
 
 
 class SccpList(ListResource):
