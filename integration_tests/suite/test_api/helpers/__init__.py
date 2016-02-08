@@ -17,3 +17,4 @@ import endpoint_sccp
 import endpoint_custom
 import user_import
 import call_permission
+import user_call_permission

@@ -354,6 +354,29 @@ class DatabaseQueries(object):
         query = text("DELETE FROM rightcall WHERE id = :id")
         self.connection.execute(query, id=id)
 
+    def add_call_permission_member(self, call_permission_id, member_id, member='user'):
+        query = text("""INSERT INTO rightcallmember
+                     (rightcallid, type, typeval)
+                     VALUES
+                     (:call_permission_id, :member, :member_id)
+                     """)
+        self.connection.execute(query,
+                                call_permission_id=call_permission_id,
+                                member=member,
+                                member_id=str(member_id))
+
+    def remove_call_permission_member(self, call_permission_id, member_id, member='user'):
+        query = text("""DELETE FROM rightcallmember
+                     WHERE
+                     rightcallid = :call_permission_id
+                     AND type = :member
+                     AND typeval = :member_id
+                     """)
+        self.connection.execute(query,
+                                call_permission_id=call_permission_id,
+                                member=member,
+                                member_id=str(member_id))
+
     def call_permission_has_user(self, call_permission_id, user_id):
         query = text("""SELECT COUNT(*)
                      FROM rightcallmember
