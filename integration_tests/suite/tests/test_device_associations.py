@@ -60,7 +60,8 @@ def test_when_sip_username_and_password_are_updated_then_provd_is_updated(provd,
 
         provd_config = provd.configs.get(device['id'])
         sip_line = provd_config['raw_config']['sip_lines']['1']
-        assert_that(sip_line, has_entries({'username': 'myusername',
+        assert_that(sip_line, has_entries({'auth_username': 'myusername',
+                                           'username': 'myusername',
                                            'password': 'mysecret'}))
 
 
