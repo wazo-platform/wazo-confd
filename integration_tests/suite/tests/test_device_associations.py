@@ -64,19 +64,6 @@ def test_when_sip_username_and_password_are_updated_then_provd_is_updated(provd,
                                            'password': 'mysecret'}))
 
 
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension()
-@fixtures.device()
-def test_updating_user_when_associated_to_device_does_not_fail(user, line, extension, device):
-    with a.user_line(user, line), \
-            a.line_extension(line, extension), \
-            a.line_device(line, device):
-
-        response = confd.users(user['id']).put(firstname='fôobar')
-        response.assert_updated()
-
-
 @fixtures.line()
 @fixtures.sip()
 @fixtures.autoprov()
