@@ -18,50 +18,43 @@
 
 from contextlib import contextmanager
 
-from test_api.helpers import user_line as ul
-from test_api.helpers import user_cti_profile as uc
-from test_api.helpers import user_voicemail as uv
-from test_api.helpers import line_extension as le
-from test_api.helpers import line_device as ld
-from test_api.helpers import line_endpoint_sip as l_endpoint_sip
-from test_api.helpers import line_endpoint_sccp as l_endpoint_sccp
-from test_api.helpers import line_endpoint_custom as l_endpoint_custom
+from test_api import helpers as h
 
 
 @contextmanager
 def user_line(user, line, check=True):
-    ul.associate(user['id'], line['id'], check)
+    h.user_line.associate(user['id'], line['id'], check)
     yield
-    ul.dissociate(user['id'], line['id'], check)
+    h.user_line.dissociate(user['id'], line['id'], check)
 
 
 @contextmanager
 def user_voicemail(user, voicemail, check=True):
-    uv.associate(user['id'], voicemail['id'], check)
+    h.user_voicemail.associate(user['id'], voicemail['id'], check)
     yield
-    uv.dissociate(user['id'], voicemail['id'], check)
+    h.user_voicemail.dissociate(user['id'], voicemail['id'], check)
 
 
 @contextmanager
 def user_cti_profile(user, cti_profile, check=True):
-    uc.associate(user['id'], cti_profile['id'])
+    h.user_cti_profile.associate(user['id'], cti_profile['id'])
     yield
-    uc.dissociate(user['id'], cti_profile['id'])
+    h.user_cti_profile.dissociate(user['id'], cti_profile['id'])
 
 
 @contextmanager
 def line_extension(line, extension, check=True):
-    le.associate(line['id'], extension['id'], check)
+    h.line_extension.associate(line['id'], extension['id'], check)
     yield
-    le.dissociate(line['id'], extension['id'], check)
+    h.line_extension.dissociate(line['id'], extension['id'], check)
 
 
 @contextmanager
 def line_device(line, device, check=True):
-    ld.associate(line['id'], device['id'])
+    h.line_device.associate(line['id'], device['id'])
     yield
     try:
-        ld.dissociate(line['id'], device['id'])
+        h.line_device.dissociate(line['id'], device['id'])
     except Exception as e:
         if check:
             raise e
@@ -69,20 +62,20 @@ def line_device(line, device, check=True):
 
 @contextmanager
 def line_endpoint_sip(line, sip, check=True):
-    l_endpoint_sip.associate(line['id'], sip['id'], check)
+    h.line_endpoint_sip.associate(line['id'], sip['id'], check)
     yield
-    l_endpoint_sip.dissociate(line['id'], sip['id'], check)
+    h.line_endpoint_sip.dissociate(line['id'], sip['id'], check)
 
 
 @contextmanager
 def line_endpoint_sccp(line, sccp, check=True):
-    l_endpoint_sccp.associate(line['id'], sccp['id'], check)
+    h.line_endpoint_sccp.associate(line['id'], sccp['id'], check)
     yield
-    l_endpoint_sccp.dissociate(line['id'], sccp['id'], check)
+    h.line_endpoint_sccp.dissociate(line['id'], sccp['id'], check)
 
 
 @contextmanager
 def line_endpoint_custom(line, custom, check=True):
-    l_endpoint_custom.associate(line['id'], custom['id'], check)
+    h.line_endpoint_custom.associate(line['id'], custom['id'], check)
     yield
-    l_endpoint_custom.dissociate(line['id'], custom['id'], check)
+    h.line_endpoint_custom.dissociate(line['id'], custom['id'], check)
