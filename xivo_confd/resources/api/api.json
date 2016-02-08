@@ -2763,6 +2763,36 @@
             }
         },
         "/users/{user_id}/lines/{line_id}": {
+            "get": {
+                "operationId": "get_user_line_association",
+                "summary": "List a line associated to user",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line associated to a User",
+                        "schema": {
+                            "$ref": "#/definitions/UserLine"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
             "delete": {
                 "operationId": "dissociate_user_line",
                 "summary": "Dissociate user and line",
