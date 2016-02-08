@@ -20,6 +20,7 @@ import os
 from setup import setup_docker, stop_docker, new_client, new_confd, \
     setup_provd, setup_database
 from provd import create_helper as create_provd_helper
+from database import create_helper as create_database_helper
 
 
 class SingletonProxy(object):
@@ -54,3 +55,4 @@ def teardown():
 confd = SingletonProxy(new_confd)
 client = SingletonProxy(new_client)
 provd = SingletonProxy(create_provd_helper)
+db = SingletonProxy(create_database_helper)

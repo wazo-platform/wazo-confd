@@ -3,14 +3,14 @@ from hamcrest import assert_that, has_entries, has_key, is_not, has_entry, conta
 
 from test_api import confd
 from test_api import helpers
-from test_api import database
+from test_api import db
 from test_api import provd
 
 
 class TestFuncKey(unittest.TestCase):
 
     def setUp(self):
-        self.db = database.create_helper()
+        self.db = db
         self.provd = provd
         self.provd.reset()
 

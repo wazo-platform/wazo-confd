@@ -20,6 +20,9 @@ pid_filename: /var/run/xivo-confd/xivo-confd.pid
 
 db_uri: postgresql://asterisk:proformatique@postgres/asterisk
 
+service_discovery:
+  enabled: false
+
 # REST API server
 rest_api:
 
