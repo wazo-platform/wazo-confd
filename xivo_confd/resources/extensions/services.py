@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,21 @@ from xivo_dao.resources.extension import dao
 
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.resources.extensions import validator, notifier
+from xivo_confd.resources.devices import builder as device_builder
 
 
-def build_service():
-    return CRUDService(dao, validator, notifier)
+class ExtensionService(CRUDService):
+
+    def __init__(self, dao, validator, notifier, device_updater):
+        super(ExtensionService, self).__init__(dao, validator, notifier)
+        self.device_updater = device_updater
+
+    def edit(self, extension):
+        super(ExtensionService, self).edit(extension)
+        self.device_updater.update_for_extension(extension)
+
+
+def build_service(provd_client):
+    device_dao = device_builder.build_dao(provd_client)
+    device_updater = device_builder.build_device_updater(device_dao)
+    return ExtensionService(dao, validator, notifier, device_updater)

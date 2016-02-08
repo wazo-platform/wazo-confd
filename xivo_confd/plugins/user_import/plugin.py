@@ -84,7 +84,7 @@ class Plugin(object):
         sccp_service = build_sccp_service()
         line_sip_service = build_le_service(provd_client, 'sip', sip_service)
         line_sccp_service = build_le_service(provd_client, 'sccp', sccp_service)
-        extension_service = build_extension_service()
+        extension_service = build_extension_service(provd_client)
         user_line_service = build_ul_service()
         line_extension_service = build_line_extension_service()
 

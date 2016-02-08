@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,9 @@ def load(core_rest_api):
     )
     converter = Converter.resource(document, Extension)
 
-    service = services.build_service()
+    provd_client = core_rest_api.provd_client()
+    service = services.build_service(provd_client)
+
     resource = CRUDResource(service, converter, list(document.field_names()) + ['type'])
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

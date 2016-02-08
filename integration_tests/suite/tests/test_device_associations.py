@@ -21,12 +21,37 @@ from __future__ import unicode_literals
 from hamcrest import assert_that, has_entries
 
 
+from test_api import config
 from test_api import mocks
 from test_api import errors as e
 from test_api import confd
 from test_api import db
 from test_api import fixtures
 from test_api import associations as a
+from test_api import helpers as h
+
+
+@mocks.provd()
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.device()
+def test_when_extension_updated_then_provd_is_updated(provd, user, line, sip, extension, device):
+    exten = h.extension.find_available_exten(config.CONTEXT)
+
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
+            a.line_extension(line, extension), a.line_device(line, device):
+
+        response = confd.extensions(extension['id']).put(exten=exten)
+        response.assert_updated()
+
+        response = confd.lines(line['id']).put()
+        response.assert_updated()
+
+        provd_config = provd.configs.get(device['id'])
+        sip_line = provd_config['raw_config']['sip_lines']['1']
+        assert_that(sip_line, has_entries(number=exten))
 
 
 @mocks.provd()

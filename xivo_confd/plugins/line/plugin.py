@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 from xivo_confd import api
 from xivo_confd.plugins.line.service import build_service
 from xivo_confd.plugins.line.resource import LineItem, LineList
+from xivo_confd.resources.devices import builder as device_builder
 
 
 class Plugin(object):

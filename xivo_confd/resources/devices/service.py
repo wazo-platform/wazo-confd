@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,12 +69,13 @@ class LineDeviceAssociationService(object):
 
 class DeviceUpdater(object):
 
-    def __init__(self, line_updater, funckey_updater, user_dao, line_dao, user_line_dao, device_dao):
+    def __init__(self, line_updater, funckey_updater, user_dao, line_dao, user_line_dao, line_extension_dao, device_dao):
         self.line_updater = line_updater
         self.funckey_updater = funckey_updater
         self.user_dao = user_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
+        self.line_extension_dao = line_extension_dao
         self.device_dao = device_dao
 
     def update_for_template(self, template):
@@ -82,6 +83,12 @@ class DeviceUpdater(object):
         public_users = self.user_dao.find_all_by(func_key_template_id=template.id)
         for user in private_users + public_users:
             self.update_for_user(user)
+
+    def update_for_extension(self, extension):
+        line_extensions = self.line_extension_dao.find_all_by(extension_id=extension.id)
+        for line_extension in line_extensions:
+            line = self.line_dao.get(line_extension.line_id)
+            self.update_for_line(line)
 
     def update_for_user(self, user):
         for user_line in self.user_line_dao.find_all_by_user_id(user.id):
