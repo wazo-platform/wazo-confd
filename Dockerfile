@@ -19,4 +19,4 @@ RUN chown www-data /var/run/xivo-confd
 
 EXPOSE 9486
 
-CMD xivo-confd -f -d
+CMD ["xivo-confd", "-fd"]
