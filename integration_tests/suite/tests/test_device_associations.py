@@ -90,6 +90,76 @@ def test_when_sip_username_and_password_are_updated_then_provd_is_updated(provd,
                                            'password': 'mysecret'}))
 
 
+@mocks.provd()
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.device()
+def test_given_config_registrar_has_changed_when_sip_line_updated_then_provd_updated(provd, user, line, sip, extension, device):
+    registrar = provd.configs.get('default')
+    registrar['registrar_main'] = '10.0.1.2'
+    registrar['proxy_main'] = '11.1.2.3'
+    provd.configs.update(registrar)
+
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
+            a.line_extension(line, extension), a.line_device(line, device):
+
+        response = confd.lines(line['id']).put()
+        response.assert_updated()
+
+        provd_config = provd.configs.get(device['id'])
+        sip_line = provd_config['raw_config']['sip_lines']['1']
+        assert_that(sip_line, has_entries(registrar_ip='10.0.1.2',
+                                          proxy_ip='11.1.2.3'))
+
+
+@mocks.provd()
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+@fixtures.device()
+def test_given_backup_registrar_has_changed_when_sip_line_updated_then_provd_updated(provd, user, line, sip, extension, device):
+    registrar = provd.configs.get('default')
+    registrar['registrar_backup'] = '20.1.2.3'
+    registrar['proxy_backup'] = '20.2.3.4'
+    provd.configs.update(registrar)
+
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
+            a.line_extension(line, extension), a.line_device(line, device):
+
+        response = confd.lines(line['id']).put()
+        response.assert_updated()
+
+        provd_config = provd.configs.get(device['id'])
+        sip_line = provd_config['raw_config']['sip_lines']['1']
+        assert_that(sip_line, has_entries(backup_registrar_ip='20.1.2.3',
+                                          backup_proxy_ip='20.2.3.4'))
+
+
+@mocks.provd()
+@fixtures.user()
+@fixtures.line()
+@fixtures.sccp()
+@fixtures.extension()
+@fixtures.device()
+def test_given_backup_registrar_has_changed_when_sccp_line_updated_then_provd_updated(provd, user, line, sccp, extension, device):
+    registrar = provd.configs.get('default')
+    registrar['proxy_backup'] = '20.2.3.4'
+    provd.configs.update(registrar)
+
+    with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), \
+            a.line_extension(line, extension), a.line_device(line, device):
+
+        response = confd.lines(line['id']).put()
+        response.assert_updated()
+
+        provd_config = provd.configs.get(device['id'])
+        sccp_config = provd_config['raw_config']['sccp_call_managers']['2']
+        assert_that(sccp_config, has_entries(ip='20.2.3.4'))
+
+
 @fixtures.line()
 @fixtures.sip()
 @fixtures.autoprov()
