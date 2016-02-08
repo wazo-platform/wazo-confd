@@ -217,15 +217,6 @@ def test_dissociate_second_user_before_first(first_user, second_user, line):
 
 @fixtures.user()
 @fixtures.line_sip()
-@fixtures.device()
-def test_dissociate_user_line_when_device_is_associated(user, line, device):
-    with a.user_line(user, line), a.line_device(line, device):
-        response = confd.users(user['id']).lines(line['id']).delete()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
-
-
-@fixtures.user()
-@fixtures.line_sip()
 def test_delete_user_when_user_and_line_associated(user, line):
     with a.user_line(user, line):
         response = confd.users(user['id']).delete()
