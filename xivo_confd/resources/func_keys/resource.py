@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 
 from flask import request
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_dao.helpers import errors
-
 from xivo_dao.resources.func_key_template.model import UserTemplate
 
 
@@ -136,6 +136,7 @@ class UserFuncKeyResource(object):
             return self.user_dao.get(int(user_id))
         return self.user_dao.get_by(uuid=user_id)
 
+    @required_acl('confd.users.{user_id}.funckeys.{position}.update')
     def update_funckey(self, user_id, position):
         user = self.get_user(user_id)
         funckey = self.fk_converter.decode(request)
@@ -143,11 +144,13 @@ class UserFuncKeyResource(object):
         self.manipulator.update_funckey(user.private_template_id, position, funckey)
         return ('', 204)
 
+    @required_acl('confd.users.{user_id}.funckeys.{position}.delete')
     def remove_funckey(self, user_id, position):
         user = self.get_user(user_id)
         self.manipulator.remove_funckey(user.private_template_id, position)
         return ('', 204)
 
+    @required_acl('confd.users.{user_id}.funckeys.{position}.read')
     def get_funckey(self, user_id, position):
         template = self.manipulator.get_unified_template(user_id)
         funckey = template.get(position)
@@ -162,19 +165,23 @@ class UserTemplateResource(object):
         self.template_converter = template_converter
         self.association_converter = association_converter
 
+    @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.update')
     def associate_template(self, user_id, template_id):
         self.manipulator.associate_user(template_id, user_id)
         return ('', 204)
 
+    @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.delete')
     def dissociate_template(self, user_id, template_id):
         self.manipulator.dissociate_user(template_id, user_id)
         return ('', 204)
 
+    @required_acl('confd.users.{user_id}.funckeys.read')
     def get_unified_template(self, user_id):
         template = self.manipulator.get_unified_template(user_id)
         response = self.template_converter.encode(template)
         return (response, 200, {'Content-Type': 'application/json'})
 
+    @required_acl('confd.users.{user_id}.funckeys.templates.read')
     def get_associations(self, user_id):
         associations = self.manipulator.find_associations_by_user(user_id)
         response = self.association_converter.encode_list(associations)
