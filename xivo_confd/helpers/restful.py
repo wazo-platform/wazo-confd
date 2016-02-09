@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ from flask import url_for, request
 from flask_restful import Resource, Api, fields, marshal
 
 from xivo_confd.helpers.common import handle_error
-from xivo_confd.authentication.confd_auth import ConfdAuth
+from xivo_confd.authentication.confd_auth import auth
 
 from xivo_dao.helpers import errors
 
@@ -71,7 +71,7 @@ class ConfdApi(Api):
 
 
 class ConfdResource(Resource):
-    method_decorators = [ConfdAuth().login_required]
+    method_decorators = [auth.login_required]
 
 
 class ListResource(ConfdResource):

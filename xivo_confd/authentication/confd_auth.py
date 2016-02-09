@@ -84,3 +84,6 @@ class ConfdAuth(HTTPDigestAuth):
         if not required_acl:
             return 'confd.#'
         return required_acl
+
+
+auth = ConfdAuth()

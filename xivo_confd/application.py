@@ -31,8 +31,8 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
 
 from xivo_confd import plugin_manager
+from xivo_confd.authentication.confd_auth import auth
 from xivo_confd.core_rest_api import CoreRestApi
-from xivo_confd.authentication.confd_auth import ConfdAuth
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.restful import ConfdApi
 from xivo_confd.helpers.bus_publisher import BusPublisher
@@ -43,8 +43,6 @@ logger = logging.getLogger(__name__)
 app = Flask('xivo_confd')
 
 api = ConfdApi(app, prefix="/1.1")
-
-auth = ConfdAuth()
 
 
 def get_bus_publisher():
