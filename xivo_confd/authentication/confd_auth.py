@@ -18,7 +18,6 @@
 import logging
 import requests
 
-from flask import current_app
 from flask import request
 from flask_httpauth import HTTPDigestAuth
 from functools import wraps
@@ -40,6 +39,13 @@ class ConfdAuth(HTTPDigestAuth):
         super(ConfdAuth, self).__init__()
         self.get_password(accesswebservice_dao.get_password)
         self.auth_verifier = AuthVerifier()
+        self._auth_host = None
+        self._auth_port = None
+
+    def set_config(self, config):
+        self._auth_host = config['host']
+        self._auth_port = config['port']
+        self.auth_verifier.set_config(config)
 
     def login_required(self, func):
         auth_func = super(ConfdAuth, self).login_required(func)
@@ -62,15 +68,13 @@ class ConfdAuth(HTTPDigestAuth):
         return remote_addr in accesswebservice_dao.get_allowed_hosts()
 
     def _verify_token(self, func, *args, **kwargs):
-        auth_config = current_app.config['auth']
-        self.auth_verifier.set_config(auth_config)
         try:
             token = self.auth_verifier.token()
             required_acl = self._acl(func, *args, **kwargs)
             token_is_valid = self.auth_verifier.client().token.is_valid(token, required_acl)
         except requests.RequestException as e:
             message = 'Authentication server on {host}:{port} unreachable: {error}'
-            logger.error(message.format(host=auth_config['host'], port=auth_config['port'], error=e))
+            logger.error(message.format(host=self._auth_host, port=self._auth_port, error=e))
             return False
 
         return token_is_valid
