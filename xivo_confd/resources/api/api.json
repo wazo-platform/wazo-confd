@@ -3796,7 +3796,8 @@
                 "items": {
                     "items": {
                         "$ref": "#/definitions/EndpointCustom"
-                    }
+                    },
+                    "type": "array"
                 },
                 "total": {
                     "type": "integer"
@@ -3827,7 +3828,8 @@
                 "items": {
                     "items": {
                         "$ref": "#/definitions/EndpointSip"
-                    }
+                    },
+                    "type": "array"
                 },
                 "total": {
                     "type": "integer"
@@ -3868,7 +3870,8 @@
                 "items": {
                     "items": {
                         "$ref": "#/definitions/EndpointSccp"
-                    }
+                    },
+                    "type": "array"
                 },
                 "total": {
                     "type": "integer"
