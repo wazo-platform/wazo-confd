@@ -17,11 +17,11 @@
 
 import logging
 import xivo_dao
+import os
+import sys
 
 from functools import partial
-from kombu import Connection, Exchange, Producer
 
-from xivo_bus import ensure, Marshaler, Publisher
 from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo_confd import setup_app
 from xivo_confd.server import run_server
@@ -41,16 +41,16 @@ class Controller(object):
         xivo_dao.init_db_from_config(self.config)
 
         app = setup_app(self.config)
-        check_fn = partial(self_check, self.config)
-        bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**self.config['bus'])
 
-        with Connection(bus_url) as conn:
-            conn.ensure_connection(errback=ensure.retry_message)
-            producer = Producer(conn,
-                                Exchange(self.config['bus']['exchange_name'],
-                                         self.config['bus']['exchange_type']),
-                                auto_declare=True)
-            marshaler = Marshaler(self.config['uuid'])
-            publisher = Publisher(producer, marshaler)
-            with ServiceCatalogRegistration('xivo-confd', self.config, publisher, check_fn):
-                run_server(app)
+        uuid = os.getenv('XIVO_UUID')
+        if not uuid and self.config['service_discovery']['enabled']:
+            logger.error('undefined environment variable XIVO_UUID')
+            sys.exit(1)
+
+        with ServiceCatalogRegistration('xivo-confd',
+                                        uuid,
+                                        self.config['consul'],
+                                        self.config['service_discovery'],
+                                        self.config['bus'],
+                                        partial(self_check, self.config)):
+            run_server(app)
