@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
 #
@@ -16,24 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import user
-import line
-import line_sip
-import extension
-import device
-import voicemail
-import user_line
-import user_voicemail
-import user_cti_profile
-import line_extension
-import line_device
-import line_endpoint_custom
-import line_endpoint_sip
-import line_endpoint_sccp
-import cti_profile
-import endpoint_sip
-import endpoint_sccp
-import endpoint_custom
-import user_import
-import call_permission
-import user_call_permission
+
+from test_api import db
+
+
+def associate(user_id, call_permission_id, check=True):
+    with db.queries() as q:
+        q.add_call_permission_member(call_permission_id, user_id)
+
+
+def dissociate(user_id, call_permission_id, check=True):
+    with db.queries() as q:
+        q.remove_call_permission_member(call_permission_id, user_id)

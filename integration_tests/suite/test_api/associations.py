@@ -79,3 +79,10 @@ def line_endpoint_custom(line, custom, check=True):
     h.line_endpoint_custom.associate(line['id'], custom['id'], check)
     yield
     h.line_endpoint_custom.dissociate(line['id'], custom['id'], check)
+
+
+@contextmanager
+def user_call_permission(user, call_permission, check=True):
+    h.user_call_permission.associate(user['id'], call_permission['id'], check)
+    yield
+    h.user_call_permission.dissociate(user['id'], call_permission['id'], check)

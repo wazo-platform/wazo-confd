@@ -171,3 +171,17 @@ def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fiel
             a.line_extension(line, incall1), a.line_extension(line, incall2):
         response = confd.users.export.get()
         assert_that(response.csv(), has_item(expected))
+
+
+@fixtures.user()
+@fixtures.call_permission()
+@fixtures.call_permission()
+def test_given_user_has_multiple_call_permissions_when_exporting_then_csv_has_call_permission_field(user, perm1, perm2):
+    permissions = sorted([perm1['name'], perm2['name']])
+    expected_permissions = ";".join(permissions)
+    expected = has_entries(uuid=user['uuid'],
+                           call_permissions=expected_permissions)
+
+    with a.user_call_permission(user, perm1), a.user_call_permission(user, perm2):
+        response = confd.users.export.get()
+        assert_that(response.csv(), has_item(expected))

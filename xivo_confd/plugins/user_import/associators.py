@@ -188,3 +188,27 @@ class IncallAssociator(Associator):
         except NotFoundError:
             return False
         return True
+
+
+class CallPermissionAssociator(Associator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def associate(self, entry):
+        user = entry.get_resource('user')
+        permissions = entry.get_resource('call_permissions')
+        if permissions is not None:
+            self.associate_permissions(user, permissions)
+
+    def associate_permissions(self, user, permissions):
+        self.dao.remove_user(user.id)
+        for permission in permissions:
+            self.dao.associate_user(permission.id, user.id)
+
+    def update(self, entry):
+        user = entry.get_resource('user')
+        names = entry.extract_field('call_permissions', 'names')
+        if names is not None:
+            entry.call_permissions = [self.dao.get_by(name=name) for name in names]
+            self.associate_permissions(user, entry.call_permissions)

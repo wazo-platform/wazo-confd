@@ -24,7 +24,7 @@ from cStringIO import StringIO
 from test_api.helpers import words
 from test_api import config
 from test_api.setup import new_client
-from test_api.helpers import voicemail, extension
+from test_api.helpers import voicemail, extension, call_permission
 
 
 def csv_client():
@@ -95,5 +95,10 @@ def make_entry(params):
     if params.get('cti_profile'):
         entry['cti_profile_enabled'] = params.get('cti_profile_enabled', '1')
         entry['cti_profile_name'] = params.get('cti_profile_name', 'Client')
+
+    nb_permissions = params.pop('call_permissions', 0)
+    if nb_permissions > 0:
+        permissions = [call_permission.generate_call_permission() for _ in range(nb_permissions)]
+        entry['call_permissions'] = ';'.join(p['name'] for p in permissions)
 
     return entry

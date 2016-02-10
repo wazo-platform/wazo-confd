@@ -25,18 +25,38 @@ from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
-from xivo_confd.plugins.user_import.service import ImportService
-from xivo_confd.plugins.user_import.resource import UserImportResource, UserExportResource
-from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
-from xivo_confd.plugins.user_import.creators import ExtensionCreator, IncallCreator, CtiProfileCreator, LineCreator, UserCreator, VoicemailCreator, SipCreator, SccpCreator
-from xivo_confd.plugins.user_import.associators import LineAssociator, SipAssociator, SccpAssociator, ExtensionAssociator, IncallAssociator, CtiProfileAssociator, VoicemailAssociator
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
 from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_service
 
+from xivo_confd.plugins.user_import.service import ImportService
+from xivo_confd.plugins.user_import.resource import UserImportResource, UserExportResource
+from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
+
+from xivo_confd.plugins.user_import.creators import (ExtensionCreator,
+                                                     IncallCreator,
+                                                     CtiProfileCreator,
+                                                     LineCreator,
+                                                     UserCreator,
+                                                     VoicemailCreator,
+                                                     SipCreator,
+                                                     SccpCreator,
+                                                     CallPermissionCreator)
+
+from xivo_confd.plugins.user_import.associators import (LineAssociator,
+                                                        SipAssociator,
+                                                        SccpAssociator,
+                                                        ExtensionAssociator,
+                                                        IncallAssociator,
+                                                        CtiProfileAssociator,
+                                                        VoicemailAssociator,
+                                                        CallPermissionAssociator)
+
 from xivo_confd.resources.voicemails.services import build_service as build_voicemail_service
 from xivo_confd.resources.extensions.services import build_service as build_extension_service
+
+from xivo_confd.database import call_permission as call_permission_dao
 
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
@@ -75,7 +95,8 @@ class Plugin(object):
                     'sccp': SccpCreator(sccp_service),
                     'extension': ExtensionCreator(extension_service),
                     'incall': IncallCreator(extension_service),
-                    'cti_profile': CtiProfileCreator(cti_profile_dao)
+                    'cti_profile': CtiProfileCreator(cti_profile_dao),
+                    'call_permissions': CallPermissionCreator(call_permission_dao),
                     }
 
         entry_creator = EntryCreator(creators)
@@ -87,7 +108,8 @@ class Plugin(object):
             ('sccp', SccpAssociator(line_sccp_service)),
             ('line', LineAssociator(user_line_service)),
             ('extension', ExtensionAssociator(line_extension_service)),
-            ('incall', IncallAssociator(line_extension_service))
+            ('incall', IncallAssociator(line_extension_service)),
+            ('call_permissions', CallPermissionAssociator(call_permission_dao)),
         ])
 
         entry_associator = EntryAssociator(associators)
@@ -102,7 +124,8 @@ class Plugin(object):
                                    sip_dao,
                                    sccp_dao,
                                    extension_dao,
-                                   incall_dao)
+                                   incall_dao,
+                                   call_permission_dao)
 
         entry_updater = EntryUpdater(creators, associators, entry_finder)
 

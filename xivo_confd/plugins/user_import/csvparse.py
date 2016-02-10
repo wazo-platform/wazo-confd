@@ -89,6 +89,14 @@ class IntRule(Rule):
         return int(value)
 
 
+class ColonListRule(Rule):
+
+    def parse(self, value):
+        if value == "":
+            return []
+        return value.split(";")
+
+
 class CsvRow(object):
 
     USER_RULES = (
@@ -146,6 +154,10 @@ class CsvRow(object):
         IntRule('incall_ring_seconds', 'ring_seconds'),
     )
 
+    CALL_PERMISSION_RULES = (
+        ColonListRule('call_permissions', 'names'),
+    )
+
     def __init__(self, fields, position):
         self.fields = fields
         self.position = position
@@ -160,6 +172,7 @@ class CsvRow(object):
             'incall': self.parse_rules(self.INCALL_RULES),
             'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
             'extension': self.parse_rules(self.EXTENSION_RULES),
+            'call_permissions': self.parse_rules(self.CALL_PERMISSION_RULES),
             'sccp': {},
         }
 

@@ -31,6 +31,8 @@ from xivo_dao.alchemy.user_line import UserLine
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.dialaction import Dialaction
+from xivo_dao.alchemy.rightcall import RightCall
+from xivo_dao.alchemy.rightcallmember import RightCallMember
 
 
 COLUMNS = ('uuid',
@@ -65,7 +67,8 @@ COLUMNS = ('uuid',
            'sip_secret',
            'exten',
            'incall_exten',
-           'incall_context')
+           'incall_context',
+           'call_permissions')
 
 
 def export_query(separator=";"):
@@ -92,6 +95,29 @@ def export_query(separator=";"):
             func.string_agg(ordered_incalls.c.context, separator).label('context')
         )
         .group_by(ordered_incalls.c.user_id)
+        .subquery()
+    )
+
+    ordered_call_permissions = aliased(
+        Session.query(
+            RightCall.name,
+            cast(RightCallMember.typeval, Integer).label('user_id')
+        )
+        .join(RightCallMember,
+              RightCallMember.rightcallid == RightCall.id)
+        .join(User,
+              and_(RightCallMember.type == 'user',
+                   cast(RightCallMember.typeval, Integer) == User.id))
+        .order_by(RightCall.name)
+        .subquery()
+    )
+
+    grouped_call_permissions = aliased(
+        Session.query(
+            ordered_call_permissions.c.user_id,
+            func.string_agg(ordered_call_permissions.c.name, separator).label('name')
+        )
+        .group_by(ordered_call_permissions.c.user_id)
         .subquery()
     )
 
@@ -128,7 +154,8 @@ def export_query(separator=";"):
         SIP.secret,
         Extension.exten,
         grouped_incalls.c.exten,
-        grouped_incalls.c.context
+        grouped_incalls.c.context,
+        grouped_call_permissions.c.name,
     )
 
     query = (
@@ -141,6 +168,8 @@ def export_query(separator=";"):
         .outerjoin(UserLine.extensions)
         .outerjoin(grouped_incalls,
                    User.id == grouped_incalls.c.user_id)
+        .outerjoin(grouped_call_permissions,
+                   User.id == grouped_call_permissions.c.user_id)
     )
 
     return COLUMNS, query
