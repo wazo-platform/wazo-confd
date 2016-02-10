@@ -18,9 +18,6 @@
 
 import argparse
 
-import xivo_dao
-
-from xivo_dao.resources.infos import dao as infos_dao
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 from xivo.http_helpers import DEFAULT_CIPHERS
