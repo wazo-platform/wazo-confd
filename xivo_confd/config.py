@@ -113,6 +113,7 @@ DEFAULT_CONFIG = {
                         'line_endpoint_plugin',
                         'user_import_plugin'],
     'service_discovery': {
+        'enabled': True,
         'advertise_address': 'localhost',
         'advertise_port': 9486,
         'advertise_address_interface': 'eth0',
