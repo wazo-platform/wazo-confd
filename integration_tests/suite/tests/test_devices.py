@@ -27,8 +27,6 @@ from test_api import fixtures
 from test_api import confd
 from test_api import provd
 
-from test_api.helpers.device import generate_device
-
 from hamcrest import (assert_that,
                       has_entry,
                       has_entries,
@@ -53,18 +51,6 @@ BOGUS = [
 ]
 
 
-class TestDeviceResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.DeleteScenarios):
-
-    url = "/devices"
-    resource = "Device"
-    required = []
-    bogus_fields = BOGUS
-
-    def create_resource(self):
-        device = generate_device()
-        return device['id']
-
-
 class TestDeviceCreateWithTemplate(unittest.TestCase):
 
     def setUp(self):
@@ -85,6 +71,36 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
         self.provd.assert_device_has_autoprov_config(device)
         self.provd.assert_config_use_device_template(config, self.template_id)
         self.provd.assert_config_does_not_exist(device_id)
+
+
+def test_get_errors():
+    fake_sip_get = confd.endpoints.sip(999999).get
+    yield s.check_resource_not_found, fake_sip_get, 'SIPEndpoint'
+
+
+def test_post_errors():
+    url = confd.devices.post
+    for check in error_checks(url):
+        yield check
+
+
+@fixtures.device()
+def test_put_errors(device):
+    url = confd.devices(device['id']).put
+    for check in error_checks(url):
+        yield check
+
+
+def error_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'ip', 123
+    yield s.check_bogus_field_returns_error, url, 'ip', 'abcd1234'
+    yield s.check_bogus_field_returns_error, url, 'mac', 123
+    yield s.check_bogus_field_returns_error, url, 'mac', 'abcd1234'
+    yield s.check_bogus_field_returns_error, url, 'mac', 'abcd1234'
+    yield s.check_bogus_field_returns_error, url, 'plugin', 'invalidplugin'
+    yield s.check_bogus_field_returns_error, url, 'template_id', 'invalidtemplateid'
+    yield s.check_bogus_field_returns_error, url, 'options', 'invalidoption'
+    yield s.check_bogus_field_returns_error, url, 'options', {'switchboard': 'yes'}
 
 
 @fixtures.device()
