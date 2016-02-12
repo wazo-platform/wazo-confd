@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ from xivo_confd.resources.api import actions as api_actions
 from xivo_confd.resources.call_logs import actions as call_logs_actions
 from xivo_confd.resources.configuration import actions as configuration_actions
 from xivo_confd.resources.cti_profiles import actions as cti_profiles_actions
-from xivo_confd.resources.devices import actions as devices_actions
 from xivo_confd.resources.extensions import actions as extensions_actions
 from xivo_confd.resources.infos import actions as infos_actions
 from xivo_confd.resources.queue_members import actions as queue_members_actions
@@ -39,7 +38,6 @@ class LegacyPlugins(object):
         self.load_resource(call_logs_actions, core)
         self.load_resource(configuration_actions, core)
         self.load_resource(cti_profiles_actions, core)
-        self.load_resource(devices_actions, core)
         self.load_resource(extensions_actions, core)
         self.load_resource(infos_actions, core)
         self.load_resource(queue_members_actions, core)

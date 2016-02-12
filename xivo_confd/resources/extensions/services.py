@@ -20,7 +20,7 @@ from xivo_dao.resources.extension import dao
 
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.resources.extensions import validator, notifier
-from xivo_confd.resources.devices import builder as device_builder
+from xivo_confd.plugins.device import builder as device_builder
 
 
 class ExtensionService(CRUDService):
