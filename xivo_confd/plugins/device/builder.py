@@ -28,7 +28,7 @@ from xivo_confd.plugins.device.dao import ProvdDeviceDao, DeviceDao
 from xivo_confd.plugins.device.notifier import DeviceNotifier
 from xivo_confd.plugins.device.validator import build_validator
 
-from xivo_confd.resources.devices.funckey import build_converters
+from xivo_confd.plugins.device.funckey import build_converters
 
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao

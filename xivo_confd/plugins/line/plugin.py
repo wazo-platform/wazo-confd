@@ -19,7 +19,6 @@
 from xivo_confd import api
 from xivo_confd.plugins.line.service import build_service
 from xivo_confd.plugins.line.resource import LineItem, LineList
-from xivo_confd.resources.devices import builder as device_builder
 
 
 class Plugin(object):
