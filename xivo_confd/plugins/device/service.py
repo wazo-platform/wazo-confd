@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import re
-
 from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.resources.devices.model import LineSIPConverter, LineSCCPConverter
+from xivo_confd.plugins.device.model import LineSIPConverter, LineSCCPConverter
+
 from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.helpers import errors
 
@@ -69,12 +68,13 @@ class LineDeviceAssociationService(object):
 
 class DeviceUpdater(object):
 
-    def __init__(self, line_updater, funckey_updater, user_dao, line_dao, user_line_dao, device_dao):
+    def __init__(self, line_updater, funckey_updater, user_dao, line_dao, user_line_dao, line_extension_dao, device_dao):
         self.line_updater = line_updater
         self.funckey_updater = funckey_updater
         self.user_dao = user_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
+        self.line_extension_dao = line_extension_dao
         self.device_dao = device_dao
 
     def update_for_template(self, template):
@@ -82,6 +82,12 @@ class DeviceUpdater(object):
         public_users = self.user_dao.find_all_by(func_key_template_id=template.id)
         for user in private_users + public_users:
             self.update_for_user(user)
+
+    def update_for_extension(self, extension):
+        line_extensions = self.line_extension_dao.find_all_by(extension_id=extension.id)
+        for line_extension in line_extensions:
+            line = self.line_dao.get(line_extension.line_id)
+            self.update_for_line(line)
 
     def update_for_user(self, user):
         for user_line in self.user_line_dao.find_all_by_user_id(user.id):
@@ -190,83 +196,6 @@ class LineDeviceUpdater(object):
         if line_extension:
             return self.extension_dao.get(line_extension.extension_id)
         return None
-
-
-class DeviceValidator(object):
-
-    IP_REGEX = re.compile(r'(1?\d{1,2}|2([0-4][0-9]|5[0-5]))(\.(1?\d{1,2}|2([0-4][0-9]|5[0-5]))){3}$')
-    MAC_REGEX = re.compile(r'^([0-9A-Fa-f]{2})(:[0-9A-Fa-f]{2}){5}$')
-
-    def __init__(self, device_dao, line_dao):
-        self.device_dao = device_dao
-        self.line_dao = line_dao
-
-    def validate_create(self, device):
-        self._check_invalid_parameters(device)
-        self._check_mac_already_exists(device)
-        self._check_plugin_exists(device)
-        self._check_template_id_exists(device)
-
-    def validate_edit(self, device):
-        device_found = self.device_dao.get(device.id)
-        self._check_invalid_parameters(device)
-        self._check_if_mac_was_modified(device_found, device)
-        self._check_plugin_exists(device)
-        self._check_template_id_exists(device)
-
-    def validate_delete(self, device):
-        self._check_device_is_not_linked_to_line(device)
-
-    def _check_mac_already_exists(self, device):
-        if not device.mac:
-            return
-
-        existing_device = self.device_dao.find_by('mac', device.mac.lower())
-        if existing_device:
-            raise errors.resource_exists('Device', mac=device.mac)
-
-    def _check_plugin_exists(self, device):
-        if not device.plugin:
-            return
-
-        plugins = self.device_dao.plugins()
-
-        if device.plugin not in plugins:
-            raise errors.param_not_found('plugin', 'Plugin')
-
-    def _check_template_id_exists(self, device):
-        if not device.template_id:
-            return
-
-        templates = self.device_dao.device_templates()
-
-        if device.template_id not in templates:
-            raise errors.param_not_found('template_id', 'DeviceTemplate')
-
-    def _check_invalid_parameters(self, device):
-        if device.ip and not self.IP_REGEX.match(device.ip):
-            raise errors.wrong_type('ip', 'IP address', ip=device.ip)
-        if device.mac and not self.MAC_REGEX.match(device.mac):
-            raise errors.wrong_type('mac', 'MAC address', mac=device.mac)
-        if device.options is not None:
-            if not isinstance(device.options, dict):
-                raise errors.wrong_type('options', 'dict-like structure', options=device.options)
-            elif 'switchboard' in device.options and not isinstance(device.options['switchboard'], bool):
-                raise errors.wrong_type('options.switchboard', 'boolean', switchboard=device.options['switchboard'])
-
-    def _check_if_mac_was_modified(self, device_found, device):
-        if not device.mac or not device_found.mac:
-            return
-
-        if device_found.mac.lower() != device.mac.lower():
-            self._check_mac_already_exists(device)
-
-    def _check_device_is_not_linked_to_line(self, device):
-        linked_lines = self.line_dao.find_all_by(device=device.id)
-        if linked_lines:
-            ids = tuple(l.id for l in linked_lines)
-            raise errors.resource_associated('Device', 'Line',
-                                             device_id=device.id, line_ids=ids)
 
 
 class SearchEngine(object):

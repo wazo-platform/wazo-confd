@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ from xivo_dao.resources.line import dao
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.plugins.line.validator import build_validator
 from xivo_confd.plugins.line.notifier import build_notifier
-from xivo_confd.resources.devices import builder as device_builder
+from xivo_confd.plugins.device import builder as device_builder
 
 
 class LineService(CRUDService):

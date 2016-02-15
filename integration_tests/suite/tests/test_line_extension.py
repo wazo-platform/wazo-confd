@@ -158,15 +158,6 @@ def test_dissociate_line_and_extension(line, extension):
 
 @fixtures.line_sip()
 @fixtures.extension()
-@fixtures.device()
-def test_dissociate_line_associated_to_a_device(line, extension, device):
-    with a.line_extension(line, extension), a.line_device(line, device):
-        response = confd.lines(line['id']).extensions(extension['id']).delete()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
-
-
-@fixtures.line_sip()
-@fixtures.extension()
 def test_delete_extension_associated_to_line(line, extension):
     with a.line_extension(line, extension):
         response = confd.extensions(extension['id']).delete()

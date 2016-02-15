@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import logging
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.resources.devices.model import ProvdDevice, DeviceConverter, ConfigConverter, EmptyConfigConverter
+from xivo_confd.plugins.device.model import ProvdDevice, DeviceConverter, ConfigConverter, EmptyConfigConverter
 
 from xivo_provd_client.error import NotFoundError
 

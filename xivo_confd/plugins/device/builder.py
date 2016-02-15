@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,10 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.resources.devices.service import DeviceService, LineDeviceAssociationService, \
-    DeviceValidator, SearchEngine, LineDeviceUpdater, DeviceUpdater, FuncKeyDeviceUpdater
-from xivo_confd.resources.devices.dao import ProvdDeviceDao, DeviceDao
-from xivo_confd.resources.devices import notifier as device_notifier
+from xivo_confd import bus
+
+from xivo_confd.plugins.device.service import (DeviceService,
+                                               LineDeviceAssociationService,
+                                               SearchEngine,
+                                               LineDeviceUpdater,
+                                               DeviceUpdater,
+                                               FuncKeyDeviceUpdater)
+
+from xivo_confd.plugins.device.dao import ProvdDeviceDao, DeviceDao
+from xivo_confd.plugins.device.notifier import DeviceNotifier
+from xivo_confd.plugins.device.validator import build_validator
+
+from xivo_confd.plugins.device.funckey import build_converters
 
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
@@ -26,8 +36,6 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
-
-from xivo_confd.resources.devices.funckey import build_converters
 
 
 def build_dao(provd_client):
@@ -39,7 +47,8 @@ def build_dao(provd_client):
 
 def build_service(device_dao):
     search_engine = SearchEngine(device_dao.provd_dao)
-    device_validator = DeviceValidator(device_dao, line_dao)
+    device_validator = build_validator(device_dao, line_dao)
+    device_notifier = DeviceNotifier(bus)
     device_service = DeviceService(device_dao,
                                    device_validator,
                                    device_notifier,
@@ -69,6 +78,7 @@ def build_device_updater(device_dao):
                          user_dao,
                          line_dao,
                          user_line_dao,
+                         line_extension_dao,
                          device_dao)
 
 

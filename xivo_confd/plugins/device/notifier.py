@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,23 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.bus_manager import send_bus_event
+from xivo_confd import bus
 
 from xivo_bus.resources.device.event import CreateDeviceEvent
 from xivo_bus.resources.device.event import EditDeviceEvent
 from xivo_bus.resources.device.event import DeleteDeviceEvent
 
 
-def created(device):
-    event = CreateDeviceEvent(device.id)
-    send_bus_event(event, event.routing_key)
+class DeviceNotifier(object):
+
+    def __init__(self, bus):
+        self.bus = bus
+
+    def created(self, device):
+        event = CreateDeviceEvent(device.id)
+        self.bus.send_bus_event(event, event.routing_key)
+
+    def edited(self, device):
+        event = EditDeviceEvent(device.id)
+        self.bus.send_bus_event(event, event.routing_key)
+
+    def deleted(self, device):
+        event = DeleteDeviceEvent(device.id)
+        self.bus.send_bus_event(event, event.routing_key)
 
 
-def edited(device):
-    event = EditDeviceEvent(device.id)
-    send_bus_event(event, event.routing_key)
-
-
-def deleted(device):
-    event = DeleteDeviceEvent(device.id)
-    send_bus_event(event, event.routing_key)
+def build_notifier():
+    return DeviceNotifier(bus)

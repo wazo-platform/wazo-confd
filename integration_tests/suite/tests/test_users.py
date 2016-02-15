@@ -267,19 +267,6 @@ def test_create_user_generates_appropriate_caller_id():
     assert_that(response.item['caller_id'], equal_to(expected_caller_id))
 
 
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension()
-@fixtures.device()
-def test_updating_user_when_associated_to_user_and_line(user, line, extension, device):
-    with a.user_line(user, line), \
-            a.line_extension(line, extension), \
-            a.line_device(line, device):
-
-        response = confd.users(user['id']).put(firstname='fôobar')
-        response.assert_updated()
-
-
 @fixtures.user(firstname="Léeroy",
                lastname="Jénkins",
                email="leeroy@jenkins.com",

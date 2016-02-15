@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@ import unittest
 from hamcrest import assert_that, equal_to, none
 
 from mock import Mock, sentinel
-from xivo_confd.resources.devices.service import DeviceService, DeviceValidator, SearchEngine, LineDeviceUpdater, DeviceUpdater, LineDeviceAssociationService
-from xivo_confd.resources.devices.dao import DeviceDao
-from xivo_confd.resources.devices.model import LineSCCPConverter, LineSIPConverter
+from xivo_confd.plugins.device.service import DeviceService, SearchEngine, LineDeviceUpdater, DeviceUpdater, LineDeviceAssociationService
+from xivo_confd.plugins.device.dao import DeviceDao
+from xivo_confd.plugins.device.model import LineSCCPConverter, LineSIPConverter
+from xivo_confd.plugins.device.model import Device
 
-from xivo_confd.resources.devices.model import Device
 from xivo_dao.resources.extension.model import Extension
 from xivo_confd.plugins.line_extension.manager import LineExtension
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
@@ -33,7 +33,7 @@ class TestDeviceService(unittest.TestCase):
 
     def setUp(self):
         self.device_dao = Mock(DeviceDao)
-        self.validator = Mock(DeviceValidator)
+        self.validator = Mock()
         self.notifier = Mock()
         self.search_engine = Mock(SearchEngine)
         self.line_dao = Mock()

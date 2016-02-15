@@ -1,5 +1,6 @@
 git+https://github.com/xivo-pbx/xivo-provd-client.git
 docker-compose
+docker-py
 nose
 pyhamcrest
 psycopg2  # sqlalchemy engine
