@@ -91,13 +91,6 @@ class UserLineList(UserLineResource):
 
 class UserLineItem(UserLineResource):
 
-    @required_acl('confd.users.{user_id}.lines.{line_id}.read')
-    def get(self, user_id, line_id):
-        user = self.get_user(user_id)
-        line = self.line_dao.get(line_id)
-        user_line = self.service.get(user, line)
-        return marshal(user_line, fields)
-
     @required_acl('confd.users.{user_id}.lines.{line_id}.delete')
     def delete(self, user_id, line_id):
         user = self.get_user(user_id)

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -82,12 +82,6 @@ class LineExtensionList(LineExtensionResource):
 
 
 class LineExtensionItem(LineExtensionResource):
-
-    def get(self, line_id, extension_id):
-        line = self.line_dao.get(line_id)
-        extension = self.extension_dao.get(extension_id)
-        line_extension = self.service.get(line, extension)
-        return marshal(line_extension, fields)
 
     def delete(self, line_id, extension_id):
         line = self.line_dao.get(line_id)
