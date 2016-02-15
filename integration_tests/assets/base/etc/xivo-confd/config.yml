@@ -88,6 +88,7 @@ enabled_plugins:
    - user_voicemail_plugin
    - user_cti_profile_plugin
    - user_line_plugin
+   - user_line_associated_plugin
    - line_extension_plugin
    - line_endpoint_plugin
    - legacy_plugins
