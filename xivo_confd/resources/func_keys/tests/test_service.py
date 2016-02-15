@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ from mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to
 
 from xivo_confd.resources.func_keys.service import TemplateService
-from xivo_confd.resources.devices.service import DeviceUpdater
+from xivo_confd.plugins.device.service import DeviceUpdater
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
