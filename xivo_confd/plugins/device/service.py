@@ -239,6 +239,10 @@ class SearchEngine(object):
         return SearchResult(total=total, items=items)
 
     def validate_parameters(self, parameters):
+        if 'direction' in parameters:
+            if parameters['direction'] not in self.provd_dao.DIRECTION:
+                raise errors.invalid_direction(parameters['direction'], self.provd_dao.DIRECTION)
+
         if 'order' in parameters:
             if parameters['order'] not in self.PROVD_DEVICE_KEYS:
                 raise errors.invalid_ordering(parameters['order'], self.PROVD_DEVICE_KEYS)
