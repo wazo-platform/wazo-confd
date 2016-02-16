@@ -20,6 +20,7 @@ import unittest
 from datetime import datetime
 
 from test_api import mocks
+from test_api import helpers as h
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
@@ -34,21 +35,8 @@ from hamcrest import (assert_that,
                       none,
                       not_none,
                       is_not,
+                      has_item,
                       starts_with)
-
-
-BOGUS = [
-    ('ip', 'aelkurxynsle', 'IP address'),
-    ('mac', 'o374awic87anwc', 'MAC address'),
-    ('sn', 123, 'unicode string'),
-    ('vendor', 123, 'unicode string'),
-    ('model', 123, 'unicode string'),
-    ('version', 123, 'unicode string'),
-    ('plugin', 123, 'unicode string'),
-    ('description', 123, 'unicode string'),
-    ('template_id', 123, 'unicode string'),
-    ('options', 123, 'dict-like structure'),
-]
 
 
 class TestDeviceCreateWithTemplate(unittest.TestCase):
@@ -74,8 +62,8 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
 
 
 def test_get_errors():
-    fake_sip_get = confd.endpoints.sip(999999).get
-    yield s.check_resource_not_found, fake_sip_get, 'SIPEndpoint'
+    fake_get = confd.devices(999999).get
+    yield s.check_resource_not_found, fake_get, 'Device'
 
 
 def test_post_errors():
@@ -103,10 +91,86 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', {'switchboard': 'yes'}
 
 
+@fixtures.device(ip="10.20.30.40",
+                 mac="aa:bb:aa:cc:01:23",
+                 model="SearchModel",
+                 plugin='zero',
+                 sn="SearchSn",
+                 vendor='SearchVendor',
+                 version='1.0',
+                 description='SearchDesc')
+def test_search_on_device(device):
+    url = confd.devices
+    searches = {'ip': '20.30',
+                'mac': 'bb:aa',
+                'model': 'chmod',
+                'plugin': 'zer',
+                'sn': 'chsn',
+                'vendor': 'chven',
+                'version': '1.0',
+                'description': 'rchdes'}
+
+    for field, term in searches.items():
+        yield check_search, url, device, field, term
+
+
+def check_search(url, device, field, term):
+    expected = has_item(has_entry(field, device[field]))
+    response = url.get(search=term)
+    assert_that(response.items, expected)
+
+
+@fixtures.device(template_id="mockdevicetemplate",
+                 plugin='zero',
+                 vendor='myvendor',
+                 version='1.0',
+                 description='getdevice',
+                 options={'switchboard': True})
+def test_get(device):
+    response = confd.devices(device['id']).get()
+    assert_that(response.item, has_entries(ip=device['ip'],
+                                           mac=device['mac'],
+                                           template_id="mockdevicetemplate",
+                                           plugin='zero',
+                                           vendor='myvendor',
+                                           version='1.0',
+                                           description='getdevice',
+                                           options={'switchboard': True}))
+
+
+def test_create_device_minimal_parameters():
+    response = confd.devices.post()
+    response.assert_created('devices')
+
+
+def test_create_device_all_parameters():
+    mac, ip = h.device.generate_mac_and_ip()
+    parameters = {'ip': ip,
+                  'mac': mac,
+                  'model': '6731i',
+                  'plugin': 'null',
+                  'sn': 'sn',
+                  'template_id': 'mockdevicetemplate',
+                  'vendor': 'Aastra',
+                  'version': '1.0',
+                  'description': 'mydevice',
+                  'options': {'switchboard': True}}
+
+    response = confd.devices.post(**parameters)
+    response.assert_created('devices')
+    assert_that(response.item, has_entries(parameters))
+
+
 @fixtures.device()
 def test_create_2_devices_with_same_mac(device):
     response = confd.devices.post(mac=device['mac'])
     response.assert_match(400, e.resource_exists('Device'))
+
+
+@fixtures.device()
+def test_create_2_devices_with_same_ip(device):
+    response = confd.devices.post(ip=device['ip'])
+    response.assert_created('devices')
 
 
 def test_create_device_with_fake_plugin():
@@ -117,6 +181,27 @@ def test_create_device_with_fake_plugin():
 def test_create_device_with_fake_template():
     response = confd.devices.post(template_id='superdupertemplate')
     response.assert_match(400, e.not_found('DeviceTemplate'))
+
+
+@fixtures.device(plugin='zero', template_id='defaultconfigdevice')
+def test_edit_device_all_parameters(device):
+    mac, ip = h.device.generate_mac_and_ip()
+    parameters = {'ip': ip,
+                  'mac': mac,
+                  'model': '6731i',
+                  'plugin': 'null',
+                  'sn': 'sn',
+                  'template_id': 'mockdevicetemplate',
+                  'vendor': 'Aastra',
+                  'version': '1.0',
+                  'description': 'mydevice',
+                  'options': {'switchboard': True}}
+
+    response = confd.devices(device['id']).put(**parameters)
+    response.assert_updated()
+
+    response = confd.devices(device['id']).get()
+    assert_that(response.item, has_entries(parameters))
 
 
 @fixtures.device()
@@ -136,6 +221,12 @@ def test_edit_device_with_fake_plugin(device):
 def test_edit_device_with_fake_template(device):
     response = confd.devices(device['id']).put(template_id='superdupertemplate')
     response.assert_match(400, e.not_found('DeviceTemplate'))
+
+
+@fixtures.device()
+def test_delete_device(device):
+    response = confd.devices(device['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.device()
