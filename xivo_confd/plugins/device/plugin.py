@@ -43,7 +43,7 @@ class Plugin(object):
 
         api.add_resource(DeviceItem,
                          '/devices/<id>',
-                         endpoint='device',
+                         endpoint='devices',
                          resource_class_args=(service,)
                          )
 

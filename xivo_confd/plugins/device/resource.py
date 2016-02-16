@@ -46,7 +46,7 @@ fields = {
     'status': fields.String,
     'template_id': fields.String,
     'options': fields.Nested(options_fields),
-    'links': FieldList(Link('device'))
+    'links': FieldList(Link('devices'))
 }
 
 parser = reqparse.RequestParser()
@@ -69,7 +69,7 @@ class DeviceList(ListResource):
     parser = parser
 
     def build_headers(self, device):
-        return {'Location': url_for('device', id=device.id, _external=True)}
+        return {'Location': url_for('devices', id=device.id, _external=True)}
 
 
 class DeviceItem(ItemResource):
