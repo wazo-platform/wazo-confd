@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2014-2015 Avencall
+# Copyright (C) 2014-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ from xivo_dao.resources.infos import dao
 from xivo_dao.resources.infos.model import Infos
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode
 from xivo_confd.helpers.resource import DecoratorChain, build_response
@@ -32,6 +33,7 @@ class InfoResource(object):
         self.dao = dao
         self.converter = converter
 
+    @required_acl('confd.infos.read')
     def get(self):
         info = self.dao.get()
         response = self.converter.encode(info)

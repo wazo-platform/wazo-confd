@@ -25,8 +25,12 @@ from xivo_dao.resources.func_key_template import dao as template_dao
 from xivo_dao.resources.user import dao as user_dao
 
 from xivo_confd import config
-from xivo_confd.helpers.resource import DecoratorChain, CRUDResource
-from xivo_confd.resources.func_keys.resource import FuncKeyResource, UserFuncKeyResource, UserTemplateResource, TemplateManipulator
+from xivo_confd.helpers.resource import DecoratorChain
+from xivo_confd.resources.func_keys.resource import (FuncKeyResource,
+                                                     FuncKeyTemplateResource,
+                                                     UserFuncKeyResource,
+                                                     UserTemplateResource,
+                                                     TemplateManipulator)
 from xivo_confd.plugins.device import builder as device_builder
 
 from xivo_confd.resources.func_keys import service as fk_service
@@ -61,7 +65,7 @@ def load(core_rest_api):
 
     template_manipulator = TemplateManipulator(service, device_updater, user_dao)
 
-    template_resource = CRUDResource(service, template_converter)
+    template_resource = FuncKeyTemplateResource(service, template_converter)
     funckey_resource = FuncKeyResource(template_manipulator, funckey_converter, association_converter)
     user_funckey_resource = UserFuncKeyResource(template_manipulator,
                                                 user_funckey_converter,

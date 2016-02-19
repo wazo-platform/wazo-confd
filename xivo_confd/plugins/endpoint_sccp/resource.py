@@ -19,6 +19,7 @@
 from flask import url_for
 from flask_restful import reqparse, fields
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
     option
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
@@ -47,8 +48,28 @@ class SccpList(ListResource):
     def build_headers(self, sccp):
         return {'Location': url_for('endpoint_sccp', id=sccp.id, _external=True)}
 
+    @required_acl('confd.endpoints.sccp.read')
+    def get(self):
+        return super(SccpList, self).get()
+
+    @required_acl('confd.endpoints.sccp.create')
+    def post(self):
+        return super(SccpList, self).post()
+
 
 class SccpItem(ItemResource):
 
     fields = sccp_fields
     parser = sccp_parser
+
+    @required_acl('confd.endpoints.sccp.{id}.read')
+    def get(self, id):
+        return super(SccpItem, self).get(id)
+
+    @required_acl('confd.endpoints.sccp.{id}.update')
+    def put(self, id):
+        return super(SccpItem, self).post(id)
+
+    @required_acl('confd.endpoints.sccp.{id}.delete')
+    def delete(self, id):
+        return super(SccpItem, self).delete(id)

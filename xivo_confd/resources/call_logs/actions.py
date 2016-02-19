@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ from flask import request
 from xivo_dao.helpers import errors
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.resources.call_logs import mapper
 from xivo_confd.resources.call_logs import serializer
 from xivo_confd.resources.call_logs import services
@@ -33,6 +34,7 @@ def load(core_rest_api):
 
     @blueprint.route('')
     @core_rest_api.auth.login_required
+    @required_acl('confd.call_logs.read')
     def get_call_logs():
         if 'start_date' in request.args or 'end_date' in request.args:
             return _list_period()

@@ -19,6 +19,7 @@
 from flask import url_for
 from flask_restful import reqparse, inputs, fields
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
     option
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
@@ -62,8 +63,28 @@ class SipList(ListResource):
     def build_headers(self, sip):
         return {'Location': url_for('endpoint_sip', id=sip.id, _external=True)}
 
+    @required_acl('confd.endpoints.sip.read')
+    def get(self):
+        return super(SipList, self).get()
+
+    @required_acl('confd.endpoints.sip.create')
+    def post(self):
+        return super(SipList, self).post()
+
 
 class SipItem(ItemResource):
 
     fields = sip_fields
     parser = sip_parser
+
+    @required_acl('confd.endpoints.sip.{id}.read')
+    def get(self, id):
+        return super(SipItem, self).get(id)
+
+    @required_acl('confd.endpoints.sip.{id}.update')
+    def put(self, id):
+        return super(SipItem, self).post(id)
+
+    @required_acl('confd.endpoints.sip.{id}.delete')
+    def delete(self, id):
+        return super(SipItem, self).delete(id)

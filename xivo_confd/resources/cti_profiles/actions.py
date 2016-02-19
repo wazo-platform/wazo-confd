@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ from xivo_dao.resources.cti_profile.model import CtiProfile
 from xivo_dao.resources.utils.search import SearchResult
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
@@ -39,6 +40,17 @@ class CtiProfileService(object):
         return self.dao.get(profile_id)
 
 
+class CtiProfileResource(CRUDResource):
+
+    @required_acl('confd.cti_profiles.{resource_id}.read')
+    def get(self, resource_id):
+        return super(CtiProfileResource, self).get(resource_id)
+
+    @required_acl('confd.cti_profiles.read')
+    def search(self):
+        return super(CtiProfileResource, self).search()
+
+
 def load(core_rest_api):
     blueprint = Blueprint('cti_profiles', __name__, url_prefix='/%s/cti_profiles' % config.API_VERSION)
     document = core_rest_api.content_parser.document(
@@ -48,7 +60,7 @@ def load(core_rest_api):
     converter = Converter.resource(document, CtiProfile, 'cti_profiles')
 
     service = CtiProfileService(dao)
-    resource = CRUDResource(service, converter)
+    resource = CtiProfileResource(service, converter)
 
     chain = DecoratorChain(core_rest_api, blueprint)
     chain.search().decorate(resource.search)

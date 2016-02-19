@@ -96,7 +96,7 @@ class UserVoicemailRoot(UserVoicemailResource):
 
 class VoicemailUserList(UserVoicemailResource):
 
-    @required_acl('confd.voicemail.{voicemail_id}.users.read')
+    @required_acl('confd.voicemails.{voicemail_id}.users.read')
     def get(self, voicemail_id):
         voicemail = self.voicemail_dao.get(voicemail_id)
         items = self.service.find_all_by(voicemail_id=voicemail.id)

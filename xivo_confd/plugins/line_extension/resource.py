@@ -22,6 +22,7 @@ from xivo_dao.helpers import errors
 from flask import url_for
 from flask_restful import reqparse, fields, marshal
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
 
 
@@ -60,12 +61,14 @@ class LineExtensionResource(ConfdResource):
 
 class LineExtensionList(LineExtensionResource):
 
+    @required_acl('confd.lines.{line_id}.extensions.read')
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         items = self.service.list(line.id)
         return {'total': len(items),
                 'items': [marshal(item, fields) for item in items]}
 
+    @required_acl('confd.lines.{line_id}.extensions.create')
     def post(self, line_id):
         line = self.line_dao.get(line_id)
         extension = self.get_extension_or_fail()
@@ -83,6 +86,7 @@ class LineExtensionList(LineExtensionResource):
 
 class LineExtensionItem(LineExtensionResource):
 
+    @required_acl('confd.lines.{line_id}.extensions.{extension_id}.delete')
     def delete(self, line_id, extension_id):
         line = self.line_dao.get(line_id)
         extension = self.extension_dao.get(extension_id)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ from flask import request
 from xivo_dao.resources.configuration import dao
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mooltiparse import Field, Boolean
 from xivo_confd.helpers.resource import DecoratorChain, build_response
 from xivo_confd.helpers.converter import Converter
@@ -59,11 +60,13 @@ class LiveReloadResource(object):
         self.service = service
         self.converter = converter
 
+    @required_acl('confd.configuration.live_reload.read')
     def get(self):
         resource = self.service.get()
         response = self.converter.encode(resource)
         return build_response(response)
 
+    @required_acl('confd.configuration.live_reload.update')
     def edit(self):
         resource = self.converter.decode(request)
         self.service.edit(resource)
