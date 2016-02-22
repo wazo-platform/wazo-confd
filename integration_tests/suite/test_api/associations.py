@@ -51,13 +51,9 @@ def line_extension(line, extension, check=True):
 
 @contextmanager
 def line_device(line, device, check=True):
-    h.line_device.associate(line['id'], device['id'])
+    h.line_device.associate(line['id'], device['id'], check)
     yield
-    try:
-        h.line_device.dissociate(line['id'], device['id'])
-    except Exception as e:
-        if check:
-            raise e
+    h.line_device.dissociate(line['id'], device['id'], check)
 
 
 @contextmanager

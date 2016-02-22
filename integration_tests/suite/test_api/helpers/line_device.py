@@ -16,15 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import db, provd
+from test_api import confd
 
 
-def associate(line_id, device_id):
-    with db.queries() as queries:
-        queries.associate_line_device(line_id, device_id)
-    provd.associate_line_device(device_id)
+def associate(line_id, device_id, check=True):
+    response = confd.lines(line_id).devices(device_id).put()
+    if check:
+        response.assert_ok()
 
 
-def dissociate(line_id, device_id):
-    with db.queries() as queries:
-        queries.dissociate_line_device(line_id, device_id)
+def dissociate(line_id, device_id, check=True):
+    response = confd.lines(line_id).devices(device_id).delete()
+    if check:
+        response.assert_ok()
