@@ -36,7 +36,8 @@ from hamcrest import (assert_that,
                       not_none,
                       is_not,
                       has_item,
-                      starts_with)
+                      starts_with,
+                      empty)
 
 
 class TestDeviceCreateWithTemplate(unittest.TestCase):
@@ -153,9 +154,14 @@ def test_create_device_minimal_parameters():
     response = confd.devices.post()
     response.assert_created('devices')
 
+    provd_device = provd.devices.get(response.item['id'])
+    assert_that(provd_device['config'], starts_with('autoprov'))
+
 
 def test_create_device_all_parameters():
     mac, ip = h.device.generate_mac_and_ip()
+    template_config = provd.configs.find({'id': 'mockdevicetemplate'})[0]
+
     parameters = {'ip': ip,
                   'mac': mac,
                   'model': '6731i',
@@ -170,6 +176,21 @@ def test_create_device_all_parameters():
     response = confd.devices.post(**parameters)
     response.assert_created('devices')
     assert_that(response.item, has_entries(parameters))
+
+    provd_device = provd.devices.get(response.item['id'])
+    assert_that(provd_device, has_entries({'ip': ip,
+                                           'mac': mac,
+                                           'model': '6731i',
+                                           'plugin': 'null',
+                                           'sn': 'sn',
+                                           'vendor': 'Aastra',
+                                           'version': '1.0',
+                                           'description': 'mydevice',
+                                           'options': {'switchboard': True}}))
+
+    provd_config = provd.configs.get(provd_device['config'])
+    assert_that(provd_config['id'], starts_with('autoprov'))
+    assert_that(provd_config['parent_ids'], has_item(template_config['id']))
 
 
 @fixtures.device()
@@ -238,6 +259,9 @@ def test_edit_device_with_fake_template(device):
 def test_delete_device(device):
     response = confd.devices(device['id']).delete()
     response.assert_deleted()
+
+    provd_devices = provd.devices.find({'id': device['id']})
+    assert_that(provd_devices, empty())
 
 
 @fixtures.device()
