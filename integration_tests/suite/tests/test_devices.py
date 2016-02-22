@@ -99,7 +99,15 @@ def error_checks(url):
                  vendor='SearchVendor',
                  version='1.0',
                  description='SearchDesc')
-def test_search_on_device(device):
+@fixtures.device(ip="11.22.33.44",
+                 mac="dd:ee:dd:ff:45:67",
+                 model="HiddenModel",
+                 plugin='null',
+                 sn="HiddenSn",
+                 vendor="HiddenVendor",
+                 version="2.0",
+                 description="HiddenDesc")
+def test_search_on_device(device, hidden):
     url = confd.devices
     searches = {'ip': '20.30',
                 'mac': 'bb:aa',
@@ -111,13 +119,16 @@ def test_search_on_device(device):
                 'description': 'rchdes'}
 
     for field, term in searches.items():
-        yield check_search, url, device, field, term
+        yield check_search, url, device, hidden, field, term
 
 
-def check_search(url, device, field, term):
-    expected = has_item(has_entry(field, device[field]))
+def check_search(url, device, hidden, field, term):
     response = url.get(search=term)
-    assert_that(response.items, expected)
+
+    expected_device = has_item(has_entry(field, device[field]))
+    hidden_device = is_not(has_item(has_entry(field, hidden[field])))
+    assert_that(response.items, expected_device)
+    assert_that(response.items, hidden_device)
 
 
 @fixtures.device(template_id="mockdevicetemplate",
