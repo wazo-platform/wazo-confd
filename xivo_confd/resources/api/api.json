@@ -35,6 +35,18 @@
             }
         }
     ],
+    "securityDefinitions": {
+        "xivo_auth_token": {
+            "type": "apiKey",
+            "name": "X-Auth-Token",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "xivo_auth_token": []
+        }
+    ],
     "paths": {
         "/call_logs": {
             "get": {
@@ -63,9 +75,6 @@
                         "type": "string",
                         "format": "date-time",
                         "required": false
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -87,11 +96,6 @@
                 "summary": "Get live reload status",
                 "tags": [
                     "configuration"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -116,9 +120,6 @@
                         "schema": {
                             "$ref": "#/definitions/LiveReload"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -137,11 +138,6 @@
                 "summary": "List CTI profiles",
                 "tags": [
                     "cti_profiles"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -167,9 +163,6 @@
                         "name": "cti_profile_id",
                         "in": "path",
                         "description": "CTI Profile ID"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -207,9 +200,6 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -239,9 +229,6 @@
                         "schema": {
                             "$ref": "#/definitions/Device"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -267,9 +254,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -301,9 +285,6 @@
                         "schema": {
                             "$ref": "#/definitions/Device"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -328,9 +309,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -357,9 +335,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -386,9 +361,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -427,9 +399,6 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -457,9 +426,6 @@
                         "schema": {
                             "$ref": "#/definitions/EndpointCustom"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -486,9 +452,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/customid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -521,9 +484,6 @@
                         "schema": {
                             "$ref": "#/definitions/EndpointCustom"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -548,9 +508,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/customid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -578,9 +535,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/customid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -625,9 +579,6 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -655,9 +606,6 @@
                         "schema": {
                             "$ref": "#/definitions/EndpointSccp"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -684,9 +632,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/sccpid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -719,9 +664,6 @@
                         "schema": {
                             "$ref": "#/definitions/EndpointSccp"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -746,9 +688,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/sccpid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -776,9 +715,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/sccpid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -823,9 +759,6 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -853,9 +786,6 @@
                         "schema": {
                             "$ref": "#/definitions/EndpointSip"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -882,9 +812,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/sipid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -917,9 +844,6 @@
                         "schema": {
                             "$ref": "#/definitions/EndpointSip"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -944,9 +868,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/sipid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -974,9 +895,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/sipid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1042,9 +960,6 @@
                         "in": "query",
                         "type": "string",
                         "description": "Filter extensions by context name"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1072,9 +987,6 @@
                         "schema": {
                             "$ref": "#/definitions/Extension"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1100,9 +1012,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/extensionid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1135,9 +1044,6 @@
                         "schema": {
                             "$ref": "#/definitions/Extension"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1162,9 +1068,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/extensionid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1190,9 +1093,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/extensionid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1215,11 +1115,6 @@
                 "tags": [
                     "funckeys"
                 ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List of destinations",
@@ -1236,11 +1131,6 @@
                 "summary": "List a func key template",
                 "tags": [
                     "funckeys"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -1269,9 +1159,6 @@
                         "schema": {
                             "$ref": "#/definitions/FuncKeyTemplate"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1297,9 +1184,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/templateid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1323,9 +1207,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/templateid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1352,9 +1233,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/templateid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1383,9 +1261,6 @@
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1420,9 +1295,6 @@
                         "schema": {
                             "$ref": "#/definitions/FuncKey"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1446,9 +1318,6 @@
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1470,11 +1339,6 @@
                 "summary": "Get server info",
                 "tags": [
                     "infos"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -1508,9 +1372,6 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1529,9 +1390,6 @@
                     "lines"
                 ],
                 "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    },
                     {
                         "name": "body",
                         "in": "body",
@@ -1564,9 +1422,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1598,9 +1453,6 @@
                         "schema": {
                             "$ref": "#/definitions/Line"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1624,9 +1476,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1654,9 +1503,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1693,9 +1539,6 @@
                     },
                     {
                         "$ref": "#/parameters/customid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1724,9 +1567,6 @@
                     },
                     {
                         "$ref": "#/parameters/customid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1754,9 +1594,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1793,9 +1630,6 @@
                     },
                     {
                         "$ref": "#/parameters/sccpid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1824,9 +1658,6 @@
                     },
                     {
                         "$ref": "#/parameters/sccpid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1854,9 +1685,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1893,9 +1721,6 @@
                     },
                     {
                         "$ref": "#/parameters/sipid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1924,9 +1749,6 @@
                     },
                     {
                         "$ref": "#/parameters/sipid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1953,9 +1775,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -1989,9 +1808,6 @@
                         "schema": {
                             "$ref": "#/definitions/LineExtension"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2025,9 +1841,6 @@
                     },
                     {
                         "$ref": "#/parameters/extensionid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2054,9 +1867,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2092,9 +1902,6 @@
                         "schema": {
                             "$ref": "#/definitions/AgentQueue"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2127,9 +1934,6 @@
                     },
                     {
                         "$ref": "#/parameters/agentid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2165,9 +1969,6 @@
                         "schema": {
                             "$ref": "#/definitions/AgentQueue"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2195,9 +1996,6 @@
                     },
                     {
                         "$ref": "#/parameters/agentid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2238,9 +2036,6 @@
                     },
                     {
                         "$ref": "#/parameters/view"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2267,9 +2062,6 @@
                         "schema": {
                             "$ref": "#/definitions/User"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2295,9 +2087,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2330,9 +2119,6 @@
                         "schema": {
                             "$ref": "#/definitions/User"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2357,9 +2143,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2386,11 +2169,6 @@
                 },
                 "tags": [
                     "users"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
                 ],
                 "produces": [
                     "text/csv; charset=utf-8"
@@ -2421,9 +2199,6 @@
                     "users"
                 ],
                 "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    },
                     {
                         "$ref": "#/parameters/csvbody"
                     }
@@ -2459,9 +2234,6 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/token"
-                    },
-                    {
                         "$ref": "#/parameters/csvbody"
                     }
                 ],
@@ -2492,9 +2264,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2521,9 +2290,6 @@
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2559,9 +2325,6 @@
                         "schema": {
                             "$ref": "#/definitions/FuncKey"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2586,9 +2349,6 @@
                     },
                     {
                         "$ref": "#/parameters/funckeyposition"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2615,9 +2375,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2647,9 +2404,6 @@
                     },
                     {
                         "$ref": "#/parameters/templateid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2677,9 +2431,6 @@
                     },
                     {
                         "$ref": "#/parameters/templateid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2706,9 +2457,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2741,9 +2489,6 @@
                         "schema": {
                             "$ref": "#/definitions/UserLine"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2777,9 +2522,6 @@
                     },
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2807,9 +2549,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useruuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2833,9 +2572,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2869,9 +2605,6 @@
                         "schema": {
                             "$ref": "#/definitions/UserVoicemail"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2899,9 +2632,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2928,9 +2658,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -2963,9 +2690,6 @@
                         "schema": {
                             "$ref": "#/definitions/UserCtiProfile"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3003,9 +2727,6 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3032,9 +2753,6 @@
                         "schema": {
                             "$ref": "#/definitions/Voicemail"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3060,9 +2778,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/voicemailid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3094,9 +2809,6 @@
                         "schema": {
                             "$ref": "#/definitions/Voicemail"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3121,9 +2833,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/voicemailid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3150,9 +2859,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/voicemailid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3183,9 +2889,6 @@
                     },
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3216,9 +2919,6 @@
                     },
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3241,11 +2941,6 @@
                 "deprecated": true,
                 "tags": [
                     "deprecated"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/token"
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -3272,9 +2967,6 @@
                         "schema": {
                             "$ref": "#/definitions/LineSip"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3301,9 +2993,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3342,9 +3031,6 @@
                         "schema": {
                             "$ref": "#/definitions/LineExtension"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3372,9 +3058,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3401,9 +3084,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3436,9 +3116,6 @@
                         "schema": {
                             "$ref": "#/definitions/LineSip"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3472,9 +3149,6 @@
                         "schema": {
                             "$ref": "#/definitions/AgentQueue"
                         }
-                    },
-                    {
-                        "$ref": "#/parameters/token"
                     }
                 ],
                 "responses": {
@@ -3603,13 +3277,6 @@
             "type": "integer",
             "name": "template_id",
             "in": "path"
-        },
-        "token": {
-            "required": false,
-            "name": "X-Auth-Token",
-            "in": "header",
-            "type": "string",
-            "description": "Authentication token obtained from xivo-auth."
         },
         "useriduuid": {
             "required": true,
