@@ -111,6 +111,7 @@ DEFAULT_CONFIG = {
                         'user_line_associated_plugin',
                         'line_extension_plugin',
                         'line_endpoint_plugin',
+                        'line_device_plugin',
                         'user_import_plugin'],
     'service_discovery': {
         'enabled': True,
