@@ -83,7 +83,7 @@ class LineItem(ItemResource):
 
     @required_acl('confd.lines.{id}.update')
     def put(self, id):
-        return super(LineItem, self).post(id)
+        return super(LineItem, self).put(id)
 
     @required_acl('confd.lines.{id}.delete')
     def delete(self, id):

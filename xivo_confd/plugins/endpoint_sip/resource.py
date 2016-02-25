@@ -83,7 +83,7 @@ class SipItem(ItemResource):
 
     @required_acl('confd.endpoints.sip.{id}.update')
     def put(self, id):
-        return super(SipItem, self).post(id)
+        return super(SipItem, self).put(id)
 
     @required_acl('confd.endpoints.sip.{id}.delete')
     def delete(self, id):

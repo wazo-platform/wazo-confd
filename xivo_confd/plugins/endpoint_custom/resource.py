@@ -67,7 +67,7 @@ class CustomItem(ItemResource):
 
     @required_acl('confd.endpoints.custom.{id}.update')
     def put(self, id):
-        return super(CustomItem, self).post(id)
+        return super(CustomItem, self).put(id)
 
     @required_acl('confd.endpoints.custom.{id}.delete')
     def delete(self, id):

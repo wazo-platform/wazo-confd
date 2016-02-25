@@ -68,7 +68,7 @@ class SccpItem(ItemResource):
 
     @required_acl('confd.endpoints.sccp.{id}.update')
     def put(self, id):
-        return super(SccpItem, self).post(id)
+        return super(SccpItem, self).put(id)
 
     @required_acl('confd.endpoints.sccp.{id}.delete')
     def delete(self, id):
