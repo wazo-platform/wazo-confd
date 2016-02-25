@@ -18,7 +18,6 @@
 
 
 import os
-import re
 
 from datetime import datetime
 
@@ -63,7 +62,13 @@ class ProvdHelper(object):
                         u'id': u'defaultconfigdevice',
                         u'label': u'Default config device',
                         u'parent_ids': [],
-                        u'raw_config': {u'ntp_enabled': True, u'ntp_ip': u'127.0.0.1'}}]
+                        u'raw_config': {u'ntp_enabled': True, u'ntp_ip': u'127.0.0.1'}},
+                       {'X_type': 'device',
+                        'deletable': True,
+                        'id': 'mockdevicetemplate',
+                        'parent_ids': ['base'],
+                        'raw_config': {}},
+                       ]
 
     def __init__(self, client):
         self.client = client

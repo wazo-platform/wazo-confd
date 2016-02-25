@@ -6,6 +6,8 @@ provd:
     - "8666"
   volumes:
     - "./etc/xivo-provd/provd.conf:/etc/xivo/provd/provd.conf"
+    - "./provd/null:/var/lib/xivo-provd/plugins/null"
+    - "./provd/zero:/var/lib/xivo-provd/plugins/zero"
 postgres:
   image: xivo/postgres-test
   expose:
