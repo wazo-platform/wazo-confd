@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,11 +21,35 @@ from flask import Blueprint
 from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Unicode, Int, Boolean
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
 from xivo_confd.resources.voicemails.services import build_service
 from xivo_confd.resources.voicemails.mooltiparse import OptionType
+
+
+class VoicemailResource(CRUDResource):
+
+    @required_acl('confd.voicemails.read')
+    def search(self):
+        return super(VoicemailResource, self).search()
+
+    @required_acl('confd.voicemails.create')
+    def create(self):
+        return super(VoicemailResource, self).create()
+
+    @required_acl('confd.voicemails.{resource_id}.read')
+    def get(self, resource_id):
+        return super(VoicemailResource, self).get(resource_id)
+
+    @required_acl('confd.voicemails.{resource_id}.update')
+    def edit(self, resource_id):
+        return super(VoicemailResource, self).edit(resource_id)
+
+    @required_acl('confd.voicemails.{resource_id}.delete')
+    def delete(self, resource_id):
+        return super(VoicemailResource, self).delete(resource_id)
 
 
 def load(core_rest_api):
@@ -51,6 +75,6 @@ def load(core_rest_api):
     converter = Converter.resource(document, Voicemail)
 
     service = build_service()
-    resource = CRUDResource(service, converter)
+    resource = VoicemailResource(service, converter)
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

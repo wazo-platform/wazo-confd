@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ from flask import request
 from flask import url_for
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int
 from xivo_confd.helpers.resource import CollectionAssociationResource, DecoratorChain, build_response
@@ -61,6 +62,7 @@ class QueueMemberService(object):
 
 class QueueMemberAssociationResource(CollectionAssociationResource):
 
+    @required_acl('confd.queues.{parent_id}.members.{resource_id}.read')
     def get_association(self, parent_id, resource_id):
         association = self.service.get(parent_id, resource_id)
         response = self.converter.encode(association)
@@ -69,11 +71,13 @@ class QueueMemberAssociationResource(CollectionAssociationResource):
                            resource_id=resource_id)
         return build_response(response, location=location)
 
+    @required_acl('confd.queues.{parent_id}.members.{resource_id}.update')
     def edit_association(self, parent_id, resource_id):
         association = self.converter.decode(request)
         self.service.edit(association)
         return ('', 204)
 
+    @required_acl('confd.queues.{parent_id}.members.create')
     def associate_collection(self, parent_id):
         association = self.converter.decode(request)
         created_association = self.service.associate(association)
@@ -83,6 +87,7 @@ class QueueMemberAssociationResource(CollectionAssociationResource):
                            resource_id=created_association.agent_id)
         return build_response(response, 201, location)
 
+    @required_acl('confd.queues.{parent_id}.members.{resource_id}.delete')
     def dissociate_collection(self, parent_id, resource_id):
         association = self.service.get(parent_id, resource_id)
         self.service.dissociate(association)

@@ -19,6 +19,7 @@
 from flask import url_for
 from flask_restful import reqparse, fields
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
 
@@ -43,6 +44,14 @@ class CustomList(ListResource):
     def build_headers(self, custom):
         return {'Location': url_for('endpoint_custom', id=custom.id, _external=True)}
 
+    @required_acl('confd.endpoints.custom.read')
+    def get(self):
+        return super(CustomList, self).get()
+
+    @required_acl('confd.endpoints.custom.create')
+    def post(self):
+        return super(CustomList, self).post()
+
 
 class CustomItem(ItemResource):
 
@@ -51,3 +60,15 @@ class CustomItem(ItemResource):
     parser = reqparse.RequestParser()
     parser.add_argument('interface', store_missing=False, nullable=False)
     parser.add_argument('enabled', type=bool, store_missing=False, nullable=False)
+
+    @required_acl('confd.endpoints.custom.{id}.read')
+    def get(self, id):
+        return super(CustomItem, self).get(id)
+
+    @required_acl('confd.endpoints.custom.{id}.update')
+    def put(self, id):
+        return super(CustomItem, self).post(id)
+
+    @required_acl('confd.endpoints.custom.{id}.delete')
+    def delete(self, id):
+        return super(CustomItem, self).delete(id)

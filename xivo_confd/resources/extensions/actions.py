@@ -20,11 +20,35 @@ from flask import Blueprint
 from xivo_dao.resources.extension.model import Extension
 
 from xivo_confd import config
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.converter import Converter
 from xivo_confd.helpers.mooltiparse import Field, Int, Unicode, Boolean
 from xivo_confd.helpers.resource import CRUDResource, DecoratorChain
 
 from xivo_confd.resources.extensions import services
+
+
+class ExtensionResource(CRUDResource):
+
+    @required_acl('confd.extensions.read')
+    def search(self):
+        return super(ExtensionResource, self).search()
+
+    @required_acl('confd.extensions.create')
+    def create(self):
+        return super(ExtensionResource, self).create()
+
+    @required_acl('confd.extensions.{resource_id}.read')
+    def get(self, resource_id):
+        return super(ExtensionResource, self).get(resource_id)
+
+    @required_acl('confd.extensions.{resource_id}.update')
+    def edit(self, resource_id):
+        return super(ExtensionResource, self).edit(resource_id)
+
+    @required_acl('confd.extensions.{resource_id}.delete')
+    def delete(self, resource_id):
+        return super(ExtensionResource, self).delete(resource_id)
 
 
 def load(core_rest_api):
@@ -43,6 +67,6 @@ def load(core_rest_api):
     provd_client = core_rest_api.provd_client()
     service = services.build_service(provd_client)
 
-    resource = CRUDResource(service, converter, list(document.field_names()) + ['type'])
+    resource = ExtensionResource(service, converter, list(document.field_names()) + ['type'])
 
     DecoratorChain.register_scrud(core_rest_api, blueprint, resource)

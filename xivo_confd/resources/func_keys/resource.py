@@ -20,6 +20,7 @@ from flask import request
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_dao.helpers import errors
+from xivo_confd.helpers.resource import CRUDResource
 from xivo_dao.resources.func_key_template.model import UserTemplate
 
 
@@ -97,29 +98,53 @@ class FuncKeyResource(object):
         self.fk_converter = fk_converter
         self.association_converter = association_converter
 
+    @required_acl('confd.funckeys.templates.{template_id}.{position}.read')
     def get_funckey(self, template_id, position):
         template = self.manipulator.get_template(template_id)
         funckey = template.get(position)
         response = self.fk_converter.encode(funckey)
         return (response, 200, {'Content-Type': 'application/json'})
 
+    @required_acl('confd.funckeys.templates.{template_id}.{position}.update')
     def update_funckey(self, template_id, position):
         funckey = self.fk_converter.decode(request)
         self.manipulator.update_funckey(template_id, position, funckey)
         return ('', 204)
 
+    @required_acl('confd.funckeys.templates.{template_id}.{position}.delete')
     def remove_funckey(self, template_id, position):
         self.manipulator.remove_funckey(template_id, position)
         return ('', 204)
 
+    @required_acl('confd.funckeys.templates.{template_id}.users.read')
     def get_associations(self, template_id):
         associations = self.manipulator.find_associations_by_template(template_id)
         response = self.association_converter.encode_list(associations)
         return (response, 200, {'Content-Type': 'application/json'})
 
+    @required_acl('confd.funckeys.destinations.read')
     def get_destinations(self):
         response = self.fk_converter.description()
         return (response, 200, {'Content-Type': 'application/json'})
+
+
+class FuncKeyTemplateResource(CRUDResource):
+
+    @required_acl('confd.funckeys.templates.read')
+    def search(self):
+        return super(FuncKeyTemplateResource, self).search()
+
+    @required_acl('confd.funckeys.templates.create')
+    def create(self):
+        return super(FuncKeyTemplateResource, self).create()
+
+    @required_acl('confd.funckeys.templates.{resource_id}.read')
+    def get(self, resource_id):
+        return super(FuncKeyTemplateResource, self).get(resource_id)
+
+    @required_acl('confd.funckeys.templates.{resource_id}.delete')
+    def delete(self, resource_id):
+        return super(FuncKeyTemplateResource, self).delete(resource_id)
 
 
 class UserFuncKeyResource(object):

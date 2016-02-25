@@ -19,6 +19,7 @@
 from flask import url_for
 from flask_restful import reqparse, fields
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.request_bouncer import limit_to_localhost
 from xivo_confd.helpers.restful import (FieldList,
                                         Link,
@@ -71,11 +72,31 @@ class DeviceList(ListResource):
     def build_headers(self, device):
         return {'Location': url_for('devices', id=device.id, _external=True)}
 
+    @required_acl('confd.devices.read')
+    def get(self):
+        return super(DeviceList, self).get()
+
+    @required_acl('confd.devices.create')
+    def post(self):
+        return super(DeviceList, self).post()
+
 
 class DeviceItem(ItemResource):
 
     fields = fields
     parser = parser
+
+    @required_acl('confd.devices.{id}.read')
+    def get(self, id):
+        return super(DeviceItem, self).get(id)
+
+    @required_acl('confd.devices.{id}.update')
+    def put(self, id):
+        return super(DeviceItem, self).put(id)
+
+    @required_acl('confd.devices.{id}.delete')
+    def delete(self, id):
+        return super(DeviceItem, self).delete(id)
 
 
 class DeviceAutoprov(ConfdResource):
@@ -83,6 +104,7 @@ class DeviceAutoprov(ConfdResource):
     def __init__(self, service):
         self.service = service
 
+    @required_acl('confd.devices.{id}.autoprov.read')
     def get(self, id):
         device = self.service.get(id)
         self.service.reset_autoprov(device)
@@ -94,6 +116,7 @@ class DeviceSynchronize(ConfdResource):
     def __init__(self, service):
         self.service = service
 
+    @required_acl('confd.devices.{id}.synchronize.read')
     def get(self, id):
         device = self.service.get(id)
         self.service.synchronize(device)

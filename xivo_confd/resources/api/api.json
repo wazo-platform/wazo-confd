@@ -52,7 +52,7 @@
             "get": {
                 "operationId": "list_call_logs",
                 "summary": "List call logs",
-                "description": "List call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"\n\nField names are listed on the first line.\n\nCall Date: Formatted as YYYY-MM-DDTHH:MM:SS\n\nPeriod: number of seconds of the call. Default: 0 if not answered",
+                "description": "**Required ACL:** `confd.call_logs.read`\n\nList call logs in CSV format:\n\n\"Call Date\",\"Caller\",\"Called\",\"Period\",\"user Field\"\n\nField names are listed on the first line.\n\nCall Date: Formatted as YYYY-MM-DDTHH:MM:SS\n\nPeriod: number of seconds of the call. Default: 0 if not answered",
                 "tags": [
                     "call_logs"
                 ],
@@ -94,6 +94,7 @@
             "get": {
                 "operationId": "get_configuration",
                 "summary": "Get live reload status",
+                "description": "**Required ACL:** `confd.configuration.live_reload.read`",
                 "tags": [
                     "configuration"
                 ],
@@ -109,6 +110,7 @@
             "put": {
                 "operationId": "update_configuration",
                 "summary": "Update live reload status",
+                "description": "**Required ACL:** `confd.configuration.live_reload.update`",
                 "tags": [
                     "configuration"
                 ],
@@ -136,6 +138,7 @@
             "get": {
                 "operationId": "list_cti_profiles",
                 "summary": "List CTI profiles",
+                "description": "**Required ACL:** `confd.cti_profiles.read`",
                 "tags": [
                     "cti_profiles"
                 ],
@@ -153,6 +156,7 @@
             "get": {
                 "operationId": "get_cti_profile",
                 "summary": "Get CTI profile",
+                "description": "**Required ACL:** `confd.cti_profiles.{cti_profile_id}.read`",
                 "tags": [
                     "cti_profiles"
                 ],
@@ -182,6 +186,7 @@
             "get": {
                 "operationId": "list_devices",
                 "summary": "List devices",
+                "description": "**Required ACL:** `confd.devices.read`",
                 "tags": [
                     "devices"
                 ],
@@ -217,6 +222,7 @@
             "post": {
                 "operationId": "create_device",
                 "summary": "Create device",
+                "description": "**Required ACL:** `confd.devices.create`",
                 "tags": [
                     "devices"
                 ],
@@ -248,6 +254,7 @@
             "get": {
                 "operationId": "get_device",
                 "summary": "Get device",
+                "description": "**Required ACL:** `confd.devices.{device_id}.read`",
                 "tags": [
                     "devices"
                 ],
@@ -271,6 +278,7 @@
             "put": {
                 "operationId": "update_device",
                 "summary": "Update device",
+                "description": "**Required ACL:** `confd.devices.{device_id}.update`",
                 "tags": [
                     "devices"
                 ],
@@ -302,7 +310,7 @@
             "delete": {
                 "operationId": "delete_device",
                 "summary": "Delete device",
-                "description": "A device can not be deleted if it is linked to a line. You must dissociate the line and the device first.",
+                "description": "**Required ACL:** `confd.devices.{device_id}.delete`\n\nA device can not be deleted if it is linked to a line. You must dissociate the line and the device first.",
                 "tags": [
                     "devices"
                 ],
@@ -328,7 +336,7 @@
             "get": {
                 "operationId": "reset_device_autoprov",
                 "summary": "Reset device to autoprov",
-                "description": "Resets a device into ‘autoprov’ mode. Once in autoprov, a device can be reprovisionned using another provisioning code. The device’s configuration will be lost when reset to autoprov mode.",
+                "description": "**Required ACL:** `confd.devices.{device_id}.autoprov.read`\n\nResets a device into ‘autoprov’ mode. Once in autoprov, a device can be reprovisionned using another provisioning code. The device’s configuration will be lost when reset to autoprov mode.",
                 "tags": [
                     "devices"
                 ],
@@ -354,7 +362,7 @@
             "get": {
                 "operationId": "synchronize_device",
                 "summary": "Synchronize device",
-                "description": "Synchronize a device’s configuration. Used when a configuration has been modified and the changes need to be sent to the device.",
+                "description": "**Required ACL:** `confd.devices.{device_id}.synchronize.read`\n\nSynchronize a device’s configuration. Used when a configuration has been modified and the changes need to be sent to the device.",
                 "tags": [
                     "devices"
                 ],
@@ -380,6 +388,7 @@
             "get": {
                 "operationId": "list_endpoints_custom",
                 "summary": "List Custom endpoints",
+                "description": "**Required ACL:** `confd.endpoints.custom.read`",
                 "tags": [
                     "endpoints",
                     "custom"
@@ -413,6 +422,7 @@
             "post": {
                 "operationId": "create_endpoint_custom",
                 "summary": "Create Custom endpoint",
+                "description": "**Required ACL:** `confd.endpoints.custom.create`",
                 "tags": [
                     "endpoints",
                     "custom"
@@ -445,6 +455,7 @@
             "get": {
                 "operationId": "get_endpoint_custom",
                 "summary": "Get Custom Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.custom.{custom_id}.read`",
                 "tags": [
                     "endpoints",
                     "custom"
@@ -469,6 +480,7 @@
             "put": {
                 "operationId": "update_endpoint_custom",
                 "summary": "Update Custom Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.custom.{custom_id}.update`",
                 "tags": [
                     "endpoints",
                     "custom"
@@ -501,6 +513,7 @@
             "delete": {
                 "operationId": "delete_endpoint_custom",
                 "summary": "Delete Custom Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.custom.{custom_id}.delete`",
                 "tags": [
                     "endpoints",
                     "custom"
@@ -527,6 +540,7 @@
             "get": {
                 "operationId": "get_endpoint_custom_line",
                 "summary": "Get Line associated to Custom endpoint",
+                "description": "**Required ACL:** `confd.endpoints.custom.{custom_id}.lines.read`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -560,6 +574,7 @@
             "get": {
                 "operationId": "list_endpoints_sccp",
                 "summary": "List SCCP endpoints",
+                "description": "**Required ACL:** `confd.endpoints.sccp.read`",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -593,6 +608,7 @@
             "post": {
                 "operationId": "create_endpoint_sccp",
                 "summary": "Create SCCP endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sccp.create`",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -625,6 +641,7 @@
             "get": {
                 "operationId": "get_endpoint_sccp",
                 "summary": "Get SCCP Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sccp.{sccp_id}.read`",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -649,6 +666,7 @@
             "put": {
                 "operationId": "update_endpoint_sccp",
                 "summary": "Update SCCP Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sccp.{sccp_id}.update`",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -681,6 +699,7 @@
             "delete": {
                 "operationId": "delete_endpoint_sccp",
                 "summary": "Delete SCCP Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sccp.{sccp_id}.delete`",
                 "tags": [
                     "endpoints",
                     "sccp"
@@ -707,6 +726,7 @@
             "get": {
                 "operationId": "get_endpoint_sccp_line",
                 "summary": "Get Line associated to SCCP endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sccp.{sccp_id}.lines.read`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -740,6 +760,7 @@
             "get": {
                 "operationId": "list_endpoints_sip",
                 "summary": "List SIP endpoints",
+                "description": "**Required ACL:** `confd.endpoints.sip.read`",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -773,6 +794,7 @@
             "post": {
                 "operationId": "create_endpoint_sip",
                 "summary": "Create SIP endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sip.create`",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -805,6 +827,7 @@
             "get": {
                 "operationId": "get_endpoint_sip",
                 "summary": "Get SIP Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sip.{sip_id}.read`",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -829,6 +852,7 @@
             "put": {
                 "operationId": "update_endpoint_sip",
                 "summary": "Update SIP Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sip.{sip_id}.update`",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -861,6 +885,7 @@
             "delete": {
                 "operationId": "delete_endpoint_sip",
                 "summary": "Delete SIP Endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sip.{sip_id}.delete`",
                 "tags": [
                     "endpoints",
                     "sip"
@@ -887,6 +912,7 @@
             "get": {
                 "operationId": "get_endpoint_sip_line",
                 "summary": "Get Line associated to SIP endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sip.{sip_id}.lines.read`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -920,6 +946,7 @@
             "get": {
                 "operationId": "list_extensions",
                 "summary": "List extensions",
+                "description": "**Required ACL:** `confd.extensions.read`",
                 "tags": [
                     "extensions"
                 ],
@@ -974,7 +1001,7 @@
             "post": {
                 "operationId": "create_extension",
                 "summary": "Create extension",
-                "description": "The extension number must be included in one of the extension ranges for the given context.",
+                "description": "**Required ACL:** `confd.extensions.create`\n\nThe extension number must be included in one of the extension ranges for the given context.",
                 "tags": [
                     "extensions"
                 ],
@@ -1006,6 +1033,7 @@
             "get": {
                 "operationId": "get_extension",
                 "summary": "Get extension",
+                "description": "**Required ACL:** `confd.extensions.{extension_id}.read`",
                 "tags": [
                     "extensions"
                 ],
@@ -1029,7 +1057,7 @@
             "put": {
                 "operationId": "update_extension",
                 "summary": "Update extension",
-                "description": "The new extension number must be included in one of the extension ranges for the new context.",
+                "description": "**Required ACL:** `confd.extensions.{extension_id}.update`\n\nThe new extension number must be included in one of the extension ranges for the new context.",
                 "tags": [
                     "extensions"
                 ],
@@ -1061,7 +1089,7 @@
             "delete": {
                 "operationId": "delete_extension",
                 "summary": "Delete extension",
-                "description": "An extension can not be deleted if it is associated to a line. You must delete the association first.",
+                "description": "**Required ACL:** `confd.extensions.{extension_id}.delete`\n\nAn extension can not be deleted if it is associated to a line. You must delete the association first.",
                 "tags": [
                     "extensions"
                 ],
@@ -1087,6 +1115,7 @@
             "get": {
                 "operationId": "get_extension_line_association",
                 "summary": "List lines association to extension",
+                "description": "**Required ACL:** `confd.#`",
                 "tags": [
                     "extensions"
                 ],
@@ -1112,6 +1141,7 @@
             "get": {
                 "operationId": "list_func_key_destinations",
                 "summary": "List of possible func key destinations and their parameters",
+                "description": "**Required ACL:** `confd.funckeys.destinations.read`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1129,6 +1159,7 @@
             "get": {
                 "operationId": "list_func_key_template",
                 "summary": "List a func key template",
+                "description": "**Required ACL:** `confd.funckeys.templates.read`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1147,6 +1178,7 @@
             "post": {
                 "operationId": "create_func_key_template",
                 "summary": "Create a template of func keys",
+                "description": "**Required ACL:** `confd.funckeys.templates.create`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1178,6 +1210,7 @@
             "get": {
                 "operationId": "get_func_key_template",
                 "summary": "Get a func key template",
+                "description": "**Required ACL:** `confd.funckeys.templates.{template_id}.read`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1201,6 +1234,7 @@
             "delete": {
                 "operationId": "delete_func_key_template",
                 "summary": "Delete func key template",
+                "description": "**Required ACL:** `confd.funckeys.templates.{template_id}.delete`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1226,6 +1260,7 @@
             "get": {
                 "operationId": "list_func_key_template_user_associations",
                 "summary": "List users associated to template",
+                "description": "**Required ACL:** `confd.funckeys.templates.{template_id}.users.read`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -1252,6 +1287,7 @@
             "get": {
                 "operationId": "get_func_key",
                 "summary": "Get a func key inside template",
+                "description": "**Required ACL:** `confd.funckeys.templates.{template_id}.{position}.read`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1278,6 +1314,7 @@
             "put": {
                 "operationId": "update_func_key",
                 "summary": "Add/Replace a func key in a template",
+                "description": "**Required ACL:** `confd.funckeys.templates.{template_id}.{position}.update`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1309,6 +1346,7 @@
             "delete": {
                 "operationId": "delete_func_key",
                 "summary": "Remove func key from template",
+                "description": "**Required ACL:** `confd.funckeys.templates.{template_id}.{position}.delete`",
                 "tags": [
                     "funckeys"
                 ],
@@ -1337,6 +1375,7 @@
             "get": {
                 "operationId": "get_infos",
                 "summary": "Get server info",
+                "description": "**Required ACL:** `confd.infos.read`",
                 "tags": [
                     "infos"
                 ],
@@ -1354,6 +1393,7 @@
             "get": {
                 "operationId": "list_lines",
                 "summary": "List lines",
+                "description": "**Required ACL:** `confd.lines.read`",
                 "tags": [
                     "lines"
                 ],
@@ -1386,6 +1426,7 @@
             "post": {
                 "operationId": "create_line",
                 "summary": "Create line",
+                "description": "**Required ACL:** `confd.lines.create`",
                 "tags": [
                     "lines"
                 ],
@@ -1416,6 +1457,7 @@
             "get": {
                 "operationId": "get_line",
                 "summary": "Get line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.read`",
                 "tags": [
                     "lines"
                 ],
@@ -1439,6 +1481,7 @@
             "put": {
                 "operationId": "update_line",
                 "summary": "Update line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.update`",
                 "tags": [
                     "lines"
                 ],
@@ -1470,6 +1513,7 @@
             "delete": {
                 "operationId": "delete_line",
                 "summary": "Delete line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.delete`",
                 "tags": [
                     "lines"
                 ],
@@ -1495,6 +1539,7 @@
             "get": {
                 "operationId": "get_line_endpoint_custom",
                 "summary": "Get Custom endpoint associated to Line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.custom.read`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1528,6 +1573,7 @@
             "put": {
                 "operationId": "associate_line_endpoint_custom",
                 "summary": "Associate line and Custom endpoint",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.custom.{custom_id}.update`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1556,6 +1602,7 @@
             "delete": {
                 "operationId": "dissociate_line_endpoint_custom",
                 "summary": "Dissociate line and Custom endpoint",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.custom.{custom_id}.delete`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1586,6 +1633,7 @@
             "get": {
                 "operationId": "get_line_endpoint_sccp",
                 "summary": "Get SCCP endpoint associated to Line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.read`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1619,6 +1667,7 @@
             "put": {
                 "operationId": "associate_line_endpoint_sccp",
                 "summary": "Associate line and SCCP endpoint",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.{sccp_id}.update`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1647,6 +1696,7 @@
             "delete": {
                 "operationId": "dissociate_line_endpoint_sccp",
                 "summary": "Dissociate line and SCCP endpoint",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.{sccp_id}.delete`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1677,6 +1727,7 @@
             "get": {
                 "operationId": "get_line_endpoint_sip",
                 "summary": "Get SIP endpoint associated to Line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.sip.read`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1710,6 +1761,7 @@
             "put": {
                 "operationId": "associate_line_endpoint_sip",
                 "summary": "Associate line and SIP endpoint",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_id}.update`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1738,6 +1790,7 @@
             "delete": {
                 "operationId": "dissociate_line_endpoint_sip",
                 "summary": "Dissociate line and SIP endpoint",
+                "description": "**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_id}.delete`",
                 "tags": [
                     "lines",
                     "endpoints",
@@ -1768,6 +1821,7 @@
             "get": {
                 "operationId": "get_line_extension_association",
                 "summary": "List extensions associated to line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.read`",
                 "tags": [
                     "lines",
                     "extensions"
@@ -1792,7 +1846,7 @@
             "post": {
                 "operationId": "associate_line_extension",
                 "summary": "Associate line and extension",
-                "description": "Because of technical limitations, a line can only have a single ‘internal’ extension associated (i.e. an extension with a context of type ‘internal’)",
+                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.create`\n\nBecause of technical limitations, a line can only have a single ‘internal’ extension associated (i.e. an extension with a context of type ‘internal’)",
                 "tags": [
                     "lines",
                     "extensions"
@@ -1830,7 +1884,7 @@
             "delete": {
                 "operationId": "dissociate_line_extension",
                 "summary": "Dissociate line and extension",
-                "description": "Any devices that are attached to a line must be removed before dissociating an extension from its line. A device can be dissociated by resetting it to autoprov mode.",
+                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.{extension_id}.delete`\n\nAny devices that are attached to a line must be removed before dissociating an extension from its line. A device can be dissociated by resetting it to autoprov mode.",
                 "tags": [
                     "lines",
                     "extensions"
@@ -1860,6 +1914,7 @@
             "get": {
                 "operationId": "get_line_user_associations",
                 "summary": "List users associated to lines",
+                "description": "**Required ACL:** `confd.lines.{line_id}.users.read`",
                 "tags": [
                     "users",
                     "lines"
@@ -1886,7 +1941,7 @@
             "post": {
                 "operationId": "associate_agent_queue",
                 "summary": "Associate an agent and queue",
-                "description": "Position in queue is set to max position + 1 or 0 if it is the first member of the queue",
+                "description": "**Required ACL:** `confd.queues.{queue_id}.members.agents.create`\n\nPosition in queue is set to max position + 1 or 0 if it is the first member of the queue",
                 "tags": [
                     "agents",
                     "queues"
@@ -1924,6 +1979,7 @@
             "get": {
                 "operationId": "get_agent_queue_association",
                 "summary": "Get Agent-Queue association",
+                "description": "**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.read`",
                 "tags": [
                     "agents",
                     "queues"
@@ -1951,6 +2007,7 @@
             "put": {
                 "operationId": "update_agent_queue_association",
                 "summary": "Update Agent-Queue association",
+                "description": "**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.update`",
                 "tags": [
                     "agents",
                     "queues"
@@ -1986,6 +2043,7 @@
             "delete": {
                 "operationId": "dissociate_agent_queue",
                 "summary": "Dissociate agent and queue",
+                "description": "**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.delete`",
                 "tags": [
                     "agents",
                     "queues"
@@ -2015,6 +2073,7 @@
             "get": {
                 "operationId": "list_user",
                 "summary": "List users",
+                "description": "**Required ACL:** `confd.users.read`",
                 "tags": [
                     "users"
                 ],
@@ -2050,6 +2109,7 @@
             "post": {
                 "operationId": "create_user",
                 "summary": "Create user",
+                "description": "**Required ACL:** `confd.users.create`",
                 "tags": [
                     "users"
                 ],
@@ -2081,6 +2141,7 @@
             "get": {
                 "operationId": "get_user",
                 "summary": "Get user",
+                "description": "**Required ACL:** `confd.users.{user_id}.read`",
                 "tags": [
                     "users"
                 ],
@@ -2104,7 +2165,7 @@
             "put": {
                 "operationId": "update_user",
                 "summary": "Update user",
-                "description": "If the firstname or the lastname is modified, the name of associated voicemail is also updated.",
+                "description": "**Required ACL:** `confd.users.{user_id}.update`\n\nIf the firstname or the lastname is modified, the name of associated voicemail is also updated.",
                 "tags": [
                     "users"
                 ],
@@ -2136,7 +2197,7 @@
             "delete": {
                 "operationId": "delete_user",
                 "summary": "Delete user",
-                "description": "A user can not be deleted if he is associated to a line or a voicemail. Any line or voicemail attached to the user must be dissociated first. The user will also be removed from all queues, groups or other XiVO entities whom he is member.",
+                "description": "**Required ACL:** `confd.users.{user_id}.delete`\n\nA user can not be deleted if he is associated to a line or a voicemail. Any line or voicemail attached to the user must be dissociated first. The user will also be removed from all queues, groups or other XiVO entities whom he is member.",
                 "tags": [
                     "users"
                 ],
@@ -2162,7 +2223,7 @@
             "get": {
                 "operationId": "export_users_csv",
                 "summary": "Mass export users and associated resources",
-                "description": "CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
+                "description": "**Required ACL:** `confd.users.export.read`\n\nCSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
                 "externalDocs": {
                     "description": "Complete documentation on the CSV data format and fields",
                     "url": "http://documentation.xivo.io/en/stable/administration/users/csv_import.html"
@@ -2187,7 +2248,7 @@
             "post": {
                 "operationId": "import_users_csv",
                 "summary": "Mass import users and associated resources",
-                "description": "CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
+                "description": "**Required ACL:** `confd.users.import.create`\n\nCSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
                 "externalDocs": {
                     "description": "Complete documentation on the CSV data format and fields",
                     "url": "http://documentation.xivo.io/en/stable/administration/users/csv_import.html"
@@ -2221,7 +2282,7 @@
             "put": {
                 "operationId": "import_users_csv",
                 "summary": "Mass import users and associated resources",
-                "description": "CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
+                "description": "**Required ACL:** `confd.users.import.update`\n\nCSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html",
                 "externalDocs": {
                     "description": "Complete documentation on the CSV data format and fields",
                     "url": "http://documentation.xivo.io/en/stable/administration/users/csv_import.html"
@@ -2257,6 +2318,7 @@
             "get": {
                 "operationId": "list_user_func_keys",
                 "summary": "List func keys for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.read`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2280,6 +2342,7 @@
             "get": {
                 "operationId": "get_user_func_key",
                 "summary": "Get a func key for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.{position}.read`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2307,6 +2370,7 @@
             "put": {
                 "operationId": "update_user_func_key",
                 "summary": "Add/Replace a func key for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.{position}.update`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2339,6 +2403,7 @@
             "delete": {
                 "operationId": "delete_user_func_key",
                 "summary": "Remove func key for user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.{position}.delete`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2368,6 +2433,7 @@
             "get": {
                 "operationId": "list_user_func_key_template_associations",
                 "summary": "List funckey templates associated to user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.templates.read`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2394,6 +2460,7 @@
             "put": {
                 "operationId": "associate_user_func_key_template",
                 "summary": "Associate a func key template to a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.templates.{template_id}.update`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2421,6 +2488,7 @@
             "delete": {
                 "operationId": "dissociate_user_func_key_template",
                 "summary": "Dissociate a func key template to a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys.templates.{template_id}.delete`",
                 "tags": [
                     "funckeys",
                     "users"
@@ -2450,6 +2518,7 @@
             "get": {
                 "operationId": "get_user_line_associations",
                 "summary": "List lines associated to user",
+                "description": "**Required ACL:** `confd.users.{user_id}.lines.read`",
                 "tags": [
                     "users",
                     "lines"
@@ -2474,6 +2543,7 @@
             "post": {
                 "operationId": "associate_user_line",
                 "summary": "Associate user and line",
+                "description": "**Required ACL:** `confd.users.{user_id}.lines.create`",
                 "tags": [
                     "users",
                     "lines"
@@ -2511,7 +2581,7 @@
             "delete": {
                 "operationId": "dissociate_user_line",
                 "summary": "Dissociate user and line",
-                "description": "Any devices that are attached the line must be removed before dissociating a user from its line. A device can be dissociated be resetting it to autoprov mode.",
+                "description": "**Required ACL:** `confd.users.{user_id}.lines.{line_id}.delete`\n\nAny devices that are attached the line must be removed before dissociating a user from its line. A device can be dissociated be resetting it to autoprov mode.",
                 "tags": [
                     "users",
                     "lines"
@@ -2541,6 +2611,7 @@
             "get": {
                 "operationId": "get_user_line_main_associated_endpoints_sip",
                 "summary": "Get SIP endpoint of main line for a user",
+                "description": "**Required ACL:** `confd.users.{user_uuid}.lines.main.associated.endpoints.sip.read`",
                 "tags": [
                     "endpoints",
                     "lines",
@@ -2565,6 +2636,7 @@
             "get": {
                 "operationId": "get_user_voicemail_association",
                 "summary": "Get voicemail associated to user",
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.read`",
                 "tags": [
                     "users",
                     "voicemails"
@@ -2589,6 +2661,7 @@
             "post": {
                 "operationId": "associate_user_voicemail",
                 "summary": "Associate user and voicemail",
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.create`",
                 "tags": [
                     "users",
                     "voicemails"
@@ -2625,6 +2698,7 @@
             "delete": {
                 "operationId": "dissociate_user_voicemail",
                 "summary": "Dissociate user and voicemail",
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.delete`",
                 "tags": [
                     "users",
                     "voicemails"
@@ -2651,6 +2725,7 @@
             "get": {
                 "operationId": "get_user_cti_profile_association",
                 "summary": "Get CtiProfile associated to User",
+                "description": "**Required ACL:** `confd.users.{user_id}.cti.read`",
                 "tags": [
                     "users",
                     "cti_profiles"
@@ -2675,6 +2750,7 @@
             "put": {
                 "operationId": "update_user_cti_profile_association",
                 "summary": "Update User-CtiProfile association",
+                "description": "**Required ACL:** `confd.users.{user_id}.cti.update`",
                 "tags": [
                     "users",
                     "cti_profiles"
@@ -2709,6 +2785,7 @@
             "get": {
                 "operationId": "list_voicemails",
                 "summary": "List voicemails",
+                "description": "**Required ACL:** `confd.voicemails.read`",
                 "tags": [
                     "voicemails"
                 ],
@@ -2741,6 +2818,7 @@
             "post": {
                 "operationId": "create_voicemail",
                 "summary": "Create voicemail",
+                "description": "**Required ACL:** `confd.voicemails.create`",
                 "tags": [
                     "voicemails"
                 ],
@@ -2772,6 +2850,7 @@
             "get": {
                 "operationId": "get_voicemail",
                 "summary": "Get voicemail",
+                "description": "**Required ACL:** `confd.voicemails.{voicemail_id}.read`",
                 "tags": [
                     "voicemails"
                 ],
@@ -2795,6 +2874,7 @@
             "put": {
                 "operationId": "update_voicemail",
                 "summary": "Update voicemail",
+                "description": "**Required ACL:** `confd.voicemails.{voicemail_id}.update`",
                 "tags": [
                     "voicemails"
                 ],
@@ -2826,7 +2906,7 @@
             "delete": {
                 "operationId": "delete_voicemail",
                 "summary": "Delete voicemail",
-                "description": "A voicemail can not be deleted if it is still attached to a user. The user must be dissociated first. Any extension that redirects to the voicemail (e.g. an Incoming call) will be disabled after deletion.",
+                "description": "**Required ACL:** `confd.voicemails.{voicemail_id}.delete`\n\nA voicemail can not be deleted if it is still attached to a user. The user must be dissociated first. Any extension that redirects to the voicemail (e.g. an Incoming call) will be disabled after deletion.",
                 "tags": [
                     "voicemails"
                 ],
@@ -2852,6 +2932,7 @@
             "get": {
                 "operationId": "get_voicemail_user_association",
                 "summary": "Get users associated to voicemail",
+                "description": "**Required ACL:** `confd.voicemails.{voicemail_id}.users.read`",
                 "tags": [
                     "users",
                     "voicemails"
@@ -2879,7 +2960,7 @@
                 "operationId": "associate_line_device",
                 "summary": "Associate line and device",
                 "deprecated": true,
-                "description": "***WARNING:*** This feature is not yet accessible nor functional",
+                "description": "**Required ACL:** `confd.#`\n\n***WARNING:*** This feature is not yet accessible nor functional",
                 "tags": [
                     "deprecated"
                 ],
@@ -2909,7 +2990,7 @@
                 "operationId": "dissociate_line_device",
                 "summary": "Dissociate line and device",
                 "deprecated": true,
-                "description": "***WARNING:*** This feature is not yet accessible nor functional",
+                "description": "**Required ACL:** `confd.#`\n\n***WARNING:*** This feature is not yet accessible nor functional",
                 "tags": [
                     "deprecated"
                 ],
@@ -2938,6 +3019,7 @@
             "get": {
                 "operationId": "list_line_sip",
                 "summary": "List SIP Lines",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -2954,6 +3036,7 @@
             "post": {
                 "operationId": "create_line_sip",
                 "summary": "Create SIP line",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -2986,6 +3069,7 @@
             "get": {
                 "operationId": "get_line_extension_legacy",
                 "summary": "Get extension associated to line",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3016,6 +3100,7 @@
             "post": {
                 "operationId": "associate_line_extension_legacy",
                 "summary": "Associate line and extension",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3051,6 +3136,7 @@
             "delete": {
                 "operationId": "dissociate_line_extension_legacy",
                 "summary": "Dissociate line and extension",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3077,6 +3163,7 @@
             "get": {
                 "operationId": "get_line_sip",
                 "summary": "Get SIP line",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3101,6 +3188,7 @@
             "put": {
                 "operationId": "update_line_sip",
                 "summary": "Update SIP line",
+                "description": "**Required ACL:** `confd.#`",
                 "deprecated": true,
                 "tags": [
                     "deprecated"
@@ -3134,7 +3222,7 @@
                 "operationId": "delete_line_sip",
                 "summary": "Delete SIP line",
                 "deprecated": true,
-                "description": "A SIP line can not be deleted if it is still associated with a user, an extesion, or a device. Any user, extension, or device attached to the line must be dissociated first.",
+                "description": "**Required ACL:** `confd.#`\n\nA SIP line can not be deleted if it is still associated with a user, an extesion, or a device. Any user, extension, or device attached to the line must be dissociated first.",
                 "tags": [
                     "deprecated"
                 ],

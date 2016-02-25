@@ -19,6 +19,7 @@
 from flask import url_for
 from flask_restful import reqparse, inputs, fields
 
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
     ListResource, ItemResource, Strict
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
@@ -56,6 +57,14 @@ class LineList(ListResource):
     def build_headers(self, line):
         return {'Location': url_for('lines', id=line.id, _external=True)}
 
+    @required_acl('confd.lines.read')
+    def get(self):
+        return super(LineList, self).get()
+
+    @required_acl('confd.lines.create')
+    def post(self):
+        return super(LineList, self).post()
+
 
 class LineItem(ItemResource):
 
@@ -67,3 +76,15 @@ class LineItem(ItemResource):
     parser.add_argument('position', type=inputs.positive, store_missing=False, nullable=False)
     parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
+
+    @required_acl('confd.lines.{id}.read')
+    def get(self, id):
+        return super(LineItem, self).get(id)
+
+    @required_acl('confd.lines.{id}.update')
+    def put(self, id):
+        return super(LineItem, self).post(id)
+
+    @required_acl('confd.lines.{id}.delete')
+    def delete(self, id):
+        return super(LineItem, self).delete(id)

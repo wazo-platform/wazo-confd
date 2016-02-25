@@ -20,6 +20,7 @@
 from flask_restful import marshal
 
 from flask_restful import fields
+from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.helpers.restful import Link, FieldList
 
@@ -99,36 +100,81 @@ class EndpointLineGet(LineEndpoint):
 
 
 class LineEndpointAssociationSip(LineEndpointAssociation):
-    pass
+
+    @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.update')
+    def put(self, line_id, endpoint_id):
+        return super(LineEndpointAssociationSip, self).put(line_id, endpoint_id)
+
+    @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.delete')
+    def delete(self, line_id, endpoint_id):
+        return super(LineEndpointAssociationSip, self).delete(line_id, endpoint_id)
 
 
 class LineEndpointGetSip(LineEndpointGet):
     fields = sip_fields
 
+    @required_acl('confd.lines.{line_id}.endpoints.sip.read')
+    def get(self, line_id):
+        return super(LineEndpointGetSip, self).get(line_id)
+
 
 class EndpointLineGetSip(EndpointLineGet):
     fields = sip_fields
 
+    @required_acl('confd.endpoints.sip.{endpoint_id}.lines.read')
+    def get(self, endpoint_id):
+        return super(EndpointLineGetSip, self).get(endpoint_id)
+
 
 class LineEndpointAssociationSccp(LineEndpointAssociation):
-    pass
+
+    @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.update')
+    def put(self, line_id, endpoint_id):
+        return super(LineEndpointAssociationSccp, self).put(line_id, endpoint_id)
+
+    @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.delete')
+    def delete(self, line_id, endpoint_id):
+        return super(LineEndpointAssociationSccp, self).delete(line_id, endpoint_id)
 
 
 class LineEndpointGetSccp(LineEndpointGet):
     fields = sccp_fields
 
+    @required_acl('confd.lines.{line_id}.endpoints.sccp.read')
+    def get(self, line_id):
+        return super(LineEndpointGetSccp, self).get(line_id)
+
 
 class EndpointLineGetSccp(EndpointLineGet):
     fields = sccp_fields
 
+    @required_acl('confd.endpoints.sccp.{endpoint_id}.lines.read')
+    def get(self, endpoint_id):
+        return super(EndpointLineGetSccp, self).get(endpoint_id)
+
 
 class LineEndpointAssociationCustom(LineEndpointAssociation):
-    pass
+
+    @required_acl('confd.lines.{line_id}.endpoints.custom.{endpoint_id}.update')
+    def put(self, line_id, endpoint_id):
+        return super(LineEndpointAssociationCustom, self).put(line_id, endpoint_id)
+
+    @required_acl('confd.lines.{line_id}.endpoints.custom.{endpoint_id}.delete')
+    def delete(self, line_id, endpoint_id):
+        return super(LineEndpointAssociationCustom, self).delete(line_id, endpoint_id)
 
 
 class LineEndpointGetCustom(LineEndpointGet):
     fields = custom_fields
 
+    @required_acl('confd.lines.{line_id}.endpoints.custom.read')
+    def get(self, line_id):
+        return super(LineEndpointGetCustom, self).get(line_id)
+
 
 class EndpointLineGetCustom(EndpointLineGet):
     fields = custom_fields
+
+    @required_acl('confd.endpoints.custom.{endpoint_id}.lines.read')
+    def get(self, endpoint_id):
+        return super(EndpointLineGetCustom, self).get(endpoint_id)
