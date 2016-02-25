@@ -936,7 +936,6 @@ def test_when_call_permission_column_is_not_in_csv_then_call_permission_remains_
             row_number=1,
             call_permission_ids=contains(perm_id)))
 
-    print response.item['updated'][0]
     assert_that(response.item['updated'], expected)
 
 
