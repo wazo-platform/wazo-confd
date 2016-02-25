@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 from xivo_confd.database import user_line as user_line_db
 from xivo_confd.database import extension as extension_db
 
-from xivo_confd.resources.line_device import validator as line_device_validator
+from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.helpers import errors
 
@@ -56,7 +56,7 @@ class InternalAssociationValidator(Validator):
 class InternalDissociationValidator(Validator):
 
     def validate(self, line, extension):
-        line_device_validator.validate_no_device(line.id)
+        ValidateLineHasNoDevice().validate(line)
 
 
 class IncallAssociationValidator(Validator):

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 from xivo_confd.helpers.validator import AssociationValidator
 from xivo_confd.helpers.validator import Validator
 
-from xivo_confd.resources.line_device import validator as line_device_validator
+from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
@@ -47,7 +47,7 @@ class ValidateLineDissociation(Validator):
         self.validate_endpoint(line, endpoint)
         self.validate_users(line)
         self.validate_extensions(line)
-        line_device_validator.validate_no_device(line.id)
+        ValidateLineHasNoDevice().validate(line)
 
     def validate_endpoint(self, line, endpoint):
         if not line.is_associated_with(endpoint):
@@ -70,6 +70,11 @@ class ValidateLineDissociation(Validator):
             raise errors.resource_associated('Line', 'Extension',
                                              line_id=line.id,
                                              extension_ids=extension_ids)
+
+    def validate_device(self, line):
+        if line.device_id is not None:
+            raise errors.resource_associated('Line', 'Device',
+                                             line_id=line.id, device_id=line.device_id)
 
 
 def build_validator():
