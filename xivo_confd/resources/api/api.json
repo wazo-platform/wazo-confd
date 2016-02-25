@@ -94,7 +94,7 @@
             "get": {
                 "operationId": "get_configuration",
                 "summary": "Get live reload status",
-                "description": "**Required ACL:** `confd.live_reload.read`",
+                "description": "**Required ACL:** `confd.configuration.live_reload.read`",
                 "tags": [
                     "configuration"
                 ],
@@ -110,7 +110,7 @@
             "put": {
                 "operationId": "update_configuration",
                 "summary": "Update live reload status",
-                "description": "**Required ACL:** `confd.live_reload.update`",
+                "description": "**Required ACL:** `confd.configuration.live_reload.update`",
                 "tags": [
                     "configuration"
                 ],
