@@ -38,7 +38,7 @@ class Plugin(object):
         dao = build_dao(provd_client)
         service = build_service(dao)
 
-        device_updater = build_device_updater(dao)
+        device_updater = build_device_updater(provd_client)
         association_service = build_line_device_associator(device_updater)
 
         api.add_resource(DeviceItem,
