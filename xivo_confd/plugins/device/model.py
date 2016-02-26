@@ -15,269 +15,158 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import abc
-
 
 class Device(object):
 
-    FIELDS = (
-        'id',
-        'ip',
-        'mac',
-        'sn',
-        'plugin',
-        'vendor',
-        'model',
-        'version',
-        'description',
-        'status',
-        'options',
-        'template_id',
-    )
+    @classmethod
+    def from_args(cls, **kwargs):
+        device = cls({}, {'parent_ids': []})
+        for key, value in kwargs.iteritems():
+            setattr(device, key, value)
+        return device
 
-    def __init__(self, **parameters):
-        for field in self.FIELDS:
-            setattr(self, field, None)
-        for name, value in parameters.iteritems():
-            if name not in self.FIELDS:
-                raise ValueError("Invalid parameter for device: {}".format(name))
-            setattr(self, name, value)
-
-
-class ProvdDevice(object):
-
-    def __init__(self, device_converter, config_converter):
-        self.device_converter = device_converter
-        self.config_converter = config_converter
-
-    @property
-    def device_id(self):
-        return self.device_converter.device_id
-
-    @property
-    def config_id(self):
-        return self.config_converter.config_id
-
-    def extract_model(self):
-        fields = self.device_converter.extract_model()
-        fields.update(self.config_converter.extract_model())
-        return Device(**fields)
-
-    def extract_device(self):
-        return self.device_converter.extract_provd()
-
-    def extract_config(self):
-        return self.config_converter.extract_provd()
-
-    def update(self, model):
-        self.device_converter.update(model)
-        self.config_converter.update(model)
-
-    def reset_autoprov(self, config):
-        self.device_converter.reset_autoprov(config['id'])
-        self.config_converter = ConfigConverter(config)
-
-    def update_lines(self, lines):
-        self.device_converter.update_lines(lines)
-        self.config_converter.update_lines(lines)
-
-    def update_funckeys(self, funckeys):
-        self.config_converter.update_funckeys(funckeys)
-
-
-class DeviceConverter(object):
-
-    DEVICE_FIELDS = [
-        'id',
-        'ip',
-        'mac',
-        'sn',
-        'plugin',
-        'vendor',
-        'model',
-        'version',
-        'description',
-        'options',
-    ]
-
-    def __init__(self, device):
+    def __init__(self, device, config=None):
         self.device = device
+        self._config = config
+
+    def set_device_value(self, name, value):
+        if value is None and name in self.device:
+            del self.device[name]
+        self.device[name] = value
 
     @property
-    def device_id(self):
+    def id(self):
         return self.device['id']
 
-    def extract_model(self):
-        fields = {name: self.device[name]
-                  for name in self.DEVICE_FIELDS
-                  if name in self.device}
-        fields['status'] = self.determine_status()
-        return fields
+    @id.setter
+    def id(self, value):
+        self.device['id'] = value
 
-    def determine_status(self):
+    @property
+    def ip(self):
+        return self.device.get('ip')
+
+    @ip.setter
+    def ip(self, value):
+        self.set_device_value('ip', value)
+
+    @property
+    def mac(self):
+        return self.device.get('mac')
+
+    @mac.setter
+    def mac(self, value):
+        if value is None and 'mac' in self.device:
+            del self.device['mac']
+        else:
+            self.device['mac'] = value.lower()
+
+    @property
+    def sn(self):
+        return self.device.get('sn')
+
+    @sn.setter
+    def sn(self, value):
+        self.set_device_value('sn', value)
+
+    @property
+    def plugin(self):
+        return self.device.get('plugin')
+
+    @plugin.setter
+    def plugin(self, value):
+        self.set_device_value('plugin', value)
+
+    @property
+    def vendor(self):
+        return self.device.get('vendor')
+
+    @vendor.setter
+    def vendor(self, value):
+        self.set_device_value('vendor', value)
+
+    @property
+    def model(self):
+        return self.device.get('model')
+
+    @model.setter
+    def model(self, value):
+        self.set_device_value('model', value)
+
+    @property
+    def version(self):
+        return self.device.get('version')
+
+    @version.setter
+    def version(self, value):
+        self.set_device_value('version', value)
+
+    @property
+    def description(self):
+        return self.device.get('description')
+
+    @description.setter
+    def description(self, value):
+        self.set_device_value('description', value)
+
+    @property
+    def options(self):
+        return self.device.get('options')
+
+    @options.setter
+    def options(self, value):
+        self.set_device_value('options', value)
+
+    @property
+    def status(self):
         if self.device.get('configured', False):
             if self.device.get('config', '').startswith('autoprov'):
                 return 'autoprov'
             return 'configured'
         return 'not_configured'
 
-    def extract_provd(self):
-        return self.device
-
-    def update(self, model):
-        device = {name: getattr(model, name)
-                  for name in self.DEVICE_FIELDS
-                  if getattr(model, name) is not None}
-
-        if 'mac' in device:
-            device['mac'] = device['mac'].lower()
-
-        self.device.update(device)
-
-    def reset_autoprov(self, config_id):
-        self.device.pop('options', None)
-        self.device['config'] = config_id
-
-    def update_lines(self, lines):
-        if not self.device['config'].startswith('autoprov'):
-            self.device['config'] = self.device['id']
-
-
-class ConfigConverter(object):
-
-    def __init__(self, config):
-        self.config = config
-
     @property
-    def config_id(self):
-        return self.config['id']
+    def template_id(self):
+        return self.config.get('configdevice')
 
-    def extract_model(self):
-        return {'template_id': self.config.get('configdevice')}
-
-    def extract_provd(self):
-        return self.config
-
-    def update(self, model):
-        self.remove_device_template()
-        if model.template_id:
-            self.add_device_template(model.template_id)
-
-    def remove_device_template(self):
+    @template_id.setter
+    def template_id(self, value):
         configdevice = self.config.pop('configdevice', None)
         if configdevice and configdevice in self.config['parent_ids']:
             self.config['parent_ids'].remove(configdevice)
-
-    def add_device_template(self, configdevice):
-        self.config['configdevice'] = configdevice
-        self.config['parent_ids'].append(configdevice)
-
-    def update_lines(self, lines):
-        self.empty_lines(lines)
-        self.fill_lines(lines)
-
-    def empty_lines(self, lines):
-        sections = set(line.section for line in lines)
-        for section in sections:
-            self.config['raw_config'][section] = {}
-
-    def fill_lines(self, lines):
-        for line in lines:
-            config = line.build()
-            self.config['raw_config'][line.section].update(config)
-
-    def update_funckeys(self, new_funckeys):
-        funckeys = self.config['raw_config'].setdefault('funckeys', {})
-        funckeys.clear()
-        funckeys.update(new_funckeys)
-
-
-class EmptyConfigConverter(object):
-
-    def extract_model(self):
-        return {'status': 'not_configured'}
-
-    def extract_provd(self):
-        raise Exception("provd config does not exist")
-
-    def update(self, model):
-        raise Exception("provd config does not exist")
-
-    def update_lines(self, lines):
-        raise Exception("provd config does not exist")
+        self.config['configdevice'] = value
+        self.config['parent_ids'].append(value)
 
     @property
-    def config_id(self):
-        raise Exception("provd config does not exist")
+    def config(self):
+        if self._config is None:
+            raise Exception("Provd Device has no config associated. The device may be corruput")
+        return self._config
 
+    @config.setter
+    def config(self, value):
+        self._config = value
 
-class LineConverter(object):
+    def is_autoprov(self):
+        return 'autoprov' in self.config['parent_ids']
 
-    __metaclass__ = abc.ABCMeta
+    def associate_config(self, config):
+        self.device['config'] = config['id']
+        self.config = config
 
-    @abc.abstractproperty
-    def section(self):
-        return
+    def update_config(self, config):
+        self.config = config
 
-    @abc.abstractmethod
-    def build(self):
-        return
+    def reset_autoprov(self, config):
+        self.device['config'] = config['id']
+        if 'options' in self.device:
+            del self.device['options']
+        self.config = config
 
+    def extract_config_device(self):
+        return self.config.get('configdevice', 'defaultconfigdevice')
 
-class LineSIPConverter(LineConverter):
-
-    section = 'sip_lines'
-
-    def __init__(self, registrar, line, extension):
-        self.registrar = registrar
-        self.line = line
-        self.extension = extension
-
-    def build(self):
-        sip = self.line.sip_endpoint
-        slot = {'auth_username': sip.name,
-                'username': sip.name,
-                'password': sip.secret,
-                'display_name': self.line.caller_id_name,
-                'number': self.extension.exten,
-                'registrar_ip': self.registrar['registrar_main'],
-                'proxy_ip': self.registrar['proxy_main']}
-
-        proxy_backup = self.registrar.get('proxy_backup', '')
-        if proxy_backup:
-            slot['backup_proxy_ip'] = proxy_backup
-            slot['backup_registrar_ip'] = self.registrar['registrar_backup']
-
-        return {self.line.device_slot: slot}
-
-    def __eq__(self, other):
-        return all([self.registrar == other.registrar,
-                    self.line == other.line,
-                    self.extension == other.extension])
-
-    def __repr__(self):
-        tpl = "<LineSIPConverter line_id:{} extension_id:{} registrar_id:{}>"
-        return tpl.format(self.line.id, self.extension.id, self.registrar['id'])
-
-
-class LineSCCPConverter(LineConverter):
-
-    section = 'sccp_call_managers'
-
-    def __init__(self, registrar):
-        self.registrar = registrar
-
-    def build(self):
-        slot = {1: {'ip': self.registrar['proxy_main']}}
-
-        proxy_backup = self.registrar.get('proxy_backup', '')
-        if proxy_backup:
-            slot[2] = {'ip': proxy_backup}
-
-        return slot
-
-    def __eq__(self, other):
-        return self.registrar == other.registrar
-
-    def __repr__(self):
-        return "<LineSCCPConverter {}>".format(self.registrar)
+    def merge(self, other):
+        self.device.update(other.device)
+        if other.template_id is not None:
+            self.template_id = other.template_id

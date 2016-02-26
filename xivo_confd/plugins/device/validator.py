@@ -50,7 +50,7 @@ class MacChanged(Validator):
     def validate(self, device):
         mac = device.mac
         if mac is not None:
-            found = self.dao.find_by('mac', mac)
+            found = self.dao.find_by(mac=mac)
             if found is not None and found.id != device.id:
                 raise errors.resource_exists('Device', mac=mac)
 
@@ -88,7 +88,7 @@ def build_validator(device_dao, line_dao):
         create=[
             Optional('mac',
                      UniqueField('mac',
-                                 lambda d: device_dao.find_by('mac', d),
+                                 lambda mac: device_dao.find_by(mac=mac),
                                  'Device')
                      ),
         ],
