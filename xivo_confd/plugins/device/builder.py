@@ -20,7 +20,6 @@ from xivo_confd import bus
 from xivo_confd.database import device as device_db
 
 from xivo_confd.plugins.device.service import (DeviceService,
-                                               LineDeviceAssociationService,
                                                SearchEngine)
 
 from xivo_confd.plugins.device.update import (DeviceUpdater,
@@ -53,13 +52,11 @@ def build_service(device_dao):
     search_engine = SearchEngine(device_dao)
     device_validator = build_validator(device_dao, line_dao)
     device_notifier = DeviceNotifier(bus)
-    device_updater = build_device_updater(device_dao.client)
-    device_associator = build_line_device_associator(device_updater)
     device_service = DeviceService(device_dao,
                                    device_validator,
                                    device_notifier,
                                    search_engine,
-                                   device_associator)
+                                   line_dao)
 
     return device_service
 
@@ -94,9 +91,3 @@ def build_generators(device_dao):
     config_generator = ConfigGenerator([raw_config_generator])
 
     return config_generator
-
-
-def build_line_device_associator(updater):
-    associator = LineDeviceAssociationService(line_dao,
-                                              updater)
-    return associator

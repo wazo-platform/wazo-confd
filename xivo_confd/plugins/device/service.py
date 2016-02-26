@@ -23,10 +23,10 @@ from xivo_dao.helpers import errors
 
 class DeviceService(CRUDService):
 
-    def __init__(self, dao, validator, notifier, search_engine, associator):
+    def __init__(self, dao, validator, notifier, search_engine, line_dao):
         super(DeviceService, self).__init__(dao, validator, notifier)
         self.search_engine = search_engine
-        self.associator = associator
+        self.line_dao = line_dao
 
     def search(self, parameters):
         return self.search_engine.search(parameters)
@@ -35,32 +35,10 @@ class DeviceService(CRUDService):
         self.dao.synchronize(device)
 
     def reset_autoprov(self, device):
-        self.dao.reset_autoprov(device)
-        self.associator.dissociate_device(device)
-
-
-class LineDeviceAssociationService(object):
-
-    def __init__(self, line_dao, device_updater):
-        self.line_dao = line_dao
-        self.device_updater = device_updater
-
-    def get_line(self, line_id):
-        return self.line_dao.get(line_id)
-
-    def associate(self, line, device):
-        line.device_id = device.id
-        self.line_dao.edit(line)
-        self.device_updater.update_for_line(line)
-
-    def dissociate(self, line, device):
-        line.device_id = None
-        self.line_dao.edit(line)
-        self.device_updater.update_for_line(line)
-
-    def dissociate_device(self, device):
         for line in self.line_dao.find_all_by(device=device.id):
-            self.dissociate(line, device)
+            line.remove_device()
+            self.line_dao.edit(line)
+        self.dao.reset_autoprov(device)
 
 
 class SearchEngine(object):
