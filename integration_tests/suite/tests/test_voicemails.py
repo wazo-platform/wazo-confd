@@ -5,11 +5,12 @@ from test_api import fixtures
 from test_api import mocks
 from test_api import scenarios as s
 from test_api import errors as e
+from test_api import helpers as h
 
 from test_api.helpers import voicemail as vm_helper
 from test_api.helpers import context as context_helper
 
-from hamcrest import assert_that, has_items, contains, has_entries
+from hamcrest import assert_that, has_items, contains, has_entry, has_entries, has_item, is_not
 
 
 REQUIRED = ['name', 'number', 'context']
@@ -112,6 +113,30 @@ def test_edit_voicemail_with_same_number_and_context(first_voicemail, second_voi
     response = confd.voicemails(first_voicemail['id']).put(number=second_voicemail['number'],
                                                            context=second_voicemail['context'])
     response.assert_match(400, e.resource_exists('Voicemail'))
+
+
+@fixtures.voicemail(name="SearchVoicemail",
+                    email="searchemail@proformatique.com")
+@fixtures.voicemail(name="HiddenVoicemail",
+                    email="hiddenvoicemail@proformatique.com")
+def test_search_voicemail(voicemail, hidden):
+    url = confd.voicemails
+
+    searches = {'name': 'searchv',
+                'number': voicemail['number'],
+                'email': 'searche'}
+
+    for field, term in searches.items():
+        yield check_search, url, voicemail, hidden, field, term
+
+
+def check_search(url, device, hidden, field, term):
+    response = url.get(search=term)
+
+    expected_device = has_item(has_entry(field, device[field]))
+    hidden_device = is_not(has_item(has_entry(field, hidden[field])))
+    assert_that(response.items, expected_device)
+    assert_that(response.items, hidden_device)
 
 
 @fixtures.voicemail()
