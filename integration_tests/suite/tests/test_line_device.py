@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import re
+
 from contextlib import contextmanager
 
 from hamcrest import assert_that, has_entries, is_not, starts_with, equal_to, contains, has_items, none, has_key
@@ -98,6 +100,23 @@ def test_get_errors():
 
     yield s.check_resource_not_found, fake_line, 'Line'
     yield s.check_resource_not_found, fake_device, 'Device'
+
+
+@fixtures.line(position=1)
+def test_associate_2_lines_with_same_position_raises_error(extra_line):
+    with line_and_device('sip') as (line, device):
+        yield check_2_lines_with_same_position_raises_error, line, extra_line, device
+
+    with line_and_device('sccp') as (line, device):
+        yield check_2_lines_with_same_position_raises_error, line, extra_line, device
+
+
+def check_2_lines_with_same_position_raises_error(line, extra_line, device):
+    response = confd.lines(line['id']).devices(device['id']).put()
+    response.assert_ok()
+
+    response = confd.lines(extra_line['id']).devices(device['id']).put()
+    response.assert_match(400, re.compile("Cannot associate 2 lines with same position"))
 
 
 def test_get_device_associated_to_line():
@@ -340,22 +359,6 @@ def check_associate_with_another_device_when_already_associated(line, device1, d
     with a.line_device(line, device1):
         response = confd.lines(line['id']).devices(device2['id']).put()
         response.assert_match(400, e.resource_associated('Line', 'Device'))
-
-
-def test_associate_2_lines_to_same_device():
-    with line_and_device('sip') as (line1, device), line_fellowship('sip') as (_, line2, _, _):
-        yield check_associate_2_lines_to_same_device, line1, line2, device
-
-    with line_and_device('sccp') as (line1, device), line_fellowship('sccp') as (_, line2, _, _):
-        yield check_associate_2_lines_to_same_device, line1, line2, device
-
-
-def check_associate_2_lines_to_same_device(line1, line2, device):
-    response = confd.lines(line1['id']).devices(device['id']).put()
-    response.assert_updated()
-
-    response = confd.lines(line2['id']).devices(device['id']).put()
-    response.assert_updated()
 
 
 def test_dissociate():

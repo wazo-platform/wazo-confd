@@ -21,6 +21,8 @@ from xivo_dao.helpers import errors
 from xivo_confd.helpers.validator import AssociationValidator
 from xivo_confd.helpers.validator import Validator
 
+from xivo_dao.resources.line import dao as line_dao
+
 
 class ValidateLineHasNoDevice(Validator):
 
@@ -44,10 +46,23 @@ class ValidateLineDeviceDissociation(Validator):
                                                  line_id=line.id, device_id=device.id)
 
 
+class ValidateLinePosition(Validator):
+
+    def __init__(self, line_dao):
+        self.line_dao = line_dao
+
+    def validate(self, line, device):
+        existing = self.line_dao.find_by(device_id=device.id, position=line.position)
+        if existing:
+            msg = "Cannot associate 2 lines with same position (position: {})".format(line.position)
+            raise errors.ResourceError(msg)
+
+
 def build_validator():
     return AssociationValidator(
         association=[
             ValidateLineDeviceAssociation(),
+            ValidateLinePosition(line_dao),
         ],
         dissociation=[
             ValidateLineDeviceDissociation(),
