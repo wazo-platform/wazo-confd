@@ -214,13 +214,14 @@ def assert_provd_config(user, line, provd_config):
     assert_that(provd_config, expected)
 
 
-def assert_sip_config(user, sip, extension, provd_config):
+def assert_sip_config(user, sip, extension, provd_config, position=1):
+    position = str(position)
     fullname = "{u[firstname]} {u[lastname]}".format(u=user)
     registrar = provd.configs.get('default')
     expected = has_entries(
         protocol='SIP',
         sip_lines=has_entries({
-            '1': has_entries(
+            position: has_entries(
                 auth_username=sip['username'],
                 username=sip['username'],
                 password=sip['secret'],
@@ -271,6 +272,26 @@ def test_associate_sip_line(device):
         provd_config = provd.configs.get(device['id'])
         assert_provd_config(user, line, provd_config)
         assert_sip_config(user, sip, extension, provd_config)
+
+
+@fixtures.device()
+def test_associate_2_sip_lines(device):
+    registrar = provd.configs.get('default')
+    registrar['proxy_backup'] = '127.0.0.2'
+    registrar['registrar_backup'] = '127.0.0.2'
+    provd.configs.update(registrar)
+
+    with line_fellowship('sip') as (user1, line1, extension1, sip1), \
+            line_fellowship('sip') as (user2, line2, extension2, sip2):
+
+        confd.lines(line2['id']).put(position=2).assert_updated()
+        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+        confd.lines(line2['id']).devices(device['id']).put().assert_updated()
+
+        provd_config = provd.configs.get(device['id'])
+        assert_provd_config(user1, line1, provd_config)
+        assert_sip_config(user1, sip1, extension1, provd_config, position=1)
+        assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
 @fixtures.device()
