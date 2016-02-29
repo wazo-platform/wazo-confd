@@ -19,21 +19,19 @@
 
 class ConfigGenerator(object):
 
-    def __init__(self, generators):
-        self.generators = generators
+    def __init__(self, raw_generator):
+        self.raw_generator = raw_generator
 
     def generate(self, device):
         configdevice = device.extract_config_device()
         config = {'id': device.id,
                   'configdevice': configdevice,
                   'parent_ids': ['base', configdevice],
-                  'X_key': '',
-                  'config_version': 1}
+                  'deletable': True,
+                  }
 
-        for generator in self.generators:
-            section = generator.generate(device)
-            if section:
-                config.update(section)
+        config.update(self.raw_generator.generate(device))
+
         return config
 
 
@@ -43,12 +41,49 @@ class RawConfigGenerator(object):
         self.generators = generators
 
     def generate(self, device):
-        raw_config = {}
+        raw_config = {'X_key': '',
+                      'config_version': 1}
         for generator in self.generators:
             section = generator.generate(device)
             if section:
                 raw_config.update(section)
         return {'raw_config': raw_config}
+
+
+class UserGenerator(object):
+
+    def __init__(self, device_db):
+        self.device_db = device_db
+
+    def generate(self, device):
+        row = self.device_db.profile_for_device(device.id)
+        if row:
+            return {'X_xivo_user_uuid': row.uuid,
+                    'X_xivo_phonebook_profile': row.context}
+
+
+class ExtensionGenerator(object):
+
+    def __init__(self, extension_dao):
+        self.extension_dao = extension_dao
+
+    def generate(self, device):
+        return {
+            'exten_dnd': self.find_exten('enablednd'),
+            'exten_fwd_unconditional': self.find_exten('fwdunc'),
+            'exten_fwd_no_answer': self.find_exten('fwdrna'),
+            'exten_fwd_busy': self.find_exten('fwdbusy'),
+            'exten_fwd_disable_all': self.find_exten('fwdundoall'),
+            'exten_park': self.find_exten('parkext'),
+            'exten_pickup_group': self.find_exten('pickupexten'),
+            'exten_pickup_call': self.find_exten('pickup'),
+            'exten_voicemail': self.find_exten('vmusermsg'),
+        }
+
+    def find_exten(self, typeval):
+        extension = self.extension_dao.find_by(type='extenfeatures', typeval=typeval)
+        if extension:
+            return extension.clean_exten()
 
 
 class FuncKeyGenerator(object):
@@ -111,7 +146,7 @@ class SipGenerator(object):
             section[slot] = config
 
         if len(section) > 0:
-            return {'sip_lines': section}
+            return {'protocol': 'SIP', 'sip_lines': section}
 
     def generate_config(self, row):
         line = row.LineFeatures
@@ -143,7 +178,7 @@ class SccpGenerator(object):
 
     def generate(self, device):
         section = {}
-        line = self.line_dao.find_by(device=device.id)
+        line = self.line_dao.find_by(device=device.id, protocol='sccp')
         if line:
             registrar = self.device_dao.get_registrar(line.configregistrar)
             section['1'] = {'ip': registrar['proxy_main']}
@@ -152,4 +187,4 @@ class SccpGenerator(object):
                 section['2'] = {'ip': proxy_backup}
 
         if len(section) > 0:
-            return {'sccp_call_managers': section}
+            return {'protocol': 'SCCP', 'sccp_call_managers': section}

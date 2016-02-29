@@ -26,6 +26,8 @@ from xivo_confd.plugins.device.update import (DeviceUpdater,
                                               ProvdUpdater)
 
 from xivo_confd.plugins.device.generators import (ConfigGenerator,
+                                                  UserGenerator,
+                                                  ExtensionGenerator,
                                                   RawConfigGenerator,
                                                   FuncKeyGenerator,
                                                   SipGenerator,
@@ -42,6 +44,7 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.extension import dao as extension_dao
 
 
 def build_dao(provd_client):
@@ -87,7 +90,16 @@ def build_generators(device_dao):
     sccp_generator = SccpGenerator(device_dao,
                                    line_dao)
 
-    raw_config_generator = RawConfigGenerator([funckey_generator, sip_generator, sccp_generator])
-    config_generator = ConfigGenerator([raw_config_generator])
+    user_generator = UserGenerator(device_db)
+
+    extension_generator = ExtensionGenerator(extension_dao)
+
+    raw_config_generator = RawConfigGenerator([user_generator,
+                                               extension_generator,
+                                               funckey_generator,
+                                               sip_generator,
+                                               sccp_generator])
+
+    config_generator = ConfigGenerator(raw_config_generator)
 
     return config_generator

@@ -18,12 +18,25 @@
 
 from sqlalchemy.orm import Load
 
+from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.user_line import UserLine as UserLine
 from xivo_dao.alchemy.usersip import UserSIP
 
 from xivo_dao.helpers.db_manager import Session
+
+
+def profile_for_device(device_id):
+    query = (Session.query(UserFeatures.uuid,
+                           LineFeatures.context)
+             .join(LineFeatures.user_lines)
+             .join(UserLine.main_user_rel)
+             .filter(LineFeatures.device_id == device_id)
+             .filter(LineFeatures.num == 1)
+             )
+
+    return query.first()
 
 
 def sip_lines_for_device(device_id):
