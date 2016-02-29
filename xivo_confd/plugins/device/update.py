@@ -68,7 +68,7 @@ class ProvdUpdater(object):
         self.line_dao = line_dao
 
     def update(self, device_id):
-        device = self.get_device(device_id)
+        device = self.dao.get(device_id)
         has_lines = self.device_has_lines(device)
 
         if device.is_autoprov() and has_lines:
@@ -78,16 +78,13 @@ class ProvdUpdater(object):
         else:
             self.reset_autoprov(device)
 
-    def get_device(self, device_id):
-        return self.dao.get(device_id)
-
     def device_has_lines(self, device):
         lines = self.line_dao.find_all_by(device_id=device.id)
         return len(lines) > 0
 
     def create_device(self, device):
         config = self.config_generator.generate(device)
-        device.associate_config(config)
+        device.update_config(config)
         self.dao.create_or_update(device)
 
     def update_device(self, device):
