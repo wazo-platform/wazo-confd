@@ -393,6 +393,26 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def line_has_sccp_device(self, line_id, sccp_device):
+        query = text("""SELECT COUNT(*)
+                     FROM linefeatures
+                        INNER JOIN sccpline
+                            ON linefeatures.protocol = 'sccp'
+                            AND linefeatures.protocolid = sccpline.id
+                            INNER JOIN sccpdevice ON sccpdevice.line = linefeatures.number
+                     WHERE
+                        linefeatures.id = :line_id
+                        AND sccpdevice.device = :sccp_device
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          line_id=line_id,
+                          sccp_device=sccp_device)
+                 .scalar())
+
+        return count > 0
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')

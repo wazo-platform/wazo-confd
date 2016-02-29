@@ -18,6 +18,8 @@
 
 from xivo_dao.helpers import errors
 
+from xivo_confd.database import device as device_db
+
 from xivo_confd.plugins.device.builder import build_device_updater
 from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.line_device.validator import build_validator
@@ -45,12 +47,16 @@ class LineDeviceService(object):
         self.validator.validate_association(line, device)
         line.associate_device(device)
         self.line_service.edit(line)
+        if line.endpoint == "sccp":
+            device_db.associate_sccp_device(line, device)
 
     def dissociate(self, line, device):
         self.validator.validate_dissociation(line, device)
         line.remove_device()
         self.line_service.edit(line)
         self.device_updater.update_device(device)
+        if line.endpoint == "sccp":
+            device_db.dissociate_sccp_device(line, device)
 
     def dissociate_device(self, device):
         for line in self.line_service.find_all_by(device_id=device.id):

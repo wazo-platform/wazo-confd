@@ -23,6 +23,7 @@ from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.user_line import UserLine as UserLine
 from xivo_dao.alchemy.usersip import UserSIP
+from xivo_dao.alchemy.sccpdevice import SCCPDevice
 
 from xivo_dao.helpers.db_manager import Session
 
@@ -53,3 +54,29 @@ def sip_lines_for_device(device_id):
              )
 
     return query.all()
+
+
+def associate_sccp_device(line, device):
+    device_name = "SEP" + device.mac.replace(":", "").upper()
+
+    sccpdevice = (Session.query(SCCPDevice)
+                  .filter(SCCPDevice.device == device_name)
+                  .first())
+
+    if sccpdevice:
+        sccpdevice.line = line.number
+    else:
+        Session.add(SCCPDevice(name=device_name,
+                               device=device_name,
+                               line=line.number))
+    Session.flush()
+
+
+def dissociate_sccp_device(line, device):
+    device_name = "SEP" + device.mac.replace(":", "").upper()
+
+    (Session.query(SCCPDevice)
+     .filter(SCCPDevice.device == device_name)
+     .filter(SCCPDevice.line == line.number)
+     .delete())
+    Session.flush()

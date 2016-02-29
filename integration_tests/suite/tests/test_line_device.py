@@ -25,6 +25,7 @@ from hamcrest import assert_that, has_entries, is_not, starts_with, equal_to, co
 from test_api import scenarios as s
 from test_api import confd
 from test_api import provd
+from test_api import db
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
@@ -313,6 +314,12 @@ def test_associate_2_sip_lines(device):
         assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
+def assert_sccp_in_db(line, device):
+    sccp_device = 'SEP' + device['mac'].replace(':', '').upper()
+    with db.queries() as q:
+        assert_that(q.line_has_sccp_device(line['id'], sccp_device))
+
+
 @fixtures.device()
 def test_associate_sccp_line(device):
     registrar = provd.configs.get('default')
@@ -329,6 +336,7 @@ def test_associate_sccp_line(device):
         provd_config = provd.configs.get(device['id'])
         assert_provd_config(user, line, provd_config)
         assert_sccp_config(provd_config)
+        assert_sccp_in_db(line, device)
 
 
 def test_associate_when_device_already_associated():
@@ -367,6 +375,7 @@ def test_dissociate():
 
     with line_and_device('sccp') as (line, device):
         yield check_dissociate, line, device
+        yield check_dissociate_sccp, line, device
 
 
 def check_dissociate(line, device):
@@ -376,6 +385,12 @@ def check_dissociate(line, device):
 
         provd_device = provd.devices.get(device['id'])
         assert_that(provd_device['config'], starts_with('autoprov'))
+
+
+def check_dissociate_sccp(line, device):
+    sccp_device = 'SEP' + device['mac'].replace(":", "").upper()
+    with db.queries() as q:
+        assert_that(q.line_has_sccp_device(line['id'], sccp_device), equal_to(False))
 
 
 def test_dissociate_when_not_associated():
