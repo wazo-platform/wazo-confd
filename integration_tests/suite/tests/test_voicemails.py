@@ -5,7 +5,6 @@ from test_api import fixtures
 from test_api import mocks
 from test_api import scenarios as s
 from test_api import errors as e
-from test_api import helpers as h
 
 from test_api.helpers import voicemail as vm_helper
 from test_api.helpers import context as context_helper
@@ -116,15 +115,18 @@ def test_edit_voicemail_with_same_number_and_context(first_voicemail, second_voi
 
 
 @fixtures.voicemail(name="SearchVoicemail",
-                    email="searchemail@proformatique.com")
+                    email="searchemail@proformatique.com",
+                    pager="searchpager@proformatique.com")
 @fixtures.voicemail(name="HiddenVoicemail",
-                    email="hiddenvoicemail@proformatique.com")
+                    email="hiddenvoicemail@proformatique.com",
+                    pager="hiddenpager@proformatique.com")
 def test_search_voicemail(voicemail, hidden):
     url = confd.voicemails
 
     searches = {'name': 'searchv',
                 'number': voicemail['number'],
-                'email': 'searche'}
+                'email': 'searche',
+                'pager': 'searchp'}
 
     for field, term in searches.items():
         yield check_search, url, voicemail, hidden, field, term
