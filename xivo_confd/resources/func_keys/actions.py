@@ -54,8 +54,7 @@ def load(core_rest_api):
     association_converter = fk_converter.build_association_converter(core_rest_api.content_parser)
 
     provd_client = core_rest_api.provd_client()
-    device_dao = device_builder.build_dao(provd_client)
-    device_updater = device_builder.build_device_updater(device_dao)
+    device_updater = device_builder.build_device_updater(provd_client)
 
     service = fk_service.TemplateService(validator,
                                          template_dao,

@@ -37,6 +37,7 @@ from hamcrest import (assert_that,
                       is_not,
                       has_item,
                       starts_with,
+                      contains,
                       empty)
 
 
@@ -121,6 +122,39 @@ def test_search_on_device(device, hidden):
 
     for field, term in searches.items():
         yield check_search, url, device, hidden, field, term
+
+
+@fixtures.device(ip="99.20.30.40",
+                 mac="aa:bb:aa:cc:01:23",
+                 model="SortModel1",
+                 sn="SortSn1",
+                 vendor='SortVendor1',
+                 version='1.0',
+                 description='SortDesc1')
+@fixtures.device(ip="99.21.30.40",
+                 mac="bb:cc:dd:aa:bb:cc",
+                 model="SortModel2",
+                 sn="SortSn2",
+                 vendor="SortVendor2",
+                 version="1.1",
+                 description="SortDesc2")
+def test_device_sorting(device1, device2):
+    yield check_device_sorting, device1, device2, 'ip', '99.'
+    yield check_device_sorting, device1, device2, 'model', 'SortModel'
+    yield check_device_sorting, device1, device2, 'sn', 'SortSn'
+    yield check_device_sorting, device1, device2, 'vendor', 'SortVendor'
+    yield check_device_sorting, device1, device2, 'version', '1.'
+    yield check_device_sorting, device1, device2, 'description', 'SortDesc'
+
+
+def check_device_sorting(device1, device2, field, search):
+    response = confd.devices.get(search=search, order=field, direction='asc')
+    assert_that(response.items, contains(has_entries(id=device1['id']),
+                                         has_entries(id=device2['id'])))
+
+    response = confd.devices.get(search=search, order=field, direction='desc')
+    assert_that(response.items, contains(has_entries(id=device2['id']),
+                                         has_entries(id=device1['id'])))
 
 
 def check_search(url, device, hidden, field, term):

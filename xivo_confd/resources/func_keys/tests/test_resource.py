@@ -25,7 +25,7 @@ from xivo_confd.helpers.converter import Converter
 from xivo_confd.resources.func_keys.service import TemplateService
 from xivo_confd.resources.func_keys.resource import UserFuncKeyResource, TemplateManipulator
 from xivo_confd.resources.func_keys.validator import BSFilterValidator
-from xivo_confd.plugins.device.service import DeviceUpdater
+from xivo_confd.plugins.device.update import DeviceUpdater
 
 from xivo_dao.helpers.exception import ResourceError, NotFoundError
 from xivo_dao.alchemy.userfeatures import UserFeatures as User

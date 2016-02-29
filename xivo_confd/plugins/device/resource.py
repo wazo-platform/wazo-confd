@@ -65,7 +65,7 @@ parser.add_argument('options', type=Strict(dict), store_missing=False)
 
 class DeviceList(ListResource):
 
-    model = Device
+    model = Device.from_args
     fields = fields
     parser = parser
 
