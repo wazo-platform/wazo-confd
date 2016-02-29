@@ -78,7 +78,7 @@ response.assert_status(200)
 #Assert that the HTTP status is one of 200, 201 or 204
 response.assert_ok()
 
-#Assert that the resposne contains a "Location:" header with a URL formatted for a given resource.
+#Assert that the response contains a "Location:" header with a URL formatted for a given resource.
 #i.e. Responses for users should have a header "Location: http://confd:9486/1.1/users"
 response.assert_location('users')
 
