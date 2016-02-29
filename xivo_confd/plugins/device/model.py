@@ -163,9 +163,6 @@ class Device(object):
             del self.device['options']
         self.config = config
 
-    def extract_config_device(self):
-        return self.config.get('configdevice', 'defaultconfigdevice')
-
     def merge(self, other):
         self.device.update(other.device)
         if other.template_id is not None:

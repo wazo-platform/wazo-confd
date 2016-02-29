@@ -23,14 +23,13 @@ class ConfigGenerator(object):
         self.raw_generator = raw_generator
 
     def generate(self, device):
-        configdevice = device.extract_config_device()
+        configdevice = device.template_id or 'defaultconfigdevice'
         config = {'id': device.id,
                   'configdevice': configdevice,
                   'parent_ids': ['base', configdevice],
                   'deletable': True,
+                  'raw_config': self.raw_generator.generate(device),
                   }
-
-        config.update(self.raw_generator.generate(device))
 
         return config
 
@@ -43,11 +42,13 @@ class RawConfigGenerator(object):
     def generate(self, device):
         raw_config = {'X_key': '',
                       'config_version': 1}
+
         for generator in self.generators:
             section = generator.generate(device)
             if section:
                 raw_config.update(section)
-        return {'raw_config': raw_config}
+
+        return raw_config
 
 
 class UserGenerator(object):
@@ -138,17 +139,16 @@ class SipGenerator(object):
         self.device_db = device_db
 
     def generate(self, device):
-        section = {}
+        sip_lines = {}
         rows = self.device_db.sip_lines_for_device(device.id)
         for row in rows:
-            slot = row.LineFeatures.device_slot
-            config = self.generate_config(row)
-            section[slot] = config
+            pos = row.LineFeatures.position
+            sip_lines[pos] = self.generate_sip_line(row)
 
-        if len(section) > 0:
-            return {'protocol': 'SIP', 'sip_lines': section}
+        if len(sip_lines) > 0:
+            return {'protocol': 'SIP', 'sip_lines': sip_lines}
 
-    def generate_config(self, row):
+    def generate_sip_line(self, row):
         line = row.LineFeatures
         sip = row.UserSIP
         extension = row.Extension
@@ -177,14 +177,16 @@ class SccpGenerator(object):
         self.line_dao = line_dao
 
     def generate(self, device):
-        section = {}
+        call_managers = {}
+
         line = self.line_dao.find_by(device=device.id, protocol='sccp')
         if line:
             registrar = self.device_dao.get_registrar(line.configregistrar)
-            section['1'] = {'ip': registrar['proxy_main']}
-            proxy_backup = registrar.get('proxy_backup', None)
-            if proxy_backup:
-                section['2'] = {'ip': proxy_backup}
+            proxy_backup = registrar.get('proxy_backup')
 
-        if len(section) > 0:
-            return {'protocol': 'SCCP', 'sccp_call_managers': section}
+            call_managers['1'] = {'ip': registrar['proxy_main']}
+            if proxy_backup:
+                call_managers['2'] = {'ip': proxy_backup}
+
+        if len(call_managers) > 0:
+            return {'protocol': 'SCCP', 'sccp_call_managers': call_managers}
