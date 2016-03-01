@@ -23,6 +23,7 @@ from xivo_confd.database import device as device_db
 from xivo_confd.plugins.device.builder import build_device_updater
 from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.line_device.validator import build_validator
+from xivo_confd.plugins.line_device.notifier import build_notifier
 
 
 class LineDevice(object):
@@ -38,13 +39,19 @@ class LineDevice(object):
 
 class LineDeviceService(object):
 
-    def __init__(self, validator, line_service, device_updater):
+    def __init__(self, validator, line_service, notifier, device_updater):
         self.validator = validator
         self.line_service = line_service
+        self.notifier = notifier
         self.device_updater = device_updater
 
     def associate(self, line, device):
         self.validator.validate_association(line, device)
+        self.associate_line_device(line, device)
+        self.device_updater.update_device(device)
+        self.notifier.associated(line, device)
+
+    def associate_line_device(self, line, device):
         line.associate_device(device)
         self.line_service.edit(line)
         if line.endpoint == "sccp":
@@ -52,9 +59,13 @@ class LineDeviceService(object):
 
     def dissociate(self, line, device):
         self.validator.validate_dissociation(line, device)
+        self.dissociate_line_device(line, device)
+        self.device_updater.update_device(device)
+        self.notifier.dissociated(line, device)
+
+    def dissociate_line_device(self, line, device):
         line.remove_device()
         self.line_service.edit(line)
-        self.device_updater.update_device(device)
         if line.endpoint == "sccp":
             device_db.dissociate_sccp_device(line, device)
 
@@ -77,4 +88,5 @@ def build_service(provd_client):
     validator = build_validator()
     updater = build_device_updater(provd_client)
     service = build_line_service(provd_client)
-    return LineDeviceService(validator, service, updater)
+    notifier = build_notifier()
+    return LineDeviceService(validator, service, notifier, updater)
