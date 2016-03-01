@@ -31,6 +31,8 @@ switchboard_fields = {
     'id': fields.String,
 }
 
+csv_header = ['date', 'entered', 'answered', 'transferred', 'abandoned', 'forwarded', 'waiting_time_average']
+
 
 class SwitchboardList(ListResource):
 
@@ -63,20 +65,20 @@ class SwitchboardStats(ConfdResource):
 
     def format_csv(self, stats):
         content = StringIO()
-        writer = csv.writer(content)
-        writer.writerow(stats[0].keys())
+        writer = csv.DictWriter(content, csv_header)
+        writer.writeheader()
 
         for row in stats:
             row = self.format_row(row)
-            encoded_row = tuple(v.encode('utf8') for v in row.values())
-            writer.writerow(encoded_row)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.critical(row)
+            writer.writerow(row)
 
         return content.getvalue()
 
     def format_row(self, row):
-        seconds = row['waiting_time_average']
+        seconds = int(row['waiting_time_average'])
         row['waiting_time_average'] = '{min:02}:{sec:02}'.format(min=seconds // 60, sec=seconds % 60)
 
-        for header, value in row.iteritems():
-            row[header] = str(value)
-        return row
+        return {header: str(value).encode('utf8') for header, value in row.iteritems()}

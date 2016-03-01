@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from collections import OrderedDict
-
 from xivo_dao.resources.switchboard import dao as switchboard_dao
+
+from xivo_confd.plugins.switchboard.stats import HourlyStatAccumulator
 
 
 class SwitchboardService(object):
@@ -29,14 +29,10 @@ class SwitchboardService(object):
         return self.dao.search(**parameters)
 
     def stats(self, switchboard_id):
-        self.dao.stats(switchboard_id)
-        return [OrderedDict({'date': '2016-03-01',
-                             'answered': 1,
-                             'entered': 1,
-                             'transferred': 1,
-                             'abandoned': 0,
-                             'forwarded': 0,
-                             'waiting_time_average': 12})]
+        stats = self.dao.stats(switchboard_id)
+        accumulator = HourlyStatAccumulator()
+        accumulator.accumulate(stats)
+        return accumulator.results()
 
 
 def build_service():
