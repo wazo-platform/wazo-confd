@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from sqlalchemy.orm import Load
+from sqlalchemy.sql import or_
 
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.linefeatures import LineFeatures
@@ -80,3 +81,15 @@ def dissociate_sccp_device(line, device):
      .filter(SCCPDevice.line == line.number)
      .delete())
     Session.flush()
+
+
+def template_has_sccp_device(template_id):
+    exists_query = (Session.query(UserFeatures)
+                    .join(UserFeatures.main_line_rel)
+                    .join(UserLine.main_line_rel)
+                    .filter(or_(UserFeatures.func_key_template_id == template_id,
+                                UserFeatures.func_key_private_template_id == template_id))
+                    .filter(LineFeatures.endpoint == "sccp")
+                    .exists())
+
+    return Session.query(exists_query).scalar()

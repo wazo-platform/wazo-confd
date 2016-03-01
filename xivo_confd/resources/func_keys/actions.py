@@ -25,6 +25,9 @@ from xivo_dao.resources.func_key_template import dao as template_dao
 from xivo_dao.resources.user import dao as user_dao
 
 from xivo_confd import config
+from xivo_confd import bus
+from xivo_confd import sysconfd
+from xivo_confd.database import device as device_db
 from xivo_confd.helpers.resource import DecoratorChain
 from xivo_confd.resources.func_keys.resource import (FuncKeyResource,
                                                      FuncKeyTemplateResource,
@@ -36,7 +39,7 @@ from xivo_confd.plugins.device import builder as device_builder
 from xivo_confd.resources.func_keys import service as fk_service
 from xivo_confd.resources.func_keys import converter as fk_converter
 from xivo_confd.resources.func_keys import validator as fk_validator
-from xivo_confd.resources.func_keys import notifier
+from xivo_confd.resources.func_keys.notifier import FuncKeyTemplateNotifier
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +58,8 @@ def load(core_rest_api):
 
     provd_client = core_rest_api.provd_client()
     device_updater = device_builder.build_device_updater(provd_client)
+
+    notifier = FuncKeyTemplateNotifier(bus, sysconfd, device_db)
 
     service = fk_service.TemplateService(validator,
                                          template_dao,
