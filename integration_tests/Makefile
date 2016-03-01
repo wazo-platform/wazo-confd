@@ -9,6 +9,7 @@ test-setup: build-provd build-confd egg-info
 	docker pull n3llyb0y/wait
 	docker pull rabbitmq
 	docker pull xivo/postgres-test
+	docker pull p0bailey/docker-flask
 
 build-confd:
 	docker build -t xivo/xivo-confd ..
