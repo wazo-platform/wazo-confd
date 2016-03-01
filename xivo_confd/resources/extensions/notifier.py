@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,16 +20,17 @@ from xivo_bus.resources.extension.event import CreateExtensionEvent, \
     EditExtensionEvent, DeleteExtensionEvent
 from xivo_confd.helpers import sysconfd_connector
 
-sysconfd_base_data = {
-    'ctibus': [],
-    'dird': [],
-    'ipbx': ['dialplan reload'],
-    'agentbus': []
-}
+
+def build_request(ipbx):
+    return {'ctibus': [],
+            'dird': [],
+            'ipbx': ipbx,
+            'agentbus': []}
 
 
 def created(extension):
-    sysconfd_connector.exec_request_handlers(sysconfd_base_data)
+    request = build_request(['dialplan reload'])
+    sysconfd_connector.exec_request_handlers(request)
     event = CreateExtensionEvent(extension.id,
                                  extension.exten,
                                  extension.context)
@@ -37,7 +38,8 @@ def created(extension):
 
 
 def edited(extension):
-    sysconfd_connector.exec_request_handlers(sysconfd_base_data)
+    request = build_request(['dialplan reload', 'sip reload', 'module reload chan_sccp.so'])
+    sysconfd_connector.exec_request_handlers(request)
     event = EditExtensionEvent(extension.id,
                                extension.exten,
                                extension.context)
@@ -45,7 +47,8 @@ def edited(extension):
 
 
 def deleted(extension):
-    sysconfd_connector.exec_request_handlers(sysconfd_base_data)
+    request = build_request(['dialplan reload'])
+    sysconfd_connector.exec_request_handlers(request)
     event = DeleteExtensionEvent(extension.id,
                                  extension.exten,
                                  extension.context)
