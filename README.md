@@ -80,6 +80,7 @@ make update-db MANAGE_DB_DIR=../../xivo-manage-db
 If you need to run tests more than once (e.g. when developing):
 
 ```
-make stop start
+make stop
+make start
 DOCKER=0 nosetests suite
 ```
