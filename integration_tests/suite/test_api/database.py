@@ -393,6 +393,12 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def insert_switchboard(self, queue_id):
+        query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
+                        VALUES ('2016-02-29 00:00:00', 'abandoned', 15.2, :queue_id)
+                        RETURNING id""")
+        return self.connection.execute(query, queue_id=queue_id).scalar()
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')
