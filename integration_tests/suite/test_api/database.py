@@ -399,6 +399,17 @@ class DatabaseQueries(object):
                         RETURNING id""")
         return self.connection.execute(query, queue_id=queue_id).scalar()
 
+    def find_queue(self, queue_name):
+        query = text("""SELECT id from queuefeatures
+                        WHERE name = :name""")
+        return self.connection.execute(query, name=queue_name).first()
+
+    def insert_switchboard_stat(self, time, end_type, wait_time, queue_id):
+        query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
+                        VALUES (:time, :end_type, :wait_time, :queue_id)
+                        RETURNING id""")
+        self.connection.execute(query, time=time, end_type=end_type, wait_time=wait_time, queue_id=queue_id)
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')

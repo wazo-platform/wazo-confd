@@ -106,3 +106,8 @@ class call_permission(IsolatedAction):
 class switchboard(IsolatedAction):
 
     actions = {'generate': h.switchboard.generate_switchboard}
+
+
+class switchboard_stat(IsolatedAction):
+
+    actions = {'generate': h.switchboard.generate_switchboard_stat}

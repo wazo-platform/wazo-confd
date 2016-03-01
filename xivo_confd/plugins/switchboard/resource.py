@@ -15,7 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import csv
 
+from cStringIO import StringIO
+from flask import make_response
 from flask_restful import fields, marshal
 
 from xivo_confd.authentication.confd_auth import required_acl
@@ -43,3 +46,37 @@ class SwitchboardList(ListResource):
         result = self.service.search(params)
         return {'total': result.total,
                 'items': [marshal(item, switchboard_fields) for item in result.items]}
+
+
+class SwitchboardStats(ConfdResource):
+
+    fields = switchboard_fields
+
+    def __init__(self, service):
+        self.service = service
+
+    @required_acl('confd.switchboards.{id}.stats.read')
+    def get(self, id):
+        stats = self.service.stats(id)
+        content = self.format_csv(stats)
+        return make_response(content, 200, {'Content-Type': 'text/csv; charset=utf-8'})
+
+    def format_csv(self, stats):
+        content = StringIO()
+        writer = csv.writer(content)
+        writer.writerow(stats[0].keys())
+
+        for row in stats:
+            row = self.format_row(row)
+            encoded_row = tuple(v.encode('utf8') for v in row.values())
+            writer.writerow(encoded_row)
+
+        return content.getvalue()
+
+    def format_row(self, row):
+        seconds = row['waiting_time_average']
+        row['waiting_time_average'] = '{min:02}:{sec:02}'.format(min=seconds // 60, sec=seconds % 60)
+
+        for header, value in row.iteritems():
+            row[header] = str(value)
+        return row

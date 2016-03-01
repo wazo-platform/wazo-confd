@@ -3283,6 +3283,38 @@
                     }
                 }
             }
+        },
+        "/switchboards/{switchboard_id}/stats": {
+            "get": {
+                "operationId": "get_switchboard_stats",
+                "summary": "Get switchboard statistics",
+                "description": "**Required ACL:** `confd.switchboards.{switchboard_id}.stats.read`\n\nSwitchboard statistics in CSV format: `\"Date\",\"Entered\",\"Answered\",\"Transferred\",\"Abandoned\",\"Forwarded\",\"Waiting Time Average\"`\n\nField names are listed on the first line.\n\nDate: Formatted as YYYY-MM-DD.",
+                "tags": [
+                    "switchboards"
+                ],
+                "produces": [
+                    "text/csv; charset=utf-8"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/switchboardid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Switchboard statistics",
+                        "schema": {
+                            "$ref": "#/definitions/SwitchboardStats"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -3391,6 +3423,13 @@
             "type": "integer",
             "name": "sip_id",
             "in": "path"
+        },
+        "switchboardid": {
+            "required": true,
+            "type": "string",
+            "name": "switchboard_id",
+            "in": "path",
+            "description": "the switchboard's ID"
         },
         "templateid": {
             "required": true,
@@ -4099,6 +4138,11 @@
             "required": [
                 "total"
             ]
+        },
+        "SwitchboardStats": {
+            "title": "SwitchboardStats",
+            "description": "",
+            "type": "string"
         },
         "User": {
             "title": "User",

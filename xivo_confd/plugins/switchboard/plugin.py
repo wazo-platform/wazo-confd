@@ -30,3 +30,7 @@ class Plugin(object):
                          '/switchboards',
                          resource_class_args=(service,)
                          )
+        api.add_resource(SwitchboardStats,
+                         '/switchboards/<id>/stats',
+                         resource_class_args=(service,)
+                         )
