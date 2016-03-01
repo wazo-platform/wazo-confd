@@ -103,6 +103,32 @@ def test_get_errors():
     yield s.check_resource_not_found, fake_device, 'Device'
 
 
+@fixtures.sip()
+@fixtures.sccp()
+def test_associate_without_required_resources_raises_error(sip, sccp):
+    yield check_associate_without_required_resources, sip, a.line_endpoint_sip
+    yield check_associate_without_required_resources, sccp, a.line_endpoint_sccp
+
+
+def check_associate_without_required_resources(endpoint, line_endpoint):
+    error = e.missing_association()
+
+    with fixtures.user() as user, \
+            fixtures.line() as line, \
+            fixtures.extension() as extension, \
+            fixtures.device() as device:
+
+        url = confd.lines(line['id']).devices(device['id'])
+        url.put().assert_match(400, error)
+        with line_endpoint(line, endpoint):
+            url.put().assert_match(400, error)
+            with a.line_extension(line, extension):
+                url.put().assert_match(400, error)
+                with a.user_line(user, line):
+                    url.put().assert_updated()
+                    url.delete()
+
+
 @fixtures.line(position=1)
 def test_associate_2_lines_with_same_position_raises_error(extra_line):
     with line_and_device('sip') as (line, device):

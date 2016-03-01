@@ -196,37 +196,43 @@ def test_updating_user_line_or_extension_associated_with_autoprov_device_does_no
         response.assert_ok()
 
 
+@fixtures.user()
 @fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
-def test_dissociate_line_associated_to_a_device(line, extension, device):
-    with a.line_extension(line, extension), a.line_device(line, device):
+def test_dissociate_line_associated_to_a_device(user, line, extension, device):
+    with a.line_extension(line, extension), a.user_line(user, line), a.line_device(line, device):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 @fixtures.user()
 @fixtures.line_sip()
+@fixtures.extension()
 @fixtures.device()
-def test_dissociate_user_line_when_device_is_associated(user, line, device):
-    with a.user_line(user, line), a.line_device(line, device):
+def test_dissociate_user_line_when_device_is_associated(user, line, extension, device):
+    with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
         response = confd.users(user['id']).lines(line['id']).delete()
         response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
+@fixtures.user()
 @fixtures.line()
 @fixtures.sip()
+@fixtures.extension()
 @fixtures.device()
-def test_dissociate_sip_endpoint_associated_to_device(line, sip, device):
-    with a.line_endpoint_sip(line, sip), a.line_device(line, device):
+def test_dissociate_sip_endpoint_associated_to_device(user, line, sip, extension, device):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated())
 
 
+@fixtures.user()
 @fixtures.line()
+@fixtures.extension()
 @fixtures.sccp()
 @fixtures.device()
-def test_dissociate_sccp_endpoint_associated_to_device(line, sccp, device):
-    with a.line_endpoint_sccp(line, sccp), a.line_device(line, device):
+def test_dissociate_sccp_endpoint_associated_to_device(user, line, extension, sccp, device):
+    with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
+        response.assert_match(400, e.resource_associated())

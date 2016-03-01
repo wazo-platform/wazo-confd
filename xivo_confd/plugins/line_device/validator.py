@@ -22,6 +22,8 @@ from xivo_confd.helpers.validator import AssociationValidator
 from xivo_confd.helpers.validator import Validator
 
 from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 
 class ValidateLineHasNoDevice(Validator):
@@ -58,11 +60,38 @@ class ValidateLinePosition(Validator):
             raise errors.ResourceError(msg)
 
 
+class ValidateRequiredResources(Validator):
+
+    def __init__(self, user_line_dao, line_extension_dao):
+        self.user_line_dao = user_line_dao
+        self.line_extension_dao = line_extension_dao
+
+    def validate(self, line, device):
+        self.validate_endpoint(line)
+        self.validate_extension(line)
+        self.validate_user(line)
+
+    def validate_endpoint(self, line):
+        if not line.is_associated():
+            raise errors.missing_association('Line', 'Endpoint', line_id=line.id)
+
+    def validate_extension(self, line):
+        line_extensions = self.line_extension_dao.find_all_by(line_id=line.id)
+        if not line_extensions:
+            raise errors.missing_association('Line', 'Extension', line_id=line.id)
+
+    def validate_user(self, line):
+        user_lines = self.user_line_dao.find_all_by(line_id=line.id)
+        if not user_lines:
+            raise errors.missing_association('User', 'Line', line_id=line.id)
+
+
 def build_validator():
     return AssociationValidator(
         association=[
             ValidateLineDeviceAssociation(),
             ValidateLinePosition(line_dao),
+            ValidateRequiredResources(user_line_dao, line_extension_dao)
         ],
         dissociation=[
             ValidateLineDeviceDissociation(),
