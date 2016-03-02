@@ -28,8 +28,8 @@ class SwitchboardService(object):
     def search(self, parameters):
         return self.dao.search(**parameters)
 
-    def stats(self, switchboard_id):
-        stats = self.dao.stats(switchboard_id)
+    def stats(self, switchboard_id, **params):
+        stats = self.dao.stats(switchboard_id, params['start_date'], params['end_date'])
         accumulator = DailyStatAccumulator()
         accumulator.accumulate(stats)
         return accumulator.results()

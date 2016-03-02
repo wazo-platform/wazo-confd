@@ -408,7 +408,16 @@ class DatabaseQueries(object):
         query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
                         VALUES (:time, :end_type, :wait_time, :queue_id)
                         RETURNING id""")
-        self.connection.execute(query, time=time, end_type=end_type, wait_time=wait_time, queue_id=queue_id)
+        return self.connection.execute(query,
+                                       time=time,
+                                       end_type=end_type,
+                                       wait_time=wait_time,
+                                       queue_id=queue_id).scalar()
+
+    def delete_switchboard_stat(self, stat_id):
+        query = text("""DELETE from stat_switchboard_queue
+                        WHERE id = :id""")
+        self.connection.execute(query, id=stat_id)
 
 
 def create_helper():

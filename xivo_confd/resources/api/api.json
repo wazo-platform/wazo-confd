@@ -61,20 +61,10 @@
                 ],
                 "parameters": [
                     {
-                        "name": "start_date",
-                        "description": "filter call logs after start date. Format YYYY-MM-DDTHH:MM:SS",
-                        "in": "query",
-                        "type": "string",
-                        "format": "date-time",
-                        "required": false
+                        "$ref": "#/parameters/startdate"
                     },
                     {
-                        "name": "end_date",
-                        "description": "filter call logs before end date. Format YYYY-MM-DDTHH:MM:SS",
-                        "in": "query",
-                        "type": "string",
-                        "format": "date-time",
-                        "required": false
+                        "$ref": "#/parameters/enddate"
                     }
                 ],
                 "responses": {
@@ -3001,6 +2991,12 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/switchboardid"
+                    },
+                    {
+                        "$ref": "#/parameters/startdate"
+                    },
+                    {
+                        "$ref": "#/parameters/enddate"
                     }
                 ],
                 "responses": {
@@ -3358,6 +3354,14 @@
             ],
             "description": "Sort list of items in 'asc' (ascending) or 'desc' (descending) order"
         },
+        "enddate": {
+            "name": "end_date",
+            "description": "filter before end date. Format YYYY-MM-DDTHH:MM:SS",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "required": false
+        },
         "extensionid": {
             "required": true,
             "type": "integer",
@@ -3423,6 +3427,14 @@
             "type": "integer",
             "name": "sip_id",
             "in": "path"
+        },
+        "startdate": {
+            "name": "start_date",
+            "description": "filter after start date. Format YYYY-MM-DDTHH:MM:SS",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "required": false
         },
         "switchboardid": {
             "required": true,

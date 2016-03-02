@@ -19,11 +19,14 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+from hamcrest import all_of
 from hamcrest import assert_that
 from hamcrest import contains
 from hamcrest import equal_to
+from hamcrest import is_not
 from hamcrest import has_entries
 from hamcrest import has_item
+from hamcrest import has_items
 
 from test_api import confd
 from test_api import fixtures
@@ -60,3 +63,29 @@ def test_stats_switchboard(stat):
     response = confd.switchboards(stat['queue_id']).stats.get()
 
     assert_that(response.csv(), has_item(expected))
+
+
+@fixtures.switchboard_stat(time=datetime(2016, 1, 1, 0, 0, 0))
+@fixtures.switchboard_stat(time=datetime(2016, 1, 2, 0, 0, 0))
+@fixtures.switchboard_stat(time=datetime(2016, 1, 3, 0, 0, 0))
+def test_stats_switchboard_before_date(stat1, stat2, stat3):
+    expected = all_of(has_items(has_entries(date='2016-01-01'),
+                                has_entries(date='2016-01-02')),
+                      is_not(has_items(has_entries(date='2016-01-03'))))
+
+    response = confd.switchboards(stat1['queue_id']).stats.get(end_date='2016-01-02T12:00:00')
+
+    assert_that(response.csv(), expected)
+
+
+@fixtures.switchboard_stat(time=datetime(2016, 2, 1, 0, 0, 0))
+@fixtures.switchboard_stat(time=datetime(2016, 2, 2, 0, 0, 0))
+@fixtures.switchboard_stat(time=datetime(2016, 2, 3, 0, 0, 0))
+def test_stats_switchboard_after_date(stat1, stat2, stat3):
+    expected = all_of(is_not(has_items(has_entries(date='2016-02-01'))),
+                      has_items(has_entries(date='2016-02-02'),
+                                has_entries(date='2016-02-03')))
+
+    response = confd.switchboards(stat1['queue_id']).stats.get(start_date='2016-02-01T12:00:00')
+
+    assert_that(response.csv(), expected)
