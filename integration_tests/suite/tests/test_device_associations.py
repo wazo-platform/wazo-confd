@@ -25,20 +25,21 @@ from test_api import config
 from test_api import mocks
 from test_api import errors as e
 from test_api import confd
+from test_api import provd
 from test_api import db
 from test_api import fixtures
 from test_api import associations as a
 from test_api import helpers as h
 
 
-@mocks.provd()
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
 @fixtures.extension()
 @fixtures.device()
-def test_when_extension_updated_then_provd_is_updated(provd, user, line, sip, extension, device):
+def test_when_extension_updated_on_sip_line_then_provd_is_updated(user, line, sip, extension, device):
     exten = h.extension.find_available_exten(config.CONTEXT)
+    line_cid = h.extension.find_available_exten(config.CONTEXT, exclude=[exten])
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
             a.line_extension(line, extension), a.line_device(line, device):
@@ -46,7 +47,7 @@ def test_when_extension_updated_then_provd_is_updated(provd, user, line, sip, ex
         response = confd.extensions(extension['id']).put(exten=exten)
         response.assert_updated()
 
-        response = confd.lines(line['id']).put()
+        response = confd.lines(line['id']).put(caller_id_num=line_cid)
         response.assert_updated()
 
         provd_config = provd.configs.get(device['id'])
@@ -194,6 +195,20 @@ def test_updating_user_line_or_extension_associated_with_autoprov_device_does_no
 
         response = confd.extensions(extension['id']).put()
         response.assert_ok()
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sccp()
+@fixtures.extension()
+def test_given_extension_associated_to_sccp_line_when_updated_then_cid_num_updated(user, line, sccp, extension):
+    exten = h.extension.find_available_exten(config.CONTEXT)
+
+    with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), a.user_line(user, line):
+        confd.extensions(extension['id']).put(exten=exten).assert_updated()
+
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries(caller_id_num=exten))
 
 
 @fixtures.user()
