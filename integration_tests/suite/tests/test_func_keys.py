@@ -62,6 +62,32 @@ class TestUserWithFuncKey(TestFuncKey):
 
         self.funckey_url.put(destination=self.destination).assert_ok()
 
+    def test_when_line_has_another_position_then_func_key_generated(self):
+        user = helpers.user.generate_user()
+        sip = helpers.endpoint_sip.generate_sip()
+        line = helpers.line.generate_line(position=2)
+        extension = helpers.extension.generate_extension()
+        device = helpers.device.generate_device()
+
+        helpers.line_endpoint_sip.associate(line['id'], sip['id'])
+        helpers.line_extension.associate(line['id'], extension['id'])
+        helpers.user_line.associate(user['id'], line['id'])
+        helpers.line_device.associate(line['id'], device['id'])
+
+        url = confd.users(user['id']).funckeys(self.pos)
+        url.put(destination=self.destination).assert_ok()
+
+        expected_funckey = {'label': None,
+                            'inherited': False,
+                            'blf': True}
+        expected_destination = {'type': self.destination['type'],
+                                'exten': self.destination['exten'],
+                                'href': None}
+
+        response = url.get()
+        assert_that(response.item, has_entries(expected_funckey))
+        assert_that(response.item['destination'], has_entries(expected_destination))
+
     def test_when_getting_position_then_func_key_returned(self):
         expected_funckey = {'label': None,
                             'inherited': False,

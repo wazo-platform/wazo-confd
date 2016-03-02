@@ -69,7 +69,12 @@ class FuncKeyGenerator(object):
             return {'funckeys': funckeys}
 
     def user_line_for_device(self, device_id):
-        line = self.line_dao.find_by(device=device_id, device_slot=1)
+        lines = self.line_dao.find_all_by(device=device_id)
+        try:
+            line = min(lines, key=lambda x: x.position)
+        except ValueError:
+            return None, None
+
         main_user_line = self.user_line_dao.find_main_user_line(line.id)
         if main_user_line:
             user = self.user_dao.get(main_user_line.user_id)
