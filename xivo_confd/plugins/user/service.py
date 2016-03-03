@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 from xivo_confd.plugins.user.validator import build_validator
 from xivo_confd.plugins.user.notifier import build_notifier
+from xivo_confd.plugins.device.builder import build_device_updater
 
 from xivo_confd.helpers.resource import CRUDService
 
@@ -25,11 +26,21 @@ from xivo_dao.resources.user import dao as user_dao
 
 class UserService(CRUDService):
 
+    def __init__(self, dao, validator, notifier, device_updater):
+        super(UserService, self).__init__(dao, validator, notifier)
+        self.device_updater = device_updater
+
+    def edit(self, user):
+        super(UserService, self).edit(user)
+        self.device_updater.update_for_user(user)
+
     def legacy_search(self, term):
         return self.dao.legacy_search(term)
 
 
-def build_service():
+def build_service(provd_client):
+    updater = build_device_updater(provd_client)
     return UserService(user_dao,
                        build_validator(),
-                       build_notifier())
+                       build_notifier(),
+                       updater)

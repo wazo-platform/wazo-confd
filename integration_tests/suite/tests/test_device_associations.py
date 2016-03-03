@@ -55,19 +55,34 @@ def test_when_extension_updated_on_sip_line_then_provd_is_updated(user, line, si
         assert_that(sip_line, has_entries(number=exten))
 
 
-@mocks.provd()
 @fixtures.user()
 @fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
-def test_when_caller_id_updated_on_line_then_provd_is_updated(provd, user, line, extension, device):
+def test_when_caller_id_updated_on_line_then_provd_is_updated(user, line, extension, device):
     with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
-        response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth")
+        response = confd.lines(line['id']).put(caller_id_name="jôhn smîth", caller_id_num="1000")
         response.assert_updated()
 
         provd_config = provd.configs.get(device['id'])
         sip_line = provd_config['raw_config']['sip_lines']['1']
-        assert_that(sip_line, has_entries({'display_name': 'Jôhn Smîth'}))
+        assert_that(sip_line, has_entries({'display_name': 'jôhn smîth',
+                                           'number': extension['exten']}))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.extension()
+@fixtures.device()
+def test_when_caller_id_updated_on_user_then_provd_is_updated(user, line, extension, device):
+    with a.user_line(user, line), a.line_extension(line, extension), a.line_device(line, device):
+        response = confd.users(user['id']).put(caller_id='"rôger rabbit" <1000>')
+        response.assert_updated()
+
+        provd_config = provd.configs.get(device['id'])
+        sip_line = provd_config['raw_config']['sip_lines']['1']
+        assert_that(sip_line, has_entries({'display_name': 'rôger rabbit',
+                                           'number': extension['exten']}))
 
 
 @mocks.provd()

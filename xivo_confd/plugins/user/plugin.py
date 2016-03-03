@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@ from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
 class Plugin(object):
 
     def load(self, core):
-        service = build_service()
+        provd_client = core.provd_client()
+
+        service = build_service(provd_client)
 
         api.add_resource(UserItem,
                          '/users/<int:id>',
