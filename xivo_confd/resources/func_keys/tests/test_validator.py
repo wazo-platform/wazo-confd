@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -131,6 +131,25 @@ class TestFuncKeyValidator(unittest.TestCase):
 
         self.first_dest_validator.validate.assert_called_once_with(destination)
         self.second_dest_validator.validate.assert_called_once_with(destination)
+
+    def test_given_label_with_invalid_characters_when_validating_then_raises_error(self):
+        model = FuncKey(label='hello\n',
+                        destination=Mock(type='foobar'))
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
+
+        model = FuncKey(label='\rhello',
+                        destination=Mock(type='foobar'))
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
+
+        model = FuncKey(label='hel;lo',
+                        destination=Mock(type='foobar'))
+
+        assert_that(calling(self.validator.validate).with_args(model),
+                    raises(InputError))
 
 
 class TestServiceValidator(unittest.TestCase):

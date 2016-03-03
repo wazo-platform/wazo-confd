@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import re
 
 from collections import Counter
 
@@ -65,10 +67,24 @@ class FuncKeyMappingValidator(Validator):
 
 class FuncKeyValidator(Validator):
 
+    LABEL_INVALID_CHARS = "\r\n\t;"
+
     def __init__(self, destinations):
         self.destinations = destinations
 
     def validate(self, funckey):
+        self.validate_label(funckey)
+        self.validate_destination(funckey)
+
+    def validate_label(self, funckey):
+        if funckey.label is not None:
+            for char in funckey.label:
+                if char in self.LABEL_INVALID_CHARS:
+                    raise errors.wrong_type('label',
+                                            "string without invalid characters (\\n \\r \\t ;)",
+                                            label=funckey.label)
+
+    def validate_destination(self, funckey):
         dest_type = funckey.destination.type
         if dest_type not in self.destinations:
             raise errors.invalid_destination_type(dest_type)
