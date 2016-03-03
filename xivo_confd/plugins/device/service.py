@@ -114,10 +114,12 @@ class SearchEngine(object):
                 raise errors.invalid_ordering(parameters['order'], self.PROVD_DEVICE_KEYS)
 
     def find_all_devices(self, parameters):
+        query = {key: value for key, value in parameters.iteritems()
+                 if key in self.PROVD_DEVICE_KEYS}
         order = parameters.get('order', self.DEFAULT_ORDER)
         direction = parameters.get('direction', self.DEFAULT_DIRECTION)
         sort_direction = self.DIRECTION[direction]
-        return self.dao.devices.find(sort=(order, sort_direction))
+        return self.dao.devices.find(query, sort=(order, sort_direction))
 
     def filter_devices(self, devices, search=None):
         if search is None:

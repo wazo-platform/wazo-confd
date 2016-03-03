@@ -165,6 +165,13 @@ def check_search(url, device, hidden, field, term):
     assert_that(response.items, expected_device)
     assert_that(response.items, hidden_device)
 
+    response = url.get(**{field: device[field]})
+
+    expected_device = has_item(has_entry('id', device['id']))
+    hidden_device = is_not(has_item(has_entry('id', hidden['id'])))
+    assert_that(response.items, expected_device)
+    assert_that(response.items, hidden_device)
+
 
 @fixtures.device(template_id="mockdevicetemplate",
                  plugin='zero',
