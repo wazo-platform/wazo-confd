@@ -340,6 +340,30 @@ def test_associate_2_sip_lines(device):
         assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
+@fixtures.device()
+def test_associate_2_sccp_lines(device):
+    with line_fellowship('sccp') as (user1, line1, extension1, sccp1), \
+            line_fellowship('sccp') as (user2, line2, extension2, sccp2):
+
+        confd.lines(line2['id']).put(position=2).assert_updated()
+        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+
+        response = confd.lines(line2['id']).devices(device['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Device'))
+
+
+@fixtures.device()
+def test_associate_lines_with_different_endpoints(device):
+    with line_fellowship('sip') as (user1, line1, extension1, sip), \
+            line_fellowship('sccp') as (user2, line2, extension2, sccp):
+
+        confd.lines(line2['id']).put(position=2).assert_updated()
+        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+
+        response = confd.lines(line2['id']).devices(device['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Device'))
+
+
 def assert_sccp_in_db(line, device):
     sccp_device = 'SEP' + device['mac'].replace(':', '').upper()
     with db.queries() as q:

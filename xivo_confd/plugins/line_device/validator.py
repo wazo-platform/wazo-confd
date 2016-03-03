@@ -86,12 +86,29 @@ class ValidateRequiredResources(Validator):
             raise errors.missing_association('User', 'Line', line_id=line.id)
 
 
+class ValidateMultipleLines(Validator):
+
+    def __init__(self, line_dao):
+        self.line_dao = line_dao
+
+    def validate(self, line, device):
+        lines = self.line_dao.find_all_by(device_id=device.id)
+        if lines:
+            existing = lines[0]
+            # Multiple lines associated to a SCCP device is not supported
+            if existing.endpoint == "sccp" or line.endpoint == "sccp":
+                raise errors.resource_associated('Line', 'Device',
+                                                 line_id=line.id, device_id=device.id,
+                                                 endpoint=line.endpoint, endpoint_id=line.endpoint_id)
+
+
 def build_validator():
     return AssociationValidator(
         association=[
             ValidateLineDeviceAssociation(),
             ValidateLinePosition(line_dao),
-            ValidateRequiredResources(user_line_dao, line_extension_dao)
+            ValidateRequiredResources(user_line_dao, line_extension_dao),
+            ValidateMultipleLines(line_dao),
         ],
         dissociation=[
             ValidateLineDeviceDissociation(),
