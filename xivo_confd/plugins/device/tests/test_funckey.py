@@ -47,7 +47,7 @@ class TestFuncKeyConverter(unittest.TestCase):
         converted = self.converter.provd_funckey(line, 1, funckey, '1234')
         assert_that(converted, has_entries({1: has_entries(label="")}))
 
-    def test_label_removes_invalid_characters(self):
+    def test_invalid_chars_removed_from_label(self):
         line = Mock(Line, device_slot=1)
         funckey = Mock(FuncKey,
                        label="\nhe;l\tlo\r",
@@ -55,3 +55,10 @@ class TestFuncKeyConverter(unittest.TestCase):
 
         converted = self.converter.provd_funckey(line, 1, funckey, '1234')
         assert_that(converted, has_entries({1: has_entries(label="hello")}))
+
+    def test_invalid_chars_removed_from_value(self):
+        line = Mock(Line, device_slot=1)
+        funckey = Mock(FuncKey, blf=True, label=None)
+
+        converted = self.converter.provd_funckey(line, 1, funckey, '\r1\t2;34\n')
+        assert_that(converted, has_entries({1: has_entries(value="1234")}))

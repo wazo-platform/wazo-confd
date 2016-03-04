@@ -50,12 +50,15 @@ class FuncKeyConverter(object):
 
     __metaclass__ = abc.ABCMeta
 
+    INVALID_CHARS = "\n\r\t;"
+
     @abc.abstractmethod
     def build(self, user, line, position, funckey):
         return
 
     def provd_funckey(self, line, position, funckey, value):
-        label = (funckey.label or '').translate(None, '\n\r\t;')
+        label = self.remove_invalid_chars(funckey.label or '')
+        value = self.remove_invalid_chars(value)
         return {position: {
             'label': label,
             'line': line.device_slot,
@@ -67,6 +70,11 @@ class FuncKeyConverter(object):
 
     def progfunckey(self, prog_exten, user_id, exten, argument):
         return fkey_extension(prog_exten, [user_id, exten, argument])
+
+    def remove_invalid_chars(self, text):
+        for char in self.INVALID_CHARS:
+            text = text.replace(char, "")
+        return text
 
 
 class UserConverter(FuncKeyConverter):
