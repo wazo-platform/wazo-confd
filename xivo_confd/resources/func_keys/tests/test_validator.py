@@ -34,10 +34,10 @@ from xivo_dao.helpers.exception import InputError, ResourceError
 
 from xivo_confd.helpers.validator import Validator
 from xivo_confd.resources.func_keys.validator import FuncKeyMappingValidator
-from xivo_confd.resources.func_keys.validator import FuncKeyValidator, \
+from xivo_confd.resources.func_keys.validator import FuncKeyModelValidator, \
     ServiceValidator, ForwardValidator, TransferValidator, AgentActionValidator, \
     ParkPositionValidator, PrivateTemplateValidator, SimilarFuncKeyValidator, \
-    BSFilterValidator
+    BSFilterValidator, CustomValidator
 
 
 class TestSimilarFuncKeyValidator(unittest.TestCase):
@@ -91,7 +91,7 @@ class TestPrivateTemplateValidator(unittest.TestCase):
 class TestFuncKeyMappingValidator(unittest.TestCase):
 
     def setUp(self):
-        self.funckey_validator = Mock(FuncKeyValidator)
+        self.funckey_validator = Mock(FuncKeyModelValidator)
         self.validator = FuncKeyMappingValidator(self.funckey_validator)
 
     def test_given_func_key_mapping_when_validating_then_validates_each_func_key(self):
@@ -112,8 +112,8 @@ class TestFuncKeyValidator(unittest.TestCase):
     def setUp(self):
         self.first_dest_validator = Mock(Validator)
         self.second_dest_validator = Mock(Validator)
-        self.validator = FuncKeyValidator({'foobar': [self.first_dest_validator,
-                                                      self.second_dest_validator]})
+        self.validator = FuncKeyModelValidator({'foobar': [self.first_dest_validator,
+                                                           self.second_dest_validator]})
 
     def test_given_no_validator_for_destination_when_validating_then_raises_error(self):
         destination = Mock(type='spam')
@@ -186,6 +186,9 @@ class TestForwardValidator(unittest.TestCase):
 
     def setUp(self):
         self.dao = Mock()
+        self.dao.find_all_forward_extensions.return_value = [ForwardExtension(id=sentinel.extension_id,
+                                                                              exten='*22',
+                                                                              forward='noanswer')]
         self.validator = ForwardValidator(self.dao)
 
     def test_given_forward_does_not_exist_when_validating_then_raises_error(self):
@@ -210,6 +213,17 @@ class TestForwardValidator(unittest.TestCase):
         self.validator.validate(destination)
 
         self.dao.find_all_forward_extensions.assert_called_once_with()
+
+    def test_given_exten_contains_invalid_characters_then_validation_raises_error(self):
+        destination = ForwardDestination(forward='noanswer', exten='hello\n')
+
+        assert_that(calling(self.validator.validate).with_args(destination),
+                    raises(InputError))
+
+    def test_given_exten_contains_valid_characters_then_validation_passes(self):
+        destination = ForwardDestination(forward='noanswer', exten='hello')
+
+        self.validator.validate(destination)
 
 
 class TestTransferValidator(unittest.TestCase):
@@ -311,6 +325,23 @@ class TestParkPositionValidator(unittest.TestCase):
         self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
+
+
+class TestCustomValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = CustomValidator()
+
+    def test_given_exten_contains_invalid_characters_then_validation_raises_error(self):
+        destination = CustomDestination(exten='1234\n')
+
+        assert_that(calling(self.validator.validate).with_args(destination),
+                    raises(InputError))
+
+    def test_given_exten_contains_valid_characters_then_validation_passes(self):
+        destination = CustomDestination(exten='1234')
+
+        self.validator.validate(destination)
 
 
 class TestBSFilterValidator(unittest.TestCase):
