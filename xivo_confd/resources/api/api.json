@@ -3288,7 +3288,7 @@
             "get": {
                 "operationId": "get_switchboard_stats",
                 "summary": "Get switchboard statistics",
-                "description": "**Required ACL:** `confd.switchboards.{switchboard_id}.stats.read`\n\nSwitchboard statistics in CSV format: `\"Date\",\"Entered\",\"Answered\",\"Transferred\",\"Abandoned\",\"Forwarded\",\"Waiting Time Average\"`\n\nField names are listed on the first line.\n\nDate: Formatted as YYYY-MM-DD.",
+                "description": "**Required ACL:** `confd.switchboards.{switchboard_id}.stats.read`\n\nSwitchboard statistics in CSV format: `\"date\",\"entered\",\"answered\",\"transferred\",\"abandoned\",\"forwarded\",\"waiting_time_average\"`\n\nField names are listed on the first line.\n\ndate: Formatted as YYYY-MM-DD.\n\nwaiting_time_average: Formatted as MM:SS.",
                 "tags": [
                     "switchboards"
                 ],
