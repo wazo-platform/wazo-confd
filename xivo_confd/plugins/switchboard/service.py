@@ -17,7 +17,7 @@
 
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
-from xivo_confd.plugins.switchboard.stats import HourlyStatAccumulator
+from xivo_confd.plugins.switchboard.stats import DailyStatAccumulator
 
 
 class SwitchboardService(object):
@@ -30,7 +30,7 @@ class SwitchboardService(object):
 
     def stats(self, switchboard_id):
         stats = self.dao.stats(switchboard_id)
-        accumulator = HourlyStatAccumulator()
+        accumulator = DailyStatAccumulator()
         accumulator.accumulate(stats)
         return accumulator.results()
 

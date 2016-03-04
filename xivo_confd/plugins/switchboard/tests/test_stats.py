@@ -21,7 +21,7 @@ from hamcrest import contains
 from hamcrest import has_entries
 from unittest import TestCase
 
-from ..stats import HourlyStatAccumulator
+from ..stats import DailyStatAccumulator
 
 
 class StatMock(object):
@@ -35,7 +35,7 @@ class StatMock(object):
 class TestHourlyStatAccumulator(TestCase):
 
     def setUp(self):
-        self.accumulator = HourlyStatAccumulator()
+        self.accumulator = DailyStatAccumulator()
 
     def test_given_no_stats_then_no_results(self):
         assert_that(self.accumulator.results(), contains())

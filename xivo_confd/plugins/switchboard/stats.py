@@ -29,7 +29,7 @@ def default_stat_factory():
     }
 
 
-class HourlyStatAccumulator(object):
+class DailyStatAccumulator(object):
 
     def __init__(self):
         self.stats = OrderedDict()
