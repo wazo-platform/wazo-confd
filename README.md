@@ -57,6 +57,8 @@ make test
 Development
 -----------
 
+### xivo-dao
+
 In case you need to mount xivo_dao inside the xivo-confd container, add the
 following line in confd volumes in
 integration_tests/assets/base/docker-compose.yml
@@ -65,9 +67,20 @@ integration_tests/assets/base/docker-compose.yml
 - "/path/to/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
 ```
 
+### Modified database
+
+If you need to run tests against a modified database schema, run:
+
+```
+make update-db MANAGE_DB_DIR=../../xivo-manage-db
+```
+
+### Quick multiple runs
+
 If you need to run tests more than once (e.g. when developing):
 
 ```
-make stop start
+make stop
+make start
 DOCKER=0 nosetests suite
 ```

@@ -111,7 +111,8 @@ DEFAULT_CONFIG = {
                         'user_line_associated_plugin',
                         'line_extension_plugin',
                         'line_endpoint_plugin',
-                        'user_import_plugin'],
+                        'user_import_plugin',
+                        'switchboard_plugin'],
     'service_discovery': {
         'enabled': True,
         'advertise_address': 'localhost',

@@ -56,6 +56,7 @@ setup(
             'line_extension_plugin = xivo_confd.plugins.line_extension.plugin:Plugin',
             'line_endpoint_plugin = xivo_confd.plugins.line_endpoint.plugin:Plugin',
             'user_import_plugin = xivo_confd.plugins.user_import.plugin:Plugin',
+            'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
         ]
     }
 )
