@@ -4131,6 +4131,11 @@
                     "type": "string",
                     "description": "Switchboard ID",
                     "readOnly": true
+                },
+                "display_name": {
+                    "type": "string",
+                    "description": "Switchboard name",
+                    "readOnly": true
                 }
             }
         },

@@ -29,6 +29,7 @@ from xivo_confd.plugins.switchboard.model import Switchboard
 
 switchboard_fields = {
     'id': fields.String,
+    'display_name': fields.String,
 }
 
 csv_header = ['date', 'entered', 'answered', 'transferred', 'abandoned', 'forwarded', 'waiting_time_average']
