@@ -2955,6 +2955,70 @@
                 }
             }
         },
+        "/switchboards": {
+            "get": {
+                "operationId": "list_switchboard",
+                "summary": "List switchboards",
+                "description": "**Required ACL:** `confd.switchboards.read`",
+                "tags": [
+                    "switchboards"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Switchboard list",
+                        "schema": {
+                            "$ref": "#/definitions/SwitchboardItems"
+                        }
+                    }
+                }
+            }
+        },
+        "/switchboards/{switchboard_id}/stats": {
+            "get": {
+                "operationId": "get_switchboard_stats",
+                "summary": "Get switchboard statistics",
+                "description": "**Required ACL:** `confd.switchboards.{switchboard_id}.stats.read`\n\nSwitchboard statistics in CSV format: `\"date\",\"entered\",\"answered\",\"transferred\",\"abandoned\",\"forwarded\",\"waiting_time_average\"`\n\nField names are listed on the first line.\n\ndate: Formatted as YYYY-MM-DD.\n\nwaiting_time_average: Formatted as MM:SS.",
+                "tags": [
+                    "switchboards"
+                ],
+                "produces": [
+                    "text/csv; charset=utf-8"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/switchboardid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Switchboard statistics",
+                        "schema": {
+                            "$ref": "#/definitions/SwitchboardStats"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/devices/{device_id}/associate_line/{line_id}": {
             "get": {
                 "operationId": "associate_line_device",
@@ -3245,70 +3309,6 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
-        "/switchboards": {
-            "get": {
-                "operationId": "list_switchboard",
-                "summary": "List switchboards",
-                "description": "**Required ACL:** `confd.switchboards.read`",
-                "tags": [
-                    "switchboards"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/order"
-                    },
-                    {
-                        "$ref": "#/parameters/direction"
-                    },
-                    {
-                        "$ref": "#/parameters/limit"
-                    },
-                    {
-                        "$ref": "#/parameters/offset"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Switchboard list",
-                        "schema": {
-                            "$ref": "#/definitions/SwitchboardItems"
-                        }
-                    }
-                }
-            }
-        },
-        "/switchboards/{switchboard_id}/stats": {
-            "get": {
-                "operationId": "get_switchboard_stats",
-                "summary": "Get switchboard statistics",
-                "description": "**Required ACL:** `confd.switchboards.{switchboard_id}.stats.read`\n\nSwitchboard statistics in CSV format: `\"date\",\"entered\",\"answered\",\"transferred\",\"abandoned\",\"forwarded\",\"waiting_time_average\"`\n\nField names are listed on the first line.\n\ndate: Formatted as YYYY-MM-DD.\n\nwaiting_time_average: Formatted as MM:SS.",
-                "tags": [
-                    "switchboards"
-                ],
-                "produces": [
-                    "text/csv; charset=utf-8"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/switchboardid"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Switchboard statistics",
-                        "schema": {
-                            "$ref": "#/definitions/SwitchboardStats"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
