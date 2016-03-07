@@ -75,7 +75,6 @@ class SearchEngine(object):
         'model',
         'version',
         'description',
-        'options',
     ]
 
     DIRECTION = {'asc': 1,
