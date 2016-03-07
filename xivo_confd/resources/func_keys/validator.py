@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,10 +65,26 @@ class FuncKeyMappingValidator(Validator):
 
 class FuncKeyValidator(Validator):
 
+    INVALID_CHARS = "\n\r\t;"
+    INVALID_CHARS_MSG = "string without special characters (\\n \\r \\t ;)"
+
+    def validate_text(self, text, field):
+        if text is not None:
+            for char in self.INVALID_CHARS:
+                if char in text:
+                    raise errors.wrong_type(field, self.INVALID_CHARS_MSG, **{field: text})
+
+
+class FuncKeyModelValidator(FuncKeyValidator):
+
     def __init__(self, destinations):
         self.destinations = destinations
 
     def validate(self, funckey):
+        self.validate_text(funckey.label, 'label')
+        self.validate_destination(funckey)
+
+    def validate_destination(self, funckey):
         dest_type = funckey.destination.type
         if dest_type not in self.destinations:
             raise errors.invalid_destination_type(dest_type)
@@ -76,7 +92,7 @@ class FuncKeyValidator(Validator):
             validator.validate(funckey.destination)
 
 
-class ServiceValidator(Validator):
+class ServiceValidator(FuncKeyValidator):
 
     def __init__(self, dao):
         self.dao = dao
@@ -90,12 +106,16 @@ class ServiceValidator(Validator):
             raise errors.param_not_found('service', service)
 
 
-class ForwardValidator(Validator):
+class ForwardValidator(FuncKeyValidator):
 
     def __init__(self, dao):
         self.dao = dao
 
     def validate(self, destination):
+        self.validate_text(destination.exten, 'exten')
+        self.validate_forward(destination)
+
+    def validate_forward(self, destination):
         extensions = self.dao.find_all_forward_extensions()
         all_forwards = [e.forward for e in extensions]
         forward = destination.forward
@@ -104,7 +124,7 @@ class ForwardValidator(Validator):
             raise errors.param_not_found('forward', forward)
 
 
-class TransferValidator(Validator):
+class TransferValidator(FuncKeyValidator):
 
     def __init__(self, dao):
         self.dao = dao
@@ -118,7 +138,7 @@ class TransferValidator(Validator):
             raise errors.param_not_found('transfer', transfer)
 
 
-class AgentActionValidator(Validator):
+class AgentActionValidator(FuncKeyValidator):
 
     def __init__(self, dao):
         self.dao = dao
@@ -132,7 +152,7 @@ class AgentActionValidator(Validator):
             raise errors.param_not_found('action', action)
 
 
-class ParkPositionValidator(Validator):
+class ParkPositionValidator(FuncKeyValidator):
 
     def __init__(self, dao):
         self.dao = dao
@@ -145,7 +165,13 @@ class ParkPositionValidator(Validator):
             raise errors.outside_park_range(position, min=min_pos, max=max_pos)
 
 
-class BSFilterValidator(Validator):
+class CustomValidator(FuncKeyValidator):
+
+    def validate(self, destination):
+        self.validate_text(destination.exten, 'exten')
+
+
+class BSFilterValidator(FuncKeyValidator):
 
     def __init__(self, dao):
         self.dao = dao
@@ -166,7 +192,7 @@ def build_validators():
         'group': [ResourceExists('group_id', group_dao.exists, 'Group')],
         'queue': [ResourceExists('queue_id', queue_dao.exists, 'Queue')],
         'conference': [ResourceExists('conference_id', conference_dao.exists, 'Conference')],
-        'custom': [],
+        'custom': [CustomValidator()],
         'service': [ServiceValidator(extension_dao)],
         'forward': [ForwardValidator(extension_dao)],
         'transfer': [TransferValidator(feature_dao)],
@@ -179,7 +205,7 @@ def build_validators():
         'bsfilter': [ResourceExists('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
     }
 
-    funckey_validator = FuncKeyValidator(destination_validators)
+    funckey_validator = FuncKeyModelValidator(destination_validators)
     mapping_validator = FuncKeyMappingValidator(funckey_validator)
     similar_validator = SimilarFuncKeyValidator()
 
