@@ -314,20 +314,6 @@ def test_delete_device(device):
     assert_that(provd_devices, empty())
 
 
-@fixtures.device()
-@fixtures.line()
-def test_associate_line_to_a_device(device, line):
-    response = confd.devices(device['id']).associate_line(line['id']).get()
-    response.assert_status(403)
-
-
-@fixtures.device()
-@fixtures.line()
-def test_dissociate_line_to_a_device(device, line):
-    response = confd.devices(device['id']).remove_line(line['id']).get()
-    response.assert_status(403)
-
-
 @mocks.provd()
 @fixtures.device()
 @fixtures.line()

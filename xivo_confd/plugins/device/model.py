@@ -29,10 +29,20 @@ class Device(object):
         self.device = device
         self._config = config
 
-    def set_device_value(self, name, value):
+    def set_value(self, name, value):
         if value is None and name in self.device:
             del self.device[name]
         self.device[name] = value
+
+    @property
+    def config(self):
+        if self._config is None:
+            raise Exception("Provd Device has no config associated. The device may be corruput")
+        return self._config
+
+    @config.setter
+    def config(self, value):
+        self._config = value
 
     @property
     def id(self):
@@ -48,7 +58,7 @@ class Device(object):
 
     @ip.setter
     def ip(self, value):
-        self.set_device_value('ip', value)
+        self.set_value('ip', value)
 
     @property
     def mac(self):
@@ -67,7 +77,7 @@ class Device(object):
 
     @sn.setter
     def sn(self, value):
-        self.set_device_value('sn', value)
+        self.set_value('sn', value)
 
     @property
     def plugin(self):
@@ -75,7 +85,7 @@ class Device(object):
 
     @plugin.setter
     def plugin(self, value):
-        self.set_device_value('plugin', value)
+        self.set_value('plugin', value)
 
     @property
     def vendor(self):
@@ -83,7 +93,7 @@ class Device(object):
 
     @vendor.setter
     def vendor(self, value):
-        self.set_device_value('vendor', value)
+        self.set_value('vendor', value)
 
     @property
     def model(self):
@@ -91,7 +101,7 @@ class Device(object):
 
     @model.setter
     def model(self, value):
-        self.set_device_value('model', value)
+        self.set_value('model', value)
 
     @property
     def version(self):
@@ -99,7 +109,7 @@ class Device(object):
 
     @version.setter
     def version(self, value):
-        self.set_device_value('version', value)
+        self.set_value('version', value)
 
     @property
     def description(self):
@@ -107,7 +117,7 @@ class Device(object):
 
     @description.setter
     def description(self, value):
-        self.set_device_value('description', value)
+        self.set_value('description', value)
 
     @property
     def options(self):
@@ -115,7 +125,7 @@ class Device(object):
 
     @options.setter
     def options(self, value):
-        self.set_device_value('options', value)
+        self.set_value('options', value)
 
     @property
     def status(self):
@@ -137,34 +147,17 @@ class Device(object):
         self.config['configdevice'] = value
         self.config['parent_ids'].append(value)
 
-    @property
-    def config(self):
-        if self._config is None:
-            raise Exception("Provd Device has no config associated. The device may be corruput")
-        return self._config
-
-    @config.setter
-    def config(self, value):
-        self._config = value
-
     def is_autoprov(self):
         return 'autoprov' in self.config['parent_ids']
 
-    def associate_config(self, config):
-        self.device['config'] = config['id']
-        self.config = config
-
     def update_config(self, config):
+        self.device['config'] = config['id']
         self.config = config
 
     def reset_autoprov(self, config):
-        self.device['config'] = config['id']
         if 'options' in self.device:
             del self.device['options']
-        self.config = config
-
-    def extract_config_device(self):
-        return self.config.get('configdevice', 'defaultconfigdevice')
+        self.update_config(config)
 
     def merge(self, other):
         self.device.update(other.device)

@@ -20,7 +20,7 @@ from flask import url_for
 from flask_restful import reqparse, fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.request_bouncer import limit_to_localhost
+
 from xivo_confd.helpers.restful import (FieldList,
                                         Link,
                                         ListResource,
@@ -120,31 +120,4 @@ class DeviceSynchronize(ConfdResource):
     def get(self, id):
         device = self.service.get(id)
         self.service.synchronize(device)
-        return ('', 204)
-
-
-class LegacyDeviceAssociation(ConfdResource):
-
-    method_decorators = ConfdResource.method_decorators + [limit_to_localhost]
-
-    def __init__(self, service, association_service):
-        self.service = service
-        self.association_service = association_service
-
-
-class LineDeviceAssociation(LegacyDeviceAssociation):
-
-    def get(self, device_id, line_id):
-        device = self.service.get(device_id)
-        line = self.association_service.get_line(line_id)
-        self.association_service.associate(line, device)
-        return ('', 204)
-
-
-class LineDeviceDissociation(LegacyDeviceAssociation):
-
-    def get(self, device_id, line_id):
-        device = self.service.get(device_id)
-        line = self.association_service.get_line(line_id)
-        self.association_service.dissociate(line, device)
         return ('', 204)

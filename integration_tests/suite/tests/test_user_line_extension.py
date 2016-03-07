@@ -153,7 +153,7 @@ def test_caller_id_on_sccp_line(user, line, sccp, extension):
     with a.line_endpoint_sccp(line, sccp), a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).get()
         assert_that(response.item, has_entries({'caller_id_name': 'Jôhn Smîth',
-                                                'caller_id_num': '1000'}))
+                                                'caller_id_num': extension['exten']}))
 
 
 @fixtures.user()

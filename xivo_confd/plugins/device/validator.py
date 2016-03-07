@@ -22,6 +22,7 @@ from xivo_confd.helpers.validator import (Validator,
                                           ValidationGroup,
                                           Optional,
                                           UniqueField,
+                                          UniqueFieldChanged,
                                           RegexField,
                                           MemberOfSequence)
 
@@ -40,19 +41,6 @@ class OptionsValidator(Validator):
         if 'switchboard' in options and not isinstance(options['switchboard'], bool):
             raise errors.wrong_type('options.switchboard', 'boolean',
                                     options=options)
-
-
-class MacChanged(Validator):
-
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, device):
-        mac = device.mac
-        if mac is not None:
-            found = self.dao.find_by(mac=mac)
-            if found is not None and found.id != device.id:
-                raise errors.resource_exists('Device', mac=mac)
 
 
 class DeviceNotAssociated(Validator):
@@ -93,7 +81,10 @@ def build_validator(device_dao, line_dao):
                      ),
         ],
         edit=[
-            MacChanged(device_dao)
+            Optional('mac',
+                     UniqueFieldChanged('mac',
+                                        device_dao,
+                                        'Device')),
         ],
         delete=[
             DeviceNotAssociated(line_dao)

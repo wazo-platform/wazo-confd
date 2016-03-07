@@ -19,21 +19,18 @@
 
 class ConfigGenerator(object):
 
-    def __init__(self, generators):
-        self.generators = generators
+    def __init__(self, raw_generator):
+        self.raw_generator = raw_generator
 
     def generate(self, device):
-        configdevice = device.extract_config_device()
+        configdevice = device.template_id or 'defaultconfigdevice'
         config = {'id': device.id,
                   'configdevice': configdevice,
                   'parent_ids': ['base', configdevice],
-                  'X_key': '',
-                  'config_version': 1}
+                  'deletable': True,
+                  'raw_config': self.raw_generator.generate(device),
+                  }
 
-        for generator in self.generators:
-            section = generator.generate(device)
-            if section:
-                config.update(section)
         return config
 
 
@@ -43,12 +40,51 @@ class RawConfigGenerator(object):
         self.generators = generators
 
     def generate(self, device):
-        raw_config = {}
+        raw_config = {'X_key': '',
+                      'config_version': 1}
+
         for generator in self.generators:
             section = generator.generate(device)
             if section:
                 raw_config.update(section)
-        return {'raw_config': raw_config}
+
+        return raw_config
+
+
+class UserGenerator(object):
+
+    def __init__(self, device_db):
+        self.device_db = device_db
+
+    def generate(self, device):
+        row = self.device_db.profile_for_device(device.id)
+        if row:
+            return {'X_xivo_user_uuid': row.uuid,
+                    'X_xivo_phonebook_profile': row.context}
+
+
+class ExtensionGenerator(object):
+
+    def __init__(self, extension_dao):
+        self.extension_dao = extension_dao
+
+    def generate(self, device):
+        return {
+            'exten_dnd': self.find_exten('enablednd'),
+            'exten_fwd_unconditional': self.find_exten('fwdunc'),
+            'exten_fwd_no_answer': self.find_exten('fwdrna'),
+            'exten_fwd_busy': self.find_exten('fwdbusy'),
+            'exten_fwd_disable_all': self.find_exten('fwdundoall'),
+            'exten_park': self.find_exten('parkext'),
+            'exten_pickup_group': self.find_exten('pickupexten'),
+            'exten_pickup_call': self.find_exten('pickup'),
+            'exten_voicemail': self.find_exten('vmusermsg'),
+        }
+
+    def find_exten(self, typeval):
+        extension = self.extension_dao.find_by(type='extenfeatures', typeval=typeval)
+        if extension:
+            return extension.clean_exten()
 
 
 class FuncKeyGenerator(object):
@@ -103,17 +139,16 @@ class SipGenerator(object):
         self.device_db = device_db
 
     def generate(self, device):
-        section = {}
+        sip_lines = {}
         rows = self.device_db.sip_lines_for_device(device.id)
         for row in rows:
-            slot = row.LineFeatures.device_slot
-            config = self.generate_config(row)
-            section[slot] = config
+            pos = row.LineFeatures.position
+            sip_lines[pos] = self.generate_sip_line(row)
 
-        if len(section) > 0:
-            return {'sip_lines': section}
+        if len(sip_lines) > 0:
+            return {'protocol': 'SIP', 'sip_lines': sip_lines}
 
-    def generate_config(self, row):
+    def generate_sip_line(self, row):
         line = row.LineFeatures
         sip = row.UserSIP
         extension = row.Extension
@@ -142,14 +177,16 @@ class SccpGenerator(object):
         self.line_dao = line_dao
 
     def generate(self, device):
-        section = {}
-        line = self.line_dao.find_by(device=device.id)
+        call_managers = {}
+
+        line = self.line_dao.find_by(device=device.id, protocol='sccp')
         if line:
             registrar = self.device_dao.get_registrar(line.configregistrar)
-            section['1'] = {'ip': registrar['proxy_main']}
-            proxy_backup = registrar.get('proxy_backup', None)
-            if proxy_backup:
-                section['2'] = {'ip': proxy_backup}
+            proxy_backup = registrar.get('proxy_backup')
 
-        if len(section) > 0:
-            return {'sccp_call_managers': section}
+            call_managers['1'] = {'ip': registrar['proxy_main']}
+            if proxy_backup:
+                call_managers['2'] = {'ip': proxy_backup}
+
+        if len(call_managers) > 0:
+            return {'protocol': 'SCCP', 'sccp_call_managers': call_managers}

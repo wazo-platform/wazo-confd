@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,10 +79,11 @@ def test_get_extension_from_line(line, extension):
         assert_that(response.item, expected)
 
 
+@f.user()
 @f.line_sip()
 @f.extension()
 @f.device()
-def test_dissociate_when_line_associated_to_device(line, extension, device):
-    with a.line_extension(line, extension), a.line_device(line, device):
+def test_dissociate_when_line_associated_to_device(user, line, extension, device):
+    with a.line_extension(line, extension), a.user_line(user, line), a.line_device(line, device):
         response = confd.lines(line['id']).extension.delete()
         response.assert_match(400, e.resource_associated('Line', 'Device'))

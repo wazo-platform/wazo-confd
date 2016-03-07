@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,16 +16,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import confd
+from xivo_confd import sysconfd
 
 
-def associate(line_id, device_id, check=True):
-    response = confd.lines(line_id).devices(device_id).put()
-    if check:
-        response.assert_ok()
+class LineDeviceNotifier(object):
+
+    REQUEST_HANDLERS = {'dird': [],
+                        'ipbx': ['module reload chan_sccp.so'],
+                        'agentbus': [],
+                        'ctibus': []}
+
+    def __init__(self, sysconfd):
+        self.sysconfd = sysconfd
+
+    def associated(self, line, device):
+        self.reload_sccp(line)
+
+    def dissociated(self, line, device):
+        self.reload_sccp(line)
+
+    def reload_sccp(self, line):
+        if line.endpoint == "sccp":
+            self.sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
 
 
-def dissociate(line_id, device_id, check=True):
-    response = confd.lines(line_id).devices(device_id).delete()
-    if check:
-        response.assert_ok()
+def build_notifier():
+    return LineDeviceNotifier(sysconfd)

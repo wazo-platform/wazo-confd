@@ -374,6 +374,33 @@
                 }
             }
         },
+        "/devices/{device_id}/lines": {
+            "get": {
+                "operationId": "get_device_line_association",
+                "summary": "List lines associated to device",
+                "description": "**Required ACL:** `confd.devices.{device_id}.lines.read`",
+                "tags": [
+                    "lines",
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/deviceid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line-Device association",
+                        "schema": {
+                            "$ref": "#/definitions/LineDeviceItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/endpoints/custom": {
             "get": {
                 "operationId": "list_endpoints_custom",
@@ -1518,6 +1545,97 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/devices": {
+            "get": {
+                "operationId": "get_line_device",
+                "summary": "Get Device associated to Line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.devices.read`",
+                "tags": [
+                    "lines",
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Line and Device",
+                        "schema": {
+                            "$ref": "#/definitions/LineDevice"
+                        }
+                    },
+                    "400": {
+                        "description": "No device associated to line",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/devices/{device_id}": {
+            "put": {
+                "operationId": "associate_line_device",
+                "summary": "Associate line and device",
+                "description": "**Required ACL:** `confd.lines.{line_id}.devices.{device_id}.update`",
+                "tags": [
+                    "lines",
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/deviceid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and device associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_line_device",
+                "summary": "Dissociate line and device",
+                "description": "**Required ACL:** `confd.lines.{line_id}.devices.{device_id}.delete`",
+                "tags": [
+                    "lines",
+                    "devices"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/deviceid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and device dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -4005,6 +4123,38 @@
                     "description": "Type of endpoint (either SIP or SCCP)"
                 }
             }
+        },
+        "LineDevice": {
+            "title": "LineDevice",
+            "properties": {
+                "line_id": {
+                    "type": "integer",
+                    "description": "Line's ID",
+                    "readOnly": true
+                },
+                "device_id": {
+                    "type": "string",
+                    "description": "Device's ID",
+                    "readOnly": true
+                }
+            }
+        },
+        "LineDeviceItems": {
+            "title": "LineDeviceItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/LineDevice"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
         },
         "LineExtension": {
             "title": "LineExtension",

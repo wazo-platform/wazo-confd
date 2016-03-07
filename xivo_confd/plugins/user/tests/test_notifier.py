@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ def sysconfd_handler(action, user_id):
     return {'ctibus': [cti],
             'dird': [],
             'ipbx': ['dialplan reload',
+                     'module reload chan_sccp.so',
                      'module reload app_queue.so',
                      'sip reload'],
             'agentbus': []}

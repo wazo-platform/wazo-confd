@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ from xivo_confd.helpers.validator import Validator, AssociationValidator
 from xivo_dao.helpers import errors
 
 
-from xivo_confd.resources.line_device import validator as line_device_validator
+from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 
 class UserLineAssociationValidator(Validator):
@@ -49,7 +49,7 @@ class UserLineDissociationValidator(Validator):
 
     def validate(self, user, line):
         self.validate_no_secondary_users(user, line)
-        line_device_validator.validate_no_device(line.id)
+        ValidateLineHasNoDevice().validate(line)
 
     def validate_no_secondary_users(self, user, line):
         exists = user_line_db.has_secondary_users(user.id, line.id)

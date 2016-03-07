@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,21 +15,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.bus_manager import send_bus_event
 from xivo_bus.resources.func_key.event import CreateFuncKeyTemplateEvent, \
     EditFuncKeyTemplateEvent, DeleteFuncKeyTemplateEvent
 
 
-def created(user):
-    event = CreateFuncKeyTemplateEvent(user.id)
-    send_bus_event(event, event.routing_key)
+class FuncKeyTemplateNotifier(object):
 
+    REQUEST_HANDLERS = {'dird': [],
+                        'ipbx': ['module reload chan_sccp.so'],
+                        'agentbus': [],
+                        'ctibus': []}
 
-def edited(user):
-    event = EditFuncKeyTemplateEvent(user.id)
-    send_bus_event(event, event.routing_key)
+    def __init__(self, bus, sysconfd, device_db):
+        self.bus = bus
+        self.sysconfd = sysconfd
+        self.device_db = device_db
 
+    def created(self, template):
+        event = CreateFuncKeyTemplateEvent(template.id)
+        self.bus.send_bus_event(event, event.routing_key)
 
-def deleted(user):
-    event = DeleteFuncKeyTemplateEvent(user.id)
-    send_bus_event(event, event.routing_key)
+    def edited(self, template):
+        event = EditFuncKeyTemplateEvent(template.id)
+        self.bus.send_bus_event(event, event.routing_key)
+        self.reload_sccp(template)
+
+    def deleted(self, template):
+        event = DeleteFuncKeyTemplateEvent(template.id)
+        self.bus.send_bus_event(event, event.routing_key)
+        self.reload_sccp(template)
+
+    def reload_sccp(self, template):
+        if self.device_db.template_has_sccp_device(template.id):
+            self.sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)

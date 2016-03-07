@@ -20,13 +20,14 @@ from xivo_confd import bus
 from xivo_confd.database import device as device_db
 
 from xivo_confd.plugins.device.service import (DeviceService,
-                                               LineDeviceAssociationService,
                                                SearchEngine)
 
 from xivo_confd.plugins.device.update import (DeviceUpdater,
                                               ProvdUpdater)
 
 from xivo_confd.plugins.device.generators import (ConfigGenerator,
+                                                  UserGenerator,
+                                                  ExtensionGenerator,
                                                   RawConfigGenerator,
                                                   FuncKeyGenerator,
                                                   SipGenerator,
@@ -43,6 +44,7 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.extension import dao as extension_dao
 
 
 def build_dao(provd_client):
@@ -53,13 +55,11 @@ def build_service(device_dao):
     search_engine = SearchEngine(device_dao)
     device_validator = build_validator(device_dao, line_dao)
     device_notifier = DeviceNotifier(bus)
-    device_updater = build_device_updater(device_dao.client)
-    device_associator = build_line_device_associator(device_updater)
     device_service = DeviceService(device_dao,
                                    device_validator,
                                    device_notifier,
                                    search_engine,
-                                   device_associator)
+                                   line_dao)
 
     return device_service
 
@@ -90,13 +90,16 @@ def build_generators(device_dao):
     sccp_generator = SccpGenerator(device_dao,
                                    line_dao)
 
-    raw_config_generator = RawConfigGenerator([funckey_generator, sip_generator, sccp_generator])
-    config_generator = ConfigGenerator([raw_config_generator])
+    user_generator = UserGenerator(device_db)
+
+    extension_generator = ExtensionGenerator(extension_dao)
+
+    raw_config_generator = RawConfigGenerator([user_generator,
+                                               extension_generator,
+                                               funckey_generator,
+                                               sip_generator,
+                                               sccp_generator])
+
+    config_generator = ConfigGenerator(raw_config_generator)
 
     return config_generator
-
-
-def build_line_device_associator(updater):
-    associator = LineDeviceAssociationService(line_dao,
-                                              updater)
-    return associator

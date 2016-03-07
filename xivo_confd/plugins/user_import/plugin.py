@@ -76,7 +76,7 @@ class Plugin(object):
     def load(self, core):
         provd_client = core.provd_client()
 
-        user_service = build_user_service()
+        user_service = build_user_service(provd_client)
         user_voicemail_service = build_uv_service()
         voicemail_service = build_voicemail_service()
         line_service = build_line_service(provd_client)
