@@ -44,7 +44,7 @@ def generate_switchboard():
     return new_switchboard()
 
 
-def generate_switchboard_stat(time, end_type, wait_time):
+def generate_switchboard_stat(time, end_type='abandoned', wait_time=1):
     switchboard = find_switchboard(name=SWITCHBOARD_STAT_QUEUE_NAME)
     if not switchboard:
         switchboard = new_switchboard(name=SWITCHBOARD_STAT_QUEUE_NAME)
@@ -54,5 +54,11 @@ def generate_switchboard_stat(time, end_type, wait_time):
             'wait_time': wait_time,
             'queue_id': switchboard['id']}
     with db.queries() as queries:
-        queries.insert_switchboard_stat(**stat)
+        stat['id'] = queries.insert_switchboard_stat(**stat)
+
     return stat
+
+
+def delete_switchboard_stat(stat_id, check=False):
+    with db.queries() as queries:
+        queries.delete_switchboard_stat(stat_id)

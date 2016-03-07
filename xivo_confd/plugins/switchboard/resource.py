@@ -19,16 +19,17 @@ import csv
 
 from cStringIO import StringIO
 from flask import make_response
-from flask_restful import fields, marshal
-
+from flask_restful import fields, marshal, reqparse
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
+from xivo_confd.helpers.restful import DateTimeLocalZone
 from xivo_confd.helpers.restful import ListResource
 
 from xivo_confd.plugins.switchboard.model import Switchboard
 
 switchboard_fields = {
     'id': fields.String,
+    'display_name': fields.String,
 }
 
 csv_header = ['date', 'entered', 'answered', 'transferred', 'abandoned', 'forwarded', 'waiting_time_average']
@@ -54,12 +55,17 @@ class SwitchboardStats(ConfdResource):
 
     fields = switchboard_fields
 
+    parser = reqparse.RequestParser()
+    parser.add_argument('start_date', type=DateTimeLocalZone(), location='args')
+    parser.add_argument('end_date', type=DateTimeLocalZone(), location='args')
+
     def __init__(self, service):
         self.service = service
 
     @required_acl('confd.switchboards.{id}.stats.read')
     def get(self, id):
-        stats = self.service.stats(id)
+        args = self.parser.parse_args()
+        stats = self.service.stats(id, **args)
         content = self.format_csv(stats)
         return make_response(content, 200, {'Content-Type': 'text/csv; charset=utf-8'})
 
@@ -70,9 +76,6 @@ class SwitchboardStats(ConfdResource):
 
         for row in stats:
             row = self.format_row(row)
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.critical(row)
             writer.writerow(row)
 
         return content.getvalue()

@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from datetime import datetime
 from flask import url_for, request
 from flask_restful import Resource, Api, fields, marshal
 
@@ -59,6 +60,15 @@ class DigitStr(object):
         if self.length and len(value) != self.length:
             raise ValueError("'{}' must have a length of {}".format(value, self.length))
         return value
+
+
+class DateTimeLocalZone(object):
+
+    def __call__(self, value):
+        try:
+            return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            raise ValueError("'{}' must be of the form '2016-12-23T04:05:06'".format(value))
 
 
 class ConfdApi(Api):

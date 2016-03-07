@@ -110,4 +110,5 @@ class switchboard(IsolatedAction):
 
 class switchboard_stat(IsolatedAction):
 
-    actions = {'generate': h.switchboard.generate_switchboard_stat}
+    actions = {'generate': h.switchboard.generate_switchboard_stat,
+               'delete': h.switchboard.delete_switchboard_stat}
