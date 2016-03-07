@@ -48,7 +48,6 @@ class LineDeviceService(object):
     def associate(self, line, device):
         self.validator.validate_association(line, device)
         self.associate_line_device(line, device)
-        self.device_updater.update_device(device)
         self.notifier.associated(line, device)
 
     def associate_line_device(self, line, device):
