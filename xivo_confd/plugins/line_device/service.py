@@ -68,10 +68,6 @@ class LineDeviceService(object):
         if line.endpoint == "sccp":
             device_db.dissociate_sccp_device(line, device)
 
-    def dissociate_device(self, device):
-        for line in self.line_service.find_all_by(device_id=device.id):
-            self.dissociate(line, device)
-
     def get_association_from_line(self, line_id):
         line = self.line_service.get(line_id)
         if not line.device_id:
