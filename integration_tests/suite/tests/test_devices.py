@@ -195,6 +195,15 @@ def test_create_device_minimal_parameters():
     response = confd.devices.post()
     response.assert_created('devices')
 
+    assert_that(response.item, has_entries(mac=none(),
+                                           template_id=none(),
+                                           status='not_configured',
+                                           plugin=none(),
+                                           vendor=none(),
+                                           version=none(),
+                                           description=none(),
+                                           options=none()))
+
     provd_device = provd.devices.get(response.item['id'])
     assert_that(provd_device['config'], starts_with('autoprov'))
 

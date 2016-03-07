@@ -46,7 +46,7 @@ fields = {
     'description': fields.String,
     'status': fields.String,
     'template_id': fields.String,
-    'options': fields.Nested(options_fields),
+    'options': fields.Nested(options_fields, allow_null=True),
     'links': FieldList(Link('devices'))
 }
 
