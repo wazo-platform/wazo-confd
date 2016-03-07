@@ -3133,66 +3133,6 @@
                 }
             }
         },
-        "/devices/{device_id}/associate_line/{line_id}": {
-            "get": {
-                "operationId": "associate_line_device",
-                "summary": "Associate line and device",
-                "deprecated": true,
-                "description": "**Required ACL:** `confd.#`\n\n***WARNING:*** This feature is not yet accessible nor functional",
-                "tags": [
-                    "deprecated"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/lineid"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Device associated"
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
-        "/devices/{device_id}/remove_line/{line_id}": {
-            "get": {
-                "operationId": "dissociate_line_device",
-                "summary": "Dissociate line and device",
-                "deprecated": true,
-                "description": "**Required ACL:** `confd.#`\n\n***WARNING:*** This feature is not yet accessible nor functional",
-                "tags": [
-                    "deprecated"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/deviceid"
-                    },
-                    {
-                        "$ref": "#/parameters/lineid"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Device dissociated"
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
         "/lines_sip": {
             "get": {
                 "operationId": "list_line_sip",
