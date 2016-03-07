@@ -3356,7 +3356,7 @@
         },
         "enddate": {
             "name": "end_date",
-            "description": "filter before end date. Format YYYY-MM-DDTHH:MM:SS",
+            "description": "filter before end date. Format YYYY-MM-DDTHH:MM:SS. Empty means 'until the current time'.",
             "in": "query",
             "type": "string",
             "format": "date-time",
@@ -3430,7 +3430,7 @@
         },
         "startdate": {
             "name": "start_date",
-            "description": "filter after start date. Format YYYY-MM-DDTHH:MM:SS",
+            "description": "filter after start date. Format YYYY-MM-DDTHH:MM:SS. Empty means 'since the earliest'.",
             "in": "query",
             "type": "string",
             "format": "date-time",
