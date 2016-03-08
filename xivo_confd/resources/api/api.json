@@ -4015,7 +4015,10 @@
                     "type": "string",
                     "description": "Number to display when calling"
                 }
-            }
+            },
+            "required": [
+                "context"
+            ]
         },
         "Line": {
             "title": "Line",
