@@ -19,6 +19,7 @@
 from xivo_confd import api
 from xivo_confd.plugins.user.service import build_service
 from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
+from xivo_confd.plugins.user.resource import UserServiceItem, UserServiceList
 
 
 class Plugin(object):
@@ -41,5 +42,15 @@ class Plugin(object):
 
         api.add_resource(UserList,
                          '/users',
+                         resource_class_args=(service,)
+                         )
+
+        api.add_resource(UserServiceItem,
+                         '/users/<uuid:uuid>/services/<service_name>',
+                         resource_class_args=(service,)
+                         )
+
+        api.add_resource(UserServiceList,
+                         '/users/<uuid:uuid>/services',
                          resource_class_args=(service,)
                          )
