@@ -449,7 +449,7 @@
                         "name": "body",
                         "in": "body",
                         "description": "Custom Endpoint to create",
-                        "required": false,
+                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/EndpointCustom"
                         }
@@ -3751,7 +3751,10 @@
                     "description": "Endpoint can be used when it is enabled",
                     "default": true
                 }
-            }
+            },
+            "required": [
+                "interface"
+            ]
         },
         "EndpointSipItems": {
             "title": "SIP Endpoints",
