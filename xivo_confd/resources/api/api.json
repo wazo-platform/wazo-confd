@@ -4419,6 +4419,14 @@
                     "type": "boolean",
                     "description": "Authorize the call transfer"
                 },
+                "call_record_enabled": {
+                    "type": "boolean",
+                    "description": "Record all call from this user"
+                },
+                "online_call_record_enabled": {
+                    "type": "boolean",
+                    "description": "Allow user to record call by pressing *3"
+                },
                 "caller_id": {
                     "type": "string",
                     "description": "Name that appears on the phone when calling. Formatted as \"Firstname Lastname\" < number >"

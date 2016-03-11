@@ -112,6 +112,8 @@ class CsvRow(object):
         UnicodeRule('userfield', 'userfield'),
         BooleanRule('supervision_enabled', 'supervision_enabled'),
         BooleanRule('call_transfer_enabled', 'call_transfer_enabled'),
+        BooleanRule('call_record_enabled', 'call_record_enabled'),
+        BooleanRule('online_call_record_enabled', 'online_call_record_enabled'),
         IntRule('entity_id', 'entity_id'),
         IntRule('ring_seconds', 'ring_seconds'),
         IntRule('simultaneous_calls', 'simultaneous_calls'),

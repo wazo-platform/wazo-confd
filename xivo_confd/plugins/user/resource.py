@@ -42,6 +42,8 @@ user_fields = {
     'preprocess_subroutine': fields.String,
     'userfield': fields.String,
     'call_transfer_enabled': fields.Boolean,
+    'call_record_enabled': fields.Boolean,
+    'online_call_record_enabled': fields.Boolean,
     'supervision_enabled': fields.Boolean,
     'ring_seconds': fields.Integer,
     'simultaneous_calls': fields.Integer,
@@ -78,6 +80,8 @@ parser.add_argument('music_on_hold', type=Strict(unicode), store_missing=False)
 parser.add_argument('preprocess_subroutine', type=Strict(unicode), store_missing=False)
 parser.add_argument('userfield', type=Strict(unicode), store_missing=False)
 parser.add_argument('call_transfer_enabled', type=Strict(bool), store_missing=False)
+parser.add_argument('call_record_enabled', type=Strict(bool), store_missing=False)
+parser.add_argument('online_call_record_enabled', type=Strict(bool), store_missing=False)
 parser.add_argument('supervision_enabled', type=Strict(bool), store_missing=False)
 parser.add_argument('ring_seconds', type=int, store_missing=False)
 parser.add_argument('simultaneous_calls', type=int, store_missing=False)
@@ -106,6 +110,8 @@ class UserList(ListResource):
     parser.add_argument('caller_id', type=Strict(unicode))
     parser.add_argument('mobile_phone_number', type=Strict(unicode))
     parser.add_argument('call_transfer_enabled', type=Strict(bool))
+    parser.add_argument('call_record_enabled', type=Strict(bool))
+    parser.add_argument('online_call_record_enabled', type=Strict(bool))
     parser.add_argument('supervision_enabled', type=Strict(bool))
     parser.add_argument('ring_seconds', type=int)
     parser.add_argument('simultaneous_calls', type=int)
