@@ -190,14 +190,16 @@ class UserUuidItem(ItemResource):
 
 
 service_fields = {
-    'enabled': fields.Boolean,
+    'dnd': {
+        'enabled': fields.Boolean(attribute='dnd_enabled'),
+    },
+    'incallfilter': {
+        'enabled': fields.Boolean(attribute='incallfilter_enabled'),
+    }
 }
 
 service_parser = reqparse.RequestParser()
 service_parser.add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False)
-
-services_attributes = {'dnd': 'dnd_enabled',
-                       'incallfilter': 'incallfilter_enabled'}
 
 
 class UserServiceItem(ConfdResource):
@@ -216,21 +218,23 @@ class UserServiceItem(ConfdResource):
 
     @required_acl('confd.users.{user_id}.services.{service_name}.read')
     def get(self, user_id, service_name):
-        if service_name not in services_attributes:
+        if service_name not in service_fields:
             raise errors.not_found('Service', service=service_name)
 
         user = self.get_user(user_id)
-        return {'enabled': getattr(user, services_attributes[service_name])}
+        return marshal(user, self.fields[service_name])
 
     @required_acl('confd.users.{user_id}.services.{service_name}.update')
     def put(self, user_id, service_name):
         user = self.get_user(user_id)
-        setattr(user, services_attributes[service_name], self.parser.parse_args()['enabled'])
+        setattr(user, service_fields[service_name]['enabled'].attribute, self.parser.parse_args()['enabled'])
         self.service.edit(user)
         return '', 204
 
 
 class UserServiceList(ConfdResource):
+
+    fields = service_fields
 
     def __init__(self, service, user_dao):
         self.service = service
@@ -244,7 +248,7 @@ class UserServiceList(ConfdResource):
     @required_acl('confd.users.{user_id}.services.read')
     def get(self, user_id):
         user = self.get_user(user_id)
-        return {key: {'enabled': getattr(user, value)} for key, value in services_attributes.iteritems()}
+        return marshal(user, self.fields)
 
 
 forward_fields = {
