@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_confd.helpers.validator import Validator, ValidationGroup,  \
-    RequiredFields, RegexField, Optional, NumberRange, MemberOfSequence, ResourceExists
+    RequiredFields, RegexField, Optional, NumberRange, MemberOfSequence, ResourceExists, UniqueField, UniqueFieldChanged
 
 from xivo_dao.helpers import errors
+from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.language import dao as language_dao
@@ -83,5 +84,15 @@ def build_validator():
         delete=[
             NoVoicemailAssociated(user_voicemail_dao),
             NoLineAssociated(user_line_dao)
+        ],
+        create=[
+            Optional('email',
+                     UniqueField('email',
+                                 lambda email: user_dao.find_by(email=email),
+                                 'User'))
+        ],
+        edit=[
+            Optional('email',
+                     UniqueFieldChanged('email', user_dao, 'User'))
         ]
     )

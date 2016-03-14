@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from test_api import scenarios as s
 from test_api import associations as a
+from test_api import errors as e
 from test_api import confd
 from test_api import fixtures
 
@@ -319,3 +320,16 @@ def test_that_users_can_be_deleted_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.user(email='common@email.com')
+def test_post_email_already_exists_then_error_raised(user):
+    response = confd.users.post(firstname='bob', email='common@email.com')
+    response.assert_match(400, e.resource_exists('User'))
+
+
+@fixtures.user(email='common@email.com')
+@fixtures.user(email='other@email.com')
+def test_put_email_already_exists_then_error_raised(_, user):
+    response = confd.users(user['uuid']).put(email='common@email.com')
+    response.assert_match(400, e.resource_exists('User'))
