@@ -21,6 +21,7 @@ from flask_restful import reqparse, fields, marshal
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, Strict, ConfdResource
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+from xivo_dao.helpers import errors
 
 
 user_fields = {
@@ -204,7 +205,7 @@ class UserServiceItem(ConfdResource):
     @required_acl('confd.users.{uuid}.services.{service_name}.read')
     def get(self, uuid, service_name):
         if service_name not in services_attributes:
-            return ['Resource Not Found - Service was not found (\'service\': \'{}\')'.format(service_name)], 404
+            raise errors.not_found('Service', service=service_name)
 
         user = self.service.get_by(uuid=str(uuid))
         return {'enabled': getattr(user, services_attributes[service_name])}
