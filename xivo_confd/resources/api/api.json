@@ -2740,7 +2740,7 @@
                 }
             }
         },
-        "/users/{user_uuid}/services": {
+        "/users/{user_id}/services": {
             "get": {
                 "operationId": "get_user_services",
                 "summary": "Get status of all user's services",
@@ -2751,7 +2751,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/useruuid"
+                        "$ref": "#/parameters/useriduuid"
                     }
                 ],
                 "responses": {
@@ -2766,7 +2766,7 @@
                 }
             }
         },
-        "/users/{user_uuid}/services/{service}": {
+        "/users/{user_id}/services/{service}": {
             "get": {
                 "operationId": "get_user_service",
                 "summary": "Get status of service",
@@ -2777,7 +2777,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/useruuid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/service"
@@ -2804,7 +2804,7 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/useruuid"
+                        "$ref": "#/parameters/useriduuid"
                     },
                     {
                         "$ref": "#/parameters/service"

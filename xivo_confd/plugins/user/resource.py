@@ -199,20 +199,26 @@ class UserServiceItem(ConfdResource):
     fields = service_fields
     parser = service_parser
 
-    def __init__(self, service):
+    def __init__(self, service, user_dao):
         self.service = service
+        self.user_dao = user_dao
 
-    @required_acl('confd.users.{uuid}.services.{service_name}.read')
-    def get(self, uuid, service_name):
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
+    @required_acl('confd.users.{user_id}.services.{service_name}.read')
+    def get(self, user_id, service_name):
         if service_name not in services_attributes:
             raise errors.not_found('Service', service=service_name)
 
-        user = self.service.get_by(uuid=str(uuid))
+        user = self.get_user(user_id)
         return {'enabled': getattr(user, services_attributes[service_name])}
 
-    @required_acl('confd.users.{uuid}.services.{service_name}.update')
-    def put(self, uuid, service_name):
-        user = self.service.get_by(uuid=str(uuid))
+    @required_acl('confd.users.{user_id}.services.{service_name}.update')
+    def put(self, user_id, service_name):
+        user = self.get_user(user_id)
         setattr(user, services_attributes[service_name], self.parser.parse_args()['enabled'])
         self.service.edit(user)
         return '', 204
@@ -220,10 +226,16 @@ class UserServiceItem(ConfdResource):
 
 class UserServiceList(ConfdResource):
 
-    def __init__(self, service):
+    def __init__(self, service, user_dao):
         self.service = service
+        self.user_dao = user_dao
 
-    @required_acl('confd.users.{uuid}.services.read')
-    def get(self, uuid):
-        user = self.service.get_by(uuid=str(uuid))
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
+    @required_acl('confd.users.{user_id}.services.read')
+    def get(self, user_id):
+        user = self.get_user(user_id)
         return {key: {'enabled': getattr(user, value)} for key, value in services_attributes.iteritems()}
