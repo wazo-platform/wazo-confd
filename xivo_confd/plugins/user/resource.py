@@ -216,16 +216,19 @@ class UserServiceItem(ConfdResource):
             return self.user_dao.get(user_id)
         return self.user_dao.get_by(uuid=str(user_id))
 
-    @required_acl('confd.users.{user_id}.services.{service_name}.read')
-    def get(self, user_id, service_name):
-        if service_name not in service_fields:
+    def validate_service(self, service_name):
+        if service_name not in self.fields:
             raise errors.not_found('Service', service=service_name)
 
+    @required_acl('confd.users.{user_id}.services.{service_name}.read')
+    def get(self, user_id, service_name):
+        self.validate_service(service_name)
         user = self.get_user(user_id)
         return marshal(user, self.fields[service_name])
 
     @required_acl('confd.users.{user_id}.services.{service_name}.update')
     def put(self, user_id, service_name):
+        self.validate_service(service_name)
         user = self.get_user(user_id)
         setattr(user, service_fields[service_name]['enabled'].attribute, self.parser.parse_args()['enabled'])
         self.service.edit(user)
