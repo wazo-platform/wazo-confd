@@ -30,16 +30,15 @@ VALID_SERVICES = ['dnd',
 @fixtures.user()
 def test_get_users_services(user):
     response = confd.users(user['uuid']).services.get()
-    response.assert_ok()
     for service in VALID_SERVICES:
-        assert_that(response.json, has_key(service))
+        assert_that(response.item, has_key(service))
 
 
 @fixtures.user()
 def test_get_value_for_each_user_service(user):
     for service in VALID_SERVICES:
         service_url = confd.users(user['uuid']).services(service)
-        yield _read_service, service_url
+        yield _read_service, service_url, False
 
 
 @fixtures.user()
@@ -56,12 +55,9 @@ def _update_service(service_url, value):
     _read_service(service_url, value)
 
 
-def _read_service(service_url, value=None):
+def _read_service(service_url, value):
     response = service_url.get()
-    response.assert_ok()
-    assert_that(response.json, has_key('enabled'))
-    if value:
-        assert_that(response.json, has_entry('enabled', value))
+    assert_that(response.item, has_entry('enabled', value))
 
 
 @fixtures.user()
