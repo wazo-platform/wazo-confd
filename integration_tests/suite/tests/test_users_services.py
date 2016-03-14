@@ -47,9 +47,6 @@ def test_put_value_for_each_user_service(user):
     for service in VALID_SERVICES:
         service_url = confd.users(user['uuid']).services(service)
         yield _update_service, service_url, False
-
-    for service in VALID_SERVICES:
-        service_url = confd.users(user['uuid']).services(service)
         yield _update_service, service_url, True
 
 
