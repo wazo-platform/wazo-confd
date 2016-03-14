@@ -245,3 +245,80 @@ class UserServiceList(ConfdResource):
     def get(self, user_id):
         user = self.get_user(user_id)
         return {key: {'enabled': getattr(user, value)} for key, value in services_attributes.iteritems()}
+
+
+forward_fields = {
+    'busy': {
+        'enabled': fields.Boolean(attribute='busy_enabled'),
+        'destination': fields.String(attribute='busy_destination')
+    },
+    'noanswer': {
+        'enabled': fields.Boolean(attribute='noanswer_enabled'),
+        'destination': fields.String(attribute='noanswer_destination')
+    },
+    'unconditional': {
+        'enabled': fields.Boolean(attribute='unconditional_enabled'),
+        'destination': fields.String(attribute='unconditional_destination')
+    }
+}
+
+forward_parser = reqparse.RequestParser()
+forward_parser.add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False)
+forward_parser.add_argument('destination', type=Strict(unicode), store_missing=False, nullable=False)
+
+
+class UserForwardItem(ConfdResource):
+
+    fields = forward_fields
+    parser = forward_parser
+
+    def __init__(self, service, user_dao):
+        self.service = service
+        self.user_dao = user_dao
+
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
+    def validate_forward(self, forward_name):
+        if forward_name not in self.fields:
+            raise errors.not_found('Forward', forward=forward_name)
+
+    def parse_and_update(self, model, forward_name):
+        form = self.parser.parse_args()
+        for name, value in form.iteritems():
+            setattr(model, self.fields[forward_name][name].attribute, value)
+        self.service.edit(model)
+
+    @required_acl('confd.users.{user_id}.forwards.{forward_name}.read')
+    def get(self, user_id, forward_name):
+        self.validate_forward(forward_name)
+        user = self.get_user(user_id)
+        return marshal(user, self.fields[forward_name])
+
+    @required_acl('confd.users.{user_id}.forwards.{forward_name}.update')
+    def put(self, user_id, forward_name):
+        self.validate_forward(forward_name)
+        user = self.get_user(user_id)
+        self.parse_and_update(user, forward_name)
+        return '', 204
+
+
+class UserForwardList(ConfdResource):
+
+    fields = forward_fields
+
+    def __init__(self, service, user_dao):
+        self.service = service
+        self.user_dao = user_dao
+
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.user_dao.get(user_id)
+        return self.user_dao.get_by(uuid=str(user_id))
+
+    @required_acl('confd.users.{user_id}.forwards.read')
+    def get(self, user_id):
+        user = self.get_user(user_id)
+        return marshal(user, self.fields)
