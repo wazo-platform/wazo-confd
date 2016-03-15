@@ -16,13 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import csv
-
-from cStringIO import StringIO
-from flask import make_response
-
 from xivo_dao.helpers.db_manager import Session
 
+from xivo_confd.representations.csv_ import output_csv
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.plugins.user_import import csvparse
@@ -73,21 +69,18 @@ class UserImportResource(ConfdResource):
 
 class UserExportResource(ConfdResource):
 
+    representations = {'text/csv; charset=utf-8': output_csv}
+
     @required_acl('confd.users.export.read')
     def get(self):
-        header, query = user_export_db.export_query()
-        content = self.format_csv(header, query)
-        return make_response((content,
-                              200,
-                              [('Content-Type', 'text/csv; charset=utf-8')]))
+        csv_header, users = user_export_db.export_query()
+        return {
+            'headers': csv_header,
+            'content': self._format_users(csv_header, users)
+        }
 
-    def format_csv(self, header, query):
-        content = StringIO()
-        writer = csv.writer(content)
-        writer.writerow(header)
-
-        for row in query:
-            encoded_row = tuple((v or "").encode('utf8') for v in row)
-            writer.writerow(encoded_row)
-
-        return content.getvalue()
+    def _format_users(self, header, users):
+        for user in users:
+            user_row = tuple((field or "") for field in user)
+            user_dict = dict(zip(header, user_row))
+            yield user_dict

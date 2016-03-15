@@ -20,7 +20,7 @@ import os
 import logging
 import urllib
 
-from flask import Flask, request, g
+from flask import Flask, g, request
 from flask_cors import CORS
 from sqlalchemy.exc import SQLAlchemyError
 
