@@ -29,6 +29,7 @@ from hamcrest import has_item
 from hamcrest import has_items
 
 from test_api import confd
+from test_api import confd_csv
 from test_api import fixtures
 from test_api import scenarios as s
 
@@ -45,7 +46,7 @@ def test_list_switchboards(first, second):
 
 
 def test_stats_switchboard_not_found():
-    yield s.check_resource_not_found, confd.switchboards(FAKE_ID).stats.get, 'Switchboard'
+    yield s.check_resource_not_found, confd_csv.switchboards(FAKE_ID).stats.get, 'Switchboard'
 
 
 @fixtures.switchboard_stat(time=datetime(2016, 3, 1, 11, 47, 23),
@@ -60,7 +61,7 @@ def test_stats_switchboard(stat):
                            forwarded='0',
                            waiting_time_average='00:12')
 
-    response = confd.switchboards(stat['queue_id']).stats.get()
+    response = confd_csv.switchboards(stat['queue_id']).stats.get()
 
     assert_that(response.csv(), has_item(expected))
 
@@ -73,7 +74,7 @@ def test_stats_switchboard_before_date(stat1, stat2, stat3):
                                 has_entries(date='2016-01-02')),
                       is_not(has_items(has_entries(date='2016-01-03'))))
 
-    response = confd.switchboards(stat1['queue_id']).stats.get(end_date='2016-01-02T12:00:00')
+    response = confd_csv.switchboards(stat1['queue_id']).stats.get(end_date='2016-01-02T12:00:00')
 
     assert_that(response.csv(), expected)
 
@@ -86,6 +87,6 @@ def test_stats_switchboard_after_date(stat1, stat2, stat3):
                       has_items(has_entries(date='2016-02-02'),
                                 has_entries(date='2016-02-03')))
 
-    response = confd.switchboards(stat1['queue_id']).stats.get(start_date='2016-02-01T12:00:00')
+    response = confd_csv.switchboards(stat1['queue_id']).stats.get(start_date='2016-02-01T12:00:00')
 
     assert_that(response.csv(), expected)
