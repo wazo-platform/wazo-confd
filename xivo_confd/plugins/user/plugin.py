@@ -19,8 +19,10 @@
 from xivo_confd import api
 from xivo_confd.plugins.user.service import build_service
 from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
-from xivo_confd.plugins.user.resource import UserServiceItem, UserServiceList
-from xivo_confd.plugins.user.resource import UserForwardItem, UserForwardList
+from xivo_confd.plugins.user.resource_sub import (UserServiceItem,
+                                                  UserServiceList,
+                                                  UserForwardItem,
+                                                  UserForwardList)
 
 
 class Plugin(object):
