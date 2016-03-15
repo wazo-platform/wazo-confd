@@ -32,6 +32,12 @@ class UserSubResource(ConfdResource):
             return self.service.get(user_id)
         return self.service.get_by(uuid=str(user_id))
 
+    def parse_and_update(self, model, parser_name):
+        form = self.parsers[parser_name].parse_args()
+        for name, value in form.iteritems():
+            setattr(model, name, value)
+        self.service.edit(model)
+
 
 service_fields = {
     'dnd': {
@@ -42,14 +48,22 @@ service_fields = {
     }
 }
 
-service_parser = reqparse.RequestParser()
-service_parser.add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False)
+service_parsers = {
+    'dnd':
+        (reqparse.RequestParser()
+            .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
+                          dest='dnd_enabled')),
+    'incallfilter':
+        (reqparse.RequestParser()
+            .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
+                          dest='incallfilter_enabled')),
+}
 
 
 class UserServiceItem(UserSubResource):
 
     fields = service_fields
-    parser = service_parser
+    parsers = service_parsers
 
     def validate_service(self, service_name):
         if service_name not in self.fields:
@@ -65,8 +79,7 @@ class UserServiceItem(UserSubResource):
     def put(self, user_id, service_name):
         self.validate_service(service_name)
         user = self.get_user(user_id)
-        setattr(user, service_fields[service_name]['enabled'].attribute, self.parser.parse_args()['enabled'])
-        self.service.edit(user)
+        self.parse_and_update(user, service_name)
         return '', 204
 
 
@@ -95,25 +108,36 @@ forward_fields = {
     }
 }
 
-forward_parser = reqparse.RequestParser()
-forward_parser.add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False)
-forward_parser.add_argument('destination', type=Strict(unicode), store_missing=False)
+forward_parsers = {
+    'busy':
+        (reqparse.RequestParser()
+            .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
+                          dest='busy_enabled')
+            .add_argument('destination', type=Strict(unicode), store_missing=False,
+                          dest='busy_destination')),
+    'noanswer':
+        (reqparse.RequestParser()
+            .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
+                          dest='noanswer_enabled')
+            .add_argument('destination', type=Strict(unicode), store_missing=False,
+                          dest='noanswer_destination')),
+    'unconditional':
+        (reqparse.RequestParser()
+            .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
+                          dest='unconditional_enabled')
+            .add_argument('destination', type=Strict(unicode), store_missing=False,
+                          dest='unconditional_destination'))
+}
 
 
 class UserForwardItem(UserSubResource):
 
     fields = forward_fields
-    parser = forward_parser
+    parsers = forward_parsers
 
     def validate_forward(self, forward_name):
         if forward_name not in self.fields:
             raise errors.not_found('Forward', forward=forward_name)
-
-    def parse_and_update(self, model, forward_name):
-        form = self.parser.parse_args()
-        for name, value in form.iteritems():
-            setattr(model, self.fields[forward_name][name].attribute, value)
-        self.service.edit(model)
 
     @required_acl('confd.users.{user_id}.forwards.{forward_name}.read')
     def get(self, user_id, forward_name):
