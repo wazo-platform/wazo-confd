@@ -2848,7 +2848,7 @@
                 }
             }
         },
-        "/users/{user_id}/services/{service}": {
+        "/users/{user_id}/services/{service_name}": {
             "get": {
                 "operationId": "get_user_service",
                 "summary": "Get status of service",
@@ -2878,7 +2878,7 @@
             },
             "put": {
                 "operationId": "update_user_service",
-                "summary": "Enable/disable service for a user",
+                "summary": "Enable/Disable service for a user",
                 "description": "**Required ACL:** `confd.users.{user_id}.services.{service}.update`",
                 "tags": [
                     "services",
@@ -3662,6 +3662,17 @@
             "type": "string",
             "description": "Search term for filtering a list of items. Only items with a field containing the search term will be returned."
         },
+        "service": {
+            "required": true,
+            "type": "string",
+            "enum": [
+                "dnd",
+                "incallfilter"
+            ],
+            "name": "service_name",
+            "in": "path",
+            "description": "the service name"
+        },
         "sipid": {
             "required": true,
             "type": "integer",
@@ -3703,17 +3714,6 @@
             "name": "user_uuid",
             "in": "path",
             "description": "the user's UUID"
-        },
-        "service": {
-            "required": true,
-            "type": "string",
-            "enum": [
-                "dnd",
-                "incallfilter"
-            ],
-            "name": "service",
-            "in": "path",
-            "description": "the service name"
         },
         "view": {
             "required": false,
