@@ -46,15 +46,13 @@ def test_get_for_each_user_forward(user):
 def test_put_for_each_user_forward(user):
     for forward in VALID_FORWARDS:
         forward_url = confd.users(user['uuid']).forwards(forward)
-        yield _update_forward, forward_url, False, ''
+        yield _update_forward, forward_url, False
         yield _update_forward, forward_url, True, '123'
 
 
-def _update_forward(forward_url, enabled, destination):
+def _update_forward(forward_url, enabled, destination=None):
     response = forward_url.put(enabled=enabled, destination=destination)
     response.assert_ok()
-    if destination == '':
-        destination = None
     _read_forward(forward_url, enabled=enabled, destination=destination)
 
 
@@ -77,6 +75,5 @@ def test_put_error(user):
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', 123
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', {}
     yield s.check_bogus_field_returns_error, forward_url, 'destination', True
-    yield s.check_bogus_field_returns_error, forward_url, 'destination', None
     yield s.check_bogus_field_returns_error, forward_url, 'destination', 123
     yield s.check_bogus_field_returns_error, forward_url, 'destination', {}

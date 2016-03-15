@@ -264,7 +264,7 @@ forward_fields = {
 
 forward_parser = reqparse.RequestParser()
 forward_parser.add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False)
-forward_parser.add_argument('destination', type=Strict(unicode), store_missing=False, nullable=False)
+forward_parser.add_argument('destination', type=Strict(unicode), store_missing=False)
 
 
 class UserForwardItem(UserSubResource):
