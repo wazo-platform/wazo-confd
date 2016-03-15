@@ -4417,15 +4417,15 @@
                 },
                 "call_transfer_enabled": {
                     "type": "boolean",
-                    "description": "Authorize the call transfer"
+                    "description": "Authorize call transfers"
                 },
                 "call_record_enabled": {
                     "type": "boolean",
-                    "description": "Record all call from this user"
+                    "description": "Record all calls made by this user"
                 },
                 "online_call_record_enabled": {
                     "type": "boolean",
-                    "description": "Allow user to record call by pressing *3"
+                    "description": "Allow user to record a call by pressing *3"
                 },
                 "caller_id": {
                     "type": "string",
@@ -4467,7 +4467,7 @@
                 },
                 "supervision_enabled": {
                     "type": "boolean",
-                    "description": "Activate the presence sharing in xivo client"
+                    "description": "Activate presence sharing in the xivo client"
                 },
                 "preprocess_subroutine": {
                     "type": "string",
