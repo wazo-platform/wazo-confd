@@ -37,7 +37,7 @@ class Device(object):
     @property
     def config(self):
         if self._config is None:
-            raise Exception("Provd Device has no config associated. The device may be corruput")
+            raise Exception("Provd Device has no config associated. The device may be corrupt")
         return self._config
 
     @config.setter

@@ -86,22 +86,23 @@ class DeviceDao(object):
 
     def delete(self, device):
         self.devices.remove(device.id)
-        self._remove_config(device)
+        self._remove_config(device._config)
 
     def reset_autoprov(self, device):
-        self._remove_config(device)
+        old_config = device._config
         autoprov_id = self.configs.autocreate()
         autoprov_config = self.configs.get(autoprov_id)
         device.reset_autoprov(autoprov_config)
         self.edit(device)
+        self._remove_config(old_config)
 
-    def _remove_config(self, device):
+    def _remove_config(self, config):
         try:
-            if device._config is not None:
-                self.configs.remove(device.config['id'])
+            if config is not None:
+                self.configs.remove(config['id'])
         except NotFoundError:
             pass
-        logger.debug("removed config %s", device.config['id'])
+        logger.debug("removed config %s", config['id'])
 
     def synchronize(self, device):
         self.devices.synchronize(device.id)
