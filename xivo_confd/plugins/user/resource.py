@@ -189,6 +189,17 @@ class UserUuidItem(ItemResource):
         return '', 204
 
 
+class UserSubResource(ConfdResource):
+
+    def __init__(self, service):
+        self.service = service
+
+    def get_user(self, user_id):
+        if isinstance(user_id, int):
+            return self.service.get(user_id)
+        return self.service.get_by(uuid=str(user_id))
+
+
 service_fields = {
     'dnd': {
         'enabled': fields.Boolean(attribute='dnd_enabled'),
@@ -202,19 +213,10 @@ service_parser = reqparse.RequestParser()
 service_parser.add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False)
 
 
-class UserServiceItem(ConfdResource):
+class UserServiceItem(UserSubResource):
 
     fields = service_fields
     parser = service_parser
-
-    def __init__(self, service, user_dao):
-        self.service = service
-        self.user_dao = user_dao
-
-    def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.user_dao.get(user_id)
-        return self.user_dao.get_by(uuid=str(user_id))
 
     def validate_service(self, service_name):
         if service_name not in self.fields:
@@ -235,18 +237,9 @@ class UserServiceItem(ConfdResource):
         return '', 204
 
 
-class UserServiceList(ConfdResource):
+class UserServiceList(UserSubResource):
 
     fields = service_fields
-
-    def __init__(self, service, user_dao):
-        self.service = service
-        self.user_dao = user_dao
-
-    def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.user_dao.get(user_id)
-        return self.user_dao.get_by(uuid=str(user_id))
 
     @required_acl('confd.users.{user_id}.services.read')
     def get(self, user_id):
@@ -274,19 +267,10 @@ forward_parser.add_argument('enabled', type=Strict(bool), store_missing=False, n
 forward_parser.add_argument('destination', type=Strict(unicode), store_missing=False, nullable=False)
 
 
-class UserForwardItem(ConfdResource):
+class UserForwardItem(UserSubResource):
 
     fields = forward_fields
     parser = forward_parser
-
-    def __init__(self, service, user_dao):
-        self.service = service
-        self.user_dao = user_dao
-
-    def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.user_dao.get(user_id)
-        return self.user_dao.get_by(uuid=str(user_id))
 
     def validate_forward(self, forward_name):
         if forward_name not in self.fields:
@@ -312,18 +296,9 @@ class UserForwardItem(ConfdResource):
         return '', 204
 
 
-class UserForwardList(ConfdResource):
+class UserForwardList(UserSubResource):
 
     fields = forward_fields
-
-    def __init__(self, service, user_dao):
-        self.service = service
-        self.user_dao = user_dao
-
-    def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.user_dao.get(user_id)
-        return self.user_dao.get_by(uuid=str(user_id))
 
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):

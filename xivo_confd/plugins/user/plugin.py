@@ -21,7 +21,6 @@ from xivo_confd.plugins.user.service import build_service
 from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
 from xivo_confd.plugins.user.resource import UserServiceItem, UserServiceList
 from xivo_confd.plugins.user.resource import UserForwardItem, UserForwardList
-from xivo_dao.resources.user import dao as user_dao
 
 
 class Plugin(object):
@@ -50,23 +49,23 @@ class Plugin(object):
         api.add_resource(UserServiceItem,
                          '/users/<uuid:user_id>/services/<service_name>',
                          '/users/<int:user_id>/services/<service_name>',
-                         resource_class_args=(service, user_dao)
+                         resource_class_args=(service,)
                          )
 
         api.add_resource(UserServiceList,
                          '/users/<uuid:user_id>/services',
                          '/users/<int:user_id>/services',
-                         resource_class_args=(service, user_dao)
+                         resource_class_args=(service,)
                          )
 
         api.add_resource(UserForwardItem,
                          '/users/<uuid:user_id>/forwards/<forward_name>',
                          '/users/<int:user_id>/forwards/<forward_name>',
-                         resource_class_args=(service, user_dao)
+                         resource_class_args=(service,)
                          )
 
         api.add_resource(UserForwardList,
                          '/users/<uuid:user_id>/forwards',
                          '/users/<int:user_id>/forwards',
-                         resource_class_args=(service, user_dao)
+                         resource_class_args=(service,)
                          )
