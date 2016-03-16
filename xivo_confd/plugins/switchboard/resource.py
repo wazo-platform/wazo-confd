@@ -15,11 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import csv
-
-from cStringIO import StringIO
-from flask import make_response
 from flask_restful import fields, marshal, reqparse
+from xivo_confd.representations.csv_ import output_csv
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.helpers.restful import DateTimeLocalZone
@@ -59,6 +56,8 @@ class SwitchboardStats(ConfdResource):
     parser.add_argument('start_date', type=DateTimeLocalZone(), location='args')
     parser.add_argument('end_date', type=DateTimeLocalZone(), location='args')
 
+    representations = {'text/csv; charset=utf-8': output_csv}
+
     def __init__(self, service):
         self.service = service
 
@@ -66,22 +65,14 @@ class SwitchboardStats(ConfdResource):
     def get(self, id):
         args = self.parser.parse_args()
         stats = self.service.stats(id, **args)
-        content = self.format_csv(stats)
-        return make_response(content, 200, {'Content-Type': 'text/csv; charset=utf-8'})
+        return {
+            'headers': csv_header,
+            'content': self._format_fields(stats)
+        }
 
-    def format_csv(self, stats):
-        content = StringIO()
-        writer = csv.DictWriter(content, csv_header)
-        writer.writeheader()
-
-        for row in stats:
-            row = self.format_row(row)
-            writer.writerow(row)
-
-        return content.getvalue()
-
-    def format_row(self, row):
-        seconds = int(row['waiting_time_average'])
-        row['waiting_time_average'] = '{min:02}:{sec:02}'.format(min=seconds // 60, sec=seconds % 60)
-
-        return {header: str(value).encode('utf8') for header, value in row.iteritems()}
+    def _format_fields(self, stats):
+        for stat in stats:
+            stat_formatted = dict(stat)
+            seconds = int(stat['waiting_time_average'])
+            stat_formatted['waiting_time_average'] = '{min:02}:{sec:02}'.format(min=seconds // 60, sec=seconds % 60)
+            yield stat_formatted

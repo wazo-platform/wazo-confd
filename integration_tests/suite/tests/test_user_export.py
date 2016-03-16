@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from hamcrest import assert_that, has_item, has_entries
 
-from test_api import confd
+from test_api import confd_csv
 from test_api import config
 from test_api import fixtures
 from test_api import associations as a
@@ -61,7 +61,7 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
                            password="ursulepassword",
                            entity_id="1")
 
-    response = confd.users.export.get()
+    response = confd_csv.users.export.get()
     assert_that(response.csv(), has_item(expected))
 
 
@@ -84,7 +84,7 @@ def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(u
                            voicemail_ask_password="1")
 
     with a.user_voicemail(user, voicemail):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -97,7 +97,7 @@ def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fiel
                            cti_profile_enabled="1")
 
     with a.user_cti_profile(user, cti_profile):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -113,7 +113,7 @@ def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(user, l
                            sip_secret=sip['secret'])
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -126,7 +126,7 @@ def test_given_user_has_sccp_line_when_exporting_then_csv_has_line_fields(user, 
                            context=line['context'])
 
     with a.line_endpoint_sccp(line, sccp), a.user_line(user, line):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -140,7 +140,7 @@ def test_given_user_has_extension_when_exporting_then_csv_has_extension_fields(u
                            context=extension['context'])
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -154,7 +154,7 @@ def test_given_user_has_incall_when_exporting_then_csv_has_incall_fields(user, l
                            incall_context=incall['context'])
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, incall):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -173,7 +173,7 @@ def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fiel
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
             a.line_extension(line, incall1), a.line_extension(line, incall2):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
 
@@ -187,5 +187,5 @@ def test_given_user_has_multiple_call_permissions_when_exporting_then_csv_has_ca
                            call_permissions=expected_permissions)
 
     with a.user_call_permission(user, perm1), a.user_call_permission(user, perm2):
-        response = confd.users.export.get()
+        response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
