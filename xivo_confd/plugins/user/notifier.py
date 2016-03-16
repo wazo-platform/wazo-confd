@@ -79,7 +79,7 @@ class UserServiceNotifier(object):
     def edited(self, user, service_name):
         self.send_sysconfd_handlers('edit', user.id)
         service_enabled = getattr(user, '{}_enabled'.format(service_name))
-        event = EditUserServiceEvent(user.id, user.uuid, service_name, service_enabled)
+        event = EditUserServiceEvent(user.uuid, service_name, service_enabled)
         self.bus.send_bus_event(event, event.routing_key)
 
 
@@ -105,7 +105,7 @@ class UserForwardNotifier(object):
         self.send_sysconfd_handlers('edit', user.id)
         forward_enabled = getattr(user, '{}_enabled'.format(forward_name))
         forward_destination = getattr(user, '{}_destination'.format(forward_name))
-        event = EditUserForwardEvent(user.id, user.uuid, forward_name, forward_enabled, forward_destination)
+        event = EditUserForwardEvent(user.uuid, forward_name, forward_enabled, forward_destination)
         self.bus.send_bus_event(event, event.routing_key)
 
 
