@@ -16,10 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_confd.plugins.user.validator import build_validator
-from xivo_confd.plugins.user.notifier import build_notifier
+from xivo_confd.plugins.user.notifier import build_notifier, build_notifier_service, build_notifier_forward
 from xivo_confd.plugins.device.builder import build_device_updater
 
 from xivo_confd.helpers.resource import CRUDService
+from xivo_confd.helpers.validator import ValidationGroup
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.user import dao as user_dao
@@ -48,3 +49,31 @@ def build_service(provd_client):
                        build_validator(),
                        build_notifier(),
                        updater)
+
+
+class UserCallServiceService(CRUDService):
+
+    def edit(self, user, service_name):
+        self.validator.validate_edit(user)
+        self.dao.edit(user)
+        self.notifier.edited(user, service_name)
+
+
+def build_service_callservice():
+    return UserCallServiceService(user_dao,
+                                  ValidationGroup(),
+                                  build_notifier_service())
+
+
+class UserForwardService(CRUDService):
+
+    def edit(self, user, forward_name):
+        self.validator.validate_edit(user)
+        self.dao.edit(user)
+        self.notifier.edited(user, forward_name)
+
+
+def build_service_forward():
+    return UserForwardService(user_dao,
+                              ValidationGroup(),
+                              build_notifier_forward())

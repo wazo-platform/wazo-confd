@@ -36,7 +36,7 @@ class UserSubResource(ConfdResource):
         form = self.parsers[parser_name].parse_args()
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model)
+        self.service.edit(model, parser_name)
 
 
 service_fields = {

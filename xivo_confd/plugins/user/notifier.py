@@ -18,8 +18,11 @@
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.user.event import CreateUserEvent, \
-    EditUserEvent, DeleteUserEvent
+from xivo_bus.resources.user.event import (CreateUserEvent,
+                                           EditUserEvent,
+                                           DeleteUserEvent,
+                                           EditUserServiceEvent,
+                                           EditUserForwardEvent)
 
 
 class UserNotifier(object):
@@ -57,3 +60,54 @@ class UserNotifier(object):
 
 def build_notifier():
     return UserNotifier(sysconfd, bus)
+
+
+class UserServiceNotifier(object):
+
+    def __init__(self, sysconfd, bus):
+        self.sysconfd = sysconfd
+        self.bus = bus
+
+    def send_sysconfd_handlers(self, action, user_id):
+        cti_command = 'xivo[user,{},{}]'.format(action, user_id)
+        handlers = {'ctibus': [cti_command],
+                    'dird': [],
+                    'ipbx': [],
+                    'agentbus': []}
+        self.sysconfd.exec_request_handlers(handlers)
+
+    def edited(self, user, service_name):
+        self.send_sysconfd_handlers('edit', user.id)
+        service_enabled = getattr(user, '{}_enabled'.format(service_name))
+        event = EditUserServiceEvent(user.id, user.uuid, service_name, service_enabled)
+        self.bus.send_bus_event(event, event.routing_key)
+
+
+def build_notifier_service():
+    return UserServiceNotifier(sysconfd, bus)
+
+
+class UserForwardNotifier(object):
+
+    def __init__(self, sysconfd, bus):
+        self.sysconfd = sysconfd
+        self.bus = bus
+
+    def send_sysconfd_handlers(self, action, user_id):
+        cti_command = 'xivo[user,{},{}]'.format(action, user_id)
+        handlers = {'ctibus': [cti_command],
+                    'dird': [],
+                    'ipbx': [],
+                    'agentbus': []}
+        self.sysconfd.exec_request_handlers(handlers)
+
+    def edited(self, user, forward_name):
+        self.send_sysconfd_handlers('edit', user.id)
+        forward_enabled = getattr(user, '{}_enabled'.format(forward_name))
+        forward_destination = getattr(user, '{}_destination'.format(forward_name))
+        event = EditUserForwardEvent(user.id, user.uuid, forward_name, forward_enabled, forward_destination)
+        self.bus.send_bus_event(event, event.routing_key)
+
+
+def build_notifier_forward():
+    return UserForwardNotifier(sysconfd, bus)

@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_confd import api
-from xivo_confd.plugins.user.service import build_service
+from xivo_confd.plugins.user.service import build_service, build_service_callservice, build_service_forward
 from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
 from xivo_confd.plugins.user.resource_sub import (UserServiceItem,
                                                   UserServiceList,
@@ -31,6 +31,8 @@ class Plugin(object):
         provd_client = core.provd_client()
 
         service = build_service(provd_client)
+        service_callservice = build_service_callservice()
+        service_forward = build_service_forward()
 
         api.add_resource(UserItem,
                          '/users/<int:id>',
@@ -51,23 +53,23 @@ class Plugin(object):
         api.add_resource(UserServiceItem,
                          '/users/<uuid:user_id>/services/<service_name>',
                          '/users/<int:user_id>/services/<service_name>',
-                         resource_class_args=(service,)
+                         resource_class_args=(service_callservice,)
                          )
 
         api.add_resource(UserServiceList,
                          '/users/<uuid:user_id>/services',
                          '/users/<int:user_id>/services',
-                         resource_class_args=(service,)
+                         resource_class_args=(service_callservice,)
                          )
 
         api.add_resource(UserForwardItem,
                          '/users/<uuid:user_id>/forwards/<forward_name>',
                          '/users/<int:user_id>/forwards/<forward_name>',
-                         resource_class_args=(service,)
+                         resource_class_args=(service_forward,)
                          )
 
         api.add_resource(UserForwardList,
                          '/users/<uuid:user_id>/forwards',
                          '/users/<int:user_id>/forwards',
-                         resource_class_args=(service,)
+                         resource_class_args=(service_forward,)
                          )
