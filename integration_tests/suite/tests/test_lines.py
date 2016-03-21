@@ -46,6 +46,8 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, line_post, 'provisioning_code', 123456
     yield s.check_bogus_field_returns_error, line_post, 'provisioning_code', 'number'
     yield s.check_bogus_field_returns_error, line_post, 'position', 'one'
+    yield s.check_bogus_field_returns_error, line_post, 'registrar', 123
+    yield s.check_bogus_field_returns_error, line_post, 'registrar', 'invalidregistrar'
 
 
 @fixtures.line()
@@ -60,6 +62,9 @@ def test_put_errors(line, sip):
     yield s.check_bogus_field_returns_error, line_put, 'provisioning_code', None
     yield s.check_bogus_field_returns_error, line_put, 'position', 'one'
     yield s.check_bogus_field_returns_error, line_put, 'position', None
+    yield s.check_bogus_field_returns_error, line_put, 'registrar', None
+    yield s.check_bogus_field_returns_error, line_put, 'registrar', 123
+    yield s.check_bogus_field_returns_error, line_put, 'registrar', 'invalidregistrar'
 
     with a.line_endpoint_sip(line, sip):
         yield s.check_bogus_field_returns_error, line_put, 'caller_id_num', 'number'
@@ -83,6 +88,7 @@ def test_get(line):
                             'device_id': none(),
                             'caller_id_name': none(),
                             'caller_id_num': none(),
+                            'registrar': 'default',
                             'provisioning_code': has_length(6),
                             'provisioning_extension': has_length(6)}
                            )
@@ -120,6 +126,7 @@ def test_create_line_with_minimal_parameters():
                             'device_id': none(),
                             'caller_id_name': none(),
                             'caller_id_num': none(),
+                            'registrar': 'default',
                             'provisioning_code': has_length(6),
                             'provisioning_extension': has_length(6)}
                            )
@@ -130,7 +137,8 @@ def test_create_line_with_minimal_parameters():
     assert_that(response.item, expected)
 
 
-def test_create_line_with_all_parameters():
+@fixtures.registrar()
+def test_create_line_with_all_parameters(registrar):
     expected = has_entries({'context': config.CONTEXT,
                             'position': 2,
                             'device_slot': 2,
@@ -139,12 +147,14 @@ def test_create_line_with_all_parameters():
                             'device_id': none(),
                             'caller_id_name': none(),
                             'caller_id_num': none(),
+                            'registrar': registrar['id'],
                             'provisioning_code': "887865",
                             'provisioning_extension': "887865"}
                            )
 
     response = confd.lines.post(context=config.CONTEXT,
                                 position=2,
+                                registrar=registrar['id'],
                                 provisioning_code="887865")
 
     assert_that(response.item, expected)
@@ -173,16 +183,19 @@ def test_update_line_with_fake_context(line):
 
 @fixtures.line()
 @fixtures.context()
-def test_update_all_parameters_on_line(line, context):
+@fixtures.registrar()
+def test_update_all_parameters_on_line(line, context, registrar):
     url = confd.lines(line['id'])
     expected = has_entries({'context': context['name'],
                             'position': 2,
                             'caller_id_name': none(),
                             'caller_id_num': none(),
+                            'registrar': registrar['id'],
                             'provisioning_code': '243546'})
 
     response = url.put(context=context['name'],
                        position=2,
+                       registrar=registrar['id'],
                        provisioning_code='243546')
     response.assert_updated()
 
