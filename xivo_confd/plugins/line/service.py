@@ -42,9 +42,10 @@ class LineService(CRUDService):
 
 
 def build_service(provd_client):
+    device_dao = device_builder.build_dao(provd_client)
     device_updater = device_builder.build_device_updater(provd_client)
 
     return LineService(dao,
-                       build_validator(),
+                       build_validator(device_dao),
                        build_notifier(),
                        device_updater)

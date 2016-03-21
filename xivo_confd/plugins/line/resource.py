@@ -37,6 +37,7 @@ line_fields = {
     'position': fields.Integer,
     'caller_id_name': fields.String,
     'caller_id_num': fields.String,
+    'registrar': fields.String,
     'links': FieldList(Link('lines'))
 }
 
@@ -53,6 +54,7 @@ class LineList(ListResource):
     parser.add_argument('position', type=inputs.positive, store_missing=False)
     parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
+    parser.add_argument('registrar', type=Strict(unicode), store_missing=False)
 
     def build_headers(self, line):
         return {'Location': url_for('lines', id=line.id, _external=True)}
@@ -76,6 +78,7 @@ class LineItem(ItemResource):
     parser.add_argument('position', type=inputs.positive, store_missing=False, nullable=False)
     parser.add_argument('caller_id_name', type=Strict(unicode), store_missing=False)
     parser.add_argument('caller_id_num', type=DigitStr(), store_missing=False)
+    parser.add_argument('registrar', type=Strict(unicode), store_missing=False)
 
     @required_acl('confd.lines.{id}.read')
     def get(self, id):

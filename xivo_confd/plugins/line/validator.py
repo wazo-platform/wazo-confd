@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import ValidationGroup, FindResource, RequiredFields, Validator, Optional, NumberRange
+from xivo_confd.helpers.validator import ValidationGroup, FindResource, RequiredFields, Validator, Optional, NumberRange, MemberOfSequence
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.helpers import errors
@@ -41,11 +41,12 @@ class ProvCodeChanged(ProvCodeAvailable):
             super(ProvCodeChanged, self).validate(line)
 
 
-def build_validator():
+def build_validator(device_dao):
     return ValidationGroup(
         common=[
             RequiredFields('context'),
             FindResource('context', context_dao.find, 'Context'),
+
         ],
         create=[
             Optional('provisioning_code',
@@ -53,10 +54,14 @@ def build_validator():
                      ),
             Optional('position',
                      NumberRange('position', minimum=1)
-                     )
+                     ),
+            Optional('registrar',
+                     MemberOfSequence('registrar', device_dao.registrars, 'Registrar')
+                     ),
         ],
         edit=[
             ProvCodeChanged(line_dao),
             RequiredFields('provisioning_code', 'position'),
-            NumberRange('position', minimum=1)
+            NumberRange('position', minimum=1),
+            MemberOfSequence('registrar', device_dao.registrars, 'Registrar'),
         ])

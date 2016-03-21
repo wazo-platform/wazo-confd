@@ -120,3 +120,7 @@ class DeviceDao(object):
         if not registrars:
             raise errors.not_found('Registrar', id=registrar_id)
         return registrars[0]
+
+    def registrars(self):
+        registrars = self.configs.find({'X_type': 'registrar'})
+        return [r['id'] for r in registrars]
