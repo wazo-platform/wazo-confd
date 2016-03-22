@@ -44,8 +44,8 @@ class Strict(object):
 
     def __call__(self, value):
         if not isinstance(value, self.typecast):
-            name = self.typecase.__name__
-            raise ValueError("value '{}' must be a {}".format(name))
+            name = self.typecast.__name__
+            raise ValueError("value '{}' must be a {}".format(value, name))
         return value
 
 
