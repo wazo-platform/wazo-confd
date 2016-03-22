@@ -115,6 +115,7 @@ DEFAULT_CONFIG = {
         'user_import_plugin',
         'line_device_plugin',
         'switchboard_plugin',
+        'permission_plugin',
     ],
     'service_discovery': {
         'enabled': True,

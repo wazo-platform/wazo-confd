@@ -2045,6 +2045,156 @@
                 }
             }
         },
+        "/permissions": {
+            "get": {
+                "operationId": "list_permissions",
+                "summary": "List permissions",
+                "description": "**Required ACL:** `confd.permissions.read`",
+                "tags": [
+                    "permissions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    },
+                    {
+                        "$ref": "#/parameters/view"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permissions list",
+                        "schema": {
+                            "$ref": "#/definitions/PermissionItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_permission",
+                "summary": "Create permission",
+                "description": "**Required ACL:** `confd.permission.create`",
+                "tags": [
+                    "permissions"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Permission to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Permission"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Permission created",
+                        "schema": {
+                            "$ref": "#/definitions/Permission"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/permissions/{permission_id}": {
+            "get": {
+                "operationId": "get_permission",
+                "summary": "Get permission",
+                "description": "**Required ACL:** `confd.permissions.{permission_id}.read`",
+                "tags": [
+                    "permissions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/permissionid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permission",
+                        "schema": {
+                            "$ref": "#/definitions/Permission"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_permission",
+                "summary": "Update permission",
+                "description": "**Required ACL:** `confd.permissions.{permission_id}.update`",
+                "tags": [
+                    "permissions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/permissionid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Permission"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_permission",
+                "summary": "Delete permission",
+                "description": "**Required ACL:** `confd.permissions.{permission_id}.delete`\n\n. The permission will also be removed from all users, groups, incoming calls and outgoing calls.",
+                "tags": [
+                    "permissions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/permissionid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/queues/{queue_id}/members/agents": {
             "post": {
                 "operationId": "associate_agent_queue",
@@ -3642,6 +3792,13 @@
             "type": "string",
             "description": "Name of the field to use for sorting the list of items returned."
         },
+        "permissionid": {
+            "required": true,
+            "type": "integer",
+            "name": "permission_id",
+            "in": "path",
+            "description": "Permission's ID"
+        },
         "queueid": {
             "required": true,
             "name": "queue_id",
@@ -4420,6 +4577,69 @@
                     "type": "boolean"
                 }
             }
+        },
+        "Permission": {
+            "title": "Permission",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the permission"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the permission"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "The password to be able to call extensions"
+                },
+                "mode": {
+                    "type": "string",
+                    "enum": [
+                        "allow",
+                        "deny"
+                    ],
+                    "default": "deny",
+                    "description": "Determine how the permission are applied"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Disable or enable the permission"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Additional information about the permission"
+                },
+                "extensions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Extensions to apply the permission"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "PermissionItems": {
+            "title": "PermissionItems",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Permission"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
         },
         "UserService": {
             "title": "UserService",

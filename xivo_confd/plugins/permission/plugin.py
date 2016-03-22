@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
 #
@@ -16,26 +16,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import user
-import line
-import line_sip
-import extension
-import device
-import voicemail
-import user_line
-import user_voicemail
-import user_cti_profile
-import line_extension
-import line_device
-import line_endpoint_custom
-import line_endpoint_sip
-import line_endpoint_sccp
-import cti_profile
-import endpoint_sip
-import endpoint_sccp
-import endpoint_custom
-import user_import
-import call_permission
-import user_call_permission
-import switchboard
-import permission
+from xivo_confd import api
+from xivo_confd.plugins.permission.service import build_service
+from xivo_confd.plugins.permission.resource import PermissionItem, PermissionList
+
+
+class Plugin(object):
+
+    def load(self, core):
+        service = build_service()
+
+        api.add_resource(PermissionList,
+                         '/permissions',
+                         resource_class_args=(service,)
+                         )
+
+        api.add_resource(PermissionItem,
+                         '/permissions/<int:id>',
+                         endpoint='permissions',
+                         resource_class_args=(service,)
+                         )

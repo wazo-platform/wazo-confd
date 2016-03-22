@@ -95,5 +95,6 @@ enabled_plugins:
    - legacy_plugins
    - user_import_plugin
    - switchboard_plugin
+   - permission_plugin
 
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c
