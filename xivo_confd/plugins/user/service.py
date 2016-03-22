@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.plugins.user.validator import build_validator
+from xivo_confd.plugins.user.validator import build_validator, build_validator_forward
 from xivo_confd.plugins.user.notifier import build_notifier, build_notifier_service, build_notifier_forward
 from xivo_confd.plugins.device.builder import build_device_updater
 
@@ -75,5 +75,5 @@ class UserForwardService(CRUDService):
 
 def build_service_forward():
     return UserForwardService(user_dao,
-                              ValidationGroup(),
+                              build_validator_forward(),
                               build_notifier_forward())

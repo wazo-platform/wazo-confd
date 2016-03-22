@@ -15,8 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import Validator, ValidationGroup,  \
-    RequiredFields, RegexField, Optional, NumberRange, MemberOfSequence, ResourceExists, UniqueField, UniqueFieldChanged
+from xivo_confd.helpers.validator import (MemberOfSequence,
+                                          NumberRange,
+                                          Optional,
+                                          RegexField,
+                                          RequiredFields,
+                                          ResourceExists,
+                                          UniqueField,
+                                          UniqueFieldChanged,
+                                          ValidationGroup,
+                                          Validator)
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user import dao as user_dao
@@ -58,6 +66,18 @@ class NoLineAssociated(Validator):
             raise errors.resource_associated('User', 'Line', line_ids=ids)
 
 
+class NoEmptyFieldWhenEnabled(Validator):
+
+    def __init__(self, field, enabled):
+        self.field = field
+        self.enabled = enabled
+
+    def validate(self, model):
+        if getattr(model, self.enabled):
+            if getattr(model, self.field) is None:
+                raise errors.forward_destination_null()
+
+
 def build_validator():
     return ValidationGroup(
         common=[
@@ -94,5 +114,18 @@ def build_validator():
         edit=[
             Optional('email',
                      UniqueFieldChanged('email', user_dao, 'User'))
+        ]
+    )
+
+
+def build_validator_forward():
+    return ValidationGroup(
+        edit=[
+            Optional('busy_enabled',
+                     NoEmptyFieldWhenEnabled('busy_destination', 'busy_enabled')),
+            Optional('noanswer_enabled',
+                     NoEmptyFieldWhenEnabled('noanswer_destination', 'noanswer_enabled')),
+            Optional('unconditional_enabled',
+                     NoEmptyFieldWhenEnabled('unconditional_destination', 'unconditional_enabled'))
         ]
     )
