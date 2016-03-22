@@ -19,7 +19,6 @@ from flask_restful import reqparse, fields, marshal
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import Strict, ConfdResource
-from xivo_dao.helpers import errors
 
 
 class UserSubResource(ConfdResource):
@@ -27,137 +26,137 @@ class UserSubResource(ConfdResource):
     def __init__(self, service):
         self.service = service
 
+    def get(self, user_id):
+        user = self.get_user(user_id)
+        return marshal(user, self.fields)
+
+    def put(self, user_id):
+        user = self.get_user(user_id)
+        self.parse_and_update(user)
+        return '', 204
+
     def get_user(self, user_id):
         if isinstance(user_id, int):
             return self.service.get(user_id)
         return self.service.get_by(uuid=str(user_id))
 
-    def parse_and_update(self, model, parser_name):
-        form = self.parsers[parser_name].parse_args()
+    def parse_and_update(self, model):
+        form = self.parser.parse_args()
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model, parser_name)
+        self.service.edit(model, self.name)
 
 
-service_fields = {
-    'dnd': {
-        'enabled': fields.Boolean(attribute='dnd_enabled'),
-    },
-    'incallfilter': {
-        'enabled': fields.Boolean(attribute='incallfilter_enabled'),
-    }
-}
+class UserServiceDND(UserSubResource):
 
-service_parsers = {
-    'dnd':
-        (reqparse.RequestParser()
-            .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
-                          dest='dnd_enabled')),
-    'incallfilter':
-        (reqparse.RequestParser()
-            .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
-                          dest='incallfilter_enabled')),
-}
+    fields = {'enabled': fields.Boolean(attribute='dnd_enabled')}
+    parser = (reqparse.RequestParser()
+              .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
+                            dest='dnd_enabled'))
+    name = 'dnd'
+
+    @required_acl('confd.users.{user_id}.services.dnd.read')
+    def get(self, user_id):
+        return super(UserServiceDND, self).get(user_id)
+
+    @required_acl('confd.users.{user_id}.services.dnd.update')
+    def put(self, user_id):
+        return super(UserServiceDND, self).put(user_id)
 
 
-class UserServiceItem(UserSubResource):
+class UserServiceIncallFilter(UserSubResource):
 
-    fields = service_fields
-    parsers = service_parsers
+    fields = {'enabled': fields.Boolean(attribute='incallfilter_enabled')}
+    parser = (reqparse.RequestParser()
+              .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
+                            dest='incallfilter_enabled'))
+    name = 'incallfilter'
 
-    def validate_service(self, service_name):
-        if service_name not in self.fields:
-            raise errors.not_found('Service', service=service_name)
+    @required_acl('confd.users.{user_id}.services.dnd.read')
+    def get(self, user_id):
+        return super(UserServiceIncallFilter, self).get(user_id)
 
-    @required_acl('confd.users.{user_id}.services.{service_name}.read')
-    def get(self, user_id, service_name):
-        self.validate_service(service_name)
-        user = self.get_user(user_id)
-        return marshal(user, self.fields[service_name])
-
-    @required_acl('confd.users.{user_id}.services.{service_name}.update')
-    def put(self, user_id, service_name):
-        self.validate_service(service_name)
-        user = self.get_user(user_id)
-        self.parse_and_update(user, service_name)
-        return '', 204
+    @required_acl('confd.users.{user_id}.services.dnd.update')
+    def put(self, user_id):
+        return super(UserServiceIncallFilter, self).put(user_id)
 
 
 class UserServiceList(UserSubResource):
 
-    fields = service_fields
+    fields = {'dnd': UserServiceDND.fields,
+              'incallfilter': UserServiceIncallFilter.fields}
 
     @required_acl('confd.users.{user_id}.services.read')
     def get(self, user_id):
-        user = self.get_user(user_id)
-        return marshal(user, self.fields)
+        return super(UserServiceList, self).get(user_id)
 
 
-forward_fields = {
-    'busy': {
-        'enabled': fields.Boolean(attribute='busy_enabled'),
-        'destination': fields.String(attribute='busy_destination')
-    },
-    'noanswer': {
-        'enabled': fields.Boolean(attribute='noanswer_enabled'),
-        'destination': fields.String(attribute='noanswer_destination')
-    },
-    'unconditional': {
-        'enabled': fields.Boolean(attribute='unconditional_enabled'),
-        'destination': fields.String(attribute='unconditional_destination')
-    }
-}
+class UserForwardBusy(UserSubResource):
 
-forward_parsers = {
-    'busy':
-        (reqparse.RequestParser()
-            .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
-                          dest='busy_enabled')
-            .add_argument('destination', type=Strict(unicode), store_missing=False,
-                          dest='busy_destination')),
-    'noanswer':
-        (reqparse.RequestParser()
-            .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
-                          dest='noanswer_enabled')
-            .add_argument('destination', type=Strict(unicode), store_missing=False,
-                          dest='noanswer_destination')),
-    'unconditional':
-        (reqparse.RequestParser()
-            .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
-                          dest='unconditional_enabled')
-            .add_argument('destination', type=Strict(unicode), store_missing=False,
-                          dest='unconditional_destination'))
-}
+    fields = {'enabled': fields.Boolean(attribute='busy_enabled'),
+              'destination': fields.String(attribute='busy_destination')}
+    parser = (reqparse.RequestParser()
+              .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
+                            dest='busy_enabled')
+              .add_argument('destination', type=Strict(unicode), store_missing=False,
+                            dest='busy_destination'))
+    name = 'busy'
+
+    @required_acl('confd.users.{user_id}.forwards.busy.read')
+    def get(self, user_id):
+        return super(UserForwardBusy, self).get(user_id)
+
+    @required_acl('confd.users.{user_id}.forwards.busy.update')
+    def put(self, user_id):
+        return super(UserForwardBusy, self).put(user_id)
 
 
-class UserForwardItem(UserSubResource):
+class UserForwardNoAnswer(UserSubResource):
 
-    fields = forward_fields
-    parsers = forward_parsers
+    fields = {'enabled': fields.Boolean(attribute='noanswer_enabled'),
+              'destination': fields.String(attribute='noanswer_destination')}
+    parser = (reqparse.RequestParser()
+              .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
+                            dest='noanswer_enabled')
+              .add_argument('destination', type=Strict(unicode), store_missing=False,
+                            dest='noanswer_destination'))
+    name = 'noanswer'
 
-    def validate_forward(self, forward_name):
-        if forward_name not in self.fields:
-            raise errors.not_found('Forward', forward=forward_name)
+    @required_acl('confd.users.{user_id}.forwards.noanswer.read')
+    def get(self, user_id):
+        return super(UserForwardNoAnswer, self).get(user_id)
 
-    @required_acl('confd.users.{user_id}.forwards.{forward_name}.read')
-    def get(self, user_id, forward_name):
-        self.validate_forward(forward_name)
-        user = self.get_user(user_id)
-        return marshal(user, self.fields[forward_name])
+    @required_acl('confd.users.{user_id}.forwards.noanswer.update')
+    def put(self, user_id):
+        return super(UserForwardNoAnswer, self).put(user_id)
 
-    @required_acl('confd.users.{user_id}.forwards.{forward_name}.update')
-    def put(self, user_id, forward_name):
-        self.validate_forward(forward_name)
-        user = self.get_user(user_id)
-        self.parse_and_update(user, forward_name)
-        return '', 204
+
+class UserForwardUnconditional(UserSubResource):
+
+    fields = {'enabled': fields.Boolean(attribute='unconditional_enabled'),
+              'destination': fields.String(attribute='unconditional_destination')}
+    parser = (reqparse.RequestParser()
+              .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
+                            dest='unconditional_enabled')
+              .add_argument('destination', type=Strict(unicode), store_missing=False,
+                            dest='unconditional_destination'))
+    name = 'unconditional'
+
+    @required_acl('confd.users.{user_id}.forwards.unconditional.read')
+    def get(self, user_id):
+        return super(UserForwardUnconditional, self).get(user_id)
+
+    @required_acl('confd.users.{user_id}.forwards.unconditional.update')
+    def put(self, user_id):
+        return super(UserForwardUnconditional, self).put(user_id)
 
 
 class UserForwardList(UserSubResource):
 
-    fields = forward_fields
+    fields = {'busy': UserForwardBusy.fields,
+              'noanswer': UserForwardNoAnswer.fields,
+              'unconditional': UserForwardUnconditional.fields}
 
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):
-        user = self.get_user(user_id)
-        return marshal(user, self.fields)
+        return super(UserForwardList, self).get(user_id)

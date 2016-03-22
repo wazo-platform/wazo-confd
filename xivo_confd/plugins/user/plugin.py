@@ -19,9 +19,12 @@
 from xivo_confd import api
 from xivo_confd.plugins.user.service import build_service, build_service_callservice, build_service_forward
 from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
-from xivo_confd.plugins.user.resource_sub import (UserServiceItem,
+from xivo_confd.plugins.user.resource_sub import (UserServiceDND,
+                                                  UserServiceIncallFilter,
                                                   UserServiceList,
-                                                  UserForwardItem,
+                                                  UserForwardBusy,
+                                                  UserForwardNoAnswer,
+                                                  UserForwardUnconditional,
                                                   UserForwardList)
 
 
@@ -50,9 +53,15 @@ class Plugin(object):
                          resource_class_args=(service,)
                          )
 
-        api.add_resource(UserServiceItem,
-                         '/users/<uuid:user_id>/services/<service_name>',
-                         '/users/<int:user_id>/services/<service_name>',
+        api.add_resource(UserServiceDND,
+                         '/users/<uuid:user_id>/services/dnd',
+                         '/users/<int:user_id>/services/dnd',
+                         resource_class_args=(service_callservice,)
+                         )
+
+        api.add_resource(UserServiceIncallFilter,
+                         '/users/<uuid:user_id>/services/incallfilter',
+                         '/users/<int:user_id>/services/incallfilter',
                          resource_class_args=(service_callservice,)
                          )
 
@@ -62,9 +71,21 @@ class Plugin(object):
                          resource_class_args=(service_callservice,)
                          )
 
-        api.add_resource(UserForwardItem,
-                         '/users/<uuid:user_id>/forwards/<forward_name>',
-                         '/users/<int:user_id>/forwards/<forward_name>',
+        api.add_resource(UserForwardBusy,
+                         '/users/<uuid:user_id>/forwards/busy',
+                         '/users/<int:user_id>/forwards/busy',
+                         resource_class_args=(service_forward,)
+                         )
+
+        api.add_resource(UserForwardNoAnswer,
+                         '/users/<uuid:user_id>/forwards/noanswer',
+                         '/users/<int:user_id>/forwards/noanswer',
+                         resource_class_args=(service_forward,)
+                         )
+
+        api.add_resource(UserForwardUnconditional,
+                         '/users/<uuid:user_id>/forwards/unconditional',
+                         '/users/<int:user_id>/forwards/unconditional',
                          resource_class_args=(service_forward,)
                          )
 

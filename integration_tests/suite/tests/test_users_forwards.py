@@ -62,13 +62,6 @@ def _read_forward(forward_url, enabled, destination=None):
 
 
 @fixtures.user()
-def test_error_on_wrong_forward(user):
-    forward_url = confd.users(user['uuid']).forwards('toto')
-    yield s.check_resource_not_found, forward_url.get, 'Forward'
-    yield s.check_resource_not_found, forward_url.put, 'Forward'
-
-
-@fixtures.user()
 def test_error_on_null_destination_when_enabled(user):
     for forward in VALID_FORWARDS:
         response = confd.users(user['uuid']).forwards(forward).put(enabled=True, destination=None)
