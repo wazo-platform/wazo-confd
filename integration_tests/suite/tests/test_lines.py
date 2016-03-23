@@ -222,6 +222,13 @@ def test_when_updating_line_then_values_are_not_overwriten_with_defaults(line):
 
 
 @fixtures.line()
+def test_when_line_has_no_endpoint_then_caller_id_can_be_set_to_null(line):
+    response = confd.lines(line['id']).put(caller_id_name=None,
+                                           caller_id_num=None)
+    response.assert_updated()
+
+
+@fixtures.line()
 def test_delete_line(line):
     response = confd.lines(line['id']).delete()
     response.assert_deleted()
