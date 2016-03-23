@@ -2422,6 +2422,88 @@
                 }
             }
         },
+        "/users/{user_id}/forwards": {
+            "get": {
+                "operationId": "list_user_forwards",
+                "summary": "List forwards for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.forwards.read`",
+                "tags": [
+                    "forwards",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/UserForwards"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/forwards/{forward_name}": {
+            "get": {
+                "operationId": "get_user_forward",
+                "summary": "Get forward for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.forward.{forward_name}.read`",
+                "tags": [
+                    "forwards",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "$ref": "#/parameters/forward"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/UserForward"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_user_forward",
+                "summary": "Update a forward for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.forwards.{forward_name}.update`",
+                "tags": [
+                    "forwards",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "$ref": "#/parameters/forward"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserForward"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    }
+                }
+            }
+        },
         "/users/{user_id}/funckeys": {
             "get": {
                 "operationId": "list_user_func_keys",
@@ -2766,7 +2848,7 @@
                 }
             }
         },
-        "/users/{user_id}/services/{service}": {
+        "/users/{user_id}/services/{service_name}": {
             "get": {
                 "operationId": "get_user_service",
                 "summary": "Get status of service",
@@ -2796,7 +2878,7 @@
             },
             "put": {
                 "operationId": "update_user_service",
-                "summary": "Enable/disable service for a user",
+                "summary": "Enable/Disable service for a user",
                 "description": "**Required ACL:** `confd.users.{user_id}.services.{service}.update`",
                 "tags": [
                     "services",
@@ -3514,6 +3596,18 @@
             "name": "extension_id",
             "in": "path"
         },
+        "forward": {
+            "required": true,
+            "type": "string",
+            "enum": [
+                "busy",
+                "noanswer",
+                "unconditional"
+            ],
+            "name": "forward_name",
+            "in": "path",
+            "description": "the forward name"
+        },
         "funckeyposition": {
             "required": true,
             "type": "integer",
@@ -3568,6 +3662,17 @@
             "type": "string",
             "description": "Search term for filtering a list of items. Only items with a field containing the search term will be returned."
         },
+        "service": {
+            "required": true,
+            "type": "string",
+            "enum": [
+                "dnd",
+                "incallfilter"
+            ],
+            "name": "service_name",
+            "in": "path",
+            "description": "the service name"
+        },
         "sipid": {
             "required": true,
             "type": "integer",
@@ -3609,17 +3714,6 @@
             "name": "user_uuid",
             "in": "path",
             "description": "the user's UUID"
-        },
-        "service": {
-            "required": true,
-            "type": "string",
-            "enum": [
-                "dnd",
-                "incallfilter"
-            ],
-            "name": "service",
-            "in": "path",
-            "description": "the service name"
         },
         "view": {
             "required": false,
@@ -4720,6 +4814,31 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "UserForward": {
+            "title": "UserForward",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "destination": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserForwards": {
+            "title": "UserForwards",
+            "properties": {
+                "busy": {
+                    "$ref": "#/definitions/UserForward"
+                },
+                "noanswer": {
+                    "$ref": "#/definitions/UserForward"
+                },
+                "inconditional": {
+                    "$ref": "#/definitions/UserForward"
                 }
             }
         },

@@ -61,12 +61,6 @@ def _read_service(service_url, value):
 
 
 @fixtures.user()
-def test_error_on_wrong_service(user):
-    service_url = confd.users(user['uuid']).services('toto')
-    yield s.check_resource_not_found, service_url.get, 'Service'
-
-
-@fixtures.user()
 def test_put_error(user):
     service_url = confd.users(user['uuid']).services('dnd').put
     yield s.check_bogus_field_returns_error, service_url, 'enabled', 'string'
