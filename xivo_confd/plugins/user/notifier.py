@@ -68,16 +68,7 @@ class UserServiceNotifier(object):
         self.sysconfd = sysconfd
         self.bus = bus
 
-    def send_sysconfd_handlers(self, action, user_id):
-        cti_command = 'xivo[user,{},{}]'.format(action, user_id)
-        handlers = {'ctibus': [cti_command],
-                    'dird': [],
-                    'ipbx': [],
-                    'agentbus': []}
-        self.sysconfd.exec_request_handlers(handlers)
-
     def edited(self, user, service_name):
-        self.send_sysconfd_handlers('edit', user.id)
         service_enabled = getattr(user, '{}_enabled'.format(service_name))
         event = EditUserServiceEvent(user.uuid, service_name, service_enabled)
         self.bus.send_bus_event(event, event.routing_key)
