@@ -114,7 +114,7 @@ class registrar(IsolatedAction):
                'delete': h.device.delete_registrar}
 
 
-class permission(IsolatedAction):
+class call_permission(IsolatedAction):
 
-    actions = {'generate': h.permission.generate_permission,
-               'delete': h.permission.delete_permission}
+    actions = {'generate': h.call_permission.generate_call_permission,
+               'delete': h.call_permission.delete_call_permission}

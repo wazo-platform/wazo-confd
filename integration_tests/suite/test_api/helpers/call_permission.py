@@ -22,19 +22,19 @@ import random
 from test_api import confd
 
 
-def generate_permission(**params):
+def generate_call_permission(**params):
     name = generate_name()
     params.setdefault('name', name)
-    return add_permission(**params)
+    return add_call_permission(**params)
 
 
-def add_permission(**params):
+def add_call_permission(**params):
     response = confd.callpermissions.post(params)
     return response.item
 
 
-def delete_permission(permission_id, check=False):
-    response = confd.callpermissions(permission_id).delete()
+def delete_call_permission(call_permission_id, check=False):
+    response = confd.callpermissions(call_permission_id).delete()
     if check:
         response.assert_ok()
 

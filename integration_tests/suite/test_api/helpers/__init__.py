@@ -37,4 +37,4 @@ import endpoint_custom
 import user_import
 import user_call_permission
 import switchboard
-import permission
+import call_permission
