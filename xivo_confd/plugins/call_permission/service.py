@@ -15,26 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.plugins.permission.validator import build_validator
-from xivo_confd.plugins.permission.notifier import build_notifier
+from xivo_confd.plugins.call_permission.validator import build_validator
+from xivo_confd.plugins.call_permission.notifier import build_notifier
 
 from xivo_confd.helpers.resource import CRUDService
 
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.resources.permission import dao as permission_dao
+from xivo_dao.resources.call_permission import dao as call_permission_dao
 
 
 # TODO: Put no_autoflush in the CRUDService
-class PermissionService(CRUDService):
+class CallPermissionService(CRUDService):
 
-    def edit(self, permission):
+    def edit(self, call_permission):
         with Session.no_autoflush:
-            self.validator.validate_edit(permission)
-        self.dao.edit(permission)
-        self.notifier.edited(permission)
+            self.validator.validate_edit(call_permission)
+        self.dao.edit(call_permission)
+        self.notifier.edited(call_permission)
 
 
 def build_service():
-    return PermissionService(permission_dao,
-                             build_validator(),
-                             build_notifier())
+    return CallPermissionService(call_permission_dao,
+                                 build_validator(),
+                                 build_notifier())

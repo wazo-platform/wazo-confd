@@ -22,7 +22,7 @@ from xivo_confd.helpers.validator import (Optional,
                                           UniqueField,
                                           UniqueFieldChanged,
                                           ValidationGroup)
-from xivo_dao.resources.permission import dao as permission_dao
+from xivo_dao.resources.call_permission import dao as call_permission_dao
 
 
 NAME_REGEX = r"^[a-z0-9_-]{1,128}$"
@@ -44,11 +44,11 @@ def build_validator():
             RequiredFields('name'),
             Optional('name',
                      UniqueField('name',
-                                 lambda name: permission_dao.find_by(name=name),
-                                 'Permission'))
+                                 lambda name: call_permission_dao.find_by(name=name),
+                                 'CallPermission'))
         ],
         edit=[
             Optional('name',
-                     UniqueFieldChanged('name', permission_dao, 'Permission'))
+                     UniqueFieldChanged('name', call_permission_dao, 'CallPermission'))
         ]
     )

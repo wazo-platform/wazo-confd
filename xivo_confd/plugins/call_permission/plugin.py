@@ -17,8 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_confd import api
-from xivo_confd.plugins.permission.service import build_service
-from xivo_confd.plugins.permission.resource import PermissionItem, PermissionList
+from xivo_confd.plugins.call_permission.service import build_service
+from xivo_confd.plugins.call_permission.resource import CallPermissionItem, CallPermissionList
 
 
 class Plugin(object):
@@ -26,13 +26,13 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(PermissionList,
-                         '/permissions',
+        api.add_resource(CallPermissionList,
+                         '/callpermissions',
                          resource_class_args=(service,)
                          )
 
-        api.add_resource(PermissionItem,
-                         '/permissions/<int:id>',
-                         endpoint='permissions',
+        api.add_resource(CallPermissionItem,
+                         '/callpermissions/<int:id>',
+                         endpoint='callpermissions',
                          resource_class_args=(service,)
                          )

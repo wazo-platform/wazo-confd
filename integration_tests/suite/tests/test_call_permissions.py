@@ -29,19 +29,19 @@ from hamcrest import (assert_that,
 
 
 def test_get_errors():
-    fake_get = confd.permissions(999999).get
-    yield s.check_resource_not_found, fake_get, 'Permission'
+    fake_get = confd.callpermissions(999999).get
+    yield s.check_resource_not_found, fake_get, 'CallPermission'
 
 
 def test_post_errors():
-    url = confd.permissions.post
+    url = confd.callpermissions.post
     for check in error_checks(url):
         yield check
 
 
 @fixtures.permission()
-def test_put_errors(permission):
-    url = confd.permissions(permission['id']).put
+def test_put_errors(call_permission):
+    url = confd.callpermissions(call_permission['id']).put
     for check in error_checks(url):
         yield check
 
@@ -76,50 +76,50 @@ def error_checks(url):
                      description="HiddenDesc",
                      mode='allow',
                      enabled=False)
-def test_search_on_permission(permission, hidden):
-    url = confd.permissions
+def test_search_on_call_permission(call_permission, hidden):
+    url = confd.callpermissions
     searches = {'name': 'search',
                 'description': 'Search',
                 'mode': 'deny',
                 'enabled': True}
 
     for field, term in searches.items():
-        yield check_search, url, permission, hidden, field, term
+        yield check_search, url, call_permission, hidden, field, term
 
 
 @fixtures.permission(name="sort1",
                      description="Sort 1")
 @fixtures.permission(name="sort2",
                      description="Sort 2")
-def test_permission_sorting(permission1, permission2):
-    yield check_permission_sorting, permission1, permission2, 'name', 'sort'
-    yield check_permission_sorting, permission1, permission2, 'description', 'Sort'
+def test_call_permission_sorting(call_permission1, call_permission2):
+    yield check_call_permission_sorting, call_permission1, call_permission2, 'name', 'sort'
+    yield check_call_permission_sorting, call_permission1, call_permission2, 'description', 'Sort'
 
 
-def check_permission_sorting(permission1, permission2, field, search):
-    response = confd.permissions.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=permission1['id']),
-                                         has_entries(id=permission2['id'])))
+def check_call_permission_sorting(call_permission1, call_permission2, field, search):
+    response = confd.callpermissions.get(search=search, order=field, direction='asc')
+    assert_that(response.items, contains(has_entries(id=call_permission1['id']),
+                                         has_entries(id=call_permission2['id'])))
 
-    response = confd.permissions.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=permission2['id']),
-                                         has_entries(id=permission1['id'])))
+    response = confd.callpermissions.get(search=search, order=field, direction='desc')
+    assert_that(response.items, contains(has_entries(id=call_permission2['id']),
+                                         has_entries(id=call_permission1['id'])))
 
 
-def check_search(url, permission, hidden, field, term):
+def check_search(url, call_permission, hidden, field, term):
     response = url.get(search=term)
 
-    expected_permission = has_item(has_entry(field, permission[field]))
-    hidden_permission = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_permission)
-    assert_that(response.items, hidden_permission)
+    expected_call_permission = has_item(has_entry(field, call_permission[field]))
+    hidden_call_permission = is_not(has_item(has_entry(field, hidden[field])))
+    assert_that(response.items, expected_call_permission)
+    assert_that(response.items, hidden_call_permission)
 
-    response = url.get(**{field: permission[field]})
+    response = url.get(**{field: call_permission[field]})
 
-    expected_permission = has_item(has_entry('id', permission['id']))
-    hidden_permission = is_not(has_item(has_entry('id', hidden['id'])))
-    assert_that(response.items, expected_permission)
-    assert_that(response.items, hidden_permission)
+    expected_call_permission = has_item(has_entry('id', call_permission['id']))
+    hidden_call_permission = is_not(has_item(has_entry('id', hidden['id'])))
+    assert_that(response.items, expected_call_permission)
+    assert_that(response.items, hidden_call_permission)
 
 
 @fixtures.permission(name="search",
@@ -128,8 +128,8 @@ def check_search(url, permission, hidden, field, term):
                      mode='deny',
                      enabled=True,
                      extensions=['123', '456'])
-def test_get(permission):
-    response = confd.permissions(permission['id']).get()
+def test_get(call_permission):
+    response = confd.callpermissions(call_permission['id']).get()
     assert_that(response.item, has_entries(name='search',
                                            password='123',
                                            description='SearchDesc',
@@ -138,9 +138,9 @@ def test_get(permission):
                                            extensions=['123', '456']))
 
 
-def test_create_permission_minimal_parameters():
-    response = confd.permissions.post(name='minimal')
-    response.assert_created('permissions')
+def test_create_call_permission_minimal_parameters():
+    response = confd.callpermissions.post(name='minimal')
+    response.assert_created('callpermissions')
 
     assert_that(response.item, has_entries(name='minimal',
                                            password=None,
@@ -150,7 +150,7 @@ def test_create_permission_minimal_parameters():
                                            extensions=[]))
 
 
-def test_create_permission_all_parameters():
+def test_create_call_permission_all_parameters():
     parameters = {'name': 'allparameter',
                   'password': '1234',
                   'description': 'Create description',
@@ -158,35 +158,35 @@ def test_create_permission_all_parameters():
                   'enabled': False,
                   'extensions': ['123', '*456', '963']}
 
-    response = confd.permissions.post(**parameters)
-    response.assert_created('permissions')
+    response = confd.callpermissions.post(**parameters)
+    response.assert_created('callpermissions')
     assert_that(response.item, has_entries(parameters))
 
 
 @fixtures.permission()
-def test_create_2_permissions_with_same_name(permission):
-    response = confd.permissions.post(name=permission['name'])
-    response.assert_match(400, e.resource_exists('Permission'))
+def test_create_2_call_permissions_with_same_name(call_permission):
+    response = confd.callpermissions.post(name=call_permission['name'])
+    response.assert_match(400, e.resource_exists('CallPermission'))
 
 
 @fixtures.permission()
-def test_create_permissions_with_invalid_mode(permission):
-    response = confd.permissions.post(name=permission['name'], mode='invalidmode')
+def test_create_call_permissions_with_invalid_mode(call_permission):
+    response = confd.callpermissions.post(name=call_permission['name'], mode='invalidmode')
     response.assert_status(400)
 
 
-def test_create_permissions_with_duplicate_extensions():
+def test_create_call_permissions_with_duplicate_extensions():
     parameters = {'name': 'duplicate_perm',
                   'extensions': ['123', '123', '456']}
 
-    response = confd.permissions.post(**parameters)
-    response.assert_created('permissions')
+    response = confd.callpermissions.post(**parameters)
+    response.assert_created('callpermissions')
     assert_that(response.item, has_entries(name=parameters['name'],
                                            extensions=['123', '456']))
 
 
 @fixtures.permission(name='name1', extension=['123'])
-def test_edit_permission_all_parameters(permission):
+def test_edit_call_permission_all_parameters(call_permission):
     parameters = {'name': 'second',
                   'password': '1234',
                   'description': 'Create description',
@@ -194,21 +194,21 @@ def test_edit_permission_all_parameters(permission):
                   'enabled': False,
                   'extensions': ['123', '*456', '963']}
 
-    response = confd.permissions(permission['id']).put(**parameters)
+    response = confd.callpermissions(call_permission['id']).put(**parameters)
     response.assert_updated()
 
-    response = confd.permissions(permission['id']).get()
+    response = confd.callpermissions(call_permission['id']).get()
     assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.permission(name='permission1')
-@fixtures.permission(name='permission2')
-def test_edit_permission_with_same_name(first_permission, second_permission):
-    response = confd.permissions(first_permission['id']).put(name=second_permission['name'])
-    response.assert_match(400, e.resource_exists('Permission'))
+@fixtures.permission(name='call_permission1')
+@fixtures.permission(name='call_permission2')
+def test_edit_call_permission_with_same_name(first_call_permission, second_call_permission):
+    response = confd.callpermissions(first_call_permission['id']).put(name=second_call_permission['name'])
+    response.assert_match(400, e.resource_exists('CallPermission'))
 
 
 @fixtures.permission()
-def test_delete_permission(permission):
-    response = confd.permissions(permission['id']).delete()
+def test_delete_call_permission(call_permission):
+    response = confd.callpermissions(call_permission['id']).delete()
     response.assert_deleted()

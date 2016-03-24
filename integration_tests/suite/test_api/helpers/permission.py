@@ -29,18 +29,18 @@ def generate_permission(**params):
 
 
 def add_permission(**params):
-    response = confd.permissions.post(params)
+    response = confd.callpermissions.post(params)
     return response.item
 
 
 def delete_permission(permission_id, check=False):
-    response = confd.permissions(permission_id).delete()
+    response = confd.callpermissions(permission_id).delete()
     if check:
         response.assert_ok()
 
 
 def generate_name():
-    response = confd.permissions.get()
+    response = confd.callpermissions.get()
     names = set(d['name'] for d in response.items)
     return _random_name(names)
 

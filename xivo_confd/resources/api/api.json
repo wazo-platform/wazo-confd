@@ -2045,13 +2045,13 @@
                 }
             }
         },
-        "/permissions": {
+        "/callpermissions": {
             "get": {
-                "operationId": "list_permissions",
-                "summary": "List permissions",
-                "description": "**Required ACL:** `confd.permissions.read`",
+                "operationId": "list_callpermissions",
+                "summary": "List call permissions",
+                "description": "**Required ACL:** `confd.callpermissions.read`",
                 "tags": [
-                    "permissions"
+                    "callpermissions"
                 ],
                 "parameters": [
                     {
@@ -2083,11 +2083,11 @@
                 }
             },
             "post": {
-                "operationId": "create_permission",
-                "summary": "Create permission",
-                "description": "**Required ACL:** `confd.permission.create`",
+                "operationId": "create_callpermission",
+                "summary": "Create call permission",
+                "description": "**Required ACL:** `confd.callpermission.create`",
                 "tags": [
-                    "permissions"
+                    "callpermissions"
                 ],
                 "parameters": [
                     {
@@ -2113,17 +2113,17 @@
                 }
             }
         },
-        "/permissions/{permission_id}": {
+        "/callpermissions/{callpermission_id}": {
             "get": {
-                "operationId": "get_permission",
-                "summary": "Get permission",
-                "description": "**Required ACL:** `confd.permissions.{permission_id}.read`",
+                "operationId": "get_callpermission",
+                "summary": "Get call permission",
+                "description": "**Required ACL:** `confd.callpermissions.{callpermission_id}.read`",
                 "tags": [
-                    "permissions"
+                    "callpermissions"
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/permissionid"
+                        "$ref": "#/parameters/callpermissionid"
                     }
                 ],
                 "responses": {
@@ -2139,15 +2139,15 @@
                 }
             },
             "put": {
-                "operationId": "update_permission",
-                "summary": "Update permission",
-                "description": "**Required ACL:** `confd.permissions.{permission_id}.update`",
+                "operationId": "update_callpermission",
+                "summary": "Update call permission",
+                "description": "**Required ACL:** `confd.callpermissions.{callpermission_id}.update`",
                 "tags": [
-                    "permissions"
+                    "callpermissions"
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/permissionid"
+                        "$ref": "#/parameters/callpermissionid"
                     },
                     {
                         "name": "body",
@@ -2171,15 +2171,15 @@
                 }
             },
             "delete": {
-                "operationId": "delete_permission",
-                "summary": "Delete permission",
-                "description": "**Required ACL:** `confd.permissions.{permission_id}.delete`\n\n. The permission will also be removed from all users, groups, incoming calls and outgoing calls.",
+                "operationId": "delete_callpermission",
+                "summary": "Delete call permission",
+                "description": "**Required ACL:** `confd.callpermissions.{callpermission_id}.delete`\n\n. The call permission will also be removed from all users, groups, incoming calls and outgoing calls.",
                 "tags": [
-                    "permissions"
+                    "callpermissions"
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/permissionid"
+                        "$ref": "#/parameters/callpermissionid"
                     }
                 ],
                 "responses": {
@@ -3792,10 +3792,10 @@
             "type": "string",
             "description": "Name of the field to use for sorting the list of items returned."
         },
-        "permissionid": {
+        "callpermissionid": {
             "required": true,
             "type": "integer",
-            "name": "permission_id",
+            "name": "callpermission_id",
             "in": "path",
             "description": "Permission's ID"
         },
@@ -4584,11 +4584,11 @@
                 "id": {
                     "type": "integer",
                     "readOnly": true,
-                    "description": "The id of the permission"
+                    "description": "The id of the call permission"
                 },
                 "name": {
                     "type": "string",
-                    "description": "The name of the permission"
+                    "description": "The name of the call permission"
                 },
                 "password": {
                     "type": "string",
@@ -4601,23 +4601,23 @@
                         "deny"
                     ],
                     "default": "deny",
-                    "description": "Determine how the permission are applied"
+                    "description": "Determine how the call permission are applied"
                 },
                 "enabled": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Disable or enable the permission"
+                    "description": "Disable or enable the call permission"
                 },
                 "description": {
                     "type": "string",
-                    "description": "Additional information about the permission"
+                    "description": "Additional information about the call permission"
                 },
                 "extensions": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "Extensions to apply the permission"
+                    "description": "Extensions to apply the call permission"
                 }
             },
             "required": [

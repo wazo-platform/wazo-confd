@@ -58,7 +58,7 @@ setup(
             'line_device_plugin = xivo_confd.plugins.line_device.plugin:Plugin',
             'user_import_plugin = xivo_confd.plugins.user_import.plugin:Plugin',
             'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
-            'permission_plugin = xivo_confd.plugins.permission.plugin:Plugin',
+            'call_permission_plugin = xivo_confd.plugins.call_permission.plugin:Plugin',
         ]
     }
 )

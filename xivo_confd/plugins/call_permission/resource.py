@@ -20,10 +20,10 @@ from flask_restful import reqparse, fields, marshal
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, Strict
-from xivo_dao.alchemy.rightcall import RightCall as Permission
+from xivo_dao.alchemy.rightcall import RightCall as CallPermission
 
 
-permission_fields = {
+call_permission_fields = {
     'id': fields.Integer,
     'name': fields.String,
     'password': fields.String,
@@ -31,7 +31,7 @@ permission_fields = {
     'mode': fields.String,
     'enabled': fields.Boolean,
     'extensions': fields.List(fields.String),
-    'links': FieldList(Link('permissions'))
+    'links': FieldList(Link('callpermissions'))
 }
 
 parser = reqparse.RequestParser()
@@ -43,20 +43,20 @@ parser.add_argument('enabled', type=Strict(bool), store_missing=False, nullable=
 parser.add_argument('extensions', type=Strict(unicode), action='append', store_missing=False, nullable=False)
 
 
-class PermissionList(ListResource):
+class CallPermissionList(ListResource):
 
-    model = Permission
-    fields = permission_fields
+    model = CallPermission
+    fields = call_permission_fields
     parser = parser
 
-    def build_headers(self, permission):
-        return {'Location': url_for('permissions', id=permission.id, _external=True)}
+    def build_headers(self, call_permission):
+        return {'Location': url_for('callpermissions', id=call_permission.id, _external=True)}
 
-    @required_acl('confd.permissions.create')
+    @required_acl('confd.callpermissions.create')
     def post(self):
-        return super(PermissionList, self).post()
+        return super(CallPermissionList, self).post()
 
-    @required_acl('confd.permissions.read')
+    @required_acl('confd.callpermissions.read')
     def get(self):
         params = self.search_params()
         result = self.service.search(params)
@@ -65,19 +65,19 @@ class PermissionList(ListResource):
                 'items': [marshal(item, self.fields) for item in result.items]}
 
 
-class PermissionItem(ItemResource):
+class CallPermissionItem(ItemResource):
 
-    fields = permission_fields
+    fields = call_permission_fields
     parser = parser
 
-    @required_acl('confd.permissions.{id}.read')
+    @required_acl('confd.callpermissions.{id}.read')
     def get(self, id):
-        return super(PermissionItem, self).get(id)
+        return super(CallPermissionItem, self).get(id)
 
-    @required_acl('confd.permissions.{id}.update')
+    @required_acl('confd.callpermissions.{id}.update')
     def put(self, id):
-        return super(PermissionItem, self).put(id)
+        return super(CallPermissionItem, self).put(id)
 
-    @required_acl('confd.permissions.{id}.delete')
+    @required_acl('confd.callpermissions.{id}.delete')
     def delete(self, id):
-        return super(PermissionItem, self).delete(id)
+        return super(CallPermissionItem, self).delete(id)
