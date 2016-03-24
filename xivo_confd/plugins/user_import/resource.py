@@ -76,7 +76,7 @@ class UserExportResource(ConfdResource):
         csv_header, users = user_export_db.export_query()
         return {
             'headers': csv_header,
-            'content': self._format_users(csv_header, users)
+            'content': list(self._format_users(csv_header, users))
         }
 
     def _format_users(self, header, users):
