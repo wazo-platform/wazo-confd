@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,10 +46,12 @@ class TestBusContext(unittest.TestCase):
     def test_send_messages(self):
         publish_func = Mock()
         publisher = BusPublisher.from_config(CONFIG)
-        marshaler = Mock()
+        marshaler = Mock(content_type=sentinel.content_type)
         marshaler.marshal_message.return_value = sentinel.event
 
         publisher.send_bus_event(sentinel.unmarshaled_event, sentinel.routing_key)
         publisher.send_messages(marshaler, publish_func)
 
-        publish_func.assert_called_once_with(sentinel.event, routing_key=sentinel.routing_key)
+        publish_func.assert_called_once_with(sentinel.event,
+                                             routing_key=sentinel.routing_key,
+                                             content_type=sentinel.content_type)
