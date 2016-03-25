@@ -42,7 +42,7 @@ class BusPublisher(object):
     def send_messages(self, marshaler, publish):
         for event, routing_key in self.messages:
             message = marshaler.marshal_message(event)
-            publish(message, routing_key=routing_key)
+            publish(message, content_type=marshaler.content_type, routing_key=routing_key)
 
     def publish_error(self, exc, interval):
         logger.error('Error: %s', exc, exc_info=1)
