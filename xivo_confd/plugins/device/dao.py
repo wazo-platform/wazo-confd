@@ -115,4 +115,12 @@ class DeviceDao(object):
         return [t['id'] for t in templates]
 
     def get_registrar(self, registrar_id):
-        return self.configs.get(registrar_id)
+        registrars = self.configs.find({'X_type': 'registrar',
+                                        'id': registrar_id})
+        if not registrars:
+            raise errors.not_found('Registrar', id=registrar_id)
+        return registrars[0]
+
+    def registrars(self):
+        registrars = self.configs.find({'X_type': 'registrar'})
+        return [r['id'] for r in registrars]

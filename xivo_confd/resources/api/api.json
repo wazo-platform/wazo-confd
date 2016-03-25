@@ -4171,6 +4171,14 @@
                     "type": "string",
                     "description": "The name of an internal context"
                 },
+                "caller_id_name": {
+                    "type": "string",
+                    "description": "Name to display when calling"
+                },
+                "caller_id_num": {
+                    "type": "string",
+                    "description": "Number to display when calling"
+                },
                 "device_id": {
                     "type": "string",
                     "description": "ID of the device associated to the line"
@@ -4203,13 +4211,9 @@
                     "type": "integer",
                     "description": "Line's position on the device"
                 },
-                "caller_id_name": {
+                "registrar": {
                     "type": "string",
-                    "description": "Name to display when calling"
-                },
-                "caller_id_num": {
-                    "type": "string",
-                    "description": "Number to display when calling"
+                    "description": "Name of the template line used by the device"
                 }
             },
             "required": [
@@ -4243,6 +4247,10 @@
                 "provisioning_code": {
                     "type": "string",
                     "description": "Code used to provision a device"
+                },
+                "registrar": {
+                    "type": "string",
+                    "description": "Name of the template line used by the device"
                 }
             }
         },

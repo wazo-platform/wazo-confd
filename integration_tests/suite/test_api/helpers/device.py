@@ -44,11 +44,19 @@ def delete_device(device_id, check=False):
 
 
 def generate_mac_and_ip():
+    return generate_mac(), generate_ip()
+
+
+def generate_ip():
+    response = confd.devices.get()
+    ips = set(d['ip'] for d in response.items)
+    return _random_ip(ips)
+
+
+def generate_mac():
     response = confd.devices.get()
     macs = set(d['mac'] for d in response.items)
-    ips = set(d['ip'] for d in response.items)
-
-    return _random_mac(macs), _random_ip(ips)
+    return _random_mac(macs)
 
 
 def generate_autoprov():
@@ -94,3 +102,25 @@ def _random_ip(ips):
     while ip in ips:
         ip = '.'.join(str(randrange(256)) for i in range(4))
     return ip
+
+
+def generate_registrar(**params):
+    name = "".join(choice(string.ascii_letters) for _ in range(20))
+    ip = generate_ip()
+    registrar = {'X_type': 'registrar',
+                 'deletable': True,
+                 'displayname': name,
+                 'id': name,
+                 'parent_ids': [],
+                 'proxy_main': ip,
+                 'proxy_backup': ip,
+                 'registrar_main': ip,
+                 'raw_config': {'X_key': 'xivo'},
+                 'registrar_backup': ip}
+    registrar.update(params)
+    provd.configs.add(registrar)
+    return registrar
+
+
+def delete_registrar(registrar_id, check=False):
+    provd.configs.remove(registrar_id)
