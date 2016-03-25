@@ -84,16 +84,7 @@ class UserForwardNotifier(object):
         self.sysconfd = sysconfd
         self.bus = bus
 
-    def send_sysconfd_handlers(self, action, user_id):
-        cti_command = 'xivo[user,{},{}]'.format(action, user_id)
-        handlers = {'ctibus': [cti_command],
-                    'dird': [],
-                    'ipbx': [],
-                    'agentbus': []}
-        self.sysconfd.exec_request_handlers(handlers)
-
     def edited(self, user, forward_name):
-        self.send_sysconfd_handlers('edit', user.id)
         forward_enabled = getattr(user, '{}_enabled'.format(forward_name))
         forward_destination = getattr(user, '{}_destination'.format(forward_name))
         event = EditUserForwardEvent(user.uuid, forward_name, forward_enabled, forward_destination)
