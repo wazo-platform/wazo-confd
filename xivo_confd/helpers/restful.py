@@ -77,7 +77,7 @@ class ConfdApi(Api):
         try:
             return handle_error(error)
         except:
-            return super(self, ConfdApi).handle_error(error)
+            return super(ConfdApi, self).handle_error(error)
 
 
 class ConfdResource(Resource):
