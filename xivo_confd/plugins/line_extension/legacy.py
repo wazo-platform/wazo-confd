@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ parser.add_argument('extension_id', type=int, required=True)
 class LegacyResource(ConfdResource):
 
     def __init__(self, service, line_dao, extension_dao, line_extension_dao):
-        super(ConfdResource, self).__init__()
+        super(LegacyResource, self).__init__()
         self.service = service
         self.line_dao = line_dao
         self.extension_dao = extension_dao
@@ -56,7 +56,6 @@ class LegacyResource(ConfdResource):
             return self.extension_dao.get(form['extension_id'])
         except NotFoundError:
             raise errors.param_not_found('extension_id', 'Extension')
-        pass
 
 
 class LineExtensionLegacy(LegacyResource):
