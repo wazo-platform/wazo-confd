@@ -120,6 +120,16 @@ class RegexField(Validator):
             raise errors.wrong_type(self.field, message)
 
 
+class RegexFieldList(RegexField):
+
+    def validate(self, model):
+        values = getattr(model, self.field)
+        for value in values:
+            if not self.regex.match(value):
+                message = "{} string matching regex '{}'".format(value, self.regex.pattern)
+                raise errors.wrong_type(self.field, message)
+
+
 class NumberRange(Validator):
 
     def __init__(self, field, minimum=None, maximum=None, step=1):

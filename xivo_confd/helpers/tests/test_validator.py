@@ -23,10 +23,21 @@ from mock import Mock, sentinel
 from xivo_dao.helpers.new_model import NewModel
 from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
-from xivo_confd.helpers.validator import RequiredFields, GetResource, \
-    ResourceExists, FindResource, Validator, Optional, MemberOfSequence, \
-    ValidationGroup, AssociationValidator, MissingFields, UniqueField, RegexField, \
-    NumberRange, UniqueFieldChanged
+from xivo_confd.helpers.validator import (AssociationValidator,
+                                          FindResource,
+                                          GetResource,
+                                          MemberOfSequence,
+                                          MissingFields,
+                                          NumberRange,
+                                          Optional,
+                                          RegexField,
+                                          RegexFieldList,
+                                          RequiredFields,
+                                          ResourceExists,
+                                          UniqueField,
+                                          UniqueFieldChanged,
+                                          ValidationGroup,
+                                          Validator)
 
 
 class TestRequiredFields(unittest.TestCase):
@@ -169,6 +180,25 @@ class TestRegexField(unittest.TestCase):
         self.regex = Mock()
         self.model = Mock(field=sentinel.field)
         self.validator = RegexField('field', self.regex)
+
+    def test_given_regex_matches_then_validation_passes(self):
+        self.validator.validate(self.model)
+
+        self.regex.match.assert_called_once_with(sentinel.field)
+
+    def test_given_regex_does_not_match_then_validation_fails(self):
+        self.regex.match.return_value = None
+
+        assert_that(calling(self.validator.validate).with_args(self.model),
+                    raises(InputError))
+
+
+class TestRegexFieldList(unittest.TestCase):
+
+    def setUp(self):
+        self.regex = Mock()
+        self.model = Mock(field=[sentinel.field])
+        self.validator = RegexFieldList('field', self.regex)
 
     def test_given_regex_matches_then_validation_passes(self):
         self.validator.validate(self.model)

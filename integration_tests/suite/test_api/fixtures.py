@@ -97,12 +97,6 @@ class custom(IsolatedAction):
                'delete': h.endpoint_custom.delete_custom}
 
 
-class call_permission(IsolatedAction):
-
-    actions = {'generate': h.call_permission.generate_call_permission,
-               'delete': h.call_permission.delete_call_permission}
-
-
 class switchboard(IsolatedAction):
 
     actions = {'generate': h.switchboard.generate_switchboard}
@@ -118,3 +112,9 @@ class registrar(IsolatedAction):
 
     actions = {'generate': h.device.generate_registrar,
                'delete': h.device.delete_registrar}
+
+
+class call_permission(IsolatedAction):
+
+    actions = {'generate': h.call_permission.generate_call_permission,
+               'delete': h.call_permission.delete_call_permission}

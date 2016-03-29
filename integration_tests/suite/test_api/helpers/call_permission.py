@@ -16,25 +16,37 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
-import random
 import string
+import random
 
-from test_api import db
-
-
-def new_call_permission(name):
-    with db.queries() as queries:
-        id = queries.insert_call_permission(name)
-    return {'id': id,
-            'name': name}
+from test_api import confd
 
 
-def generate_call_permission(name=None):
-    name = name or 'cp_' + ''.join(random.choice(string.ascii_letters) for _ in range(10))
-    return new_call_permission(name)
+def generate_call_permission(**params):
+    name = generate_name()
+    params.setdefault('name', name)
+    return add_call_permission(**params)
 
 
-def delete_call_permission(permission_id, check=False):
-    with db.queries() as queries:
-        queries.delete_call_permission(permission_id)
+def add_call_permission(**params):
+    response = confd.callpermissions.post(params)
+    return response.item
+
+
+def delete_call_permission(call_permission_id, check=False):
+    response = confd.callpermissions(call_permission_id).delete()
+    if check:
+        response.assert_ok()
+
+
+def generate_name():
+    response = confd.callpermissions.get()
+    names = set(d['name'] for d in response.items)
+    return _random_name(names)
+
+
+def _random_name(names):
+    name = ''.join(random.choice(string.lowercase) for i in range(10))
+    while name in names:
+        name = ''.join(random.choice(string.lowercase) for i in range(10))
+    return name
