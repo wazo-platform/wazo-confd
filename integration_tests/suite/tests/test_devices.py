@@ -208,6 +208,29 @@ def test_create_device_minimal_parameters():
     assert_that(provd_device['config'], starts_with('autoprov'))
 
 
+def test_create_device_null_parameters():
+    response = confd.devices.post(mac=None,
+                                  template_id=None,
+                                  plugin=None,
+                                  vendor=None,
+                                  version=None,
+                                  description=None,
+                                  options=None)
+    response.assert_created('devices')
+
+    assert_that(response.item, has_entries(mac=none(),
+                                           template_id=none(),
+                                           status='not_configured',
+                                           plugin=none(),
+                                           vendor=none(),
+                                           version=none(),
+                                           description=none(),
+                                           options=none()))
+
+    provd_device = provd.devices.get(response.item['id'])
+    assert_that(provd_device['config'], starts_with('autoprov'))
+
+
 def test_create_device_all_parameters():
     mac, ip = h.device.generate_mac_and_ip()
     template_config = provd.configs.find({'id': 'mockdevicetemplate'})[0]
@@ -284,6 +307,37 @@ def test_edit_device_all_parameters(device):
 
     response = confd.devices(device['id']).get()
     assert_that(response.item, has_entries(parameters))
+
+
+@fixtures.device(ip="127.8.0.8",
+                 mac="a1:b1:c1:d1:e1:f1",
+                 model='6731i',
+                 plugin='zero',
+                 sn='sn',
+                 template_id='defaultconfigdevice',
+                 vendor='1.0',
+                 description='nullparameters',
+                 options={'switchboard': True})
+def test_edit_device_null_parameters(device):
+    url = confd.devices(device['id'])
+    response = url.put(mac=None,
+                       template_id=None,
+                       plugin=None,
+                       vendor=None,
+                       version=None,
+                       description=None,
+                       options=None)
+    response.assert_updated()
+
+    response = confd.devices(device['id']).get()
+    assert_that(response.item, has_entries(mac=none(),
+                                           template_id=none(),
+                                           status='not_configured',
+                                           plugin=none(),
+                                           vendor=none(),
+                                           version=none(),
+                                           description=none(),
+                                           options=none()))
 
 
 @fixtures.device()

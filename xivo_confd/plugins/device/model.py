@@ -30,9 +30,11 @@ class Device(object):
         self._config = config
 
     def set_value(self, name, value):
-        if value is None and name in self.device:
-            del self.device[name]
-        self.device[name] = value
+        if value is None:
+            if name in self.device:
+                del self.device[name]
+        else:
+            self.device[name] = value
 
     @property
     def config(self):
@@ -66,10 +68,8 @@ class Device(object):
 
     @mac.setter
     def mac(self, value):
-        if value is None and 'mac' in self.device:
-            del self.device['mac']
-        else:
-            self.device['mac'] = value.lower()
+        value = value.lower() if value else None
+        self.set_value('mac', value)
 
     @property
     def sn(self):
@@ -144,8 +144,10 @@ class Device(object):
         configdevice = self.config.pop('configdevice', None)
         if configdevice and configdevice in self.config['parent_ids']:
             self.config['parent_ids'].remove(configdevice)
-        self.config['configdevice'] = value
-        self.config['parent_ids'].append(value)
+
+        if value:
+            self.config['configdevice'] = value
+            self.config['parent_ids'].append(value)
 
     def is_autoprov(self):
         return 'autoprov' in self.config['parent_ids']
