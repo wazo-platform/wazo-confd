@@ -18,7 +18,7 @@
 
 from xivo_confd import api
 from xivo_confd.plugins.user.service import build_service, build_service_callservice, build_service_forward
-from xivo_confd.plugins.user.resource import UserItem, UserUuidItem, UserList
+from xivo_confd.plugins.user.resource import UserItem, UserList
 from xivo_confd.plugins.user.resource_sub import (UserServiceDND,
                                                   UserServiceIncallFilter,
                                                   UserServiceList,
@@ -38,13 +38,9 @@ class Plugin(object):
         service_forward = build_service_forward()
 
         api.add_resource(UserItem,
+                         '/users/<uuid:id>',
                          '/users/<int:id>',
                          endpoint='users',
-                         resource_class_args=(service,)
-                         )
-
-        api.add_resource(UserUuidItem,
-                         '/users/<uuid:uuid>',
                          resource_class_args=(service,)
                          )
 

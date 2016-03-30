@@ -41,7 +41,7 @@ parser.add_argument('cti_profile_id', type=int, store_missing=False)
 parser.add_argument('enabled', type=bool, store_missing=False)
 
 
-class UserCtiProfileResource(ConfdResource):
+class UserCtiProfileRoot(ConfdResource):
 
     def __init__(self, service, user_dao, cti_profile_dao):
         super(ConfdResource, self).__init__()
@@ -49,24 +49,16 @@ class UserCtiProfileResource(ConfdResource):
         self.user_dao = user_dao
         self.cti_profile_dao = cti_profile_dao
 
-    def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.user_dao.get(user_id)
-        return self.user_dao.get_by(uuid=str(user_id))
-
-
-class UserCtiProfileRoot(UserCtiProfileResource):
-
     @required_acl('confd.users.{user_id}.cti.read')
     def get(self, user_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         association = self.service.get(user.id)
         return marshal(association, fields)
 
     @required_acl('confd.users.{user_id}.cti.update')
     def put(self, user_id):
         form = parser.parse_args()
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         association = self.service.get(user.id)
         self.update_model(association, form)
         self.service.edit(association)

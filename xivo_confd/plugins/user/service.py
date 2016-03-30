@@ -26,7 +26,13 @@ from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.user import dao as user_dao
 
 
-class UserService(CRUDService):
+class UserBaseService(CRUDService):
+
+    def get(self, user_id):
+        return self.dao.get_by_id_uuid(user_id)
+
+
+class UserService(UserBaseService):
 
     def __init__(self, dao, validator, notifier, device_updater):
         super(UserService, self).__init__(dao, validator, notifier)
@@ -51,7 +57,7 @@ def build_service(provd_client):
                        updater)
 
 
-class UserCallServiceService(CRUDService):
+class UserCallServiceService(UserBaseService):
 
     def edit(self, user, service_name):
         self.validator.validate_edit(user)
@@ -65,7 +71,7 @@ def build_service_callservice():
                                   build_notifier_service())
 
 
-class UserForwardService(CRUDService):
+class UserForwardService(UserBaseService):
 
     def edit(self, user, forward_name):
         self.validator.validate_edit(user)

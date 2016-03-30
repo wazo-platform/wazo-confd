@@ -173,26 +173,3 @@ class UserItem(ItemResource):
     @required_acl('confd.users.{id}.delete')
     def delete(self, id):
         return super(UserItem, self).delete(id)
-
-
-class UserUuidItem(ItemResource):
-
-    fields = user_fields
-    parser = parser
-
-    @required_acl('confd.users.{uuid}.read')
-    def get(self, uuid):
-        user = self.service.get_by(uuid=str(uuid))
-        return marshal(user, self.fields)
-
-    @required_acl('confd.users.{uuid}.update')
-    def put(self, uuid):
-        user = self.service.get_by(uuid=str(uuid))
-        self.parse_and_update(user)
-        return '', 204
-
-    @required_acl('confd.users.{uuid}.delete')
-    def delete(self, uuid):
-        user = self.service.get_by(uuid=str(uuid))
-        self.service.delete(user)
-        return '', 204

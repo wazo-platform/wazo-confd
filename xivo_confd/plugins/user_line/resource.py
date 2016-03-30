@@ -59,9 +59,7 @@ class UserLineResource(ConfdResource):
             raise errors.param_not_found('line_id', 'Line')
 
     def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.user_dao.get(user_id)
-        return self.user_dao.get_by(uuid=str(user_id))
+        return self.user_dao.get_by_id_uuid(user_id)
 
 
 class UserLineList(UserLineResource):
