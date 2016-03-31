@@ -154,6 +154,7 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
                            extension=extension['exten'],
                            context=extension['context'],
                            entity=config.ENTITY_NAME,
+                           enabled=True,
                            protocol='sip')
 
     with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), \
@@ -176,6 +177,7 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
                            extension=extension['exten'],
                            context=extension['context'],
                            entity=config.ENTITY_NAME,
+                           enabled=True,
                            protocol='sccp')
 
     with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), \
@@ -198,6 +200,7 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
                            extension=extension['exten'],
                            context=extension['context'],
                            entity=config.ENTITY_NAME,
+                           enabled=True,
                            protocol='custom')
 
     with a.line_endpoint_custom(line, custom), a.line_extension(line, extension), \
@@ -217,6 +220,7 @@ def test_summary_view_on_user_without_line(user):
                            extension=none(),
                            context=none(),
                            entity=config.ENTITY_NAME,
+                           enabled=True,
                            protocol=none())
 
     response = confd.users.get(view='summary', id=user['id'])

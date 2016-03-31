@@ -76,6 +76,7 @@ view_fields = {
         'provisioning_code': fields.String,
         'entity': fields.String,
         'protocol': fields.String,
+        'enabled': fields.Boolean,
     }
 }
 
