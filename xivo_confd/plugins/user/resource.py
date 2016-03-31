@@ -50,7 +50,6 @@ user_fields = {
 }
 
 view_fields = {
-    'user': user_fields,
     'directory': {
         'id': fields.Integer,
         'uuid': fields.String,
