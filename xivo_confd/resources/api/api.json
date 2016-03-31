@@ -3877,7 +3877,11 @@
             "name": "view",
             "in": "query",
             "type": "string",
-            "description": "Different view of the list of users. Acceptable values: user, directory."
+            "enum": [
+                "directory",
+                "summary"
+            ],
+            "description": "Different view of the list of users."
         },
         "voicemailid": {
             "required": true,
