@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import os
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
 EXTENSION_RANGE = range(1000, 5001)
+ENTITY_NAME = 'xivotest'
 
 
 def confd_host():

@@ -23,8 +23,9 @@ from test_api import associations as a
 from test_api import errors as e
 from test_api import confd
 from test_api import fixtures
+from test_api import config
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not
+from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not, contains, none
 
 
 FULL_USER = {"firstname": "Jôhn",
@@ -140,6 +141,88 @@ def test_that_the_directory_view_works_with_unicode_characters(user):
     assert_that(response.items[0]['id'], equal_to(user['id']))
 
 
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_summary_view_on_sip_endpoint(user, line, sip, extension):
+    expected = has_entries(id=user['id'],
+                           uuid=user['uuid'],
+                           firstname=user['firstname'],
+                           lastname=user['lastname'],
+                           provisioning_code=line['provisioning_code'],
+                           extension=extension['exten'],
+                           context=extension['context'],
+                           entity=config.ENTITY_NAME,
+                           protocol='sip')
+
+    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), \
+            a.user_line(user, line):
+
+        response = confd.users.get(view='summary', id=user['id'])
+        assert_that(response.items, contains(expected))
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sccp()
+@fixtures.extension()
+def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
+    expected = has_entries(id=user['id'],
+                           uuid=user['uuid'],
+                           firstname=user['firstname'],
+                           lastname=user['lastname'],
+                           provisioning_code=none(),
+                           extension=extension['exten'],
+                           context=extension['context'],
+                           entity=config.ENTITY_NAME,
+                           protocol='sccp')
+
+    with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), \
+            a.user_line(user, line):
+
+        response = confd.users.get(view='summary', id=user['id'])
+        assert_that(response.items, contains(expected))
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.custom()
+@fixtures.extension()
+def test_summary_view_on_custom_endpoint(user, line, custom, extension):
+    expected = has_entries(id=user['id'],
+                           uuid=user['uuid'],
+                           firstname=user['firstname'],
+                           lastname=user['lastname'],
+                           provisioning_code=none(),
+                           extension=extension['exten'],
+                           context=extension['context'],
+                           entity=config.ENTITY_NAME,
+                           protocol='custom')
+
+    with a.line_endpoint_custom(line, custom), a.line_extension(line, extension), \
+            a.user_line(user, line):
+
+        response = confd.users.get(view='summary', id=user['id'])
+        assert_that(response.items, contains(expected))
+
+
+@fixtures.user()
+def test_summary_view_on_user_without_line(user):
+    expected = has_entries(id=user['id'],
+                           uuid=user['uuid'],
+                           firstname=user['firstname'],
+                           lastname=user['lastname'],
+                           provisioning_code=none(),
+                           extension=none(),
+                           context=none(),
+                           entity=config.ENTITY_NAME,
+                           protocol=none())
+
+    response = confd.users.get(view='summary', id=user['id'])
+    assert_that(response.items, contains(expected))
+
+
 @fixtures.user(firstname="Lègacy", lastname="Usér")
 @fixtures.user(firstname="Hîde", lastname="Mé")
 def test_search_using_legacy_parameter(user1, user2):
@@ -177,7 +260,7 @@ def test_search_on_user_view(user):
     }
 
     for field, term in searches.items():
-        yield check_search, url, user, field, term
+        yield check_search, url, field, term, user[field]
 
 
 @fixtures.user(firstname="Môustapha",
@@ -199,7 +282,7 @@ def test_search_on_directory_view(user):
     }
 
     for field, term in searches.items():
-        yield check_search, url, user, field, term
+        yield check_search, url, field, term, user[field]
 
 
 @fixtures.user()
@@ -224,8 +307,24 @@ def test_search_on_users_with_context_filter(user, line, extension):
         assert_that(response.total, equal_to(0))
 
 
-def check_search(url, user, field, term):
-    expected = has_item(has_entry(field, user[field]))
+@fixtures.user(firstname="Âboubacar",
+               lastname="Manè",
+               description="Âboubacar le grand danseur")
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_search_on_summary_view(user, line, sip, extension):
+    url = confd.users(view='summary')
+
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
+        yield check_search, url, 'firstname', 'âbou', user['firstname']
+        yield check_search, url, 'lastname', 'man', user['lastname']
+        yield check_search, url, 'provisioning_code', line['provisioning_code'], line['provisioning_code']
+        yield check_search, url, 'extension', extension['exten'], extension['exten']
+
+
+def check_search(url, field, term, value):
+    expected = has_item(has_entry(field, value))
     response = url.get(search=term)
     assert_that(response.items, expected)
 

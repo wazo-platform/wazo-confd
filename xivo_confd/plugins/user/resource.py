@@ -49,20 +49,34 @@ user_fields = {
     'links': FieldList(Link('users'))
 }
 
-directory_fields = {
-    'id': fields.Integer,
-    'uuid': fields.String,
-    'line_id': fields.Integer(default=None),
-    'agent_id': fields.Integer(default=None),
-    'firstname': fields.String,
-    'lastname': fields.String,
-    'email': fields.String,
-    'exten': fields.String,
-    'mobile_phone_number': fields.String,
-    'voicemail_number': fields.String,
-    'userfield': fields.String,
-    'description': fields.String,
-    'context': fields.String,
+view_fields = {
+    'user': user_fields,
+    'directory': {
+        'id': fields.Integer,
+        'uuid': fields.String,
+        'line_id': fields.Integer(default=None),
+        'agent_id': fields.Integer(default=None),
+        'firstname': fields.String,
+        'lastname': fields.String,
+        'email': fields.String,
+        'exten': fields.String,
+        'mobile_phone_number': fields.String,
+        'voicemail_number': fields.String,
+        'userfield': fields.String,
+        'description': fields.String,
+        'context': fields.String,
+    },
+    'summary': {
+        'id': fields.Integer,
+        'uuid': fields.String,
+        'firstname': fields.String,
+        'lastname': fields.String,
+        'extension': fields.String,
+        'context': fields.String,
+        'provisioning_code': fields.String,
+        'entity': fields.String,
+        'protocol': fields.String,
+    }
 }
 
 parser = reqparse.RequestParser()
@@ -135,14 +149,10 @@ class UserList(ListResource):
                 'items': [marshal(item, user_fields) for item in result.items]}
 
     def user_search(self):
-        if request.args.get('view') == 'directory':
-            fields = directory_fields
-        else:
-            fields = user_fields
-
+        view = request.args.get('view')
+        fields = view_fields.get(view, user_fields)
         params = self.search_params()
         result = self.service.search(params)
-
         return {'total': result.total,
                 'items': [marshal(item, fields) for item in result.items]}
 
