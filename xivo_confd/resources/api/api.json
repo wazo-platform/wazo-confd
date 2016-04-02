@@ -5426,7 +5426,7 @@
         "Wizard": {
             "title": "Wizard",
             "properties": {
-                "licence": {
+                "license": {
                     "type": "boolean",
                     "description": "Licence accepted"
                 },
