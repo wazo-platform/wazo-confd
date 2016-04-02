@@ -3612,7 +3612,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Wizard creation",
                         "schema": {
                             "$ref": "#/definitions/WizardItems"
