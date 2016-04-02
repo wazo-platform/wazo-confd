@@ -3592,6 +3592,54 @@
                 }
             }
         },
+        "/wizard": {
+            "post": {
+                "operationId": "passing_wizard",
+                "summary": "Pass the wizard",
+                "description": "**Required ACL:** `none`",
+                "tags": [
+                    "wizard"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Wizard to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Wizard"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wizard creation",
+                        "schema": {
+                            "$ref": "#/definitions/WizardItems"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "reset_wizard",
+                "summary": "Reset XiVO to the wizard",
+                "description": "**Required ACL:** `confd.wizard.reset`",
+                "tags": [
+                    "wizard"
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
         "/lines_sip": {
             "get": {
                 "operationId": "list_line_sip",
@@ -5372,6 +5420,103 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "Wizard": {
+            "title": "Wizard",
+            "properties": {
+                "licence": {
+                    "type": "boolean",
+                    "description": "Licence accepted"
+                },
+                "hostname": {
+                    "type": "string",
+                    "description": "Hostname"
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "Timezone"
+                },
+                "lang": {
+                    "type": "string",
+                    "description": "Lang"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Webi password root"
+                },
+                "resolvconf": {
+                    "$ref": "#/definitions/WizardResolvconfItems"
+                },
+                "netiface": {
+                    "$ref": "#/definitions/WizardNetifaceItems"
+                },
+                "entity": {
+                    "$ref": "#/definitions/WizardEntityItems"
+                }
+            }
+        },
+        "WizardResolvconfItems": {
+            "title": "WizardResolvconfItems",
+            "properties": {
+                "domain": {
+                    "type": "string",
+                    "description": "Domain"
+                },
+                "ns1": {
+                    "type": "string",
+                    "description": "Name server 1"
+                },
+                "ns2": {
+                    "type": "string",
+                    "description": "Name server 2"
+                }
+            }
+        },
+        "WizardNetifaceItems": {
+            "title": "WizardNetifaceItems",
+            "properties": {
+                "interface": {
+                    "type": "string",
+                    "description": "Network interface"
+                },
+                "address": {
+                    "type": "string",
+                    "description": "Interface address"
+                },
+                "netmask": {
+                    "type": "string",
+                    "description": "Netmask"
+                },
+                "gateway": {
+                    "type": "string",
+                    "description": "Default gateway"
+                }
+            }
+        },
+        "WizardEntityItems": {
+            "title": "WizardEntityItems",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "entity"
+                },
+                "display": {
+                    "type": "string",
+                    "description": "Displayname entity"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description"
+                }
+            }
+        },
+        "WizardItems": {
+            "title": "WizardItems",
+            "properties": {
+                "uuid": {
+                    "type": "string"
                 }
             }
         }
