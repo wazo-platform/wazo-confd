@@ -27,7 +27,7 @@ class Plugin(object):
         service = build_service()
 
         api.add_resource(WizardItem,
-                         '/wizard/,
+                         '/wizard/',
                          endpoint='wizard',
                          resource_class_args=(service,)
                          )
