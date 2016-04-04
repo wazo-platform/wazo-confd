@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
 
 
 SYSCONFD_HANDLERS = {'ctibus': [],
-                     'dird': [],
                      'ipbx': ['sip reload', 'dialplan reload'],
                      'agentbus': []}
 

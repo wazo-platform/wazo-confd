@@ -23,7 +23,6 @@ from xivo_confd.helpers import sysconfd_connector
 
 def build_request(ipbx):
     return {'ctibus': [],
-            'dird': [],
             'ipbx': ipbx,
             'agentbus': []}
 

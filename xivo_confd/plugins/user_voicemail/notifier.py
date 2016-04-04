@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ def dissociated(user_voicemail):
 
 def sysconf_command_association_updated(user_voicemail):
     command = {
-        'dird': [],
         'ipbx': ['sip reload', 'module reload chan_sccp.so'],
         'agentbus': [],
         'ctibus': _generate_ctibus_commands(user_voicemail)

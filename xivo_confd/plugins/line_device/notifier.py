@@ -21,8 +21,7 @@ from xivo_confd import sysconfd
 
 class LineDeviceNotifier(object):
 
-    REQUEST_HANDLERS = {'dird': [],
-                        'ipbx': ['module reload chan_sccp.so'],
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
                         'agentbus': [],
                         'ctibus': []}
 

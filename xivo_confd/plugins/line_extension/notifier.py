@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ def associated(line_extension):
 def send_sysconf_commands(line_extension):
     command = {
         'ctibus': _generate_ctibus_commands(line_extension),
-        'dird': [],
         'ipbx': ['dialplan reload', 'sip reload'],
         'agentbus': [],
     }

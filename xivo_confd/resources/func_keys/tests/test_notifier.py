@@ -32,8 +32,7 @@ from xivo_confd.resources.func_keys.notifier import FuncKeyTemplateNotifier
 
 class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {'dird': [],
-                        'ipbx': ['module reload chan_sccp.so'],
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
                         'agentbus': [],
                         'ctibus': []}
 

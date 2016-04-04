@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ def edited(user_cti_profile):
 def _send_sysconfd_command(user_cti_profile):
     command_dict = {
         'ctibus': _generate_cti_commands(user_cti_profile),
-        'dird': [],
         'ipbx': [],
         'agentbus': [],
     }

@@ -33,7 +33,6 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 def sysconfd_handler(action, user_id):
     cti = 'xivo[user,{},{}]'.format(action, user_id)
     return {'ctibus': [cti],
-            'dird': [],
             'ipbx': ['dialplan reload',
                      'module reload chan_sccp.so',
                      'module reload app_queue.so',

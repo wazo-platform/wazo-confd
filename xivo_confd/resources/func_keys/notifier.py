@@ -21,8 +21,7 @@ from xivo_bus.resources.func_key.event import CreateFuncKeyTemplateEvent, \
 
 class FuncKeyTemplateNotifier(object):
 
-    REQUEST_HANDLERS = {'dird': [],
-                        'ipbx': ['module reload chan_sccp.so'],
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
                         'agentbus': [],
                         'ctibus': []}
 

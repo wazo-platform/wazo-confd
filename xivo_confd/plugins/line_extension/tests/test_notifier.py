@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,7 +49,6 @@ class TestLineExtensionNotifier(unittest.TestCase):
 
         expected_sysconf_command = {
             'ctibus': ['xivo[phone,edit,1]', 'xivo[user,edit,3]'],
-            'dird': [],
             'ipbx': ['dialplan reload', 'sip reload'],
             'agentbus': []
         }

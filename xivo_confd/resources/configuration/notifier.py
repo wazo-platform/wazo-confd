@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ def live_reload_status_changed(data):
 def _send_sysconfd_command():
     command_dict = {
         'ctibus': ['xivo[cticonfig,update]'],
-        'dird': [],
         'ipbx': [],
         'agentbus': [],
     }

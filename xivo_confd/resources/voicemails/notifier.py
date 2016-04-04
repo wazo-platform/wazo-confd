@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ from xivo_bus.resources.voicemail.event import DeleteVoicemailEvent
 def _new_sysconfd_data(ctibus_command, ipbx_commands):
     return {
         'ctibus': [ctibus_command],
-        'dird': [],
         'ipbx': ipbx_commands,
         'agentbus': []
     }

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ def agent_removed_from_queue(agent_id, queue_id):
 
 def sysconf_command_agent_association_updated(queue_member):
     command = {
-        'dird': [],
         'ipbx': [],
         'agentbus': ['agent.edit.%s' % queue_member.agent_id],
         'ctibus': []
@@ -48,7 +47,6 @@ def sysconf_command_agent_association_updated(queue_member):
 
 def sysconf_command_agent_associated(queue_member):
     command = {
-        'dird': [],
         'ipbx': [],
         'agentbus': ['agent.edit.%s' % queue_member.agent_id],
         'ctibus': ['xivo[queuemember,update]']
@@ -58,7 +56,6 @@ def sysconf_command_agent_associated(queue_member):
 
 def sysconf_command_agent_removed_from_queue(agent_id):
     command = {
-        'dird': [],
         'ipbx': [],
         'agentbus': ['agent.edit.%s' % agent_id],
         'ctibus': ['xivo[queuemember,update]']

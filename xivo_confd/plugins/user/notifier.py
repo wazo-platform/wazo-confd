@@ -34,7 +34,6 @@ class UserNotifier(object):
     def send_sysconfd_handlers(self, action, user_id):
         cti_command = 'xivo[user,{},{}]'.format(action, user_id)
         handlers = {'ctibus': [cti_command],
-                    'dird': [],
                     'ipbx': ['dialplan reload',
                              'module reload chan_sccp.so',
                              'module reload app_queue.so',

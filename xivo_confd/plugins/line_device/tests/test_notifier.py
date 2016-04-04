@@ -31,8 +31,7 @@ from xivo_confd.plugins.line_device.notifier import LineDeviceNotifier
 
 class TestLineDeviceNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {'dird': [],
-                        'ipbx': ['module reload chan_sccp.so'],
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
                         'agentbus': [],
                         'ctibus': []}
 
