@@ -30,7 +30,7 @@ class SccpEndpointNotifier(object):
 
     def send_sysconfd_handlers(self):
         handlers = {'ctibus': [],
-                    'ipbx': ['module reload chan_sccp', 'dialplan reload'],
+                    'ipbx': ['module reload chan_sccp.so', 'dialplan reload'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 

@@ -29,7 +29,7 @@ from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
 
 SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload chan_sccp', 'dialplan reload'],
+                     'ipbx': ['module reload chan_sccp.so', 'dialplan reload'],
                      'agentbus': []}
 
 
