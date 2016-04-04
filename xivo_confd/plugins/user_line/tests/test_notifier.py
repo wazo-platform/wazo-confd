@@ -35,16 +35,11 @@ class TestUserLineNotifier(unittest.TestCase):
         bus_event_associated.assert_called_once_with(user_line)
 
     @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
-    @patch('xivo_dao.resources.user_line.dao.find_all_by_user_id')
-    def test_send_sysconf_command_association_updated(self, find_all_by_user_id, exec_request_handlers):
+    def test_send_sysconf_command_association_updated(self, exec_request_handlers):
         user_line = UserLine(user_id=1, line_id=2)
-        user_line_1 = Mock(UserLine, line_id=3)
-        user_line_2 = Mock(UserLine, line_id=4)
-
-        find_all_by_user_id.return_value = [user_line_1, user_line_2]
 
         expected_sysconf_command = {
-            'ctibus': ['xivo[user,edit,1]', 'xivo[phone,edit,3]', 'xivo[phone,edit,4]'],
+            'ctibus': [],
             'ipbx': ['dialplan reload', 'sip reload'],
             'agentbus': []
         }
@@ -52,7 +47,6 @@ class TestUserLineNotifier(unittest.TestCase):
         notifier.sysconf_command_association_updated(user_line)
 
         exec_request_handlers.assert_called_once_with(expected_sysconf_command)
-        find_all_by_user_id.assert_called_once_with(user_line.user_id)
 
     @patch('xivo_bus.resources.user_line.event.UserLineAssociatedEvent')
     @patch('xivo_confd.helpers.bus_manager.send_bus_event')

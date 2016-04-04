@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_bus.resources.user_line import event
-from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_confd.helpers import sysconfd_connector
 from xivo_confd.helpers import bus_manager
 
@@ -35,19 +34,9 @@ def sysconf_command_association_updated(user_line):
     command = {
         'ipbx': ['dialplan reload', 'sip reload'],
         'agentbus': [],
-        'ctibus': _generate_ctibus_commands(user_line)
+        'ctibus': [],
     }
     sysconfd_connector.exec_request_handlers(command)
-
-
-def _generate_ctibus_commands(user_line):
-    ctibus = ['xivo[user,edit,%d]' % user_line.user_id]
-
-    user_lines = user_line_dao.find_all_by_user_id(user_line.user_id)
-    for user_line in user_lines:
-        ctibus.append('xivo[phone,edit,%d]' % user_line.line_id)
-
-    return ctibus
 
 
 def bus_event_associated(user_line):
