@@ -5430,10 +5430,6 @@
                     "type": "boolean",
                     "description": "Licence accepted"
                 },
-                "hostname": {
-                    "type": "string",
-                    "description": "Hostname"
-                },
                 "timezone": {
                     "type": "string",
                     "description": "Timezone"
@@ -5460,6 +5456,10 @@
         "WizardResolvconfItems": {
             "title": "WizardResolvconfItems",
             "properties": {
+                "hostname": {
+                    "type": "string",
+                    "description": "Hostname"
+                },
                 "domain": {
                     "type": "string",
                     "description": "Domain"
