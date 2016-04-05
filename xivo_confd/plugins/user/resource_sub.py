@@ -27,18 +27,13 @@ class UserSubResource(ConfdResource):
         self.service = service
 
     def get(self, user_id):
-        user = self.get_user(user_id)
+        user = self.service.get(user_id)
         return marshal(user, self.fields)
 
     def put(self, user_id):
-        user = self.get_user(user_id)
+        user = self.service.get(user_id)
         self.parse_and_update(user)
         return '', 204
-
-    def get_user(self, user_id):
-        if isinstance(user_id, int):
-            return self.service.get(user_id)
-        return self.service.get_by(uuid=str(user_id))
 
     def parse_and_update(self, model):
         form = self.parser.parse_args()

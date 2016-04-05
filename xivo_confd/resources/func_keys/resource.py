@@ -31,11 +31,6 @@ class TemplateManipulator(object):
         self.device_updater = device_updater
         self.user_dao = user_dao
 
-    def get_user(self, user_id):
-        if user_id.isdigit():
-            return self.user_dao.get(int(user_id))
-        return self.user_dao.get_by(uuid=user_id)
-
     def update_funckey(self, template_id, position, funckey):
         template = self.tpl_service.get(template_id)
         template.keys[position] = funckey
@@ -49,7 +44,7 @@ class TemplateManipulator(object):
 
     def associate_user(self, template_id, user_id):
         template = self.tpl_service.get(template_id)
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         if template.private:
             raise errors.not_permitted("Cannot associate a private template with a user",
                                        template_id=template_id)
@@ -58,7 +53,7 @@ class TemplateManipulator(object):
         self.device_updater.update_for_user(user)
 
     def dissociate_user(self, template_id, user_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         if user.func_key_template_id != template_id:
             raise errors.not_found("FuncKeyTemplate", template_id=template_id)
         user.func_key_template_id = None
@@ -69,7 +64,7 @@ class TemplateManipulator(object):
         return self.tpl_service.get(template_id)
 
     def get_unified_template(self, user_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         if user.func_key_template_id:
             public_template = self.tpl_service.get(user.func_key_template_id)
             private_template = self.tpl_service.get(user.private_template_id)
@@ -78,7 +73,7 @@ class TemplateManipulator(object):
             return self.tpl_service.get(user.private_template_id)
 
     def find_associations_by_user(self, user_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         if user.func_key_template_id:
             return [UserTemplate(user_id=user.id,
                                  template_id=user.func_key_template_id)]
@@ -156,14 +151,9 @@ class UserFuncKeyResource(object):
         self.validator = validator
         self.user_dao = user_dao
 
-    def get_user(self, user_id):
-        if user_id.isdigit():
-            return self.user_dao.get(int(user_id))
-        return self.user_dao.get_by(uuid=user_id)
-
     @required_acl('confd.users.{user_id}.funckeys.{position}.update')
     def update_funckey(self, user_id, position):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         funckey = self.fk_converter.decode(request)
         self.validator.validate(user, funckey)
         self.manipulator.update_funckey(user.private_template_id, position, funckey)
@@ -171,7 +161,7 @@ class UserFuncKeyResource(object):
 
     @required_acl('confd.users.{user_id}.funckeys.{position}.delete')
     def remove_funckey(self, user_id, position):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         self.manipulator.remove_funckey(user.private_template_id, position)
         return ('', 204)
 
