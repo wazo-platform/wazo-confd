@@ -5024,11 +5024,6 @@
                 "voicemail_id": {
                     "type": "integer",
                     "description": "Voicemail ID"
-                },
-                "enabled": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Whether the user can use this voicemail or not"
                 }
             },
             "required": [
