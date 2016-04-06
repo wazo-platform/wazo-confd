@@ -46,7 +46,7 @@ parser.add_argument('line_id', type=int, required=True)
 class UserLineResource(ConfdResource):
 
     def __init__(self, service, user_dao, line_dao):
-        super(ConfdResource, self).__init__()
+        super(UserLineResource, self).__init__()
         self.service = service
         self.user_dao = user_dao
         self.line_dao = line_dao
