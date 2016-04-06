@@ -116,6 +116,7 @@ DEFAULT_CONFIG = {
         'line_device_plugin',
         'switchboard_plugin',
         'call_permission_plugin',
+        'user_call_permission_plugin',
     ],
     'service_discovery': {
         'enabled': True,

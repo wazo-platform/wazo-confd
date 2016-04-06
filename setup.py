@@ -59,6 +59,7 @@ setup(
             'user_import_plugin = xivo_confd.plugins.user_import.plugin:Plugin',
             'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
             'call_permission_plugin = xivo_confd.plugins.call_permission.plugin:Plugin',
+            'user_call_permission_plugin = xivo_confd.plugins.user_call_permission.plugin:Plugin',
         ]
     }
 )

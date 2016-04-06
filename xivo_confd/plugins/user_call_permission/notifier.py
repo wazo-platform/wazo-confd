@@ -16,16 +16,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import confd
+from xivo_confd import bus
+from xivo_bus.resources.user_call_permission.event import (UserCallPermissionAssociatedEvent,
+                                                           UserCallPermissionDissociatedEvent)
 
 
-def associate(user_id, call_permission_id, check=True):
-    response = confd.users(user_id).callpermissions(call_permission_id).put()
-    if check:
-        response.assert_ok()
+class UserCallPermissionNotifier(object):
+
+    def __init__(self, bus):
+        self.bus = bus
+
+    def associated(self, user, call_permission):
+        event = UserCallPermissionAssociatedEvent(user.uuid, call_permission.id)
+        self.bus.send_bus_event(event, event.routing_key)
+
+    def dissociated(self, user, call_permission):
+        event = UserCallPermissionDissociatedEvent(user.uuid, call_permission.id)
+        self.bus.send_bus_event(event, event.routing_key)
 
 
-def dissociate(user_id, call_permission_id, check=True):
-    response = confd.users(user_id).callpermissions(call_permission_id).delete()
-    if check:
-        response.assert_ok()
+def build_notifier():
+    return UserCallPermissionNotifier(bus)
