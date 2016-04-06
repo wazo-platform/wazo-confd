@@ -98,36 +98,15 @@ parser.add_argument('online_call_record_enabled', type=Strict(bool), store_missi
 parser.add_argument('supervision_enabled', type=Strict(bool), store_missing=False)
 parser.add_argument('ring_seconds', type=int, store_missing=False)
 parser.add_argument('simultaneous_calls', type=int, store_missing=False)
-parser.add_argument('caller_id', store_missing=False, type=Strict(unicode))
-parser.add_argument('mobile_phone_number', store_missing=False, type=Strict(unicode))
+parser.add_argument('caller_id', type=Strict(unicode), store_missing=False)
+parser.add_argument('mobile_phone_number', type=Strict(unicode), store_missing=False)
 
 
 class UserList(ListResource):
 
     model = User
     fields = user_fields
-
-    parser = reqparse.RequestParser()
-    parser.add_argument('firstname', type=Strict(unicode), required=True)
-    parser.add_argument('lastname', type=Strict(unicode))
-    parser.add_argument('email', type=Strict(unicode))
-    parser.add_argument('timezone', type=Strict(unicode))
-    parser.add_argument('language', type=Strict(unicode))
-    parser.add_argument('description', type=Strict(unicode))
-    parser.add_argument('outgoing_caller_id', type=Strict(unicode))
-    parser.add_argument('username', type=Strict(unicode))
-    parser.add_argument('password', type=Strict(unicode))
-    parser.add_argument('music_on_hold', type=Strict(unicode))
-    parser.add_argument('preprocess_subroutine', type=Strict(unicode))
-    parser.add_argument('userfield', type=Strict(unicode))
-    parser.add_argument('caller_id', type=Strict(unicode))
-    parser.add_argument('mobile_phone_number', type=Strict(unicode))
-    parser.add_argument('call_transfer_enabled', type=Strict(bool))
-    parser.add_argument('call_record_enabled', type=Strict(bool))
-    parser.add_argument('online_call_record_enabled', type=Strict(bool))
-    parser.add_argument('supervision_enabled', type=Strict(bool))
-    parser.add_argument('ring_seconds', type=int)
-    parser.add_argument('simultaneous_calls', type=int)
+    parser = parser
 
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
