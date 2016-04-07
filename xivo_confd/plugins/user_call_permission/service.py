@@ -44,7 +44,6 @@ class UserCallPermissionService(object):
 
     def dissociate(self, user, call_permission):
         self.validator.validate_dissociation(user, call_permission)
-        self.dao.get_by(user_id=user.id, call_permission_id=call_permission.id)
         self.dao.dissociate(user, call_permission)
         self.notifier.dissociated(user, call_permission)
 

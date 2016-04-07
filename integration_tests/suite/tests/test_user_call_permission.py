@@ -46,11 +46,13 @@ def test_associate_errors(user, call_permission):
 @fixtures.user()
 @fixtures.call_permission()
 def test_dissociate_errors(user, call_permission):
+    fake_user_call_permission = confd.users(user['id']).callpermissions(call_permission['id']).delete
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    yield s.check_resource_not_found, fake_user_call_permission, 'UserCallPermission'
 
 
 def test_get_errors():

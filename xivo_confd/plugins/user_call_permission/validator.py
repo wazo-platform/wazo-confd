@@ -22,7 +22,7 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
 
 
-class UserLineAssociationValidator(Validator):
+class UserCallPermissionAssociationValidator(Validator):
 
     def validate(self, user, call_permission):
         self.validate_user_not_already_associated(user, call_permission)
@@ -32,13 +32,12 @@ class UserLineAssociationValidator(Validator):
                                                                 call_permission_id=call_permission.id)
         if user_call_permission:
             raise errors.resource_associated('User', 'CallPermission',
-                                             user_id=user.id,
-                                             call_permission_id=call_permission.id)
+                                             user_id=user.id, call_permission_id=call_permission.id)
 
 
 def build_validator():
     return AssociationValidator(
         association=[
-            UserLineAssociationValidator()
+            UserCallPermissionAssociationValidator()
         ]
     )
