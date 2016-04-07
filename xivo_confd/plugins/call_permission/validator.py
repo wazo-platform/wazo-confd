@@ -26,8 +26,8 @@ from xivo_dao.resources.call_permission import dao as call_permission_dao
 
 
 NAME_REGEX = r"^[a-z0-9_-]{1,128}$"
-PASSWORD_REGEX = r"^[0-9#\*]{1,40}"
-EXTENSION_REGEX = r"^(?:_?\+?[0-9NXZ\*#\-\[\]]+[\.\!]?){1,40}"
+PASSWORD_REGEX = r"^[0-9#\*]{1,40}$"
+EXTENSION_REGEX = r"^(?:_?\+?[0-9NXZ\*#\-\[\]]+[\.\!]?){1,40}$"
 
 
 def build_validator():
