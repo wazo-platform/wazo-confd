@@ -4922,6 +4922,14 @@
                 "userfield": {
                     "type": "string",
                     "description": "A custom field which purpose is left to the client. If the user has no userfield, then this field is an empty string."
+                },
+                "call_permission_password": {
+                    "type": "string",
+                    "description": "Overwrite all passwords set in call permissions associated to the user"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable/Disable the user"
                 }
             },
             "required": [

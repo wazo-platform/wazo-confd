@@ -46,6 +46,8 @@ FULL_USER = {"firstname": "Jôhn",
              "call_transfer_enabled": False,
              "call_record_enabled": True,
              "online_call_record_enabled": True,
+             "call_permission_password": '1234',
+             "enabled": False,
              "ring_seconds": 60,
              "simultaneous_calls": 10}
 
@@ -67,6 +69,8 @@ NULL_USER = {"firstname": "Jôhn",
              "call_transfer_enabled": True,
              "call_record_enabled": False,
              "online_call_record_enabled": False,
+             "call_permission_password": None,
+             "enabled": True,
              "ring_seconds": 30,
              "simultaneous_calls": 5}
 
@@ -116,6 +120,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 65
     yield s.check_bogus_field_returns_error, url, 'language', 'klingon'
+    yield s.check_bogus_field_returns_error, url, 'call_permission_password', 1234
+    yield s.check_bogus_field_returns_error, url, 'call_permission_password', 'invalid_char'
+    yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
 
 
 def put_error_checks(url):
@@ -261,6 +269,7 @@ def test_search_using_legacy_parameter(user1, user2):
                mobile_phone_number="5552423232",
                userfield="leeroy jenkins userfield",
                description="Léeroy Jénkin's bio",
+               enabled=False,
                preprocess_subroutine="leeroy_preprocess")
 def test_search_on_user_view(user):
     url = confd.users
@@ -274,6 +283,7 @@ def test_search_on_user_view(user):
         'userfield': 'jenkins userfield',
         'description': "jénkin's bio",
         'preprocess_subroutine': 'roy_preprocess',
+        'enabled': False,
     }
 
     for field, term in searches.items():

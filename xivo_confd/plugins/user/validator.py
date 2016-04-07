@@ -38,6 +38,7 @@ from xivo_confd.database import entity as entity_db
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
 USERNAME_PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]+$"
+CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,40}"
 
 
 class NoVoicemailAssociated(Validator):
@@ -90,6 +91,8 @@ def build_validator():
                      RegexField.compile('username', USERNAME_PASSWORD_REGEX)),
             Optional('password',
                      RegexField.compile('password', USERNAME_PASSWORD_REGEX)),
+            Optional('call_permission_password',
+                     RegexField.compile('call_permission_password', CALL_PERMISSION_PASSWORD_REGEX)),
             Optional('ring_seconds',
                      NumberRange('ring_seconds', minimum=0, maximum=60, step=5)),
             Optional('simultaneous_calls',
