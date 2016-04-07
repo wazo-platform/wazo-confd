@@ -102,19 +102,27 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'userfield', 123
     yield s.check_bogus_field_returns_error, url, 'caller_id', 'callerid'
+    yield s.check_bogus_field_returns_error, url, 'caller_id', None
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
     yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', None
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', None
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 'sixty'
-    yield s.check_bogus_field_returns_error, url, 'username', 'ûsername',
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', -1
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 21
+    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', None
+    yield s.check_bogus_field_returns_error, url, 'username', 'ûsername',
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 6
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 65
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
     yield s.check_bogus_field_returns_error, url, 'language', 'klingon'
 
 
