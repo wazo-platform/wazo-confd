@@ -16,10 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from hamcrest import assert_that
-from hamcrest import contains
-from hamcrest import empty
-from hamcrest import has_entries
+from hamcrest import (assert_that,
+                      contains,
+                      empty,
+                      has_entries,
+                      not_)
 
 from test_api import scenarios as s
 from test_api import confd
@@ -78,7 +79,7 @@ def test_associate_using_uuid(user, call_permission):
 @fixtures.call_permission()
 @fixtures.call_permission()
 @fixtures.call_permission()
-def test_associate_muliple_call_permissions_to_user(user, perm1, perm2, perm3):
+def test_associate_multiple_call_permissions_to_user(user, perm1, perm2, perm3):
     confd.users(user['id']).callpermissions(perm1['id']).put().assert_updated()
     confd.users(user['id']).callpermissions(perm2['id']).put().assert_updated()
     confd.users(user['id']).callpermissions(perm3['id']).put().assert_updated()
@@ -88,7 +89,7 @@ def test_associate_muliple_call_permissions_to_user(user, perm1, perm2, perm3):
 @fixtures.user()
 @fixtures.user()
 @fixtures.call_permission()
-def test_associate_muliple_users_to_call_permission(user1, user2, user3, call_permission):
+def test_associate_multiple_users_to_call_permission(user1, user2, user3, call_permission):
     confd.users(user1['id']).callpermissions(call_permission['id']).put().assert_updated()
     confd.users(user2['id']).callpermissions(call_permission['id']).put().assert_updated()
     confd.users(user3['id']).callpermissions(call_permission['id']).put().assert_updated()
@@ -96,16 +97,20 @@ def test_associate_muliple_users_to_call_permission(user1, user2, user3, call_pe
 
 @fixtures.user()
 @fixtures.call_permission()
-def test_get_call_permissions_associated_to_user(user, call_permission):
+@fixtures.call_permission()
+def test_get_call_permissions_associated_to_user(user, perm1, perm2):
     expected = contains(has_entries({'user_id': user['id'],
-                                     'call_permission_id': call_permission['id']}))
+                                     'call_permission_id': perm1['id']}),
+                        has_entries({'user_id': user['id'],
+                                     'call_permission_id': perm2['id']}))
 
-    with a.user_call_permission(user, call_permission):
-        response = confd.users(user['id']).callpermissions.get()
-        assert_that(response.items, expected)
+    with a.user_call_permission(user, perm1):
+        with a.user_call_permission(user, perm2):
+            response = confd.users(user['id']).callpermissions.get()
+            assert_that(response.items, expected)
 
-        response = confd.users(user['uuid']).callpermissions.get()
-        assert_that(response.items, expected)
+            response = confd.users(user['uuid']).callpermissions.get()
+            assert_that(response.items, expected)
 
 
 @fixtures.user()
@@ -122,14 +127,18 @@ def test_get_call_permission_after_dissociation(user, call_permission):
 
 
 @fixtures.user()
+@fixtures.user()
 @fixtures.call_permission()
-def test_get_users_associated_to_call_permission(user, call_permission):
-    expected = contains(has_entries({'user_id': user['id'],
+def test_get_users_associated_to_call_permission(user1, user2, call_permission):
+    expected = contains(has_entries({'user_id': user1['id'],
+                                     'call_permission_id': call_permission['id']}),
+                        has_entries({'user_id': user2['id'],
                                      'call_permission_id': call_permission['id']}))
 
-    with a.user_call_permission(user, call_permission):
-        response = confd.callpermissions(call_permission['id']).users.get()
-        assert_that(response.items, expected)
+    with a.user_call_permission(user1, call_permission):
+        with a.user_call_permission(user2, call_permission):
+            response = confd.callpermissions(call_permission['id']).users.get()
+            assert_that(response.items, expected)
 
 
 @fixtures.user()
@@ -152,13 +161,19 @@ def test_dissociate_using_uuid(user, call_permission):
 @fixtures.call_permission()
 def test_delete_user_when_user_and_call_permission_associated(user, call_permission):
     with a.user_call_permission(user, call_permission, check=False):
+        response = confd.users(user['id']).callpermissions.get()
+        assert_that(response.items, not_(empty()))
         confd.users(user['id']).delete().assert_deleted()
+        invalid_user = confd.users(user['id']).callpermissions.get
+        yield s.check_resource_not_found, invalid_user, 'User'
 
 
 @fixtures.user()
 @fixtures.call_permission()
 def test_delete_call_permission_when_user_and_call_permission_associated(user, call_permission):
     with a.user_call_permission(user, call_permission, check=False):
+        response = confd.users(user['id']).callpermissions.get()
+        assert_that(response.items, not_(empty()))
         confd.callpermissions(call_permission['id']).delete().assert_deleted()
         response = confd.users(user['id']).callpermissions.get()
         assert_that(response.items, empty())
