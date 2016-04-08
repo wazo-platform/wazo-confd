@@ -123,7 +123,7 @@ def setup_app(config):
 
     app.debug = config.get('debug', False)
 
-    auth.set_config(config['auth'])
+    auth.set_config(config)
     core = CoreRestApi(app, api, auth)
     plugin_manager.load_plugins(core)
 

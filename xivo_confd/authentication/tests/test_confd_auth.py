@@ -34,10 +34,11 @@ class TestConfdAuthBase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.secret_key = os.urandom(24)
 
-        auth_config = {'host': 'localhost',
-                       'port': 9497}
+        config = {'auth': {'host': 'localhost',
+                           'port': 9497},
+                  'rest_api': {'http': {'port': 9487}}}
         self.auth = ConfdAuth()
-        self.auth.set_config(auth_config)
+        self.auth.set_config(config)
 
         @self.app.route('/')
         @self.auth.login_required

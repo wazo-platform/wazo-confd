@@ -34,7 +34,6 @@ required_acl = required_acl
 class ConfdAuth(HTTPDigestAuth):
 
     ALLOWED_HOST = '127.0.0.1'
-    ALLOWED_PORT = '9487'
 
     def __init__(self):
         super(ConfdAuth, self).__init__()
@@ -42,11 +41,16 @@ class ConfdAuth(HTTPDigestAuth):
         self.auth_verifier = AuthVerifier()
         self._auth_host = None
         self._auth_port = None
+        self._allowed_port = None
 
     def set_config(self, config):
-        self._auth_host = config['host']
-        self._auth_port = config['port']
-        self.auth_verifier.set_config(config)
+        self._auth_host = config['auth']['host']
+        self._auth_port = config['auth']['port']
+        try:
+            self._allowed_port = str(config['rest_api']['http']['port'])
+        except KeyError:
+            pass  # None is fine if http is not enabled
+        self.auth_verifier.set_config(config['auth'])
 
     def login_required(self, func):
         auth_func = super(ConfdAuth, self).login_required(func)
@@ -65,7 +69,7 @@ class ConfdAuth(HTTPDigestAuth):
         # check localhost first to avoid accessing the database for nothing
         remote_addr = request.remote_addr
         remote_port = request.environ['SERVER_PORT']
-        if remote_addr == self.ALLOWED_HOST and remote_port == self.ALLOWED_PORT:
+        if remote_addr == self.ALLOWED_HOST and remote_port == self._allowed_port:
             return True
         return remote_addr in accesswebservice_dao.get_allowed_hosts()
 
