@@ -33,7 +33,8 @@ required_acl = required_acl
 
 class ConfdAuth(HTTPDigestAuth):
 
-    ALLOWED_HOSTS = ['127.0.0.1']
+    ALLOWED_HOST = '127.0.0.1'
+    ALLOWED_PORT = '9487'
 
     def __init__(self):
         super(ConfdAuth, self).__init__()
@@ -63,7 +64,8 @@ class ConfdAuth(HTTPDigestAuth):
     def _remote_address_allowed(self):
         # check localhost first to avoid accessing the database for nothing
         remote_addr = request.remote_addr
-        if remote_addr in self.ALLOWED_HOSTS:
+        remote_port = request.environ['SERVER_PORT']
+        if remote_addr == self.ALLOWED_HOST and remote_port == self.ALLOWED_PORT:
             return True
         return remote_addr in accesswebservice_dao.get_allowed_hosts()
 

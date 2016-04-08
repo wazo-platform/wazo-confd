@@ -50,10 +50,10 @@ class TestConfdAuthBase(unittest.TestCase):
 @patch('xivo_dao.accesswebservice_dao.get_allowed_hosts')
 class TestConfdAuthAllowedHosts(TestConfdAuthBase):
 
-    def test_when_request_from_localhost_then_calls_action(self, get_allowed_hosts):
+    def test_when_request_from_local_host_and_local_port_then_calls_action(self, get_allowed_hosts):
         get_allowed_hosts.return_value = []
 
-        response = self.client.get('/', environ_base={'REMOTE_ADDR': '127.0.0.1'})
+        response = self.client.get('/', environ_overrides={'REMOTE_ADDR': '127.0.0.1', 'SERVER_PORT': '9487'})
 
         assert_that(response.status_code, equal_to(200))
         assert_that(response.data, equal_to('called'))
@@ -61,10 +61,17 @@ class TestConfdAuthAllowedHosts(TestConfdAuthBase):
     def test_when_request_from_allowed_host_then_calls_action(self, get_allowed_hosts):
         get_allowed_hosts.return_value = ['192.168.0.1']
 
-        response = self.client.get('/', environ_base={'REMOTE_ADDR': '192.168.0.1'})
+        response = self.client.get('/', environ_overrides={'REMOTE_ADDR': '192.168.0.1', 'SERVER_PORT': '9486'})
 
         assert_that(response.status_code, equal_to(200))
         assert_that(response.data, equal_to('called'))
+
+    def test_when_request_from_local_host_and_remote_port_then_request_refused(self, get_allowed_hosts):
+        get_allowed_hosts.return_value = []
+
+        response = self.client.get('/', environ_overrides={'REMOTE_ADDR': '127.0.0.1', 'SERVER_PORT': '9486'})
+
+        assert_that(response.status_code, equal_to(401))
 
 
 class TestConfdAuthCredentials(TestConfdAuthBase):
