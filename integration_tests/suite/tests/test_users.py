@@ -102,28 +102,31 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'userfield', 123
     yield s.check_bogus_field_returns_error, url, 'caller_id', 'callerid'
-    yield s.check_bogus_field_returns_error, url, 'caller_id', None
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
     yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', None
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', None
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 'sixty'
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', -1
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 21
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', None
     yield s.check_bogus_field_returns_error, url, 'username', 'ûsername',
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 6
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 65
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
     yield s.check_bogus_field_returns_error, url, 'language', 'klingon'
+
+
+def put_error_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'caller_id', None
+    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
+    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', None
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
 
 
 @fixtures.user()
@@ -131,6 +134,8 @@ def test_put_errors(user):
     user_put = confd.users(user['id']).put
 
     for check in error_checks(user_put):
+        yield check
+    for check in put_error_checks(user_put):
         yield check
 
 
@@ -361,6 +366,19 @@ def test_create_minimal_parameters():
 
     response.assert_created('users')
     assert_that(response.item, has_entry("firstname", "Roger"))
+
+
+def test_create_with_null_parameters_fills_default_values():
+    response = confd.users.post(firstname="Charlie")
+    response.assert_created('users')
+
+    assert_that(response.item, has_entries(caller_id='"Charlie"',
+                                           call_transfer_enabled=True,
+                                           call_record_enabled=False,
+                                           online_call_record_enabled=False,
+                                           supervision_enabled=True,
+                                           ring_seconds=30,
+                                           simultaneous_calls=5))
 
 
 def test_create_user_with_all_parameters():
