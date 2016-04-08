@@ -112,8 +112,15 @@ def build_validator():
                                  'User'))
         ],
         edit=[
+            RequiredFields('call_transfer_enabled',
+                           'call_record_enabled',
+                           'online_call_record_enabled',
+                           'supervision_enabled',
+                           'ring_seconds',
+                           'simultaneous_calls',
+                           'caller_id'),
             Optional('email',
-                     UniqueFieldChanged('email', user_dao, 'User'))
+                     UniqueFieldChanged('email', user_dao, 'User')),
         ]
     )
 
