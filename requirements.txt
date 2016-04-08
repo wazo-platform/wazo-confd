@@ -11,6 +11,7 @@ flask-negotiate==0.1.0
 flask-restful==0.3.5
 flask==0.10.1
 kombu==3.0.26
+marshmallow==2.6.1
 netifaces
 psycopg2==2.5.4  # from xivo-dao
 pyopenssl==0.14  # from xivo-lib-python

@@ -36,7 +36,8 @@ Depends: ${python:Depends},
          python-flask-restful,
          python-cherrypy3,
          python-requests (>= 2.4.3),
-         python-netifaces
+         python-netifaces,
+         python-marshmallow
 Provides: xivo-librestapi
 Conflicts: xivo-librestapi
 Replaces: xivo-librestapi

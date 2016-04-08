@@ -15,10 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask_restful import reqparse, fields, marshal
+from flask import request
+from flask_restful import abort
+from marshmallow import Schema, fields, pre_dump
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import Strict, ConfdResource
+from xivo_confd.helpers.restful import ConfdResource
+
+
+class BaseSchema(Schema):
+    def handle_error(self, error, data):
+        # Format the error message to have the same behavior as flask-restful
+        error_msg = {key: value[0] for key, value in error.message.iteritems()}
+        return abort(400, message=error_msg)
 
 
 class UserSubResource(ConfdResource):
@@ -28,7 +37,7 @@ class UserSubResource(ConfdResource):
 
     def get(self, user_id):
         user = self.service.get(user_id)
-        return marshal(user, self.fields)
+        return self.schema.dump(user).data
 
     def put(self, user_id):
         user = self.service.get(user_id)
@@ -36,18 +45,33 @@ class UserSubResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self.parser.parse_args()
+        form = self.schema.load(request.get_json()).data
         for name, value in form.iteritems():
             setattr(model, name, value)
         self.service.edit(model, self.name)
 
 
+class ServiceDNDSchema(BaseSchema):
+    enabled = fields.Boolean(attribute='dnd_enabled', required=True)
+
+
+class ServiceIncallFilterSchema(BaseSchema):
+    enabled = fields.Boolean(attribute='incallfilter_enabled', required=True)
+
+
+class ServicesSchema(BaseSchema):
+    dnd = fields.Nested(ServiceDNDSchema)
+    incallfilter = fields.Nested(ServiceIncallFilterSchema)
+
+    @pre_dump()
+    def add_envelope(self, data):
+        return {'dnd': data,
+                'incallfilter': data}
+
+
 class UserServiceDND(UserSubResource):
 
-    fields = {'enabled': fields.Boolean(attribute='dnd_enabled')}
-    parser = (reqparse.RequestParser()
-              .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
-                            dest='dnd_enabled'))
+    schema = ServiceDNDSchema()
     name = 'dnd'
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
@@ -61,10 +85,7 @@ class UserServiceDND(UserSubResource):
 
 class UserServiceIncallFilter(UserSubResource):
 
-    fields = {'enabled': fields.Boolean(attribute='incallfilter_enabled')}
-    parser = (reqparse.RequestParser()
-              .add_argument('enabled', type=Strict(bool), store_missing=False, required=True, nullable=False,
-                            dest='incallfilter_enabled'))
+    schema = ServiceIncallFilterSchema()
     name = 'incallfilter'
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
@@ -78,24 +99,44 @@ class UserServiceIncallFilter(UserSubResource):
 
 class UserServiceList(UserSubResource):
 
-    fields = {'dnd': UserServiceDND.fields,
-              'incallfilter': UserServiceIncallFilter.fields}
+    schema = ServicesSchema()
 
     @required_acl('confd.users.{user_id}.services.read')
     def get(self, user_id):
         return super(UserServiceList, self).get(user_id)
 
 
+class ForwardBusySchema(BaseSchema):
+    enabled = fields.Boolean(attribute='busy_enabled')
+    destination = fields.String(attribute='busy_destination', allow_none=True)
+
+
+class ForwardNoAnswerSchema(BaseSchema):
+    enabled = fields.Boolean(attribute='noanswer_enabled')
+    destination = fields.String(attribute='noanswer_destination', allow_none=True)
+
+
+class UnconditionalForwardSchema(BaseSchema):
+    enabled = fields.Boolean(attribute='unconditional_enabled')
+    destination = fields.String(attribute='unconditional_destination', allow_none=True)
+
+
+class ForwardsSchema(BaseSchema):
+    busy = fields.Nested(ForwardBusySchema)
+    noanswer = fields.Nested(ForwardNoAnswerSchema)
+    unconditional = fields.Nested(UnconditionalForwardSchema)
+
+    @pre_dump
+    def add_envelope(self, data):
+        return {'busy': data,
+                'noanswer': data,
+                'unconditional': data}
+
+
 class UserForwardBusy(UserSubResource):
 
-    fields = {'enabled': fields.Boolean(attribute='busy_enabled'),
-              'destination': fields.String(attribute='busy_destination')}
-    parser = (reqparse.RequestParser()
-              .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
-                            dest='busy_enabled')
-              .add_argument('destination', type=Strict(unicode), store_missing=False,
-                            dest='busy_destination'))
     name = 'busy'
+    schema = ForwardBusySchema()
 
     @required_acl('confd.users.{user_id}.forwards.busy.read')
     def get(self, user_id):
@@ -108,13 +149,7 @@ class UserForwardBusy(UserSubResource):
 
 class UserForwardNoAnswer(UserSubResource):
 
-    fields = {'enabled': fields.Boolean(attribute='noanswer_enabled'),
-              'destination': fields.String(attribute='noanswer_destination')}
-    parser = (reqparse.RequestParser()
-              .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
-                            dest='noanswer_enabled')
-              .add_argument('destination', type=Strict(unicode), store_missing=False,
-                            dest='noanswer_destination'))
+    schema = ForwardNoAnswerSchema()
     name = 'noanswer'
 
     @required_acl('confd.users.{user_id}.forwards.noanswer.read')
@@ -128,13 +163,7 @@ class UserForwardNoAnswer(UserSubResource):
 
 class UserForwardUnconditional(UserSubResource):
 
-    fields = {'enabled': fields.Boolean(attribute='unconditional_enabled'),
-              'destination': fields.String(attribute='unconditional_destination')}
-    parser = (reqparse.RequestParser()
-              .add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False,
-                            dest='unconditional_enabled')
-              .add_argument('destination', type=Strict(unicode), store_missing=False,
-                            dest='unconditional_destination'))
+    schema = UnconditionalForwardSchema()
     name = 'unconditional'
 
     @required_acl('confd.users.{user_id}.forwards.unconditional.read')
@@ -148,9 +177,7 @@ class UserForwardUnconditional(UserSubResource):
 
 class UserForwardList(UserSubResource):
 
-    fields = {'busy': UserForwardBusy.fields,
-              'noanswer': UserForwardNoAnswer.fields,
-              'unconditional': UserForwardUnconditional.fields}
+    schema = ForwardsSchema()
 
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):
