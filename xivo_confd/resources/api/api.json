@@ -4863,14 +4863,17 @@
                 },
                 "call_transfer_enabled": {
                     "type": "boolean",
+                    "default": true,
                     "description": "Authorize call transfers"
                 },
                 "call_record_enabled": {
                     "type": "boolean",
+                    "default": false,
                     "description": "Record all calls made by this user"
                 },
                 "online_call_record_enabled": {
                     "type": "boolean",
+                    "default": false,
                     "description": "Allow user to record a call by pressing *3"
                 },
                 "caller_id": {
@@ -4905,14 +4908,17 @@
                 },
                 "ring_seconds": {
                     "type": "integer",
+                    "default": 30,
                     "description": "Number of seconds a user's phone will ring before fallbacking"
                 },
                 "simultaneous_calls": {
                     "type": "integer",
+                    "default": 5,
                     "description": "Number of allowed simultaneous calls on a user's phone"
                 },
                 "supervision_enabled": {
                     "type": "boolean",
+                    "default": true,
                     "description": "Activate presence sharing in the xivo client"
                 },
                 "preprocess_subroutine": {
@@ -4929,6 +4935,7 @@
                 },
                 "enabled": {
                     "type": "boolean",
+                    "default": true,
                     "description": "Enable/Disable the user"
                 }
             },
