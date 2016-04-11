@@ -30,6 +30,14 @@ class BaseSchema(Schema):
         return abort(400, message=error_msg)
 
 
+class StrictBoolean(fields.Boolean):
+
+    def _deserialize(self, value, attr, data):
+        if not isinstance(value, bool):
+            self.fail('invalid')
+        return value
+
+
 class UserSubResource(ConfdResource):
 
     def __init__(self, service):
@@ -52,11 +60,11 @@ class UserSubResource(ConfdResource):
 
 
 class ServiceDNDSchema(BaseSchema):
-    enabled = fields.Boolean(attribute='dnd_enabled', required=True)
+    enabled = StrictBoolean(attribute='dnd_enabled', required=True)
 
 
 class ServiceIncallFilterSchema(BaseSchema):
-    enabled = fields.Boolean(attribute='incallfilter_enabled', required=True)
+    enabled = StrictBoolean(attribute='incallfilter_enabled', required=True)
 
 
 class ServicesSchema(BaseSchema):
@@ -107,17 +115,17 @@ class UserServiceList(UserSubResource):
 
 
 class ForwardBusySchema(BaseSchema):
-    enabled = fields.Boolean(attribute='busy_enabled')
+    enabled = StrictBoolean(attribute='busy_enabled', falsy=set((False,)), truthy=set((True,)))
     destination = fields.String(attribute='busy_destination', allow_none=True)
 
 
 class ForwardNoAnswerSchema(BaseSchema):
-    enabled = fields.Boolean(attribute='noanswer_enabled')
+    enabled = StrictBoolean(attribute='noanswer_enabled')
     destination = fields.String(attribute='noanswer_destination', allow_none=True)
 
 
 class UnconditionalForwardSchema(BaseSchema):
-    enabled = fields.Boolean(attribute='unconditional_enabled')
+    enabled = StrictBoolean(attribute='unconditional_enabled')
     destination = fields.String(attribute='unconditional_destination', allow_none=True)
 
 
