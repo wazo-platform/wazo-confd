@@ -63,8 +63,7 @@ def build_notifier():
 
 class UserServiceNotifier(object):
 
-    def __init__(self, sysconfd, bus):
-        self.sysconfd = sysconfd
+    def __init__(self, bus):
         self.bus = bus
 
     def edited(self, user, schema):
@@ -76,13 +75,12 @@ class UserServiceNotifier(object):
 
 
 def build_notifier_service():
-    return UserServiceNotifier(sysconfd, bus)
+    return UserServiceNotifier(bus)
 
 
 class UserForwardNotifier(object):
 
-    def __init__(self, sysconfd, bus):
-        self.sysconfd = sysconfd
+    def __init__(self, bus):
         self.bus = bus
 
     def edited(self, user, schema):
@@ -94,4 +92,4 @@ class UserForwardNotifier(object):
 
 
 def build_notifier_forward():
-    return UserForwardNotifier(sysconfd, bus)
+    return UserForwardNotifier(bus)
