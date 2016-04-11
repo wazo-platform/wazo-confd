@@ -59,10 +59,10 @@ def build_service(provd_client):
 
 class UserCallServiceService(UserBaseService):
 
-    def edit(self, user, service_name):
+    def edit(self, user, schema):
         self.validator.validate_edit(user)
         self.dao.edit(user)
-        self.notifier.edited(user, service_name)
+        self.notifier.edited(user, schema)
 
 
 def build_service_callservice():
@@ -73,10 +73,10 @@ def build_service_callservice():
 
 class UserForwardService(UserBaseService):
 
-    def edit(self, user, forward_name):
+    def edit(self, user, schema):
         self.validator.validate_edit(user)
         self.dao.edit(user)
-        self.notifier.edited(user, forward_name)
+        self.notifier.edited(user, schema)
 
 
 def build_service_forward():

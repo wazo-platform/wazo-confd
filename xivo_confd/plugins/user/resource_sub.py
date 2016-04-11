@@ -56,15 +56,19 @@ class UserSubResource(ConfdResource):
         form = self.schema.load(request.get_json()).data
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model, self.name)
+        self.service.edit(model, self.schema)
 
 
 class ServiceDNDSchema(BaseSchema):
     enabled = StrictBoolean(attribute='dnd_enabled', required=True)
 
+    types = ['dnd']
+
 
 class ServiceIncallFilterSchema(BaseSchema):
     enabled = StrictBoolean(attribute='incallfilter_enabled', required=True)
+
+    types = ['incallfilter']
 
 
 class ServicesSchema(BaseSchema):
@@ -80,7 +84,6 @@ class ServicesSchema(BaseSchema):
 class UserServiceDND(UserSubResource):
 
     schema = ServiceDNDSchema()
-    name = 'dnd'
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
     def get(self, user_id):
@@ -94,7 +97,6 @@ class UserServiceDND(UserSubResource):
 class UserServiceIncallFilter(UserSubResource):
 
     schema = ServiceIncallFilterSchema()
-    name = 'incallfilter'
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
     def get(self, user_id):
@@ -118,21 +120,27 @@ class ForwardBusySchema(BaseSchema):
     enabled = StrictBoolean(attribute='busy_enabled', falsy=set((False,)), truthy=set((True,)))
     destination = fields.String(attribute='busy_destination', allow_none=True)
 
+    types = ['busy']
+
 
 class ForwardNoAnswerSchema(BaseSchema):
     enabled = StrictBoolean(attribute='noanswer_enabled')
     destination = fields.String(attribute='noanswer_destination', allow_none=True)
 
+    types = ['noanswer']
 
-class UnconditionalForwardSchema(BaseSchema):
+
+class ForwardUnconditionalSchema(BaseSchema):
     enabled = StrictBoolean(attribute='unconditional_enabled')
     destination = fields.String(attribute='unconditional_destination', allow_none=True)
+
+    types = ['unconditional']
 
 
 class ForwardsSchema(BaseSchema):
     busy = fields.Nested(ForwardBusySchema)
     noanswer = fields.Nested(ForwardNoAnswerSchema)
-    unconditional = fields.Nested(UnconditionalForwardSchema)
+    unconditional = fields.Nested(ForwardUnconditionalSchema)
 
     @pre_dump
     def add_envelope(self, data):
@@ -143,7 +151,6 @@ class ForwardsSchema(BaseSchema):
 
 class UserForwardBusy(UserSubResource):
 
-    name = 'busy'
     schema = ForwardBusySchema()
 
     @required_acl('confd.users.{user_id}.forwards.busy.read')
@@ -158,7 +165,6 @@ class UserForwardBusy(UserSubResource):
 class UserForwardNoAnswer(UserSubResource):
 
     schema = ForwardNoAnswerSchema()
-    name = 'noanswer'
 
     @required_acl('confd.users.{user_id}.forwards.noanswer.read')
     def get(self, user_id):
@@ -171,8 +177,7 @@ class UserForwardNoAnswer(UserSubResource):
 
 class UserForwardUnconditional(UserSubResource):
 
-    schema = UnconditionalForwardSchema()
-    name = 'unconditional'
+    schema = ForwardUnconditionalSchema()
 
     @required_acl('confd.users.{user_id}.forwards.unconditional.read')
     def get(self, user_id):
