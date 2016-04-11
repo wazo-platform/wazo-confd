@@ -121,7 +121,8 @@ def build_validator():
                            'supervision_enabled',
                            'ring_seconds',
                            'simultaneous_calls',
-                           'caller_id'),
+                           'caller_id',
+                           'enabled'),
             Optional('email',
                      UniqueFieldChanged('email', user_dao, 'User')),
         ]

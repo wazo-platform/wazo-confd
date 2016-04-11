@@ -103,7 +103,7 @@ parser.add_argument('simultaneous_calls', type=int, store_missing=False)
 parser.add_argument('caller_id', type=Strict(unicode), store_missing=False)
 parser.add_argument('mobile_phone_number', type=Strict(unicode), store_missing=False)
 parser.add_argument('call_permission_password', type=Strict(unicode), store_missing=False)
-parser.add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False)
+parser.add_argument('enabled', type=Strict(bool), store_missing=False)
 
 
 class UserList(ListResource):
