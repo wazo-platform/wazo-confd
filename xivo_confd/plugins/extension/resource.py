@@ -22,21 +22,21 @@ from flask_restful import reqparse, fields
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
     Strict, DigitStr
-from xivo_dao.resources.extension.model import Extension
+from xivo_dao.alchemy.extension import Extension
 
 
 fields = {
     'id': fields.Integer,
     'exten': fields.String,
     'context': fields.String,
-    'commented': fields.Integer,
+    'commented': fields.Boolean(attribute='legacy_commented'),
     'links': FieldList(Link('extensions'))
 }
 
 parser = reqparse.RequestParser()
 parser.add_argument('exten', type=DigitStr(), store_missing=False)
 parser.add_argument('context', type=Strict(unicode), store_missing=False)
-parser.add_argument('commented', type=Strict(bool), store_missing=False)
+parser.add_argument('commented', type=Strict(bool), store_missing=False, dest='legacy_commented')
 
 
 class ExtensionList(ListResource):
