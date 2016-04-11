@@ -173,7 +173,7 @@ def test_create_minimal_voicemail():
 
 def test_create_voicemails_same_number_different_contexts():
     number, context = vm_helper.new_number_and_context('vmctx1')
-    other_context = context_helper.new_context('vmctx2')
+    other_context = context_helper.generate_context(name='vmctx2')
 
     response = confd.voicemails.post(name='samenumber1',
                                      number=number,
@@ -182,7 +182,7 @@ def test_create_voicemails_same_number_different_contexts():
 
     response = confd.voicemails.post(name='samenumber2',
                                      number=number,
-                                     context=other_context)
+                                     context=other_context['name'])
     response.assert_ok()
 
 

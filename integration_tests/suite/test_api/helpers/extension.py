@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,11 @@ from test_api import confd
 from test_api import config
 
 
-def generate_extension(context=config.CONTEXT, exten=None):
-    if not exten:
-        exten = find_available_exten(context)
-    return add_extension(exten=exten, context=context)
+def generate_extension(**parameters):
+    parameters.setdefault('context', config.CONTEXT)
+    if 'exten' not in parameters:
+        parameters['exten'] = find_available_exten(parameters['context'])
+    return add_extension(**parameters)
 
 
 def find_available_exten(context, exclude=None):

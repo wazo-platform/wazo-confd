@@ -109,7 +109,7 @@ def test_associate_line_and_internal_extension(line, extension):
     assert_that(response.item, expected)
 
 
-@fixtures.extension('from-extern')
+@fixtures.extension(context='from-extern')
 @fixtures.line_sip()
 def test_associate_incall_to_line_without_user(incall, line):
     response = confd.lines(line['id']).extensions.post(extension_id=incall['id'])
