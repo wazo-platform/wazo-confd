@@ -94,7 +94,6 @@ ALL_OPTIONS = [
     ['fullname', 'fullname'],
     ['defaultip', '127.0.0.1'],
     ['qualifyfreq', '5000'],
-    ['protocol', 'sip'],
     ['regexten', 'regexten'],
     ['regseconds', '60'],
     ['regserver', '127.0.0.1'],
