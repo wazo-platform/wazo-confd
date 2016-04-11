@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import unicode_literals
-from hamcrest import assert_that, has_key, has_entries
+from hamcrest import assert_that, has_key, has_entries, equal_to
 
 from test_api import confd
 from test_api import fixtures
@@ -62,6 +62,22 @@ def _read_forward(forward_url, enabled, destination=None):
 
 
 @fixtures.user()
+def test_put_forwards(user):
+    forwards_url = confd.users(user['uuid']).forwards
+    yield _update_forwards, forwards_url, {'enabled': True, 'destination': '123'}, \
+                                          {'enabled': False, 'destination': '456'}, \
+                                          {'enabled': False, 'destination': None}
+
+
+def _update_forwards(forwards_url, busy={}, noanswer={}, unconditional={}):
+    response = forwards_url.put(busy=busy, noanswer=noanswer, unconditional=unconditional)
+    response.assert_ok()
+
+    response = forwards_url.get()
+    assert_that(response.item, equal_to({'busy': busy, 'noanswer': noanswer, 'unconditional': unconditional}))
+
+
+@fixtures.user()
 def test_error_on_null_destination_when_enabled(user):
     for forward in VALID_FORWARDS:
         response = confd.users(user['uuid']).forwards(forward).put(enabled=True, destination=None)
@@ -74,6 +90,8 @@ def test_put_error(user):
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', 'string'
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', None
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', 123
+    yield s.check_bogus_field_returns_error, forward_url, 'enabled', 1
+    yield s.check_bogus_field_returns_error, forward_url, 'enabled', 0
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', {}
     yield s.check_bogus_field_returns_error, forward_url, 'destination', True
     yield s.check_bogus_field_returns_error, forward_url, 'destination', 123

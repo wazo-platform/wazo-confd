@@ -17,7 +17,7 @@
 
 from flask import request
 from flask_restful import abort
-from marshmallow import Schema, fields, pre_dump
+from marshmallow import Schema, fields, pre_dump, post_load
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
@@ -77,8 +77,7 @@ class ServicesSchema(BaseSchema):
 
     @pre_dump()
     def add_envelope(self, data):
-        return {'dnd': data,
-                'incallfilter': data}
+        return {type_: data for type_ in self.types}
 
 
 class UserServiceDND(UserSubResource):
@@ -142,11 +141,19 @@ class ForwardsSchema(BaseSchema):
     noanswer = fields.Nested(ForwardNoAnswerSchema)
     unconditional = fields.Nested(ForwardUnconditionalSchema)
 
+    types = ['busy', 'noanswer', 'unconditional']
+
     @pre_dump
     def add_envelope(self, data):
-        return {'busy': data,
-                'noanswer': data,
-                'unconditional': data}
+        return {type_: data for type_ in self.types}
+
+    @post_load
+    def remove_envelope(self, data):
+        result = {}
+        for forward in data.itervalues():
+            for key, value in forward.iteritems():
+                result[key] = value
+        return result
 
 
 class UserForwardBusy(UserSubResource):
@@ -195,3 +202,7 @@ class UserForwardList(UserSubResource):
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):
         return super(UserForwardList, self).get(user_id)
+
+    @required_acl('confd.users.{user_id}.forwards.update')
+    def put(self, user_id):
+        return super(UserForwardList, self).put(user_id)

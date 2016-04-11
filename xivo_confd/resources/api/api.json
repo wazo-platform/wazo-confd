@@ -2702,6 +2702,36 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "operationId": "update_user_forwards",
+                "summary": "Update all forwards for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.forwards.update`",
+                "tags": [
+                    "forwards",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserForwards"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    }
+                }
             }
         },
         "/users/{user_id}/forwards/{forward_name}": {
