@@ -22,6 +22,7 @@ from xivo_confd import api
 
 from xivo_confd.plugins.user.service import build_service as build_user_service
 from xivo_confd.plugins.line.service import build_service as build_line_service
+from xivo_confd.plugins.extension.service import build_service as build_extension_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
@@ -54,7 +55,6 @@ from xivo_confd.plugins.user_import.associators import (LineAssociator,
                                                         CallPermissionAssociator)
 
 from xivo_confd.resources.voicemails.services import build_service as build_voicemail_service
-from xivo_confd.resources.extensions.services import build_service as build_extension_service
 
 from xivo_confd.database import call_permission as call_permission_dao
 
