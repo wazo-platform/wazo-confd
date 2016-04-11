@@ -4203,7 +4203,8 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "Custom Endpoint ID (read-only)"
+                    "description": "Custom Endpoint ID",
+                    "readOnly": true
                 },
                 "interface": {
                     "type": "string",
@@ -4236,6 +4237,11 @@
         "EndpointSip": {
             "title": "SIP Endpoint",
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "SIP Endpoint ID",
+                    "readOnly": true
+                },
                 "username": {
                     "type": "string",
                     "description": "SIP username"
@@ -4278,6 +4284,11 @@
         "EndpointSccp": {
             "title": "SCCP Endpoint",
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "SCCP Endpoint ID",
+                    "readOnly": true
+                },
                 "options": {
                     "description": "Advanced configuration options. Options are appended at the end of a \nSCCP account in the file 'sccp.conf' used by asterisk.\nPlease consult the asterisk documentation for further details on available\nparameters. Because of database limitations, only the following options are allowed:\n\n * cid_name\n * cid_num\n * allow\n * disallow\n \nOptions must have the following the form:\n\n```\n{\n  \"options\": [\n    [\"name1\", \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n```\n\nThe resulting configuration in sip.conf will have the following form:\n\n```\n[1000]\nname1=value1\nname2=value2\n```\n",
                     "type": "array",
