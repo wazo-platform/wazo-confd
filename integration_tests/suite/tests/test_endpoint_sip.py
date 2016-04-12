@@ -82,7 +82,6 @@ ALL_OPTIONS = [
     ['rtptimeout', '15'],
     ['disallow', 'all'],
     ['allow', 'g723'],
-    ['allow', 'gsm'],
     ['setvar', 'setvar'],
     ['accountcode', 'accountcode'],
     ['md5secret', 'abcdefg'],
