@@ -33,9 +33,8 @@ fields = {
                             field='line_id',
                             target='id'),
                        Link('extensions',
-                            route='extensions.get',
                             field='extension_id',
-                            target='resource_id'))
+                            target='id'))
 }
 
 parser = reqparse.RequestParser()

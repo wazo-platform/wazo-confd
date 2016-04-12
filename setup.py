@@ -49,6 +49,7 @@ setup(
             'endpoint_custom_plugin = xivo_confd.plugins.endpoint_custom.plugin:Plugin',
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'device_plugin = xivo_confd.plugins.device.plugin:Plugin',
+            'extension_plugin = xivo_confd.plugins.extension.plugin:Plugin',
             'user_voicemail_plugin = xivo_confd.plugins.user_voicemail.plugin:Plugin',
             'user_cti_profile_plugin = xivo_confd.plugins.user_cti_profile.plugin:Plugin',
             'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',

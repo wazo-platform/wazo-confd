@@ -317,18 +317,29 @@ class DatabaseQueries(object):
 
         return filter_member_id
 
-    def insert_context(self, name, contexttype):
+    def insert_context(self, **parameters):
+        parameters.setdefault('displayname', parameters['name'])
+        parameters.setdefault('description', '')
+        parameters.setdefault('commented', 0)
         query = text("""
-                     INSERT INTO context(name, displayname, contexttype, description, entity)
+                     INSERT INTO context(name, displayname, contexttype, description, commented, entity)
                      VALUES (
-                                :name, :name, :contexttype, '',
+                                :name, :displayname, :contexttype, :description, :commented,
                                 (SELECT id FROM entity LIMIT 1)
                             )
                      """)
 
-        self.connection.execute(query, name=name, contexttype=contexttype)
+        self.connection.execute(query, **parameters)
 
-        return name
+        return parameters['name']
+
+    def insert_context_range(self, context, type_, start, end, didlength=0):
+        query = text("""
+                     INSERT INTO contextnumbers(context, type, numberbeg, numberend, didlength)
+                     VALUES (:context, :type, :numberbeg, :numberend, :didlength)
+                     """)
+
+        self.connection.execute(query, context=context, type=type_, numberbeg=start, numberend=end, didlength=didlength)
 
     def delete_context(self, name):
         query = text("DELETE FROM context WHERE name = :name")

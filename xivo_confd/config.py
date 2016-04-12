@@ -106,6 +106,7 @@ DEFAULT_CONFIG = {
         'endpoint_custom_plugin',
         'line_sip_plugin',
         'device_plugin',
+        'extension_plugin',
         'user_voicemail_plugin',
         'user_cti_profile_plugin',
         'user_line_plugin',

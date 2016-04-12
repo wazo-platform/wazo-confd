@@ -1,6 +1,6 @@
 from test_api import confd
 from test_api import config
-from test_api.helpers.context import new_context
+from test_api.helpers.context import generate_context
 
 
 def generate_voicemail(**kwargs):
@@ -16,7 +16,7 @@ def generate_number_and_context():
 
 
 def new_number_and_context(context):
-    new_context(context)
+    generate_context(name=context)
     return find_available_number(context), context
 
 
