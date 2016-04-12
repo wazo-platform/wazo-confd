@@ -123,7 +123,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', 1234
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', 'invalid_char'
     yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
 
 
 def put_error_checks(url):
@@ -135,6 +134,7 @@ def put_error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', None
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
 
 
 @fixtures.user()
