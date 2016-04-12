@@ -46,6 +46,8 @@ user_fields = {
     'supervision_enabled': fields.Boolean,
     'ring_seconds': fields.Integer,
     'simultaneous_calls': fields.Integer,
+    'call_permission_password': fields.String,
+    'enabled': fields.Boolean,
     'links': FieldList(Link('users'))
 }
 
@@ -100,6 +102,8 @@ parser.add_argument('ring_seconds', type=int, store_missing=False)
 parser.add_argument('simultaneous_calls', type=int, store_missing=False)
 parser.add_argument('caller_id', type=Strict(unicode), store_missing=False)
 parser.add_argument('mobile_phone_number', type=Strict(unicode), store_missing=False)
+parser.add_argument('call_permission_password', type=Strict(unicode), store_missing=False)
+parser.add_argument('enabled', type=Strict(bool), store_missing=False)
 
 
 class UserList(ListResource):
