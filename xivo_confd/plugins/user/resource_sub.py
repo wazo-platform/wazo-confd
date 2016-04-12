@@ -75,6 +75,8 @@ class ServicesSchema(BaseSchema):
     dnd = fields.Nested(ServiceDNDSchema)
     incallfilter = fields.Nested(ServiceIncallFilterSchema)
 
+    types = ['dnd', 'incallfilter']
+
     @pre_dump()
     def add_envelope(self, data):
         return {type_: data for type_ in self.types}
