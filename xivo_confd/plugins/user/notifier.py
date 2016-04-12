@@ -63,32 +63,33 @@ def build_notifier():
 
 class UserServiceNotifier(object):
 
-    def __init__(self, sysconfd, bus):
-        self.sysconfd = sysconfd
+    def __init__(self, bus):
         self.bus = bus
 
-    def edited(self, user, service_name):
-        service_enabled = getattr(user, '{}_enabled'.format(service_name))
-        event = EditUserServiceEvent(user.uuid, service_name, service_enabled)
-        self.bus.send_bus_event(event, event.routing_key)
+    def edited(self, user, schema):
+        services = schema.dump(user).data
+        for type_ in schema.types:
+            service = services.get(type_, services)
+            event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
+            self.bus.send_bus_event(event, event.routing_key)
 
 
 def build_notifier_service():
-    return UserServiceNotifier(sysconfd, bus)
+    return UserServiceNotifier(bus)
 
 
 class UserForwardNotifier(object):
 
-    def __init__(self, sysconfd, bus):
-        self.sysconfd = sysconfd
+    def __init__(self, bus):
         self.bus = bus
 
-    def edited(self, user, forward_name):
-        forward_enabled = getattr(user, '{}_enabled'.format(forward_name))
-        forward_destination = getattr(user, '{}_destination'.format(forward_name))
-        event = EditUserForwardEvent(user.uuid, forward_name, forward_enabled, forward_destination)
-        self.bus.send_bus_event(event, event.routing_key)
+    def edited(self, user, schema):
+        forwards = schema.dump(user).data
+        for type_ in schema.types:
+            forward = forwards.get(type_, forwards)
+            event = EditUserForwardEvent(user.uuid, type_, forward['enabled'], forward['destination'])
+            self.bus.send_bus_event(event, event.routing_key)
 
 
 def build_notifier_forward():
-    return UserForwardNotifier(sysconfd, bus)
+    return UserForwardNotifier(bus)

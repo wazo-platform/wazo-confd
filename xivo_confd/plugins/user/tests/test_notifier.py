@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import unittest
-from mock import Mock
+from mock import Mock, call
 
 from xivo_bus.resources.user.event import (CreateUserEvent,
                                            EditUserEvent,
@@ -26,6 +26,12 @@ from xivo_bus.resources.user.event import (CreateUserEvent,
                                            EditUserForwardEvent)
 from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.user.notifier import UserNotifier, UserServiceNotifier, UserForwardNotifier
+from xivo_confd.plugins.user.resource_sub import (ServiceDNDSchema,
+                                                  ServiceIncallFilterSchema,
+                                                  ForwardBusySchema,
+                                                  ForwardNoAnswerSchema,
+                                                  ForwardUnconditionalSchema,
+                                                  ForwardsSchema)
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
@@ -95,30 +101,29 @@ class TestUserNotifier(unittest.TestCase):
 class TestUserServiceNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
         self.bus = Mock()
         self.user = Mock(User, uuid='1234-abcd', dnd_enabled=True, incallfilter_enabled=True)
 
-        self.notifier = UserServiceNotifier(self.sysconfd, self.bus)
+        self.notifier = UserServiceNotifier(self.bus)
 
     def test_when_user_service_dnd_edited_then_event_sent_on_bus(self):
-        service_name = 'dnd'
+        schema = ServiceDNDSchema()
         expected_event = EditUserServiceEvent(self.user.uuid,
-                                              service_name,
+                                              schema.types[0],
                                               self.user.dnd_enabled)
 
-        self.notifier.edited(self.user, service_name)
+        self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
 
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
-        service_name = 'incallfilter'
+        schema = ServiceIncallFilterSchema()
         expected_event = EditUserServiceEvent(self.user.uuid,
-                                              service_name,
+                                              schema.types[0],
                                               self.user.incallfilter_enabled)
 
-        self.notifier.edited(self.user, service_name)
+        self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
@@ -127,47 +132,68 @@ class TestUserServiceNotifier(unittest.TestCase):
 class TestUserForwardNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
         self.bus = Mock()
         self.user = Mock(User, uuid='1234-abcd',
                          busy_enabled=True, busy_destination='123',
                          noanswer_enabled=False, noanswer_destination='456',
                          unconditional_enabled=True, unconditional_destination='789')
 
-        self.notifier = UserForwardNotifier(self.sysconfd, self.bus)
+        self.notifier = UserForwardNotifier(self.bus)
 
     def test_when_user_forward_busy_edited_then_event_sent_on_bus(self):
-        service_name = 'busy'
+        schema = ForwardBusySchema()
         expected_event = EditUserForwardEvent(self.user.uuid,
-                                              service_name,
+                                              'busy',
                                               self.user.busy_enabled,
                                               self.user.busy_destination)
 
-        self.notifier.edited(self.user, service_name)
+        self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
 
     def test_when_user_forward_noanswer_edited_then_event_sent_on_bus(self):
-        service_name = 'noanswer'
+        schema = ForwardNoAnswerSchema()
         expected_event = EditUserForwardEvent(self.user.uuid,
-                                              service_name,
+                                              'noanswer',
                                               self.user.noanswer_enabled,
                                               self.user.noanswer_destination)
 
-        self.notifier.edited(self.user, service_name)
+        self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
 
     def test_when_user_forward_unconditional_edited_then_event_sent_on_bus(self):
-        service_name = 'unconditional'
+        schema = ForwardUnconditionalSchema()
         expected_event = EditUserForwardEvent(self.user.uuid,
-                                              service_name,
+                                              'unconditional',
                                               self.user.unconditional_enabled,
                                               self.user.unconditional_destination)
 
-        self.notifier.edited(self.user, service_name)
+        self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
+
+    def test_when_user_forwards_edited_then_event_sent_on_bus(self):
+        schema = ForwardsSchema()
+        self.notifier.edited(self.user, schema)
+
+        expected_busy_event = EditUserForwardEvent(self.user.uuid,
+                                                   'busy',
+                                                   self.user.busy_enabled,
+                                                   self.user.busy_destination)
+
+        expected_noanswer_event = EditUserForwardEvent(self.user.uuid,
+                                                       'noanswer',
+                                                       self.user.noanswer_enabled,
+                                                       self.user.noanswer_destination)
+        expected_unconditional_event = EditUserForwardEvent(self.user.uuid,
+                                                            'unconditional',
+                                                            self.user.unconditional_enabled,
+                                                            self.user.unconditional_destination)
+        expected_calls = [call(expected_busy_event, expected_busy_event.routing_key),
+                          call(expected_noanswer_event, expected_noanswer_event.routing_key),
+                          call(expected_unconditional_event, expected_unconditional_event.routing_key)]
+        self.bus.send_bus_event.assert_has_calls(expected_calls)
