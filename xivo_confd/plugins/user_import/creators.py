@@ -26,7 +26,7 @@ from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from xivo_dao.resources.voicemail.model import Voicemail
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
-from xivo_dao.resources.extension.model import Extension
+from xivo_dao.alchemy.extension import Extension
 
 
 class Creator(object):
@@ -129,7 +129,7 @@ class ExtensionCreator(Creator):
         context = fields.get('context')
         if exten and context:
             try:
-                return self.service.dao.get_by_exten_context(exten, context)
+                return self.service.dao.get_by(exten=exten, context=context)
             except NotFoundError:
                 return None
 
@@ -171,7 +171,7 @@ class IncallCreator(Creator):
         context = fields.get('context')
         if exten and context:
             try:
-                return self.service.dao.get_by_exten_context(exten, context)
+                return self.service.dao.get_by(exten=exten, context=context)
             except NotFoundError:
                 return None
 

@@ -26,7 +26,7 @@ from xivo_bus.resources.extension.event import (CreateExtensionEvent,
 from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.extension.notifier import ExtensionNotifier
 
-from xivo_dao.resources.extension.model import Extension
+from xivo_dao.alchemy.extension import Extension
 
 
 class TestExtensionNotifier(unittest.TestCase):

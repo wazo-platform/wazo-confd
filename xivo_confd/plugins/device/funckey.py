@@ -119,7 +119,7 @@ class GroupConverter(FuncKeyConverter):
         self.extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        extension = self.extension_dao.get_by_group_id(funckey.destination.group_id)
+        extension = self.extension_dao.get_by(type='group', typeval=str(funckey.destination.group_id))
         return self.provd_funckey(line, position, funckey, extension.exten)
 
     def determine_type(self, funckey):
@@ -132,7 +132,7 @@ class QueueConverter(FuncKeyConverter):
         self.extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        extension = self.extension_dao.get_by_queue_id(funckey.destination.queue_id)
+        extension = self.extension_dao.get_by(type='queue', typeval=str(funckey.destination.queue_id))
         return self.provd_funckey(line, position, funckey, extension.exten)
 
     def determine_type(self, funckey):
@@ -145,7 +145,7 @@ class ConferenceConverter(FuncKeyConverter):
         self.extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        extension = self.extension_dao.get_by_conference_id(funckey.destination.conference_id)
+        extension = self.extension_dao.get_by(type='meetme', typeval=str(funckey.destination.conference_id))
         return self.provd_funckey(line, position, funckey, extension.exten)
 
 
@@ -156,7 +156,7 @@ class PagingConverter(FuncKeyConverter):
         self.paging_dao = paging_dao
 
     def build(self, user, line, position, funckey):
-        prefix_exten = self.extension_dao.get_by_type('extenfeatures', 'paging')
+        prefix_exten = self.extension_dao.get_by(type='extenfeatures', typeval='paging')
         extension = self.paging_dao.get_number(funckey.destination.paging_id)
         value = '{}{}'.format(prefix_exten.clean_exten(), extension)
         return self.provd_funckey(line, position, funckey, value)
@@ -179,7 +179,7 @@ class ServiceConverter(FuncKeyConverter):
         extension = self.extension_dao.get(funckey.destination.extension_id)
 
         if funckey.destination.service in self.PROGFUNCKEYS:
-            prog_exten = self.extension_dao.get_by_type('extenfeatures', 'phoneprogfunckey')
+            prog_exten = self.extension_dao.get_by(type='extenfeatures', typeval='phoneprogfunckey')
             value = self.progfunckey(prog_exten.exten,
                                      user.id,
                                      extension.clean_exten(),
@@ -207,7 +207,7 @@ class ForwardConverter(FuncKeyConverter):
         self.extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        prog_exten = self.extension_dao.get_by_type('extenfeatures', 'phoneprogfunckey')
+        prog_exten = self.extension_dao.get_by(type='extenfeatures', typeval='phoneprogfunckey')
         fwd_exten = self.extension_dao.get(funckey.destination.extension_id)
 
         value = self.progfunckey(prog_exten.exten,
@@ -256,7 +256,7 @@ class BSFilterConverter(FuncKeyConverter):
         self.extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        prefix = self.extension_dao.get_by_type('extenfeatures', 'bsfilter')
+        prefix = self.extension_dao.get_by(type='extenfeatures', typeval='bsfilter')
 
         value = '{}{}'.format(prefix.clean_exten(),
                               funckey.destination.filter_member_id)
@@ -270,7 +270,7 @@ class AgentConverter(FuncKeyConverter):
         self.extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        prog_exten = self.extension_dao.get_by_type('extenfeatures', 'phoneprogfunckey')
+        prog_exten = self.extension_dao.get_by(type='extenfeatures', typeval='phoneprogfunckey')
         action_exten = self.extension_dao.get(funckey.destination.extension_id)
 
         value = self.progfunckey(prog_exten.exten,

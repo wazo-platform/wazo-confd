@@ -30,8 +30,8 @@ class ExtenAvailableOnCreateValidator(Validator):
         self.dao = dao
 
     def validate(self, extension):
-        existing = self.dao.find_by_exten_context(extension.exten,
-                                                  extension.context)
+        existing = self.dao.find_by(exten=extension.exten,
+                                    context=extension.context)
         if existing:
             raise errors.resource_exists('Extension',
                                          exten=extension.exten,
@@ -44,8 +44,8 @@ class ExtenAvailabelOnUpdateValidator(Validator):
         self.dao = dao
 
     def validate(self, extension):
-        existing = self.dao.find_by_exten_context(extension.exten,
-                                                  extension.context)
+        existing = self.dao.find_by(exten=extension.exten,
+                                    context=extension.context)
         if existing and existing.id != extension.id:
             raise errors.resource_exists('Extension',
                                          exten=extension.exten,
@@ -74,7 +74,7 @@ class ExtensionAssociationValidator(Validator):
         self.line_extension_dao = line_extension_dao
 
     def validate(self, extension):
-        extension_type, typeval = self.dao.get_type_typeval(extension.id)
+        extension_type, typeval = extension.type, extension.typeval
 
         # extensions that are created or dissociated are set to these values by default
         if extension_type != 'user' and typeval != '0':
