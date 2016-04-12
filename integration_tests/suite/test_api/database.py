@@ -353,57 +353,6 @@ class DatabaseQueries(object):
         query = text("UPDATE linefeatures SET device = NULL WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)
 
-    def insert_call_permission(self, name):
-        query = text("INSERT INTO rightcall(name, description) VALUES (:name, '') RETURNING id")
-        return self.connection.execute(query, name=name).scalar()
-
-    def delete_call_permission(self, id):
-        query = text("DELETE FROM rightcallexten WHERE rightcallid = :id")
-        self.connection.execute(query, id=id)
-        query = text("DELETE FROM rightcallmember WHERE rightcallid = :id")
-        self.connection.execute(query, id=id)
-        query = text("DELETE FROM rightcall WHERE id = :id")
-        self.connection.execute(query, id=id)
-
-    def add_call_permission_member(self, call_permission_id, member_id, member='user'):
-        query = text("""INSERT INTO rightcallmember
-                     (rightcallid, type, typeval)
-                     VALUES
-                     (:call_permission_id, :member, :member_id)
-                     """)
-        self.connection.execute(query,
-                                call_permission_id=call_permission_id,
-                                member=member,
-                                member_id=str(member_id))
-
-    def remove_call_permission_member(self, call_permission_id, member_id, member='user'):
-        query = text("""DELETE FROM rightcallmember
-                     WHERE
-                     rightcallid = :call_permission_id
-                     AND type = :member
-                     AND typeval = :member_id
-                     """)
-        self.connection.execute(query,
-                                call_permission_id=call_permission_id,
-                                member=member,
-                                member_id=str(member_id))
-
-    def call_permission_has_user(self, call_permission_id, user_id):
-        query = text("""SELECT COUNT(*)
-                     FROM rightcallmember
-                     WHERE
-                        rightcallid = :call_permission_id
-                        AND type = 'user'
-                        AND typeval = :user_id
-                     """)
-        count = (self.connection
-                 .execute(query,
-                          call_permission_id=call_permission_id,
-                          user_id=str(user_id))
-                 .scalar())
-
-        return count > 0
-
     def insert_switchboard(self, queue_id):
         query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
                         VALUES ('2016-02-29 00:00:00', 'abandoned', 15.2, :queue_id)

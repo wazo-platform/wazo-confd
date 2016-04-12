@@ -30,6 +30,8 @@ from xivo_confd.plugins.user_line.service import build_service as build_ul_servi
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
 from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_service
+from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
+from xivo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
 
 from xivo_confd.plugins.user_import.service import ImportService
 from xivo_confd.plugins.user_import.resource import UserImportResource, UserExportResource
@@ -56,9 +58,8 @@ from xivo_confd.plugins.user_import.associators import (LineAssociator,
 
 from xivo_confd.resources.voicemails.services import build_service as build_voicemail_service
 
-from xivo_confd.database import call_permission as call_permission_dao
-
 from xivo_dao.resources.incall import dao as incall_dao
+from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
@@ -68,6 +69,7 @@ from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
 from xivo_dao.resources.user_cti_profile import dao as user_cti_profile_dao
 
 
@@ -87,6 +89,8 @@ class Plugin(object):
         extension_service = build_extension_service(provd_client)
         user_line_service = build_ul_service()
         line_extension_service = build_line_extension_service()
+        call_permission_service = build_call_permission_service()
+        user_call_permission_service = build_user_call_permission_service()
 
         creators = {'user': UserCreator(user_service),
                     'line': LineCreator(line_service),
@@ -96,7 +100,7 @@ class Plugin(object):
                     'extension': ExtensionCreator(extension_service),
                     'incall': IncallCreator(extension_service),
                     'cti_profile': CtiProfileCreator(cti_profile_dao),
-                    'call_permissions': CallPermissionCreator(call_permission_dao),
+                    'call_permissions': CallPermissionCreator(call_permission_service),
                     }
 
         entry_creator = EntryCreator(creators)
@@ -109,7 +113,8 @@ class Plugin(object):
             ('line', LineAssociator(user_line_service)),
             ('extension', ExtensionAssociator(line_extension_service)),
             ('incall', IncallAssociator(line_extension_service)),
-            ('call_permissions', CallPermissionAssociator(call_permission_dao)),
+            ('call_permissions', CallPermissionAssociator(user_call_permission_service,
+                                                          call_permission_service)),
         ])
 
         entry_associator = EntryAssociator(associators)
@@ -125,7 +130,8 @@ class Plugin(object):
                                    sccp_dao,
                                    extension_dao,
                                    incall_dao,
-                                   call_permission_dao)
+                                   call_permission_dao,
+                                   user_call_permission_dao)
 
         entry_updater = EntryUpdater(creators, associators, entry_finder)
 

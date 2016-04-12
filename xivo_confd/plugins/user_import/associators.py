@@ -192,8 +192,9 @@ class IncallAssociator(Associator):
 
 class CallPermissionAssociator(Associator):
 
-    def __init__(self, dao):
-        self.dao = dao
+    def __init__(self, service, call_permission_service):
+        self.service = service
+        self.call_permission_service = call_permission_service
 
     def associate(self, entry):
         user = entry.get_resource('user')
@@ -202,13 +203,13 @@ class CallPermissionAssociator(Associator):
             self.associate_permissions(user, permissions)
 
     def associate_permissions(self, user, permissions):
-        self.dao.remove_user(user.id)
+        self.service.dissociate_all_by_user(user)
         for permission in permissions:
-            self.dao.associate_user(permission.id, user.id)
+            self.service.associate(user, permission)
 
     def update(self, entry):
         user = entry.get_resource('user')
         names = entry.extract_field('call_permissions', 'names')
         if names is not None:
-            entry.call_permissions = [self.dao.get_by(name=name) for name in names]
+            entry.call_permissions = [self.call_permission_service.get_by(name=name) for name in names]
             self.associate_permissions(user, entry.call_permissions)
