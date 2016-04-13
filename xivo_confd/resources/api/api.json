@@ -3596,7 +3596,7 @@
             "post": {
                 "operationId": "passing_wizard",
                 "summary": "Pass the wizard",
-                "description": "**Required ACL:** `none`",
+                "description": "**Required ACL:** `none`\n\nThis API can only be use once to configure the XiVO.",
                 "tags": [
                     "wizard"
                 ],
@@ -3604,7 +3604,7 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Wizard to create",
+                        "description": "Wizard parameters to configure",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Wizard"
@@ -3613,10 +3613,12 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Wizard creation",
                         "schema": {
-                            "$ref": "#/definitions/WizardItems"
+                            "$ref": "#/definitions/Wizard"
                         }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
                     }
                 }
             },
@@ -5426,99 +5428,64 @@
         "Wizard": {
             "title": "Wizard",
             "properties": {
+                "xivo_uuid": {
+                    "type": "string",
+                    "readOnly": true,
+                    "description": "XiVO's uuid"
+                },
+                "admin_username": {
+                    "type": "string",
+                    "readOnly": true,
+                    "default": "root",
+                    "description": "XiVO administrator username"
+                },
+                "admin_password": {
+                    "type": "string",
+                    "description": "XiVO administrator password"
+                },
                 "license": {
                     "type": "boolean",
-                    "description": "Licence accepted"
+                    "description": "Accept/Decline the GPLv3"
                 },
                 "timezone": {
                     "type": "string",
-                    "description": "Timezone"
+                    "default": "America/Montreal",
+                    "description": "XiVO's timezone"
                 },
-                "lang": {
+                "language": {
                     "type": "string",
-                    "description": "Lang"
+                    "default": "en_US",
+                    "description": "The language in which the XiVO will play sounds"
                 },
-                "password": {
+                "entity_name": {
                     "type": "string",
-                    "description": "Webi password root"
+                    "description": "Entity's name"
                 },
-                "resolvconf": {
-                    "$ref": "#/definitions/WizardResolvconfItems"
-                },
-                "netiface": {
-                    "$ref": "#/definitions/WizardNetifaceItems"
-                },
-                "entity": {
-                    "$ref": "#/definitions/WizardEntityItems"
+                "network": {
+                    "$ref": "#/definitions/WizardNetwork"
                 }
-            }
+            },
+            "required": [
+                "license",
+                "admin_password"
+            ]
         },
-        "WizardResolvconfItems": {
-            "title": "WizardResolvconfItems",
+        "WizardNetwork": {
+            "title": "WizardNetwork",
             "properties": {
                 "hostname": {
                     "type": "string",
-                    "description": "Hostname"
+                    "default": "System's hostname",
+                    "description": "System's hostname"
                 },
-                "domain": {
-                    "type": "string",
-                    "description": "Domain"
-                },
-                "ns1": {
-                    "type": "string",
-                    "description": "Name server 1"
-                },
-                "ns2": {
-                    "type": "string",
-                    "description": "Name server 2"
-                }
-            }
-        },
-        "WizardNetifaceItems": {
-            "title": "WizardNetifaceItems",
-            "properties": {
                 "interface": {
                     "type": "string",
                     "description": "Network interface"
-                },
-                "address": {
-                    "type": "string",
-                    "description": "Interface address"
-                },
-                "netmask": {
-                    "type": "string",
-                    "description": "Netmask"
-                },
-                "gateway": {
-                    "type": "string",
-                    "description": "Default gateway"
                 }
-            }
-        },
-        "WizardEntityItems": {
-            "title": "WizardEntityItems",
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "entity"
-                },
-                "display": {
-                    "type": "string",
-                    "description": "Displayname entity"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Description"
-                }
-            }
-        },
-        "WizardItems": {
-            "title": "WizardItems",
-            "properties": {
-                "uuid": {
-                    "type": "string"
-                }
-            }
+            },
+            "required": [
+                "interface"
+            ]
         }
     }
 }
