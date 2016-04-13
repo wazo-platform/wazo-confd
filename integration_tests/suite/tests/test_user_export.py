@@ -40,6 +40,8 @@ from test_api import helpers as h
                call_transfer_enabled=True,
                call_record_enabled=False,
                online_call_record_enabled=False,
+               call_permission_password="1234",
+               enabled=True,
                username="ursule",
                password="ursulepassword")
 def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fields(user):
@@ -57,6 +59,8 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
                            call_transfer_enabled="1",
                            call_record_enabled="0",
                            online_call_record_enabled="0",
+                           call_permission_password="1234",
+                           enabled="1",
                            username="ursule",
                            password="ursulepassword",
                            entity_id="1")

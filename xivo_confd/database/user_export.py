@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from sqlalchemy.sql import cast, func, and_
+from sqlalchemy.sql import cast, func, and_, case
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import aliased
 
@@ -43,6 +43,8 @@ COLUMNS = ('uuid',
            'mobile_phone_number',
            'outgoing_caller_id',
            'language',
+           'call_permission_password',
+           'enabled',
            'ring_seconds',
            'simultaneous_calls',
            'supervision_enabled',
@@ -132,6 +134,8 @@ def export_query(separator=";"):
         User.mobile_phone_number,
         User.outgoing_caller_id,
         User.language,
+        User.call_permission_password,
+        case([(User.enabled, '1')], else_='0'),
         cast(User.ring_seconds, String),
         cast(User.simultaneous_calls, String),
         cast(User.enablehint, String),
