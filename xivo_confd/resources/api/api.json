@@ -3621,25 +3621,6 @@
                         "$ref": "#/responses/CreateError"
                     }
                 }
-            },
-            "delete": {
-                "operationId": "reset_wizard",
-                "summary": "Reset XiVO to the wizard",
-                "description": "**Required ACL:** `confd.wizard.reset`",
-                "tags": [
-                    "wizard"
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/responses/ResourceDeleted"
-                    },
-                    "400": {
-                        "$ref": "#/responses/DeleteError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
             }
         },
         "/lines_sip": {
@@ -5478,13 +5459,13 @@
                     "default": "System's hostname",
                     "description": "System's hostname"
                 },
-                "interface": {
+                "ip_address": {
                     "type": "string",
-                    "description": "Network interface"
+                    "description": "IP address of the voip interface"
                 }
             },
             "required": [
-                "interface"
+                "address"
             ]
         }
     }
