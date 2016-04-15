@@ -16,20 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd import api
-from xivo_confd.plugins.wizard.service import build_service
-from xivo_confd.plugins.wizard.resource import WizardResource
-from xivo_dao.resources.infos import dao as infos_dao
+from xivo_confd.helpers.validator import ValidationGroup
 
 
-class Plugin(object):
-
-    def load(self, core):
-        provd_client = core.provd_client()
-        service = build_service(provd_client, infos_dao)
-
-        api.add_resource(WizardResource,
-                         '/wizard',
-                         endpoint='wizard',
-                         resource_class_args=(service,)
-                         )
+def build_validator():
+    return ValidationGroup()

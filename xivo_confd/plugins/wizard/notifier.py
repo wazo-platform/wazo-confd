@@ -16,20 +16,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd import api
-from xivo_confd.plugins.wizard.service import build_service
-from xivo_confd.plugins.wizard.resource import WizardResource
-from xivo_dao.resources.infos import dao as infos_dao
+from xivo_confd import bus
+
+from xivo_bus.resources.wizard.event import CreateWizardEvent
 
 
-class Plugin(object):
+class WizardNotifier(object):
 
-    def load(self, core):
-        provd_client = core.provd_client()
-        service = build_service(provd_client, infos_dao)
+    def __init__(self, bus):
+        self.bus = bus
 
-        api.add_resource(WizardResource,
-                         '/wizard',
-                         endpoint='wizard',
-                         resource_class_args=(service,)
-                         )
+    def created(self):
+        event = CreateWizardEvent()
+        self.bus.send_bus_event(event, event.routing_key)
+
+
+def build_notifier():
+    return WizardNotifier(bus)

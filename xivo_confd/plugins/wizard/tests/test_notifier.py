@@ -16,20 +16,25 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd import api
-from xivo_confd.plugins.wizard.service import build_service
-from xivo_confd.plugins.wizard.resource import WizardResource
-from xivo_dao.resources.infos import dao as infos_dao
+import unittest
+from mock import Mock
+
+from xivo_bus.resources.wizard.event import CreateWizardEvent
+
+from xivo_confd.plugins.wizard.notifier import WizardNotifier
 
 
-class Plugin(object):
+class TestWizardNotifier(unittest.TestCase):
 
-    def load(self, core):
-        provd_client = core.provd_client()
-        service = build_service(provd_client, infos_dao)
+    def setUp(self):
+        self.bus = Mock()
 
-        api.add_resource(WizardResource,
-                         '/wizard',
-                         endpoint='wizard',
-                         resource_class_args=(service,)
-                         )
+        self.notifier = WizardNotifier(self.bus)
+
+    def test_when_wizard_created_then_event_sent_on_bus(self):
+        expected_event = CreateWizardEvent()
+
+        self.notifier.created()
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event,
+                                                        expected_event.routing_key)
