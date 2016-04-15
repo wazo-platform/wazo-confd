@@ -82,7 +82,6 @@ ALL_OPTIONS = [
     ['rtptimeout', '15'],
     ['disallow', 'all'],
     ['allow', 'g723'],
-    ['setvar', 'setvar'],
     ['accountcode', 'accountcode'],
     ['md5secret', 'abcdefg'],
     ['mohinterpret', 'mohinterpret'],
