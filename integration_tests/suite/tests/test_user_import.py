@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from hamcrest import (assert_that,
                       contains,
+                      contains_inanyorder,
                       contains_string,
                       equal_to,
                       has_entries,
@@ -33,7 +34,6 @@ from test_api import confd
 from test_api import config
 from test_api import helpers as h
 from test_api import fixtures
-from test_api import db
 
 
 client = h.user_import.csv_client()
@@ -377,8 +377,9 @@ def test_given_csv_has_call_permission_then_call_permission_associated(call_perm
     assert_that(response.item['created'], expected)
 
     user_id = response.item['created'][0]['user_id']
-    with db.queries() as queries:
-        assert_that(queries.call_permission_has_user(call_permission['id'], user_id))
+    user_call_permissions = confd.users(user_id).callpermissions.get().items
+    assert_that(user_call_permissions, contains(has_entries(call_permission_id=call_permission['id'],
+                                                            user_id=user_id)))
 
 
 @fixtures.call_permission()
@@ -397,9 +398,11 @@ def test_given_csv_has_multiple_call_permissions_then_all_call_permission_associ
     assert_that(response.item['created'], expected)
 
     user_id = response.item['created'][0]['user_id']
-    with db.queries() as queries:
-        assert_that(queries.call_permission_has_user(perm1['id'], user_id))
-        assert_that(queries.call_permission_has_user(perm2['id'], user_id))
+    user_call_permissions = confd.users(user_id).callpermissions.get().items
+    assert_that(user_call_permissions, contains_inanyorder(has_entries(call_permission_id=perm1['id'],
+                                                                       user_id=user_id),
+                                                           has_entries(call_permission_id=perm2['id'],
+                                                                       user_id=user_id)))
 
 
 def test_given_call_permission_does_not_exist_then_error_raised():
@@ -498,8 +501,9 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     response = confd.users(user_id).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=cti_profile['id']))
 
-    with db.queries() as queries:
-        assert_that(queries.call_permission_has_user(call_permission['id'], user_id))
+    response = confd.users(user_id).callpermissions.get()
+    assert_that(response.items, contains(has_entries(call_permission_id=call_permission['id'],
+                                                     user_id=user_id)))
 
 
 @fixtures.call_permission()
@@ -907,11 +911,11 @@ def test_when_updating_call_permission_field_then_call_permissions_updated(entry
     old_perm_id1, old_perm_id2 = entry['call_permission_ids']
     user_id = response.item['updated'][0]['user_id']
 
-    with db.queries() as q:
-        assert_that(q.call_permission_has_user(perm1['id'], user_id), equal_to(True))
-        assert_that(q.call_permission_has_user(perm2['id'], user_id), equal_to(True))
-        assert_that(q.call_permission_has_user(old_perm_id1, user_id), equal_to(False))
-        assert_that(q.call_permission_has_user(old_perm_id2, user_id), equal_to(False))
+    response = confd.users(user_id).callpermissions.get()
+    assert_that(response.items, contains_inanyorder(has_entries(call_permission_id=perm1['id'],
+                                                                user_id=user_id),
+                                                    has_entries(call_permission_id=perm2['id'],
+                                                                user_id=user_id)))
 
 
 @fixtures.csv_entry(call_permissions=1)
@@ -928,11 +932,10 @@ def test_when_call_permission_column_is_empty_then_call_permission_is_removed(en
 
     assert_that(response.item['updated'], expected)
 
-    old_perm_id = entry['call_permission_ids'][0]
     user_id = response.item['updated'][0]['user_id']
 
-    with db.queries() as q:
-        assert_that(q.call_permission_has_user(old_perm_id, user_id), equal_to(False))
+    response = confd.users(user_id).callpermissions.get()
+    assert_that(response.items, empty())
 
 
 @fixtures.csv_entry(call_permissions=1)
@@ -1108,8 +1111,9 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     response = confd.users(entry['user_id']).cti.get()
     assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
 
-    with db.queries() as queries:
-        assert_that(queries.call_permission_has_user(call_permission['id'], entry['user_id']))
+    response = confd.users(entry['user_id']).callpermissions.get()
+    assert_that(response.items, contains_inanyorder(has_entries(call_permission_id=call_permission['id'],
+                                                                user_id=entry['user_id'])))
 
 
 @fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip", call_permissions=1)

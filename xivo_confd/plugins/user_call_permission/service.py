@@ -47,6 +47,9 @@ class UserCallPermissionService(object):
         self.dao.dissociate(user, call_permission)
         self.notifier.dissociated(user, call_permission)
 
+    def dissociate_all_by_user(self, user):
+        self.dao.dissociate_all_by_user(user)
+
 
 def build_service():
     notifier = build_notifier()

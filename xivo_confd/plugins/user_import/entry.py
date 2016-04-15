@@ -32,7 +32,7 @@ class Entry(object):
         self.extension = None
         self.incall = None
         self.cti_profile = None
-        self.call_permissions = None
+        self.call_permissions = []
 
     def extract_ids(self):
         return {
@@ -122,7 +122,7 @@ class EntryFinder(object):
 
     def __init__(self, user_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
                  user_cti_profile_dao, line_dao, user_line_dao, sip_dao, sccp_dao,
-                 extension_dao, incall_dao, call_permission_dao):
+                 extension_dao, incall_dao, call_permission_dao, user_call_permission_dao):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
@@ -135,6 +135,7 @@ class EntryFinder(object):
         self.extension_dao = extension_dao
         self.incall_dao = incall_dao
         self.call_permission_dao = call_permission_dao
+        self.user_call_permission_dao = user_call_permission_dao
 
     def get_entry(self, row):
         entry_dict = row.parse()
@@ -144,7 +145,9 @@ class EntryFinder(object):
 
         entry.cti_profile = self.user_cti_profile_dao.find_profile_by_userid(user.id)
 
-        entry.call_permissions = self.call_permission_dao.find_all_by_member('user', user.id)
+        user_call_permissions = self.user_call_permission_dao.find_all_by(user_id=user.id)
+        for user_call_permission in user_call_permissions:
+            entry.call_permissions.append(self.call_permission_dao.get_by(id=user_call_permission.call_permission_id))
 
         user_voicemail = self.user_voicemail_dao.find_by_user_id(user.id)
         if user_voicemail:
