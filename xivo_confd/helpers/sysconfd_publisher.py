@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2013-2016 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
 import requests
 import json
 
@@ -49,6 +66,42 @@ class SysconfdPublisher(object):
         url = "{}/delete_voicemail".format(self.base_url)
         self.add_request('GET', url, params=params)
 
+    def commonconf_apply(self):
+        url = "{}/commonconf_apply".format(self.base_url)
+        self.add_request('GET', url)
+        self.flush()
+
+    def commonconf_generate(self):
+        url = "{}/commonconf_generate".format(self.base_url)
+        self.add_request('POST', url, data=json.dumps({}))
+        self.flush()
+
+    def set_hosts(self, hostname, domain):
+        data = {'hostname': hostname,
+                'domain': domain}
+        url = "{}/hosts".format(self.base_url)
+        self.add_request('POST', url, data=json.dumps(data))
+        self.flush()
+
+    def set_resolvconf(self, nameserver, domain):
+        data = {'nameservers': nameserver,
+                'search': [domain]}
+        url = "{}/resolv_conf".format(self.base_url)
+        self.add_request('POST', url, data=json.dumps(data))
+        self.flush()
+
+    def xivo_service_start(self):
+        data = {'xivo-service': 'start'}
+        url = "{}/xivoctl".format(self.base_url)
+        self.add_request('POST', url, data=json.dumps(data))
+        self.flush()
+
+    def xivo_service_enable(self):
+        data = {'xivo-service': 'enable'}
+        url = "{}/xivoctl".format(self.base_url)
+        self.add_request('POST', url, data=json.dumps(data))
+        self.flush()
+
     def _session(self):
         session = requests.Session()
         session.trust_env = False
@@ -66,6 +119,7 @@ class SysconfdPublisher(object):
         session = self._session()
         self.flush_handlers(session)
         self.flush_requests(session)
+        self.rollback()
 
     def flush_handlers(self, session):
         if len(self.handlers) > 0:

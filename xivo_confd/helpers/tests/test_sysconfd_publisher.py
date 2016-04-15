@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,73 @@ class TestSysconfdClient(TestCase):
                                                      url,
                                                      params={'mailbox': '123', 'context': 'default'},
                                                      data=None)
+
+    def test_commonconf_generate(self):
+        self.session.request.return_value = Mock(status_code=200)
+
+        self.client.commonconf_generate()
+
+        url = "http://localhost:8668/commonconf_generate"
+        self.session.request.assert_called_once_with('POST', url, params={}, data='{}')
+
+    def test_commonconf_apply(self):
+        self.session.request.return_value = Mock(status_code=200)
+
+        self.client.commonconf_apply()
+
+        url = "http://localhost:8668/commonconf_apply"
+        self.session.request.assert_called_once_with('GET', url, params={}, data=None)
+
+    def test_xivo_service_start(self):
+        self.session.request.return_value = Mock(status_code=200)
+        data = {'xivo-service': 'start'}
+
+        self.client.xivo_service_start()
+        method, url, body = self.extract_request()
+
+        expected_url = "http://localhost:8668/xivoctl"
+        self.assertEquals(method, "POST")
+        self.assertEquals(url, expected_url)
+        self.assertEquals(json.loads(body), data)
+
+    def test_xivo_service_enable(self):
+        self.session.request.return_value = Mock(status_code=200)
+        data = {'xivo-service': 'enable'}
+
+        self.client.xivo_service_enable()
+        method, url, body = self.extract_request()
+
+        expected_url = "http://localhost:8668/xivoctl"
+        self.assertEquals(method, "POST")
+        self.assertEquals(url, expected_url)
+        self.assertEquals(json.loads(body), data)
+
+    def test_set_hosts(self):
+        self.session.request.return_value = Mock(status_code=200)
+        data = {'hostname': 'toto',
+                'domain': 'toto.tata.titi'}
+
+        self.client.set_hosts(data['hostname'], data['domain'])
+        method, url, body = self.extract_request()
+
+        expected_url = "http://localhost:8668/hosts"
+        self.assertEquals(method, "POST")
+        self.assertEquals(url, expected_url)
+        self.assertEquals(json.loads(body), data)
+
+    def test_set_resolvconf(self):
+        self.session.request.return_value = Mock(status_code=200)
+        domain = 'toto.titi.tata'
+        data = {'nameservers': ['127.0.0.1'],
+                'search': [domain]}
+
+        self.client.set_resolvconf(data['nameservers'], domain)
+        method, url, body = self.extract_request()
+
+        expected_url = "http://localhost:8668/resolv_conf"
+        self.assertEquals(method, "POST")
+        self.assertEquals(url, expected_url)
+        self.assertEquals(json.loads(body), data)
 
     def test_move_voicemail_storage(self):
         self.session.request.return_value = Mock(status_code=200)
