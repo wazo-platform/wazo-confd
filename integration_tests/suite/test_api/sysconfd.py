@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import re
 import requests
 
 from pprint import pformat
-from hamcrest import assert_that, has_entries, equal_to
+from hamcrest import assert_that, has_entries, equal_to, has_item, has_entry
 
 
 class SysconfdMock(object):
@@ -43,15 +43,19 @@ class SysconfdMock(object):
         return response.json()['requests']
 
     def assert_request(self, path, method='GET', query=None, body=None):
-        request = self.request_matching(path, method)
+        results = self.request_matching(path, method)
         if query:
-            assert_that(request['query'], has_entries(query), pformat(request))
+            assert_that(results, has_item(has_entry('query', has_entries(query))), pformat(results))
         if body:
-            assert_that(request['body'], equal_to(body), pformat(request))
+            assert_that(results, has_item(has_entry('body', equal_to(body))), pformat(results))
 
     def request_matching(self, path, method='GET'):
         regex = re.compile(path)
+        results = []
         for request in self.requests():
             if regex.match(request['path']) and request['method'] == method:
-                return request
-        raise AssertionError("Request not found: {} {}".format(method, path))
+                results.append(request)
+
+        if not results:
+            raise AssertionError("Request not found: {} {}".format(method, path))
+        return results
