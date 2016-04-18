@@ -116,6 +116,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             "simultaneous_calls": "5",
             "ring_seconds": "10",
             "userfield": "userfield",
+            "call_permission_password": "1234",
+            "enabled": "1"
             }]
 
     response = client.post("/users/import", csv)
@@ -138,6 +140,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
                                   simultaneous_calls=5,
                                   ring_seconds=10,
                                   userfield="userfield",
+                                  call_permission_password='1234',
+                                  enabled=True,
                                   uuid=user_uuid))
 
 
@@ -532,6 +536,8 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
          "call_transfer_enabled": "1",
          "call_record_enabled": "0",
          "online_call_record_enabled": "0",
+         "call_permission_password": "1234",
+         "enabled": "1",
          "exten": exten1,
          "context": config.CONTEXT,
          "line_protocol": "sip",
@@ -567,6 +573,8 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
          "call_transfer_enabled": "1",
          "call_record_enabled": "1",
          "online_call_record_enabled": "1",
+         "call_permission_password": "5678",
+         "enabled": "0",
          "exten": exten2,
          "context": config.CONTEXT,
          "line_protocol": "sccp",
@@ -655,6 +663,8 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
             "simultaneous_calls": "5",
             "ring_seconds": "10",
             "userfield": "userfield",
+            "call_permission_password": "123",
+            "enabled": "0",
             }]
 
     response = client.put("/users/import", csv)
@@ -677,6 +687,8 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
                                   simultaneous_calls=5,
                                   ring_seconds=10,
                                   userfield="userfield",
+                                  call_permission_password='123',
+                                  enabled=False,
                                   uuid=user_uuid))
 
 
@@ -1000,6 +1012,8 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
          "call_transfer_enabled": "1",
          "call_record_enabled": "0",
          "online_call_record_enabled": "0",
+         "call_permission_password": "321",
+         "enabled": "1",
          "sip_username": "georgesipusername",
          "sip_password": "georgesippassword",
          "incall_exten": incall_exten1,
@@ -1032,6 +1046,8 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
          "call_transfer_enabled": "1",
          "call_record_enabled": "1",
          "online_call_record_enabled": "1",
+         "call_permission_password": "654",
+         "enabled": "0",
          "exten": exten2,
          "context": config.CONTEXT,
          "incall_exten": incall_exten2,
@@ -1139,6 +1155,8 @@ def test_given_each_field_updated_individually_then_entry_updated(entry, call_pe
               "call_transfer_enabled": "1",
               "call_record_enabled": "1",
               "online_call_record_enabled": "1",
+              "call_permission_password": "542",
+              "enabled": "0",
               "sip_username": "fabiensipusername",
               "sip_password": "fabiensippassword",
               "incall_exten": incall_exten,
