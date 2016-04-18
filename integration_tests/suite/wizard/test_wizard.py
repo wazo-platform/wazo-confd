@@ -25,6 +25,9 @@ from hamcrest import (assert_that,
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from test_api import confd, provd, db, mocks
 
+RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
+TIMEZONE = 'America/Montreal'
+
 
 class IntegrationTest(AssetLaunchingTestCase):
 
@@ -45,7 +48,6 @@ class TestWizardErrors(IntegrationTest):
         super(TestWizardErrors, self).setUp()
         self.default_body = {'admin_password': 'password',
                              'license': True,
-                             'timezone': 'America/Montreal',
                              'language': 'en_US',
                              'entity_name': 'Test_Entity',
                              'network': {'hostname': 'Tutu',
@@ -73,7 +75,6 @@ class TestWizard(IntegrationTest):
     def test_post(self, sysconfd):
         data = {'admin_password': 'password',
                 'license': True,
-                'timezone': 'America/Montreal',
                 'language': 'en_US',
                 'entity_name': 'Test_Entity',
                 'network': {'hostname': 'Tutu',
@@ -101,8 +102,10 @@ class TestWizard(IntegrationTest):
             assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
-            assert_that(queries.general_has_timezone(data['timezone']))
-            assert_that(queries.resolvconf_is_configured(data['network']['hostname'], data['network']['domain']))
+            assert_that(queries.general_has_timezone(TIMEZONE))
+            assert_that(queries.resolvconf_is_configured(data['network']['hostname'],
+                                                         data['network']['domain'],
+                                                         RESOLVCONF_NAMESERVERS))
             assert_that(queries.netiface_is_configured(ip_address, gateway))
 
     def validate_sysconfd(self, sysconfd, data):
@@ -118,7 +121,7 @@ class TestWizard(IntegrationTest):
                                                  'domain': data['network']['domain']}))
         sysconfd.assert_request('/resolv_conf',
                                 method='POST',
-                                body=json.dumps({'nameservers': ['8.8.8.8', '8.8.4.4'],
+                                body=json.dumps({'nameservers': RESOLVCONF_NAMESERVERS,
                                                  'search': [data['network']['domain']]}))
         sysconfd.assert_request('/commonconf_generate',
                                 method='POST',

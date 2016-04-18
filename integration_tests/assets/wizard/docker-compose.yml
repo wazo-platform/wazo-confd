@@ -41,6 +41,8 @@ confd:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"
     - "./etc/ssl:/usr/share/xivo-certs"
+    - "./etc/timezone:/etc/timezone"
+    - "./etc/resolv.conf:/etc/resolv.conf"
 sync:
   image: n3llyb0y/wait
   links:
