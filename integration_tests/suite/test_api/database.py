@@ -399,6 +399,149 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def admin_has_password(self, password):
+        query = text("""SELECT COUNT(*)
+                     FROM "user"
+                     WHERE
+                        login = 'root'
+                        AND passwd = :password
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          password=password)
+                 .scalar())
+
+        return count > 0
+
+    def autoprov_is_configured(self):
+        query = text("""SELECT COUNT(*)
+                     FROM staticsip
+                     WHERE
+                        category = 'general'
+                        AND filename = 'sip.conf'
+                        AND var_name = 'autocreate_prefix'
+                     """)
+        count = (self.connection
+                 .execute(query)
+                 .scalar())
+
+        return count > 0
+
+    def entity_has_name_displayname(self, name, displayname):
+        query = text("""SELECT COUNT(*)
+                     FROM entity
+                     WHERE
+                        name = :name
+                        AND displayname = :displayname
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          name=name,
+                          displayname=displayname)
+                 .scalar())
+
+        return count > 0
+
+    def sip_has_language(self, language):
+        query = text("""SELECT COUNT(*)
+                     FROM staticsip
+                     WHERE
+                        var_name = 'language'
+                        AND var_val = :language
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          language=language)
+                 .scalar())
+
+        return count > 0
+
+    def iax_has_language(self, language):
+        query = text("""SELECT COUNT(*)
+                     FROM staticiax
+                     WHERE
+                        var_name = 'language'
+                        AND var_val = :language
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          language=language)
+                 .scalar())
+
+        return count > 0
+
+    def sccp_has_language(self, language):
+        query = text("""SELECT COUNT(*)
+                     FROM sccpgeneralsettings
+                     WHERE
+                        option_name = 'language'
+                        AND option_value = :language
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          language=language)
+                 .scalar())
+
+        return count > 0
+
+    def general_has_timezone(self, timezone):
+        query = text("""SELECT COUNT(*)
+                     FROM general
+                     WHERE
+                        timezone = :timezone
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          timezone=timezone)
+                 .scalar())
+
+        return count > 0
+
+    def resolvconf_is_configured(self, hostname, domain, nameservers):
+        query = text("""SELECT COUNT(*)
+                     FROM resolvconf
+                     WHERE
+                        hostname = :hostname
+                        AND domain = :domain
+                        AND search = :domain
+                        AND nameserver1 = :nameserver1
+                        AND nameserver2 = :nameserver2
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          hostname=hostname,
+                          domain=domain,
+                          nameserver1=nameservers[0],
+                          nameserver2=nameservers[1])
+                 .scalar())
+
+        return count > 0
+
+    def netiface_is_configured(self, address, gateway):
+        # Note that interface and netmask are not tested
+        query = text("""SELECT COUNT(*)
+                     FROM netiface
+                     WHERE
+                        hwtypeid = 1
+                        AND type = 'iface'
+                        AND family = 'inet'
+                        AND method = 'static'
+                        AND address = :address
+                        AND broadcast = ''
+                        AND gateway = :gateway
+                        AND mtu = 1500
+                        AND options = ''
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          address=address,
+                          gateway=gateway)
+                 .scalar())
+
+        return count > 0
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')
