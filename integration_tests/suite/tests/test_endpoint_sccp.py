@@ -104,7 +104,7 @@ def test_create_sccp_with_all_parameters():
     assert_that(response.item, expected)
 
 
-@fixtures.sccp(options=[["allow", "gsm"], ["allow", "alaw"], ["disallow", "ulaw"], ["disallow", "spip"]])
+@fixtures.sccp(options=[["allow", "alaw"], ["disallow", "all"]])
 def test_update_options(sccp):
     options = [
         ["allow", "g723"],
