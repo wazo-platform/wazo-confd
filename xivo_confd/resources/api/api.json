@@ -5430,17 +5430,6 @@
         "Wizard": {
             "title": "Wizard",
             "properties": {
-                "xivo_uuid": {
-                    "type": "string",
-                    "readOnly": true,
-                    "description": "XiVO's uuid"
-                },
-                "admin_username": {
-                    "type": "string",
-                    "readOnly": true,
-                    "default": "root",
-                    "description": "XiVO administrator username"
-                },
                 "admin_password": {
                     "type": "string",
                     "description": "XiVO administrator password"
@@ -5448,11 +5437,6 @@
                 "license": {
                     "type": "boolean",
                     "description": "Accept/Decline the GPLv3"
-                },
-                "timezone": {
-                    "type": "string",
-                    "default": "America/Montreal",
-                    "description": "XiVO's timezone"
                 },
                 "language": {
                     "type": "string",

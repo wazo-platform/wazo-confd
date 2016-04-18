@@ -22,6 +22,7 @@ import re
 from flask import request
 from flask_restful import Resource
 from marshmallow import fields, post_load
+from marshmallow.validate import Equal
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 
@@ -82,11 +83,19 @@ class WizardSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     admin_username = fields.Constant(constant='root', dump_only=True)
     admin_password = fields.String(required=True)
-    license = StrictBoolean(required=True)
-    timezone = fields.String()
-    language = fields.String()
-    entity_name = fields.String()
+    license = StrictBoolean(required=True, validate=Equal(True))
+    language = fields.String(default='en_US')
+    entity_name = fields.String(default='xivo')
+    timezone = fields.String(dump_only=True)
     network = fields.Nested(WizardNetworkSchema)
+
+    @post_load
+    def set_timezone(self, item):
+        item['timezone'] = self.get_timezone()
+
+    def get_timezone(self):
+        with open('/etc/timezone', 'r') as f:
+            return f.readline().strip()
 
 
 class ConfiguredSchema(BaseSchema):
