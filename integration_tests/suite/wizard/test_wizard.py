@@ -16,10 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import json
+import re
+
 from hamcrest import (assert_that,
                       equal_to,
-                      has_item,
-                      contains_string,
                       starts_with)
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
@@ -27,6 +27,10 @@ from test_api import confd, provd, db, mocks
 
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
 TIMEZONE = 'America/Montreal'
+
+
+def build_string(length):
+    return ''.join('a' for _ in range(length))
 
 
 class IntegrationTest(AssetLaunchingTestCase):
@@ -46,27 +50,68 @@ class TestWizardErrors(IntegrationTest):
 
     def setUp(self):
         super(TestWizardErrors, self).setUp()
-        self.default_body = {'admin_password': 'password',
-                             'license': True,
-                             'language': 'en_US',
-                             'entity_name': 'Test_Entity',
-                             'network': {'hostname': 'Tutu',
-                                         'domain': 'domain.test.com',
-                                         'ip_address': self.ip_address}}
 
-    def test_do_not_accept_license(self):
-        body = self.default_body
-        body['license'] = False
-        result = confd.wizard.post(body)
-        assert_that(result.status, equal_to(400))
-        assert_that(result.json, has_item(contains_string('license')))
+    def test_error_license(self):
+        self.check_bogus_field_returns_error('license', 1234)
+        self.check_bogus_field_returns_error('license', 'asdf')
+        self.check_bogus_field_returns_error('license', False)
 
-    def test_not_boolean_lincense(self):
-        body = self.default_body
-        body['license'] = 'asdf'
+    def test_error_password(self):
+        self.check_bogus_field_returns_error('admin_password', 1234)
+        self.check_bogus_field_returns_error('admin_password', None)
+        self.check_bogus_field_returns_error('admin_password', True)
+        self.check_bogus_field_returns_error('admin_password', 'invalidé')
+        self.check_bogus_field_returns_error('admin_password', build_string(65))
+        self.check_bogus_field_returns_error('admin_password', build_string(3))
+
+    def test_error_language(self):
+        self.check_bogus_field_returns_error('language', 1234)
+        self.check_bogus_field_returns_error('language', None)
+        self.check_bogus_field_returns_error('language', True)
+        self.check_bogus_field_returns_error('language', 'fr_US')
+
+    def test_error_entity_name(self):
+        self.check_bogus_field_returns_error('entity_name', 1234)
+        self.check_bogus_field_returns_error('entity_name', None)
+        self.check_bogus_field_returns_error('entity_name', True)
+        self.check_bogus_field_returns_error('entity_name', build_string(65))
+        self.check_bogus_field_returns_error('entity_name', build_string(2))
+
+    def test_error_hostname(self):
+        self.check_bogus_field_returns_error('hostname', 1234)
+        self.check_bogus_field_returns_error('hostname', None)
+        self.check_bogus_field_returns_error('hostname', True)
+        self.check_bogus_field_returns_error('hostname', '-bad-regex')
+        self.check_bogus_field_returns_error('hostname', build_string(64))
+
+    def test_error_domain(self):
+        self.check_bogus_field_returns_error('domain', 1234)
+        self.check_bogus_field_returns_error('domain', None)
+        self.check_bogus_field_returns_error('domain', True)
+        self.check_bogus_field_returns_error('domain', '-bad-regex')
+        self.check_bogus_field_returns_error('domain', build_string(256))
+
+    def test_error_ip_address(self):
+        self.check_bogus_field_returns_error('ip_address', 1234)
+        self.check_bogus_field_returns_error('ip_address', None)
+        self.check_bogus_field_returns_error('ip_address', True)
+        self.check_bogus_field_returns_error('ip_address', '1922.162.23.2')
+
+    def check_bogus_field_returns_error(self, field, bogus):
+        body = {'admin_password': 'password',
+                'license': True,
+                'language': 'en_US',
+                'entity_name': 'Test_Entity',
+                'network': {'hostname': 'Tutu',
+                            'domain': 'domain.test.com',
+                            'ip_address': self.ip_address}}
+        if field in body:
+            body[field] = bogus
+        else:
+            body['network'][field] = bogus
+
         result = confd.wizard.post(body)
-        assert_that(result.status, equal_to(400))
-        assert_that(result.json, has_item(contains_string('license')))
+        result.assert_match(400, re.compile(re.escape(field)))
 
 
 class TestWizard(IntegrationTest):

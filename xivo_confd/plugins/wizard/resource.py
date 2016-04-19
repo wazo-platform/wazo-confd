@@ -22,21 +22,31 @@ import re
 from flask import request
 from flask_restful import Resource
 from marshmallow import fields, post_load
-from marshmallow.validate import Equal
+from marshmallow.validate import Equal, Regexp, Length, OneOf
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
 NAMESERVER_REGEX = '^nameserver (.*)'
+IP_ADDRESS_REGEX = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
+BASE_HOSTNAME_REGEX = r'[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?'
+HOSTNAME_REGEX = r'^{}$'.format(BASE_HOSTNAME_REGEX)
+DOMAIN_REGEX = r'^(?:{}\.)*({})$'.format(BASE_HOSTNAME_REGEX, BASE_HOSTNAME_REGEX)
+INTERFACE_REGEX = r'^[\w\-\:\.]{1,64}$'
 
 
 class WizardNetworkSchema(BaseSchema):
-    hostname = fields.String(required=True)
-    ip_address = fields.String(required=True)
-    domain = fields.String(required=True)
-    interface = fields.String(dump_only=True)
-    netmask = fields.String(dump_only=True)
-    gateway = fields.String(dump_only=True)
-    nameserver = fields.String(dump_only=True)
+    hostname = fields.String(required=True, validate=(Regexp(HOSTNAME_REGEX), Length(max=63)))
+    ip_address = fields.String(required=True, validate=Regexp(IP_ADDRESS_REGEX))
+    domain = fields.String(required=True, validate=(Regexp(DOMAIN_REGEX), Length(max=255)))
+    interface = fields.String(dump_only=True, validate=Regexp(INTERFACE_REGEX))
+    netmask = fields.String(dump_only=True, validate=Regexp(IP_ADDRESS_REGEX))
+    gateway = fields.String(dump_only=True, validate=Regexp(IP_ADDRESS_REGEX))
+    nameservers = fields.List(fields.String(validate=Regexp(IP_ADDRESS_REGEX)), dump_only=True)
 
     @post_load
     def get_network_informations(self, item):
@@ -44,7 +54,7 @@ class WizardNetworkSchema(BaseSchema):
         item['interface'] = interface
         item['netmask'] = netmask
         item['gateway'] = self.get_gateway(interface)
-        item['nameserver'] = self.get_nameserver()
+        item['nameservers'] = self.get_nameserver()
 
         return item
 
@@ -82,11 +92,11 @@ class WizardNetworkSchema(BaseSchema):
 class WizardSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     admin_username = fields.Constant(constant='root', dump_only=True)
-    admin_password = fields.String(required=True)
+    admin_password = fields.String(required=True, validate=Regexp(ADMIN_PASSWORD_REGEX))
     license = StrictBoolean(required=True, validate=Equal(True))
-    language = fields.String(default='en_US')
-    entity_name = fields.String(default='xivo')
-    timezone = fields.String(dump_only=True)
+    language = fields.String(default='en_US', validate=OneOf(['en_US', 'fr_FR']))
+    entity_name = fields.String(default='xivo', validate=Length(min=3, max=64))
+    timezone = fields.String(dump_only=True, validate=Length(max=128))
     network = fields.Nested(WizardNetworkSchema)
 
     @post_load

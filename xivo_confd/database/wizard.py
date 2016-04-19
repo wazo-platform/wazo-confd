@@ -67,17 +67,17 @@ def set_timezone(timezone):
     Session.add(row)
 
 
-def set_resolvconf(hostname, domain, nameserver):
+def set_resolvconf(hostname, domain, nameservers):
     row = Session.query(Resolvconf).first()
     row.hostname = hostname
     row.domain = domain
     row.search = domain
     row.description = 'Wizard Configuration'
-    row.nameserver1 = nameserver[0]
-    if len(nameserver) > 1:
-        row.nameserver2 = nameserver[1]
-        if len(nameserver) > 2:
-            row.nameserver3 = nameserver[2]
+    row.nameserver1 = nameservers[0]
+    if len(nameservers) > 1:
+        row.nameserver2 = nameservers[1]
+        if len(nameservers) > 2:
+            row.nameserver3 = nameservers[2]
 
     Session.add(row)
 
@@ -116,5 +116,5 @@ def created(wizard, autoprov_username):
     set_default_entity(wizard['entity_name'])
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
-    set_resolvconf(network['hostname'], network['domain'], network['nameserver'])
+    set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])

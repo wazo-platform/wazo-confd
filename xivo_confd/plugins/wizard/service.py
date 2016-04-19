@@ -46,7 +46,7 @@ class WizardService(object):
         commit_database()
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],
-                                wizard['network']['nameserver'])
+                                wizard['network']['nameservers'])
         self._initialize_provd(wizard['network']['ip_address'], autoprov_username)
 
         wizard_db.set_xivo_configured()
