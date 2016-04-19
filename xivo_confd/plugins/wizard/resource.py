@@ -24,6 +24,7 @@ from flask_restful import Resource
 from marshmallow import fields, post_load
 from marshmallow.validate import Equal, Regexp, Length, OneOf
 
+from xivo_dao.helpers import errors
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 
 import logging
@@ -54,7 +55,7 @@ class WizardNetworkSchema(BaseSchema):
         item['interface'] = interface
         item['netmask'] = netmask
         item['gateway'] = self.get_gateway(interface)
-        item['nameservers'] = self.get_nameserver()
+        item['nameservers'] = self.get_nameservers()
 
         return item
 
@@ -63,7 +64,7 @@ class WizardNetworkSchema(BaseSchema):
         for gateway in gateways:
             if interface in gateway:
                 return gateway[0]
-        raise Exception('Gateway not found')
+        raise errors.not_found('Gateway')
 
     def get_netmask_interface(self, ip_address):
         for interface in netifaces.interfaces():
@@ -72,9 +73,9 @@ class WizardNetworkSchema(BaseSchema):
                 if address['addr'] == ip_address:
                     return address['netmask'], interface
 
-        raise Exception('IP address not found')
+        raise errors.not_found('IP Address')
 
-    def get_nameserver(self):
+    def get_nameservers(self):
         nameserver_regex = re.compile(NAMESERVER_REGEX)
         nameservers = []
         with open('/etc/resolv.conf', 'r') as f:
@@ -84,7 +85,7 @@ class WizardNetworkSchema(BaseSchema):
                     nameservers.append(nameserver.group(1))
 
         if not nameservers:
-            raise Exception('Nameserver not found')
+            raise errors.not_found('Nameserver')
 
         return nameservers
 
@@ -126,7 +127,7 @@ class WizardResource(Resource):
 
     def post(self):
         if self.service.get().configured:
-            raise Exception('xivo already exists')
+            raise errors.xivo_already_configured()
 
         wizard = self.wizard_schema.load(request.get_json()).data
         wizard_with_uuid = self.service.created(wizard)

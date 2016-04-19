@@ -48,9 +48,6 @@ class IntegrationTest(AssetLaunchingTestCase):
 
 class TestWizardErrors(IntegrationTest):
 
-    def setUp(self):
-        super(TestWizardErrors, self).setUp()
-
     def test_error_license(self):
         self.check_bogus_field_returns_error('license', 1234)
         self.check_bogus_field_returns_error('license', 'asdf')
@@ -112,6 +109,23 @@ class TestWizardErrors(IntegrationTest):
 
         result = confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape(field)))
+
+
+class TestWizardErrorConfigured(IntegrationTest):
+
+    def test_error_ip_address(self):
+        body = {'admin_password': 'password',
+                'license': True,
+                'language': 'en_US',
+                'entity_name': 'Test_Entity',
+                'network': {'hostname': 'Tutu',
+                            'domain': 'domain.test.com',
+                            'ip_address': self.ip_address}}
+        response = confd.wizard.post(body)
+        response.assert_ok()
+
+        response = confd.wizard.post(body)
+        response.assert_match(400, re.compile(re.escape('configured')))
 
 
 class TestWizard(IntegrationTest):
