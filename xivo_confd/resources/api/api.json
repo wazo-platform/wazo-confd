@@ -3595,7 +3595,7 @@
         "/wizard": {
             "get": {
                 "operationId": "get_wizard_status",
-                "summary": "Get wizard_status",
+                "summary": "Get wizard status",
                 "description": "**Required ACL:** `None`",
                 "tags": [
                     "wizard"
@@ -3640,6 +3640,29 @@
                     },
                     "400": {
                         "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/wizard/discover": {
+            "get": {
+                "operationId": "get_wizard_discover",
+                "summary": "Get wizard discover",
+                "description": "**Required ACL:** `none`\n\nThis API can only be use before wizard configuration.",
+                "tags": [
+                    "wizard"
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/WizardDiscover"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             }
@@ -5438,6 +5461,10 @@
                     "type": "boolean",
                     "description": "Accept/Decline the GPLv3"
                 },
+                "timezone": {
+                    "type": "string",
+                    "description": "System timezone. Example: America/Montreal"
+                },
                 "language": {
                     "type": "string",
                     "default": "en_US",
@@ -5453,7 +5480,9 @@
             },
             "required": [
                 "license",
-                "admin_password"
+                "admin_password",
+                "network",
+                "timezone"
             ]
         },
         "WizardConfigured": {
@@ -5462,6 +5491,73 @@
                 "configured": {
                     "type": "boolean",
                     "description": "Wizard configured or not"
+                }
+            }
+        },
+        "WizardDiscover": {
+            "title": "WizardDiscover",
+            "properties": {
+                "hostname": {
+                    "type": "string",
+                    "description": "System's hostname"
+                },
+                "domain": {
+                    "type": "string",
+                    "description": "Domain name"
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "System's timezone. From file ``/etc/timezone``"
+                },
+                "nameservers": {
+                    "type": "array",
+                    "maximum": 3,
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Nameserver used in resolv.conf. Maximum 3"
+                },
+                "interfaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/WizardDiscoverInterface"
+                    }
+                },
+                "gateways": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/WizardDiscoverGateway"
+                    }
+                }
+            }
+        },
+        "WizardDiscoverInterface": {
+            "title": "WizardDiscoverInterface",
+            "properties": {
+                "interface": {
+                    "type": "string",
+                    "description": "Interface name"
+                },
+                "ip_address": {
+                    "type": "string",
+                    "description": "IPv4 address of the voip interface"
+                },
+                "netmask": {
+                    "type": "string",
+                    "description": "Netmask of the ip address"
+                }
+            }
+        },
+        "WizardDiscoverGateway": {
+            "title": "WizardDiscoverInterface",
+            "properties": {
+                "interface": {
+                    "type": "string",
+                    "description": "Interface name"
+                },
+                "gateway": {
+                    "type": "string",
+                    "description": "Gateway IPv4 address"
                 }
             }
         },
@@ -5476,15 +5572,38 @@
                     "type": "string",
                     "description": "Domain name"
                 },
+                "interface": {
+                    "type": "string",
+                    "description": "Interface name"
+                },
                 "ip_address": {
                     "type": "string",
                     "description": "IPv4 address of the voip interface"
+                },
+                "netmask": {
+                    "type": "string",
+                    "description": "Netmask of the ip address"
+                },
+                "gateway": {
+                    "type": "string",
+                    "description": "Gateway IPv4 address"
+                },
+                "nameservers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Nameserver used in resolv.conf. Maximum 3"
                 }
             },
             "required": [
                 "hostname",
                 "domain",
-                "ip_address"
+                "ip_address",
+                "interface",
+                "netmask",
+                "gateway",
+                "nameservers"
             ]
         }
     }

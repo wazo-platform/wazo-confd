@@ -18,7 +18,7 @@
 
 from xivo_confd import api
 from xivo_confd.plugins.wizard.service import build_service
-from xivo_confd.plugins.wizard.resource import WizardResource
+from xivo_confd.plugins.wizard.resource import WizardResource, WizardDiscoverResource
 from xivo_dao.resources.infos import dao as infos_dao
 
 
@@ -31,5 +31,10 @@ class Plugin(object):
         api.add_resource(WizardResource,
                          '/wizard',
                          endpoint='wizard',
+                         resource_class_args=(service,)
+                         )
+
+        api.add_resource(WizardDiscoverResource,
+                         '/wizard/discover',
                          resource_class_args=(service,)
                          )

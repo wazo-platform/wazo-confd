@@ -16,23 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import netifaces
-import re
-
 from flask import request
 from flask_restful import Resource
-from marshmallow import fields, post_load
+from marshmallow import fields
 from marshmallow.validate import Equal, Regexp, Length, OneOf
 
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
-NAMESERVER_REGEX = '^nameserver (.*)'
 IP_ADDRESS_REGEX = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
 BASE_HOSTNAME_REGEX = r'[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?'
 HOSTNAME_REGEX = r'^{}$'.format(BASE_HOSTNAME_REGEX)
@@ -41,72 +33,24 @@ INTERFACE_REGEX = r'^[\w\-\:\.]{1,64}$'
 
 
 class WizardNetworkSchema(BaseSchema):
-    hostname = fields.String(required=True, validate=(Regexp(HOSTNAME_REGEX), Length(max=63)))
-    ip_address = fields.String(required=True, validate=Regexp(IP_ADDRESS_REGEX))
-    domain = fields.String(required=True, validate=(Regexp(DOMAIN_REGEX), Length(max=255)))
-    interface = fields.String(dump_only=True, validate=Regexp(INTERFACE_REGEX))
-    netmask = fields.String(dump_only=True, validate=Regexp(IP_ADDRESS_REGEX))
-    gateway = fields.String(dump_only=True, validate=Regexp(IP_ADDRESS_REGEX))
-    nameservers = fields.List(fields.String(validate=Regexp(IP_ADDRESS_REGEX)), dump_only=True)
-
-    @post_load
-    def get_network_informations(self, item):
-        netmask, interface = self.get_netmask_interface(item['ip_address'])
-        item['interface'] = interface
-        item['netmask'] = netmask
-        item['gateway'] = self.get_gateway(interface)
-        item['nameservers'] = self.get_nameservers()
-
-        return item
-
-    def get_gateway(self, interface):
-        gateways = netifaces.gateways()[netifaces.AF_INET]
-        for gateway in gateways:
-            if interface in gateway:
-                return gateway[0]
-        raise errors.not_found('Gateway')
-
-    def get_netmask_interface(self, ip_address):
-        for interface in netifaces.interfaces():
-            addresses_ipv4 = netifaces.ifaddresses(interface)[netifaces.AF_INET]
-            for address in addresses_ipv4:
-                if address['addr'] == ip_address:
-                    return address['netmask'], interface
-
-        raise errors.not_found('IP Address')
-
-    def get_nameservers(self):
-        nameserver_regex = re.compile(NAMESERVER_REGEX)
-        nameservers = []
-        with open('/etc/resolv.conf', 'r') as f:
-            for line in f.readlines():
-                nameserver = re.match(nameserver_regex, line)
-                if nameserver:
-                    nameservers.append(nameserver.group(1))
-
-        if not nameservers:
-            raise errors.not_found('Nameserver')
-
-        return nameservers
+    hostname = fields.String(validate=(Regexp(HOSTNAME_REGEX), Length(max=63)), required=True)
+    ip_address = fields.String(validate=Regexp(IP_ADDRESS_REGEX), required=True)
+    domain = fields.String(validate=(Regexp(DOMAIN_REGEX), Length(max=255)), required=True)
+    interface = fields.String(validate=Regexp(INTERFACE_REGEX), required=True)
+    netmask = fields.String(validate=Regexp(IP_ADDRESS_REGEX), required=True)
+    gateway = fields.String(validate=Regexp(IP_ADDRESS_REGEX), required=True)
+    nameservers = fields.List(fields.String(validate=Regexp(IP_ADDRESS_REGEX)), validate=Length(max=3), required=True)
 
 
 class WizardSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     admin_username = fields.Constant(constant='root', dump_only=True)
-    admin_password = fields.String(required=True, validate=Regexp(ADMIN_PASSWORD_REGEX))
-    license = StrictBoolean(required=True, validate=Equal(True))
-    language = fields.String(default='en_US', validate=OneOf(['en_US', 'fr_FR']))
-    entity_name = fields.String(default='xivo', validate=Length(min=3, max=64))
-    timezone = fields.String(dump_only=True, validate=Length(max=128))
+    admin_password = fields.String(validate=Regexp(ADMIN_PASSWORD_REGEX), required=True)
+    license = StrictBoolean(validate=Equal(True), required=True)
+    language = fields.String(validate=OneOf(['en_US', 'fr_FR']), default='en_US')
+    entity_name = fields.String(validate=Length(min=3, max=64), default='xivo')
+    timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema)
-
-    @post_load
-    def set_timezone(self, item):
-        item['timezone'] = self.get_timezone()
-
-    def get_timezone(self):
-        with open('/etc/timezone', 'r') as f:
-            return f.readline().strip()
 
 
 class ConfiguredSchema(BaseSchema):
@@ -132,3 +76,43 @@ class WizardResource(Resource):
         wizard = self.wizard_schema.load(request.get_json()).data
         wizard_with_uuid = self.service.created(wizard)
         return self.wizard_schema.dump(wizard_with_uuid).data
+
+
+class WizardDiscoverInterfaceSchema(BaseSchema):
+    ip_address = fields.String()
+    interface = fields.String()
+    netmask = fields.String()
+
+
+class WizardDiscoverGatewaySchema(BaseSchema):
+    gateway = fields.String()
+    interface = fields.String()
+
+
+class WizardDiscoverSchema(BaseSchema):
+    hostname = fields.String()
+    nameservers = fields.List(fields.String())
+    domain = fields.String()
+    timezone = fields.String()
+    interfaces = fields.List(fields.Nested(WizardDiscoverInterfaceSchema))
+    gateways = fields.List(fields.Nested(WizardDiscoverGatewaySchema))
+
+
+class WizardDiscoverResource(Resource):
+
+    schema = WizardDiscoverSchema()
+
+    def __init__(self, service):
+        self.service = service
+
+    def get(self):
+        if self.service.get().configured:
+            raise errors.xivo_already_configured()
+
+        discover = {'interfaces': self.service.get_interfaces(),
+                    'gateways': self.service.get_gateways(),
+                    'nameservers': self.service.get_nameservers(),
+                    'hostname': self.service.get_hostname(),
+                    'timezone': self.service.get_timezone(),
+                    'domain': self.service.get_domain()}
+        return self.schema.dump(discover).data

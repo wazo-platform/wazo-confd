@@ -20,6 +20,10 @@ import re
 
 from hamcrest import (assert_that,
                       equal_to,
+                      has_entry,
+                      has_entries,
+                      has_item,
+                      none,
                       starts_with)
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
@@ -38,12 +42,6 @@ class IntegrationTest(AssetLaunchingTestCase):
     assets_root = 'assets'
     service = 'confd'
     asset = 'wizard'
-
-    def setUp(self):
-        super(IntegrationTest, self).setUp()
-        network_settings = self.service_status()['NetworkSettings']
-        self.ip_address = network_settings['IPAddress']
-        self.gateway = network_settings['Gateway']
 
 
 class TestWizardErrors(IntegrationTest):
@@ -74,6 +72,12 @@ class TestWizardErrors(IntegrationTest):
         self.check_bogus_field_returns_error('entity_name', build_string(65))
         self.check_bogus_field_returns_error('entity_name', build_string(2))
 
+    def test_error_timezone(self):
+        self.check_bogus_field_returns_error('timezone', 1234)
+        self.check_bogus_field_returns_error('timezone', None)
+        self.check_bogus_field_returns_error('timezone', True)
+        self.check_bogus_field_returns_error('timezone', build_string(129))
+
     def test_error_hostname(self):
         self.check_bogus_field_returns_error('hostname', 1234)
         self.check_bogus_field_returns_error('hostname', None)
@@ -88,20 +92,55 @@ class TestWizardErrors(IntegrationTest):
         self.check_bogus_field_returns_error('domain', '-bad-regex')
         self.check_bogus_field_returns_error('domain', build_string(256))
 
+    def test_error_interface(self):
+        self.check_bogus_field_returns_error('interface', 1234)
+        self.check_bogus_field_returns_error('interface', None)
+        self.check_bogus_field_returns_error('interface', True)
+        self.check_bogus_field_returns_error('interface', 'not;valid;interface')
+        self.check_bogus_field_returns_error('interface', build_string(65))
+
     def test_error_ip_address(self):
         self.check_bogus_field_returns_error('ip_address', 1234)
         self.check_bogus_field_returns_error('ip_address', None)
         self.check_bogus_field_returns_error('ip_address', True)
         self.check_bogus_field_returns_error('ip_address', '1922.162.23.2')
 
+    def test_error_netmask(self):
+        self.check_bogus_field_returns_error('netmask', 1234)
+        self.check_bogus_field_returns_error('netmask', None)
+        self.check_bogus_field_returns_error('netmask', True)
+        self.check_bogus_field_returns_error('netmask', '1234.192.192.0')
+
+    def test_error_nameservers(self):
+        self.check_bogus_field_returns_error('nameservers', 1234)
+        self.check_bogus_field_returns_error('nameservers', None)
+        self.check_bogus_field_returns_error('nameservers', True)
+        self.check_bogus_field_returns_error('nameservers', 'string')
+        self.check_bogus_field_returns_error('nameservers', ['1234.168.0.1'])
+        self.check_bogus_field_returns_error('nameservers', ['192.168.0.1',
+                                                             '192.168.0.2',
+                                                             '192.168.0.3',
+                                                             '192.168.0.4'])
+
+    def test_error_gateway(self):
+        self.check_bogus_field_returns_error('gateway', 1234)
+        self.check_bogus_field_returns_error('gateway', None)
+        self.check_bogus_field_returns_error('gateway', True)
+        self.check_bogus_field_returns_error('gateway', '1234.192.192.0')
+
     def check_bogus_field_returns_error(self, field, bogus):
         body = {'admin_password': 'password',
                 'license': True,
                 'language': 'en_US',
                 'entity_name': 'Test_Entity',
+                'timezone': 'America/Montreal',
                 'network': {'hostname': 'Tutu',
                             'domain': 'domain.test.com',
-                            'ip_address': self.ip_address}}
+                            'interface': 'eth0',
+                            'ip_address': '127.0.0.1',
+                            'netmask': '255.255.0.0',
+                            'gateway': '127.2.5.1',
+                            'nameservers': ['8.8.8.8']}}
         if field in body:
             body[field] = bogus
         else:
@@ -111,20 +150,51 @@ class TestWizardErrors(IntegrationTest):
         result.assert_match(400, re.compile(re.escape(field)))
 
 
+class TestWizardDiscover(IntegrationTest):
+
+    def test_get_wizard_discover(self):
+        docker_status = self.service_status()
+        hostname = docker_status['Config']['Hostname']
+
+        network_settings = docker_status['NetworkSettings']
+        ip_address = network_settings['IPAddress']
+        gateway = network_settings['Gateway']
+
+        expected_response = {
+            'domain': none(),
+            'nameservers': RESOLVCONF_NAMESERVERS,
+            'hostname': hostname,
+            'gateways':  has_item(has_entry('gateway', gateway)),
+            'timezone': TIMEZONE,
+            'interfaces': has_item(has_entry('ip_address', ip_address))
+        }
+
+        response = confd.wizard.discover.get()
+        assert_that(response.item, has_entries(expected_response))
+
+
 class TestWizardErrorConfigured(IntegrationTest):
 
-    def test_error_ip_address(self):
+    def test_error_configured(self):
         body = {'admin_password': 'password',
                 'license': True,
                 'language': 'en_US',
                 'entity_name': 'Test_Entity',
+                'timezone': 'America/Montreal',
                 'network': {'hostname': 'Tutu',
                             'domain': 'domain.test.com',
-                            'ip_address': self.ip_address}}
+                            'interface': 'eth0',
+                            'ip_address': '127.0.0.1',
+                            'netmask': '255.255.0.0',
+                            'gateway': '127.2.5.1',
+                            'nameservers': ['8.8.8.8']}}
         response = confd.wizard.post(body)
         response.assert_ok()
 
         response = confd.wizard.post(body)
+        response.assert_match(400, re.compile(re.escape('configured')))
+
+        response = confd.wizard.discover.get()
         response.assert_match(400, re.compile(re.escape('configured')))
 
 
@@ -136,9 +206,14 @@ class TestWizard(IntegrationTest):
                 'license': True,
                 'language': 'en_US',
                 'entity_name': 'Test_Entity',
+                'timezone': 'America/Montreal',
                 'network': {'hostname': 'Tutu',
                             'domain': 'domain.test.com',
-                            'ip_address': self.ip_address}}
+                            'interface': 'eth0',
+                            'ip_address': '127.0.0.1',
+                            'netmask': '255.255.0.0',
+                            'gateway': '127.2.5.1',
+                            'nameservers': ['8.8.8.8', '1.2.3.4']}}
 
         response = confd.wizard.get()
         assert_that(response.item, equal_to({'configured': False}))
@@ -149,11 +224,11 @@ class TestWizard(IntegrationTest):
         response = confd.wizard.get()
         assert_that(response.item, equal_to({'configured': True}))
 
-        self.validate_db(data, self.ip_address, self.gateway)
+        self.validate_db(data)
         self.validate_sysconfd(sysconfd, data)
-        self.validate_provd(self.ip_address, self.gateway)
+        self.validate_provd(data['network']['ip_address'])
 
-    def validate_db(self, data, ip_address, gateway):
+    def validate_db(self, data):
         with db.queries() as queries:
             assert_that(queries.admin_has_password(data['admin_password']))
             assert_that(queries.autoprov_is_configured())
@@ -161,11 +236,12 @@ class TestWizard(IntegrationTest):
             assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
-            assert_that(queries.general_has_timezone(TIMEZONE))
+            assert_that(queries.general_has_timezone(data['timezone']))
             assert_that(queries.resolvconf_is_configured(data['network']['hostname'],
                                                          data['network']['domain'],
-                                                         RESOLVCONF_NAMESERVERS))
-            assert_that(queries.netiface_is_configured(ip_address, gateway))
+                                                         data['network']['nameservers']))
+            assert_that(queries.netiface_is_configured(data['network']['ip_address'],
+                                                       data['network']['gateway']))
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_request('/xivoctl',
@@ -180,7 +256,7 @@ class TestWizard(IntegrationTest):
                                                  'domain': data['network']['domain']}))
         sysconfd.assert_request('/resolv_conf',
                                 method='POST',
-                                body=json.dumps({'nameservers': RESOLVCONF_NAMESERVERS,
+                                body=json.dumps({'nameservers': data['network']['nameservers'],
                                                  'search': [data['network']['domain']]}))
         sysconfd.assert_request('/commonconf_generate',
                                 method='POST',
@@ -188,7 +264,7 @@ class TestWizard(IntegrationTest):
         sysconfd.assert_request('/commonconf_apply',
                                 method='GET')
 
-    def validate_provd(self, ip_address, gateway):
+    def validate_provd(self, ip_address):
         configs = provd.configs.find()
 
         autoprov_username = configs[1]['raw_config']['sip_lines']['1']['username']

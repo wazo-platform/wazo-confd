@@ -16,7 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import netifaces
 import random
+import re
+import socket
 
 from xivo_confd import sysconfd
 from xivo_confd.application import commit_database
@@ -25,6 +28,7 @@ from xivo_confd.plugins.wizard.validator import build_validator
 from xivo_confd.database import wizard as wizard_db
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
+NAMESERVER_REGEX = '^nameserver (.*)'
 
 
 class WizardService(object):
@@ -107,6 +111,50 @@ class WizardService(object):
     def _generate_autoprov_username(self):
         suffix = ''.join(random.choice(USERNAME_VALUES) for _ in range(8))
         return 'ap{}'.format(suffix)
+
+    def get_interfaces(self):
+        interfaces = []
+        for interface in netifaces.interfaces():
+            addresses_ipv4 = netifaces.ifaddresses(interface)[netifaces.AF_INET]
+            for address in addresses_ipv4:
+                interfaces.append({'ip_address': address.get('addr'),
+                                   'netmask': address.get('netmask'),
+                                   'interface': interface})
+        return interfaces
+
+    def get_gateways(self):
+        gateways = []
+        for gateway in netifaces.gateways()[netifaces.AF_INET]:
+            gateways.append({'gateway': gateway[0],
+                             'interface': gateway[1]})
+        return gateways
+
+    def get_nameservers(self):
+        nameserver_regex = re.compile(NAMESERVER_REGEX)
+        nameservers = []
+        with open('/etc/resolv.conf', 'r') as f:
+            for line in f.readlines():
+                nameserver = re.match(nameserver_regex, line)
+                if nameserver:
+                    nameservers.append(nameserver.group(1))
+
+        return nameservers
+
+    def get_timezone(self):
+        with open('/etc/timezone', 'r') as f:
+            return f.readline().strip()
+
+    def get_hostname(self):
+        return socket.gethostname()
+
+    def get_domain(self):
+        return self._fqdn_without_hostname()
+
+    def _fqdn_without_hostname(self):
+        fqdn = socket.getfqdn().split('.', 1)
+        if len(fqdn) == 2:
+            return fqdn[1]
+        return None
 
 
 def build_service(provd_client, infos_dao):
