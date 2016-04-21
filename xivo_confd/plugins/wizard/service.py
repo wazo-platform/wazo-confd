@@ -55,7 +55,7 @@ class WizardService(object):
 
         wizard_db.set_xivo_configured()
         self.notifier.created()
-        wizard['uuid'] = self.infos_dao.get()
+        wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
 
     def _send_sysconfd_cmd(self, hostname, domain, nameserver):

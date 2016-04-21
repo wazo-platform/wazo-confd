@@ -43,7 +43,7 @@ class WizardNetworkSchema(BaseSchema):
 
 
 class WizardSchema(BaseSchema):
-    uuid = fields.UUID(dump_only=True)
+    xivo_uuid = fields.UUID(dump_only=True)
     admin_username = fields.Constant(constant='root', dump_only=True)
     admin_password = fields.String(validate=Regexp(ADMIN_PASSWORD_REGEX), required=True)
     license = StrictBoolean(validate=Equal(True), required=True)
