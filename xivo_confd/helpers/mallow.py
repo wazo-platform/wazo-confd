@@ -22,9 +22,11 @@ from marshmallow import Schema, fields
 
 class BaseSchema(Schema):
     def handle_error(self, error, data):
-        # Format the error message to have the same behavior as flask-restful
-        error_msg = {key: value[0] for key, value in error.message.iteritems()}
-        return abort(400, message=error_msg)
+        return abort(400, message=error.message)
+
+    def on_bind_field(self, field_name, field_obj):
+        if isinstance(field_obj, fields.Nested):
+            field_obj.nested.handle_error = super(BaseSchema, self).handle_error
 
 
 class StrictBoolean(fields.Boolean):
