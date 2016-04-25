@@ -16,7 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.helpers.db_manager import Session
+from xivo_dao.alchemy.context import Context
+from xivo_dao.alchemy.contextnumbers import ContextNumbers
 from xivo_dao.alchemy.entity import Entity
 from xivo_dao.alchemy.general import General
 from xivo_dao.alchemy.netiface import Netiface
@@ -25,6 +26,7 @@ from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 from xivo_dao.alchemy.staticiax import StaticIAX
 from xivo_dao.alchemy.staticsip import StaticSIP
 from xivo_dao.alchemy.user import User
+from xivo_dao.helpers.db_manager import Session
 
 
 def set_admin_password(password):
@@ -40,10 +42,13 @@ def set_autoprov_name(autoprov_username):
                           var_val=autoprov_username))
 
 
-def set_default_entity(display_name):
-    name = ''.join(c for c in display_name if c.isalnum()).lower()
+def set_default_entity(display_name, name):
     row = Entity(displayname=display_name, name=name, description='Wizard Entity')
     Session.add(row)
+
+
+def get_entity(display_name):
+    return ''.join(c for c in display_name if c.isalnum()).lower()
 
 
 def set_language(language):
@@ -98,6 +103,50 @@ def set_netiface(interface, address, netmask, gateway):
                          description='Wizard Configuration'))
 
 
+def set_context_switchboard(entity):
+    Session.add(Context(name='__switchboard_directory',
+                        displayname='Switchboard',
+                        entity=entity,
+                        contexttype='others',
+                        description=''))
+
+
+def set_context_internal(context, entity):
+    Session.add(Context(name='default',
+                        displayname=context['display_name'],
+                        entity=entity,
+                        contexttype='internal',
+                        description=''))
+
+    Session.add(ContextNumbers(context='default',
+                               type='user',
+                               numberbeg=context['number_start'],
+                               numberend=context['number_end']))
+
+
+def set_context_incall(context, entity):
+    Session.add(Context(name='from-extern',
+                        displayname=context['display_name'],
+                        entity=entity,
+                        contexttype='incall',
+                        description=''))
+
+    if context.get('number_start') and context.get('number_end'):
+        Session.add(ContextNumbers(context='from-extern',
+                                   type='incall',
+                                   numberbeg=context['number_start'],
+                                   numberend=context['number_end'],
+                                   didlength=context['did_length']))
+
+
+def set_context_outcall(context, entity):
+    Session.add(Context(name='to-extern',
+                        displayname=context['display_name'],
+                        entity=entity,
+                        contexttype='outcall',
+                        description=''))
+
+
 def set_xivo_configured():
     row = Session.query(General).first()
     row.configured = True
@@ -110,11 +159,16 @@ def get_xivo_configured():
 
 def created(wizard, autoprov_username):
     network = wizard['network']
+    entity = get_entity(wizard['entity_name'])
 
     set_admin_password(wizard['admin_password'])
     set_autoprov_name(autoprov_username)
-    set_default_entity(wizard['entity_name'])
+    set_default_entity(wizard['entity_name'], entity)
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
+    set_context_switchboard(entity)
+    set_context_incall(wizard['context_incall'], entity)
+    set_context_internal(wizard['context_internal'], entity)
+    set_context_outcall(wizard['context_outcall'], entity)

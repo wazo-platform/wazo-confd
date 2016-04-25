@@ -542,6 +542,100 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def context_has_internal(self, display_name, number_start, number_end):
+        query = text("""SELECT COUNT(*)
+                     FROM context
+                     INNER JOIN contextnumbers
+                        ON context.name = contextnumbers.context
+                     WHERE
+                        context.name = 'default'
+                        AND context.displayname = :display_name
+                        AND context.contexttype = 'internal'
+                        AND contextnumbers.type = 'user'
+                        AND contextnumbers.numberbeg = :number_start
+                        AND contextnumbers.numberend = :number_end
+                        AND contextnumbers.didlength = 0
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          display_name=display_name,
+                          number_start=number_start,
+                          number_end=number_end)
+                 .scalar())
+
+        return count > 0
+
+    def context_has_incall(self, display_name=None, number_start=None, number_end=None, did_length=None):
+        if number_start is None and number_end is None:
+            query = text("""SELECT COUNT(*)
+                         FROM context
+                         WHERE
+                            context.name = 'from-extern'
+                            AND context.displayname = :display_name
+                            AND context.contexttype = 'incall'
+                         """)
+
+            count = (self.connection
+                     .execute(query,
+                              display_name=display_name)
+                     .scalar())
+        else:
+            query = text("""SELECT COUNT(*)
+                         FROM context
+                         INNER JOIN contextnumbers
+                            ON context.name = contextnumbers.context
+                         WHERE
+                            context.name = 'from-extern'
+                            AND context.displayname = :display_name
+                            AND context.contexttype = 'incall'
+                            AND contextnumbers.type = 'incall'
+                            AND contextnumbers.numberbeg = :number_start
+                            AND contextnumbers.numberend = :number_end
+                            AND contextnumbers.didlength = :did_length
+                         """)
+
+            count = (self.connection
+                     .execute(query,
+                              display_name=display_name,
+                              number_start=number_start,
+                              number_end=number_end,
+                              did_length=did_length)
+                     .scalar())
+
+        return count > 0
+
+    def context_has_outcall(self, display_name):
+        query = text("""SELECT COUNT(*)
+                     FROM context
+                     WHERE
+                        context.name = 'to-extern'
+                        AND context.displayname = :display_name
+                        AND context.contexttype = 'outcall'
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          display_name=display_name)
+                 .scalar())
+
+        return count > 0
+
+    def context_has_switchboard(self):
+        query = text("""SELECT COUNT(*)
+                     FROM context
+                     WHERE
+                        context.name = '__switchboard_directory'
+                        AND context.displayname = 'Switchboard'
+                        AND context.contexttype = 'others'
+                     """)
+
+        count = (self.connection
+                 .execute(query)
+                 .scalar())
+
+        return count > 0
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')
