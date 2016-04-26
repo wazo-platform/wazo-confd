@@ -18,7 +18,7 @@
 
 from flask import request
 from flask_restful import Resource
-from marshmallow import fields, validates_schema
+from marshmallow import fields, validates_schema, validates
 from marshmallow.validate import Equal, Regexp, Length, OneOf, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
@@ -85,6 +85,12 @@ class WizardSchema(BaseSchema):
     context_internal = fields.Nested(WizardContextInternalSchema)
     context_outcall = fields.Nested(WizardContextOutcallSchema, missing=WizardContextOutcallSchema().load({}).data)
     context_incall = fields.Nested(WizardContextIncallSchema, missing=WizardContextIncallSchema().load({}).data)
+
+    @validates('entity_name')
+    def validate_entity_name(self, entity_name):
+        sub_name = ''.join(c for c in entity_name if c.isalnum())
+        if len(sub_name) < 3:
+            raise ValidationError('Shorter than alphanumeric minimum length 3.')
 
 
 class ConfiguredSchema(BaseSchema):

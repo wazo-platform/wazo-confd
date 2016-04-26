@@ -69,6 +69,7 @@ class TestWizardErrors(IntegrationTest):
         self.check_bogus_field_returns_error('entity_name', 1234)
         self.check_bogus_field_returns_error('entity_name', None)
         self.check_bogus_field_returns_error('entity_name', True)
+        self.check_bogus_field_returns_error('entity_name', ' __  ')
         self.check_bogus_field_returns_error('entity_name', build_string(65))
         self.check_bogus_field_returns_error('entity_name', build_string(2))
 
