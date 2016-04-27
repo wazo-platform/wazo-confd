@@ -41,7 +41,7 @@ class SysconfdPublisher(object):
     def __init__(self, base_url, dao):
         self.base_url = base_url
         self.dao = dao
-        self.rollback()
+        self._reset()
 
     def exec_request_handlers(self, args):
         if self.dao.is_live_reload_enabled():
@@ -119,7 +119,7 @@ class SysconfdPublisher(object):
         session = self._session()
         self.flush_handlers(session)
         self.flush_requests(session)
-        self.rollback()
+        self._reset()
 
     def flush_handlers(self, session):
         if len(self.handlers) > 0:
@@ -135,5 +135,8 @@ class SysconfdPublisher(object):
             self.check_for_errors(response)
 
     def rollback(self):
+        self._reset()
+
+    def _reset(self):
         self.requests = []
         self.handlers = {}
