@@ -3611,7 +3611,7 @@
             "post": {
                 "operationId": "pass_wizard",
                 "summary": "Pass the wizard",
-                "description": "**Required ACL:** `none`\n\nThis API can only be use once to configure the XiVO.",
+                "description": "**Required ACL:** `none`\n\nThis API can only be used once to configure the XiVO.",
                 "tags": [
                     "wizard"
                 ],
@@ -3642,7 +3642,7 @@
             "get": {
                 "operationId": "get_wizard_discover",
                 "summary": "Get wizard discover",
-                "description": "**Required ACL:** `none`\n\nThis API can only be use before wizard configuration.",
+                "description": "**Required ACL:** `none`\n\nThis API can only be used before wizard configuration.",
                 "tags": [
                     "wizard"
                 ],
@@ -5449,11 +5449,11 @@
             "properties": {
                 "admin_password": {
                     "type": "string",
-                    "description": "XiVO administrator password"
+                    "description": "XiVO administrator ``root`` password"
                 },
                 "license": {
                     "type": "boolean",
-                    "description": "Accept/Decline the GPLv3"
+                    "description": "Accept/decline the GPLv3"
                 },
                 "timezone": {
                     "type": "string",
