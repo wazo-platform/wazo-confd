@@ -114,7 +114,7 @@ class WizardResource(Resource):
             raise errors.xivo_already_configured()
 
         wizard = self.wizard_schema.load(request.get_json()).data
-        wizard_with_uuid = self.service.created(wizard)
+        wizard_with_uuid = self.service.create(wizard)
         return self.wizard_schema.dump(wizard_with_uuid).data
 
 

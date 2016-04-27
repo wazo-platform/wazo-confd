@@ -157,7 +157,7 @@ def get_xivo_configured():
     return Session.query(General).first()
 
 
-def created(wizard, autoprov_username):
+def create(wizard, autoprov_username):
     network = wizard['network']
     entity = get_entity(wizard['entity_name'])
 

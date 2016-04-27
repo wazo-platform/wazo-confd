@@ -43,10 +43,10 @@ class WizardService(object):
     def get(self):
         return wizard_db.get_xivo_configured()
 
-    def created(self, wizard):
+    def create(self, wizard):
         self.validator.validate_create(wizard)
         autoprov_username = self._generate_autoprov_username()
-        wizard_db.created(wizard, autoprov_username)
+        wizard_db.create(wizard, autoprov_username)
         commit_database()
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],
