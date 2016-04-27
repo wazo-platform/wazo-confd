@@ -242,6 +242,7 @@ class TestWizardErrors(IntegrationTest):
 
     def test_error_context_incall_did_length(self):
         self.check_context_incall_bogus_field_returns_error('did_length', None)
+        # True is interpreted as 1 = valid
         self.check_context_incall_bogus_field_returns_error('did_length', 'abcd')
         self.check_context_incall_bogus_field_returns_error('did_length', -1)
         self.check_context_incall_bogus_field_returns_error('did_length', 21)
