@@ -43,18 +43,16 @@ class SysconfdMock(object):
         return response.json()['requests']
 
     def assert_request(self, path, method='GET', query=None, body=None):
-        results = self.request_matching(path, method)
+        results = self.requests_matching(path, method)
         if query:
             assert_that(results, has_item(has_entry('query', has_entries(query))), pformat(results))
         if body:
             assert_that(results, has_item(has_entry('body', equal_to(body))), pformat(results))
 
-    def request_matching(self, path, method='GET'):
+    def requests_matching(self, path, method='GET'):
         regex = re.compile(path)
-        results = []
-        for request in self.requests():
-            if regex.match(request['path']) and request['method'] == method:
-                results.append(request)
+        results = [request for request in self.requests()
+                   if regex.match(request['path']) and request['method'] == method]
 
         if not results:
             raise AssertionError("Request not found: {} {}".format(method, path))
