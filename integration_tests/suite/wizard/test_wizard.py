@@ -32,6 +32,74 @@ from test_api import confd, provd, db, mocks
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
 TIMEZONE = 'America/Montreal'
 
+COMPLETE_POST_BODY = {'admin_password': 'password',
+                      'license': True,
+                      'language': 'en_US',
+                      'entity_name': 'Test_Entity',
+                      'timezone': 'America/Montreal',
+                      'network': {'hostname': 'Tutu',
+                                  'domain': 'domain.example.com',
+                                  'interface': 'eth0',
+                                  'ip_address': '127.0.0.1',
+                                  'netmask': '255.255.0.0',
+                                  'gateway': '127.2.5.1',
+                                  'nameservers': ['8.8.8.8', '1.2.3.4']},
+                      'context_internal': {'display_name': 'Default',
+                                           'number_start': '1000',
+                                           'number_end': '1999'},
+                      'context_incall': {'display_name': 'Incalls',
+                                         'number_start': '2000',
+                                         'number_end': '2999',
+                                         'did_length': 4},
+                      'context_outcall': {'display_name': 'Outcalls'}}
+
+BOGUS_BASE_BODY = {'admin_password': 'password',
+                   'license': True,
+                   'language': 'en_US',
+                   'entity_name': 'Test_Entity',
+                   'timezone': 'America/Montreal',
+                   'network': {'hostname': 'Tutu',
+                               'domain': 'domain.example.com',
+                               'interface': 'eth0',
+                               'ip_address': '127.0.0.1',
+                               'netmask': '255.255.0.0',
+                               'gateway': '127.2.5.1',
+                               'nameservers': ['8.8.8.8']},
+                   'context_internal': {'display_name': 'Default',
+                                        'number_start': '1000',
+                                        'number_end': '1999'},
+                   'context_incall': {'display_name': 'Incalls',
+                                      'number_start': '2000',
+                                      'number_end': '2999'},
+                   'context_outcall': {'display_name': 'Outcalls'}}
+
+MINIMAL_POST_BODY = {'admin_password': 'password',
+                     'license': True,
+                     'timezone': 'America/Montreal',
+                     'network': {'hostname': 'Tutu',
+                                 'domain': 'domain.example.com',
+                                 'interface': 'eth0',
+                                 'ip_address': '127.0.0.1',
+                                 'netmask': '255.255.0.0',
+                                 'gateway': '127.2.5.1',
+                                 'nameservers': ['8.8.8.8']},
+                     'context_internal': {'number_start': '1000',
+                                          'number_end': '1999'}}
+SOME_VALID_POST_BODY = {'admin_password': 'password',
+                        'license': True,
+                        'language': 'en_US',
+                        'entity_name': 'Test_Entity',
+                        'timezone': 'America/Montreal',
+                        'network': {'hostname': 'Tutu',
+                                    'domain': 'domain.example.com',
+                                    'interface': 'eth0',
+                                    'ip_address': '127.0.0.1',
+                                    'netmask': '255.255.0.0',
+                                    'gateway': '127.2.5.1',
+                                    'nameservers': ['8.8.8.8']},
+                        'context_internal': {'number_start': '1000',
+                                             'number_end': '1999'}}
+
 
 def build_string(length):
     return ''.join('a' for _ in range(length))
@@ -185,25 +253,7 @@ class TestWizardErrors(IntegrationTest):
         self.check_context_outcall_bogus_field_returns_error('display_name', build_string(129))
 
     def check_bogus_field_returns_error(self, field, bogus, sub_field=None):
-        body = {'admin_password': 'password',
-                'license': True,
-                'language': 'en_US',
-                'entity_name': 'Test_Entity',
-                'timezone': 'America/Montreal',
-                'network': {'hostname': 'Tutu',
-                            'domain': 'domain.test.com',
-                            'interface': 'eth0',
-                            'ip_address': '127.0.0.1',
-                            'netmask': '255.255.0.0',
-                            'gateway': '127.2.5.1',
-                            'nameservers': ['8.8.8.8']},
-                'context_internal': {'display_name': 'Default',
-                                     'number_start': '1000',
-                                     'number_end': '1999'},
-                'context_incall': {'display_name': 'Incalls',
-                                   'number_start': '2000',
-                                   'number_end': '2999'},
-                'context_outcall': {'display_name': 'Outcalls'}}
+        body = BOGUS_BASE_BODY
         if field in body:
             body[field] = bogus
         elif field in body['network']:
@@ -279,20 +329,7 @@ class TestWizardDiscover(IntegrationTest):
 class TestWizardErrorConfigured(IntegrationTest):
 
     def test_error_configured(self):
-        body = {'admin_password': 'password',
-                'license': True,
-                'language': 'en_US',
-                'entity_name': 'Test_Entity',
-                'timezone': 'America/Montreal',
-                'network': {'hostname': 'Tutu',
-                            'domain': 'domain.test.com',
-                            'interface': 'eth0',
-                            'ip_address': '127.0.0.1',
-                            'netmask': '255.255.0.0',
-                            'gateway': '127.2.5.1',
-                            'nameservers': ['8.8.8.8']},
-                'context_internal': {'number_start': '1000',
-                                     'number_end': '1999'}}
+        body = SOME_VALID_POST_BODY
         response = confd.wizard.post(body)
         response.assert_ok()
 
@@ -306,18 +343,7 @@ class TestWizardErrorConfigured(IntegrationTest):
 class TestWizardDefaultValue(IntegrationTest):
 
     def test_default_configuration(self):
-        body = {'admin_password': 'password',
-                'license': True,
-                'timezone': 'America/Montreal',
-                'network': {'hostname': 'Tutu',
-                            'domain': 'domain.test.com',
-                            'interface': 'eth0',
-                            'ip_address': '127.0.0.1',
-                            'netmask': '255.255.0.0',
-                            'gateway': '127.2.5.1',
-                            'nameservers': ['8.8.8.8']},
-                'context_internal': {'number_start': '1000',
-                                     'number_end': '1999'}}
+        body = MINIMAL_POST_BODY
         response = confd.wizard.post(body)
         response.assert_ok()
 
@@ -337,26 +363,7 @@ class TestWizard(IntegrationTest):
 
     @mocks.sysconfd()
     def test_post(self, sysconfd):
-        data = {'admin_password': 'password',
-                'license': True,
-                'language': 'en_US',
-                'entity_name': 'Test_Entity',
-                'timezone': 'America/Montreal',
-                'network': {'hostname': 'Tutu',
-                            'domain': 'domain.test.com',
-                            'interface': 'eth0',
-                            'ip_address': '127.0.0.1',
-                            'netmask': '255.255.0.0',
-                            'gateway': '127.2.5.1',
-                            'nameservers': ['8.8.8.8', '1.2.3.4']},
-                'context_internal': {'display_name': 'Default',
-                                     'number_start': '1000',
-                                     'number_end': '1999'},
-                'context_incall': {'display_name': 'Incalls',
-                                   'number_start': '2000',
-                                   'number_end': '2999',
-                                   'did_length': 4},
-                'context_outcall': {'display_name': 'Outcalls'}}
+        data = COMPLETE_POST_BODY
 
         response = confd.wizard.get()
         assert_that(response.item, equal_to({'configured': False}))
