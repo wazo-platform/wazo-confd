@@ -3605,12 +3605,6 @@
                         "schema": {
                             "$ref": "#/definitions/WizardConfigured"
                         }
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             },
