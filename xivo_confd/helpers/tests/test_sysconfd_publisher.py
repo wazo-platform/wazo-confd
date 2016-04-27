@@ -50,6 +50,7 @@ class TestSysconfdClient(TestCase):
         self.session.request.return_value = Mock(status_code=200)
 
         self.client.commonconf_generate()
+        self.client.flush()
 
         url = "http://localhost:8668/commonconf_generate"
         self.session.request.assert_called_once_with('POST', url, params={}, data='{}')
@@ -58,6 +59,7 @@ class TestSysconfdClient(TestCase):
         self.session.request.return_value = Mock(status_code=200)
 
         self.client.commonconf_apply()
+        self.client.flush()
 
         url = "http://localhost:8668/commonconf_apply"
         self.session.request.assert_called_once_with('GET', url, params={}, data=None)
@@ -67,8 +69,9 @@ class TestSysconfdClient(TestCase):
         data = {'xivo-service': 'start'}
 
         self.client.xivo_service_start()
-        method, url, body = self.extract_request()
+        self.client.flush()
 
+        method, url, body = self.extract_request()
         expected_url = "http://localhost:8668/xivoctl"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
@@ -79,8 +82,9 @@ class TestSysconfdClient(TestCase):
         data = {'xivo-service': 'enable'}
 
         self.client.xivo_service_enable()
-        method, url, body = self.extract_request()
+        self.client.flush()
 
+        method, url, body = self.extract_request()
         expected_url = "http://localhost:8668/xivoctl"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
@@ -92,8 +96,9 @@ class TestSysconfdClient(TestCase):
                 'domain': 'toto.tata.titi'}
 
         self.client.set_hosts(data['hostname'], data['domain'])
-        method, url, body = self.extract_request()
+        self.client.flush()
 
+        method, url, body = self.extract_request()
         expected_url = "http://localhost:8668/hosts"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
@@ -106,8 +111,9 @@ class TestSysconfdClient(TestCase):
                 'search': [domain]}
 
         self.client.set_resolvconf(data['nameservers'], domain)
-        method, url, body = self.extract_request()
+        self.client.flush()
 
+        method, url, body = self.extract_request()
         expected_url = "http://localhost:8668/resolv_conf"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)

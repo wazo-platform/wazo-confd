@@ -69,19 +69,16 @@ class SysconfdPublisher(object):
     def commonconf_apply(self):
         url = "{}/commonconf_apply".format(self.base_url)
         self.add_request('GET', url)
-        self.flush()
 
     def commonconf_generate(self):
         url = "{}/commonconf_generate".format(self.base_url)
         self.add_request('POST', url, data=json.dumps({}))
-        self.flush()
 
     def set_hosts(self, hostname, domain):
         data = {'hostname': hostname,
                 'domain': domain}
         url = "{}/hosts".format(self.base_url)
         self.add_request('POST', url, data=json.dumps(data))
-        self.flush()
 
     def set_resolvconf(self, nameserver, domain):
         data = {'nameservers': nameserver,
@@ -94,13 +91,11 @@ class SysconfdPublisher(object):
         data = {'xivo-service': 'start'}
         url = "{}/xivoctl".format(self.base_url)
         self.add_request('POST', url, data=json.dumps(data))
-        self.flush()
 
     def xivo_service_enable(self):
         data = {'xivo-service': 'enable'}
         url = "{}/xivoctl".format(self.base_url)
         self.add_request('POST', url, data=json.dumps(data))
-        self.flush()
 
     def _session(self):
         session = requests.Session()

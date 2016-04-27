@@ -60,11 +60,15 @@ class WizardService(object):
 
     def _send_sysconfd_cmd(self, hostname, domain, nameserver):
         self.sysconfd.xivo_service_enable()
+        self.sysconfd.flush()
         self.sysconfd.xivo_service_start()
+        self.sysconfd.flush()
         self.sysconfd.set_hosts(hostname, domain)
         self.sysconfd.set_resolvconf(nameserver, domain)
         self.sysconfd.commonconf_generate()
+        self.sysconfd.flush()
         self.sysconfd.commonconf_apply()
+        self.sysconfd.flush()
 
     def _initialize_provd(self, address, autoprov_username):
         default_config = {'X_type': 'registrar',
