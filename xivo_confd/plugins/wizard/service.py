@@ -130,7 +130,7 @@ class WizardService(object):
 
     def get_gateways(self):
         gateways = []
-        for gateway in netifaces.gateways()[netifaces.AF_INET]:
+        for gateway in netifaces.gateways().get(netifaces.AF_INET, []):
             gateways.append({'gateway': gateway[0],
                              'interface': gateway[1]})
         return gateways
