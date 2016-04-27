@@ -23,6 +23,7 @@ from hamcrest import (assert_that,
                       has_entry,
                       has_entries,
                       has_item,
+                      is_not,
                       none,
                       starts_with)
 
@@ -320,6 +321,14 @@ class TestWizardDiscover(IntegrationTest):
             'gateways':  has_item(has_entry('gateway', gateway)),
             'timezone': TIMEZONE,
             'interfaces': has_item(has_entry('ip_address', ip_address))
+        }
+
+        response = confd.wizard.discover.get()
+        assert_that(response.item, has_entries(expected_response))
+
+    def test_wizard_discover_ignores_interface_lo(self):
+        expected_response = {
+            'interfaces': is_not(has_item(has_entry('interface', 'lo')))
         }
 
         response = confd.wizard.discover.get()

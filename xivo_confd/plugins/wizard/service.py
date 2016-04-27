@@ -113,14 +113,16 @@ class WizardService(object):
         return 'ap{}'.format(suffix)
 
     def get_interfaces(self):
-        interfaces = []
-        for interface in netifaces.interfaces():
-            addresses_ipv4 = netifaces.ifaddresses(interface)[netifaces.AF_INET]
+        result = []
+        candidate_interfaces = (interface for interface in netifaces.interfaces()
+                                if interface != 'lo')
+        for interface in candidate_interfaces:
+            addresses_ipv4 = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
             for address in addresses_ipv4:
-                interfaces.append({'ip_address': address.get('addr'),
-                                   'netmask': address.get('netmask'),
-                                   'interface': interface})
-        return interfaces
+                result.append({'ip_address': address.get('addr'),
+                               'netmask': address.get('netmask'),
+                               'interface': interface})
+        return result
 
     def get_gateways(self):
         gateways = []
