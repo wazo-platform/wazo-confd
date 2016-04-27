@@ -138,17 +138,23 @@ class WizardService(object):
     def get_nameservers(self):
         nameserver_regex = re.compile(NAMESERVER_REGEX)
         nameservers = []
-        with open('/etc/resolv.conf', 'r') as f:
-            for line in f.readlines():
-                nameserver = re.match(nameserver_regex, line)
-                if nameserver:
-                    nameservers.append(nameserver.group(1))
+        try:
+            with open('/etc/resolv.conf', 'r') as f:
+                for line in f.readlines():
+                    nameserver = re.match(nameserver_regex, line)
+                    if nameserver:
+                        nameservers.append(nameserver.group(1))
+        except IOError:
+            pass
 
         return nameservers
 
     def get_timezone(self):
-        with open('/etc/timezone', 'r') as f:
-            return f.readline().strip()
+        try:
+            with open('/etc/timezone', 'r') as f:
+                return f.readline().strip()
+        except IOError:
+            return None
 
     def get_hostname(self):
         return socket.gethostname()
