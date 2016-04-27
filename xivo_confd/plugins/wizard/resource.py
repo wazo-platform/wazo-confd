@@ -81,8 +81,8 @@ class WizardSchema(BaseSchema):
     language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
     entity_name = fields.String(validate=Length(min=3, max=64), missing='xivo')
     timezone = fields.String(validate=Length(max=128), required=True)
-    network = fields.Nested(WizardNetworkSchema)
-    context_internal = fields.Nested(WizardContextInternalSchema)
+    network = fields.Nested(WizardNetworkSchema, required=True)
+    context_internal = fields.Nested(WizardContextInternalSchema, required=True)
     context_outcall = fields.Nested(WizardContextOutcallSchema, missing=WizardContextOutcallSchema().load({}).data)
     context_incall = fields.Nested(WizardContextIncallSchema, missing=WizardContextIncallSchema().load({}).data)
 
