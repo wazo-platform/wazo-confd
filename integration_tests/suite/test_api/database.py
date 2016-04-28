@@ -399,6 +399,258 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def admin_has_password(self, password):
+        query = text("""SELECT COUNT(*)
+                     FROM "user"
+                     WHERE
+                        login = 'root'
+                        AND passwd = :password
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          password=password)
+                 .scalar())
+
+        return count > 0
+
+    def autoprov_is_configured(self):
+        query = text("""SELECT COUNT(*)
+                     FROM staticsip
+                     WHERE
+                        category = 'general'
+                        AND filename = 'sip.conf'
+                        AND var_name = 'autocreate_prefix'
+                     """)
+        count = (self.connection
+                 .execute(query)
+                 .scalar())
+
+        return count > 0
+
+    def entity_has_name_displayname(self, name, displayname):
+        query = text("""SELECT COUNT(*)
+                     FROM entity
+                     WHERE
+                        name = :name
+                        AND displayname = :displayname
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          name=name,
+                          displayname=displayname)
+                 .scalar())
+
+        return count > 0
+
+    def sip_has_language(self, language):
+        query = text("""SELECT COUNT(*)
+                     FROM staticsip
+                     WHERE
+                        var_name = 'language'
+                        AND var_val = :language
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          language=language)
+                 .scalar())
+
+        return count > 0
+
+    def iax_has_language(self, language):
+        query = text("""SELECT COUNT(*)
+                     FROM staticiax
+                     WHERE
+                        var_name = 'language'
+                        AND var_val = :language
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          language=language)
+                 .scalar())
+
+        return count > 0
+
+    def sccp_has_language(self, language):
+        query = text("""SELECT COUNT(*)
+                     FROM sccpgeneralsettings
+                     WHERE
+                        option_name = 'language'
+                        AND option_value = :language
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          language=language)
+                 .scalar())
+
+        return count > 0
+
+    def general_has_timezone(self, timezone):
+        query = text("""SELECT COUNT(*)
+                     FROM general
+                     WHERE
+                        timezone = :timezone
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          timezone=timezone)
+                 .scalar())
+
+        return count > 0
+
+    def resolvconf_is_configured(self, hostname, domain, nameservers):
+        query = text("""SELECT COUNT(*)
+                     FROM resolvconf
+                     WHERE
+                        hostname = :hostname
+                        AND domain = :domain
+                        AND search = :domain
+                        AND nameserver1 = :nameserver1
+                        AND nameserver2 = :nameserver2
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          hostname=hostname,
+                          domain=domain,
+                          nameserver1=nameservers[0],
+                          nameserver2=nameservers[1])
+                 .scalar())
+
+        return count > 0
+
+    def netiface_is_configured(self, address, gateway):
+        # Note that interface and netmask are not tested
+        query = text("""SELECT COUNT(*)
+                     FROM netiface
+                     WHERE
+                        hwtypeid = 1
+                        AND type = 'iface'
+                        AND family = 'inet'
+                        AND method = 'static'
+                        AND address = :address
+                        AND broadcast = ''
+                        AND gateway = :gateway
+                        AND mtu = 1500
+                        AND options = ''
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          address=address,
+                          gateway=gateway)
+                 .scalar())
+
+        return count > 0
+
+    def context_has_internal(self, display_name, number_start, number_end):
+        query = text("""SELECT COUNT(*)
+                     FROM context
+                     INNER JOIN contextnumbers
+                        ON context.name = contextnumbers.context
+                     WHERE
+                        context.name = 'default'
+                        AND context.displayname = :display_name
+                        AND context.contexttype = 'internal'
+                        AND contextnumbers.type = 'user'
+                        AND contextnumbers.numberbeg = :number_start
+                        AND contextnumbers.numberend = :number_end
+                        AND contextnumbers.didlength = 0
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          display_name=display_name,
+                          number_start=number_start,
+                          number_end=number_end)
+                 .scalar())
+
+        return count > 0
+
+    def context_has_incall(self, display_name=None, number_start=None, number_end=None, did_length=None):
+        if number_start is None and number_end is None:
+            query = text("""SELECT COUNT(*)
+                         FROM context
+                         WHERE
+                            context.name = 'from-extern'
+                            AND context.displayname = :display_name
+                            AND context.contexttype = 'incall'
+                         """)
+
+            count = (self.connection
+                     .execute(query,
+                              display_name=display_name)
+                     .scalar())
+        else:
+            query = text("""SELECT COUNT(*)
+                         FROM context
+                         INNER JOIN contextnumbers
+                            ON context.name = contextnumbers.context
+                         WHERE
+                            context.name = 'from-extern'
+                            AND context.displayname = :display_name
+                            AND context.contexttype = 'incall'
+                            AND contextnumbers.type = 'incall'
+                            AND contextnumbers.numberbeg = :number_start
+                            AND contextnumbers.numberend = :number_end
+                            AND contextnumbers.didlength = :did_length
+                         """)
+
+            count = (self.connection
+                     .execute(query,
+                              display_name=display_name,
+                              number_start=number_start,
+                              number_end=number_end,
+                              did_length=did_length)
+                     .scalar())
+
+        return count > 0
+
+    def context_has_outcall(self, display_name):
+        query = text("""SELECT COUNT(*)
+                     FROM context
+                     WHERE
+                        context.name = 'to-extern'
+                        AND context.displayname = :display_name
+                        AND context.contexttype = 'outcall'
+                     """)
+
+        count = (self.connection
+                 .execute(query,
+                          display_name=display_name)
+                 .scalar())
+
+        return count > 0
+
+    def context_has_switchboard(self):
+        query = text("""SELECT COUNT(*)
+                     FROM context
+                     WHERE
+                        context.name = '__switchboard_directory'
+                        AND context.displayname = 'Switchboard'
+                        AND context.contexttype = 'others'
+                     """)
+
+        count = (self.connection
+                 .execute(query)
+                 .scalar())
+
+        return count > 0
+
+    def internal_context_include_outcall_context(self):
+        query = text("""SELECT COUNT(*)
+                     FROM contextinclude
+                     WHERE
+                        context = 'default'
+                        AND include = 'to-extern'
+                        AND priority = 0
+                     """)
+
+        count = (self.connection
+                 .execute(query)
+                 .scalar())
+
+        return count > 0
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')

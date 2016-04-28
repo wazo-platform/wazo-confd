@@ -118,6 +118,7 @@ DEFAULT_CONFIG = {
         'switchboard_plugin',
         'call_permission_plugin',
         'user_call_permission_plugin',
+        'wizard_plugin',
     ],
     'service_discovery': {
         'enabled': True,

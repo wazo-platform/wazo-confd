@@ -16,26 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import request
-from flask_restful import abort
-from marshmallow import Schema, fields, pre_dump, post_load
+from marshmallow import fields, pre_dump, post_load
 
 from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 from xivo_confd.helpers.restful import ConfdResource
-
-
-class BaseSchema(Schema):
-    def handle_error(self, error, data):
-        # Format the error message to have the same behavior as flask-restful
-        error_msg = {key: value[0] for key, value in error.message.iteritems()}
-        return abort(400, message=error_msg)
-
-
-class StrictBoolean(fields.Boolean):
-
-    def _deserialize(self, value, attr, data):
-        if not isinstance(value, bool):
-            self.fail('invalid')
-        return value
 
 
 class UserSubResource(ConfdResource):
