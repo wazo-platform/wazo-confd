@@ -25,7 +25,6 @@ from hamcrest import (assert_that,
                       has_entries,
                       has_item,
                       is_not,
-                      none,
                       starts_with)
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
@@ -33,6 +32,7 @@ from test_api import confd, provd, db, mocks
 
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
 TIMEZONE = 'America/Montreal'
+DOMAIN = 'example.com'
 
 COMPLETE_POST_BODY = {'admin_password': 'password',
                       'license': True,
@@ -290,10 +290,14 @@ class TestWizardDiscover(IntegrationTest):
         ip_address = network_settings['IPAddress']
         gateway = network_settings['Gateway']
 
+        # This is a bug in docker-compose 1.7 (docker API 1.22).
+        # In docker API 1.23 the hostname should be separated from the domain
+        hostname_hacked = '{}.{}'.format(hostname, DOMAIN)
+
         expected_response = {
-            'domain': none(),
+            'domain': DOMAIN,
             'nameservers': RESOLVCONF_NAMESERVERS,
-            'hostname': hostname,
+            'hostname': hostname_hacked,
             'gateways':  has_item(has_entry('gateway', gateway)),
             'timezone': TIMEZONE,
             'interfaces': has_item(has_entry('ip_address', ip_address))

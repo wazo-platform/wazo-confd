@@ -43,6 +43,7 @@ confd:
     - "./etc/ssl:/usr/share/xivo-certs"
     - "./etc/timezone:/etc/timezone"
     - "./etc/resolv.conf:/etc/resolv.conf"
+  domainname: example.com
 sync:
   image: n3llyb0y/wait
   links:
