@@ -4954,6 +4954,15 @@
                 },
                 "language": {
                     "type": "string",
+                    "enum": [
+                        "de_DE",
+                        "en_US",
+                        "es_ES",
+                        "fr_FR",
+                        "fr_CA",
+                        "it_IT",
+                        "nl_NL"
+                    ],
                     "description": "User language (e.g. \"en_US\")"
                 },
                 "description": {
@@ -5385,6 +5394,15 @@
                 },
                 "language": {
                     "type": "string",
+                    "enum": [
+                        "de_DE",
+                        "en_US",
+                        "es_ES",
+                        "fr_FR",
+                        "fr_CA",
+                        "it_IT",
+                        "nl_NL"
+                    ],
                     "default": "The system default language",
                     "description": "Language used for the voicemail menu prompt"
                 },
@@ -5462,6 +5480,15 @@
                 "language": {
                     "type": "string",
                     "default": "en_US",
+                    "enum": [
+                        "de_DE",
+                        "en_US",
+                        "es_ES",
+                        "fr_FR",
+                        "fr_CA",
+                        "it_IT",
+                        "nl_NL"
+                    ],
                     "description": "The language in which the XiVO will play sounds"
                 },
                 "entity_name": {
