@@ -3596,7 +3596,7 @@
             "get": {
                 "operationId": "get_wizard_status",
                 "summary": "Get wizard status",
-                "description": "**Required ACL:** `None`",
+                "description": "**Required ACL:** none",
                 "tags": [
                     "wizard"
                 ],
@@ -3611,7 +3611,7 @@
             "post": {
                 "operationId": "pass_wizard",
                 "summary": "Pass the wizard",
-                "description": "**Required ACL:** `none`\n\nThis API can only be used once to configure the XiVO.",
+                "description": "**Required ACL:** none\n\nThis API can only be used before wizard configuration.",
                 "tags": [
                     "wizard"
                 ],
@@ -3645,7 +3645,7 @@
             "get": {
                 "operationId": "get_wizard_discover",
                 "summary": "Get wizard discover",
-                "description": "**Required ACL:** `none`\n\nThis API can only be used before wizard configuration.",
+                "description": "**Required ACL:** none\n\nThis API can only be used before wizard configuration.",
                 "tags": [
                     "wizard"
                 ],
@@ -3655,14 +3655,8 @@
                             "$ref": "#/definitions/WizardDiscover"
                         }
                     },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
                     "403": {
                         "$ref": "#/responses/AlreadyConfiguredError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             }
@@ -5483,7 +5477,7 @@
                 },
                 "license": {
                     "type": "boolean",
-                    "description": "Accept/decline the GPLv3"
+                    "description": "Accept/decline the GPLv3: http://www.gnu.org/licenses/gpl-3.0.en.html"
                 },
                 "timezone": {
                     "type": "string",
@@ -5505,7 +5499,7 @@
                 },
                 "entity_name": {
                     "type": "string",
-                    "description": "Entity's name"
+                    "description": "Name of the default entity (e.g. company name or last name)"
                 },
                 "network": {
                     "$ref": "#/definitions/WizardNetwork"
@@ -5534,7 +5528,7 @@
             "properties": {
                 "configured": {
                     "type": "boolean",
-                    "description": "Wizard configured or not"
+                    "description": "Whether XiVO has already been configured or not"
                 }
             }
         },
@@ -5544,15 +5538,15 @@
                 "display_name": {
                     "type": "string",
                     "default": "Incalls",
-                    "description": "Display name of the context"
+                    "description": "Name of the context"
                 },
                 "number_start": {
                     "type": "string",
-                    "description": "Number range start for incoming calls"
+                    "description": "Beginning of the range of phone numbers for incoming calls"
                 },
                 "number_end": {
                     "type": "string",
-                    "description": "Number range end for incoming calls"
+                    "description": "End of the range of phone numbers for incoming calls"
                 },
                 "did_length": {
                     "type": "integer",
@@ -5566,15 +5560,15 @@
                 "display_name": {
                     "type": "string",
                     "default": "Default",
-                    "description": "Display name of the context"
+                    "description": "Name of the context"
                 },
                 "number_start": {
                     "type": "string",
-                    "description": "Number range start for users"
+                    "description": "Beginning of the range of phone numbers for users"
                 },
                 "number_end": {
                     "type": "string",
-                    "description": "Number range end for users"
+                    "description": "End of the range of phone numbers for users"
                 }
             },
             "required": [
@@ -5588,7 +5582,7 @@
                 "display_name": {
                     "type": "string",
                     "default": "Outcalls",
-                    "description": "Display name of the context"
+                    "description": "Name of the context"
                 }
             }
         },
@@ -5597,15 +5591,15 @@
             "properties": {
                 "hostname": {
                     "type": "string",
-                    "description": "System's hostname"
+                    "description": "System hostname"
                 },
                 "domain": {
                     "type": "string",
-                    "description": "Domain name"
+                    "description": "System domain name"
                 },
                 "timezone": {
                     "type": "string",
-                    "description": "System's timezone from file ``/etc/timezone``"
+                    "description": "System timezone from file ``/etc/timezone``"
                 },
                 "nameservers": {
                     "type": "array",
@@ -5638,16 +5632,16 @@
                 },
                 "ip_address": {
                     "type": "string",
-                    "description": "IPv4 address of the voip interface"
+                    "description": "IPv4 address of the interface"
                 },
                 "netmask": {
                     "type": "string",
-                    "description": "Netmask of the ip address"
+                    "description": "Netmask of the IP address"
                 }
             }
         },
         "WizardDiscoverGateway": {
-            "title": "WizardDiscoverInterface",
+            "title": "WizardDiscoverGateway",
             "properties": {
                 "interface": {
                     "type": "string",
@@ -5664,7 +5658,7 @@
             "properties": {
                 "hostname": {
                     "type": "string",
-                    "description": "System's hostname"
+                    "description": "System hostname"
                 },
                 "domain": {
                     "type": "string",
@@ -5676,11 +5670,11 @@
                 },
                 "ip_address": {
                     "type": "string",
-                    "description": "IPv4 address of the voip interface"
+                    "description": "IPv4 address of the VoIP interface (connected to phones)"
                 },
                 "netmask": {
                     "type": "string",
-                    "description": "Netmask of the ip address (e.g. 255.255.0.0)"
+                    "description": "Netmask of the IP address (e.g. 255.255.0.0)"
                 },
                 "gateway": {
                     "type": "string",
