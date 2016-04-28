@@ -58,6 +58,7 @@ COMPLETE_POST_BODY = {'admin_password': 'password',
 MINIMAL_POST_BODY = {'admin_password': 'password',
                      'license': True,
                      'timezone': 'America/Montreal',
+                     'entity_name': 'xivo',
                      'network': {'hostname': 'Tutu',
                                  'domain': 'domain.example.com',
                                  'interface': 'eth0',
@@ -332,7 +333,6 @@ class TestWizardDefaultValue(IntegrationTest):
         response.assert_ok()
 
         with db.queries() as queries:
-            assert_that(queries.entity_has_name_displayname('xivo', 'xivo'))
             assert_that(queries.sip_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))

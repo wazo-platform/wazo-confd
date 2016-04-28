@@ -86,7 +86,7 @@ class WizardSchema(BaseSchema):
     admin_password = fields.String(validate=Regexp(ADMIN_PASSWORD_REGEX), required=True)
     license = StrictBoolean(validate=Equal(True), required=True)
     language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
-    entity_name = fields.String(validate=Length(min=3, max=64), missing='xivo')
+    entity_name = fields.String(validate=Length(min=3, max=64), required=True)
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
     context_internal = fields.Nested(WizardContextInternalSchema, required=True)

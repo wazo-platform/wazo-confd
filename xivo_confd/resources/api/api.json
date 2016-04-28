@@ -5482,10 +5482,11 @@
                 }
             },
             "required": [
-                "license",
                 "admin_password",
-                "network",
+                "license",
                 "timezone",
+                "entity_name",
+                "network",
                 "context_internal"
             ]
         },
