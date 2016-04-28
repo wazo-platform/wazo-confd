@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -87,6 +87,9 @@ def extract_http_messages(error):
         code = error.code
         messages = ["Input Error - {}: {}".format(key, value)
                     for key, value in message.iteritems()]
+    elif isinstance(message, unicode):
+        code = error.code
+        messages = [message]
     else:
         # Return a generic HTTP error message if we couldn't find anything
         code = getattr(error, 'code', 400)

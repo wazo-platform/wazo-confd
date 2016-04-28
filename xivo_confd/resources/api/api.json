@@ -3634,6 +3634,9 @@
                     },
                     "400": {
                         "$ref": "#/responses/CreateError"
+                    },
+                    "401": {
+                        "$ref": "#/responses/AlreadyConfiguredError"
                     }
                 }
             }
@@ -3654,6 +3657,9 @@
                     },
                     "400": {
                         "$ref": "#/responses/GenericError"
+                    },
+                    "401": {
+                        "$ref": "#/responses/AlreadyConfiguredError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -4099,6 +4105,12 @@
         }
     },
     "responses": {
+        "AlreadyConfiguredError": {
+            "description": "The XiVO must not be configured",
+            "schema": {
+                "$ref": "#/definitions/Error"
+            }
+        },
         "GenericError": {
             "description": "An error occured during the operation",
             "schema": {

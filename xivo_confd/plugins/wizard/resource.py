@@ -22,8 +22,8 @@ from marshmallow import fields, validates_schema, validates
 from marshmallow.validate import Equal, Regexp, Length, OneOf, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
-from xivo_dao.helpers import errors
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from .access_restriction import xivo_unconfigured
 
 ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
 IP_ADDRESS_REGEX = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
@@ -116,10 +116,8 @@ class WizardResource(Resource):
         configured = self.service.get()
         return self.configured_schema.dump(configured).data
 
+    @xivo_unconfigured
     def post(self):
-        if self.service.get().configured:
-            raise errors.xivo_already_configured()
-
         wizard = self.wizard_schema.load(request.get_json()).data
         wizard_with_uuid = self.service.create(wizard)
         return self.wizard_schema.dump(wizard_with_uuid).data
@@ -152,9 +150,8 @@ class WizardDiscoverResource(Resource):
     def __init__(self, service):
         self.service = service
 
+    @xivo_unconfigured
     def get(self):
-        if self.service.get().configured:
-            raise errors.xivo_already_configured()
 
         discover = {'interfaces': self.service.get_interfaces(),
                     'gateways': self.service.get_gateways(),

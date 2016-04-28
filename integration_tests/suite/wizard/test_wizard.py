@@ -323,10 +323,10 @@ class TestWizardErrorConfigured(IntegrationTest):
         response.assert_ok()
 
         response = confd.wizard.post(body)
-        response.assert_match(400, re.compile(re.escape('configured')))
+        response.assert_match(401, re.compile(re.escape('configured')))
 
         response = confd.wizard.discover.get()
-        response.assert_match(400, re.compile(re.escape('configured')))
+        response.assert_match(401, re.compile(re.escape('configured')))
 
 
 class TestWizardDefaultValue(IntegrationTest):
