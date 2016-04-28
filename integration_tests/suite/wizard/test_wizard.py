@@ -150,54 +150,54 @@ class TestWizardErrors(IntegrationTest):
         self.check_bogus_field_returns_error('timezone', build_string(129))
 
     def test_error_hostname(self):
-        self.check_bogus_field_returns_error('hostname', 1234)
-        self.check_bogus_field_returns_error('hostname', None)
-        self.check_bogus_field_returns_error('hostname', True)
-        self.check_bogus_field_returns_error('hostname', '-bad-regex')
-        self.check_bogus_field_returns_error('hostname', build_string(64))
+        self.check_network_bogus_field_returns_error('hostname', 1234)
+        self.check_network_bogus_field_returns_error('hostname', None)
+        self.check_network_bogus_field_returns_error('hostname', True)
+        self.check_network_bogus_field_returns_error('hostname', '-bad-regex')
+        self.check_network_bogus_field_returns_error('hostname', build_string(64))
 
     def test_error_domain(self):
-        self.check_bogus_field_returns_error('domain', 1234)
-        self.check_bogus_field_returns_error('domain', None)
-        self.check_bogus_field_returns_error('domain', True)
-        self.check_bogus_field_returns_error('domain', '-bad-regex')
-        self.check_bogus_field_returns_error('domain', build_string(256))
+        self.check_network_bogus_field_returns_error('domain', 1234)
+        self.check_network_bogus_field_returns_error('domain', None)
+        self.check_network_bogus_field_returns_error('domain', True)
+        self.check_network_bogus_field_returns_error('domain', '-bad-regex')
+        self.check_network_bogus_field_returns_error('domain', build_string(256))
 
     def test_error_interface(self):
-        self.check_bogus_field_returns_error('interface', 1234)
-        self.check_bogus_field_returns_error('interface', None)
-        self.check_bogus_field_returns_error('interface', True)
-        self.check_bogus_field_returns_error('interface', 'not;valid;interface')
-        self.check_bogus_field_returns_error('interface', build_string(65))
+        self.check_network_bogus_field_returns_error('interface', 1234)
+        self.check_network_bogus_field_returns_error('interface', None)
+        self.check_network_bogus_field_returns_error('interface', True)
+        self.check_network_bogus_field_returns_error('interface', 'not;valid;interface')
+        self.check_network_bogus_field_returns_error('interface', build_string(65))
 
     def test_error_ip_address(self):
-        self.check_bogus_field_returns_error('ip_address', 1234)
-        self.check_bogus_field_returns_error('ip_address', None)
-        self.check_bogus_field_returns_error('ip_address', True)
-        self.check_bogus_field_returns_error('ip_address', '1922.162.23.2')
+        self.check_network_bogus_field_returns_error('ip_address', 1234)
+        self.check_network_bogus_field_returns_error('ip_address', None)
+        self.check_network_bogus_field_returns_error('ip_address', True)
+        self.check_network_bogus_field_returns_error('ip_address', '1922.162.23.2')
 
     def test_error_netmask(self):
-        self.check_bogus_field_returns_error('netmask', 1234)
-        self.check_bogus_field_returns_error('netmask', None)
-        self.check_bogus_field_returns_error('netmask', True)
-        self.check_bogus_field_returns_error('netmask', '1234.192.192.0')
+        self.check_network_bogus_field_returns_error('netmask', 1234)
+        self.check_network_bogus_field_returns_error('netmask', None)
+        self.check_network_bogus_field_returns_error('netmask', True)
+        self.check_network_bogus_field_returns_error('netmask', '1234.192.192.0')
 
     def test_error_nameservers(self):
-        self.check_bogus_field_returns_error('nameservers', 1234)
-        self.check_bogus_field_returns_error('nameservers', None)
-        self.check_bogus_field_returns_error('nameservers', True)
-        self.check_bogus_field_returns_error('nameservers', 'string')
-        self.check_bogus_field_returns_error('nameservers', ['1234.168.0.1'])
-        self.check_bogus_field_returns_error('nameservers', ['192.168.0.1',
-                                                             '192.168.0.2',
-                                                             '192.168.0.3',
-                                                             '192.168.0.4'])
+        self.check_network_bogus_field_returns_error('nameservers', 1234)
+        self.check_network_bogus_field_returns_error('nameservers', None)
+        self.check_network_bogus_field_returns_error('nameservers', True)
+        self.check_network_bogus_field_returns_error('nameservers', 'string')
+        self.check_network_bogus_field_returns_error('nameservers', ['1234.168.0.1'])
+        self.check_network_bogus_field_returns_error('nameservers', ['192.168.0.1',
+                                                                     '192.168.0.2',
+                                                                     '192.168.0.3',
+                                                                     '192.168.0.4'])
 
     def test_error_gateway(self):
-        self.check_bogus_field_returns_error('gateway', 1234)
-        self.check_bogus_field_returns_error('gateway', None)
-        self.check_bogus_field_returns_error('gateway', True)
-        self.check_bogus_field_returns_error('gateway', '1234.192.192.0')
+        self.check_network_bogus_field_returns_error('gateway', 1234)
+        self.check_network_bogus_field_returns_error('gateway', None)
+        self.check_network_bogus_field_returns_error('gateway', True)
+        self.check_network_bogus_field_returns_error('gateway', '1234.192.192.0')
 
     def test_error_context_internal_display_name(self):
         self.check_context_internal_bogus_field_returns_error('display_name', 1234)
@@ -257,15 +257,16 @@ class TestWizardErrors(IntegrationTest):
 
     def check_bogus_field_returns_error(self, field, bogus, sub_field=None):
         body = BOGUS_BASE_BODY
-        if field in body:
+        if sub_field is None:
             body[field] = bogus
-        elif field in body['network']:
-            body['network'][field] = bogus
         else:
             body[sub_field][field] = bogus
 
         result = confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape(field)))
+
+    def check_network_bogus_field_returns_error(self, field, bogus):
+        self.check_bogus_field_returns_error(field, bogus, 'network')
 
     def check_context_internal_bogus_field_returns_error(self, field, bogus):
         self.check_bogus_field_returns_error(field, bogus, 'context_internal')
