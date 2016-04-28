@@ -68,9 +68,16 @@ class WizardContextInternalSchema(BaseSchema):
 
 class WizardContextIncallSchema(WizardContextInternalSchema):
     display_name = fields.String(validate=Length(min=3, max=128), missing='Incalls')
-    did_length = fields.Integer(validate=Range(min=0, max=20), missing=4)
+    did_length = fields.Integer(validate=Range(min=0, max=20))
     number_start = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
     number_end = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
+
+    @validates_schema
+    def validate_numbers(self, data):
+        super(WizardContextIncallSchema, self).validate_numbers(data)
+        if data.get('number_start') and data.get('number_end'):
+            if not data.get('did_length'):
+                raise ValidationError('Missing data for required field.', 'did_length')
 
 
 class WizardSchema(BaseSchema):

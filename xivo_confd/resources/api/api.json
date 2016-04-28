@@ -5516,7 +5516,7 @@
                 },
                 "did_length": {
                     "type": "integer",
-                    "description": "Length of the DID"
+                    "description": "Length of the DID. Required if number_start and number_end are defined"
                 }
             }
         },

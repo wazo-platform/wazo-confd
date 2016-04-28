@@ -71,7 +71,8 @@ BOGUS_BASE_BODY = {'admin_password': 'password',
                                         'number_end': '1999'},
                    'context_incall': {'display_name': 'Incalls',
                                       'number_start': '2000',
-                                      'number_end': '2999'},
+                                      'number_end': '2999',
+                                      'did_length': 4},
                    'context_outcall': {'display_name': 'Outcalls'}}
 
 MINIMAL_POST_BODY = {'admin_password': 'password',
@@ -303,6 +304,12 @@ class TestWizardErrors(IntegrationTest):
         body = {'context_incall': {'number_start': '2000'}}
         result = confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_incall')))
+
+    def test_context_incall_missing_did_length(self):
+        body = {'context_incall': {'number_start': '2000',
+                                   'number_end': '3000'}}
+        result = confd.wizard.post(body)
+        result.assert_match(400, re.compile(re.escape('did_length')))
 
 
 class TestWizardDiscover(IntegrationTest):
