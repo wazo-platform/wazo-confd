@@ -5475,7 +5475,7 @@
                 },
                 "timezone": {
                     "type": "string",
-                    "description": "System timezone. Example: America/Montreal"
+                    "description": "System timezone. Example: America/Montreal. For the complete list of supported timezones, see ``/usr/share/zoneinfo/``"
                 },
                 "language": {
                     "type": "string",
@@ -5593,14 +5593,15 @@
                 },
                 "timezone": {
                     "type": "string",
-                    "description": "System's timezone. From file ``/etc/timezone``"
+                    "description": "System's timezone from file ``/etc/timezone``"
                 },
                 "nameservers": {
                     "type": "array",
+                    "maxItems": 3,
                     "items": {
                         "type": "string"
                     },
-                    "description": "Nameserver used in resolv.conf. Maximum 3"
+                    "description": "Nameservers from file ``/etc/resolv.conf``"
                 },
                 "interfaces": {
                     "type": "array",
@@ -5621,7 +5622,7 @@
             "properties": {
                 "interface": {
                     "type": "string",
-                    "description": "Interface name"
+                    "description": "Interface name (e.g. eth0)"
                 },
                 "ip_address": {
                     "type": "string",
@@ -5638,7 +5639,7 @@
             "properties": {
                 "interface": {
                     "type": "string",
-                    "description": "Interface name"
+                    "description": "Interface name (e.g. eth0)"
                 },
                 "gateway": {
                     "type": "string",
@@ -5659,7 +5660,7 @@
                 },
                 "interface": {
                     "type": "string",
-                    "description": "Interface name"
+                    "description": "Interface name (e.g. eth0)"
                 },
                 "ip_address": {
                     "type": "string",
@@ -5667,7 +5668,7 @@
                 },
                 "netmask": {
                     "type": "string",
-                    "description": "Netmask of the ip address"
+                    "description": "Netmask of the ip address (e.g. 255.255.0.0)"
                 },
                 "gateway": {
                     "type": "string",
@@ -5678,7 +5679,8 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Nameserver used in resolv.conf. Maximum 3"
+                    "maxItems": 3,
+                    "description": "List of IPv4 addresses. Nameservers are used in resolv.conf."
                 }
             },
             "required": [
