@@ -3635,7 +3635,7 @@
                     "400": {
                         "$ref": "#/responses/CreateError"
                     },
-                    "401": {
+                    "403": {
                         "$ref": "#/responses/AlreadyConfiguredError"
                     }
                 }
@@ -3658,7 +3658,7 @@
                     "400": {
                         "$ref": "#/responses/GenericError"
                     },
-                    "401": {
+                    "403": {
                         "$ref": "#/responses/AlreadyConfiguredError"
                     },
                     "404": {
