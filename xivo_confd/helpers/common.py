@@ -77,7 +77,7 @@ def rollback():
 
 
 def extract_http_messages(error):
-    # we need to keep error messages compatiable with API v1.1,
+    # we need to keep error messages compatible with API v1.1,
     # but flask-restful's error handling isn't flexible
     # enough to allow us to reformat its error messages.
     # So we attempt to extract the errors from the exception
