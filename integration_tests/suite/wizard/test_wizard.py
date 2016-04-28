@@ -389,6 +389,7 @@ class TestWizard(IntegrationTest):
                                                    data['context_incall']['did_length']))
             assert_that(queries.context_has_outcall(data['context_outcall']['display_name']))
             assert_that(queries.context_has_switchboard())
+            assert_that(queries.internal_context_include_outcall_context())
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_request('/xivoctl',

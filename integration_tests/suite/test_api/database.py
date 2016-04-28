@@ -636,6 +636,21 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def internal_context_include_outcall_context(self):
+        query = text("""SELECT COUNT(*)
+                     FROM contextinclude
+                     WHERE
+                        context = 'default'
+                        AND include = 'to-extern'
+                        AND priority = 0
+                     """)
+
+        count = (self.connection
+                 .execute(query)
+                 .scalar())
+
+        return count > 0
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')

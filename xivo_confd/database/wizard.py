@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao.alchemy.context import Context
+from xivo_dao.alchemy.contextinclude import ContextInclude
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 from xivo_dao.alchemy.entity import Entity
 from xivo_dao.alchemy.general import General
@@ -147,6 +148,12 @@ def set_context_outcall(context, entity):
                         description=''))
 
 
+def include_outcall_context_in_internal_context():
+    Session.add(ContextInclude(context='default',
+                               include='to-extern',
+                               priority=0))
+
+
 def set_xivo_configured():
     row = Session.query(General).first()
     row.configured = True
@@ -172,3 +179,4 @@ def create(wizard, autoprov_username):
     set_context_incall(wizard['context_incall'], entity)
     set_context_internal(wizard['context_internal'], entity)
     set_context_outcall(wizard['context_outcall'], entity)
+    include_outcall_context_in_internal_context()
