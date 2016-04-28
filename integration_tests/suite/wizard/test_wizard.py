@@ -24,11 +24,15 @@ from hamcrest import (assert_that,
                       has_entry,
                       has_entries,
                       has_item,
+                      has_length,
                       is_not,
                       starts_with)
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from xivo_test_helpers import until
+
 from test_api import confd, provd, db, mocks
+from test_api.bus import BusClient
 
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
 TIMEZONE = 'America/Montreal'
@@ -352,6 +356,7 @@ class TestWizard(IntegrationTest):
     @mocks.sysconfd()
     def test_post(self, sysconfd):
         data = copy.deepcopy(COMPLETE_POST_BODY)
+        BusClient.listen_events('config.wizard.created')
 
         response = confd.wizard.get()
         assert_that(response.item, equal_to({'configured': False}))
@@ -365,6 +370,13 @@ class TestWizard(IntegrationTest):
         self.validate_db(data)
         self.validate_sysconfd(sysconfd, data)
         self.validate_provd(data['network']['ip_address'])
+        self.validate_bus_event()
+
+    def validate_bus_event(self):
+        def assert_function():
+            assert_that(BusClient.events(), has_length(1))
+
+        until.assert_(assert_function, tries=5)
 
     def validate_db(self, data):
         with db.queries() as queries:

@@ -14,8 +14,8 @@ postgres:
     - "15432:5432"
 rabbitmq:
   image: rabbitmq
-  expose:
-    - "5672"
+  ports:
+    - "5672:5672"
 sysconfd:
   image: p0bailey/docker-flask
   expose:
