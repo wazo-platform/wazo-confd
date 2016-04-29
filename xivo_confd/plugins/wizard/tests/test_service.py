@@ -96,7 +96,7 @@ class TestWizardService(unittest.TestCase):
         assert_that(result, empty())
 
     def test_get_timezone(self):
-        with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data='America/Montreal')) as m:
+        with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data='America/Montreal'), create=True) as m:
             result = self.service.get_timezone()
 
         m.assert_called_once_with('/etc/timezone', 'r')
@@ -112,7 +112,7 @@ class TestWizardService(unittest.TestCase):
     def test_get_nameservers(self):
         resolv_conf = 'search example.com\nnameserver 192.168.2.0\nnameserver 192.168.2.1'
         expected_result = ['192.168.2.0', '192.168.2.1']
-        with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data=resolv_conf)) as m:
+        with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data=resolv_conf), create=True) as m:
             result = self.service.get_nameservers()
 
         m.assert_called_once_with('/etc/resolv.conf', 'r')
