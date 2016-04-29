@@ -17,6 +17,7 @@
 
 import copy
 import json
+import os
 import re
 
 from hamcrest import (assert_that,
@@ -34,6 +35,7 @@ from xivo_test_helpers import until
 from test_api import confd, provd, db, mocks
 from test_api.bus import BusClient
 
+ASSET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
 TIMEZONE = 'America/Montreal'
 DOMAIN = 'example.com'
@@ -80,7 +82,7 @@ def build_string(length):
 
 class IntegrationTest(AssetLaunchingTestCase):
 
-    assets_root = 'assets'
+    assets_root = ASSET_ROOT
     service = 'confd'
     asset = 'wizard'
 
