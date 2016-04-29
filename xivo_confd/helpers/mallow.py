@@ -25,8 +25,11 @@ class BaseSchema(Schema):
         return abort(400, message=error.message)
 
     def on_bind_field(self, field_name, field_obj):
+        # Without this, the nested schema handle error and abort. So the error
+        # message will not include parent key and the rest of the parent schema
+        # will not be validated
         if isinstance(field_obj, fields.Nested):
-            field_obj.nested.handle_error = super(BaseSchema, self).handle_error
+            field_obj.schema.handle_error = super(BaseSchema, self).handle_error
 
 
 class StrictBoolean(fields.Boolean):
