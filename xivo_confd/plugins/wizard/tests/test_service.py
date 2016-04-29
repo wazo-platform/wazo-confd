@@ -56,16 +56,6 @@ class TestWizardService(unittest.TestCase):
         assert_that(result, equal_to(expected_result))
 
     @patch('xivo_confd.plugins.wizard.service.netifaces')
-    def test_get_interfaces_return_empty_list_when_no_interfaces(self, netifaces):
-        netifaces.interfaces.return_value = []
-        netifaces.AF_INET = 4
-        netifaces.ifaddresses.side_effect = ValueError('You must specify a valid interface name')
-
-        result = self.service.get_interfaces()
-
-        assert_that(result, empty())
-
-    @patch('xivo_confd.plugins.wizard.service.netifaces')
     def test_get_interfaces_return_empty_list_when_no_ip_address(self, netifaces):
         netifaces.interfaces.return_value = ['eth0']
         netifaces.AF_INET = 4
