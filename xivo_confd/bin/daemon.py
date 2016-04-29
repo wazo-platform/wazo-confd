@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 import logging
 import sys
 
+from xivo import xivo_logging
+from xivo.config_helper import set_xivo_uuid, UUIDNotFound
 from xivo.daemonize import pidfile_context
 from xivo.user_rights import change_user
-from xivo import xivo_logging
 
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
@@ -38,6 +39,12 @@ def main(argv):
 
     if config['user']:
         change_user(config['user'])
+
+    try:
+        set_xivo_uuid(config, logger)
+    except UUIDNotFound:
+        if config['service_discovery']['enabled']:
+            raise
 
     controller = Controller(config)
 
