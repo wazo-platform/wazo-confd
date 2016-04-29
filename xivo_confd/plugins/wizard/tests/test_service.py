@@ -102,7 +102,7 @@ class TestWizardService(unittest.TestCase):
         m.assert_called_once_with('/etc/timezone', 'r')
         assert_that(result, equal_to('America/Montreal'))
 
-    @patch('xivo_confd.plugins.wizard.service.open')
+    @patch('xivo_confd.plugins.wizard.service.open', create=True)
     def test_get_timezone_return_none_if_no_file(self, mopen):
         mopen.side_effect = IOError()
         result = self.service.get_timezone()
@@ -118,7 +118,7 @@ class TestWizardService(unittest.TestCase):
         m.assert_called_once_with('/etc/resolv.conf', 'r')
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.open')
+    @patch('xivo_confd.plugins.wizard.service.open', create=True)
     def test_get_resolv_conf_return_none_if_no_file(self, mopen):
         mopen.side_effect = IOError()
         result = self.service.get_nameservers()
