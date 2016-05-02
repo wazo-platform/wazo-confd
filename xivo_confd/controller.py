@@ -17,8 +17,6 @@
 
 import logging
 import xivo_dao
-import os
-import sys
 
 from functools import partial
 
@@ -42,13 +40,8 @@ class Controller(object):
 
         app = setup_app(self.config)
 
-        uuid = os.getenv('XIVO_UUID')
-        if not uuid and self.config['service_discovery']['enabled']:
-            logger.error('undefined environment variable XIVO_UUID')
-            sys.exit(1)
-
         with ServiceCatalogRegistration('xivo-confd',
-                                        uuid,
+                                        self.config['uuid'],
                                         self.config['consul'],
                                         self.config['service_discovery'],
                                         self.config['bus'],
