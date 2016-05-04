@@ -25,7 +25,7 @@ from marshmallow.exceptions import ValidationError
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 from .access_restriction import xivo_unconfigured
 
-ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
+ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
 IP_ADDRESS_REGEX = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
 BASE_HOSTNAME_REGEX = r'[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?'
 HOSTNAME_REGEX = r'^{}$'.format(BASE_HOSTNAME_REGEX)
