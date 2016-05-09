@@ -22,6 +22,8 @@ import re
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
+LANGUAGE_REGEX = r"^[a-z]{2}_[A-Z]{2}$"
+
 
 class Validator(object):
 
