@@ -108,4 +108,4 @@ def test_delete_user_when_user_and_entity_associated(entity, user):
         assert_that(response.item, not_(empty()))
         confd.users(user['id']).delete().assert_deleted()
         invalid_user = confd.users(user['id']).entities.get
-        yield s.check_resource_not_found, invalid_user, 'User'
+        s.check_resource_not_found(invalid_user, 'User')
