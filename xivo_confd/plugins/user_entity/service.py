@@ -39,9 +39,6 @@ class UserEntityService(object):
         user.user_id = user_id
         return user
 
-    def get(self, user, entity):
-        return self.dao.get_by(id=user.id, entity_id=entity.id)
-
     def associate(self, user, entity_id):
         entity = Entity(entity_id)
         self.validator.validate_association(user, entity)
