@@ -120,6 +120,7 @@ DEFAULT_CONFIG = {
         'call_permission_plugin',
         'user_call_permission_plugin',
         'wizard_plugin',
+        'user_entity_plugin',
     ],
     'service_discovery': {
         'enabled': True,

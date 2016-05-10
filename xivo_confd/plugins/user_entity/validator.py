@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2016 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+
+from xivo_confd.helpers.validator import AssociationValidator, Validator
+from xivo_dao.helpers import errors
+
+from xivo_confd.database import entity as entity_db
+
+
+class UserEntityAssociationValidator(Validator):
+
+    def validate(self, user, entity):
+        self.validate_entity_exists(entity)
+        self.validate_user_not_already_associated(user, entity)
+
+    def validate_user_not_already_associated(self, user, entity):
+        if user.entity_id == entity.id:
+            raise errors.resource_associated('User', 'Entity',
+                                             user_id=user.id, entity=entity.id)
+
+    # TODO: This should be deleted when entity dao will be implemented
+    def validate_entity_exists(self, entity):
+        exists = entity_db.entity_id_exists(entity.id)
+        if not exists:
+            raise errors.not_found('Entity', id=entity.id)
+
+
+def build_validator():
+    return AssociationValidator(
+        association=[
+            UserEntityAssociationValidator()
+        ]
+    )

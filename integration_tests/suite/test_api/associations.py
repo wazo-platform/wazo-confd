@@ -82,3 +82,9 @@ def user_call_permission(user, call_permission, check=True):
     h.user_call_permission.associate(user['id'], call_permission['id'], check)
     yield
     h.user_call_permission.dissociate(user['id'], call_permission['id'], check)
+
+
+@contextmanager
+def user_entity(user, entity, check=True):
+    h.user_entity.associate(user['id'], entity['id'], check)
+    yield
