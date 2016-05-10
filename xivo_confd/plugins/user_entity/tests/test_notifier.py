@@ -28,14 +28,15 @@ class TestUserLineNotifier(unittest.TestCase):
 
     def setUp(self):
         self.bus = Mock()
-        self.user = Mock(User, uuid='abcd-1234', entity_id='1')
+        self.entity = Mock(id='1')
+        self.user = Mock(User, uuid='abcd-1234')
 
         self.notifier = UserEntityNotifier(self.bus)
 
     def test_when_entity_associate_to_user_then_event_sent_on_bus(self):
-        expected_event = UserEntityAssociatedEvent(self.user.uuid, self.user.entity_id)
+        expected_event = UserEntityAssociatedEvent(self.user.uuid, self.entity.id)
 
-        self.notifier.associated(self.user, self.user.entity_id)
+        self.notifier.associated(self.user, self.entity)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
