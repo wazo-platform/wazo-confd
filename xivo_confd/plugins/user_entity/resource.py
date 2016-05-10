@@ -33,11 +33,10 @@ fields = {
 
 class UserEntityResource(ConfdResource):
 
-    def __init__(self, service, user_dao, entity_dao):
+    def __init__(self, service, user_dao):
         super(UserEntityResource, self).__init__()
         self.service = service
         self.user_dao = user_dao
-        self.entity_dao = entity_dao
 
     def get_user(self, user_id):
         return self.user_dao.get_by_id_uuid(user_id)
