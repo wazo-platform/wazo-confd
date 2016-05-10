@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,16 @@ from xivo_dao import context_dao
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 from xivo_dao.resources.voicemail import dao as voicemail_dao
-from xivo_dao.resources.language import dao as language_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
-from xivo_confd.helpers.validator import Validator, ValidationGroup, \
-    MissingFields, FindResource, MemberOfSequence, Optional, RegexField
+from xivo_confd.helpers.validator import (FindResource,
+                                          LANGUAGE_REGEX,
+                                          MemberOfSequence,
+                                          MissingFields,
+                                          Optional,
+                                          RegexField,
+                                          ValidationGroup,
+                                          Validator)
 
 
 NUMBER_REGEX = r"^[0-9]{1,40}$"
@@ -78,10 +83,7 @@ def build_validators():
             MissingFields(),
             FindResource('context', context_dao.get, 'Context'),
             RegexField.compile('number', NUMBER_REGEX, "numeric string (max length: 40)"),
-            Optional('language', MemberOfSequence(
-                'language',
-                language_dao.find_all,
-                'Language')),
+            Optional('language', RegexField.compile('language', LANGUAGE_REGEX)),
             Optional('timezone', MemberOfSequence(
                 'timezone',
                 voicemail_dao.find_all_timezone,
