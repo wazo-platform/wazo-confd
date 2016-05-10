@@ -2684,7 +2684,7 @@
         "/users/{user_id}/entities": {
             "get": {
                 "operationId": "get_user_entity_association",
-                "summary": "Get entity associated to user",
+                "summary": "Get entity of a user",
                 "description": "**Required ACL:** `confd.users.{user_id}.entities.read`",
                 "tags": [
                     "users",
@@ -2711,8 +2711,8 @@
         "/users/{user_id}/entities/{entity_id}": {
             "put": {
                 "operationId": "associate_user_entity",
-                "summary": "Associate user and entity",
-                "description": "**Required ACL:** `confd.users.{user_id}.entities.update`",
+                "summary": "Change the entity of a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.entities.{entity_id}.update`",
                 "tags": [
                     "users",
                     "entities"
