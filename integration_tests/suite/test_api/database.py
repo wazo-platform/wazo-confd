@@ -345,6 +345,28 @@ class DatabaseQueries(object):
         query = text("DELETE FROM context WHERE name = :name")
         self.connection.execute(query, name=name)
 
+    def insert_entity(self, name):
+        query = text("""
+        INSERT INTO entity (name, description)
+        VALUES (:name, '')
+        RETURNING id
+        """)
+
+        entity_id = (self.connection
+                     .execute(query,
+                              name=name)
+                     .scalar())
+
+        return entity_id
+
+    def delete_entity(self, entity_id):
+        query = text("DELETE FROM entity WHERE id = :id")
+        self.connection.execute(query, id=entity_id)
+
+    def get_entities(self):
+        query = text("SELECT * FROM entity")
+        return self.connection.execute(query)
+
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)

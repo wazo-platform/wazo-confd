@@ -62,6 +62,7 @@ setup(
             'call_permission_plugin = xivo_confd.plugins.call_permission.plugin:Plugin',
             'user_call_permission_plugin = xivo_confd.plugins.user_call_permission.plugin:Plugin',
             'wizard_plugin = xivo_confd.plugins.wizard.plugin:Plugin',
+            'user_entity_plugin = xivo_confd.plugins.user_entity.plugin:Plugin',
         ]
     }
 )

@@ -118,3 +118,9 @@ class call_permission(IsolatedAction):
 
     actions = {'generate': h.call_permission.generate_call_permission,
                'delete': h.call_permission.delete_call_permission}
+
+
+class entity(IsolatedAction):
+
+    actions = {'generate': h.entity.generate_entity,
+               'delete': h.entity.delete_entity}
