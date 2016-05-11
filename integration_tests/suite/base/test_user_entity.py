@@ -19,6 +19,7 @@
 from hamcrest import (assert_that,
                       empty,
                       has_entries,
+                      has_length,
                       not_)
 
 from test_api import scenarios as s
@@ -26,7 +27,9 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
+from test_api.bus import BusClient
 
+from xivo_test_helpers import until
 
 FAKE_ID = 999999999
 
@@ -109,3 +112,14 @@ def test_delete_user_when_user_and_entity_associated(entity, user):
         confd.users(user['id']).delete().assert_deleted()
         invalid_user = confd.users(user['id']).entities.get
         s.check_resource_not_found(invalid_user, 'User')
+
+
+@fixtures.entity()
+@fixtures.user()
+def test_bus_event_when_associate(entity, user):
+    BusClient.listen_events('config.users.{}.entities.updated'.format(user['uuid']))
+    with a.user_entity(user, entity):
+        def assert_function():
+            assert_that(BusClient.events(), has_length(1))
+
+        until.assert_(assert_function, tries=5)
