@@ -93,6 +93,15 @@ def test_associate_when_user_already_associated_to_same_entity(entity, user):
 
 @fixtures.entity()
 @fixtures.user()
+@fixtures.line_sip()
+def test_associate_when_user_already_associated_to_a_line(entity, user, line):
+    with a.user_line(user, line):
+        response = confd.users(user['id']).entities(entity['id']).put()
+        response.assert_match(400, e.resource_associated('User', 'Line'))
+
+
+@fixtures.entity()
+@fixtures.user()
 def test_delete_user_when_user_and_entity_associated(entity, user):
     with a.user_entity(user, entity, check=False):
         response = confd.users(user['id']).entities.get()
