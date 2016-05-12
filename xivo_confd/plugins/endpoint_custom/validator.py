@@ -20,7 +20,7 @@ from xivo_confd.helpers.validator import ValidationGroup, RequiredFields, Unique
 
 from xivo_dao.resources.endpoint_custom import dao
 
-INTERFACE_REGEX = r"^[a-z0-9#\*\.\/_@:-]{1,128}$"
+INTERFACE_REGEX = r"^[a-z0-9#*./_@:-]{1,128}$"
 
 
 def find_by_interface(interface):
