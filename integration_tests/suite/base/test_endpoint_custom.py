@@ -103,6 +103,12 @@ def test_create_custom_all_parameters():
     assert_that(response.item, expected)
 
 
+def test_create_custom_accept_uppercase_interface():
+    response = confd.endpoints.custom.post(interface='Local/123@foobar')
+
+    response.assert_ok()
+
+
 def test_given_interface_already_exists_then_error_raised():
     response = confd.endpoints.custom.post(interface='custom/duplicate')
     response.assert_ok()
