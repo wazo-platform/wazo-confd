@@ -124,3 +124,9 @@ class entity(IsolatedAction):
 
     actions = {'generate': h.entity.generate_entity,
                'delete': h.entity.delete_entity}
+
+
+class funckey_template(IsolatedAction):
+
+    actions = {'generate': h.funckey_template.generate_funckey_template,
+               'delete': h.funckey_template.delete_funckey_template}

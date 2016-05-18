@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
 #
@@ -16,28 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import user
-import line
-import line_sip
-import extension
-import device
-import voicemail
-import user_line
-import user_voicemail
-import user_cti_profile
-import line_extension
-import line_device
-import line_endpoint_custom
-import line_endpoint_sip
-import line_endpoint_sccp
-import cti_profile
-import endpoint_sip
-import endpoint_sccp
-import endpoint_custom
-import user_import
-import user_call_permission
-import switchboard
-import call_permission
-import entity
-import user_entity
-import funckey_template
+from test_api import confd
+
+
+def generate_funckey_template(**params):
+    return add_funckey_template(**params)
+
+
+def add_funckey_template(**params):
+    response = confd.funckeys.templates.post(params)
+    return response.item
+
+
+def delete_funckey_template(funckey_template_id, check=False):
+    response = confd.funckeys.templates(funckey_template_id).delete()
+    if check:
+        response.assert_ok()
