@@ -46,6 +46,7 @@ class Plugin(object):
 
         api.add_resource(UserList,
                          '/users',
+                         endpoint='users_list',
                          resource_class_args=(service,)
                          )
 
