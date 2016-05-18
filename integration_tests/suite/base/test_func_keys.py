@@ -34,7 +34,7 @@ from test_api import scenarios as s
 FAKE_ID = 999999999
 
 
-class TestFuncKey(unittest.TestCase):
+class BaseTestFuncKey(unittest.TestCase):
 
     def setUp(self):
         self.db = db
@@ -76,7 +76,7 @@ class TestFuncKey(unittest.TestCase):
         response.assert_ok()
 
 
-class TestUserWithFuncKey(TestFuncKey):
+class TestUserWithFuncKey(BaseTestFuncKey):
 
     def setUp(self):
         super(TestUserWithFuncKey, self).setUp()
@@ -214,7 +214,7 @@ class TestUserWithFuncKey(TestFuncKey):
         s.check_resource_not_found(fake_funckey, 'FuncKey')
 
 
-class TestAllFuncKeyDestinations(TestFuncKey):
+class TestAllFuncKeyDestinations(BaseTestFuncKey):
 
     def setUp(self):
         super(TestAllFuncKeyDestinations, self).setUp()
@@ -247,29 +247,41 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             '5': {'label': '', 'type': 'speeddial', 'line': 1, 'value': custom_exten},
             '6': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*10'},
             '7': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*9'},
-            '8': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
-            '9': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
-            '10': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
+            '8': {'label': '', 'type': 'speeddial', 'line': 1,
+                  'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
+            '9': {'label': '', 'type': 'speeddial', 'line': 1,
+                  'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
+            '10': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
             '11': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*8'},
             '12': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*34'},
             '13': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*36'},
-            '14': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
+            '14': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
             '15': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*98'},
             '16': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*92'},
-            '17': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
-            '18': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
-            '19': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
-            '20': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'],
-                                                                                                            fwd=forward_number)},
+            '17': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
+            '18': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
+            '19': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
+            '20': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'], fwd=forward_number)},
             '21': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*1'},
             '22': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*2'},
-            '23': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '24': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '25': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '23': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '24': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '25': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
             '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
             '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
-            '28': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*11{paging}'.format(paging=paging_number)},
-            '29': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
+            '28': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*11{paging}'.format(paging=paging_number)},
+            '29': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*37{member_id}'.format(member_id=filter_member_id)},
             '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
             '31': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
         }
@@ -345,7 +357,7 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             self.check_provd_has_funckey(pos, provd_funckey)
 
 
-class TestTemplateAssociation(TestFuncKey):
+class TestTemplateAssociation(BaseTestFuncKey):
 
     def setUp(self):
         super(TestTemplateAssociation, self).setUp()
@@ -515,7 +527,7 @@ class TestTemplateAssociation(TestFuncKey):
         assert_that(response.items, empty())
 
 
-class TestBlfFuncKeys(TestFuncKey):
+class TestBlfFuncKeys(BaseTestFuncKey):
 
     def setUp(self):
         super(TestBlfFuncKeys, self).setUp()
@@ -556,20 +568,31 @@ class TestBlfFuncKeys(TestFuncKey):
             '1': {'label': '', 'type': 'blf', 'line': 1, 'value': user_exten},
             '4': {'label': '', 'type': 'blf', 'line': 1, 'value': conf_exten},
             '5': {'label': '', 'type': 'blf', 'line': 1, 'value': custom_exten},
-            '8': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
-            '9': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
-            '10': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
-            '14': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
-            '17': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
-            '18': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
-            '19': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
-            '20': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'],
-                                                                                                      fwd=forward_number)},
-            '23': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '24': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '25': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '8': {'label': '', 'type': 'blf', 'line': 1,
+                  'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
+            '9': {'label': '', 'type': 'blf', 'line': 1,
+                  'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
+            '10': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
+            '14': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
+            '17': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
+            '18': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
+            '19': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
+            '20': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'], fwd=forward_number)},
+            '23': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '24': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '25': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
             '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
-            '29': {'label': '', 'type': 'blf', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
+            '29': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*37{member_id}'.format(member_id=filter_member_id)},
         }
 
     def test_when_creating_funckey_then_blf_activated_by_default(self):
