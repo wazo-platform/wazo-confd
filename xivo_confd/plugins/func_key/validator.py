@@ -28,7 +28,6 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
 from xivo_dao.resources.bsfilter import dao as bsfilter_dao
 from xivo_dao.resources.conference import dao as conference_dao
-from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.features import dao as feature_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.paging import dao as paging_dao
@@ -95,64 +94,10 @@ class FuncKeyModelValidator(FuncKeyValidator):
             validator.validate(funckey.destination)
 
 
-class ServiceValidator(FuncKeyValidator):
-
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, destination):
-        extensions = self.dao.find_all_service_extensions()
-        all_services = [e.service for e in extensions]
-        service = destination.service
-
-        if service not in all_services:
-            raise errors.param_not_found('service', service)
-
-
 class ForwardValidator(FuncKeyValidator):
-
-    def __init__(self, dao):
-        self.dao = dao
 
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
-        self.validate_forward(destination)
-
-    def validate_forward(self, destination):
-        extensions = self.dao.find_all_forward_extensions()
-        all_forwards = [e.forward for e in extensions]
-        forward = destination.forward
-
-        if forward not in all_forwards:
-            raise errors.param_not_found('forward', forward)
-
-
-class TransferValidator(FuncKeyValidator):
-
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, destination):
-        extensions = self.dao.find_all_transfer_extensions()
-        all_transfers = [e.transfer for e in extensions]
-        transfer = destination.transfer
-
-        if transfer not in all_transfers:
-            raise errors.param_not_found('transfer', transfer)
-
-
-class AgentActionValidator(FuncKeyValidator):
-
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, destination):
-        extensions = self.dao.find_all_agent_action_extensions()
-        all_actions = [e.action for e in extensions]
-        action = destination.action
-
-        if action not in all_actions:
-            raise errors.param_not_found('action', action)
 
 
 class ParkPositionValidator(FuncKeyValidator):
@@ -196,11 +141,10 @@ def build_validator():
         'queue': [ResourceExists('queue_id', queue_dao.exists, 'Queue')],
         'conference': [ResourceExists('conference_id', conference_dao.exists, 'Conference')],
         'custom': [CustomValidator()],
-        'service': [ServiceValidator(extension_dao)],
-        'forward': [ForwardValidator(extension_dao)],
-        'transfer': [TransferValidator(feature_dao)],
-        'agent': [AgentActionValidator(extension_dao),
-                  ResourceExists('agent_id', agent_dao.exists, 'Agent')],
+        'service': [],
+        'forward': [ForwardValidator()],
+        'transfer': [],
+        'agent': [ResourceExists('agent_id', agent_dao.exists, 'Agent')],
         'park_position': [ParkPositionValidator(feature_dao)],
         'parking': [],
         'onlinerec': [],
