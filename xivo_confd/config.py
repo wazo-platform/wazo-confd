@@ -95,7 +95,6 @@ DEFAULT_CONFIG = {
         "user_line",
         "user_line_associated",
         "user_voicemail",
-        "func_keys",
     ],
     'extra_plugins': [],
     'enabled_plugins': [
