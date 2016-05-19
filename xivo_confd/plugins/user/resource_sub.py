@@ -103,7 +103,7 @@ class UserServiceList(UserSubResource):
 
 
 class ForwardBusySchema(BaseSchema):
-    enabled = StrictBoolean(attribute='busy_enabled', falsy=set((False,)), truthy=set((True,)))
+    enabled = StrictBoolean(attribute='busy_enabled')
     destination = fields.String(attribute='busy_destination', allow_none=True)
 
     types = ['busy']
