@@ -62,7 +62,7 @@ class TestUserNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
 
     def test_when_user_created_then_event_sent_on_bus(self):
-        expected_event = CreateUserEvent(self.user.id)
+        expected_event = CreateUserEvent(self.user.id, self.user.uuid)
 
         self.notifier.created(self.user)
 
@@ -76,7 +76,7 @@ class TestUserNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
 
     def test_when_user_edited_then_event_sent_on_bus(self):
-        expected_event = EditUserEvent(self.user.id)
+        expected_event = EditUserEvent(self.user.id, self.user.uuid)
 
         self.notifier.edited(self.user)
 
@@ -90,7 +90,7 @@ class TestUserNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
 
     def test_when_user_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteUserEvent(self.user.id)
+        expected_event = DeleteUserEvent(self.user.id, self.user.uuid)
 
         self.notifier.deleted(self.user)
 
