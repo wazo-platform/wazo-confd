@@ -22,12 +22,13 @@ from mock import Mock
 
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 
-from xivo_bus.resources.func_key.event import CreateFuncKeyTemplateEvent, \
-    EditFuncKeyTemplateEvent, DeleteFuncKeyTemplateEvent
+from xivo_bus.resources.func_key.event import (CreateFuncKeyTemplateEvent,
+                                               DeleteFuncKeyTemplateEvent,
+                                               EditFuncKeyTemplateEvent)
 
 from xivo_confd.helpers.bus_publisher import BusPublisher
 from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
-from xivo_confd.resources.func_keys.notifier import FuncKeyTemplateNotifier
+from xivo_confd.plugins.func_key.notifier import FuncKeyTemplateNotifier
 
 
 class TestFuncKeyTemplateNotifier(unittest.TestCase):

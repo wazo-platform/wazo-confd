@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_bus.resources.func_key.event import CreateFuncKeyTemplateEvent, \
-    EditFuncKeyTemplateEvent, DeleteFuncKeyTemplateEvent
+from xivo_confd import bus, sysconfd
+from xivo_confd.database import device as device_db
+
+from xivo_bus.resources.func_key.event import (CreateFuncKeyTemplateEvent,
+                                               EditFuncKeyTemplateEvent,
+                                               DeleteFuncKeyTemplateEvent)
 
 
 class FuncKeyTemplateNotifier(object):
@@ -37,13 +41,17 @@ class FuncKeyTemplateNotifier(object):
     def edited(self, template):
         event = EditFuncKeyTemplateEvent(template.id)
         self.bus.send_bus_event(event, event.routing_key)
-        self.reload_sccp(template)
+        self._reload_sccp(template)
 
     def deleted(self, template):
         event = DeleteFuncKeyTemplateEvent(template.id)
         self.bus.send_bus_event(event, event.routing_key)
-        self.reload_sccp(template)
+        self._reload_sccp(template)
 
-    def reload_sccp(self, template):
+    def _reload_sccp(self, template):
         if self.device_db.template_has_sccp_device(template.id):
             self.sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
+
+
+def build_notifier():
+    return FuncKeyTemplateNotifier(bus, sysconfd, device_db)

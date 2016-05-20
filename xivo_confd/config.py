@@ -95,7 +95,6 @@ DEFAULT_CONFIG = {
         "user_line",
         "user_line_associated",
         "user_voicemail",
-        "func_keys",
     ],
     'extra_plugins': [],
     'enabled_plugins': [
@@ -121,6 +120,7 @@ DEFAULT_CONFIG = {
         'user_call_permission_plugin',
         'wizard_plugin',
         'user_entity_plugin',
+        'func_key_plugin',
     ],
     'service_discovery': {
         'enabled': True,

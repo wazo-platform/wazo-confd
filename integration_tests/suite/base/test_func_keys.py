@@ -1,13 +1,43 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2016 Avencall
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 import unittest
-from hamcrest import assert_that, has_entries, has_key, is_not, has_entry, contains
+from hamcrest import (assert_that,
+                      contains,
+                      empty,
+                      has_entries,
+                      has_entry,
+                      has_key,
+                      is_not,
+                      not_)
 
 from test_api import confd
 from test_api import helpers
 from test_api import db
 from test_api import provd
+from test_api import associations as a
+from test_api import scenarios as s
+from test_api import fixtures
+
+FAKE_ID = 999999999
 
 
-class TestFuncKey(unittest.TestCase):
+class BaseTestFuncKey(unittest.TestCase):
 
     def setUp(self):
         self.db = db
@@ -49,7 +79,7 @@ class TestFuncKey(unittest.TestCase):
         response.assert_ok()
 
 
-class TestUserWithFuncKey(TestFuncKey):
+class TestUserWithFuncKey(BaseTestFuncKey):
 
     def setUp(self):
         super(TestUserWithFuncKey, self).setUp()
@@ -149,8 +179,45 @@ class TestUserWithFuncKey(TestFuncKey):
 
         self.check_provd_does_not_have_funckey(self.pos)
 
+    def test_get_user_funckeys(self):
+        destination_2 = {'type': 'custom', 'exten': '456'}
+        destination_3 = {'type': 'custom', 'exten': '789'}
+        confd.users(self.user['id']).funckeys(2).put(destination=destination_2)
+        confd.users(self.user['id']).funckeys(3).put(destination=destination_3)
 
-class TestAllFuncKeyDestinations(TestFuncKey):
+        response = confd.users(self.user['id']).funckeys.get()
+
+        expected_result = has_entries({'keys': has_entries({
+            '1': has_entries({'destination': has_entries(self.destination)}),
+            '2': has_entries({'destination': has_entries(destination_2)}),
+            '3': has_entries({'destination': has_entries(destination_3)})})
+        })
+
+        assert_that(response.item, expected_result)
+
+    def test_put_errors(self):
+        fake_user = confd.users(FAKE_ID).funckeys(1).put
+        s.check_resource_not_found(fake_user, 'User')
+
+    def test_delete_errors(self):
+        fake_user = confd.users(FAKE_ID).funckeys(1).delete
+        s.check_resource_not_found(fake_user, 'User')
+
+        # This should raise an error
+        # fake_funckey = confd.users(self.user['id']).funckeys(FAKE_ID).delete
+        # s.check_resource_not_found(fake_funckey, 'FuncKey')
+
+    def test_get_errors(self):
+        fake_user = confd.users(FAKE_ID).funckeys.get
+        fake_user_2 = confd.users(FAKE_ID).funckeys(1).get
+        fake_funckey = confd.users(self.user['uuid']).funckeys(FAKE_ID).get
+
+        s.check_resource_not_found(fake_user, 'User')
+        s.check_resource_not_found(fake_user_2, 'User')
+        s.check_resource_not_found(fake_funckey, 'FuncKey')
+
+
+class TestAllFuncKeyDestinations(BaseTestFuncKey):
 
     def setUp(self):
         super(TestAllFuncKeyDestinations, self).setUp()
@@ -183,29 +250,41 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             '5': {'label': '', 'type': 'speeddial', 'line': 1, 'value': custom_exten},
             '6': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*10'},
             '7': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*9'},
-            '8': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
-            '9': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
-            '10': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
+            '8': {'label': '', 'type': 'speeddial', 'line': 1,
+                  'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
+            '9': {'label': '', 'type': 'speeddial', 'line': 1,
+                  'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
+            '10': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
             '11': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*8'},
             '12': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*34'},
             '13': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*36'},
-            '14': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
+            '14': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
             '15': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*98'},
             '16': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*92'},
-            '17': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
-            '18': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
-            '19': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
-            '20': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'],
-                                                                                                            fwd=forward_number)},
+            '17': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
+            '18': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
+            '19': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
+            '20': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'], fwd=forward_number)},
             '21': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*1'},
             '22': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*2'},
-            '23': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '24': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '25': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '23': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '24': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '25': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
             '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
             '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
-            '28': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*11{paging}'.format(paging=paging_number)},
-            '29': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
+            '28': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*11{paging}'.format(paging=paging_number)},
+            '29': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*37{member_id}'.format(member_id=filter_member_id)},
             '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
             '31': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
         }
@@ -281,7 +360,7 @@ class TestAllFuncKeyDestinations(TestFuncKey):
             self.check_provd_has_funckey(pos, provd_funckey)
 
 
-class TestTemplateAssociation(TestFuncKey):
+class TestTemplateAssociation(BaseTestFuncKey):
 
     def setUp(self):
         super(TestTemplateAssociation, self).setUp()
@@ -401,8 +480,79 @@ class TestTemplateAssociation(TestFuncKey):
 
         assert_that(response.items, contains(has_entries(expected_association)))
 
+    def test_associate_errors(self):
+        fake_user = confd.users(FAKE_ID).funckeys.templates(self.template['id']).put
+        fake_template = confd.users(self.user['id']).funckeys.templates(FAKE_ID).put
 
-class TestBlfFuncKeys(TestFuncKey):
+        s.check_resource_not_found(fake_user, 'User')
+        s.check_resource_not_found(fake_template, 'FuncKeyTemplate')
+
+    def test_dissociate_errors(self):
+        fake_user = confd.users(FAKE_ID).funckeys.templates(self.template['id']).delete
+        fake_template = confd.users(self.user['id']).funckeys.templates(FAKE_ID).delete
+
+        s.check_resource_not_found(fake_user, 'User')
+        s.check_resource_not_found(fake_template, 'FuncKeyTemplate')
+
+    def test_get_errors(self):
+        fake_user = confd.users(FAKE_ID).funckeys.templates.get
+        s.check_resource_not_found(fake_user, 'User')
+
+        # XXX: This is a bug that do not raise an error
+        # fake_template = confd.funckeys.templates(FAKE_ID).users.get
+        # s.check_resource_not_found(fake_template, 'FuncKeyTemplate')
+
+    def test_associate_second_template_then_overwrite_previous_template(self):
+        funckeys_2 = {'1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
+                      '2': {'destination': {'type': 'onlinerec'}}}
+        provd_funckeys_2 = {
+            '1': {'label': '', 'type': 'blf', 'line': 1, 'value': '1000'},
+            '2': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
+        }
+        template_2 = confd.funckeys.templates.post(keys=funckeys_2).item
+
+        confd.users(self.user['id']).funckeys.templates(self.template['id']).put().assert_updated()
+        self.check_provd_has_funckey('1', self.provd_funckeys['1'])
+        self.check_provd_has_funckey('2', self.provd_funckeys['2'])
+
+        confd.users(self.user['id']).funckeys.templates(template_2['id']).put().assert_updated()
+        self.check_provd_has_funckey('1', provd_funckeys_2['1'])
+        self.check_provd_has_funckey('2', provd_funckeys_2['2'])
+
+    def test_get_template_after_dissociation(self):
+        self.association_url.put().assert_updated()
+        self.association_url.delete().assert_deleted()
+
+        response = confd.users(self.user['id']).funckeys.templates.get()
+        assert_that(response.items, empty())
+
+        response = confd.users(self.user['uuid']).funckeys.templates.get()
+        assert_that(response.items, empty())
+
+
+@fixtures.user()
+@fixtures.funckey_template()
+def test_delete_funckey_template_when_user_and_funckey_template_associated(user, funckey_template):
+    with a.user_funckey_template(user, funckey_template, check=False):
+        response = confd.users(user['id']).funckeys.templates.get()
+        assert_that(response.items, not_(empty()))
+        confd.funckeys.templates(funckey_template['id']).delete().assert_deleted()
+        response = confd.users(user['id']).funckeys.templates.get()
+        assert_that(response.items, empty())
+
+
+@fixtures.user()
+@fixtures.funckey_template()
+def test_delete_user_when_user_and_funckey_template_associated(user, funckey_template):
+    with a.user_funckey_template(user, funckey_template, check=False):
+        response = confd.funckeys.templates(funckey_template['id']).users.get()
+        assert_that(response.items, not_(empty()))
+        confd.users(user['id']).delete().assert_deleted()
+        response = confd.funckeys.templates(funckey_template['id']).users.get()
+        assert_that(response.items, empty())
+
+
+class TestBlfFuncKeys(BaseTestFuncKey):
 
     def setUp(self):
         super(TestBlfFuncKeys, self).setUp()
@@ -443,20 +593,31 @@ class TestBlfFuncKeys(TestFuncKey):
             '1': {'label': '', 'type': 'blf', 'line': 1, 'value': user_exten},
             '4': {'label': '', 'type': 'blf', 'line': 1, 'value': conf_exten},
             '5': {'label': '', 'type': 'blf', 'line': 1, 'value': custom_exten},
-            '8': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
-            '9': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
-            '10': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
-            '14': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
-            '17': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
-            '18': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
-            '19': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
-            '20': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'],
-                                                                                                      fwd=forward_number)},
-            '23': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '24': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
-            '25': {'label': '', 'type': 'blf', 'line': 1, 'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '8': {'label': '', 'type': 'blf', 'line': 1,
+                  'value': '*735{user_id}***226'.format(user_id=self.user['id'])},
+            '9': {'label': '', 'type': 'blf', 'line': 1,
+                  'value': '*735{user_id}***227'.format(user_id=self.user['id'])},
+            '10': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***225'.format(user_id=self.user['id'])},
+            '14': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***290'.format(user_id=self.user['id'])},
+            '17': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***222'.format(user_id=self.user['id'])},
+            '18': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***223'.format(user_id=self.user['id'])},
+            '19': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***221'.format(user_id=self.user['id'])},
+            '20': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***223*{fwd}'.format(user_id=self.user['id'], fwd=forward_number)},
+            '23': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***231***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '24': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***232***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
+            '25': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***230***3{agent_id}'.format(user_id=self.user['id'], agent_id=agent_id)},
             '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
-            '29': {'label': '', 'type': 'blf', 'line': 1, 'value': '*37{member_id}'.format(member_id=filter_member_id)},
+            '29': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*37{member_id}'.format(member_id=filter_member_id)},
         }
 
     def test_when_creating_funckey_then_blf_activated_by_default(self):
