@@ -202,6 +202,22 @@ def test_get_position(funckey_template):
     assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
 
 
+@fixtures.funckey_template()
+def test_delete(funckey_template):
+    response = confd.funckeys.templates(funckey_template['id']).delete()
+    response.assert_deleted()
+    url_get = confd.funckeys.templates(funckey_template['id']).get
+    s.check_resource_not_found(url_get, 'FuncKeyTemplate')
+
+
+@fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}})
+def test_delete_position(funckey_template):
+    response = confd.funckeys.templates(funckey_template['id'])(1).delete()
+    response.assert_deleted()
+    url_get = confd.funckeys.templates(funckey_template['id'])(1).get
+    s.check_resource_not_found(url_get, 'FuncKey')
+
+
 def test_create_funckey_template_minimal_parameters():
     response = confd.funckeys.templates.post()
     response.assert_created('templates')
