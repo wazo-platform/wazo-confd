@@ -203,7 +203,7 @@ class TestUserWithFuncKey(BaseTestFuncKey):
         fake_user = confd.users(FAKE_ID).funckeys(1).delete
         s.check_resource_not_found(fake_user, 'User')
 
-        # This should be raise an error
+        # This should raise an error
         # fake_funckey = confd.users(self.user['id']).funckeys(FAKE_ID).delete
         # s.check_resource_not_found(fake_funckey, 'FuncKey')
 

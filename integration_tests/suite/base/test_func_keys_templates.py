@@ -131,11 +131,11 @@ def test_get_position_errors(funckey_template):
     yield s.check_resource_not_found, fake_get, 'FuncKey'
 
 
-# Should be raise an error
+# Should raise an error
 # @fixtures.funckey_template()
 # def test_delete_position_errors(funckey_template):
-#     fake_get = confd.funckeys.templates(funckey_template['id'])(1).delete
-#     yield s.check_resource_not_found, fake_get, 'FuncKey'
+#     fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
+#     yield s.check_resource_not_found, fake_delete, 'FuncKey'
 
 
 @fixtures.funckey_template()
@@ -244,10 +244,10 @@ def test_put_error_on_duplicate_destination(funckey_template):
 
 
 def test_create_funckey_template_all_parameters():
-    # Done in func_keys.py
+    # Done in test_func_keys.py
     pass
 
 
 def test_edit_funckey_template_position_all_parameters():
-    # Done in func_keys.py
+    # Done in test_func_keys.py
     pass

@@ -193,7 +193,7 @@ class FuncKeyPositionField(fields.Field):
 
     def _deserialize(self, value, attr, data):
         if not isinstance(value, dict):
-            raise ValidationError('FuncKey must be a dictionnary')
+            raise ValidationError('FuncKey must be a dictionary')
 
         template = {}
         for raw_position, raw_funckey in value.iteritems():
