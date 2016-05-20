@@ -22,7 +22,6 @@ import unittest
 from mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to
 
-# from xivo_confd.resources.func_keys.service import TemplateService
 from xivo_confd.plugins.func_key.service import TemplateService
 from xivo_confd.plugins.device.update import DeviceUpdater
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
@@ -33,6 +32,7 @@ class TestTemplateService(unittest.TestCase):
 
     def setUp(self):
         self.validator = Mock()
+        self.validator_bsfilter = Mock()
         self.template_dao = Mock()
 
         self.user_dao = Mock()
@@ -45,6 +45,7 @@ class TestTemplateService(unittest.TestCase):
         self.service = TemplateService(self.template_dao,
                                        self.user_dao,
                                        self.validator,
+                                       self.validator_bsfilter,
                                        self.notifier,
                                        self.device_updater)
 
