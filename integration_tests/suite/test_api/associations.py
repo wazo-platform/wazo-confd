@@ -88,3 +88,10 @@ def user_call_permission(user, call_permission, check=True):
 def user_entity(user, entity, check=True):
     h.user_entity.associate(user['id'], entity['id'], check)
     yield
+
+
+@contextmanager
+def user_funckey_template(user, funckey_template, check=True):
+    h.user_funckey_template.associate(user['id'], funckey_template['id'], check)
+    yield
+    h.user_funckey_template.dissociate(user['id'], funckey_template['id'], check)

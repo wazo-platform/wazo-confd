@@ -23,13 +23,16 @@ from hamcrest import (assert_that,
                       has_entries,
                       has_entry,
                       has_key,
-                      is_not)
+                      is_not,
+                      not_)
 
 from test_api import confd
 from test_api import helpers
 from test_api import db
 from test_api import provd
+from test_api import associations as a
 from test_api import scenarios as s
+from test_api import fixtures
 
 FAKE_ID = 999999999
 
@@ -524,6 +527,28 @@ class TestTemplateAssociation(BaseTestFuncKey):
         assert_that(response.items, empty())
 
         response = confd.users(self.user['uuid']).funckeys.templates.get()
+        assert_that(response.items, empty())
+
+
+@fixtures.user()
+@fixtures.funckey_template()
+def test_delete_funckey_template_when_user_and_funckey_template_associated(user, funckey_template):
+    with a.user_funckey_template(user, funckey_template, check=False):
+        response = confd.users(user['id']).funckeys.templates.get()
+        assert_that(response.items, not_(empty()))
+        confd.funckeys.templates(funckey_template['id']).delete().assert_deleted()
+        response = confd.users(user['id']).funckeys.templates.get()
+        assert_that(response.items, empty())
+
+
+@fixtures.user()
+@fixtures.funckey_template()
+def test_delete_user_when_user_and_funckey_template_associated(user, funckey_template):
+    with a.user_funckey_template(user, funckey_template, check=False):
+        response = confd.funckeys.templates(funckey_template['id']).users.get()
+        assert_that(response.items, not_(empty()))
+        confd.users(user['id']).delete().assert_deleted()
+        response = confd.funckeys.templates(funckey_template['id']).users.get()
         assert_that(response.items, empty())
 
 

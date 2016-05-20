@@ -41,3 +41,4 @@ import call_permission
 import entity
 import user_entity
 import funckey_template
+import user_funckey_template
