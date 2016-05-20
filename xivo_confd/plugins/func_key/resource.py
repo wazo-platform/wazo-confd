@@ -60,6 +60,12 @@ models_destination = {'user': UserDestination,
                       'onlinerec': OnlineRecordingDestination}
 
 
+def _create_funckey_model(funckey):
+    type_ = funckey['destination'].pop('type')
+    funckey['destination'] = models_destination[type_](**funckey['destination'])
+    return FuncKey(**funckey)
+
+
 class FuncKeyDestination(ConfdResource):
 
     @required_acl('confd.funckeys.destinations.read')
@@ -73,7 +79,6 @@ class FuncKeyTemplateList(ListResource):
 
     schema = FuncKeyTemplateSchema(context={'exclude_destination': ['agent', 'bsfilter']})
     model = FuncKeyTemplate
-    models_destination = models_destination
 
     def build_headers(self, template):
         return {'Location': url_for('func_keys_templates', id=template.id, _external=True)}
@@ -94,9 +99,7 @@ class FuncKeyTemplateList(ListResource):
 
     def _create_template_model(self, template):
         for position, funckey in template.get('keys', {}).iteritems():
-            type_ = template['keys'][position]['destination'].pop('type')
-            template['keys'][position]['destination'] = self.models_destination[type_](**funckey['destination'])
-            template['keys'][position] = FuncKey(**funckey)
+            template['keys'][position] = _create_funckey_model(funckey)
         return self.model(**template)
 
 
@@ -123,8 +126,6 @@ class FuncKeyTemplateItem(ConfdResource):
 class FuncKeyTemplateItemPosition(ItemResource):
 
     schema = FuncKeySchema(context={'exclude_destination': ['agent', 'bsfilter']})
-    model = FuncKey
-    models_destination = models_destination
 
     @required_acl('confd.funckeys.templates.{id}.{position}.read')
     def get(self, id, position):
@@ -135,7 +136,7 @@ class FuncKeyTemplateItemPosition(ItemResource):
     def put(self, id, position):
         template = self.service.get(id)
         funckey = self.schema.load(request.get_json()).data
-        funckey_model = self._create_funckey_model(funckey)
+        funckey_model = _create_funckey_model(funckey)
         self.service.edit_funckey(funckey_model, template, position)
         return '', 204
 
@@ -144,11 +145,6 @@ class FuncKeyTemplateItemPosition(ItemResource):
         template = self.service.get(id)
         self.service.delete_funckey(template, position)
         return '', 204
-
-    def _create_funckey_model(self, funckey):
-        type_ = funckey['destination'].pop('type')
-        funckey['destination'] = self.models_destination[type_](**funckey['destination'])
-        return self.model(**funckey)
 
 
 class UserFuncKey(ConfdResource):
@@ -176,15 +172,13 @@ class UserFuncKeyList(UserFuncKey):
 class UserFuncKeyItemPosition(UserFuncKey):
 
     schema = FuncKeySchema()
-    model = FuncKey
-    models_destination = models_destination
 
     @required_acl('confd.users.{user_id}.funckeys.{position}.update')
     def put(self, user_id, position):
         user = self.user_dao.get_by_id_uuid(user_id)
         template = self.template_dao.get(user.private_template_id)
         funckey = self.schema.load(request.get_json()).data
-        funckey_model = self._create_funckey_model(funckey)
+        funckey_model = _create_funckey_model(funckey)
         self.service.edit_user_funckey(user, funckey_model, template, position)
         return '', 204
 
@@ -200,11 +194,6 @@ class UserFuncKeyItemPosition(UserFuncKey):
         template = self.service.get_unified_template(user_id)
         funckey = template.get(position)
         return self.schema.dump(funckey).data
-
-    def _create_funckey_model(self, funckey):
-        type_ = funckey['destination'].pop('type')
-        funckey['destination'] = self.models_destination[type_](**funckey['destination'])
-        return self.model(**funckey)
 
 
 class UserFuncKeyTemplate(ConfdResource):
