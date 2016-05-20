@@ -1204,7 +1204,7 @@
                         "name": "body",
                         "in": "body",
                         "description": "Template to create",
-                        "required": true,
+                        "required": false,
                         "schema": {
                             "$ref": "#/definitions/FuncKeyTemplate"
                         }
@@ -1214,7 +1214,7 @@
                     "201": {
                         "description": "Template created",
                         "schema": {
-                            "$ref": "#/definitions/Extension"
+                            "$ref": "#/definitions/FuncKeyTemplate"
                         }
                     },
                     "400": {
