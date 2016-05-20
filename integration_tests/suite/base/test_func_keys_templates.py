@@ -168,10 +168,10 @@ def test_search_on_funckey_template(funckey_template, hidden):
 def check_search(url, funckey_template, hidden, field, term):
     response = url.get(search=term)
 
-    expected_funckey_template = has_item(has_entry(field, funckey_template[field]))
-    hidden_funckey_template = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_funckey_template)
-    assert_that(response.items, hidden_funckey_template)
+    shows_expected_funckey_template = has_item(has_entry(field, funckey_template[field]))
+    discards_hidden_funckey_template = is_not(has_item(has_entry(field, hidden[field])))
+    assert_that(response.items, shows_expected_funckey_template)
+    assert_that(response.items, discards_hidden_funckey_template)
 
 
 @fixtures.funckey_template(name='sort1')
