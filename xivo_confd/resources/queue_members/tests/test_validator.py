@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from mock import patch
+
 import unittest
+
+from mock import patch
 
 from xivo_dao.helpers.exception import NotFoundError, ResourceError
 from xivo_dao.helpers.exception import InputError
@@ -28,8 +30,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_edit_agent_queue_association(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                   patch_get_agent):
+    def test_validate_edit_agent_queue_association(self, patch_get_by_queue_and_agent, patch_get_queue, _):
         queue_member = QueueMemberAgent(agent_id=3, queue_id=5, penalty=3)
         validator.validate_edit_agent_queue_association(queue_member)
 
@@ -39,8 +40,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_edit_agent_queue_association_no_such_queue(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                                 patch_get_agent):
+    def test_validate_edit_agent_queue_association_no_such_queue(self, _, patch_get_queue, __):
         patch_get_queue.side_effect = LookupError
         queue_member = QueueMemberAgent(agent_id=3, queue_id=5, penalty=3)
         self.assertRaises(NotFoundError, validator.validate_edit_agent_queue_association, queue_member)
@@ -48,8 +48,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_edit_agent_queue_association_no_such_association(self, patch_get_by_queue_and_agent,
-                                                                       patch_get_queue, patch_get_agent):
+    def test_validate_edit_agent_queue_association_no_such_association(self, patch_get_by_queue_and_agent, _, __):
         patch_get_by_queue_and_agent.side_effect = NotFoundError
         queue_member = QueueMemberAgent(agent_id=3, queue_id=5, penalty=3)
         self.assertRaises(NotFoundError, validator.validate_edit_agent_queue_association, queue_member)
@@ -57,8 +56,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_edit_agent_queue_association_no_such_agent(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                                 patch_get_agent):
+    def test_validate_edit_agent_queue_association_no_such_agent(self, _, __, patch_get_agent):
         patch_get_agent.return_value = None
         queue_member = QueueMemberAgent(agent_id=3, queue_id=5, penalty=3)
         self.assertRaises(NotFoundError, validator.validate_edit_agent_queue_association, queue_member)
@@ -75,7 +73,7 @@ class TestQueueMembersValidator(unittest.TestCase):
 
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
-    def test_validate_get_agent_queue_association_no_such_queue(self, patch_get_queue, patch_get_agent):
+    def test_validate_get_agent_queue_association_no_such_queue(self, patch_get_queue, _):
         queue_id = 5
         agent_id = 3
         patch_get_queue.side_effect = LookupError
@@ -84,7 +82,7 @@ class TestQueueMembersValidator(unittest.TestCase):
 
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
-    def test_validate_get_agent_queue_association_no_such_agent(self, patch_get_queue, patch_get_agent):
+    def test_validate_get_agent_queue_association_no_such_agent(self, _, patch_get_agent):
         queue_id = 5
         agent_id = 3
         patch_get_agent.return_value = None
@@ -93,7 +91,7 @@ class TestQueueMembersValidator(unittest.TestCase):
 
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
-    def test_validate_associate_agent_queue_no_such_queue(self, patch_get_queue, patch_get_agent):
+    def test_validate_associate_agent_queue_no_such_queue(self, patch_get_queue, _):
         queue_id = 5
         agent_id = 3
         patch_get_queue.side_effect = LookupError
@@ -102,7 +100,7 @@ class TestQueueMembersValidator(unittest.TestCase):
 
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
-    def test_validate_associate_agent_queue_no_such_agent(self, patch_get_queue, patch_get_agent):
+    def test_validate_associate_agent_queue_no_such_agent(self, _, patch_get_agent):
         queue_id = 5
         agent_id = 3
         patch_get_agent.return_value = None
@@ -112,8 +110,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_associate_agent_queue_already_exists(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                           patch_get_agent):
+    def test_validate_associate_agent_queue_already_exists(self, patch_get_by_queue_and_agent, _, __):
         queue_id = 8
         agent_id = 9
         queue_member = QueueMemberAgent
@@ -124,8 +121,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_remove_agent_from_queue_no_such_queue(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                            patch_get_agent):
+    def test_validate_remove_agent_from_queue_no_such_queue(self, _, patch_get_queue, __):
         patch_get_queue.side_effect = LookupError
 
         self.assertRaises(NotFoundError, validator.validate_remove_agent_from_queue, agent_id=3, queue_id=5)
@@ -133,8 +129,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_remove_agent_from_queue_no_such_agent(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                            patch_get_agent):
+    def test_validate_remove_agent_from_queue_no_such_agent(self, _, __, patch_get_agent):
         patch_get_agent.return_value = None
 
         self.assertRaises(NotFoundError, validator.validate_remove_agent_from_queue, agent_id=3, queue_id=5)
@@ -142,8 +137,7 @@ class TestQueueMembersValidator(unittest.TestCase):
     @patch('xivo_dao.agent_dao.get')
     @patch('xivo_dao.queue_dao.get')
     @patch('xivo_dao.resources.queue_members.dao.get_by_queue_id_and_agent_id')
-    def test_validate_remove_agent_from_queue_no_such_association(self, patch_get_by_queue_and_agent, patch_get_queue,
-                                                                  patch_get_agent):
+    def test_validate_remove_agent_from_queue_no_such_association(self, patch_get_by_queue_and_agent, _, __):
         patch_get_by_queue_and_agent.side_effect = NotFoundError
 
         self.assertRaises(NotFoundError, validator.validate_remove_agent_from_queue, agent_id=3, queue_id=5)

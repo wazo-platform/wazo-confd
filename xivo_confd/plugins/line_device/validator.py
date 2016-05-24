@@ -16,14 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.helpers import errors
-
 from xivo_confd.helpers.validator import AssociationValidator
 from xivo_confd.helpers.validator import Validator
 
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_dao.helpers import errors
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.user_line import dao as user_line_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 
 
 class ValidateLineHasNoDevice(Validator):
@@ -106,9 +105,9 @@ def build_validator():
     return AssociationValidator(
         association=[
             ValidateLineDeviceAssociation(),
-            ValidateLinePosition(line_dao),
-            ValidateRequiredResources(user_line_dao, line_extension_dao),
-            ValidateMultipleLines(line_dao),
+            ValidateLinePosition(line_dao_module),
+            ValidateRequiredResources(user_line_dao_module, line_extension_dao_module),
+            ValidateMultipleLines(line_dao_module),
         ],
         dissociation=[
             ValidateLineDeviceDissociation(),

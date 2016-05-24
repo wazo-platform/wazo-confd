@@ -38,66 +38,57 @@ class Plugin(object):
     def load(self, core):
         provd_client = core.provd_client()
 
-        self.load_sip(api, provd_client)
-        self.load_sccp(api, provd_client)
-        self.load_custom(api, provd_client)
+        self.load_sip(provd_client)
+        self.load_sccp(provd_client)
+        self.load_custom(provd_client)
 
-    def load_sip(self, api, provd_client):
+    def load_sip(self, provd_client):
         service = self.build_sip_service(provd_client)
 
         api.add_resource(LineEndpointAssociationSip,
                          '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',
                          endpoint='line_endpoint_sip',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(LineEndpointGetSip,
                          '/lines/<int:line_id>/endpoints/sip',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(EndpointLineGetSip,
                          '/endpoints/sip/<int:endpoint_id>/lines',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
-    def load_sccp(self, api, provd_client):
+    def load_sccp(self, provd_client):
         service = self.build_sccp_service(provd_client)
 
         api.add_resource(LineEndpointAssociationSccp,
                          '/lines/<int:line_id>/endpoints/sccp/<int:endpoint_id>',
                          endpoint='line_endpoint_sccp',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(LineEndpointGetSccp,
                          '/lines/<int:line_id>/endpoints/sccp',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(EndpointLineGetSccp,
                          '/endpoints/sccp/<int:endpoint_id>/lines',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
-    def load_custom(self, api, provd_client):
+    def load_custom(self, provd_client):
         service = self.build_custom_service(provd_client)
 
         api.add_resource(LineEndpointAssociationCustom,
                          '/lines/<int:line_id>/endpoints/custom/<int:endpoint_id>',
                          endpoint='line_endpoint_custom',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(LineEndpointGetCustom,
                          '/lines/<int:line_id>/endpoints/custom',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(EndpointLineGetCustom,
                          '/endpoints/custom/<int:endpoint_id>/lines',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
     def build_sip_service(self, provd_client):
         sip_service = build_sip_service(provd_client)

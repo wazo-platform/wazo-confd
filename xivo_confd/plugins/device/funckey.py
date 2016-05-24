@@ -16,34 +16,35 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
-from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.features import dao as features_dao
-from xivo_dao.resources.paging import dao as paging_dao
-
 import abc
 
 from xivo.xivo_helpers import fkey_extension
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.user_line import dao as user_line_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
+from xivo_dao.resources.extension import dao as extension_dao_module
+from xivo_dao.resources.features import dao as features_dao_module
+from xivo_dao.resources.paging import dao as paging_dao_module
 
 
 def build_converters():
-    return {'user': UserConverter(line_dao, user_line_dao, line_extension_dao, extension_dao),
-            'group': GroupConverter(extension_dao),
-            'queue': QueueConverter(extension_dao),
-            'conference': ConferenceConverter(extension_dao),
-            'paging': PagingConverter(extension_dao, paging_dao),
-            'service': ServiceConverter(extension_dao),
+    return {'user': UserConverter(line_dao_module,
+                                  user_line_dao_module,
+                                  line_extension_dao_module,
+                                  extension_dao_module),
+            'group': GroupConverter(extension_dao_module),
+            'queue': QueueConverter(extension_dao_module),
+            'conference': ConferenceConverter(extension_dao_module),
+            'paging': PagingConverter(extension_dao_module, paging_dao_module),
+            'service': ServiceConverter(extension_dao_module),
             'custom': CustomConverter(),
-            'forward': ForwardConverter(extension_dao),
-            'transfer': TransferConverter(features_dao),
+            'forward': ForwardConverter(extension_dao_module),
+            'transfer': TransferConverter(features_dao_module),
             'park_position': ParkPositionConverter(),
-            'parking': ParkingConverter(features_dao),
-            'bsfilter': BSFilterConverter(extension_dao),
-            'agent': AgentConverter(extension_dao),
-            'onlinerec': OnlineRecordingConverter(features_dao),
-            }
+            'parking': ParkingConverter(features_dao_module),
+            'bsfilter': BSFilterConverter(extension_dao_module),
+            'agent': AgentConverter(extension_dao_module),
+            'onlinerec': OnlineRecordingConverter(features_dao_module)}
 
 
 class FuncKeyConverter(object):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class TestCRUDResource(unittest.TestCase):
         self.resource = CRUDResource(self.service, self.converter, self.extra_parameters)
 
     @patch('xivo_confd.helpers.resource.extract_search_parameters')
-    def test_when_search_requested_then_search_service_called(self, mock_extract, request, _):
+    def test_when_search_requested_then_search_service_called(self, mock_extract, request, __):
         expected_parameters = mock_extract.return_value
 
         self.resource.search()
@@ -42,7 +42,7 @@ class TestCRUDResource(unittest.TestCase):
         mock_extract.assert_called_once_with(request.args, self.extra_parameters)
         self.service.search.assert_called_once_with(expected_parameters)
 
-    def test_when_search_requested_then_search_result_converted(self, request, _):
+    def test_when_search_requested_then_search_result_converted(self, request, __):
         request.args = {}
         search_result = self.service.search.return_value
         expected_response = self.converter.encode_list.return_value
@@ -56,7 +56,7 @@ class TestCRUDResource(unittest.TestCase):
                               200,
                               {'Content-Type': 'application/json'})))
 
-    def test_when_get_requested_then_service_called(self, request, _):
+    def test_when_get_requested_then_service_called(self, _, __):
         self.resource.get(sentinel.resource_id)
 
         self.service.get.assert_called_once_with(sentinel.resource_id)
@@ -76,12 +76,12 @@ class TestCRUDResource(unittest.TestCase):
                               {'Location': expected_location,
                                'Content-Type': 'application/json'})))
 
-    def test_when_create_requested_then_request_decoded(self, request, _):
+    def test_when_create_requested_then_request_decoded(self, request, __):
         self.resource.create()
 
         self.converter.decode.assert_called_once_with(request)
 
-    def test_when_create_requested_then_service_called(self, request, _):
+    def test_when_create_requested_then_service_called(self, _, __):
         expected_resource = self.converter.decode.return_value
 
         self.resource.create()
@@ -103,42 +103,42 @@ class TestCRUDResource(unittest.TestCase):
                               {'Location': expected_location,
                                'Content-Type': 'application/json'})))
 
-    def test_when_edit_requested_then_resource_acquired_through_service(self, request, _):
+    def test_when_edit_requested_then_resource_acquired_through_service(self, _, __):
         self.resource.edit(sentinel.resource_id)
 
         self.service.get.assert_called_once_with(sentinel.resource_id)
 
-    def test_when_edit_requested_then_resource_updated(self, request, _):
+    def test_when_edit_requested_then_resource_updated(self, request, __):
         expected_resource = self.service.get.return_value
 
         self.resource.edit(sentinel.resource_id)
         self.converter.update.assert_called_once_with(request, expected_resource)
 
-    def test_when_edit_requested_then_service_edits_resource(self, request, _):
+    def test_when_edit_requested_then_service_edits_resource(self, _, __):
         expected_resource = self.service.get.return_value
 
         self.resource.edit(sentinel.resource_id)
 
         self.service.edit.assert_called_once_with(expected_resource)
 
-    def test_when_edit_requested_then_returns_empty_response(self, request, _):
+    def test_when_edit_requested_then_returns_empty_response(self, _, __):
         response = self.resource.edit(sentinel.resource_id)
 
         assert_that(response, equal_to(('', 204)))
 
-    def test_when_delete_requested_then_resource_acquired_through_service(self, request, _):
+    def test_when_delete_requested_then_resource_acquired_through_service(self, _, __):
         self.resource.delete(sentinel.resource_id)
 
         self.service.get.assert_called_once_with(sentinel.resource_id)
 
-    def test_when_delete_requested_then_service_deletes_resource(self, request, _):
+    def test_when_delete_requested_then_service_deletes_resource(self, _, __):
         expected_resource = self.service.get.return_value
 
         self.resource.delete(sentinel.resource_id)
 
         self.service.delete.assert_called_once_with(expected_resource)
 
-    def test_when_delete_requested_then_returns_empty_response(self, request, _):
+    def test_when_delete_requested_then_returns_empty_response(self, _, __):
         response = self.resource.edit(sentinel.resource_id)
 
         assert_that(response, equal_to(('', 204)))
@@ -250,17 +250,17 @@ class TestCollectionAssociationResource(unittest.TestCase):
                                      200,
                                      {'Content-Type': 'application/json'})))
 
-    def test_when_associating_resource_then_parent_is_validated(self, request, _):
+    def test_when_associating_resource_then_parent_is_validated(self, _, __):
         self.resource.associate_collection(sentinel.parent_id)
 
         self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
 
-    def test_when_associating_resource_then_request_decoded(self, request, _):
+    def test_when_associating_resource_then_request_decoded(self, request, __):
         self.resource.associate_collection(sentinel.parent_id)
 
         self.converter.decode.assert_called_once_with(request)
 
-    def test_when_associating_resource_then_association_created(self, request, _):
+    def test_when_associating_resource_then_association_created(self, _, __):
         expected_association = self.converter.decode.return_value
 
         self.resource.associate_collection(sentinel.parent_id)
@@ -333,17 +333,17 @@ class TestSingleAssociationResource(unittest.TestCase):
                                      200,
                                      {'Content-Type': 'application/json'})))
 
-    def test_when_associating_resource_then_request_decoded(self, request, _):
+    def test_when_associating_resource_then_request_decoded(self, request, __):
         self.resource.associate(sentinel.parent_id)
 
         self.converter.decode.assert_called_once_with(request)
 
-    def test_when_associating_resource_then_parent_is_validated(self, request, _):
+    def test_when_associating_resource_then_parent_is_validated(self, _, __):
         self.resource.associate(sentinel.parent_id)
 
         self.service.validate_parent.assert_called_once_with(sentinel.parent_id)
 
-    def test_when_associating_resource_then_association_created(self, request, _):
+    def test_when_associating_resource_then_association_created(self, _, __):
         expected_association = self.converter.decode.return_value
 
         self.resource.associate(sentinel.parent_id)
