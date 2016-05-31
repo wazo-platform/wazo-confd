@@ -120,6 +120,22 @@ class TestWizardService(unittest.TestCase):
         assert_that(result, empty())
 
     @patch('xivo_confd.plugins.wizard.service.socket')
+    def test_get_hostname(self, socket):
+        socket.gethostname.return_value = 'confd'
+        expected_result = 'confd'
+
+        result = self.service.get_hostname()
+        assert_that(result, equal_to(expected_result))
+
+    @patch('xivo_confd.plugins.wizard.service.socket')
+    def test_get_hostname_return_only_hostname_when_fqdn(self, socket):
+        socket.gethostname.return_value = 'confd.example.com'
+        expected_result = 'confd'
+
+        result = self.service.get_hostname()
+        assert_that(result, equal_to(expected_result))
+
+    @patch('xivo_confd.plugins.wizard.service.socket')
     def test_get_domain(self, socket):
         socket.getfqdn.return_value = 'confd.example.com'
         expected_result = 'example.com'

@@ -157,10 +157,14 @@ class WizardService(object):
             return None
 
     def get_hostname(self):
-        return socket.gethostname()
+        return self._hostname_without_domain()
 
     def get_domain(self):
         return self._fqdn_without_hostname()
+
+    def _hostname_without_domain(self):
+        hostname = socket.gethostname().split('.', 1)
+        return hostname[0]
 
     def _fqdn_without_hostname(self):
         fqdn = socket.getfqdn().split('.', 1)

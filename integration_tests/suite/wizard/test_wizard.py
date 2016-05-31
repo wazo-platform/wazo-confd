@@ -296,14 +296,10 @@ class TestWizardDiscover(IntegrationTest):
         ip_address = network_settings['IPAddress']
         gateway = network_settings['Gateway']
 
-        # This is a bug in docker-compose 1.7 (docker API 1.22).
-        # In docker API 1.23 the hostname should be separated from the domain
-        hostname_hacked = '{}.{}'.format(hostname, DOMAIN)
-
         expected_response = {
             'domain': DOMAIN,
             'nameservers': RESOLVCONF_NAMESERVERS,
-            'hostname': hostname_hacked,
+            'hostname': hostname,
             'gateways':  has_item(has_entry('gateway', gateway)),
             'timezone': TIMEZONE,
             'interfaces': has_item(has_entry('ip_address', ip_address))
