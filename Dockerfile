@@ -1,7 +1,7 @@
 ## Image to build from sources
 
 FROM python:2.7.9
-MAINTAINER XiVO Team "dev@avencall.com"
+MAINTAINER XiVO Team "dev+docker@proformatique.com"
 
 # Install xivo-confd
 ADD . /usr/src/xivo-confd
