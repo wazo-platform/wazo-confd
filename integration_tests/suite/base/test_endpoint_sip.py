@@ -31,7 +31,6 @@ ALL_OPTIONS = [
     ['sendrpid', 'yes'],
     ['videosupport', 'yes'],
     ['maxcallbitrate', '1024'],
-    ['registertrying', '1'],
     ['session-minse', '10'],
     ['maxforwards', '1'],
     ['rtpholdtimeout', '15'],
