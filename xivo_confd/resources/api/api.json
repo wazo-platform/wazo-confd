@@ -4699,7 +4699,10 @@
                     "type": "string",
                     "description": "Name of the template line used by the device"
                 }
-            }
+            },
+            "required": [
+                "context"
+            ]
         },
         "LineEndpoint": {
             "title": "LineEndpoint",
