@@ -2630,7 +2630,7 @@
             "put": {
                 "operationId": "associate_user_callpermission",
                 "summary": "Associate user and call permission",
-                "description": "**Required ACL:** `confd.users.{user_id}.callpermissions.update`",
+                "description": "**Required ACL:** `confd.users.{user_id}.callpermissions.{call_permission_id}.update`",
                 "tags": [
                     "users",
                     "callpermissions"
@@ -2655,7 +2655,7 @@
             "delete": {
                 "operationId": "dissociate_user_callpermission",
                 "summary": "Dissociate user and call permission",
-                "description": "**Required ACL:** `confd.users.{user_id}.callpermissions.delete`",
+                "description": "**Required ACL:** `confd.users.{user_id}.callpermissions.{call_permission_id}.delete`",
                 "tags": [
                     "users",
                     "callpermissions"
