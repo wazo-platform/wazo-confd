@@ -40,6 +40,7 @@ from xivo_dao.resources.func_key.model import (AgentDestination,
                                                UserDestination)
 from .schema import (FuncKeyDestinationField,
                      FuncKeySchema,
+                     FuncKeyUnifiedTemplateSchema,
                      FuncKeyTemplateSchema,
                      FuncKeyTemplateUserSchema)
 
@@ -161,7 +162,7 @@ class UserFuncKey(ConfdResource):
 
 class UserFuncKeyList(UserFuncKey):
 
-    schema = FuncKeyTemplateSchema()
+    schema = FuncKeyUnifiedTemplateSchema()
 
     @required_acl('confd.users.{user_id}.funckeys.read')
     def get(self, user_id):

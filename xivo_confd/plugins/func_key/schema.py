@@ -226,6 +226,13 @@ class FuncKeyTemplateSchema(BaseSchema):
         return output
 
 
+class FuncKeyUnifiedTemplateSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String()
+    keys = FuncKeyPositionField(fields.Integer(validate=Range(min=1)),
+                                fields.Nested(FuncKeySchema, required=True))
+
+
 class FuncKeyTemplateUserSchema(BaseSchema):
     user_id = fields.Integer()
     template_id = fields.Integer()

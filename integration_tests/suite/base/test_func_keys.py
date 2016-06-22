@@ -182,15 +182,21 @@ class TestUserWithFuncKey(BaseTestFuncKey):
     def test_get_user_funckeys(self):
         destination_2 = {'type': 'custom', 'exten': '456'}
         destination_3 = {'type': 'custom', 'exten': '789'}
+        destination_4 = {'type': 'custom', 'exten': '012'}
         confd.users(self.user['id']).funckeys(2).put(destination=destination_2)
         confd.users(self.user['id']).funckeys(3).put(destination=destination_3)
+        template_parameters = {'name': 'pos4',
+                               'keys': {'4': {'destination': destination_4}}}
+        template = confd.funckeys.templates.post(**template_parameters).item
+        confd.users(self.user['id']).funckeys.templates(template['id']).put()
 
         response = confd.users(self.user['id']).funckeys.get()
 
         expected_result = has_entries({'keys': has_entries({
             '1': has_entries({'destination': has_entries(self.destination)}),
             '2': has_entries({'destination': has_entries(destination_2)}),
-            '3': has_entries({'destination': has_entries(destination_3)})})
+            '3': has_entries({'destination': has_entries(destination_3)}),
+            '4': has_entries({'destination': has_entries(destination_4)})})
         })
 
         assert_that(response.item, expected_result)
