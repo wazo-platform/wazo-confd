@@ -114,15 +114,26 @@ def test_post_errors():
 
 
 def error_checks(url):
+    valid_funckey = {'destination': {'type': 'custom', 'exten': '1234'}}
+
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', True
     yield s.check_bogus_field_returns_error, url, 'keys', True
     yield s.check_bogus_field_returns_error, url, 'keys', None
     yield s.check_bogus_field_returns_error, url, 'keys', 'string'
     yield s.check_bogus_field_returns_error, url, 'keys', 1234
+    yield s.check_bogus_field_returns_error, url, 'keys', {'not_integer': valid_funckey}
+    yield s.check_bogus_field_returns_error, url, 'keys', {None: valid_funckey}
 
+    regex = r'keys.*1.*destination'
     for destination in invalid_destinations:
-        yield s.check_bogus_field_returns_error, url, 'keys', {'1': {'destination': destination}}
+        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
+
+    regex = r'keys.*1'
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 'string'}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 1234}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': True}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': None}, regex
 
 
 @fixtures.funckey_template()

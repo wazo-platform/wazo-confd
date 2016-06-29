@@ -221,3 +221,8 @@ def check_bogus_field_returns_error(request, field, bogus, message=None):
     message = message or field
     response = request({field: bogus})
     response.assert_match(400, re.compile(re.escape(message)))
+
+
+def check_bogus_field_returns_error_matching_regex(request, field, bogus, regex):
+    response = request({field: bogus})
+    response.assert_match(400, re.compile(regex))

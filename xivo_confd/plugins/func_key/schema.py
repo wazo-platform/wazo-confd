@@ -199,7 +199,11 @@ class FuncKeyPositionField(fields.Field):
         for raw_position, raw_funckey in value.iteritems():
             position = self.key_field.deserialize(raw_position, attr, data)
             self.nested_field.schema.context = self.context
-            funckey = self.nested_field.deserialize(raw_funckey, attr, data)
+            try:
+                funckey = self.nested_field.deserialize(raw_funckey, attr, data)
+            except ValidationError as e:
+                nested_errors = {str(position): e.messages}
+                raise ValidationError(nested_errors, data=data)
             template[position] = funckey
         return template
 
