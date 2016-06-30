@@ -2068,16 +2068,13 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/view"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Permissions list",
+                        "description": "Call Permissions list",
                         "schema": {
-                            "$ref": "#/definitions/PermissionItems"
+                            "$ref": "#/definitions/CallPermissionItems"
                         }
                     }
                 }
@@ -2085,7 +2082,7 @@
             "post": {
                 "operationId": "create_callpermission",
                 "summary": "Create call permission",
-                "description": "**Required ACL:** `confd.callpermission.create`",
+                "description": "**Required ACL:** `confd.callpermissions.create`",
                 "tags": [
                     "callpermissions"
                 ],
@@ -2093,18 +2090,18 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Permission to create",
+                        "description": "Call Permission to create",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Permission created",
+                        "description": "Call Permission created",
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/Call Permission"
                         }
                     },
                     "400": {
@@ -2128,9 +2125,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Permission",
+                        "description": "Call Permission",
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     },
                     "404": {
@@ -2154,7 +2151,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     }
                 ],
@@ -4871,8 +4868,8 @@
                 }
             }
         },
-        "Permission": {
-            "title": "Permission",
+        "CallPermission": {
+            "title": "CallPermission",
             "properties": {
                 "id": {
                     "type": "integer",
@@ -4917,13 +4914,13 @@
                 "name"
             ]
         },
-        "PermissionItems": {
-            "title": "PermissionItems",
+        "CallPermissionItems": {
+            "title": "CallPermissionItems",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Permission"
+                        "$ref": "#/definitions/CallPermission"
                     }
                 },
                 "total": {
