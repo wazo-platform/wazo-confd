@@ -2101,7 +2101,7 @@
                     "201": {
                         "description": "Call Permission created",
                         "schema": {
-                            "$ref": "#/definitions/Call Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     },
                     "400": {
