@@ -325,7 +325,7 @@ class DatabaseQueries(object):
                      INSERT INTO context(name, displayname, contexttype, description, commented, entity)
                      VALUES (
                                 :name, :displayname, :contexttype, :description, :commented,
-                                (SELECT id FROM entity LIMIT 1)
+                                (SELECT name FROM entity LIMIT 1)
                             )
                      """)
 
@@ -341,31 +341,81 @@ class DatabaseQueries(object):
 
         self.connection.execute(query, context=context, type=type_, numberbeg=start, numberend=end, didlength=didlength)
 
+    def associate_context_entity(self, context_name, entity_name):
+        query = text("UPDATE context SET entity = :entity_name WHERE name = :context_name")
+        self.connection.execute(query, entity_name=entity_name, context_name=context_name)
+
     def delete_context(self, name):
         query = text("DELETE FROM context WHERE name = :name")
         self.connection.execute(query, name=name)
 
-    def insert_entity(self, name):
+    def insert_call_pickup(self, name):
         query = text("""
-        INSERT INTO entity (name, description)
-        VALUES (:name, '')
+        INSERT INTO pickup (id, name, description, entity_id)
+        VALUES (
+                     1, :name, '',
+                     (SELECT id FROM entity LIMIT 1)
+               )
         RETURNING id
         """)
 
-        entity_id = (self.connection
-                     .execute(query,
-                              name=name)
-                     .scalar())
+        call_pickup_id = (self.connection
+                          .execute(query,
+                                   name=name)
+                          .scalar())
 
-        return entity_id
+        return call_pickup_id
 
-    def delete_entity(self, entity_id):
-        query = text("DELETE FROM entity WHERE id = :id")
-        self.connection.execute(query, id=entity_id)
+    def delete_call_pickup(self, call_pickup_id):
+        query = text("DELETE FROM pickup WHERE id = :id")
+        self.connection.execute(query, id=call_pickup_id)
 
-    def get_entities(self):
-        query = text("SELECT * FROM entity")
-        return self.connection.execute(query)
+    def associate_call_pickup_entity(self, call_pickup_id, entity_id):
+        query = text("UPDATE pickup SET entity_id = :entity_id WHERE id = :call_pickup_id")
+        self.connection.execute(query, entity_id=entity_id, call_pickup_id=call_pickup_id)
+
+    def insert_call_filter(self, name):
+        query = text("""
+        INSERT INTO callfilter (name, type, description)
+        VALUES (
+                     :name, 'bosssecretary', ''
+               )
+        RETURNING id
+        """)
+
+        call_filter_id = (self.connection
+                          .execute(query,
+                                   name=name)
+                          .scalar())
+
+        return call_filter_id
+
+    def delete_call_filter(self, call_filter_id):
+        query = text("DELETE FROM callfilter WHERE id = :id")
+        self.connection.execute(query, id=call_filter_id)
+
+    def associate_call_filter_entity(self, call_filter_id, entity_id):
+        query = text("UPDATE callfilter SET entity_id = :entity_id WHERE id = :call_filter_id")
+        self.connection.execute(query, entity_id=entity_id, call_filter_id=call_filter_id)
+
+    def insert_schedule(self):
+        query = text("""
+        INSERT INTO schedule DEFAULT VALUES RETURNING id
+        """)
+
+        schedule_id = (self.connection
+                       .execute(query)
+                       .scalar())
+
+        return schedule_id
+
+    def delete_schedule(self, schedule_id):
+        query = text("DELETE FROM schedule WHERE id = :id")
+        self.connection.execute(query, id=schedule_id)
+
+    def associate_schedule_entity(self, schedule_id, entity_id):
+        query = text("UPDATE schedule SET entity_id = :entity_id WHERE id = :schedule_id")
+        self.connection.execute(query, entity_id=entity_id, schedule_id=schedule_id)
 
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")

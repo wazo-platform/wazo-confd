@@ -121,6 +121,7 @@ DEFAULT_CONFIG = {
         'wizard_plugin',
         'user_entity_plugin',
         'func_key_plugin',
+        'entity_plugin',
     ],
     'service_discovery': {
         'enabled': True,

@@ -19,31 +19,28 @@
 import string
 import random
 
-from test_api import db
+from test_api import confd
 
 
-def add_entity(name):
-    with db.queries() as queries:
-        id = queries.insert_entity(name)
-    return {'id': id,
-            'name': name}
+def generate_entity(**params):
+    params.setdefault('name', generate_name())
+    return add_entity(**params)
 
 
-def generate_entity(name=None):
-    if name is None:
-        name = generate_name()
-    return add_entity(name)
+def add_entity(**params):
+    response = confd.entities.post(params)
+    return response.item
 
 
 def delete_entity(entity_id, check=False):
-    with db.queries() as queries:
-        queries.delete_entity(entity_id)
+    response = confd.entities(entity_id).delete()
+    if check:
+        response.assert_ok()
 
 
 def generate_name():
-    with db.queries() as queries:
-        response = queries.get_entities()
-    names = set(d['name'] for d in response)
+    response = confd.entities.get()
+    names = set(d['name'] for d in response.items)
     return _random_name(names)
 
 
