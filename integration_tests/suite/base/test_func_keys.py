@@ -32,6 +32,7 @@ from test_api import db
 from test_api import provd
 from test_api import associations as a
 from test_api import scenarios as s
+from test_api import errors as e
 from test_api import fixtures
 
 FAKE_ID = 999999999
@@ -120,6 +121,13 @@ def test_put_user_errors(user):
     for check in error_funckey_position_checks(url):
         yield check
 
+    fake_user = confd.users(FAKE_ID).funckeys.put
+    yield s.check_resource_not_found, fake_user, 'User'
+
+    url = confd.users(user['uuid']).funckeys.put
+    for check in error_funckeys_checks(url):
+        yield check
+
 
 def error_funckey_position_checks(url):
     yield s.check_bogus_field_returns_error, url, 'blf', 123
@@ -129,6 +137,29 @@ def error_funckey_position_checks(url):
 
     for destination in invalid_destinations:
         yield s.check_bogus_field_returns_error, url, 'destination', destination
+
+
+def error_funckeys_checks(url):
+    valid_funckey = {'destination': {'type': 'custom', 'exten': '1234'}}
+
+    yield s.check_bogus_field_returns_error, url, 'name', 123
+    yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'keys', True
+    yield s.check_bogus_field_returns_error, url, 'keys', None
+    yield s.check_bogus_field_returns_error, url, 'keys', 'string'
+    yield s.check_bogus_field_returns_error, url, 'keys', 1234
+    yield s.check_bogus_field_returns_error, url, 'keys', {'not_integer': valid_funckey}
+    yield s.check_bogus_field_returns_error, url, 'keys', {None: valid_funckey}
+
+    regex = r'keys.*1.*destination'
+    for destination in invalid_destinations:
+        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
+
+    regex = r'keys.*1'
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 'string'}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 1234}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': True}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': None}, regex
 
 
 def test_delete_user_errors():
@@ -226,18 +257,6 @@ def check_provd_has_funckey(device, position, funckey):
 
 
 @fixtures.user()
-@fixtures.line_sip(position=2)
-@fixtures.extension()
-@fixtures.device()
-def test_when_line_has_another_position_then_func_key_generated(user, line_sip, extension, device):
-    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
-        destination = {'type': 'custom', 'exten': '1234'}
-        confd.users(user['id']).funckeys(1).put(destination=destination).assert_updated()
-        response = confd.users(user['id']).funckeys(1).get()
-        assert_that(response.item['destination'], has_entries(destination))
-
-
-@fixtures.user()
 @fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
@@ -286,6 +305,37 @@ def test_get_user_position(user):
 
     response = confd.users(user['uuid']).funckeys(1).get()
     assert_that(response.item, has_entries(expected_funckey))
+
+
+@fixtures.user()
+def test_put_user_error_on_duplicate_destination(user):
+    parameters = {'name': 'duplicate_dest',
+                  'keys': {'1': {'destination': {'type': 'custom', 'exten': '123'}},
+                           '2': {'destination': {'type': 'custom', 'exten': '123'}}}}
+
+    response = confd.users(user['id']).funckeys.put(**parameters)
+    response.assert_status(400)
+
+
+@fixtures.user()
+def test_error_when_user_are_not_bs_filter_member(user):
+    parameters = {'name': 'validate_bsfilter',
+                  'keys': {'1': {'destination': {'type': 'bsfilter', 'filter_member_id': '123'}}}}
+
+    response = confd.users(user['id']).funckeys.put(**parameters)
+    response.assert_match(400, e.missing_association('User', 'BSFilter'))
+
+
+@fixtures.user()
+@fixtures.line_sip(position=2)
+@fixtures.extension()
+@fixtures.device()
+def test_when_line_has_another_position_then_func_key_generated(user, line_sip, extension, device):
+    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
+        destination = {'type': 'custom', 'exten': '1234'}
+        confd.users(user['id']).funckeys(1).put(destination=destination).assert_updated()
+        response = confd.users(user['id']).funckeys(1).get()
+        assert_that(response.item['destination'], has_entries(destination))
 
 
 class BaseTestFuncKey(unittest.TestCase):
@@ -448,11 +498,16 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         for pos, expected_funckey in self.confd_funckeys.items():
             self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
-    def test_when_creating_agent_or_bsfilter_for_public_template_then_returns_error(self):
-        for position in self.exclude_for_template:
-            funckey = self.confd_funckeys[position]
-            response = confd.funckeys.templates.post(keys={'1': funckey})
-            response.assert_status(400)
+    def test_when_update_user_funckeys(self):
+        response = confd.users(self.user['id']).funckeys.put(name='user1', keys=self.confd_funckeys)
+        response.assert_updated()
+
+        response = confd.users(self.user['id']).funckeys.get()
+        funckeys = response.item['keys']
+
+        for pos, expected_funckey in self.confd_funckeys.items():
+            expected_funckey['inherited'] = False
+            self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
     def assert_template_has_funckey(self, funckeys, pos, expected):
         expected.setdefault('blf', False)

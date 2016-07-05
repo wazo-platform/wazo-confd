@@ -89,6 +89,11 @@ class TemplateService(object):
         self.validator_bsfilter.validate(user, funckey)
         self.edit_funckey(funckey, template, position)
 
+    def edit_user_template(self, user, template):
+        for position in template.keys:
+            self.validator_bsfilter.validate(user, template.keys[position])
+        self.edit(template)
+
     def delete(self, template):
         self.validator.validate_delete(template)
         users = self.user_dao.find_all_by(func_key_template_id=template.id)

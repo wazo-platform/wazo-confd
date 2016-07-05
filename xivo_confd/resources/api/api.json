@@ -2981,6 +2981,36 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "operationId": "update_user_func_keys",
+                "summary": "Update func keys for a user",
+                "description": "**Required ACL:** `confd.users.{user_id}.funckeys..update`\n\n**WARNING** This endpoint restore to default value or delete all fields that are not defined.",
+                "tags": [
+                    "funckeys",
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FuncKeyTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    }
+                }
             }
         },
         "/users/{user_id}/funckeys/{position}": {

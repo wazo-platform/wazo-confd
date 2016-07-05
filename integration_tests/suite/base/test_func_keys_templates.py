@@ -27,7 +27,7 @@ from hamcrest import (assert_that,
                       has_item,
                       is_not)
 
-from .test_func_keys import invalid_destinations, error_funckey_position_checks
+from .test_func_keys import error_funckeys_checks, error_funckey_position_checks
 
 invalid_template_destinations = [
     {'type': 'agent'},
@@ -45,35 +45,12 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.funckeys.templates.post
-    for check in error_checks(url):
+    for check in error_funckeys_checks(url):
         yield check
 
     regex = r'keys.*1.*destination.*type'
     for destination in invalid_template_destinations:
         yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
-
-
-def error_checks(url):
-    valid_funckey = {'destination': {'type': 'custom', 'exten': '1234'}}
-
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'keys', True
-    yield s.check_bogus_field_returns_error, url, 'keys', None
-    yield s.check_bogus_field_returns_error, url, 'keys', 'string'
-    yield s.check_bogus_field_returns_error, url, 'keys', 1234
-    yield s.check_bogus_field_returns_error, url, 'keys', {'not_integer': valid_funckey}
-    yield s.check_bogus_field_returns_error, url, 'keys', {None: valid_funckey}
-
-    regex = r'keys.*1.*destination'
-    for destination in invalid_destinations:
-        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
-
-    regex = r'keys.*1'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 'string'}, regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 1234}, regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': True}, regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': None}, regex
 
 
 @fixtures.funckey_template()
