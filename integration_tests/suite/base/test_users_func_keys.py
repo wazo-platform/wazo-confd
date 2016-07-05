@@ -121,7 +121,7 @@ def test_put_position(user, line_sip, extension, device):
                           'type': 'speeddial',
                           'line': 1,
                           'value': '702'}
-    position = '1'
+    position = 1
 
     with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
@@ -137,6 +137,7 @@ def test_put_position(user, line_sip, extension, device):
 
 
 def check_provd_has_funckey(device, position, funckey):
+    position = str(position)
     config = provd.configs.get(device['id'])
     funckeys = config['raw_config']['funckeys']
 
@@ -151,8 +152,8 @@ def check_provd_has_funckey(device, position, funckey):
 def test_delete_position(user, line_sip, extension, device):
     destination_id = {'type': 'custom', 'exten': '1234'}
     destination_uuid = {'type': 'custom', 'exten': '1235'}
-    position_id = '1'
-    position_uuid = '2'
+    position_id = 1
+    position_uuid = 2
     with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
         confd.users(user['id']).funckeys(position_id).put(destination=destination_id).assert_updated()
         confd.users(user['id']).funckeys(position_uuid).put(destination=destination_uuid).assert_updated()
@@ -169,6 +170,7 @@ def test_delete_position(user, line_sip, extension, device):
 
 
 def check_provd_does_not_have_funckey(device, position):
+    position = str(position)
     config = provd.configs.get(device['id'])
     funckeys = config['raw_config']['funckeys']
 
@@ -224,6 +226,21 @@ def test_when_line_has_another_position_then_func_key_generated(user, line_sip, 
         confd.users(user['id']).funckeys(1).put(destination=destination).assert_updated()
         response = confd.users(user['id']).funckeys(1).get()
         assert_that(response.item['destination'], has_entries(destination))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.extension()
+@fixtures.device()
+def test_when_move_funckey_position_then_no_duplicate_error(user, line_sip, extension, device):
+    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
+        destination = {'type': 'custom', 'exten': '1234'}
+        confd.users(user['id']).funckeys(1).put(destination=destination).assert_updated()
+
+        response = confd.users(user['id']).funckeys.put(keys={'2': {'destination': destination}})
+        response.assert_updated()
+        check_provd_does_not_have_funckey(device, 1)
+        check_provd_has_funckey(device, 2, {'label': '', 'type': 'blf', 'line': 1, 'value': '1234'})
 
 
 def test_edit_all_parameters():
