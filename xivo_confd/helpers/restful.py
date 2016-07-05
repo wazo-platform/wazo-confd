@@ -94,7 +94,7 @@ class ListResource(ConfdResource):
         params = self.search_params()
         total, items = self.service.search(params)
         return {'total': total,
-                'items': [marshal(item, self.fields) for item in items]}
+                'items': [self._dump_result(item) for item in items]}
 
     def search_params(self):
         args = ((key, request.args[key]) for key in request.args)
@@ -114,13 +114,27 @@ class ListResource(ConfdResource):
         return int(value)
 
     def post(self):
-        form = self.parser.parse_args()
+        form = self._load_form()
         model = self.model(**form)
         model = self.service.create(model)
-        return marshal(model, self.fields), 201, self.build_headers(model)
+        return self._dump_result(model), 201, self.build_headers(model)
 
     def build_headers(self, model):
         raise NotImplementedError()
+
+    def _load_form(self):
+        # old style
+        if getattr(self, 'parser', False):
+            return self.parser.parse_args()
+
+        return self.schema.load(request.get_json()).data
+
+    def _dump_result(self, model):
+        # old style
+        if getattr(self, 'fields', False):
+            return marshal(model, self.fields)
+
+        return self.schema.dump(model).data
 
 
 class ItemResource(ConfdResource):
@@ -131,7 +145,7 @@ class ItemResource(ConfdResource):
 
     def get(self, id):
         model = self.service.get(id)
-        return marshal(model, self.fields)
+        return self._dump_result(model)
 
     def put(self, id):
         model = self.service.get(id)
@@ -139,7 +153,7 @@ class ItemResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self.parser.parse_args()
+        form = self._load_form()
         for name, value in form.iteritems():
             setattr(model, name, value)
         self.service.edit(model)
@@ -148,6 +162,20 @@ class ItemResource(ConfdResource):
         model = self.service.get(id)
         self.service.delete(model)
         return '', 204
+
+    def _load_form(self):
+        # old style
+        if getattr(self, 'parser', False):
+            return self.parser.parse_args()
+
+        return self.schema.load(request.get_json()).data
+
+    def _dump_result(self, model):
+        # old style
+        if getattr(self, 'fields', False):
+            return marshal(model, self.fields)
+
+        return self.schema.dump(model).data
 
 
 class FieldList(fields.Raw):

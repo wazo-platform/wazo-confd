@@ -2068,16 +2068,13 @@
                     },
                     {
                         "$ref": "#/parameters/search"
-                    },
-                    {
-                        "$ref": "#/parameters/view"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Permissions list",
+                        "description": "Call Permissions list",
                         "schema": {
-                            "$ref": "#/definitions/PermissionItems"
+                            "$ref": "#/definitions/CallPermissionItems"
                         }
                     }
                 }
@@ -2085,7 +2082,7 @@
             "post": {
                 "operationId": "create_callpermission",
                 "summary": "Create call permission",
-                "description": "**Required ACL:** `confd.callpermission.create`",
+                "description": "**Required ACL:** `confd.callpermissions.create`",
                 "tags": [
                     "callpermissions"
                 ],
@@ -2093,18 +2090,18 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Permission to create",
+                        "description": "Call Permission to create",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Permission created",
+                        "description": "Call Permission created",
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     },
                     "400": {
@@ -2128,9 +2125,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Permission",
+                        "description": "Call Permission",
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     },
                     "404": {
@@ -2154,7 +2151,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Permission"
+                            "$ref": "#/definitions/CallPermission"
                         }
                     }
                 ],
@@ -2215,6 +2212,121 @@
                         "schema": {
                             "$ref": "#/definitions/UserCallPermissionItems"
                         }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/entities": {
+            "get": {
+                "operationId": "list_entities",
+                "summary": "List entities",
+                "description": "**Required ACL:** `confd.entities.read`",
+                "tags": [
+                    "entities"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entities list",
+                        "schema": {
+                            "$ref": "#/definitions/EntityItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_entity",
+                "summary": "Create entity",
+                "description": "**Required ACL:** `confd.entities.create`",
+                "tags": [
+                    "entities"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Entity to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Entity"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Entity created",
+                        "schema": {
+                            "$ref": "#/definitions/Entity"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/entities/{entity_id}": {
+            "get": {
+                "operationId": "get_entity",
+                "summary": "Get entity",
+                "description": "**Required ACL:** `confd.entities.{entity_id}.read`",
+                "tags": [
+                    "entities"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/entityid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entity",
+                        "schema": {
+                            "$ref": "#/definitions/Entity"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_entity",
+                "summary": "Delete entity",
+                "description": "**Required ACL:** `confd.entities.{entity_id}.delete`\n\nAn entity can not be deleted if it is associated to an object.",
+                "tags": [
+                    "entities"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/entityid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"
@@ -4464,6 +4576,44 @@
                 }
             }
         },
+        "Entity": {
+            "title": "Entity",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the call permission"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the Entity. Must be unique"
+                },
+                "display_name": {
+                    "type": "string",
+                    "description": "The displayed name on the web interface"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "EntityItems": {
+            "title": "EntityItems",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Entity"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        },
         "Error": {
             "type": "array",
             "items": {
@@ -4871,8 +5021,8 @@
                 }
             }
         },
-        "Permission": {
-            "title": "Permission",
+        "CallPermission": {
+            "title": "CallPermission",
             "properties": {
                 "id": {
                     "type": "integer",
@@ -4917,13 +5067,13 @@
                 "name"
             ]
         },
-        "PermissionItems": {
-            "title": "PermissionItems",
+        "CallPermissionItems": {
+            "title": "CallPermissionItems",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Permission"
+                        "$ref": "#/definitions/CallPermission"
                     }
                 },
                 "total": {

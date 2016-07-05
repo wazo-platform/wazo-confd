@@ -130,3 +130,21 @@ class funckey_template(IsolatedAction):
 
     actions = {'generate': h.funckey_template.generate_funckey_template,
                'delete': h.funckey_template.delete_funckey_template}
+
+
+class call_pickup(IsolatedAction):
+
+    actions = {'generate': h.call_pickup.generate_call_pickup,
+               'delete': h.call_pickup.delete_call_pickup}
+
+
+class call_filter(IsolatedAction):
+
+    actions = {'generate': h.call_filter.generate_call_filter,
+               'delete': h.call_filter.delete_call_filter}
+
+
+class schedule(IsolatedAction):
+
+    actions = {'generate': h.schedule.generate_schedule,
+               'delete': h.schedule.delete_schedule}
