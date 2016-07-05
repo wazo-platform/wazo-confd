@@ -36,6 +36,80 @@ from test_api import fixtures
 
 FAKE_ID = 999999999
 
+invalid_destinations = [
+    1234,
+    'string',
+    {'type': 'invalid'},
+
+    {'type': 'user'},
+    {'type': 'user', 'bad_field': 123},
+    {'type': 'user', 'user_id': 'string'},
+    {'type': 'user', 'user_id': None},
+
+    {'type': 'group'},
+    {'type': 'group', 'bad_field': 123},
+    {'type': 'group', 'group_id': 'string'},
+    {'type': 'group', 'group_id': None},
+
+    {'type': 'queue'},
+    {'type': 'queue', 'bad_field': 123},
+    {'type': 'queue', 'queue_id': 'string'},
+    {'type': 'queue', 'queue_id': None},
+
+    {'type': 'conference'},
+    {'type': 'conference', 'bad_field': 123},
+    {'type': 'conference', 'conference_id': 'string'},
+    {'type': 'conference', 'conference_id': None},
+
+    {'type': 'custom'},
+    {'type': 'custom', 'bad_field': '123'},
+    {'type': 'custom', 'exten': 1234},
+    {'type': 'custom', 'exten': True},
+    {'type': 'custom', 'exten': None},
+
+    {'type': 'service'},
+    {'type': 'service', 'bad_field': 'enablevm'},
+    {'type': 'service', 'service': 'invalid'},
+    {'type': 'service', 'service': True},
+    {'type': 'service', 'service': None},
+    {'type': 'service', 'service': 1234},
+
+    {'type': 'forward'},
+    {'type': 'forward', 'bad_field': 'busy'},
+    {'type': 'forward', 'forward': 'invalid'},
+    {'type': 'forward', 'forward': True},
+    {'type': 'forward', 'forward': None},
+    {'type': 'forward', 'forward': 1234},
+    {'type': 'forward', 'forward': 'busy', 'exten': True},
+    {'type': 'forward', 'forward': 'busy', 'exten': 1234},
+
+    {'type': 'transfer'},
+    {'type': 'transfer', 'bad_field': 'blind'},
+    {'type': 'transfer', 'transfer': 'invalid'},
+    {'type': 'transfer', 'transfer': True},
+    {'type': 'transfer', 'transfer': None},
+    {'type': 'transfer', 'transfer': 1234},
+
+    {'type': 'park_position'},
+    {'type': 'park_position', 'bad_field': 123},
+    {'type': 'park_position', 'position': 'invalid'},
+    {'type': 'park_position', 'position': None},
+
+    {'type': 'agent'},
+    {'type': 'agent', 'agent_id': 'invalid'},
+    {'type': 'agent', 'agent_id': None},
+
+    {'type': 'bsfilter'},
+    {'type': 'bsfilter', 'filter_member_id': 'invalid'},
+    {'type': 'bsfilter', 'filter_member_id': None},
+
+    {'type': 'paging'},
+    {'type': 'paging', 'bad_field': 123},
+    {'type': 'paging', 'paging_id': 'invalid'},
+    {'type': 'paging', 'paging_id': None},
+
+]
+
 
 class BaseTestFuncKey(unittest.TestCase):
 
@@ -214,11 +288,11 @@ class TestUserWithFuncKey(BaseTestFuncKey):
         # s.check_resource_not_found(fake_funckey, 'FuncKey')
 
     def test_get_errors(self):
-        fake_user = confd.users(FAKE_ID).funckeys.get
+        fake_user_1 = confd.users(FAKE_ID).funckeys.get
         fake_user_2 = confd.users(FAKE_ID).funckeys(1).get
         fake_funckey = confd.users(self.user['uuid']).funckeys(FAKE_ID).get
 
-        s.check_resource_not_found(fake_user, 'User')
+        s.check_resource_not_found(fake_user_1, 'User')
         s.check_resource_not_found(fake_user_2, 'User')
         s.check_resource_not_found(fake_funckey, 'FuncKey')
 

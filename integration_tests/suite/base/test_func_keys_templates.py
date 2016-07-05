@@ -27,78 +27,14 @@ from hamcrest import (assert_that,
                       has_item,
                       is_not)
 
-invalid_destinations = [
-    1234,
-    'string',
-    {'type': 'not_valid'},
+from .test_func_keys import invalid_destinations
 
-    {'type': 'user'},
-    {'type': 'user', 'bad_field': 123},
-    {'type': 'user', 'user_id': 'string'},
-    {'type': 'user', 'user_id': None},
-
-    {'type': 'group'},
-    {'type': 'group', 'bad_field': 123},
-    {'type': 'group', 'group_id': 'string'},
-    {'type': 'group', 'group_id': None},
-
-    {'type': 'queue'},
-    {'type': 'queue', 'bad_field': 123},
-    {'type': 'queue', 'queue_id': 'string'},
-    {'type': 'queue', 'queue_id': None},
-
-    {'type': 'conference'},
-    {'type': 'conference', 'bad_field': 123},
-    {'type': 'conference', 'conference_id': 'string'},
-    {'type': 'conference', 'conference_id': None},
-
-    {'type': 'custom'},
-    {'type': 'custom', 'bad_field': '123'},
-    {'type': 'custom', 'exten': 1234},
-    {'type': 'custom', 'exten': True},
-    {'type': 'custom', 'exten': None},
-
-    {'type': 'service'},
-    {'type': 'service', 'bad_field': 'enablevm'},
-    {'type': 'service', 'service': 'not_valid'},
-    {'type': 'service', 'service': True},
-    {'type': 'service', 'service': None},
-    {'type': 'service', 'service': 1234},
-
-    {'type': 'forward'},
-    {'type': 'forward', 'bad_field': 'busy'},
-    {'type': 'forward', 'forward': 'not_valid'},
-    {'type': 'forward', 'forward': True},
-    {'type': 'forward', 'forward': None},
-    {'type': 'forward', 'forward': 1234},
-    {'type': 'forward', 'forward': 'busy', 'exten': True},
-    {'type': 'forward', 'forward': 'busy', 'exten': 1234},
-
-    {'type': 'transfer'},
-    {'type': 'transfer', 'bad_field': 'blind'},
-    {'type': 'transfer', 'transfer': 'not_valid'},
-    {'type': 'transfer', 'transfer': True},
-    {'type': 'transfer', 'transfer': None},
-    {'type': 'transfer', 'transfer': 1234},
-
-    {'type': 'park_position'},
-    {'type': 'park_position', 'bad_field': 123},
-    {'type': 'park_position', 'position': 'not_valid'},
-    {'type': 'park_position', 'position': None},
-
-    # This type are exclude from template
+invalid_template_destinations = [
     {'type': 'agent'},
     {'type': 'agent', 'agent_id': 1234},
 
-    # This type are exclude from template
     {'type': 'bsfilter'},
     {'type': 'bsfilter', 'filter_member_id': 1234},
-
-    {'type': 'paging'},
-    {'type': 'paging', 'bad_field': 123},
-    {'type': 'paging', 'paging_id': 'not_valid'},
-    {'type': 'paging', 'paging_id': None},
-
 ]
 
 
@@ -111,6 +47,10 @@ def test_post_errors():
     url = confd.funckeys.templates.post
     for check in error_checks(url):
         yield check
+
+    regex = r'keys.*1.*destination.*type'
+    for destination in invalid_template_destinations:
+        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
 
 
 def error_checks(url):
@@ -154,6 +94,9 @@ def test_put_position_errors(funckey_template):
     url = confd.funckeys.templates(funckey_template['id'])(1).put
     for check in error_position_checks(url):
         yield check
+
+    for destination in invalid_template_destinations:
+        yield s.check_bogus_field_returns_error, url, 'destination', destination
 
 
 def error_position_checks(url):
