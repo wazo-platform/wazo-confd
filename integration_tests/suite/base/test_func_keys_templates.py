@@ -27,7 +27,7 @@ from hamcrest import (assert_that,
                       has_item,
                       is_not)
 
-from .test_func_keys import invalid_destinations
+from .test_func_keys import invalid_destinations, error_funckey_position_checks
 
 invalid_template_destinations = [
     {'type': 'agent'},
@@ -92,20 +92,10 @@ def test_get_position_errors(funckey_template):
 @fixtures.funckey_template()
 def test_put_position_errors(funckey_template):
     url = confd.funckeys.templates(funckey_template['id'])(1).put
-    for check in error_position_checks(url):
+    for check in error_funckey_position_checks(url):
         yield check
 
     for destination in invalid_template_destinations:
-        yield s.check_bogus_field_returns_error, url, 'destination', destination
-
-
-def error_position_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'blf', 123
-    yield s.check_bogus_field_returns_error, url, 'blf', 'string'
-    yield s.check_bogus_field_returns_error, url, 'blf', None
-    yield s.check_bogus_field_returns_error, url, 'label', 1234
-
-    for destination in invalid_destinations:
         yield s.check_bogus_field_returns_error, url, 'destination', destination
 
 

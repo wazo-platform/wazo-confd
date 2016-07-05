@@ -111,15 +111,29 @@ invalid_destinations = [
 ]
 
 
-def test_put_user_errors():
+@fixtures.user()
+def test_put_user_errors(user):
     fake_user = confd.users(FAKE_ID).funckeys(1).put
+    yield s.check_resource_not_found, fake_user, 'User'
 
-    s.check_resource_not_found(fake_user, 'User')
+    url = confd.users(user['uuid']).funckeys(1).put
+    for check in error_funckey_position_checks(url):
+        yield check
+
+
+def error_funckey_position_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'blf', 123
+    yield s.check_bogus_field_returns_error, url, 'blf', 'string'
+    yield s.check_bogus_field_returns_error, url, 'blf', None
+    yield s.check_bogus_field_returns_error, url, 'label', 1234
+
+    for destination in invalid_destinations:
+        yield s.check_bogus_field_returns_error, url, 'destination', destination
 
 
 def test_delete_user_errors():
     fake_user = confd.users(FAKE_ID).funckeys(1).delete
-    s.check_resource_not_found(fake_user, 'User')
+    yield s.check_resource_not_found, fake_user, 'User'
 
     # This should raise an error
     # fake_funckey = confd.users(self.user['id']).funckeys(FAKE_ID).delete
@@ -132,9 +146,9 @@ def test_get_user_errors(user):
     fake_user_2 = confd.users(FAKE_ID).funckeys(1).get
     fake_funckey = confd.users(user['uuid']).funckeys(FAKE_ID).get
 
-    s.check_resource_not_found(fake_user_1, 'User')
-    s.check_resource_not_found(fake_user_2, 'User')
-    s.check_resource_not_found(fake_funckey, 'FuncKey')
+    yield s.check_resource_not_found, fake_user_1, 'User'
+    yield s.check_resource_not_found, fake_user_2, 'User'
+    yield s.check_resource_not_found, fake_funckey, 'FuncKey'
 
 
 @fixtures.user()
