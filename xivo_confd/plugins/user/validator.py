@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_confd.helpers.validator import (LANGUAGE_REGEX,
-                                          MemberOfSequence,
                                           NumberRange,
                                           Optional,
                                           RegexField,
@@ -116,6 +115,7 @@ def build_validator():
         ],
         edit=[
             RequiredFields('call_transfer_enabled',
+                           'dtmf_hangup_enabled',
                            'call_record_enabled',
                            'online_call_record_enabled',
                            'supervision_enabled',

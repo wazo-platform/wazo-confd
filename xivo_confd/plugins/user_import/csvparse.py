@@ -114,6 +114,7 @@ class CsvRow(object):
         BooleanRule('enabled', 'enabled'),
         BooleanRule('supervision_enabled', 'supervision_enabled'),
         BooleanRule('call_transfer_enabled', 'call_transfer_enabled'),
+        BooleanRule('dtmf_hangup_enabled', 'dtmf_hangup_enabled'),
         BooleanRule('call_record_enabled', 'call_record_enabled'),
         BooleanRule('online_call_record_enabled', 'online_call_record_enabled'),
         IntRule('entity_id', 'entity_id'),

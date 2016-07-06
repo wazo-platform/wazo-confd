@@ -44,6 +44,7 @@ FULL_USER = {"firstname": "Jôhn",
              "description": "John's description",
              "supervision_enabled": False,
              "call_transfer_enabled": False,
+             "dtmf_hangup_enabled": True,
              "call_record_enabled": True,
              "online_call_record_enabled": True,
              "call_permission_password": '1234',
@@ -67,6 +68,7 @@ NULL_USER = {"firstname": "Jôhn",
              "description": None,
              "supervision_enabled": True,
              "call_transfer_enabled": True,
+             "dtmf_hangup_enabled": False,
              "call_record_enabled": False,
              "online_call_record_enabled": False,
              "call_permission_password": None,
@@ -108,6 +110,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'caller_id', 'callerid'
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
     yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 'yeah'
@@ -128,6 +131,7 @@ def error_checks(url):
 def put_error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'caller_id', None
     yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', None
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', None
@@ -384,6 +388,7 @@ def test_create_with_null_parameters_fills_default_values():
 
     assert_that(response.item, has_entries(caller_id='"Charlie"',
                                            call_transfer_enabled=True,
+                                           dtmf_hangup_enabled=False,
                                            call_record_enabled=False,
                                            online_call_record_enabled=False,
                                            supervision_enabled=True,
