@@ -5201,12 +5201,12 @@
                 },
                 "call_transfer_enabled": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Authorize call transfers"
                 },
                 "dtmf_hangup_enabled": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Authorize to hangup with DTMF"
                 },
                 "call_record_enabled": {
