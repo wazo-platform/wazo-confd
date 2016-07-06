@@ -36,6 +36,113 @@ from test_api import fixtures
 
 FAKE_ID = 999999999
 
+invalid_destinations = [
+    1234,
+    'string',
+    {'type': 'invalid'},
+
+    {'type': 'user'},
+    {'type': 'user', 'bad_field': 123},
+    {'type': 'user', 'user_id': 'string'},
+    {'type': 'user', 'user_id': None},
+
+    {'type': 'group'},
+    {'type': 'group', 'bad_field': 123},
+    {'type': 'group', 'group_id': 'string'},
+    {'type': 'group', 'group_id': None},
+
+    {'type': 'queue'},
+    {'type': 'queue', 'bad_field': 123},
+    {'type': 'queue', 'queue_id': 'string'},
+    {'type': 'queue', 'queue_id': None},
+
+    {'type': 'conference'},
+    {'type': 'conference', 'bad_field': 123},
+    {'type': 'conference', 'conference_id': 'string'},
+    {'type': 'conference', 'conference_id': None},
+
+    {'type': 'custom'},
+    {'type': 'custom', 'bad_field': '123'},
+    {'type': 'custom', 'exten': 1234},
+    {'type': 'custom', 'exten': True},
+    {'type': 'custom', 'exten': None},
+
+    {'type': 'service'},
+    {'type': 'service', 'bad_field': 'enablevm'},
+    {'type': 'service', 'service': 'invalid'},
+    {'type': 'service', 'service': True},
+    {'type': 'service', 'service': None},
+    {'type': 'service', 'service': 1234},
+
+    {'type': 'forward'},
+    {'type': 'forward', 'bad_field': 'busy'},
+    {'type': 'forward', 'forward': 'invalid'},
+    {'type': 'forward', 'forward': True},
+    {'type': 'forward', 'forward': None},
+    {'type': 'forward', 'forward': 1234},
+    {'type': 'forward', 'forward': 'busy', 'exten': True},
+    {'type': 'forward', 'forward': 'busy', 'exten': 1234},
+
+    {'type': 'transfer'},
+    {'type': 'transfer', 'bad_field': 'blind'},
+    {'type': 'transfer', 'transfer': 'invalid'},
+    {'type': 'transfer', 'transfer': True},
+    {'type': 'transfer', 'transfer': None},
+    {'type': 'transfer', 'transfer': 1234},
+
+    {'type': 'park_position'},
+    {'type': 'park_position', 'bad_field': 123},
+    {'type': 'park_position', 'position': 'invalid'},
+    {'type': 'park_position', 'position': None},
+
+    {'type': 'agent'},
+    {'type': 'agent', 'agent_id': 'invalid'},
+    {'type': 'agent', 'agent_id': None},
+
+    {'type': 'bsfilter'},
+    {'type': 'bsfilter', 'filter_member_id': 'invalid'},
+    {'type': 'bsfilter', 'filter_member_id': None},
+
+    {'type': 'paging'},
+    {'type': 'paging', 'bad_field': 123},
+    {'type': 'paging', 'paging_id': 'invalid'},
+    {'type': 'paging', 'paging_id': None},
+
+]
+
+
+def error_funckey_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'blf', 123
+    yield s.check_bogus_field_returns_error, url, 'blf', 'string'
+    yield s.check_bogus_field_returns_error, url, 'blf', None
+    yield s.check_bogus_field_returns_error, url, 'label', 1234
+
+    for destination in invalid_destinations:
+        yield s.check_bogus_field_returns_error, url, 'destination', destination
+
+
+def error_funckeys_checks(url):
+    valid_funckey = {'destination': {'type': 'custom', 'exten': '1234'}}
+
+    yield s.check_bogus_field_returns_error, url, 'name', 123
+    yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'keys', True
+    yield s.check_bogus_field_returns_error, url, 'keys', None
+    yield s.check_bogus_field_returns_error, url, 'keys', 'string'
+    yield s.check_bogus_field_returns_error, url, 'keys', 1234
+    yield s.check_bogus_field_returns_error, url, 'keys', {'not_integer': valid_funckey}
+    yield s.check_bogus_field_returns_error, url, 'keys', {None: valid_funckey}
+
+    regex = r'keys.*1.*destination'
+    for destination in invalid_destinations:
+        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
+
+    regex = r'keys.*1'
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 'string'}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 1234}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': True}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': None}, regex
+
 
 class BaseTestFuncKey(unittest.TestCase):
 
@@ -77,150 +184,6 @@ class BaseTestFuncKey(unittest.TestCase):
     def add_funckey_to_user(self, pos, funckey):
         response = confd.users(self.user['id']).funckeys(pos).put(**funckey)
         response.assert_ok()
-
-
-class TestUserWithFuncKey(BaseTestFuncKey):
-
-    def setUp(self):
-        super(TestUserWithFuncKey, self).setUp()
-
-        self.destination = {'type': 'custom', 'exten': '1234'}
-        self.pos = '1'
-
-        self.funckey_url = confd.users(self.user['id']).funckeys(self.pos)
-        self.uuid_url = confd.users(self.user['uuid']).funckeys(self.pos)
-
-        self.funckey_url.put(destination=self.destination).assert_ok()
-
-    def test_when_line_has_another_position_then_func_key_generated(self):
-        user = helpers.user.generate_user()
-        sip = helpers.endpoint_sip.generate_sip()
-        line = helpers.line.generate_line(position=2)
-        extension = helpers.extension.generate_extension()
-        device = helpers.device.generate_device()
-
-        helpers.line_endpoint_sip.associate(line['id'], sip['id'])
-        helpers.line_extension.associate(line['id'], extension['id'])
-        helpers.user_line.associate(user['id'], line['id'])
-        helpers.line_device.associate(line['id'], device['id'])
-
-        url = confd.users(user['id']).funckeys(self.pos)
-        url.put(destination=self.destination).assert_ok()
-
-        expected_funckey = {'label': None,
-                            'inherited': False,
-                            'blf': True}
-        expected_destination = {'type': self.destination['type'],
-                                'exten': self.destination['exten'],
-                                'href': None}
-
-        response = url.get()
-        assert_that(response.item, has_entries(expected_funckey))
-        assert_that(response.item['destination'], has_entries(expected_destination))
-
-    def test_when_getting_position_then_func_key_returned(self):
-        expected_funckey = {'label': None,
-                            'inherited': False,
-                            'blf': True}
-        expected_destination = {'type': self.destination['type'],
-                                'exten': self.destination['exten'],
-                                'href': None}
-
-        response = self.funckey_url.get()
-
-        assert_that(response.item, has_entries(expected_funckey))
-        assert_that(response.item['destination'], has_entries(expected_destination))
-
-        response = self.uuid_url.get()
-
-        assert_that(response.item, has_entries(expected_funckey))
-        assert_that(response.item['destination'], has_entries(expected_destination))
-
-    def test_when_updating_position_then_func_key_modified_in_provd(self):
-        modified_funckey = {'blf': False,
-                            'label': 'myfunckey',
-                            'destination': {'type': 'park_position',
-                                            'position': 701}}
-        uuid_funckey = {'blf': False,
-                        'label': 'myfunckey',
-                        'destination': {'type': 'park_position',
-                                        'position': 702}}
-
-        provd_funckey = {'label': 'myfunckey',
-                         'type': 'speeddial',
-                         'line': 1,
-                         'value': '701'}
-        provd_uuid_funckey = {'label': 'myfunckey',
-                              'type': 'speeddial',
-                              'line': 1,
-                              'value': '702'}
-
-        self.funckey_url.put(**modified_funckey).assert_updated()
-        self.check_provd_has_funckey(self.pos, provd_funckey)
-
-        self.uuid_url.put(**uuid_funckey).assert_updated()
-        self.check_provd_has_funckey(self.pos, provd_uuid_funckey)
-
-    def test_when_deleting_position_then_func_key_removed(self):
-        response = self.funckey_url.delete()
-        response.assert_ok()
-
-        response = self.funckey_url.get()
-        response.assert_status(404)
-
-        self.check_provd_does_not_have_funckey(self.pos)
-
-    def test_when_deleting_position_using_uuid_then_func_key_removed(self):
-        response = self.uuid_url.delete()
-        response.assert_ok()
-
-        response = self.funckey_url.get()
-        response.assert_status(404)
-
-        self.check_provd_does_not_have_funckey(self.pos)
-
-    def test_get_user_funckeys(self):
-        destination_2 = {'type': 'custom', 'exten': '456'}
-        destination_3 = {'type': 'custom', 'exten': '789'}
-        destination_4 = {'type': 'custom', 'exten': '012'}
-        confd.users(self.user['id']).funckeys(2).put(destination=destination_2)
-        confd.users(self.user['id']).funckeys(3).put(destination=destination_3)
-        template_parameters = {'name': 'pos4',
-                               'keys': {'4': {'destination': destination_4}}}
-        template = confd.funckeys.templates.post(**template_parameters).item
-        confd.users(self.user['id']).funckeys.templates(template['id']).put()
-
-        response = confd.users(self.user['id']).funckeys.get()
-
-        expected_result = has_entries({'keys': has_entries({
-            '1': has_entries({'destination': has_entries(self.destination)}),
-            '2': has_entries({'destination': has_entries(destination_2)}),
-            '3': has_entries({'destination': has_entries(destination_3)}),
-            '4': has_entries({'destination': has_entries(destination_4)})})
-        })
-
-        assert_that(response.item, expected_result)
-
-    def test_put_errors(self):
-        fake_user = confd.users(FAKE_ID).funckeys(1).put
-        s.check_resource_not_found(fake_user, 'User')
-
-    def test_delete_errors(self):
-        fake_user = confd.users(FAKE_ID).funckeys(1).delete
-        s.check_resource_not_found(fake_user, 'User')
-
-        # This should raise an error
-        # fake_funckey = confd.users(self.user['id']).funckeys(FAKE_ID).delete
-        # s.check_resource_not_found(fake_funckey, 'FuncKey')
-
-    def test_get_errors(self):
-        fake_user = confd.users(FAKE_ID).funckeys.get
-        fake_user_2 = confd.users(FAKE_ID).funckeys(1).get
-        fake_funckey = confd.users(self.user['uuid']).funckeys(FAKE_ID).get
-
-        s.check_resource_not_found(fake_user, 'User')
-        s.check_resource_not_found(fake_user_2, 'User')
-        s.check_resource_not_found(fake_funckey, 'FuncKey')
 
 
 class TestAllFuncKeyDestinations(BaseTestFuncKey):
@@ -341,11 +304,16 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         for pos, expected_funckey in self.confd_funckeys.items():
             self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
-    def test_when_creating_agent_or_bsfilter_for_public_template_then_returns_error(self):
-        for position in self.exclude_for_template:
-            funckey = self.confd_funckeys[position]
-            response = confd.funckeys.templates.post(keys={'1': funckey})
-            response.assert_status(400)
+    def test_when_update_user_funckeys(self):
+        response = confd.users(self.user['id']).funckeys.put(name='user1', keys=self.confd_funckeys)
+        response.assert_updated()
+
+        response = confd.users(self.user['id']).funckeys.get()
+        funckeys = response.item['keys']
+
+        for pos, expected_funckey in self.confd_funckeys.items():
+            expected_funckey['inherited'] = False
+            self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
     def assert_template_has_funckey(self, funckeys, pos, expected):
         expected.setdefault('blf', False)

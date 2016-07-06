@@ -169,6 +169,21 @@ class UserFuncKeyList(UserFuncKey):
         template = self.service.get_unified_template(user_id)
         return self.schema.dump(template).data
 
+    @required_acl('confd.users.{user_id}.funckeys.update')
+    def put(self, user_id):
+        user = self.user_dao.get_by_id_uuid(user_id)
+        template = self.template_dao.get(user.private_template_id)
+        template_model = self.schema.load(request.get_json()).data
+
+        for position, funckey in template_model.get('keys', {}).iteritems():
+            template_model['keys'][position] = _create_funckey_model(funckey)
+
+        template.keys = template_model.get('keys', {})
+        template.name = template_model.get('name')
+
+        self.service.edit_user_template(user, template)
+        return '', 204
+
 
 class UserFuncKeyItemPosition(UserFuncKey):
 
