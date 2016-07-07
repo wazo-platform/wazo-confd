@@ -68,8 +68,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'language', True
     yield s.check_bogus_field_returns_error, url, 'timezone', 123
     yield s.check_bogus_field_returns_error, url, 'timezone', True
-    yield s.check_bogus_field_returns_error, url, 'max_messages', '2'
-    yield s.check_bogus_field_returns_error, url, 'max_messages', True
+    yield s.check_bogus_field_returns_error, url, 'max_messages', 'string'
     yield s.check_bogus_field_returns_error, url, 'max_messages', {}
     yield s.check_bogus_field_returns_error, url, 'max_messages', []
     yield s.check_bogus_field_returns_error, url, 'attach_audio', 'false'
