@@ -17,11 +17,11 @@
 
 import re
 from flask import url_for
-from marshmallow import fields, post_dump
+from marshmallow import fields
 from marshmallow.validate import Length, Regexp
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_dao.alchemy.entity import Entity
 
@@ -33,13 +33,7 @@ class EntitySchema(BaseSchema):
     name = fields.String(validate=Regexp(NAME_REGEX), required=True)
     display_name = fields.String(validate=Length(min=3, max=128), allow_none=True)
     description = fields.Constant('', load_only=True)  # Avoid mess with webi
-
-    @post_dump
-    def generate_links(self, output):
-        endpoint = 'entities'
-        output['links'] = [{'href': url_for(endpoint, id=output['id'], _external=True),
-                            'rel': endpoint}]
-        return output
+    links = ListLink(Link('entities'))
 
 
 class EntityList(ListResource):
