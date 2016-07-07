@@ -18,7 +18,7 @@
 
 
 import unittest
-from mock import Mock
+from mock import Mock, call
 
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 
@@ -32,10 +32,6 @@ from xivo_confd.plugins.func_key.notifier import FuncKeyTemplateNotifier
 
 
 class TestFuncKeyTemplateNotifier(unittest.TestCase):
-
-    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
-                        'agentbus': [],
-                        'ctibus': []}
 
     def setUp(self):
         self.bus = Mock(BusPublisher)
@@ -61,19 +57,29 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
                                                         expected_event.routing_key)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(self):
+        expected_handlers = {'ctibus': [],
+                             'ipbx': ['dialplan reload'],
+                             'agentbus': []}
+        expected_handlers_sccp = {'ctibus': [],
+                                  'ipbx': ['module reload chan_sccp.so'],
+                                  'agentbus': []}
         self.device_db.template_has_sccp_device.return_value = True
 
         self.notifier.edited(self.func_key_template)
 
         self.device_db.template_has_sccp_device.assert_called_once_with(self.func_key_template.id)
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+        calls = [call(expected_handlers), call(expected_handlers_sccp)]
+        self.sysconfd.exec_request_handlers.assert_has_calls(calls)
 
     def test_given_template_has_no_devices_when_edited_then_sccp_not_reloaded(self):
+        expected_handlers = {'ctibus': [],
+                             'ipbx': ['dialplan reload'],
+                             'agentbus': []}
         self.device_db.template_has_sccp_device.return_value = False
 
         self.notifier.edited(self.func_key_template)
 
-        self.assertEquals(self.sysconfd.exec_request_handlers.call_count, 0)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_func_key_template_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteFuncKeyTemplateEvent(self.func_key_template.id)
@@ -84,16 +90,26 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
                                                         expected_event.routing_key)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(self):
+        expected_handlers = {'ctibus': [],
+                             'ipbx': ['dialplan reload'],
+                             'agentbus': []}
+        expected_handlers_sccp = {'ctibus': [],
+                                  'ipbx': ['module reload chan_sccp.so'],
+                                  'agentbus': []}
         self.device_db.template_has_sccp_device.return_value = True
 
         self.notifier.deleted(self.func_key_template)
 
         self.device_db.template_has_sccp_device.assert_called_once_with(self.func_key_template.id)
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+        calls = [call(expected_handlers), call(expected_handlers_sccp)]
+        self.sysconfd.exec_request_handlers.assert_has_calls(calls)
 
     def test_given_template_has_no_devices_when_deleted_then_sccp_not_reloaded(self):
+        expected_handlers = {'ctibus': [],
+                             'ipbx': ['dialplan reload'],
+                             'agentbus': []}
         self.device_db.template_has_sccp_device.return_value = False
 
         self.notifier.deleted(self.func_key_template)
 
-        self.assertEquals(self.sysconfd.exec_request_handlers.call_count, 0)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
