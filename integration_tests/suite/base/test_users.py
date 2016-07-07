@@ -387,7 +387,7 @@ def test_create_with_null_parameters_fills_default_values():
     response.assert_created('users')
 
     assert_that(response.item, has_entries(caller_id='"Charlie"',
-                                           call_transfer_enabled=True,
+                                           call_transfer_enabled=False,
                                            dtmf_hangup_enabled=False,
                                            call_record_enabled=False,
                                            online_call_record_enabled=False,
