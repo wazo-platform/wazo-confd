@@ -30,9 +30,8 @@ fields = {
     'user_id': fields.Integer,
     'voicemail_id': fields.Integer,
     'links': FieldList(Link('voicemails',
-                            route='voicemails.get',
                             field='voicemail_id',
-                            target='resource_id'),
+                            target='id'),
                        Link('users',
                             field='user_id',
                             target='id'))

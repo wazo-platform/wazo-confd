@@ -64,7 +64,8 @@ setup(
             'wizard_plugin = xivo_confd.plugins.wizard.plugin:Plugin',
             'user_entity_plugin = xivo_confd.plugins.user_entity.plugin:Plugin',
             'func_key_plugin = xivo_confd.plugins.func_key.plugin:Plugin',
-            'entity_plugin = xivo_confd.plugins.entity.plugin:Plugin'
+            'entity_plugin = xivo_confd.plugins.entity.plugin:Plugin',
+            'voicemail_plugin = xivo_confd.plugins.voicemail.plugin:Plugin'
         ]
     }
 )

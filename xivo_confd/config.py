@@ -122,6 +122,7 @@ DEFAULT_CONFIG = {
         'user_entity_plugin',
         'func_key_plugin',
         'entity_plugin',
+        'voicemail_plugin',
     ],
     'service_discovery': {
         'enabled': True,

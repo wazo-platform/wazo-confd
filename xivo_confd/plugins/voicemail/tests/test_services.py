@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import unittest
 from mock import Mock
 
 from xivo_dao.resources.voicemail.model import Voicemail
-from xivo_confd.resources.voicemails.services import VoicemailService
+from xivo_confd.plugins.voicemail.service import VoicemailService
 
 
 class TestVoicemailService(unittest.TestCase):

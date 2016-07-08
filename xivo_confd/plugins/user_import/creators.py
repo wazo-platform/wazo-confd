@@ -18,6 +18,8 @@
 
 import abc
 
+from xivo_confd.plugins.voicemail.resource import VoicemailSchema
+
 from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
@@ -66,6 +68,8 @@ class UserCreator(Creator):
 
 class VoicemailCreator(Creator):
 
+    schema = VoicemailSchema(handle_error=False, strict=True)
+
     def find(self, fields):
         number = fields.get('number')
         context = fields.get('context')
@@ -79,7 +83,12 @@ class VoicemailCreator(Creator):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
-            return self.service.create(Voicemail(**fields))
+            form = self.schema.load(fields).data
+            return self.service.create(Voicemail(**form))
+
+    def update(self, fields, model):
+        form = self.schema.load(fields, partial=True).data
+        super(VoicemailCreator, self).update(form, model)
 
 
 class LineCreator(Creator):

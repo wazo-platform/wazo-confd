@@ -216,6 +216,18 @@ def test_given_voicemail_contains_error_then_error_returned():
     assert_error(response, has_error_field('number'))
 
 
+@fixtures.csv_entry(voicemail=True)
+def test_update_voicemail_contains_error_then_error_returned(entry):
+    csv = [{"uuid": entry["user_uuid"],
+            "voicemail_number": "invalid",
+            "voicemail_password": "invalid",
+            }]
+
+    response = client.put("/users/import", csv)
+    assert_error(response, has_error_field('number'))
+    assert_error(response, has_error_field('password'))
+
+
 def test_given_csv_has_minimal_line_fields_then_line_created():
     csv = [{"firstname": "Chârles",
             "line_protocol": "sip",

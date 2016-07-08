@@ -56,7 +56,7 @@ from xivo_confd.plugins.user_import.associators import (LineAssociator,
                                                         VoicemailAssociator,
                                                         CallPermissionAssociator)
 
-from xivo_confd.resources.voicemails.services import build_service as build_voicemail_service
+from xivo_confd.plugins.voicemail.service import build_service as build_voicemail_service
 
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.call_permission import dao as call_permission_dao

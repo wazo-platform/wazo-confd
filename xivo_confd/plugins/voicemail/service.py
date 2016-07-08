@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.resources.voicemail import dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
 
-from xivo_confd.helpers.resource import CRUDService
 from xivo_confd import sysconfd
-from xivo_confd.resources.voicemails import notifier
-from xivo_confd.resources.voicemails.validator import build_validators
+from xivo_confd.helpers.resource import CRUDService
+from xivo_confd.plugins.voicemail.notifier import build_notifier
+from xivo_confd.plugins.voicemail.validator import build_validator
 
 
 class VoicemailService(CRUDService):
@@ -54,5 +54,7 @@ class VoicemailService(CRUDService):
 
 
 def build_service():
-    validator = build_validators()
-    return VoicemailService(dao, validator, notifier, sysconfd)
+    return VoicemailService(voicemail_dao,
+                            build_validator(),
+                            build_notifier(),
+                            sysconfd)

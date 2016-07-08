@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,17 +22,10 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 from xivo_confd.helpers.validator import (FindResource,
-                                          LANGUAGE_REGEX,
                                           MemberOfSequence,
-                                          MissingFields,
                                           Optional,
-                                          RegexField,
                                           ValidationGroup,
                                           Validator)
-
-
-NUMBER_REGEX = r"^[0-9]{1,40}$"
-PASSWORD_REGEX = r"^[0-9]{1,80}$"
 
 
 class NumberContextExists(Validator):
@@ -77,20 +70,13 @@ class AssociatedToUser(Validator):
                                              user_ids=user_ids)
 
 
-def build_validators():
+def build_validator():
     return ValidationGroup(
         common=[
-            MissingFields(),
             FindResource('context', context_dao.get, 'Context'),
-            RegexField.compile('number', NUMBER_REGEX, "numeric string (max length: 40)"),
-            Optional('language', RegexField.compile('language', LANGUAGE_REGEX)),
-            Optional('timezone', MemberOfSequence(
-                'timezone',
-                voicemail_dao.find_all_timezone,
-                'Timezone')),
-            Optional('password',
-                     RegexField.compile('password', PASSWORD_REGEX, "numeric string (max length: 80)")
-                     ),
+            Optional('timezone', MemberOfSequence('timezone',
+                                                  voicemail_dao.find_all_timezone,
+                                                  'Timezone')),
         ],
         create=[
             NumberContextExists(voicemail_dao)

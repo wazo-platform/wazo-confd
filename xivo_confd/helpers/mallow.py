@@ -21,8 +21,14 @@ from marshmallow import Schema, fields
 
 
 class BaseSchema(Schema):
-    def handle_error(self, error, data):
-        return abort(400, message=error.message)
+    def __init__(self, handle_error=True, *args, **kwargs):
+        super(BaseSchema, self).__init__(*args, **kwargs)
+
+        if handle_error:
+            def handle_error_fn(error, data):
+                return abort(400, message=error.message)
+
+            self.handle_error = handle_error_fn
 
     def on_bind_field(self, field_name, field_obj):
         # Without this, the nested schema handle error and abort. So the error

@@ -1,6 +1,5 @@
 
 from test_api import confd
-from test_api import config
 from test_api import fixtures
 from test_api import mocks
 from test_api import scenarios as s
@@ -12,61 +11,108 @@ from test_api.helpers import context as context_helper
 from hamcrest import assert_that, has_items, contains, has_entry, has_entries, has_item, is_not
 
 
-REQUIRED = ['name', 'number', 'context']
-
-BOGUS = [
-    ('name', 123, 'unicode string'),
-    ('number', 123, 'unicode string'),
-    ('number', 'fakenumber', 'numeric string'),
-    ('context', 123, 'unicode string'),
-    ('password', 123, 'unicode string'),
-    ('password', 'fakepassword', 'numeric string'),
-    ('password', 123, 'unicode string'),
-    ('email', 123, 'unicode string'),
-    ('language', 123, 'unicode string'),
-    ('timezone', 123, 'unicode string'),
-    ('max_messages', '3', 'integer'),
-    ('attach_audio', 'true', 'boolean'),
-    ('delete_messages', 'false', 'boolean'),
-    ('ask_password', 'true', 'boolean'),
-    ('options', '999', 'list of paired string tuples')
-]
-
-FAKE = [
-    ('context', 'wrongcontext', 'Context'),
-    ('language', 'fakelanguage', 'Language'),
-    ('timezone', 'faketimezone', 'Timezone')
-]
+def build_string(length):
+    return ''.join('a' for _ in range(length))
 
 
-class TestVoicemailResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.DeleteScenarios):
-
-    url = "/voicemails"
-    resource = "Voicemail"
-    required = REQUIRED
-    bogus_fields = BOGUS
-
-    def create_resource(self):
-        voicemail = vm_helper.generate_voicemail()
-        return voicemail['id']
-
-    def post_resource(self, parameters):
-        fields = _generate_fields()
-        fields.update(parameters)
-        return confd.voicemails.post(fields)
+def test_get_errors():
+    fake_get = confd.voicemails(999999).get
+    yield s.check_resource_not_found, fake_get, 'Voicemail'
 
 
-def _generate_fields():
-    number, context = vm_helper.generate_number_and_context()
-    return {'number': number, 'context': context, 'name': 'testvoicemail'}
+def test_post_errors():
+    url = confd.voicemails.post
+    for check in error_checks(url):
+        yield check
+
+    for check in error_required_checks(url):
+        yield check
+
+
+@fixtures.voicemail()
+def test_put_errors(voicemail):
+    fake_put = confd.voicemails(9999999).put
+    yield s.check_resource_not_found, fake_put, 'Voicemail'
+
+    url = confd.voicemails(voicemail['id']).put
+    for check in error_checks(url):
+        yield check
+
+
+def error_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'name', 123
+    yield s.check_bogus_field_returns_error, url, 'name', None
+    yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'name', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'number', 123
+    yield s.check_bogus_field_returns_error, url, 'number', None
+    yield s.check_bogus_field_returns_error, url, 'number', 'one'
+    yield s.check_bogus_field_returns_error, url, 'number', '#1234'
+    yield s.check_bogus_field_returns_error, url, 'number', '*1234'
+    yield s.check_bogus_field_returns_error, url, 'number', build_string(0)
+    yield s.check_bogus_field_returns_error, url, 'number', build_string(41)
+    yield s.check_bogus_field_returns_error, url, 'context', 123
+    yield s.check_bogus_field_returns_error, url, 'context', None
+    yield s.check_bogus_field_returns_error, url, 'context', True
+    yield s.check_bogus_field_returns_error, url, 'password', 123
+    yield s.check_bogus_field_returns_error, url, 'password', True
+    yield s.check_bogus_field_returns_error, url, 'password', 'one'
+    yield s.check_bogus_field_returns_error, url, 'password', '#1234'
+    yield s.check_bogus_field_returns_error, url, 'password', '*1234'
+    yield s.check_bogus_field_returns_error, url, 'password', build_string(0)
+    yield s.check_bogus_field_returns_error, url, 'password', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'email', 123
+    yield s.check_bogus_field_returns_error, url, 'email', True
+    yield s.check_bogus_field_returns_error, url, 'email', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'language', 123
+    yield s.check_bogus_field_returns_error, url, 'language', True
+    yield s.check_bogus_field_returns_error, url, 'timezone', 123
+    yield s.check_bogus_field_returns_error, url, 'timezone', True
+    yield s.check_bogus_field_returns_error, url, 'max_messages', 'string'
+    yield s.check_bogus_field_returns_error, url, 'max_messages', {}
+    yield s.check_bogus_field_returns_error, url, 'max_messages', []
+    yield s.check_bogus_field_returns_error, url, 'attach_audio', 'false'
+    yield s.check_bogus_field_returns_error, url, 'attach_audio', {}
+    yield s.check_bogus_field_returns_error, url, 'attach_audio', []
+    yield s.check_bogus_field_returns_error, url, 'delete_messages', 'true'
+    yield s.check_bogus_field_returns_error, url, 'delete_messages', None
+    yield s.check_bogus_field_returns_error, url, 'delete_messages', {}
+    yield s.check_bogus_field_returns_error, url, 'delete_messages', []
+    yield s.check_bogus_field_returns_error, url, 'ask_password', 'false'
+    yield s.check_bogus_field_returns_error, url, 'ask_password', None
+    yield s.check_bogus_field_returns_error, url, 'ask_password', {}
+    yield s.check_bogus_field_returns_error, url, 'ask_password', []
+    yield s.check_bogus_field_returns_error, url, 'options', 'string'
+    yield s.check_bogus_field_returns_error, url, 'options', 1234
+    yield s.check_bogus_field_returns_error, url, 'options', True
+    yield s.check_bogus_field_returns_error, url, 'options', None
+    yield s.check_bogus_field_returns_error, url, 'options', {}
+    yield s.check_bogus_field_returns_error, url, 'options', ['string']
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
+    yield s.check_bogus_field_returns_error, url, 'options', [{'string': 'string'}]
+    yield s.check_bogus_field_returns_error, url, 'options', [['string']]
+    yield s.check_bogus_field_returns_error, url, 'options', [[None, None]]
+    yield s.check_bogus_field_returns_error, url, 'options', [['string', 'string', 'string']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['string', 'string'], ['string']]
+
+
+def error_required_checks(url):
+    yield s.check_missing_required_field_returns_error, url, 'name'
+    yield s.check_missing_required_field_returns_error, url, 'number'
+    yield s.check_missing_required_field_returns_error, url, 'context'
 
 
 @fixtures.voicemail
 def test_fake_fields(voicemail):
+    fake = [
+        ('context', 'wrongcontext', 'Context'),
+        ('language', 'fakelanguage', 'Language'),
+        ('timezone', 'faketimezone', 'Timezone')
+    ]
     requests = (confd.voicemails.post,
                 confd.voicemails(voicemail['id']).put)
 
-    for (field, value, error_field) in FAKE:
+    for (field, value, error_field) in fake:
         for request in requests:
             fields = _generate_fields()
             fields[field] = value
@@ -74,28 +120,9 @@ def test_fake_fields(voicemail):
             yield response.assert_match, 400, e.not_found(error_field)
 
 
-def digit_field_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'number', 'one'
-    yield s.check_bogus_field_returns_error, url, 'number', '#1234'
-    yield s.check_bogus_field_returns_error, url, 'number', '*1234'
-    yield s.check_bogus_field_returns_error, url, 'password', 'one'
-    yield s.check_bogus_field_returns_error, url, 'password', '#1234'
-    yield s.check_bogus_field_returns_error, url, 'password', '*1234'
-
-
-def test_validation_on_digit_fields():
-    number = vm_helper.find_available_number()
-    url = confd.voicemails(number=number,
-                           name="test",
-                           context=config.CONTEXT).post
-
-    for check in digit_field_checks(url):
-        yield check
-
-    with fixtures.voicemail() as voicemail:
-        url = confd.voicemails(voicemail['id']).put
-        for check in digit_field_checks(url):
-            yield check
+def _generate_fields():
+    number, context = vm_helper.generate_number_and_context()
+    return {'number': number, 'context': context, 'name': 'testvoicemail'}
 
 
 @fixtures.voicemail()

@@ -18,6 +18,7 @@
 
 import logging
 
+from marshmallow import ValidationError
 from xivo_dao.helpers.exception import ServiceError
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ class ImportService(object):
             try:
                 entry = self.create_entry(row)
                 created.append(entry)
-            except ServiceError as e:
+            except (ServiceError, ValidationError) as e:
                 logger.warn("Error importing CSV row %s: %s", row.position, e)
                 errors.append(row.format_error(e))
 
@@ -57,7 +58,7 @@ class ImportService(object):
             try:
                 entry = self.update_row(row)
                 updated.append(entry)
-            except ServiceError as e:
+            except (ServiceError, ValidationError) as e:
                 logger.warn("ERROR importing CSV row %s: %s", row.position, e)
                 errors.append(row.format_error(e))
 

@@ -153,7 +153,7 @@ class ItemResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self._load_form()
+        form = self._load_form_partial()
         for name, value in form.iteritems():
             setattr(model, name, value)
         self.service.edit(model)
@@ -163,12 +163,12 @@ class ItemResource(ConfdResource):
         self.service.delete(model)
         return '', 204
 
-    def _load_form(self):
+    def _load_form_partial(self):
         # old style
         if getattr(self, 'parser', False):
             return self.parser.parse_args()
 
-        return self.schema.load(request.get_json()).data
+        return self.schema.load(request.get_json(), partial=True).data
 
     def _dump_result(self, model):
         # old style
