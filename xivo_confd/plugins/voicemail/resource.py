@@ -16,37 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import url_for
-from marshmallow import fields
-from marshmallow.validate import Regexp, Length
 
 from xivo_dao.resources.voicemail.model import Voicemail
+from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_confd.helpers.validator import LANGUAGE_REGEX
-
-NUMBER_REGEX = r"^[0-9]{1,40}$"
-PASSWORD_REGEX = r"^[0-9]{1,80}$"
-
-
-class VoicemailSchema(BaseSchema):
-    id = fields.Integer(dump_only=True)
-    name = fields.String(validate=Length(max=80), required=True)
-    number = fields.String(validate=Regexp(NUMBER_REGEX), required=True)
-    context = fields.String(required=True)
-    password = fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
-    email = fields.String(validate=Length(max=80), allow_none=True)
-    language = fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
-    timezone = fields.String(allow_none=True)
-    pager = fields.String(validate=Length(max=80), allow_none=True)
-    max_messages = fields.Integer(allow_none=True)
-    attach_audio = StrictBoolean(allow_none=True)
-    delete_messages = StrictBoolean()
-    ask_password = StrictBoolean()
-    enabled = StrictBoolean()
-    options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
-    links = ListLink(Link('voicemails'))
 
 
 class VoicemailList(ListResource):
