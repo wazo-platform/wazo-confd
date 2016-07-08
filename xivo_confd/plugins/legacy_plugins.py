@@ -23,7 +23,6 @@ from xivo_confd.resources.call_logs import actions as call_logs_actions
 from xivo_confd.resources.configuration import actions as configuration_actions
 from xivo_confd.resources.cti_profiles import actions as cti_profiles_actions
 from xivo_confd.resources.infos import actions as infos_actions
-from xivo_confd.resources.queue_members import actions as queue_members_actions
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,6 @@ class LegacyPlugins(object):
         self.load_resource(configuration_actions, core)
         self.load_resource(cti_profiles_actions, core)
         self.load_resource(infos_actions, core)
-        self.load_resource(queue_members_actions, core)
 
     def load_resource(self, module, core):
         logger.info("Loading legacy plugin: %s", module.__name__)

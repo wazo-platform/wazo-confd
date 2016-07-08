@@ -123,6 +123,7 @@ DEFAULT_CONFIG = {
         'func_key_plugin',
         'entity_plugin',
         'voicemail_plugin',
+        'queue_member_plugin',
     ],
     'service_discovery': {
         'enabled': True,
