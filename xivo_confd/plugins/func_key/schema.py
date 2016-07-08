@@ -23,7 +23,7 @@ from marshmallow import Schema, fields, validates, post_dump
 from marshmallow.validate import OneOf, Regexp, Range
 from marshmallow.exceptions import ValidationError
 
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
 EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
 
@@ -221,13 +221,7 @@ class FuncKeyTemplateSchema(BaseSchema):
     name = fields.String()
     keys = FuncKeyPositionField(fields.Integer(validate=Range(min=1)),
                                 fields.Nested(FuncKeySchema, required=True))
-
-    @post_dump
-    def generate_links(self, output):
-        endpoint = 'func_keys_templates'
-        output['links'] = [{'href': url_for(endpoint, id=output['id'], _external=True),
-                            'rel': endpoint}]
-        return output
+    links = ListLink(Link('func_keys_templates'))
 
 
 class FuncKeyUnifiedTemplateSchema(BaseSchema):
@@ -240,13 +234,9 @@ class FuncKeyUnifiedTemplateSchema(BaseSchema):
 class FuncKeyTemplateUserSchema(BaseSchema):
     user_id = fields.Integer()
     template_id = fields.Integer()
-
-    @post_dump
-    def generate_links(self, output):
-        fk_endpoint = 'func_keys_templates'
-        user_endpoint = 'users'
-        output['links'] = [{'href': url_for(user_endpoint, id=output['user_id'], _external=True),
-                            'rel': user_endpoint},
-                           {'href': url_for(fk_endpoint, id=output['template_id'], _external=True),
-                            'rel': fk_endpoint}]
-        return output
+    links = ListLink(Link('func_keys_templates',
+                          field='template_id',
+                          target='id'),
+                     Link('users',
+                          field='user_id',
+                          target='id'))

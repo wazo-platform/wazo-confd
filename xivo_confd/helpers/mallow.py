@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from flask import url_for
 from flask_restful import abort
 from marshmallow import Schema, fields
 
@@ -44,3 +45,44 @@ class StrictBoolean(fields.Boolean):
         if not isinstance(value, bool):
             self.fail('invalid')
         return value
+
+
+class Link(fields.Field):
+
+    _CHECK_ATTRIBUTE = False
+
+    def __init__(self, resource, route=None, field='id', target=None, **kwargs):
+        super(Link, self).__init__(dump_only=True, **kwargs)
+        self.resource = resource
+        self.route = route or resource
+        self.field = field
+        self.target = target or field
+
+    def _serialize(self, value, key, obj):
+        value = self.extract_value(obj)
+        if value:
+            options = {self.target: value, '_external': True}
+            url = url_for(self.route, **options)
+            return {'rel': self.resource, 'href': url}
+
+    def extract_value(self, obj):
+        if isinstance(obj, dict):
+            return obj.get(self.field)
+        return getattr(obj, self.field)
+
+
+class ListLink(fields.Field):
+
+    _CHECK_ATTRIBUTE = False
+
+    def __init__(self, *links, **kwargs):
+        super(ListLink, self).__init__(dump_only=True, **kwargs)
+        self.links = links
+
+    def _serialize(self, value, key, obj):
+        output = []
+        for link in self.links:
+            link_obj = link.serialize(key, obj)
+            if link_obj:
+                output.append(link_obj)
+        return output
