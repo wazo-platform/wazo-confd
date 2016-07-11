@@ -1,14 +1,26 @@
-import unittest
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2016 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from test_api import confd
-from test_api import errors as e
+from test_api import scenarios as s
 
 FAKE_ID = 999999999
 
 
-class TestCtiProfile(unittest.TestCase):
-
-    def test_fake_cti_profile(self):
-        response = confd.cti_profiles(FAKE_ID).get()
-        response.assert_match(404,
-                              e.not_found('CtiProfile'))
+def test_get_errors():
+    fake_get = confd.cti_profiles(FAKE_ID).get
+    yield s.check_resource_not_found, fake_get, 'CtiProfile'
