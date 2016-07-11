@@ -81,22 +81,6 @@ DEFAULT_CONFIG = {
         'host': 'localhost',
         'port': '8668'
     },
-    'default_plugins': [
-        "api",
-        "call_logs",
-        "configuration",
-        "cti_profiles",
-        "extensions",
-        "infos",
-        "queue_members",
-        "voicemails",
-        "line_extension",
-        "user_cti_profile",
-        "user_line",
-        "user_line_associated",
-        "user_voicemail",
-    ],
-    'extra_plugins': [],
     'enabled_plugins': [
         'legacy_plugins',
         'user_plugin',
