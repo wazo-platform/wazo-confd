@@ -68,6 +68,7 @@ setup(
             'voicemail_plugin = xivo_confd.plugins.voicemail.plugin:Plugin',
             'queue_member_plugin = xivo_confd.plugins.queue_member.plugin:Plugin',
             'cti_profile_plugin = xivo_confd.plugins.cti_profile.plugin:Plugin',
+            'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
         ]
     }
 )
