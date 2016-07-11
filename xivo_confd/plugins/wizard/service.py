@@ -93,7 +93,7 @@ class WizardService(object):
                          u'parent_ids': [],
                          u'raw_config': {u'ntp_enabled': True,
                                          u'ntp_ip': address,
-                                         u'sip_dtmf_mode': u'SIP-INFO'}}
+                                         u'sip_dtmf_mode': u'RTP-out-of-band'}}
         autoprov_config = {u'X_type': u'internal',
                            u'deletable': False,
                            u'id': u'autoprov',

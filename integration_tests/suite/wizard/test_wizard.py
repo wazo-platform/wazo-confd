@@ -463,7 +463,7 @@ class TestWizard(IntegrationTest):
              u'parent_ids': [],
              u'raw_config': {u'ntp_enabled': True,
                              u'ntp_ip': ip_address,
-                             u'sip_dtmf_mode': u'SIP-INFO'}}
+                             u'sip_dtmf_mode': u'RTP-out-of-band'}}
         ]
 
         assert_that(configs, equal_to(expected_config))
