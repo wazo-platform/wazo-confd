@@ -108,6 +108,7 @@ DEFAULT_CONFIG = {
         'entity_plugin',
         'voicemail_plugin',
         'queue_member_plugin',
+        'cti_profile_plugin',
     ],
     'service_discovery': {
         'enabled': True,
