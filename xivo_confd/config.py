@@ -110,6 +110,7 @@ DEFAULT_CONFIG = {
         'queue_member_plugin',
         'cti_profile_plugin',
         'info_plugin',
+        'call_log_plugin',
     ],
     'service_discovery': {
         'enabled': True,

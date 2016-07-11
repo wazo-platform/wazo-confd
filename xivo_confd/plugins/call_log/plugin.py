@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,20 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
+from xivo_confd import api
+from xivo_confd.plugins.call_log.service import build_service
+from xivo_confd.plugins.call_log.resource import CallLog
+from xivo_confd.plugins.call_log import serializer
+from xivo_confd.plugins.call_log import mapper
 
-from xivo_confd.resources.api import actions as api_actions
-from xivo_confd.resources.configuration import actions as configuration_actions
 
-logger = logging.getLogger(__name__)
-
-
-class LegacyPlugins(object):
+class Plugin(object):
 
     def load(self, core):
-        self.load_resource(api_actions, core)
-        self.load_resource(configuration_actions, core)
+        service = build_service()
 
-    def load_resource(self, module, core):
-        logger.info("Loading legacy plugin: %s", module.__name__)
-        module.load(core)
+        api.add_resource(CallLog,
+                         '/call_logs',
+                         resource_class_args=(service, serializer, mapper)
+                         )
