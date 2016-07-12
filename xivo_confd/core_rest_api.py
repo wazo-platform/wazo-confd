@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014-2015 Avencall
+# Copyright (C) 2014-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 
 import logging
 
-from xivo_confd.helpers.mooltiparse import parser as mooltiparse_parser
-
 from xivo_provd_client import new_provisioning_client_from_config
 
 logger = logging.getLogger(__name__)
@@ -30,7 +28,6 @@ class CoreRestApi(object):
         self.app = app
         self.api = api
         self.auth = auth
-        self.content_parser = mooltiparse_parser()
 
     @property
     def config(self):

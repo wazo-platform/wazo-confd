@@ -22,8 +22,6 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException, BadRequest
 
 from xivo_confd.helpers.common import handle_error
-from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
-from xivo_confd.helpers.mooltiparse.errors import ValidationError
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers.exception import ServiceError
 
@@ -58,24 +56,6 @@ class TestHandleError(TestCommon):
         expected_status_code = 400
         expected_message = ["service error"]
         exception = ServiceError("service error")
-
-        response = handle_error(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_validation_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["validation error"]
-        exception = ValidationError("validation error")
-
-        response = handle_error(exception)
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
-    def test_when_content_type_error_is_raised(self):
-        expected_status_code = 400
-        expected_message = ["content type error"]
-        exception = ContentTypeError("content type error")
 
         response = handle_error(exception)
 

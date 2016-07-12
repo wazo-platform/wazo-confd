@@ -26,15 +26,9 @@ from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import ServiceError
 from xivo_dao.helpers.exception import NotFoundError
 
-from xivo_confd.helpers.mooltiparse.errors import ValidationError
-from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
-
-
 logger = logging.getLogger(__name__)
 
-GENERIC_ERRORS = (ServiceError,
-                  ValidationError,
-                  ContentTypeError)
+GENERIC_ERRORS = (ServiceError,)
 
 NOT_FOUND_ERRORS = (NotFoundError,)
 
