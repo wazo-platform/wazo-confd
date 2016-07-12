@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ class TestCallLogs(unittest.TestCase):
         response = self.client.call_logs.get(start_date='',
                                              end_date='2013-01-29T00:00:00')
         response.assert_match(400,
-                              e.wrong_type(field='start_date', type='datetime'))
+                              e.missing_parameters(field='start_date', type='datetime'))
 
     def test_empty_end_date(self):
         response = self.client.call_logs.get(start_date='2013-01-29T00:00:00',
                                              end_date='')
         response.assert_match(400,
-                              e.wrong_type(field='end_date', type='datetime'))
+                              e.missing_parameters(field='end_date', type='datetime'))
