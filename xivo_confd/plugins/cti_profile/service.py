@@ -15,12 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from test_api import confd
-from test_api import scenarios as s
-
-FAKE_ID = 999999999
+from xivo_dao.resources.cti_profile import dao as cti_profile_dao
+from xivo_dao.resources.utils.search import SearchResult
 
 
-def test_get_errors():
-    fake_get = confd.cti_profiles(FAKE_ID).get
-    yield s.check_resource_not_found, fake_get, 'CtiProfile'
+class CtiProfileService(object):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def search(self, args):
+        items = self.dao.find_all()
+        return SearchResult(items=items, total=len(items))
+
+    def get(self, profile_id):
+        return self.dao.get(profile_id)
+
+
+def build_service():
+    return CtiProfileService(cti_profile_dao)
