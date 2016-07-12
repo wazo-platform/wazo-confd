@@ -70,6 +70,7 @@ setup(
             'cti_profile_plugin = xivo_confd.plugins.cti_profile.plugin:Plugin',
             'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
             'call_log_plugin = xivo_confd.plugins.call_log.plugin:Plugin',
+            'configuration_plugin = xivo_confd.plugins.configuration.plugin:Plugin',
         ]
     }
 )

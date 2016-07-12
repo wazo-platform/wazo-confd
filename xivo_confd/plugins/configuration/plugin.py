@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,18 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
-
-from xivo_confd.resources.api import actions as api_actions
-
-logger = logging.getLogger(__name__)
+from xivo_confd import api
+from xivo_confd.plugins.configuration.service import build_service
+from xivo_confd.plugins.configuration.resource import LiveReloadResource
 
 
-class LegacyPlugins(object):
+class Plugin(object):
 
     def load(self, core):
-        self.load_resource(api_actions, core)
+        service = build_service()
 
-    def load_resource(self, module, core):
-        logger.info("Loading legacy plugin: %s", module.__name__)
-        module.load(core)
+        api.add_resource(LiveReloadResource,
+                         '/configuration/live_reload',
+                         resource_class_args=(service,)
+                         )
