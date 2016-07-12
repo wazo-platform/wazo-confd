@@ -112,6 +112,7 @@ DEFAULT_CONFIG = {
         'info_plugin',
         'call_log_plugin',
         'configuration_plugin',
+        'api_plugin',
     ],
     'service_discovery': {
         'enabled': True,

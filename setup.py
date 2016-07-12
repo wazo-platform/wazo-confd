@@ -71,6 +71,7 @@ setup(
             'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
             'call_log_plugin = xivo_confd.plugins.call_log.plugin:Plugin',
             'configuration_plugin = xivo_confd.plugins.configuration.plugin:Plugin',
+            'api_plugin = xivo_confd.plugins.api.plugin:Plugin',
         ]
     }
 )
