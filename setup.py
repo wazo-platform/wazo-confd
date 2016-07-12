@@ -41,7 +41,6 @@ setup(
     entry_points={
         'xivo_confd.plugins': [
             'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
-            'legacy_plugins = xivo_confd.plugins.legacy_plugins:LegacyPlugins',
             'user_plugin = xivo_confd.plugins.user.plugin:Plugin',
             'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
             'endpoint_sip_plugin = xivo_confd.plugins.endpoint_sip.plugin:Plugin',

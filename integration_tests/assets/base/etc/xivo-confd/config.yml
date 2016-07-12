@@ -93,7 +93,6 @@ enabled_plugins:
    - line_extension_plugin
    - line_endpoint_plugin
    - line_device_plugin
-   - legacy_plugins
    - user_import_plugin
    - switchboard_plugin
    - call_permission_plugin

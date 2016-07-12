@@ -82,7 +82,6 @@ DEFAULT_CONFIG = {
         'port': '8668'
     },
     'enabled_plugins': [
-        'legacy_plugins',
         'user_plugin',
         'line_plugin',
         'endpoint_sip_plugin',
