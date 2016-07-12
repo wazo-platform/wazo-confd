@@ -28,9 +28,8 @@ fields = {
     'enabled': fields.Boolean,
     'cti_profile_id': fields.Integer(default=None),
     'links': FieldList(Link('cti_profiles',
-                            route='cti_profiles.get',
                             field='cti_profile_id',
-                            target='resource_id'),
+                            target='id'),
                        Link('users',
                             field='user_id',
                             target='id'))
