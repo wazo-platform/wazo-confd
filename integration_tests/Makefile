@@ -1,7 +1,7 @@
 .PHONY: test-setup distclean
 
-PROVD_DIR=../../xivo-provisioning
-MANAGE_DB_DIR=../../xivo-manage-db/
+PROVD_DIR=../../provisioning
+MANAGE_DB_DIR=../../manage-db/
 POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/postgres-test/Dockerfile
 
 

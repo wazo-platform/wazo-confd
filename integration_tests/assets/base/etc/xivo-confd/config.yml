@@ -93,7 +93,6 @@ enabled_plugins:
    - line_extension_plugin
    - line_endpoint_plugin
    - line_device_plugin
-   - legacy_plugins
    - user_import_plugin
    - switchboard_plugin
    - call_permission_plugin
@@ -106,5 +105,6 @@ enabled_plugins:
    - info_plugin
    - call_log_plugin
    - configuration_plugin
+   - api_plugin
 
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c

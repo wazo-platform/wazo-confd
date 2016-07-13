@@ -82,7 +82,6 @@ DEFAULT_CONFIG = {
         'port': '8668'
     },
     'enabled_plugins': [
-        'legacy_plugins',
         'user_plugin',
         'line_plugin',
         'endpoint_sip_plugin',
@@ -112,6 +111,7 @@ DEFAULT_CONFIG = {
         'info_plugin',
         'call_log_plugin',
         'configuration_plugin',
+        'api_plugin',
     ],
     'service_discovery': {
         'enabled': True,

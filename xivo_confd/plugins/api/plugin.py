@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,25 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask import Blueprint
-from xivo_confd import config
+from xivo_confd import api
 
-import json
-from pkg_resources import resource_string
-
-PACKAGE = 'xivo_confd.resources.api'
+from xivo_confd.plugins.api.resource import SwaggerResource
 
 
-def load(core_rest_api):
-    blueprint = Blueprint('api', __name__, url_prefix='/%s/api' % config.API_VERSION)
-    blueprint.add_url_rule('/api.json', 'api', api)
-    core_rest_api.register(blueprint)
+class Plugin(object):
 
-
-def api():
-    try:
-        api_spec = resource_string(PACKAGE, 'api.json')
-    except IOError:
-        msg = json.dumps(["API spec does not exist"])
-        return (msg, 404)
-    return (api_spec, 200, {'Content-Type': 'application/json'})
+    def load(self, core):
+        api.add_resource(SwaggerResource,
+                         '/api/api.json')

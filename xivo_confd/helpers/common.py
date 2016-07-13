@@ -23,19 +23,12 @@ from flask_restful.utils import http_status_message
 from flask import g
 
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import ServiceError
 from xivo_dao.helpers.exception import NotFoundError
 
-from xivo_confd.helpers.mooltiparse.errors import ValidationError
-from xivo_confd.helpers.mooltiparse.errors import ContentTypeError
-
-
 logger = logging.getLogger(__name__)
 
-GENERIC_ERRORS = (ServiceError,
-                  ValidationError,
-                  ContentTypeError)
+GENERIC_ERRORS = (ServiceError,)
 
 NOT_FOUND_ERRORS = (NotFoundError,)
 
@@ -101,54 +94,3 @@ def extract_http_messages(error):
 def error_response(messages, code):
     response = json.dumps(messages)
     return (response, code, {'Content-Type': 'application/json'})
-
-
-class ParameterExtractor(object):
-
-    PARAMETERS = ('search', 'direction', 'order')
-    NUMERIC = ('limit', 'skip', 'offset')
-    DIRECTIONS = ('asc', 'desc')
-
-    def __init__(self, extra):
-        self.extra = extra
-
-    def extract(self, arguments):
-        self._reset()
-
-        for name in self.NUMERIC:
-            self._extract_numeric(name, arguments)
-
-        all_parameters = self.PARAMETERS + tuple(self.extra)
-        for parameter in all_parameters:
-            self._extract_parameter(parameter, arguments)
-
-        self._validate_direction()
-
-        return self.extracted
-
-    def _reset(self):
-        self.extracted = {}
-
-    def _extract_numeric(self, name, arguments):
-        value = arguments.get(name, None)
-        if value:
-            if not value.isdigit():
-                raise errors.wrong_type(name, 'positive number')
-            value = int(value)
-            if value < 0:
-                raise errors.wrong_type(name, 'positive number')
-            self.extracted[name] = value
-
-    def _extract_parameter(self, name, arguments):
-        if name in arguments:
-            self.extracted[name] = arguments[name]
-
-    def _validate_direction(self):
-        if 'direction' in self.extracted:
-            if self.extracted['direction'] not in self.DIRECTIONS:
-                raise errors.invalid_direction()
-
-
-def extract_search_parameters(arguments, extra=None):
-    extra = extra or []
-    return ParameterExtractor(extra).extract(arguments)
