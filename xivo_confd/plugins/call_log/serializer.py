@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-
-# Copyright (C) 2015-2016 Avencall
+#
+# Copyright (C) 2012-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,20 +16,30 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
+import csv
+from StringIO import StringIO
+from xivo.unicode_csv import UnicodeDictWriter
 
-from xivo_confd.resources.api import actions as api_actions
-from xivo_confd.resources.configuration import actions as configuration_actions
+CSV_HEADERS = ['Call Date',
+               'Caller',
+               'Called',
+               'Period',
+               'user Field']
 
-logger = logging.getLogger(__name__)
+
+def encode_list(call_logs):
+    response = StringIO()
+    write_headers(response, CSV_HEADERS)
+    write_body(response, CSV_HEADERS, call_logs)
+    return response.getvalue()
 
 
-class LegacyPlugins(object):
+def write_headers(csv_file, headers):
+    writer = csv.writer(csv_file)
+    writer.writerow(headers)
 
-    def load(self, core):
-        self.load_resource(api_actions, core)
-        self.load_resource(configuration_actions, core)
 
-    def load_resource(self, module, core):
-        logger.info("Loading legacy plugin: %s", module.__name__)
-        module.load(core)
+def write_body(csv_file, headers, call_logs):
+    writer = UnicodeDictWriter(csv_file, CSV_HEADERS)
+    for call_log in call_logs:
+        writer.writerow(call_log)

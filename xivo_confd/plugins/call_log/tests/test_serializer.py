@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (C) 2012  Avencall
+# Copyright (C) 2012-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,13 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from datetime import datetime, timedelta
 from hamcrest import assert_that, equal_to
-from mock import Mock
 import textwrap
 from unittest import TestCase
-from xivo_confd.resources.call_logs import serializer
-from xivo_confd.resources.call_logs.serializer import CSV_HEADERS
+from xivo_confd.plugins.call_log import serializer
+from xivo_confd.plugins.call_log.serializer import CSV_HEADERS
 
 
 class TestCallLogsSerializer(TestCase):

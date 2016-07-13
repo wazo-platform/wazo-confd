@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (C) 2012  Avencall
+# Copyright (C) 2012-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 from hamcrest import assert_that, has_entries, has_entry
 from mock import Mock
 from unittest import TestCase
-from xivo_confd.resources.call_logs import mapper
+from xivo_confd.plugins.call_log import mapper
 
 
 class TestCallLogsMapper(TestCase):

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-#
-# Copyright (C) 2012  Avencall
+
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,30 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import csv
-from StringIO import StringIO
-from xivo.unicode_csv import UnicodeDictWriter
-
-CSV_HEADERS = ['Call Date',
-               'Caller',
-               'Called',
-               'Period',
-               'user Field']
+from xivo_confd import api
+from xivo_confd.plugins.call_log.service import build_service
+from xivo_confd.plugins.call_log.resource import CallLog
+from xivo_confd.plugins.call_log import serializer
+from xivo_confd.plugins.call_log import mapper
 
 
-def encode_list(call_logs):
-    response = StringIO()
-    write_headers(response, CSV_HEADERS)
-    write_body(response, CSV_HEADERS, call_logs)
-    return response.getvalue()
+class Plugin(object):
 
+    def load(self, core):
+        service = build_service()
 
-def write_headers(csv_file, headers):
-    writer = csv.writer(csv_file)
-    writer.writerow(headers)
-
-
-def write_body(csv_file, headers, call_logs):
-    writer = UnicodeDictWriter(csv_file, CSV_HEADERS)
-    for call_log in call_logs:
-        writer.writerow(call_log)
+        api.add_resource(CallLog,
+                         '/call_logs',
+                         resource_class_args=(service, serializer, mapper)
+                         )
