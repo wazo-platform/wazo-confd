@@ -18,8 +18,6 @@
 import unittest
 from mock import Mock
 
-from xivo_confd.helpers.bus_publisher import BusPublisher
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.configuration.notifier import LiveReloadNotifier
 from xivo_bus.resources.configuration.event import LiveReloadEditedEvent
 
@@ -27,8 +25,8 @@ from xivo_bus.resources.configuration.event import LiveReloadEditedEvent
 class TestLiveReloadNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.bus = Mock(BusPublisher)
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.bus = Mock()
+        self.sysconfd = Mock()
         self.device_db = Mock()
         self.live_reload = {'enabled': True}
         self.notifier = LiveReloadNotifier(self.bus, self.sysconfd)

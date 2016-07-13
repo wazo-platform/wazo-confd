@@ -22,7 +22,6 @@ from mock import Mock
 from xivo_bus.resources.endpoint_sccp.event import CreateSccpEndpointEvent, \
     EditSccpEndpointEvent, DeleteSccpEndpointEvent
 
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.endpoint_sccp.notifier import SccpEndpointNotifier
 
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
@@ -36,7 +35,7 @@ SYSCONFD_HANDLERS = {'ctibus': [],
 class TestSccpEndpointNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.sysconfd = Mock()
         self.bus = Mock()
         self.sccp_endpoint = Mock(SCCPEndpoint, id=1234)
 

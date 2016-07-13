@@ -26,16 +26,14 @@ from xivo_bus.resources.voicemail.event import (CreateVoicemailEvent,
                                                 DeleteVoicemailEvent,
                                                 EditVoicemailEvent)
 
-from xivo_confd.helpers.bus_publisher import BusPublisher
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.voicemail.notifier import VoicemailNotifier
 
 
 class TestVoicemailNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.bus = Mock(BusPublisher)
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.bus = Mock()
+        self.sysconfd = Mock()
         self.device_db = Mock()
         self.voicemail = Mock(Voicemail, id=10)
         self.notifier = VoicemailNotifier(self.bus, self.sysconfd)

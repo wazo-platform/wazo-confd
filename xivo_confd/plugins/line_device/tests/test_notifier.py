@@ -25,7 +25,6 @@ from hamcrest import assert_that, equal_to
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_confd.plugins.device.model import Device
 
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.line_device.notifier import LineDeviceNotifier
 
 
@@ -36,7 +35,7 @@ class TestLineDeviceNotifier(unittest.TestCase):
                         'ctibus': []}
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.sysconfd = Mock()
         self.line = Mock(Line)
         self.device = Mock(Device)
         self.notifier = LineDeviceNotifier(self.sysconfd)

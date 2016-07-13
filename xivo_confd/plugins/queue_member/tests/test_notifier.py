@@ -22,16 +22,14 @@ from xivo_bus.resources.queue_members.event import (AgentQueueAssociatedEvent,
                                                     AgentQueueAssociationEditedEvent,
                                                     AgentRemovedFromQueueEvent)
 from xivo_confd.plugins.queue_member.notifier import QueueMemberNotifier
-from xivo_confd.helpers.bus_publisher import BusPublisher
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_dao.resources.queue_members.model import QueueMemberAgent
 
 
 class TestQueueMemberNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.bus = Mock(BusPublisher)
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.bus = Mock()
+        self.sysconfd = Mock()
         self.device_db = Mock()
         self.queue_member = Mock(QueueMemberAgent, agent_id=10, queue_id=100, penalty=5)
         self.notifier = QueueMemberNotifier(self.bus, self.sysconfd)

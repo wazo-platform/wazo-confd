@@ -26,16 +26,14 @@ from xivo_bus.resources.func_key.event import (CreateFuncKeyTemplateEvent,
                                                DeleteFuncKeyTemplateEvent,
                                                EditFuncKeyTemplateEvent)
 
-from xivo_confd.helpers.bus_publisher import BusPublisher
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.func_key.notifier import FuncKeyTemplateNotifier
 
 
 class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.bus = Mock(BusPublisher)
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.bus = Mock()
+        self.sysconfd = Mock()
         self.device_db = Mock()
         self.func_key_template = Mock(FuncKeyTemplate, id=10)
         self.notifier = FuncKeyTemplateNotifier(self.bus, self.sysconfd, self.device_db)

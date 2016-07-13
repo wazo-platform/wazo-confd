@@ -23,7 +23,6 @@ from xivo_bus.resources.extension.event import (CreateExtensionEvent,
                                                 EditExtensionEvent,
                                                 DeleteExtensionEvent)
 
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.extension.notifier import ExtensionNotifier
 
 from xivo_dao.alchemy.extension import Extension
@@ -32,7 +31,7 @@ from xivo_dao.alchemy.extension import Extension
 class TestExtensionNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.sysconfd = Mock()
         self.bus = Mock()
         self.extension = Mock(Extension, id=1234, exten='1000', context='default')
 

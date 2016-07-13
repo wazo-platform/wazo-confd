@@ -22,7 +22,6 @@ from mock import Mock
 from xivo_bus.resources.line.event import CreateLineEvent, \
     EditLineEvent, DeleteLineEvent
 
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.line.notifier import LineNotifier
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
@@ -36,7 +35,7 @@ SYSCONFD_HANDLERS = {'ctibus': [],
 class TestLineNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.sysconfd = Mock()
         self.bus = Mock()
         self.line = Mock(Line, id=1234)
 

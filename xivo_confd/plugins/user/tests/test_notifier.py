@@ -24,7 +24,6 @@ from xivo_bus.resources.user.event import (CreateUserEvent,
                                            DeleteUserEvent,
                                            EditUserServiceEvent,
                                            EditUserForwardEvent)
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
 from xivo_confd.plugins.user.notifier import UserNotifier, UserServiceNotifier, UserForwardNotifier
 from xivo_confd.plugins.user.resource_sub import (ServiceDNDSchema,
                                                   ServiceIncallFilterSchema,
@@ -49,7 +48,7 @@ def sysconfd_handler(action, user_id):
 class TestUserNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd = Mock(SysconfdPublisher)
+        self.sysconfd = Mock()
         self.bus = Mock()
         self.user = Mock(User, id=1234)
 
