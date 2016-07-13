@@ -105,5 +105,6 @@ enabled_plugins:
    - cti_profile_plugin
    - info_plugin
    - call_log_plugin
+   - configuration_plugin
 
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c

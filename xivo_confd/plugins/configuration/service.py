@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,16 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao.resources.configuration import dao as configuration_dao
 
-from xivo_dao.helpers import errors
-
-LIVE_RELOAD_PARAM = 'enabled'
+from xivo_confd.plugins.configuration.notifier import build_notifier
 
 
-def validate_live_reload_data(data):
-    if data.get(LIVE_RELOAD_PARAM) is None:
-        raise errors.missing(LIVE_RELOAD_PARAM)
-    if len(data) > 1:
-        params = data.keys()
-        params.remove(LIVE_RELOAD_PARAM)
-        raise errors.unknown(*params)
+class LiveReloadService(object):
+
+    def __init__(self, dao, notifier):
+        self.dao = dao
+        self.notifier = notifier
+
+    def get(self):
+        return {'enabled': self.dao.is_live_reload_enabled()}
+
+    def edit(self, live_reload):
+        self.dao.set_live_reload_status(live_reload)
+        self.notifier.edited(live_reload)
+
+
+def build_service():
+    return LiveReloadService(configuration_dao,
+                             build_notifier())

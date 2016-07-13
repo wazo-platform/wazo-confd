@@ -19,7 +19,6 @@
 import logging
 
 from xivo_confd.resources.api import actions as api_actions
-from xivo_confd.resources.configuration import actions as configuration_actions
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ class LegacyPlugins(object):
 
     def load(self, core):
         self.load_resource(api_actions, core)
-        self.load_resource(configuration_actions, core)
 
     def load_resource(self, module, core):
         logger.info("Loading legacy plugin: %s", module.__name__)

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-#
-# Copyright (C) 2012  Avencall
+
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,3 +15,18 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from xivo_confd import api
+from xivo_confd.plugins.configuration.service import build_service
+from xivo_confd.plugins.configuration.resource import LiveReloadResource
+
+
+class Plugin(object):
+
+    def load(self, core):
+        service = build_service()
+
+        api.add_resource(LiveReloadResource,
+                         '/configuration/live_reload',
+                         resource_class_args=(service,)
+                         )

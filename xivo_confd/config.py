@@ -111,6 +111,7 @@ DEFAULT_CONFIG = {
         'cti_profile_plugin',
         'info_plugin',
         'call_log_plugin',
+        'configuration_plugin',
     ],
     'service_discovery': {
         'enabled': True,
