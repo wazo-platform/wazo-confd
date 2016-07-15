@@ -19,7 +19,14 @@
 
 import unittest
 
+from datetime import datetime
+from datetime import timedelta
+from hamcrest import assert_that
+from hamcrest import contains
+from hamcrest import empty
+
 from test_api import errors as e
+from test_api import fixtures
 from test_api.setup import new_client
 
 
@@ -49,3 +56,104 @@ class TestCallLogs(unittest.TestCase):
                                              end_date='')
         response.assert_match(400,
                               e.missing_parameters(field='end_date', type='datetime'))
+
+    @fixtures.call_log(date=datetime(2013, 1, 30, 8, 46, 20),
+                       source_name=u'Père Noël',
+                       source_exten='1009',
+                       destination_exten='1001',
+                       duration=timedelta(seconds=3),
+                       answered=True)
+    @fixtures.call_log(date=datetime(2013, 1, 30, 11, 3, 47),
+                       source_name='Bob Marley',
+                       source_exten='1002',
+                       destination_exten='4185550155',
+                       duration=timedelta(seconds=0),
+                       answered=False)
+    @fixtures.call_log(date=datetime(2013, 1, 30, 11, 20, 8),
+                       source_name='Bob Marley',
+                       source_exten='1002',
+                       destination_exten='4185550155',
+                       duration=timedelta(seconds=3),
+                       user_field=u'Père Noël',
+                       answered=True)
+    def test_list_call_logs(self, _, __, ___):
+        expected = contains({'Call Date': '2013-01-30T08:46:20',
+                             'Caller': u'Père Noël (1009)',
+                             'Called': '1001',
+                             'Period': '3',
+                             'user Field': ''},
+                            {'Call Date': '2013-01-30T11:03:47',
+                             'Caller': 'Bob Marley (1002)',
+                             'Called': '4185550155',
+                             'Period': '0',
+                             'user Field': ''},
+                            {'Call Date': '2013-01-30T11:20:08',
+                             'Caller': 'Bob Marley (1002)',
+                             'Called': '4185550155',
+                             'Period': '3',
+                             'user Field': u'Père Noël'})
+
+        response = self.client.call_logs.get()
+
+        assert_that(response.csv(), expected)
+
+    @fixtures.call_log(date=datetime(2013, 1, 30, 8, 46, 20),
+                       source_name=u'Père, Noël',
+                       source_exten='1009',
+                       destination_exten='1001',
+                       duration=timedelta(seconds=3),
+                       answered=True)
+    def test_list_call_logs_with_csv_separator_inside_fields(self, _):
+        expected = contains({'Call Date': '2013-01-30T08:46:20',
+                             'Caller': u'Père, Noël (1009)',
+                             'Called': '1001',
+                             'Period': '3',
+                             'user Field': ''})
+
+        response = self.client.call_logs.get()
+
+        assert_that(response.csv(), expected)
+
+    @fixtures.call_log(date=datetime(2013, 1, 30, 8, 46, 20),
+                       source_name=u'Père, Noël',
+                       source_exten='1009',
+                       destination_exten='1001',
+                       duration=timedelta(seconds=3),
+                       answered=True)
+    def test_list_end_sooner_than_start(self, _):
+        expected = empty()
+
+        response = self.client.call_logs.get(start_date='2013-01-31T00:00:00',
+                                             end_date='2013-01-30T00:00:00')
+
+        assert_that(response.csv(), expected)
+
+    @fixtures.call_log(date=datetime(2013, 1, 29, 8, 46, 20),
+                       source_name=u'Père Noël',
+                       source_exten='1009',
+                       destination_exten='1001',
+                       duration=timedelta(seconds=3),
+                       answered=True)
+    @fixtures.call_log(date=datetime(2013, 1, 30, 11, 13, 47),
+                       source_name='Bob Marley',
+                       source_exten='1002',
+                       destination_exten='4185550155',
+                       duration=timedelta(seconds=0),
+                       answered=False)
+    @fixtures.call_log(date=datetime(2013, 1, 31, 11, 20, 8),
+                       source_name='Bob Marley',
+                       source_exten='1002',
+                       destination_exten='4185550155',
+                       duration=timedelta(seconds=3),
+                       user_field=u'Père Noël',
+                       answered=True)
+    def test_when_list_in_period_then_call_logs_are_filtered(self, _, __, ___):
+        expected = contains({'Call Date': '2013-01-30T11:13:47',
+                             'Caller': 'Bob Marley (1002)',
+                             'Called': '4185550155',
+                             'Period': '0',
+                             'user Field': ''})
+
+        response = self.client.call_logs.get(start_date='2013-01-30T11:11:11', end_date='2013-01-30T12:12:12')
+
+        assert_that(response.csv(), expected)

@@ -723,6 +723,24 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def insert_call_log(self, date, source_name, source_exten, destination_exten, duration, user_field, answered):
+        query = text("""INSERT INTO call_log(date, source_name, source_exten, destination_exten, duration, user_field, answered)
+                        VALUES (:date, :source_name, :source_exten, :destination_exten, :duration, :user_field, :answered)
+                        RETURNING id""")
+        return self.connection.execute(query,
+                                       date=date,
+                                       source_name=source_name,
+                                       source_exten=source_exten,
+                                       destination_exten=destination_exten,
+                                       duration=duration,
+                                       user_field=user_field,
+                                       answered=answered).scalar()
+
+    def delete_call_log(self, call_log_id):
+        query = text("""DELETE from call_log
+                        WHERE id = :id""")
+        self.connection.execute(query, id=call_log_id)
+
 
 def create_helper():
     user = os.environ.get('DB_USER', 'asterisk')
