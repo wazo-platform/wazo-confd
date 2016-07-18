@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
 #
@@ -16,37 +16,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import user
-import line
-import line_sip
-import extension
-import device
-import voicemail
-import user_line
-import user_voicemail
-import user_cti_profile
-import line_extension
-import line_device
-import line_endpoint_custom
-import line_endpoint_sip
-import line_endpoint_sccp
-import cti_profile
-import endpoint_sip
-import endpoint_sccp
-import endpoint_custom
-import user_import
-import user_call_permission
-import switchboard
-import call_permission
-import entity
-import user_entity
-import funckey_template
-import user_funckey_template
-import call_pickup
-import call_pickup_entity
-import call_filter
-import call_filter_entity
-import context_entity
-import schedule
-import schedule_entity
-import call_log
+from test_api import db
+
+
+def generate_call_log(date, source_name, source_exten, destination_exten, duration, answered, user_field=''):
+    call_log = {'date': date,
+                'source_name': source_name,
+                'source_exten': source_exten,
+                'destination_exten': destination_exten,
+                'duration': duration,
+                'answered': answered,
+                'user_field': user_field}
+
+    with db.queries() as queries:
+        call_log['id'] = queries.insert_call_log(**call_log)
+
+    return call_log
+
+
+def delete_call_log(call_log_id, check=False):
+    with db.queries() as queries:
+        queries.delete_call_log(call_log_id)
