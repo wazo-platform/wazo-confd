@@ -129,6 +129,22 @@ def test_associate_two_internal_extensions_to_same_line(first_extension, second_
     response.assert_match(400, e.resource_associated('Line', 'Extension'))
 
 
+@fixtures.extension()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_associate_multi_lines_to_extension(extension, line1, line2, line3):
+    response = confd.lines(line1['id']).extensions.post(extension_id=extension['id'])
+    response.assert_created('lines', 'extensions')
+
+    response = confd.lines(line2['id']).extensions.post(extension_id=extension['id'])
+    response.assert_created('lines', 'extensions')
+
+    response = confd.lines(line3['id']).extensions.post(extension_id=extension['id'])
+    response.assert_created('lines', 'extensions')
+
+
+
 @fixtures.line()
 @fixtures.extension()
 def test_associate_line_without_endpoint(line, extension):
