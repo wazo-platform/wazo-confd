@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2016 Avencall
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 from test_api.helpers.line_sip import generate_line, delete_line
 from test_api.helpers.extension import generate_extension, delete_extension
 from test_api import scenarios as s
@@ -143,6 +161,46 @@ def test_associate_multi_lines_to_extension(extension, line1, line2, line3):
     response = confd.lines(line3['id']).extensions.post(extension_id=extension['id'])
     response.assert_created('lines', 'extensions')
 
+
+@fixtures.user()
+@fixtures.extension()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_associate_multi_lines_to_extension_with_same_user(user, extension, line1, line2):
+    with a.user_line(user, line1), a.user_line(user, line2):
+        response = confd.lines(line1['id']).extensions.post(extension_id=extension['id'])
+        response.assert_created('lines', 'extensions')
+
+        response = confd.lines(line2['id']).extensions.post(extension_id=extension['id'])
+        response.assert_created('lines', 'extensions')
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.extension()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_associate_multi_lines_to_extension_with_different_user(user1, user2, extension, line1, line2):
+    with a.user_line(user1, line1), a.user_line(user2, line2):
+        response = confd.lines(line1['id']).extensions.post(extension_id=extension['id'])
+        response.assert_created('lines', 'extensions')
+
+        response = confd.lines(line2['id']).extensions.post(extension_id=extension['id'])
+        response.assert_match(400, e.resource_associated('User', 'Line'))
+
+
+@fixtures.user()
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extension1, extension2, line1, line2):
+    with a.user_line(user, line1), a.user_line(user, line2):
+        response = confd.lines(line1['id']).extensions.post(extension_id=extension1['id'])
+        response.assert_created('lines', 'extensions')
+
+        response = confd.lines(line2['id']).extensions.post(extension_id=extension2['id'])
+        response.assert_created('lines', 'extensions')
 
 
 @fixtures.line()
