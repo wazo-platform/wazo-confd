@@ -30,10 +30,18 @@ class UserLineAssociationValidator(Validator):
 
     def validate(self, user, line):
         self.validate_line_has_endpoint(line)
+        self.validate_user_line_not_already_associated(user, line)
 
     def validate_line_has_endpoint(self, line):
         if not line.is_associated():
             raise errors.missing_association('Line', 'Endpoint',
+                                             line_id=line.id)
+
+    def validate_user_line_not_already_associated(self, user, line):
+        user_line = user_line_dao.find_by(user_id=user.id, line_id=line.id)
+        if user_line:
+            raise errors.resource_associated('User', 'Line',
+                                             user_id=user.id,
                                              line_id=line.id)
 
 class UserLineDissociationValidator(Validator):
