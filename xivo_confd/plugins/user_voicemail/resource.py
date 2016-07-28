@@ -60,7 +60,7 @@ class UserVoicemailResource(ConfdResource):
         return self.user_dao.get_by_id_uuid(user_id)
 
 
-class UserVoicemailRoot(UserVoicemailResource):
+class UserVoicemailLegacy(UserVoicemailResource):
 
     @required_acl('confd.users.{user_id}.voicemail.read')
     def get(self, user_id):
@@ -89,6 +89,23 @@ class UserVoicemailRoot(UserVoicemailResource):
                       voicemail_id=model.voicemail_id,
                       _external=True)
         return {'Location': url}
+
+
+def UserVoicemailItem(UserVoicemailLegacy):
+
+    @required_acl('confd.users.{user_id}.voicemails.read')
+    def get(self, user_id):
+        user = self.get_user(user_id)
+        user_voicemail = self.service.get_by(user_id=user.id)
+        return marshal(user_voicemail, fields)
+
+    @required_acl('confd.users.{user_id}.voicemails.delete')
+    def delete(self, user_id):
+        user = self.get_user(user_id)
+        user_voicemail = self.service.get_by(user_id=user.id)
+        voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
+        self.service.dissociate(user, voicemail)
+        return '', 204
 
 
 class VoicemailUserList(UserVoicemailResource):

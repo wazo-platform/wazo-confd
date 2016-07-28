@@ -141,28 +141,3 @@ def test_dissociate_using_uuid(user, voicemail):
 def test_dissociate_when_not_associated(user):
     response = confd.users(user['id']).voicemail.delete()
     response.assert_match(404, e.not_found('UserVoicemail'))
-
-
-@fixtures.user()
-@fixtures.voicemail()
-def test_delete_user_when_still_associated(user, voicemail):
-    with a.user_voicemail(user, voicemail):
-        response = confd.users(user['id']).delete()
-        response.assert_match(400, e.resource_associated('User', 'Voicemail'))
-
-
-@fixtures.user()
-@fixtures.voicemail()
-def test_delete_voicemail_when_still_associated(user, voicemail):
-    with a.user_voicemail(user, voicemail):
-        response = confd.voicemails(voicemail['id']).delete()
-        response.assert_match(400, e.resource_associated('Voicemail', 'User'))
-
-
-@fixtures.user()
-@fixtures.voicemail()
-def test_edit_voicemail_when_still_associated(user, voicemail):
-    number = h.voicemail.find_available_number(voicemail['context'])
-    with a.user_voicemail(user, voicemail):
-        response = confd.voicemails(voicemail['id']).put(number=number)
-        response.assert_updated()
