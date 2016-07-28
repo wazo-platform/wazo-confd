@@ -42,7 +42,9 @@ no_user_associated_regex = re.compile(r"line with id \d+ is not associated to a 
 already_associated_regex = re.compile(r"line with id \d+ already has an extension with a context of type 'internal'")
 
 
-class TestLineExtensionCollectionAssociation(s.AssociationScenarios, s.DissociationCollectionScenarios, s.AssociationGetCollectionScenarios):
+class TestLineExtensionCollectionAssociation(s.AssociationScenarios,
+                                             s.DissociationCollectionScenarios,
+                                             s.AssociationGetCollectionScenarios):
 
     left_resource = "Line"
     right_resource = "Extension"
@@ -90,6 +92,16 @@ class TestLineExtensionAssociation(s.AssociationScenarios, s.DissociationScenari
         return confd.lines(line_id).extension.get()
 
 
+@fixtures.line()
+@fixtures.extension()
+def test_associate_errors(line, extension):
+    fake_line = confd.lines(FAKE_ID).extensions(extension['id']).put
+    fake_extension = confd.lines(line['id']).extensions(FAKE_ID).put
+
+    yield s.check_resource_not_found, fake_line, 'Line'
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+
+
 @fixtures.line_sip()
 def test_get_associations_when_not_associated(line):
     response = confd.lines(line['id']).extensions.get()
@@ -118,19 +130,18 @@ def test_get_line_from_fake_extension():
 @fixtures.line_sip()
 @fixtures.extension()
 def test_associate_line_and_internal_extension(line, extension):
-    expected = has_entries({'line_id': line['id'],
-                            'extension_id': extension['id']})
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-
-    response.assert_created('lines', 'extensions')
-    assert_that(response.item, expected)
+    response = confd.lines(line['id']).extensions.get()
+    assert_that(response.items, contains(has_entries({'line_id': line['id'],
+                                                      'extension_id': extension['id']})))
 
 
 @fixtures.extension(context='from-extern')
 @fixtures.line_sip()
 def test_associate_incall_to_line_without_user(incall, line):
-    response = confd.lines(line['id']).extensions.post(extension_id=incall['id'])
+    response = confd.lines(line['id']).extensions(incall['id']).put()
     response.assert_match(400, e.missing_association('Line', 'User'))
 
 
@@ -138,12 +149,10 @@ def test_associate_incall_to_line_without_user(incall, line):
 @fixtures.extension()
 @fixtures.line_sip()
 def test_associate_two_internal_extensions_to_same_line(first_extension, second_extension, line):
-    associate = confd.lines(line['id']).extensions
+    response = confd.lines(line['id']).extensions(first_extension['id']).put()
+    response.assert_updated()
 
-    response = associate.post(extension_id=first_extension['id'])
-    response.assert_created('lines', 'extensions')
-
-    response = associate.post(extension_id=second_extension['id'])
+    response = confd.lines(line['id']).extensions(second_extension['id']).put()
     response.assert_match(400, e.resource_associated('Line', 'Extension'))
 
 
@@ -206,7 +215,7 @@ def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extensio
 @fixtures.line()
 @fixtures.extension()
 def test_associate_line_without_endpoint(line, extension):
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
+    response = confd.lines(line['id']).extensions(extension['id']).put()
     response.assert_match(400, e.missing_association('Line', 'Endpoint'))
 
 
@@ -215,11 +224,11 @@ def test_associate_line_without_endpoint(line, extension):
 @fixtures.extension()
 def test_associate_line_with_endpoint(line, sip, extension):
     with a.line_endpoint_sip(line, sip, check=False):
-        url = confd.lines(line['id']).extensions
-        response = url.post(extension_id=extension['id'])
-        response.assert_created('lines', 'extensions')
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'extension_id': extension['id']}))
+        response = confd.lines(line['id']).extensions(extension['id']).put()
+        response.assert_updated()
+        response = confd.lines(line['id']).extensions.get()
+        assert_that(response.items, contains(has_entries({'line_id': line['id'],
+                                                          'extension_id': extension['id']})))
 
 
 @fixtures.line_sip()

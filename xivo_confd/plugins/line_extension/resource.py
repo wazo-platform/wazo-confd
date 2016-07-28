@@ -91,3 +91,10 @@ class LineExtensionItem(LineExtensionResource):
         extension = self.extension_dao.get(extension_id)
         self.service.dissociate(line, extension)
         return '', 204
+
+    @required_acl('confd.lines.{line_id}.extensions.{extension_id}.update')
+    def put(self, line_id, extension_id):
+        line = self.line_dao.get(line_id)
+        extension = self.extension_dao.get(extension_id)
+        self.service.associate(line, extension)
+        return '', 204
