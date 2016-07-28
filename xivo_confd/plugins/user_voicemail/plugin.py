@@ -21,7 +21,10 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from xivo_confd import api
 from xivo_confd.plugins.user_voicemail.service import build_service
-from xivo_confd.plugins.user_voicemail.resource import UserVoicemailItem, VoicemailUserList, UserVoicemailLegacy
+from xivo_confd.plugins.user_voicemail.resource import (UserVoicemailItem,
+                                                        UserVoicemailList,
+                                                        VoicemailUserList,
+                                                        UserVoicemailLegacy)
 
 
 class Plugin(object):
@@ -34,10 +37,16 @@ class Plugin(object):
                          resource_class_args=(service, user_dao, voicemail_dao)
                          )
 
-        api.add_resource(UserVoicemailItem,
+        api.add_resource(UserVoicemailList,
                          '/users/<int:user_id>/voicemails',
                          '/users/<uuid:user_id>/voicemails',
                          endpoint='user_voicemails',
+                         resource_class_args=(service, user_dao, voicemail_dao)
+                         )
+
+        api.add_resource(UserVoicemailItem,
+                         '/users/<int:user_id>/voicemails/<int:voicemail_id>',
+                         '/users/<uuid:user_id>/voicemails/<int:voicemail_id>',
                          resource_class_args=(service, user_dao, voicemail_dao)
                          )
 
