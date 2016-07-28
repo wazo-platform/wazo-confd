@@ -27,29 +27,6 @@ from hamcrest import assert_that, has_entries, has_items
 FAKE_ID = 999999999
 
 
-class TestUserVoicemailAssociation(s.DissociationScenarios,
-                                   s.AssociationGetScenarios):
-
-    left_resource = "User"
-    right_resource = "Voicemail"
-
-    def create_resources(self):
-        self.user_id = h.user.generate_user()['id']
-        self.voicemail_id = h.voicemail.generate_voicemail()['id']
-        return self.user_id, self.voicemail_id
-
-    def delete_resources(self, user_id, voicemail_id):
-        h.voicemail.delete_voicemail(self.voicemail_id)
-        h.user.delete_user(self.user_id)
-        h.voicemail.delete_voicemail(self.voicemail_id)
-
-    def dissociate_resources(self, user_id, voicemail_id):
-        return confd.users(user_id).voicemails.delete()
-
-    def get_association(self, user_id, voicemail_id):
-        return confd.users(user_id).voicemails.get()
-
-
 @fixtures.user()
 @fixtures.voicemail()
 def test_associate_errors(user, voicemail):
@@ -58,6 +35,27 @@ def test_associate_errors(user, voicemail):
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_voicemail, 'Voicemail'
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_dissociate_errors(user, voicemail):
+    fake_user = confd.users(FAKE_ID).voicemails.delete
+    fake_user_voicemail = confd.users(user['id']).voicemails.delete
+
+    yield s.check_resource_not_found, fake_user, 'User'
+    yield s.check_resource_not_found, fake_user_voicemail, 'UserVoicemail'
+
+
+@fixtures.user()
+def test_get_errors(user):
+    fake_user = confd.users(FAKE_ID).voicemails.get
+    fake_voicemail = confd.voicemails(FAKE_ID).users.get
+    fake_user_voicemail = confd.users(user['id']).voicemails.delete
+
+    yield s.check_resource_not_found, fake_user, 'User'
+    yield s.check_resource_not_found, fake_voicemail, 'Voicemail'
+    yield s.check_resource_not_found, fake_user_voicemail, 'UserVoicemail'
 
 
 @fixtures.user()
@@ -91,12 +89,6 @@ def test_associate_multiple_users_to_voicemail(user1, user2, voicemail):
 
     response = confd.users(user2['id']).voicemails(voicemail['id']).put()
     response.assert_updated()
-
-
-@fixtures.user()
-def test_get_when_not_associated(user):
-    response = confd.users(user['id']).voicemails.get()
-    response.assert_match(404, e.not_found('UserVoicemail'))
 
 
 @fixtures.user()
@@ -143,12 +135,6 @@ def test_dissociate_using_uuid(user, voicemail):
 
 
 @fixtures.user()
-def test_dissociate_when_not_associated(user):
-    response = confd.users(user['id']).voicemails.delete()
-    response.assert_match(404, e.not_found('UserVoicemail'))
-
-
-@fixtures.user()
 @fixtures.voicemail()
 def test_delete_user_when_still_associated(user, voicemail):
     with a.user_voicemail(user, voicemail):
@@ -171,11 +157,6 @@ def test_edit_voicemail_when_still_associated(user, voicemail):
     with a.user_voicemail(user, voicemail):
         response = confd.voicemails(voicemail['id']).put(number=number)
         response.assert_updated()
-
-
-def test_get_users_associated_to_voicemail_when_voicemail_does_not_exist():
-    response = confd.voicemails(FAKE_ID).users.get()
-    response.assert_match(404, e.not_found('Voicemail'))
 
 
 @fixtures.user()
