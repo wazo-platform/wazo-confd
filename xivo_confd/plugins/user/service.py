@@ -37,8 +37,8 @@ class UserService(UserBaseService):
         super(UserService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
 
-    def edit(self, user):
-        super(UserService, self).edit(user)
+    def edit(self, user, updated_fields=[]):
+        super(UserService, self).edit(user, updated_fields)
         self.device_updater.update_for_user(user)
 
     def legacy_search(self, term):

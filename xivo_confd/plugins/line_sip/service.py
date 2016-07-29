@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class LineSipService(object):
         line = line_sip.build_line(sip)
         return self.line_service.create(line)
 
-    def edit(self, line_sip):
+    def edit(self, line_sip, updated_fields=[]):
         line = self.line_service.get(line_sip.id)
         sip = self.sip_service.get(line.protocolid)
 

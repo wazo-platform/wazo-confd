@@ -36,8 +36,10 @@ class LineService(CRUDService):
     def find_all_by(self, **criteria):
         return self.dao.find_all_by(**criteria)
 
-    def edit(self, line):
-        super(LineService, self).edit(line)
+    def edit(self, line, updated_fields=[]):
+        self.validator.validate_edit(line)
+        self.dao.edit(line)
+        self.notifier.edited(line)
         self.device_updater.update_for_line(line)
 
 

@@ -74,7 +74,7 @@ class TemplateService(object):
         self.notifier.created(created_template)
         return created_template
 
-    def edit(self, template):
+    def edit(self, template, updated_fields=[]):
         self.validator.validate_edit(template)
         self._adjust_blfs(template)
         self.template_dao.edit(template)
