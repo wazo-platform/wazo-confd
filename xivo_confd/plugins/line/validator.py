@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import ValidationGroup, FindResource, RequiredFields, Validator, Optional, NumberRange, MemberOfSequence
+from xivo_confd.helpers.validator import ValidationGroup, FindResource, Validator, Optional, MemberOfSequence
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.helpers import errors
@@ -43,25 +43,17 @@ class ProvCodeChanged(ProvCodeAvailable):
 
 def build_validator(device_dao):
     return ValidationGroup(
-        common=[
-            RequiredFields('context'),
-            FindResource('context', context_dao.find, 'Context'),
-
-        ],
         create=[
             Optional('provisioning_code',
                      ProvCodeAvailable(line_dao)
                      ),
-            Optional('position',
-                     NumberRange('position', minimum=1)
-                     ),
             Optional('registrar',
                      MemberOfSequence('registrar', device_dao.registrars, 'Registrar')
                      ),
+            FindResource('context', context_dao.find, 'Context'),
         ],
         edit=[
             ProvCodeChanged(line_dao),
-            RequiredFields('provisioning_code', 'position'),
-            NumberRange('position', minimum=1),
             MemberOfSequence('registrar', device_dao.registrars, 'Registrar'),
+            FindResource('context', context_dao.find, 'Context'),
         ])
