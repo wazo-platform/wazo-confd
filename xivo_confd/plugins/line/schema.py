@@ -30,7 +30,7 @@ class LineSchema(BaseSchema):
     device_slot = fields.Integer(dump_only=True)
     provisioning_extension = fields.String(dump_only=True)
 
-    context = fields.String(validate=Length(max=39), required=True)
+    context = fields.String(required=True)
     provisioning_code = fields.String(validate=(Predicate('isdigit'), Length(equal=6)))
     position = fields.Integer(validate=Range(min=1))
     caller_id_name = fields.String(allow_none=True)  # Validate length callerid_name + num = max(160)
