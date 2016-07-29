@@ -22,6 +22,7 @@ from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.plugins.line.validator import build_validator
 from xivo_confd.plugins.line.notifier import build_notifier
 from xivo_confd.plugins.device import builder as device_builder
+from xivo_dao.helpers.db_manager import Session
 
 
 class LineService(CRUDService):
@@ -37,7 +38,8 @@ class LineService(CRUDService):
         return self.dao.find_all_by(**criteria)
 
     def edit(self, line, updated_fields=[]):
-        self.validator.validate_edit(line)
+        with Session.no_autoflush:
+            self.validator.validate_edit(line)
         self.dao.edit(line)
         self.notifier.edited(line)
         self.device_updater.update_for_line(line)
