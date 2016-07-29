@@ -41,7 +41,7 @@ class LineService(CRUDService):
         with Session.no_autoflush:
             self.validator.validate_edit(line)
         self.dao.edit(line)
-        self.notifier.edited(line)
+        self.notifier.edited(line, updated_fields)
         self.device_updater.update_for_line(line)
 
 
