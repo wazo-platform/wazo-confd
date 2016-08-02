@@ -1925,69 +1925,6 @@
                 }
             }
         },
-        "/lines/{line_id}/extensions": {
-            "get": {
-                "operationId": "get_line_extension_association",
-                "summary": "List extensions associated to line",
-                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.read`",
-                "tags": [
-                    "lines",
-                    "extensions"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of associations",
-                        "schema": {
-                            "$ref": "#/definitions/LineExtensionItems"
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
-            "post": {
-                "operationId": "associate_line_extension",
-                "summary": "Associate line and extension",
-                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.create`\n\nBecause of technical limitations, a line can only have a single ‘internal’ extension associated (i.e. an extension with a context of type ‘internal’)",
-                "tags": [
-                    "lines",
-                    "extensions"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/lineid"
-                    },
-                    {
-                        "required": true,
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/LineExtension"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Line and Extension associated",
-                        "schema": {
-                            "$ref": "#/definitions/LineExtension"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
         "/lines/{line_id}/extensions/{extension_id}": {
             "delete": {
                 "operationId": "dissociate_line_extension",
@@ -2008,6 +1945,34 @@
                 "responses": {
                     "204": {
                         "description": "Line and Extension dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "associate_line_extension",
+                "summary": "Associate line and extension",
+                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.{extension_id}.update`\n\nBecause of technical limitations, a line can only have a single ‘internal’ extension associated (i.e. an extension with a context of type ‘internal’)",
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "$ref": "#/parameters/extensionid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Line and Extension associated"
                     },
                     "400": {
                         "$ref": "#/responses/GenericError"
@@ -3846,6 +3811,69 @@
                     },
                     "403": {
                         "$ref": "#/responses/AlreadyConfiguredError"
+                    }
+                }
+            }
+        },
+        "/lines/{line_id}/extensions": {
+            "get": {
+                "operationId": "get_line_extension_association",
+                "summary": "List extensions associated to line",
+                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.read`",
+                "tags": [
+                    "lines",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of associations",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtensionItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_line_extension_deprecated",
+                "summary": "Associate line and extension",
+                "deprecated": true,
+                "description": "**Required ACL:** `confd.lines.{line_id}.extensions.create`\n\nBecause of technical limitations, a line can only have a single ‘internal’ extension associated (i.e. an extension with a context of type ‘internal’)",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/lineid"
+                    },
+                    {
+                        "required": true,
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Line and Extension associated",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             }
