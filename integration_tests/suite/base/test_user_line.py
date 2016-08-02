@@ -212,7 +212,7 @@ def test_associate_user_to_multiple_lines_with_different_extension(user, extensi
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_user_to_line_with_extension_with_multiple_lines(user1, user2, extension, line1, line2):
+def test_associate_two_users_to_two_lines_with_same_extension(user1, user2, extension, line1, line2):
     with a.line_extension(line1, extension), a.line_extension(line2, extension):
         response = confd.users(user1['id']).lines.post(line_id=line1['id'])
         response.assert_created('users', 'lines')

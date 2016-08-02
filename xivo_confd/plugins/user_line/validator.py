@@ -32,7 +32,7 @@ class UserLineAssociationValidator(Validator):
     def validate(self, user, line):
         self.validate_line_has_endpoint(line)
         self.validate_user_line_not_already_associated(user, line)
-        self.validate_line_has_no_different_extension(user, line)
+        self.validate_extension_is_not_already_associated_to_another_user(user, line)
 
     def validate_line_has_endpoint(self, line):
         if not line.is_associated():
@@ -46,7 +46,7 @@ class UserLineAssociationValidator(Validator):
                                              user_id=user.id,
                                              line_id=line.id)
 
-    def validate_line_has_no_different_extension(self, user, line):
+    def validate_extension_is_not_already_associated_to_another_user(self, user, line):
         main_line_extension = line_extension_dao.find_by_line_id(line.id)
         if not main_line_extension:
             return
