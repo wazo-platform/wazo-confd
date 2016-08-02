@@ -20,10 +20,12 @@ import re
 
 from hamcrest import assert_that
 from hamcrest import contains
+from hamcrest import contains_inanyorder
 from hamcrest import empty
 from hamcrest import has_entries
 from hamcrest import has_item
 from hamcrest import has_entry
+from hamcrest import is_
 
 from test_api import scenarios as s
 from test_api import confd
@@ -174,10 +176,12 @@ def test_associate_user_to_multiple_lines(user, line1, line2, line3):
     response.assert_created('users', 'lines')
 
     response = confd.users(user['id']).lines.get()
-    assert_that(response.items[0]['main_line'], True)
-    assert_that(response.items[1]['main_line'], False)
-    assert_that(response.items[2]['main_line'], False)
-    assert_that(response.total, 3)
+    assert_that(response.items, contains_inanyorder(has_entries({'line_id': line1['id'],
+                                                                 'main_line': True}),
+                                                    has_entries({'line_id': line2['id'],
+                                                                 'main_line': False}),
+                                                    has_entries({'line_id': line3['id'],
+                                                                 'main_line': False})))
 
 
 @fixtures.user()
@@ -266,13 +270,13 @@ def test_dissociate_second_user_then_first(first_user, second_user, line):
 @fixtures.line_sip()
 def test_dissociate_main_line_then_main_line_fallback_to_secondary(user, line1, line2, line3):
     response = confd.users(user['uuid']).lines.post(line_id=line1['id'])
-    assert_that(response.item['main_line'], True)
+    assert_that(response.item['main_line'], is_(True))
 
     response = confd.users(user['uuid']).lines.post(line_id=line2['id'])
-    assert_that(response.item['main_line'], False)
+    assert_that(response.item['main_line'], is_(False))
 
     response = confd.users(user['uuid']).lines.post(line_id=line3['id'])
-    assert_that(response.item['main_line'], False)
+    assert_that(response.item['main_line'], is_(False))
 
     confd.users(user['uuid']).lines(line1['id']).delete().assert_deleted()
     response = confd.users(user['uuid']).lines.get()
