@@ -5531,7 +5531,7 @@
                 },
                 "main_line": {
                     "type": "boolean",
-                    "description": "To be implemented later. Always true",
+                    "description": "True if the line is the first to have been associated to the user",
                     "readOnly": true
                 },
                 "main_user": {

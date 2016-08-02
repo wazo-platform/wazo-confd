@@ -21,7 +21,8 @@ from xivo_confd.database import user_line as user_line_db
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
 from xivo_dao.helpers import errors
-
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
@@ -30,19 +31,36 @@ class UserLineAssociationValidator(Validator):
 
     def validate(self, user, line):
         self.validate_line_has_endpoint(line)
-        self.validate_user_not_already_associated(user)
+        self.validate_user_line_not_already_associated(user, line)
+        self.validate_extension_is_not_already_associated_to_another_user(user, line)
 
     def validate_line_has_endpoint(self, line):
         if not line.is_associated():
             raise errors.missing_association('Line', 'Endpoint',
                                              line_id=line.id)
 
-    def validate_user_not_already_associated(self, user):
-        line_id = user_line_db.find_line_id_for_user(user.id)
-        if line_id:
+    def validate_user_line_not_already_associated(self, user, line):
+        user_line = user_line_dao.find_by(user_id=user.id, line_id=line.id)
+        if user_line:
             raise errors.resource_associated('User', 'Line',
                                              user_id=user.id,
-                                             line_id=line_id)
+                                             line_id=line.id)
+
+    def validate_extension_is_not_already_associated_to_another_user(self, user, line):
+        main_line_extension = line_extension_dao.find_by_line_id(line.id)
+        if not main_line_extension:
+            return
+
+        line_extensions = line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id)
+        for line_extension in line_extensions:
+            user_line = user_line_dao.find_by(line_id=line_extension.line_id, main_user=True)
+            if not user_line:
+                continue
+
+            if user_line.user_id != user.id:
+                raise errors.resource_associated('Line', 'Extension',
+                                                 line_id=line_extension.line_id,
+                                                 extension_id=line_extension.extension_id)
 
 
 class UserLineDissociationValidator(Validator):

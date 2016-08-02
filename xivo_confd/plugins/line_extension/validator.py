@@ -21,6 +21,8 @@ from xivo_confd.database import extension as extension_db
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.helpers import errors
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
@@ -30,7 +32,7 @@ class InternalAssociationValidator(Validator):
     def validate(self, line, extension):
         self.validate_line_has_endpoint(line)
         self.validate_line_has_no_extension(line)
-        self.validate_extension_not_associated(extension)
+        self.validate_line_has_no_different_user(line, extension)
 
     def validate_line_has_endpoint(self, line):
         if not line.is_associated():
@@ -44,13 +46,21 @@ class InternalAssociationValidator(Validator):
                                              line_id=line.id,
                                              extension_id=extension_id)
 
-    def validate_extension_not_associated(self, extension):
-        resource, resource_id = extension_db.get_associated_resource(extension.id)
-        if not (resource == 'user' and resource_id == '0'):
-            raise errors.resource_associated('Extension',
-                                             resource,
-                                             id=extension.id,
-                                             associated_id=resource_id)
+    def validate_line_has_no_different_user(self, line, extension):
+        user_line = user_line_dao.find_by(line_id=line.id, main_user=True)
+        if not user_line:
+            return
+
+        line_extensions = line_extension_dao.find_all_by(extension_id=extension.id)
+        for line_extension in line_extensions:
+            other_user_line = user_line_dao.find_by(line_id=line_extension.line_id, main_user=True)
+            if not other_user_line:
+                continue
+
+            if other_user_line.user_id != user_line.user_id:
+                raise errors.resource_associated('User', 'Line',
+                                                 user_id=other_user_line.user_id,
+                                                 line_id=other_user_line.line_id)
 
 
 class InternalDissociationValidator(Validator):
