@@ -3154,69 +3154,6 @@
                 }
             }
         },
-        "/users/{user_id}/lines": {
-            "get": {
-                "operationId": "get_user_line_associations",
-                "summary": "List lines associated to user",
-                "description": "**Required ACL:** `confd.users.{user_id}.lines.read`",
-                "tags": [
-                    "users",
-                    "lines"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/useriduuid"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Lines associated to a User",
-                        "schema": {
-                            "$ref": "#/definitions/UserLineItems"
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
-            "post": {
-                "operationId": "associate_user_line",
-                "summary": "Associate user and line",
-                "description": "**Required ACL:** `confd.users.{user_id}.lines.create`",
-                "tags": [
-                    "users",
-                    "lines"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/UserLine"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "User associated with Line",
-                        "schema": {
-                            "$ref": "#/definitions/UserLine"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            }
-        },
         "/users/{user_id}/lines/{line_id}": {
             "delete": {
                 "operationId": "dissociate_user_line",
@@ -3237,6 +3174,34 @@
                 "responses": {
                     "204": {
                         "description": "User and Line dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "associate_user_line",
+                "summary": "Associate user and line",
+                "description": "**Required ACL:** `confd.users.{user_id}.lines.{line_id}.update`",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "$ref": "#/parameters/lineid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and Line associated"
                     },
                     "400": {
                         "$ref": "#/responses/GenericError"
@@ -3811,6 +3776,69 @@
                     },
                     "403": {
                         "$ref": "#/responses/AlreadyConfiguredError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/lines": {
+            "get": {
+                "operationId": "get_user_line_associations",
+                "summary": "List lines associated to user",
+                "description": "**Required ACL:** `confd.users.{user_id}.lines.read`",
+                "tags": [
+                    "users",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lines associated to a User",
+                        "schema": {
+                            "$ref": "#/definitions/UserLineItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_user_line",
+                "summary": "Associate user and line",
+                "deprecated": true,
+                "description": "**Required ACL:** `confd.users.{user_id}.lines.create`",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserLine"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User associated with Line",
+                        "schema": {
+                            "$ref": "#/definitions/UserLine"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
                     }
                 }
             }

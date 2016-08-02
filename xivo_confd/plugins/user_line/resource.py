@@ -96,6 +96,13 @@ class UserLineItem(UserLineResource):
         self.service.dissociate(user, line)
         return '', 204
 
+    @required_acl('confd.users.{user_id}.lines.{line_id}.update')
+    def put(self, user_id, line_id):
+        user = self.get_user(user_id)
+        line = self.line_dao.get(line_id)
+        self.service.associate(user, line)
+        return '', 204
+
 
 class LineUserList(UserLineResource):
 
