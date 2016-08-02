@@ -49,18 +49,48 @@ class UserVoicemailResource(ConfdResource):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
 
-    def get_voicemail_or_fail(self):
-        form = parser.parse_args()
-        try:
-            return self.voicemail_dao.get(form['voicemail_id'])
-        except NotFoundError:
-            raise errors.param_not_found('voicemail_id', 'Voicemail')
-
     def get_user(self, user_id):
         return self.user_dao.get_by_id_uuid(user_id)
 
 
-class UserVoicemailRoot(UserVoicemailResource):
+class UserVoicemailItem(UserVoicemailResource):
+
+    @required_acl('confd.users.{user_id}.voicemails.{voicemail_id}.update')
+    def put(self, user_id, voicemail_id):
+        user = self.get_user(user_id)
+        voicemail = self.voicemail_dao.get(voicemail_id)
+        self.service.associate(user, voicemail)
+        return '', 204
+
+
+class UserVoicemailList(UserVoicemailResource):
+
+    @required_acl('confd.users.{user_id}.voicemails.read')
+    def get(self, user_id):
+        user = self.get_user(user_id)
+        user_voicemail = self.service.get_by(user_id=user.id)
+        return marshal(user_voicemail, fields)
+
+    @required_acl('confd.users.{user_id}.voicemails.delete')
+    def delete(self, user_id):
+        user = self.get_user(user_id)
+        user_voicemail = self.service.get_by(user_id=user.id)
+        voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
+        self.service.dissociate(user, voicemail)
+        return '', 204
+
+
+class VoicemailUserList(UserVoicemailResource):
+
+    @required_acl('confd.voicemails.{voicemail_id}.users.read')
+    def get(self, voicemail_id):
+        voicemail = self.voicemail_dao.get(voicemail_id)
+        items = self.service.find_all_by(voicemail_id=voicemail.id)
+        return {'total': len(items),
+                'items': [marshal(item, fields) for item in items]}
+
+
+class UserVoicemailLegacy(UserVoicemailResource):
 
     @required_acl('confd.users.{user_id}.voicemail.read')
     def get(self, user_id):
@@ -90,12 +120,9 @@ class UserVoicemailRoot(UserVoicemailResource):
                       _external=True)
         return {'Location': url}
 
-
-class VoicemailUserList(UserVoicemailResource):
-
-    @required_acl('confd.voicemails.{voicemail_id}.users.read')
-    def get(self, voicemail_id):
-        voicemail = self.voicemail_dao.get(voicemail_id)
-        items = self.service.find_all_by(voicemail_id=voicemail.id)
-        return {'total': len(items),
-                'items': [marshal(item, fields) for item in items]}
+    def get_voicemail_or_fail(self):
+        form = parser.parse_args()
+        try:
+            return self.voicemail_dao.get(form['voicemail_id'])
+        except NotFoundError:
+            raise errors.param_not_found('voicemail_id', 'Voicemail')

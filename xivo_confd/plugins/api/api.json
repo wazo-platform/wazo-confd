@@ -3395,11 +3395,11 @@
                 }
             }
         },
-        "/users/{user_id}/voicemail": {
+        "/users/{user_id}/voicemails": {
             "get": {
                 "operationId": "get_user_voicemail_association",
                 "summary": "Get voicemail associated to user",
-                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.read`",
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemails.read`",
                 "tags": [
                     "users",
                     "voicemails"
@@ -3421,47 +3421,10 @@
                     }
                 }
             },
-            "post": {
-                "operationId": "associate_user_voicemail",
-                "summary": "Associate user and voicemail",
-                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.create`",
-                "tags": [
-                    "users",
-                    "voicemails"
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/useriduuid"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "User and Voicemail to associate",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/UserVoicemail"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User and Voicemail associated",
-                        "schema": {
-                            "$ref": "#/definitions/UserVoicemail"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/GenericError"
-                    },
-                    "404": {
-                        "$ref": "#/responses/NotFoundError"
-                    }
-                }
-            },
             "delete": {
                 "operationId": "dissociate_user_voicemail",
                 "summary": "Dissociate user and voicemail",
-                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.delete`",
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemails.delete`",
                 "tags": [
                     "users",
                     "voicemails"
@@ -3474,6 +3437,36 @@
                 "responses": {
                     "204": {
                         "description": "User and Voicemail dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/voicemails/{voicemail_id}": {
+            "put": {
+                "operationId": "associate_user_voicemail",
+                "summary": "Associate user and voicemail",
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemails.{voicemail_id}.update`",
+                "tags": [
+                    "users",
+                    "voicemails"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "$ref": "#/parameters/voicemailid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and voicemail associated"
                     },
                     "400": {
                         "$ref": "#/responses/GenericError"
@@ -3857,56 +3850,6 @@
                 }
             }
         },
-        "/lines_sip": {
-            "get": {
-                "operationId": "list_line_sip",
-                "summary": "List SIP Lines",
-                "description": "**Required ACL:** `confd.#`",
-                "deprecated": true,
-                "tags": [
-                    "deprecated"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of SIP Lines",
-                        "schema": {
-                            "$ref": "#/definitions/LineSipItems"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "operationId": "create_line_sip",
-                "summary": "Create SIP line",
-                "description": "**Required ACL:** `confd.#`",
-                "deprecated": true,
-                "tags": [
-                    "deprecated"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "SIP Line to create",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/LineSip"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "SIP Line created",
-                        "schema": {
-                            "$ref": "#/definitions/LineSip"
-                        }
-                    },
-                    "400": {
-                        "$ref": "#/responses/CreateError"
-                    }
-                }
-            }
-        },
         "/lines/{line_id}/extension": {
             "get": {
                 "operationId": "get_line_extension_legacy",
@@ -4001,6 +3944,56 @@
                 }
             }
         },
+        "/lines_sip": {
+            "get": {
+                "operationId": "list_line_sip",
+                "summary": "List SIP Lines",
+                "description": "**Required ACL:** `confd.#`",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of SIP Lines",
+                        "schema": {
+                            "$ref": "#/definitions/LineSipItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_line_sip",
+                "summary": "Create SIP line",
+                "description": "**Required ACL:** `confd.#`",
+                "deprecated": true,
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "SIP Line to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "SIP Line created",
+                        "schema": {
+                            "$ref": "#/definitions/LineSip"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
         "/lines_sip/{line_id}": {
             "get": {
                 "operationId": "get_line_sip",
@@ -4087,6 +4080,95 @@
                     },
                     "400": {
                         "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/voicemail": {
+            "get": {
+                "operationId": "get_user_voicemail_association_deprecated",
+                "summary": "Get voicemail associated to user",
+                "deprecated": true,
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.read`",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User-Voicemail association",
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "associate_user_voicemail_deprecated",
+                "summary": "Associate user and voicemail",
+                "deprecated": true,
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.create`",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User and Voicemail to associate",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User and Voicemail associated",
+                        "schema": {
+                            "$ref": "#/definitions/UserVoicemail"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_user_voicemail_deprecated",
+                "summary": "Dissociate user and voicemail",
+                "deprecated": true,
+                "description": "**Required ACL:** `confd.users.{user_id}.voicemail.delete`",
+                "tags": [
+                    "deprecated"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/useriduuid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User and Voicemail dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
                     },
                     "404": {
                         "$ref": "#/responses/NotFoundError"

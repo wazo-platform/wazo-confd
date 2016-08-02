@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ from test_api import confd
 
 
 def associate(user_id, voicemail_id, check=True):
-    response = confd.users(user_id).voicemail.post(voicemail_id=voicemail_id)
+    response = confd.users(user_id).voicemails(voicemail_id).put()
     if check:
         response.assert_ok()
 
