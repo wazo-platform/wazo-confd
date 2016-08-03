@@ -31,8 +31,8 @@ def new_switchboard(name=None):
         queue_name = name or 'sw_' + ''.join(random.choice(string.ascii_letters) for _ in range(10))
         queue_number = extension.find_available_exten(config.CONTEXT)
         queue_id = queries.insert_queue(queue_name, queue_number)
-        id = queries.insert_switchboard(queue_id)
-    return {'id': str(id)}
+        queries.insert_switchboard(queue_id)
+    return {'id': str(queue_id)}
 
 
 def find_switchboard(name):

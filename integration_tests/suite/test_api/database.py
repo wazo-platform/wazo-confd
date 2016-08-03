@@ -429,7 +429,7 @@ class DatabaseQueries(object):
         query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
                         VALUES ('2016-02-29 00:00:00', 'abandoned', 15.2, :queue_id)
                         RETURNING id""")
-        return self.connection.execute(query, queue_id=queue_id).scalar()
+        self.connection.execute(query, queue_id=queue_id)
 
     def find_queue(self, queue_name):
         query = text("""SELECT id from queuefeatures
