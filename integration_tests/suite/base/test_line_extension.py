@@ -23,6 +23,7 @@ from test_api import errors as e
 from test_api import associations as a
 from test_api import helpers as h
 from test_api import confd
+from test_api import db
 from test_api import fixtures
 from test_api import config
 
@@ -210,6 +211,17 @@ def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extensio
 
         response = confd.lines(line2['id']).extensions.post(extension_id=extension2['id'])
         response.assert_created('lines', 'extensions')
+
+
+@fixtures.line_sip()
+def test_associate_line_to_extension_already_associated_to_other_resource(line):
+    with db.queries() as queries:
+        queries.insert_queue(number='1234')
+
+    extension_id = confd.extensions.get(exten='1234').items[0]['id']
+
+    response = confd.lines(line['id']).extensions(extension_id).put()
+    response.assert_match(400, e.resource_associated('Extension', 'queue'))
 
 
 @fixtures.line()

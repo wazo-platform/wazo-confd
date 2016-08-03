@@ -32,6 +32,7 @@ class InternalAssociationValidator(Validator):
     def validate(self, line, extension):
         self.validate_line_has_endpoint(line)
         self.validate_line_has_no_extension(line)
+        self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_line_has_no_different_user(line, extension)
 
     def validate_line_has_endpoint(self, line):
@@ -45,6 +46,14 @@ class InternalAssociationValidator(Validator):
             raise errors.resource_associated('Line', 'Extension',
                                              line_id=line.id,
                                              extension_id=extension_id)
+
+    def validate_extension_not_associated_to_other_resource(self, extension):
+        resource, resource_id = extension_db.get_associated_resource(extension.id)
+        if resource != 'user':
+            raise errors.resource_associated('Extension',
+                                             resource,
+                                             id=extension.id,
+                                             associated_id=resource_id)
 
     def validate_line_has_no_different_user(self, line, extension):
         user_line = user_line_dao.find_by(line_id=line.id, main_user=True)
