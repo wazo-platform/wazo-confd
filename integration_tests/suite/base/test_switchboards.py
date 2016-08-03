@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 from hamcrest import all_of
 from hamcrest import assert_that
-from hamcrest import contains
+from hamcrest import contains_inanyorder
 from hamcrest import equal_to
 from hamcrest import is_not
 from hamcrest import has_entries
@@ -41,7 +41,7 @@ FAKE_ID = '12345'
 def test_list_switchboards(first, second):
     response = confd.switchboards.get()
 
-    assert_that(response.items, contains(has_entries(first), has_entries(second)))
+    assert_that(response.items, contains_inanyorder(has_entries(first), has_entries(second)))
     assert_that(response.total, equal_to(2))
 
 
