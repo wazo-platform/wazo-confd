@@ -105,15 +105,17 @@ def test_associate_user_line_using_uuid_and_deprecated(user, line):
 @fixtures.user()
 @fixtures.user()
 @fixtures.line_sip()
-def test_associate_muliple_users_to_line(user1, user2, user3, line):
-    response = confd.users(user1['id']).lines(line['id']).put()
-    response.assert_updated()
+@fixtures.extension()
+def test_associate_muliple_users_to_line(user1, user2, user3, line, extension):
+    with a.line_extension(line, extension):
+        response = confd.users(user1['id']).lines(line['id']).put()
+        response.assert_updated()
 
-    response = confd.users(user2['id']).lines(line['id']).put()
-    response.assert_updated()
+        response = confd.users(user2['id']).lines(line['id']).put()
+        response.assert_updated()
 
-    response = confd.users(user3['id']).lines(line['id']).put()
-    response.assert_updated()
+        response = confd.users(user3['id']).lines(line['id']).put()
+        response.assert_updated()
 
 
 @fixtures.user()

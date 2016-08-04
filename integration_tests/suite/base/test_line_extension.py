@@ -147,6 +147,16 @@ def test_associate_incall_to_line_without_user(incall, line):
 
 
 @fixtures.extension()
+@fixtures.line_sip()
+@fixtures.user()
+@fixtures.user()
+def test_associate_extension_to_one_line_multiple_users(extension, line, first_user, second_user):
+    with a.user_line(first_user, line), a.user_line(second_user, line):
+        response = confd.lines(line['id']).extensions(extension['id']).put()
+        response.assert_updated()
+
+
+@fixtures.extension()
 @fixtures.extension()
 @fixtures.line_sip()
 def test_associate_two_internal_extensions_to_same_line(first_extension, second_extension, line):

@@ -32,7 +32,7 @@ class UserLineAssociationValidator(Validator):
     def validate(self, user, line):
         self.validate_line_has_endpoint(line)
         self.validate_user_line_not_already_associated(user, line)
-        self.validate_extension_is_not_already_associated_to_another_user(user, line)
+        self.validate_we_are_not_creating_a_group_under_the_same_extension(user, line)
 
     def validate_line_has_endpoint(self, line):
         if not line.is_associated():
@@ -46,21 +46,27 @@ class UserLineAssociationValidator(Validator):
                                              user_id=user.id,
                                              line_id=line.id)
 
-    def validate_extension_is_not_already_associated_to_another_user(self, user, line):
+    def validate_we_are_not_creating_a_group_under_the_same_extension(self, user, line):
         main_line_extension = line_extension_dao.find_by_line_id(line.id)
         if not main_line_extension:
             return
 
-        line_extensions = line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id)
-        for line_extension in line_extensions:
-            user_line = user_line_dao.find_by(line_id=line_extension.line_id, main_user=True)
-            if not user_line:
-                continue
+        lines_reachable_from_extension = set(line_extension.line_id for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id))
+        users_reachable_from_extension = set(user_line.user_id
+                                             for line_id in lines_reachable_from_extension
+                                             for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True))
+        users_reachable_from_extension.add(user.id)
 
-            if user_line.user_id != user.id:
-                raise errors.resource_associated('Line', 'Extension',
-                                                 line_id=line_extension.line_id,
-                                                 extension_id=line_extension.extension_id)
+        if len(users_reachable_from_extension) == 1:
+            return
+        elif len(lines_reachable_from_extension) == 1:
+            return
+        else:
+            lines_reachable_from_extension.remove(line.id)
+            faulty_line_id = lines_reachable_from_extension.pop()
+            raise errors.resource_associated('Line', 'Extension',
+                                             line_id=faulty_line_id,
+                                             extension_id=main_line_extension.extension_id)
 
 
 class UserLineDissociationValidator(Validator):
