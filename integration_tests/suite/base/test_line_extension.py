@@ -162,14 +162,14 @@ def test_associate_two_internal_extensions_to_same_line(first_extension, second_
 @fixtures.line_sip()
 @fixtures.line_sip()
 def test_associate_multi_lines_to_extension(extension, line1, line2, line3):
-    response = confd.lines(line1['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line1['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
-    response = confd.lines(line2['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line2['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
-    response = confd.lines(line3['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line3['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
 
 @fixtures.user()
@@ -178,11 +178,11 @@ def test_associate_multi_lines_to_extension(extension, line1, line2, line3):
 @fixtures.line_sip()
 def test_associate_multi_lines_to_extension_with_same_user(user, extension, line1, line2):
     with a.user_line(user, line1), a.user_line(user, line2):
-        response = confd.lines(line1['id']).extensions.post(extension_id=extension['id'])
-        response.assert_created('lines', 'extensions')
+        response = confd.lines(line1['id']).extensions(extension['id']).put()
+        response.assert_updated()
 
-        response = confd.lines(line2['id']).extensions.post(extension_id=extension['id'])
-        response.assert_created('lines', 'extensions')
+        response = confd.lines(line2['id']).extensions(extension['id']).put()
+        response.assert_updated()
 
 
 @fixtures.user()
@@ -192,10 +192,10 @@ def test_associate_multi_lines_to_extension_with_same_user(user, extension, line
 @fixtures.line_sip()
 def test_associate_multi_lines_to_extension_with_different_user(user1, user2, extension, line1, line2):
     with a.user_line(user1, line1), a.user_line(user2, line2):
-        response = confd.lines(line1['id']).extensions.post(extension_id=extension['id'])
-        response.assert_created('lines', 'extensions')
+        response = confd.lines(line1['id']).extensions(extension['id']).put()
+        response.assert_updated()
 
-        response = confd.lines(line2['id']).extensions.post(extension_id=extension['id'])
+        response = confd.lines(line2['id']).extensions(extension['id']).put()
         response.assert_match(400, e.resource_associated('User', 'Line'))
 
 
@@ -206,11 +206,11 @@ def test_associate_multi_lines_to_extension_with_different_user(user1, user2, ex
 @fixtures.line_sip()
 def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extension1, extension2, line1, line2):
     with a.user_line(user, line1), a.user_line(user, line2):
-        response = confd.lines(line1['id']).extensions.post(extension_id=extension1['id'])
-        response.assert_created('lines', 'extensions')
+        response = confd.lines(line1['id']).extensions(extension1['id']).put()
+        response.assert_updated()
 
-        response = confd.lines(line2['id']).extensions.post(extension_id=extension2['id'])
-        response.assert_created('lines', 'extensions')
+        response = confd.lines(line2['id']).extensions(extension2['id']).put()
+        response.assert_updated()
 
 
 @fixtures.line_sip()
