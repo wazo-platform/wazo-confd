@@ -35,6 +35,6 @@ def self_check(config):
 
     url = '{}://{}:{}/{}/infos'.format(scheme, 'localhost', port, API_VERSION)
     try:
-        return requests.get(url, headers={'accept': 'application/json'}, verify=verify).status_code == 200
+        return requests.get(url, headers={'accept': 'application/json'}, verify=verify).status_code in (200, 401)
     except Exception:
         return False

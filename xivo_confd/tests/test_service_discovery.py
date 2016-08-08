@@ -50,6 +50,14 @@ class TestSelfCheck(unittest.TestCase):
 
         self.assert_get_called(get, 'http://localhost:4242/1.1/infos')
 
+    @patch('xivo_confd.service_discovery.requests.get', return_value=Mock(status_code=401))
+    def test_that_self_check_returns_true_if_infos_returns_401(self, get):
+        result = self_check(self.config)
+
+        assert_that(result, equal_to(True))
+
+        self.assert_get_called(get, 'http://localhost:4242/1.1/infos')
+
     @patch('xivo_confd.service_discovery.requests.get', return_value=Mock(status_code=200))
     def test_that_https_is_used_if_http_is_not_enabled(self, get):
         self.config['rest_api']['http']['enabled'] = False
