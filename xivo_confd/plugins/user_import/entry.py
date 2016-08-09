@@ -121,8 +121,9 @@ class EntryAssociator(object):
 class EntryFinder(object):
 
     def __init__(self, user_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
-                 user_cti_profile_dao, line_dao, user_line_dao, sip_dao, sccp_dao,
-                 extension_dao, incall_dao, call_permission_dao, user_call_permission_dao):
+                 user_cti_profile_dao, line_dao, user_line_dao, line_extension_dao,
+                 sip_dao, sccp_dao, extension_dao, incall_dao, call_permission_dao,
+                 user_call_permission_dao):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
@@ -130,6 +131,7 @@ class EntryFinder(object):
         self.user_cti_profile_dao = user_cti_profile_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
+        self.line_extension_dao = line_extension_dao
         self.sip_dao = sip_dao
         self.sccp_dao = sccp_dao
         self.extension_dao = extension_dao
@@ -153,7 +155,7 @@ class EntryFinder(object):
         if user_voicemail:
             entry.voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
 
-        user_line = self.user_line_dao.find_by(user_id=user.id)
+        user_line = self.user_line_dao.find_by(user_id=user.id, main_line=True)
         if user_line:
             self.attach_line_resources(entry, user_line)
 
@@ -161,8 +163,9 @@ class EntryFinder(object):
 
     def attach_line_resources(self, entry, user_line):
         entry.line = self.line_dao.get(user_line.line_id)
-        if user_line.extension_id:
-            entry.extension = self.extension_dao.get(user_line.extension_id)
+        line_extension = self.line_extension_dao.find_by(line_id=user_line.line_id, main_extension=True)
+        if line_extension:
+            entry.extension = self.extension_dao.get(line_extension.extension_id)
 
         if entry.line.endpoint == "sip":
             entry.sip = self.sip_dao.get(entry.line.endpoint_id)
