@@ -37,7 +37,8 @@ from xivo_confd.database import entity as entity_db
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
-USERNAME_PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]+$"
+USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
+PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
 CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
 
 
@@ -88,9 +89,9 @@ def build_validator():
             Optional('caller_id',
                      RegexField.compile('caller_id', CALLER_ID_REGEX)),
             Optional('username',
-                     RegexField.compile('username', USERNAME_PASSWORD_REGEX)),
+                     RegexField.compile('username', USERNAME_REGEX)),
             Optional('password',
-                     RegexField.compile('password', USERNAME_PASSWORD_REGEX)),
+                     RegexField.compile('password', PASSWORD_REGEX)),
             Optional('call_permission_password',
                      RegexField.compile('call_permission_password', CALL_PERMISSION_PASSWORD_REGEX)),
             Optional('ring_seconds',
