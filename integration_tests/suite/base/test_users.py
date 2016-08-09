@@ -375,6 +375,15 @@ def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
     assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
 
 
+@fixtures.user(firstname="Snôw", lastname="Whîte", username='snow.white+dwarves@disney.example.com')
+def test_that_the_username_can_be_an_email(user):
+    result = confd.users(user['id']).get()
+
+    assert_that(result.item, has_entries(firstname='Snôw',
+                                         lastname='Whîte',
+                                         username='snow.white+dwarves@disney.example.com'))
+
+
 def test_create_minimal_parameters():
     response = confd.users.post(firstname="Roger")
 
