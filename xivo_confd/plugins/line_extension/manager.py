@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014-2015 Avencall
+# Copyright (C) 2014-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ from xivo_dao.helpers import errors
 
 from xivo_dao.alchemy.context import Context
 from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.line_extension import LineExtension
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.dialaction import Dialaction
@@ -37,17 +38,6 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd.plugins.line_extension import validator
-
-
-class LineExtension(object):
-
-    @classmethod
-    def from_models(cls, line, extension):
-        return cls(line.id, extension.id)
-
-    def __init__(self, line_id, extension_id):
-        self.line_id = line_id
-        self.extension_id = extension_id
 
 
 def build_manager():
@@ -69,14 +59,16 @@ class AssociationManager(object):
         self.associators = associators
 
     def list(self, line_id):
-        user_line_query = (Session.query(UserLine.line_id,
-                                         UserLine.extension_id)
-                           .filter(UserLine.line_id == line_id)
-                           .filter(UserLine.extension_id != None)  # noqa
-                           .distinct())
+        line_extension_query = (Session.query(LineExtension.line_id,
+                                              LineExtension.extension_id)
+                                .filter(LineExtension.line_id == line_id)
+                                .distinct())
 
-        incall_query = (Session.query(UserLine.line_id,
+        incall_query = (Session.query(LineExtension.line_id,
                                       Extension.id.label('extension_id'))
+                        .join(UserLine,
+                              and_(UserLine.line_id == LineExtension.line_id,
+                                   LineExtension.main_extension == True))  # noqa
                         .join(Dialaction,
                               and_(Dialaction.action == 'user',
                                    cast(Dialaction.actionarg1, Integer) == UserLine.user_id,
@@ -87,10 +79,10 @@ class AssociationManager(object):
                         .join(Extension,
                               and_(Incall.exten == Extension.exten,
                                    Incall.context == Extension.context))
-                        .filter(UserLine.line_id == line_id))
+                        .filter(LineExtension.line_id == line_id))
 
-        return [LineExtension(row.line_id, row.extension_id)
-                for row in user_line_query.union(incall_query)]
+        return [LineExtension(line_id=row.line_id, extension_id=row.extension_id)
+                for row in line_extension_query.union(incall_query)]
 
     def associate(self, line, extension):
         associator = self._get_associator(extension)
@@ -141,7 +133,7 @@ class InternalAssociator(object):
     def associate(self, line, extension):
         self.validator.validate_association(line, extension)
         self.dao.associate(line, extension)
-        return LineExtension.from_models(line, extension)
+        return LineExtension(line_id=line.id, extension_id=extension.id)
 
     def dissociate(self, line, extension):
         self.validator.validate_dissociation(line, extension)
@@ -149,7 +141,7 @@ class InternalAssociator(object):
 
     def get_association(self, line, extension):
         self.dao.get_by(line_id=line.id, extension_id=extension.id)
-        return LineExtension.from_models(line, extension)
+        return LineExtension(line_id=line.id, extension_id=extension.id)
 
 
 class IncallAssociator(object):
@@ -163,7 +155,7 @@ class IncallAssociator(object):
     def associate(self, line, extension):
         self.validator.validate_association(line, extension)
         self._create_incall(line, extension)
-        return LineExtension.from_models(line, extension)
+        return LineExtension(line_id=line.id, extension_id=extension.id)
 
     def _create_incall(self, line, extension):
         main_user_line = self.user_line_dao.get_by(main_user=True, line_id=line.id)
@@ -182,4 +174,4 @@ class IncallAssociator(object):
             raise errors.not_found('LineExtension', line_id=line.id, extension_id=extension.id)
         if association.line_id != line.id:
             raise errors.not_found('LineExtension', line_id=line.id, extension_id=extension.id)
-        return LineExtension(association.line_id, association.extension_id)
+        return LineExtension(line_id=association.line_id, extension_id=association.extension_id)
