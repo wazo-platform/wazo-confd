@@ -22,7 +22,6 @@ from xivo_confd.plugins.device.builder import build_device_updater
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.helpers.validator import ValidationGroup
 
-from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.user import dao as user_dao
 
 
@@ -39,10 +38,7 @@ class UserService(UserBaseService):
         self.device_updater = device_updater
 
     def edit(self, user):
-        with Session.no_autoflush:
-            self.validator.validate_edit(user)
-        self.dao.edit(user)
-        self.notifier.edited(user)
+        super(UserService, self).edit(user)
         self.device_updater.update_for_user(user)
 
     def legacy_search(self, term):

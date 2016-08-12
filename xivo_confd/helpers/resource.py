@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from xivo_dao.helpers.db_manager import Session
+
 
 class CRUDService(object):
 
@@ -43,7 +45,8 @@ class CRUDService(object):
         return created_resource
 
     def edit(self, resource):
-        self.validator.validate_edit(resource)
+        with Session.no_autoflush:
+            self.validator.validate_edit(resource)
         self.dao.edit(resource)
         self.notifier.edited(resource)
 
