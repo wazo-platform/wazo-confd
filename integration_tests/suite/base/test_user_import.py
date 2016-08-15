@@ -33,6 +33,7 @@ from hamcrest import (assert_that,
 from test_api import confd
 from test_api import config
 from test_api import helpers as h
+from test_api import associations as a
 from test_api import fixtures
 
 
@@ -838,6 +839,30 @@ def test_when_updating_extension_then_extension_updated(entry):
     extension = confd.extensions(extension_id).get().item
     assert_that(extension, has_entries(exten=exten,
                                        context=config.CONTEXT))
+
+
+@fixtures.csv_entry(extension=True)
+@fixtures.line_sip()
+@fixtures.extension()
+def test_when_updating_extension_then_only_main_extension_updated(entry, line2, extension2):
+    exten = h.extension.find_available_exten(config.CONTEXT)
+
+    user = {'id': entry['user_uuid']}
+    with a.user_line(user, line2), a.line_extension(line2, extension2):
+        csv = [{"uuid": entry["user_uuid"],
+                "exten": exten,
+                "context": config.CONTEXT,
+                }]
+
+        response = client.put("/users/import", csv)
+        extension_id = get_update_field(response, 'extension_id')
+
+        response = confd.extensions(extension_id).get().item
+        assert_that(response, has_entries(exten=exten,
+                                          context=config.CONTEXT))
+
+        response = confd.extensions(extension2['id']).get().item
+        assert_that(response, has_entries(exten=extension2['exten']))
 
 
 @fixtures.csv_entry(line_protocol="sip")

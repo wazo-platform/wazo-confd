@@ -24,7 +24,7 @@ from xivo_confd.plugins.user_entity.notifier import UserEntityNotifier
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 
-class TestUserLineNotifier(unittest.TestCase):
+class TestEntityNotifier(unittest.TestCase):
 
     def setUp(self):
         self.bus = Mock()

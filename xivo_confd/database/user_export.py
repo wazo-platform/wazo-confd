@@ -28,6 +28,7 @@ from xivo_dao.alchemy.cti_profile import CtiProfile
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.line_extension import LineExtension
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.dialaction import Dialaction
@@ -175,7 +176,8 @@ def export_query(separator=";"):
         .outerjoin(User.main_line_rel)
         .outerjoin(UserLine.main_line_rel)
         .outerjoin(Line.sip_endpoint)
-        .outerjoin(UserLine.extensions)
+        .outerjoin(Line.line_extensions)
+        .outerjoin(LineExtension.main_extension_rel)
         .outerjoin(grouped_incalls,
                    User.id == grouped_incalls.c.user_id)
         .outerjoin(grouped_call_permissions,

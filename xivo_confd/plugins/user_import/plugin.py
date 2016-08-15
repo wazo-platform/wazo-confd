@@ -64,6 +64,7 @@ from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
 from xivo_dao.resources.extension import dao as extension_dao
@@ -126,6 +127,7 @@ class Plugin(object):
                                    user_cti_profile_dao,
                                    line_dao,
                                    user_line_dao,
+                                   line_extension_dao,
                                    sip_dao,
                                    sccp_dao,
                                    extension_dao,

@@ -22,7 +22,8 @@ from sqlalchemy.sql import or_
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.extension import Extension
-from xivo_dao.alchemy.user_line import UserLine as UserLine
+from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.line_extension import LineExtension
 from xivo_dao.alchemy.usersip import UserSIP
 from xivo_dao.alchemy.sccpdevice import SCCPDevice
 
@@ -46,7 +47,8 @@ def sip_lines_for_device(device_id):
              .join(LineFeatures.sip_endpoint)
              .join(LineFeatures.user_lines)
              .join(UserLine.main_user_rel)
-             .join(UserLine.main_extension_rel)
+             .join(LineFeatures.line_extensions)
+             .join(LineExtension.main_extension_rel)
              .filter(LineFeatures.device == device_id)
              .options(
                  Load(LineFeatures).load_only("id", "configregistrar"),

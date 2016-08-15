@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 from xivo_dao.helpers.db_manager import Session
 
 from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.line_extension import LineExtension
 
 
 def find_line_id_for_user(user_id):
@@ -48,7 +49,7 @@ def has_secondary_users(user_id, line_id):
 
 
 def find_extension_id_for_line(line_id):
-    return (Session.query(UserLine.extension_id)
-            .filter(UserLine.line_id == line_id)
-            .filter(UserLine.extension_id != None)  # noqa
+    return (Session.query(LineExtension.extension_id)
+            .filter(LineExtension.line_id == line_id)
+            .filter(LineExtension.main_extension == True)  # noqa
             .scalar())
