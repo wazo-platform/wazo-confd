@@ -21,7 +21,7 @@ from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 
-from xivo_confd.helpers.validator import Validator, ValidationGroup, RequiredFields, GetResource
+from xivo_confd.helpers.validator import Validator, ValidationGroup, GetResource
 
 
 class ExtenAvailableOnCreateValidator(Validator):
@@ -94,7 +94,6 @@ class ExtensionAssociationValidator(Validator):
 def build_validator():
     return ValidationGroup(
         common=[
-            RequiredFields('exten', 'context'),
             GetResource('context', context_dao.get, 'Context'),
             ExtensionRangeValidator(context_dao),
         ],
