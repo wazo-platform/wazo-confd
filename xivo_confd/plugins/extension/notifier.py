@@ -41,8 +41,9 @@ class ExtensionNotifier(object):
                                      extension.context)
         self.bus.send_bus_event(event, event.routing_key)
 
-    def edited(self, extension):
-        self.send_sysconfd_handlers(['dialplan reload', 'sip reload', 'module reload chan_sccp.so'])
+    def edited(self, extension, updated_fields):
+        if updated_fields is None or updated_fields:
+            self.send_sysconfd_handlers(['dialplan reload', 'sip reload', 'module reload chan_sccp.so'])
         event = EditExtensionEvent(extension.id,
                                    extension.exten,
                                    extension.context)
