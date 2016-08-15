@@ -18,6 +18,7 @@
 
 import abc
 
+from xivo_confd.plugins.extension.schema import ExtensionSchema
 from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from xivo_dao.helpers.exception import NotFoundError
@@ -132,6 +133,8 @@ class SccpCreator(Creator):
 
 class ExtensionCreator(Creator):
 
+    schema = ExtensionSchema(handle_error=False, strict=True)
+
     def find(self, fields):
         exten = fields.get('exten')
         context = fields.get('context')
@@ -145,7 +148,12 @@ class ExtensionCreator(Creator):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
-            return self.service.create(Extension(**fields))
+            form = self.schema.load(fields).data
+            return self.service.create(Extension(**form))
+
+    def update(self, fields, model):
+        form = self.schema.load(fields, partial=True).data
+        super(ExtensionCreator, self).update(form, model)
 
 
 class CtiProfileCreator(Creator):
