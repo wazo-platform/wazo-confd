@@ -47,6 +47,9 @@ class Creator(object):
         pass
 
     def update(self, fields, model):
+        if getattr(self, 'schema', False):
+            fields = self.schema.load(fields, partial=True).data
+
         self.update_model(fields, model)
         self.service.edit(model)
 
@@ -85,10 +88,6 @@ class VoicemailCreator(Creator):
         if number or context:
             form = self.schema.load(fields).data
             return self.service.create(Voicemail(**form))
-
-    def update(self, fields, model):
-        form = self.schema.load(fields, partial=True).data
-        super(VoicemailCreator, self).update(form, model)
 
 
 class LineCreator(Creator):
@@ -150,10 +149,6 @@ class ExtensionCreator(Creator):
         if exten and context:
             form = self.schema.load(fields).data
             return self.service.create(Extension(**form))
-
-    def update(self, fields, model):
-        form = self.schema.load(fields, partial=True).data
-        super(ExtensionCreator, self).update(form, model)
 
 
 class CtiProfileCreator(Creator):
