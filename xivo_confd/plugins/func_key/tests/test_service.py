@@ -96,9 +96,9 @@ class TestTemplateService(unittest.TestCase):
         self.template_dao.edit.assert_called_once_with(self.template)
 
     def test_when_editing_then_sends_notification(self):
-        self.service.edit(self.template)
+        self.service.edit(self.template, None)
 
-        self.notifier.edited.assert_called_once_with(self.template)
+        self.notifier.edited.assert_called_once_with(self.template, None)
 
     def test_when_editing_then_updates_func_keys_for_device(self):
         self.service.edit(self.template)

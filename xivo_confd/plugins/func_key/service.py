@@ -74,25 +74,26 @@ class TemplateService(object):
         self.notifier.created(created_template)
         return created_template
 
-    def edit(self, template, updated_fields=[]):
+    def edit(self, template, updated_fields=None):
         self.validator.validate_edit(template)
         self._adjust_blfs(template)
         self.template_dao.edit(template)
         self.device_updater.update_for_template(template)
-        self.notifier.edited(template)
+        self.notifier.edited(template, updated_fields)
 
     def edit_funckey(self, funckey, template, position):
         template.keys[position] = funckey
-        self.edit(template)
+        updated_fields = [position]
+        self.edit(template, updated_fields)
 
     def edit_user_funckey(self, user, funckey, template, position):
         self.validator_bsfilter.validate(user, funckey)
         self.edit_funckey(funckey, template, position)
 
-    def edit_user_template(self, user, template):
+    def edit_user_template(self, user, template, updated_fields):
         for funckey in template.keys.itervalues():
             self.validator_bsfilter.validate(user, funckey)
-        self.edit(template)
+        self.edit(template, updated_fields)
 
     def delete(self, template):
         self.validator.validate_delete(template)
@@ -106,7 +107,8 @@ class TemplateService(object):
     def delete_funckey(self, template, position):
         if position in template.keys:
             del template.keys[position]
-        self.edit(template)
+        updated_fields = [position]
+        self.edit(template, updated_fields)
 
     def _adjust_blfs(self, template):
         for funckey in template.keys.values():
