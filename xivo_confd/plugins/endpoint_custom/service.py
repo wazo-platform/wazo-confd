@@ -16,7 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.endpoint_custom import dao
 
 from xivo_confd.helpers.resource import CRUDService
@@ -24,16 +23,7 @@ from xivo_confd.plugins.endpoint_custom.validator import build_validator
 from xivo_confd.plugins.endpoint_custom.notifier import build_notifier
 
 
-class CustomEndpointService(CRUDService):
-
-    def edit(self, custom):
-        with Session.no_autoflush:
-            self.validator.validate_edit(custom)
-        self.dao.edit(custom)
-        self.notifier.edited(custom)
-
-
 def build_service():
-    return CustomEndpointService(dao,
-                                 build_validator(),
-                                 build_notifier())
+    return CRUDService(dao,
+                       build_validator(),
+                       build_notifier())

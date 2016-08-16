@@ -20,21 +20,10 @@ from xivo_confd.plugins.call_permission.notifier import build_notifier
 
 from xivo_confd.helpers.resource import CRUDService
 
-from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 
 
-# TODO: Put no_autoflush in the CRUDService
-class CallPermissionService(CRUDService):
-
-    def edit(self, call_permission):
-        with Session.no_autoflush:
-            self.validator.validate_edit(call_permission)
-        self.dao.edit(call_permission)
-        self.notifier.edited(call_permission)
-
-
 def build_service():
-    return CallPermissionService(call_permission_dao,
-                                 build_validator(),
-                                 build_notifier())
+    return CRUDService(call_permission_dao,
+                       build_validator(),
+                       build_notifier())
