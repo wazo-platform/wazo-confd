@@ -34,7 +34,7 @@ setup(
     ],
 
     package_data={
-        'xivo_confd.plugins.api': ['*.json'],
+        'xivo_confd.plugins.*': ['*.json'],
     },
 
     zip_safe=False,
