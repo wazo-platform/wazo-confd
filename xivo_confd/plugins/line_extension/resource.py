@@ -19,27 +19,23 @@
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
-from flask import url_for
-from flask_restful import reqparse, fields, marshal
+from flask import url_for, request
+from marshmallow import fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ConfdResource
 
 
-fields = {
-    'line_id': fields.Integer,
-    'extension_id': fields.Integer,
-    'links': FieldList(Link('lines',
-                            field='line_id',
-                            target='id'),
-                       Link('extensions',
-                            field='extension_id',
-                            target='id'))
-}
-
-parser = reqparse.RequestParser()
-parser.add_argument('line_id', type=int, required=True, location='view_args')
-parser.add_argument('extension_id', type=int, required=True)
+class LineExtensionSchema(BaseSchema):
+    line_id = fields.Integer()
+    extension_id = fields.Integer(required=True)
+    links = ListLink(Link('lines',
+                          field='line_id',
+                          target='id'),
+                     Link('extensions',
+                          field='extension_id',
+                          target='id'))
 
 
 class LineExtensionResource(ConfdResource):
@@ -50,30 +46,28 @@ class LineExtensionResource(ConfdResource):
         self.line_dao = line_dao
         self.extension_dao = extension_dao
 
-    def get_extension_or_fail(self):
-        form = parser.parse_args()
-        try:
-            return self.extension_dao.get(form['extension_id'])
-        except NotFoundError:
-            raise errors.param_not_found('extension_id', 'Extension')
-
 
 class LineExtensionList(LineExtensionResource):
+
+    schema = LineExtensionSchema()
 
     @required_acl('confd.lines.{line_id}.extensions.read')
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         items = self.service.list(line.id)
         return {'total': len(items),
-                'items': [marshal(item, fields) for item in items]}
+                'items': self.schema.dump(items, many=True).data}
 
     @required_acl('confd.lines.{line_id}.extensions.create')
     def post(self, line_id):
+        return self.post_deprecated(line_id)
+
+    def post_deprecated(self, line_id):
         line = self.line_dao.get(line_id)
         extension = self.get_extension_or_fail()
         line_extension = self.service.associate(line, extension)
         headers = self.build_headers(line_extension)
-        return marshal(line_extension, fields), 201, headers
+        return self.schema.dump(line_extension).data, 201, headers
 
     def build_headers(self, model):
         url = url_for('line_extensions',
@@ -81,6 +75,13 @@ class LineExtensionList(LineExtensionResource):
                       line_id=model.line_id,
                       _external=True)
         return {'Location': url}
+
+    def get_extension_or_fail(self):
+        form = self.schema.load(request.get_json()).data
+        try:
+            return self.extension_dao.get(form['extension_id'])
+        except NotFoundError:
+            raise errors.param_not_found('extension_id', 'Extension')
 
 
 class LineExtensionItem(LineExtensionResource):
