@@ -47,6 +47,18 @@ class LineExtensionResource(ConfdResource):
         self.extension_dao = extension_dao
 
 
+class ExtensionLineList(LineExtensionResource):
+
+    schema = LineExtensionSchema()
+
+    @required_acl('confd.extensions.{extension_id}.lines.read')
+    def get(self, extension_id):
+        extension = self.extension_dao.get(extension_id)
+        items = self.service.find_all_by(extension_id=extension.id)
+        return {'total': len(items),
+                'items': self.schema.dump(items, many=True).data}
+
+
 class LineExtensionList(LineExtensionResource):
 
     schema = LineExtensionSchema()

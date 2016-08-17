@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,13 @@
 from xivo_confd.plugins.line_extension.manager import build_manager
 from xivo_confd.plugins.line_extension import notifier
 
+from xivo_dao.resources.line_extension import dao as line_extension_dao
+
 
 class LineExtensionService(object):
 
-    def __init__(self, manager, notifier):
+    def __init__(self, dao, manager, notifier):
+        self.dao = dao
         self.manager = manager
         self.notifier = notifier
 
@@ -31,6 +34,9 @@ class LineExtensionService(object):
 
     def get(self, line, extension):
         return self.manager.get_association(line, extension)
+
+    def find_all_by(self, **criteria):
+        return self.dao.find_all_by(**criteria)
 
     def associate(self, line, extension):
         line_extension = self.manager.associate(line, extension)
@@ -44,5 +50,6 @@ class LineExtensionService(object):
 
 
 def build_service():
-    return LineExtensionService(build_manager(),
+    return LineExtensionService(line_extension_dao,
+                                build_manager(),
                                 notifier)

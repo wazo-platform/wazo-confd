@@ -21,7 +21,6 @@ from test_api.helpers.extension import generate_extension, delete_extension
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
-from test_api import helpers as h
 from test_api import confd
 from test_api import db
 from test_api import fixtures
@@ -32,41 +31,10 @@ from hamcrest import contains
 from hamcrest import empty
 from hamcrest import has_entries
 from hamcrest import has_item
-
-import re
+from hamcrest import has_items
 
 
 FAKE_ID = 999999999
-
-no_line_associated_regex = re.compile(r"Extension with id=\d+ does not have a line")
-no_user_associated_regex = re.compile(r"line with id \d+ is not associated to a user")
-already_associated_regex = re.compile(r"line with id \d+ already has an extension with a context of type 'internal'")
-
-
-class TestLineExtensionCollectionAssociation(s.AssociationScenarios,
-                                             s.DissociationCollectionScenarios,
-                                             s.AssociationGetCollectionScenarios):
-
-    left_resource = "Line"
-    right_resource = "Extension"
-
-    def create_resources(self):
-        line = generate_line()
-        extension = generate_extension()
-        return line['id'], extension['id']
-
-    def delete_resources(self, line_id, extension_id):
-        delete_line(line_id)
-        delete_extension(extension_id)
-
-    def associate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extensions.post(extension_id=extension_id)
-
-    def dissociate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extensions(extension_id).delete()
-
-    def get_association(self, line_id, extension_id):
-        return confd.lines(line_id).extensions.get()
 
 
 class TestLineExtensionAssociation(s.AssociationScenarios, s.DissociationScenarios, s.AssociationGetScenarios):
@@ -103,29 +71,53 @@ def test_associate_errors(line, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
-@fixtures.line_sip()
-def test_get_associations_when_not_associated(line):
-    response = confd.lines(line['id']).extensions.get()
-    assert_that(response.items, contains())
+@fixtures.line()
+@fixtures.extension()
+def test_dissociate_errors(line, extension):
+    fake_line = confd.lines(FAKE_ID).extensions(extension['id']).delete
+    fake_extension = confd.lines(line['id']).extensions(FAKE_ID).delete
+    fake_line_extension = confd.lines(line['id']).extensions(extension['id']).delete
+
+    yield s.check_resource_not_found, fake_line, 'Line'
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+    yield s.check_resource_not_found, fake_line_extension, 'LineExtension'
+
+
+def test_get_errors():
+    fake_line = confd.lines(FAKE_ID).extensions.get
+    fake_extension = confd.extensions(FAKE_ID).lines.get
+
+    yield s.check_resource_not_found, fake_line, 'Line'
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+
+
+@fixtures.extension()
+@fixtures.extension(context=config.INCALL_CONTEXT)
+def test_get_errors_deprecated(extension, incall):
+    fake_extension_deprecated = confd.extensions(FAKE_ID).line.get
+    not_associated_extension_deprecated = confd.extensions(extension['id']).line.get
+    not_associated_incall_deprecated = confd.extensions(incall['id']).line.get
+
+    yield s.check_resource_not_found, fake_extension_deprecated, 'Extension'
+    yield s.check_resource_not_found, not_associated_extension_deprecated, 'LineExtension'
+    yield s.check_resource_not_found, not_associated_incall_deprecated, 'LineExtension'
 
 
 @fixtures.line_sip()
 @fixtures.extension()
-def test_get_line_from_extension_when_not_associated(line, extension):
-    response = confd.extensions(extension['id']).line.get()
-    response.assert_match(404, e.not_found('LineExtension'))
+def test_get_associations_when_not_associated(line, extension):
+    response = confd.lines(line['id']).extensions.get()
+    assert_that(response.items, empty())
+
+    response = confd.extensions(extension['id']).lines.get()
+    assert_that(response.items, empty())
 
 
 @fixtures.line_sip()
-@fixtures.extension(context=config.INCALL_CONTEXT)
-def test_get_line_from_incall_when_not_associated(line, incall):
-    response = confd.extensions(incall['id']).line.get()
-    response.assert_match(404, e.not_found('LineExtension'))
-
-
-def test_get_line_from_fake_extension():
-    response = confd.extensions(FAKE_ID).line.get()
-    response.assert_match(404, e.not_found('Extension'))
+@fixtures.extension()
+def test_associate_deprecated(line, extension):
+    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
+    response.assert_created('lines', 'extensions')
 
 
 @fixtures.line_sip()
@@ -223,6 +215,14 @@ def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extensio
         response.assert_updated()
 
 
+@fixtures.extension()
+@fixtures.line_sip()
+def test_associate_line_to_extension_already_associated(extension, line):
+    with a.line_extension(line, extension):
+        response = confd.lines(line['id']).extensions(extension['id']).put()
+        response.assert_match(400, e.resource_associated('Extension', 'Line'))
+
+
 @fixtures.line_sip()
 def test_associate_line_to_extension_already_associated_to_other_resource(line):
     with db.queries() as queries:
@@ -279,12 +279,28 @@ def test_get_line_extension(line, extension):
         response = confd.lines(line['id']).extensions.get()
         assert_that(response.items, expected)
 
+        response = confd.extensions(extension['id']).lines.get()
+        assert_that(response.items, expected)
+
+
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.extension()
+def test_get_multi_lines_extension(line1, line2, extension):
+    expected = has_items(has_entries(line_id=line1['id'],
+                                     extension_id=extension['id']),
+                         has_entries(line_id=line2['id'],
+                                     extension_id=extension['id']))
+
+    with a.line_extension(line1, extension), a.line_extension(line2, extension):
+        response = confd.extensions(extension['id']).lines.get()
+        assert_that(response.items, expected)
+
 
 @fixtures.line_sip()
 @fixtures.extension()
-def test_get_line_extension_after_dissociation(line, extension):
-    h.line_extension.associate(line['id'], extension['id'])
-    h.line_extension.dissociate(line['id'], extension['id'])
-
-    response = confd.lines(line['id']).extensions.get()
-    assert_that(response.items, empty())
+def test_dissociation(line, extension):
+    with a.line_extension(line, extension, check=False):
+        confd.lines(line['id']).extensions(extension['id']).delete().assert_deleted()
+        response = confd.lines(line['id']).extensions.get()
+        assert_that(response.items, empty())
