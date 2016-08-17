@@ -4956,15 +4956,18 @@
                 },
                 "device_id": {
                     "type": "string",
-                    "description": "ID of the device associated to the line"
+                    "description": "ID of the device associated to the line",
+                    "readOnly": true
                 },
                 "device_slot": {
                     "type": "integer",
-                    "description": "Line's position on the device"
+                    "description": "*Deprecated* Please use `position`",
+                    "readOnly": true
                 },
                 "name": {
                     "type": "string",
-                    "description": "The name of the line"
+                    "description": "The name of the line",
+                    "readOnly": true
                 },
                 "protocol": {
                     "type": "string",
@@ -4976,7 +4979,8 @@
                 },
                 "provisioning_extension": {
                     "type": "string",
-                    "description": "Code used to provision a device"
+                    "description": "*Deprecated* Please use `provisioning_code`",
+                    "readOnly": true
                 },
                 "provisioning_code": {
                     "type": "string",

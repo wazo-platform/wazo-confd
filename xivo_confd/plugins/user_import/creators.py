@@ -100,7 +100,7 @@ class LineCreator(Creator):
         if 'endpoint' in fields:
             del fields['endpoint']
             self.update_model(fields, line)
-            self.service.edit(line)
+            self.service.edit(line, fields.keys())
 
     def create(self, fields):
         fields = dict(fields)

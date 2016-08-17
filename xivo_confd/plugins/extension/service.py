@@ -29,8 +29,8 @@ class ExtensionService(CRUDService):
         super(ExtensionService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
 
-    def edit(self, extension):
-        super(ExtensionService, self).edit(extension)
+    def edit(self, extension, updated_fields=[]):
+        super(ExtensionService, self).edit(extension, updated_fields)
         self.device_updater.update_for_extension(extension)
 
 

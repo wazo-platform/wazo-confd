@@ -30,7 +30,7 @@ class VoicemailService(CRUDService):
         super(VoicemailService, self).__init__(dao, validator, notifier, extra)
         self.sysconf = sysconf
 
-    def edit(self, voicemail):
+    def edit(self, voicemail, updated_fields=[]):
         self.validator.validate_edit(voicemail)
         old_voicemail = self.dao.get(voicemail.id)
         self.dao.edit(voicemail)

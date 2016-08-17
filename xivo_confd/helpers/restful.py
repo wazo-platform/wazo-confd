@@ -154,9 +154,20 @@ class ItemResource(ConfdResource):
 
     def parse_and_update(self, model):
         form = self._load_form_partial()
+        updated_fields = self.find_updated_fields(model, form)
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model)
+        self.service.edit(model, updated_fields)
+
+    def find_updated_fields(self, model, form):
+        updated_fields = []
+        for name, value in form.iteritems():
+            try:
+                if getattr(model, name) != value:
+                    updated_fields.append(name)
+            except AttributeError:
+                pass
+        return updated_fields
 
     def delete(self, id):
         model = self.service.get(id)

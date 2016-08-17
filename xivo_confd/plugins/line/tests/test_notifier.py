@@ -55,9 +55,16 @@ class TestLineNotifier(unittest.TestCase):
                                                         expected_event.routing_key)
 
     def test_when_line_edited_then_sip_reloaded(self):
-        self.notifier.edited(self.line)
+        updated_fields = ['name']
+        self.notifier.edited(self.line, updated_fields)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
+
+    def test_when_line_edited_and_no_change_then_sip_not_reloaded(self):
+        updated_fields = []
+        self.notifier.edited(self.line, updated_fields)
+
+        self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_line_edited_then_event_sent_on_bus(self):
         expected_event = EditLineEvent(self.line.id)
