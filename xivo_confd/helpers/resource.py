@@ -44,7 +44,7 @@ class CRUDService(object):
         self.notifier.created(created_resource)
         return created_resource
 
-    def edit(self, resource, updated_fields=[]):
+    def edit(self, resource, updated_fields=None):
         with Session.no_autoflush:
             self.validator.validate_edit(resource)
         self.dao.edit(resource)

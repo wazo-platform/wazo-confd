@@ -37,7 +37,7 @@ class LineService(CRUDService):
     def find_all_by(self, **criteria):
         return self.dao.find_all_by(**criteria)
 
-    def edit(self, line, updated_fields=[]):
+    def edit(self, line, updated_fields=None):
         with Session.no_autoflush:
             self.validator.validate_edit(line)
         self.dao.edit(line)

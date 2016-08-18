@@ -39,8 +39,8 @@ class LineNotifier(object):
         event = CreateLineEvent(line.id)
         self.bus.send_bus_event(event, event.routing_key)
 
-    def edited(self, line, updated_fields=[]):
-        if updated_fields:
+    def edited(self, line, updated_fields):
+        if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers()
         event = EditLineEvent(line.id)
         self.bus.send_bus_event(event, event.routing_key)

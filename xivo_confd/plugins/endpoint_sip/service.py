@@ -31,7 +31,7 @@ class SipEndpointService(CRUDService):
         super(SipEndpointService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
 
-    def edit(self, sip, updated_fields=[]):
+    def edit(self, sip, updated_fields=None):
         super(SipEndpointService, self).edit(sip, updated_fields)
         self.device_updater.update_for_endpoint_sip(sip)
 
