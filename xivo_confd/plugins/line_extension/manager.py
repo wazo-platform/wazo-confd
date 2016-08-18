@@ -124,7 +124,7 @@ class AssociationService(object):
         return
 
 
-class InternalAssociator(object):
+class InternalAssociator(AssociationService):
 
     def __init__(self, validator, dao):
         self.validator = validator
@@ -144,7 +144,7 @@ class InternalAssociator(object):
         return LineExtension(line_id=line.id, extension_id=extension.id)
 
 
-class IncallAssociator(object):
+class IncallAssociator(AssociationService):
 
     def __init__(self, validator, user_line_dao, incall_dao, extension_dao):
         self.validator = validator

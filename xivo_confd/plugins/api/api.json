@@ -1131,10 +1131,11 @@
         "/extensions/{extension_id}/line": {
             "get": {
                 "operationId": "get_extension_line_association",
+                "deprecated": true,
                 "summary": "List lines association to extension",
                 "description": "**Required ACL:** `confd.#`",
                 "tags": [
-                    "extensions"
+                    "deprecated"
                 ],
                 "parameters": [
                     {
@@ -1146,6 +1147,33 @@
                         "description": "Line-Extension association",
                         "schema": {
                             "$ref": "#/definitions/LineExtension"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/extensions/{extension_id}/lines": {
+            "get": {
+                "operationId": "list_extension_line_association",
+                "summary": "List lines association to extension",
+                "description": "**Required ACL:** `confd.extensions.{extension_id}.lines.read`",
+                "tags": [
+                    "extensions",
+                    "lines"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/extensionid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of associations",
+                        "schema": {
+                            "$ref": "#/definitions/LineExtensionItems"
                         }
                     },
                     "404": {

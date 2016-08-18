@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
 from xivo_confd import api
-from xivo_confd.plugins.line_extension.resource import LineExtensionItem, LineExtensionList
+from xivo_confd.plugins.line_extension.resource import LineExtensionItem, LineExtensionList, ExtensionLineList
 from xivo_confd.plugins.line_extension.legacy import LineExtensionLegacy, ExtensionLineLegacy
 from xivo_confd.plugins.line_extension.service import build_service
 
@@ -41,6 +41,11 @@ class Plugin(object):
 
         api.add_resource(LineExtensionList,
                          '/lines/<int:line_id>/extensions',
+                         resource_class_args=class_args
+                         )
+
+        api.add_resource(ExtensionLineList,
+                         '/extensions/<int:extension_id>/lines',
                          resource_class_args=class_args
                          )
 
