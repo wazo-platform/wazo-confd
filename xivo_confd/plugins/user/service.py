@@ -37,7 +37,7 @@ class UserService(UserBaseService):
         super(UserService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
 
-    def edit(self, user, updated_fields=[]):
+    def edit(self, user, updated_fields=None):
         super(UserService, self).edit(user, updated_fields)
         self.device_updater.update_for_user(user)
 
