@@ -33,9 +33,7 @@ setup(
         'bin/xivo-confd'
     ],
 
-    package_data={
-        'xivo_confd.plugins.*': ['*.json'],
-    },
+    package_data={'xivo_confd.plugins': ['*/api.json']},
 
     zip_safe=False,
     entry_points={
