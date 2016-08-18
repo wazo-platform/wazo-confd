@@ -2709,6 +2709,7 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "User-Forwards",
                         "schema": {
                             "$ref": "#/definitions/UserForwards"
                         }
@@ -2765,6 +2766,7 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "User-Forward",
                         "schema": {
                             "$ref": "#/definitions/UserForward"
                         }
@@ -3134,6 +3136,7 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "User-Services",
                         "schema": {
                             "$ref": "#/definitions/UserServices"
                         }
@@ -3163,6 +3166,7 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "User-Service",
                         "schema": {
                             "$ref": "#/definitions/UserService"
                         }
@@ -3602,6 +3606,7 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "Wizard status",
                         "schema": {
                             "$ref": "#/definitions/WizardConfigured"
                         }
@@ -3628,6 +3633,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "Wizard passed",
                         "schema": {
                             "$ref": "#/definitions/Wizard"
                         }
@@ -3651,6 +3657,7 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "Wizard discover",
                         "schema": {
                             "$ref": "#/definitions/WizardDiscover"
                         }
@@ -4765,10 +4772,6 @@
                 "keys": {
                     "type": "object"
                 }
-            },
-            "externalDocs": {
-                "url": "http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
-                "description": "Documentation on function key models"
             }
         },
         "FuncKey": {
@@ -4784,10 +4787,6 @@
                 "destination": {
                     "type": "object"
                 }
-            },
-            "externalDocs": {
-                "url": "http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html",
-                "description": "Documentation on function key models"
             }
         },
         "Info": {
