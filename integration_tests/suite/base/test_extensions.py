@@ -36,11 +36,6 @@ outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for con
 FAKE_ID = 999999999
 
 
-def test_alphanumeric_extension():
-    url = confd.extensions(context='default').post
-    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123'
-
-
 def test_get_errors():
     url = confd.extensions(FAKE_ID).get
     yield s.check_resource_not_found, url, 'Extension'
@@ -55,23 +50,26 @@ def test_post_errors(extension):
 
 @fixtures.extension()
 def test_put_errors(extension):
-    url = confd.extensions(extension['id'],
-                           exten=extension['exten'],
-                           context=extension['context']).put
+    url = confd.extensions(extension['id']).put
     for check in error_checks(url):
         yield check
 
 
-@fixtures.extension()
-def test_delete_errors(extension):
-    url = confd.extensions(extension['id'])
-    url.delete()
-    yield s.check_resource_not_found, url.get, 'Extension'
+def test_delete_errors():
+    url = confd.extensions(FAKE_ID).delete
+    yield s.check_resource_not_found, url, 'Extension'
 
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'exten', None
+    yield s.check_bogus_field_returns_error, url, 'exten', True
+    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123'
+    yield s.check_bogus_field_returns_error, url, 'exten', {}
+    yield s.check_bogus_field_returns_error, url, 'exten', []
     yield s.check_bogus_field_returns_error, url, 'context', None
+    yield s.check_bogus_field_returns_error, url, 'context', True
+    yield s.check_bogus_field_returns_error, url, 'context', {}
+    yield s.check_bogus_field_returns_error, url, 'context', []
 
 
 @fixtures.extension()

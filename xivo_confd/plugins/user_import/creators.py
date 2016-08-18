@@ -18,6 +18,7 @@
 
 import abc
 
+from xivo_confd.plugins.extension.schema import ExtensionSchema
 from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from xivo_dao.helpers.exception import NotFoundError
@@ -46,6 +47,9 @@ class Creator(object):
         pass
 
     def update(self, fields, model):
+        if getattr(self, 'schema', False):
+            fields = self.schema.load(fields, partial=True).data
+
         self.update_model(fields, model)
         self.service.edit(model)
 
@@ -84,10 +88,6 @@ class VoicemailCreator(Creator):
         if number or context:
             form = self.schema.load(fields).data
             return self.service.create(Voicemail(**form))
-
-    def update(self, fields, model):
-        form = self.schema.load(fields, partial=True).data
-        super(VoicemailCreator, self).update(form, model)
 
 
 class LineCreator(Creator):
@@ -132,6 +132,8 @@ class SccpCreator(Creator):
 
 class ExtensionCreator(Creator):
 
+    schema = ExtensionSchema(handle_error=False, strict=True)
+
     def find(self, fields):
         exten = fields.get('exten')
         context = fields.get('context')
@@ -145,7 +147,8 @@ class ExtensionCreator(Creator):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
-            return self.service.create(Extension(**fields))
+            form = self.schema.load(fields).data
+            return self.service.create(Extension(**form))
 
 
 class CtiProfileCreator(Creator):

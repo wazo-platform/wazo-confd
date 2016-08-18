@@ -17,33 +17,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
-from flask_restful import reqparse, fields
-
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
-    Strict, DigitStr
+from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_dao.alchemy.extension import Extension
 
-
-fields = {
-    'id': fields.Integer,
-    'exten': fields.String,
-    'context': fields.String,
-    'commented': fields.Boolean(attribute='legacy_commented'),
-    'links': FieldList(Link('extensions'))
-}
-
-parser = reqparse.RequestParser()
-parser.add_argument('exten', type=DigitStr(), store_missing=False)
-parser.add_argument('context', type=Strict(unicode), store_missing=False)
-parser.add_argument('commented', type=Strict(bool), store_missing=False, dest='legacy_commented')
+from .schema import ExtensionSchema
 
 
 class ExtensionList(ListResource):
 
     model = Extension
-    fields = fields
-    parser = parser
+    schema = ExtensionSchema()
 
     def build_headers(self, extension):
         return {'Location': url_for('extensions', id=extension.id, _external=True)}
@@ -59,8 +43,7 @@ class ExtensionList(ListResource):
 
 class ExtensionItem(ItemResource):
 
-    fields = fields
-    parser = parser
+    schema = ExtensionSchema()
 
     @required_acl('confd.extensions.{id}.read')
     def get(self, id):

@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.extension import dao
 
 from xivo_confd.helpers.resource import CRUDService
@@ -30,7 +31,10 @@ class ExtensionService(CRUDService):
         self.device_updater = device_updater
 
     def edit(self, extension, updated_fields=None):
-        super(ExtensionService, self).edit(extension, updated_fields)
+        with Session.no_autoflush:
+            self.validator.validate_edit(extension)
+        self.dao.edit(extension)
+        self.notifier.edited(extension, updated_fields)
         self.device_updater.update_for_extension(extension)
 
 
