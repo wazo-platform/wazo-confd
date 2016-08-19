@@ -35,8 +35,13 @@ class BaseSchema(Schema):
         # Without this, the nested schema handle error and abort. So the error
         # message will not include parent key and the rest of the parent schema
         # will not be validated
+        self._inherit_handle_error(field_obj)
+
+    def _inherit_handle_error(self, field_obj):
         if isinstance(field_obj, fields.Nested):
             field_obj.schema.handle_error = super(BaseSchema, self).handle_error
+        if isinstance(field_obj, fields.List):
+            self._inherit_handle_error(field_obj.container)
 
 
 class StrictBoolean(fields.Boolean):

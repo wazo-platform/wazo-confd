@@ -58,6 +58,7 @@ setup(
             'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'queue_member_plugin = xivo_confd.plugins.queue_member.plugin:Plugin',
+            'sip_general_plugin = xivo_confd.plugins.sip_general.plugin:Plugin',
             'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
             'user_call_permission_plugin = xivo_confd.plugins.user_call_permission.plugin:Plugin',
             'user_cti_profile_plugin = xivo_confd.plugins.user_cti_profile.plugin:Plugin',

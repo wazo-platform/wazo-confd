@@ -4804,8 +4804,8 @@
             "items": {
                 "type": "string"
             },
-            "maxLength": 2,
-            "minLength": 2
+            "maxItems": 2,
+            "minItems": 2
         },
         "LineView": {
             "title": "Line",
