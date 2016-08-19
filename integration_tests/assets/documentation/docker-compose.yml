@@ -1,0 +1,33 @@
+sync:
+  image: n3llyb0y/wait
+  links:
+    - confd
+    - swagger-validator
+    - postgres
+  environment:
+    PORTS: "9486 8080 5432"
+
+confd:
+  image: xivo-confd-test
+  expose:
+    - "9486"
+  links:
+    - postgres
+  volumes:
+    - "../../..:/usr/src/xivo-confd"
+    - "./etc/ssl:/usr/share/xivo-certs"
+  environment:
+    XIVO_UUID: "abcd-1234"
+  command: "xivo-confd -f -d"
+
+postgres:
+  image: xivo/postgres
+  expose:
+    - "5432"
+
+swagger-validator:
+  image: swaggerapi/swagger-validator
+  ports:
+    - "18080:8080"
+  links:
+    - confd

@@ -11,6 +11,7 @@ test-setup: build-provd build-confd egg-info
 	docker pull xivo/postgres
 	docker pull xivo/postgres-test
 	docker pull p0bailey/docker-flask
+	docker pull swaggerapi/swagger-validator
 
 build-confd:
 	docker build -t xivo/xivo-confd ..
