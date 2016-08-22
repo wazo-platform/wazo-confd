@@ -18,7 +18,7 @@
 
 from flask import url_for
 from flask_restful import abort
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, pre_load
 
 
 class BaseSchema(Schema):
@@ -37,6 +37,10 @@ class BaseSchema(Schema):
         # will not be validated
         if isinstance(field_obj, fields.Nested):
             field_obj.schema.handle_error = super(BaseSchema, self).handle_error
+
+    @pre_load
+    def ensure_dict(self, data):
+        return data or {}
 
 
 class StrictBoolean(fields.Boolean):
