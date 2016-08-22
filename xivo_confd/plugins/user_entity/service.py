@@ -22,11 +22,6 @@ from xivo_confd.plugins.user_entity.notifier import build_notifier
 from xivo_confd.plugins.user_entity.validator import build_validator
 
 
-class Entity(object):
-    def __init__(self, entity_id):
-        self.id = entity_id
-
-
 class UserEntityService(object):
 
     def __init__(self, dao, validator, notifier):
@@ -39,10 +34,9 @@ class UserEntityService(object):
         user.user_id = user_id
         return user
 
-    def associate(self, user, entity_id):
-        entity = Entity(entity_id)
+    def associate(self, user, entity):
         self.validator.validate_association(user, entity)
-        user.entity_id = entity_id
+        user.entity_id = entity.id
         self.dao.edit(user)
         self.notifier.associated(user, entity)
 
