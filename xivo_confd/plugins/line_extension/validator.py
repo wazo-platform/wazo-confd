@@ -16,13 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_confd.database import user_line as user_line_db
-from xivo_confd.database import extension as extension_db
 
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_dao.resources.extension import dao as extension_dao
 
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
@@ -48,12 +48,12 @@ class InternalAssociationValidator(Validator):
                                              extension_id=extension_id)
 
     def validate_extension_not_associated_to_other_resource(self, extension):
-        resource, resource_id = extension_db.get_associated_resource(extension.id)
-        if resource != 'user':
+        extension = extension_dao.find_by(id=extension.id)
+        if extension.type != 'user':
             raise errors.resource_associated('Extension',
-                                             resource,
+                                             extension.type,
                                              id=extension.id,
-                                             associated_id=resource_id)
+                                             associated_id=extension.typeval)
 
     def validate_line_has_no_different_user(self, line, extension):
         user_line = user_line_dao.find_by(line_id=line.id, main_user=True)
