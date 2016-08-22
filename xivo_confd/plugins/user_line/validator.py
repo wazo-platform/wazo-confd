@@ -16,8 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.database import user_line as user_line_db
-
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
 from xivo_dao.helpers import errors
@@ -76,8 +74,9 @@ class UserLineDissociationValidator(Validator):
         ValidateLineHasNoDevice().validate(line)
 
     def validate_no_secondary_users(self, user, line):
-        exists = user_line_db.has_secondary_users(user.id, line.id)
-        if exists:
+        user_line = user_line_dao.find_by(line_id=line.id,
+                                          main_user=False)
+        if user_line and user_line.user_id != user.id:
             raise errors.secondary_users(line_id=line.id)
 
 

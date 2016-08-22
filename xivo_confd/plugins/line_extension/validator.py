@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.database import user_line as user_line_db
-
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.helpers import errors
@@ -41,11 +39,11 @@ class InternalAssociationValidator(Validator):
                                              line_id=line.id)
 
     def validate_line_has_no_extension(self, line):
-        extension_id = user_line_db.find_extension_id_for_line(line.id)
-        if extension_id:
+        line_extension = line_extension_dao.find_by(line_id=line.id)
+        if line_extension:
             raise errors.resource_associated('Line', 'Extension',
-                                             line_id=line.id,
-                                             extension_id=extension_id)
+                                             line_id=line_extension.line_id,
+                                             extension_id=line_extension.extension_id)
 
     def validate_extension_not_associated_to_other_resource(self, extension):
         extension = extension_dao.find_by(id=extension.id)
@@ -84,8 +82,8 @@ class IncallAssociationValidator(Validator):
         self.validate_line_has_user(line)
 
     def validate_line_has_user(self, line):
-        exists = user_line_db.check_line_has_users(line.id)
-        if not exists:
+        user_line = user_line_dao.find_by(line_id=line.id)
+        if not user_line:
             raise errors.missing_association('Line', 'User')
 
 
