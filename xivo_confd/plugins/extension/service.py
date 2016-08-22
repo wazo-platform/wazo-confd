@@ -35,7 +35,9 @@ class ExtensionService(CRUDService):
             self.validator.validate_edit(extension)
         self.dao.edit(extension)
         self.notifier.edited(extension, updated_fields)
-        self.device_updater.update_for_extension(extension)
+
+        if updated_fields is None or updated_fields:
+            self.device_updater.update_for_extension(extension)
 
 
 def build_service(provd_client):
