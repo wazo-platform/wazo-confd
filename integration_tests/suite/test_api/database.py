@@ -260,6 +260,17 @@ class DatabaseQueries(object):
 
         return agent_id
 
+    def get_agent(self):
+        query = text("SELECT * FROM agentfeatures")
+        return self.connection.execute(query)
+
+    def delete_agent(self, agent_id):
+        query = text("DELETE FROM func_key_dest_agent WHERE agent_id = :agent_id")
+        self.connection.execute(query, agent_id=agent_id)
+
+        query = text("DELETE FROM agentfeatures WHERE id = :agent_id")
+        self.connection.execute(query, agent_id=agent_id)
+
     def insert_paging(self, number='1234'):
         query = text("""
         INSERT INTO paging (number, timeout)
