@@ -16,18 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 class DeviceUpdater(object):
 
-    def __init__(self, user_dao, line_dao, user_line_dao, line_extension_dao, provd_updater):
+    def __init__(self, user_dao, line_dao, user_line_dao, line_extension_dao, func_key_template_db, provd_updater):
         self.user_dao = user_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
         self.line_extension_dao = line_extension_dao
+        self.func_key_template_db = func_key_template_db
         self.provd_updater = provd_updater
 
     def update_for_template(self, template):
@@ -41,6 +38,22 @@ class DeviceUpdater(object):
         for line_extension in line_extensions:
             line = self.line_dao.get(line_extension.line_id)
             self.update_for_line(line)
+
+        func_key_templates = self._find_all_fk_templates_by_extension(extension)
+        for func_key_template in func_key_templates:
+            self.update_for_template(func_key_template)
+
+    def _find_all_fk_templates_by_extension(self, extension):
+        user_id = self._find_user_id_by_extension(extension)
+        if user_id:
+            return self.func_key_template_db.find_all_dst_user(user_id)
+        return []
+
+    def _find_user_id_by_extension(self, extension):
+        line_extension = self.line_extension_dao.find_by(extension_id=extension.id)
+        if line_extension:
+            user_line = self.user_line_dao.find_by(line_id=line_extension.line_id, main_user=True)
+            return user_line.user_id
 
     def update_for_user(self, user):
         for user_line in self.user_line_dao.find_all_by_user_id(user.id):

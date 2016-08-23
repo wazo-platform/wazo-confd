@@ -16,16 +16,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import re
+import datetime
+import time
 
 from hamcrest import assert_that
 from hamcrest import contains
 from hamcrest import contains_inanyorder
+from hamcrest import equal_to
 from hamcrest import has_entries
 from hamcrest import has_item
 from hamcrest import not_
 
 from test_api import confd
 from test_api import config
+from test_api import provd
+from test_api import associations as a
 from test_api import scenarios as s
 from test_api import helpers as h
 from test_api import errors as e
@@ -192,6 +197,60 @@ def test_update_additional_parameters(extension1):
     url = confd.extensions(extension1['id'])
     url.put(commented=True).assert_updated()
     assert_that(url.get().item, has_entries(commented=True))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.device()
+@fixtures.device()
+def test_edit_extension_then_funckeys_updated(user1, user2, user3,
+                                              line_sip1, line_sip2, line_sip3,
+                                              extension1, extension2, extension3,
+                                              device1, device2):
+    with a.line_extension(line_sip1, extension1), a.user_line(user1, line_sip1), a.line_device(line_sip1, device1), \
+            a.line_extension(line_sip2, extension2), a.user_line(user2, line_sip2), a.line_device(line_sip2, device2), \
+            a.line_extension(line_sip3, extension3), a.user_line(user3, line_sip3):
+        timestamp = datetime.datetime.utcnow()
+        destination = {'type': 'user', 'user_id': user3['id']}
+        confd.users(user1['id']).funckeys(1).put(destination=destination).assert_updated()
+
+        confd.extensions(extension3['id']).put(exten='1033').assert_updated()
+
+        config = provd.configs.get(device1['id'])
+        assert_that(config['raw_config']['funckeys']['1']['value'], equal_to('1033'))
+
+        assert_that(provd.has_updated(device2['id'], timestamp), equal_to(False))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.device()
+def test_edit_extension_with_no_change_device_not_updated(user1, user2,
+                                                          line_sip1, line_sip2,
+                                                          extension1, extension2,
+                                                          device):
+    with a.line_extension(line_sip1, extension1), a.user_line(user1, line_sip1), a.line_device(line_sip1, device), \
+            a.line_extension(line_sip2, extension2), a.user_line(user2, line_sip2):
+        destination = {'type': 'user', 'user_id': user2['id']}
+        confd.users(user1['id']).funckeys(1).put(destination=destination).assert_updated()
+
+        time.sleep(1)
+        timestamp = datetime.datetime.utcnow()
+
+        confd.extensions(extension2['id']).put(exten=extension2['exten']).assert_updated()
+
+        assert_that(provd.has_updated(device['id'], timestamp), equal_to(False))
 
 
 def test_search_extensions():

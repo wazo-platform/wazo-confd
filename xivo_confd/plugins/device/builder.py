@@ -18,6 +18,7 @@
 from xivo_confd import bus
 
 from xivo_confd.database import device as device_db
+from xivo_confd.database import func_key_template as func_key_template_db
 
 from xivo_confd.plugins.device.service import (DeviceService,
                                                SearchEngine)
@@ -72,6 +73,7 @@ def build_device_updater(provd_client):
                          line_dao,
                          user_line_dao,
                          line_extension_dao,
+                         func_key_template_db,
                          provd_updater)
 
 
