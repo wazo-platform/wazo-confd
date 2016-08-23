@@ -17,7 +17,7 @@
 
 from flask import request
 from marshmallow import fields, post_dump, pre_load
-from marshmallow.validate import Length
+from marshmallow.validate import Length, NoneOf
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema
@@ -25,14 +25,18 @@ from xivo_confd.helpers.restful import ConfdResource
 
 from xivo_dao.alchemy.staticsip import StaticSIP
 
-import logging
-
-logger = logging.getLogger(__name__)
+REGISTER_ERROR = "The 'register' key can only be defined in trunk options"
 
 
 class KeyValueOption(BaseSchema):
-    key = fields.String(validate=Length(max=128), required=True, attribute='var_name')
-    value = fields.String(validate=Length(max=255), required=True, allow_none=True, attribute='var_val')
+    key = fields.String(validate=(Length(max=128),
+                                  NoneOf(['register'], error=REGISTER_ERROR)),
+                        required=True,
+                        attribute='var_name')
+    value = fields.String(validate=Length(max=255),
+                          required=True,
+                          allow_none=True,
+                          attribute='var_val')
 
     @pre_load
     def add_envelope(self, data):
