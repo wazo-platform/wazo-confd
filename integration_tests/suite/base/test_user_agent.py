@@ -52,7 +52,7 @@ def test_associate_errors(agent, user):
 @fixtures.user()
 def test_dissociate_errors(user):
     fake_user = confd.users(FAKE_ID).agents().delete
-    fake_user_agent = confd.users(user['id']).agents().delete
+    fake_user_agent = confd.users(user['id']).agents.delete
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_user_agent, 'UserAgent'
