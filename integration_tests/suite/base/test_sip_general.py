@@ -44,6 +44,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', [['too', 'much', 'value']]
     yield s.check_bogus_field_returns_error, url, 'options', [['wrong_type', 1234]]
 
+    yield s.check_bogus_field_returns_error, url, 'options', [['register', 'value']]
+
 
 def test_get():
     response = confd.asterisk.sip.general.get()
