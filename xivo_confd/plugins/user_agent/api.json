@@ -1,6 +1,5 @@
 {
     "paths": {
-
         "/users/{user_id}/agents": {
             "get": {
                 "operationId": "get_user_agent_association",
@@ -41,6 +40,9 @@
                     }
                 ],
                 "responses": {
+                    "204": {
+                        "description": "The user and agent have been dissociated."
+                    },
                     "400": {
                         "$ref": "#/responses/GenericError"
                     },
@@ -68,6 +70,9 @@
                     }
                 ],
                 "responses": {
+                    "204": {
+                        "description": "The user and agent have been associated."
+                    },
                     "400": {
                         "$ref": "#/responses/GenericError"
                     },
