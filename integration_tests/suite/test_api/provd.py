@@ -157,6 +157,13 @@ class ProvdHelper(object):
                 return True
         return False
 
+    def updated_count(self, device_id, timestamp=None):
+        timestamp = timestamp or datetime.utcnow()
+        expected_line = "Updating device {}".format(device_id)
+        output = self.find_provd_logs(timestamp)
+        count = len([line for line in output.split("\n") if expected_line in line])
+        return count
+
     def find_provd_logs(self, timestamp):
         client = DockerClient()
         for container in client.containers(filters={'status': 'running'}):

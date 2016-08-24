@@ -17,7 +17,6 @@
 
 import re
 import datetime
-import time
 
 from hamcrest import assert_that
 from hamcrest import contains
@@ -242,15 +241,15 @@ def test_edit_extension_with_no_change_device_not_updated(user1, user2,
                                                           device):
     with a.line_extension(line_sip1, extension1), a.user_line(user1, line_sip1), a.line_device(line_sip1, device), \
             a.line_extension(line_sip2, extension2), a.user_line(user2, line_sip2):
+        timestamp = datetime.datetime.utcnow()
         destination = {'type': 'user', 'user_id': user2['id']}
         confd.users(user1['id']).funckeys(1).put(destination=destination).assert_updated()
 
-        time.sleep(1)
-        timestamp = datetime.datetime.utcnow()
+        assert_that(provd.updated_count(device['id'], timestamp), equal_to(1))
 
         confd.extensions(extension2['id']).put(exten=extension2['exten']).assert_updated()
 
-        assert_that(provd.has_updated(device['id'], timestamp), equal_to(False))
+        assert_that(provd.updated_count(device['id'], timestamp), equal_to(1))
 
 
 def test_search_extensions():
