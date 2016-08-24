@@ -91,6 +91,13 @@ def user_entity(user, entity, check=True):
 
 
 @contextmanager
+def user_agent(user, agent, check=True):
+    h.user_agent.associate(user['id'], agent['id'], check)
+    yield
+    h.user_agent.dissociate(user['id'], agent['id'], check)
+
+
+@contextmanager
 def user_funckey_template(user, funckey_template, check=True):
     h.user_funckey_template.associate(user['id'], funckey_template['id'], check)
     yield
