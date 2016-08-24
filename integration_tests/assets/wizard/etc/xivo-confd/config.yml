@@ -67,12 +67,6 @@ sysconfd:
     host: sysconfd
     port: 8668
 
-# Extra resources to load.
-# This is deprecated and for retro-compatibility only.
-#extra_plugins:
-#   - resource_name
-
-
 # Activate confd plugins
 # This is the recommended way to add plugins.
 enabled_plugins:
