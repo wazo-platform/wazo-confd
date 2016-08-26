@@ -16,13 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from collections import namedtuple
 import time
 
-from xivo_dao.helpers import errors
-from xivo.unicode_csv import UnicodeDictReader
-
+from collections import namedtuple
 from flask import request
+
+from xivo.unicode_csv import UnicodeDictReader
+from xivo_dao.helpers import errors
 
 
 ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])

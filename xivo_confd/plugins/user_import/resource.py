@@ -18,12 +18,12 @@
 
 from xivo_dao.helpers.db_manager import Session
 
-from xivo_confd.representations.csv_ import output_csv
+from xivo_confd import sysconfd, bus
 from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.database import user_export as user_export_db
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.plugins.user_import import csvparse
-from xivo_confd.database import user_export as user_export_db
-from xivo_confd import sysconfd, bus
+from xivo_confd.representations.csv_ import output_csv
 
 
 class UserImportResource(ConfdResource):
