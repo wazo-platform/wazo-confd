@@ -541,9 +541,8 @@ def test_given_csv_has_all_resources_then_all_relations_created():
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.voicemail()
 @fixtures.call_permission()
-def test_given_resources_already_exist_when_importing_then_resources_associated(sip, extension, incall, voicemail, call_permission):
-    cti_profile = h.cti_profile.find_by_name("Client")
-
+@fixtures.cti_profile()
+def test_given_resources_already_exist_when_importing_then_resources_associated(sip, extension, incall, voicemail, call_permission, cti_profile):
     csv = [{"firstname": "importassociate",
             "exten": extension['exten'],
             "context": extension['context'],
@@ -553,7 +552,7 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
             "incall_context": incall['context'],
             "voicemail_number": voicemail['number'],
             "voicemail_context": voicemail['context'],
-            "cti_profile_name": "Client",
+            "cti_profile_name": cti_profile['name'],
             "call_permissions": call_permission['name'],
             "entity_id": "1",
             }]
@@ -982,31 +981,31 @@ def test_when_adding_incall_then_incall_created(entry):
 
 @fixtures.csv_entry(cti_profile=True,
                     cti_profile_name="Client")
-def test_when_updating_cti_profile_fields_then_cti_profile_updated(entry):
+@fixtures.cti_profile()
+def test_when_updating_cti_profile_fields_then_cti_profile_updated(entry, cti_profile):
     csv = [{"uuid": entry['user_uuid'],
-            "cti_profile_name": "Agent"}]
+            "cti_profile_name": cti_profile['name']}]
 
     response = client.put("/users/import", csv)
     user_id = get_update_field(response, 'user_id')
-    cti_profile_id = h.cti_profile.find_id_for_profile("Agent")
 
     user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id'],
                                               enabled=True))
 
 
 @fixtures.csv_entry()
-def test_when_adding_cti_profile_fields_then_cti_profile_added(entry):
+@fixtures.cti_profile()
+def test_when_adding_cti_profile_fields_then_cti_profile_added(entry, cti_profile):
     csv = [{"uuid": entry['user_uuid'],
-            "cti_profile_name": "Agent",
+            "cti_profile_name": cti_profile['name'],
             "cti_profile_enabled": "1"}]
 
     response = client.put("/users/import", csv)
     user_id = get_update_field(response, 'user_id')
 
-    cti_profile_id = h.cti_profile.find_id_for_profile("Agent")
     user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id'],
                                               enabled=True))
 
 

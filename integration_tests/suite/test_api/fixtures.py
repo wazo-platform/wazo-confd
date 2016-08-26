@@ -86,11 +86,6 @@ class csv_entry(IsolatedAction):
     actions = {'generate': h.user_import.generate_entry}
 
 
-class cti_profile(IsolatedAction):
-
-    actions = {'generate': h.cti_profile.find_by_name}
-
-
 class custom(IsolatedAction):
 
     actions = {'generate': h.endpoint_custom.generate_custom,
@@ -160,3 +155,9 @@ class call_log(IsolatedAction):
 
     actions = {'generate': h.call_log.generate_call_log,
                'delete': h.call_log.delete_call_log}
+
+
+class cti_profile(IsolatedAction):
+
+    actions = {'generate': h.cti_profile.generate_cti_profile,
+               'delete': h.cti_profile.delete_cti_profile}

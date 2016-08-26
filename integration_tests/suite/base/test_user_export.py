@@ -24,7 +24,6 @@ from test_api import confd_csv
 from test_api import config
 from test_api import fixtures
 from test_api import associations as a
-from test_api import helpers as h
 
 
 @fixtures.user(firstname="Ûrsule",
@@ -94,10 +93,10 @@ def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(u
         assert_that(response.csv(), has_item(expected))
 
 
+@fixtures.cti_profile()
 @fixtures.user(username="floogle",
                password="secret")
-def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fields(user):
-    cti_profile = h.cti_profile.find_by_name("Client")
+def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fields(cti_profile, user):
     expected = has_entries(uuid=user['uuid'],
                            cti_profile_name=cti_profile['name'],
                            cti_profile_enabled="1")

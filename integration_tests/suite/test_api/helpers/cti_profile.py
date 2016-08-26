@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,16 +16,39 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import random
+import string
 
+from test_api import db
 from test_api import confd
 
 
-def find_by_name(name):
-    profiles = confd.cti_profiles.get().items
-    found = [p for p in profiles if p['name'] == name]
-    return found[0] if found else None
+def generate_cti_profile(**parameters):
+    parameters.setdefault('name', generate_name())
+    return add_cti_profile(**parameters)
 
 
-def find_id_for_profile(name):
-    profile = find_by_name(name)
-    return profile['id'] if profile else None
+def add_cti_profile(**parameters):
+    with db.queries() as queries:
+        id = queries.insert_cti_profile(**parameters)
+    parameters['id'] = id
+    return parameters
+
+
+def delete_cti_profile(cti_profile_id, check=False):
+    with db.queries() as queries:
+        queries.dissociate_cti_profile(cti_profile_id)
+        queries.delete_cti_profile(cti_profile_id)
+
+
+def generate_name():
+    response = confd.cti_profiles.get()
+    names = set(d['name'] for d in response.items)
+    return _random_name(names)
+
+
+def _random_name(names):
+    name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    if name in names:
+        return _random_name(names)
+    return name
