@@ -55,5 +55,5 @@ class UserEntityList(UserEntityResource):
     @required_acl('confd.users.{user_id}.entities.read')
     def get(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
-        item = self.service.find_by_user_id(user.id)
+        item = self.service.find_by(user_id=user.id)
         return marshal(item, fields)

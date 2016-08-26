@@ -32,12 +32,15 @@ from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_
 from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_service
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
 from xivo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
+from xivo_confd.plugins.user_entity.service import build_service as build_user_entity_service
+from xivo_confd.plugins.entity.service import build_service as build_entity_service
 
 from xivo_confd.plugins.user_import.service import ImportService
 from xivo_confd.plugins.user_import.resource import UserImportResource, UserExportResource
 from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 
 from xivo_confd.plugins.user_import.creators import (ExtensionCreator,
+                                                     EntityCreator,
                                                      IncallCreator,
                                                      CtiProfileCreator,
                                                      LineCreator,
@@ -51,6 +54,7 @@ from xivo_confd.plugins.user_import.associators import (LineAssociator,
                                                         SipAssociator,
                                                         SccpAssociator,
                                                         ExtensionAssociator,
+                                                        EntityAssociator,
                                                         IncallAssociator,
                                                         CtiProfileAssociator,
                                                         VoicemailAssociator,
@@ -62,6 +66,7 @@ from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.entity import dao as entity_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
@@ -80,6 +85,7 @@ class Plugin(object):
         provd_client = core.provd_client()
 
         user_service = build_user_service(provd_client)
+        entity_service = build_entity_service()
         user_voicemail_service = build_uv_service()
         voicemail_service = build_voicemail_service()
         line_service = build_line_service(provd_client)
@@ -89,11 +95,13 @@ class Plugin(object):
         line_sccp_service = build_le_service(provd_client, 'sccp', sccp_service)
         extension_service = build_extension_service(provd_client)
         user_line_service = build_ul_service()
+        user_entity_service = build_user_entity_service()
         line_extension_service = build_line_extension_service()
         call_permission_service = build_call_permission_service()
         user_call_permission_service = build_user_call_permission_service()
 
         creators = {'user': UserCreator(user_service),
+                    'entity': EntityCreator(entity_service),
                     'line': LineCreator(line_service),
                     'voicemail': VoicemailCreator(voicemail_service),
                     'sip': SipCreator(sip_service),
@@ -112,6 +120,7 @@ class Plugin(object):
             ('sip', SipAssociator(line_sip_service)),
             ('sccp', SccpAssociator(line_sccp_service)),
             ('line', LineAssociator(user_line_service)),
+            ('entity', EntityAssociator(user_entity_service)),
             ('extension', ExtensionAssociator(line_extension_service)),
             ('incall', IncallAssociator(line_extension_service)),
             ('call_permissions', CallPermissionAssociator(user_call_permission_service,
@@ -121,6 +130,7 @@ class Plugin(object):
         entry_associator = EntryAssociator(associators)
 
         entry_finder = EntryFinder(user_dao,
+                                   entity_dao,
                                    voicemail_dao,
                                    user_voicemail_dao,
                                    cti_profile_dao,

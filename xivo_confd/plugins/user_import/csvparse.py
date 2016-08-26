@@ -117,9 +117,12 @@ class CsvRow(object):
         BooleanRule('dtmf_hangup_enabled', 'dtmf_hangup_enabled'),
         BooleanRule('call_record_enabled', 'call_record_enabled'),
         BooleanRule('online_call_record_enabled', 'online_call_record_enabled'),
-        IntRule('entity_id', 'entity_id'),
         IntRule('ring_seconds', 'ring_seconds'),
         IntRule('simultaneous_calls', 'simultaneous_calls'),
+    )
+
+    ENTITY_RULES = (
+        IntRule('entity_id', 'id'),
     )
 
     VOICEMAIL_RULES = (
@@ -170,6 +173,7 @@ class CsvRow(object):
     def parse(self):
         return {
             'user': self.parse_rules(self.USER_RULES),
+            'entity': self.parse_rules(self.ENTITY_RULES),
             'voicemail': self.parse_rules(self.VOICEMAIL_RULES),
             'line': self.parse_rules(self.LINE_RULES),
             'sip': self.parse_rules(self.SIP_RULES),

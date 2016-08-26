@@ -69,6 +69,20 @@ class UserCreator(Creator):
             return self.service.create(User(**fields))
 
 
+class EntityCreator(Creator):
+
+    def find(self, fields):
+        entity_id = fields.get('id')
+        if entity_id:
+            return self.service.get_by(id=entity_id)
+
+    def create(self, fields):
+        return None
+
+    def update(self, fields, model):
+        pass
+
+
 class VoicemailCreator(Creator):
 
     schema = VoicemailSchema(handle_error=False, strict=True)

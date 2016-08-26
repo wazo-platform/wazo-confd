@@ -29,9 +29,13 @@ class UserEntityService(object):
         self.validator = validator
         self.notifier = notifier
 
-    def find_by_user_id(self, user_id):
-        user = self.dao.find_by(id=user_id)
-        user.user_id = user_id
+    def find_by(self, **criteria):
+        user_id = criteria.pop('user_id', None)
+        if user_id:
+            criteria['id'] = user_id
+        user = self.dao.find_by(**criteria)
+        if user:
+            user.user_id = user_id
         return user
 
     def associate(self, user, entity):
