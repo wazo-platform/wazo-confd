@@ -114,12 +114,12 @@ class Plugin(object):
         entry_creator = EntryCreator(creators)
 
         associators = OrderedDict([
+            ('entity', EntityAssociator(user_entity_service)),
             ('voicemail', VoicemailAssociator(user_voicemail_service)),
             ('cti_profile', CtiProfileAssociator(user_cti_profile_service, cti_profile_dao)),
             ('sip', SipAssociator(line_sip_service)),
             ('sccp', SccpAssociator(line_sccp_service)),
             ('line', LineAssociator(user_line_service)),
-            ('entity', EntityAssociator(user_entity_service)),
             ('extension', ExtensionAssociator(line_extension_service)),
             ('incall', IncallAssociator(line_extension_service)),
             ('call_permissions', CallPermissionAssociator(user_call_permission_service,

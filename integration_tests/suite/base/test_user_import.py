@@ -130,6 +130,24 @@ def test_given_non_default_entity_then_user_entity_updated(entry, entity):
                                               entity_id=entity['id']))
 
 
+@fixtures.entity()
+@fixtures.context(start='1000', end='1999')
+def test_given_two_entities_then_can_create_user_in_second_entity(entity, context):
+    with a.context_entity(context, entity, check=False):
+            csv = [{'firstname': 'Rîchard',
+                    'entity_id': entity['id'],
+                    'exten': '1000',
+                    'context': context['name'],
+                    'line_protocol': 'sip'}]
+
+            response = client.post('/users/import', csv)
+            user_id = get_import_field(response, 'user_id')
+
+            user_entity = confd.users(user_id).entities.get()
+            assert_that(user_entity.item, has_entries(user_id=user_id,
+                                                      entity_id=entity['id']))
+
+
 def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
     csv = [{"firstname": "Rîchard"}]
 
