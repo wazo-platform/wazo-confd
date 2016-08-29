@@ -26,6 +26,7 @@ from hamcrest import (assert_that,
                       has_entries,
                       has_items,
                       has_length,
+                      is_not,
                       not_none,
                       instance_of,
                       empty)
@@ -86,7 +87,65 @@ def test_given_entity_id_does_not_exist_then_error_returned():
             "entity_id": "999999999"}]
 
     response = client.post("/users/import", csv)
-    assert_error(response, has_error_field("entity"))
+    assert_error(response, has_error_field("Entity"))
+
+
+@fixtures.csv_entry()
+def test_given_entity_id_does_not_exist_when_update_then_error_returned(entry):
+    csv = [{'uuid': entry['user_uuid'],
+            'entity_id': "999999999"}]
+
+    response = client.put("/users/import", csv)
+    assert_error(response, has_error_field("Entity"))
+
+
+@fixtures.entity()
+def test_given_non_default_entity_then_user_imported(entity):
+    csv = [{"firstname": "Rîchard",
+            "entity_id": entity['id']}]
+
+    response = client.post("/users/import", csv)
+    user_id = get_import_field(response, 'user_id')
+
+    user_entity = confd.users(user_id).entities.get()
+    assert_that(user_entity.item, has_entries(user_id=user_id,
+                                              entity_id=entity['id']))
+
+
+@fixtures.csv_entry()
+@fixtures.entity()
+def test_given_non_default_entity_then_user_entity_updated(entry, entity):
+    csv = [{"uuid": entry['user_uuid'],
+            "entity_id": entity['id']}]
+
+    user_id = entry['user_id']
+    user_entity = confd.users(user_id).entities.get()
+    assert_that(user_entity.item, has_entries(user_id=user_id,
+                                              entity_id=is_not(entity['id'])))
+
+    client.put("/users/import", csv).assert_ok()
+
+    user_entity = confd.users(user_id).entities.get()
+    assert_that(user_entity.item, has_entries(user_id=user_id,
+                                              entity_id=entity['id']))
+
+
+@fixtures.entity()
+@fixtures.context(start='1000', end='1999')
+def test_given_two_entities_then_can_create_user_in_second_entity(entity, context):
+    with a.context_entity(context, entity, check=False):
+            csv = [{'firstname': 'Rîchard',
+                    'entity_id': entity['id'],
+                    'exten': '1000',
+                    'context': context['name'],
+                    'line_protocol': 'sip'}]
+
+            response = client.post('/users/import', csv)
+            user_id = get_import_field(response, 'user_id')
+
+            user_entity = confd.users(user_id).entities.get()
+            assert_that(user_entity.item, has_entries(user_id=user_id,
+                                                      entity_id=entity['id']))
 
 
 def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
@@ -496,6 +555,7 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
             "voicemail_context": voicemail['context'],
             "cti_profile_name": "Client",
             "call_permissions": call_permission['name'],
+            "entity_id": "1",
             }]
 
     response = client.post("/users/import", csv)
@@ -523,6 +583,10 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     response = confd.users(user_id).callpermissions.get()
     assert_that(response.items, contains(has_entries(call_permission_id=call_permission['id'],
                                                      user_id=user_id)))
+
+    response = confd.users(user_id).entities.get()
+    assert_that(response.item, has_entries(entity_id=1,
+                                           user_id=user_id))
 
 
 @fixtures.call_permission()

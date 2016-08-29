@@ -23,12 +23,12 @@ from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from xivo_dao.helpers.exception import NotFoundError
 
+from xivo_dao.alchemy.extension import Extension
+from xivo_dao.alchemy.linefeatures import LineFeatures as Line
+from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.usersip import UserSIP as SIP
-from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from xivo_dao.resources.voicemail.model import Voicemail
-from xivo_dao.alchemy.linefeatures import LineFeatures as Line
-from xivo_dao.alchemy.extension import Extension
 
 
 class Creator(object):
@@ -67,6 +67,20 @@ class UserCreator(Creator):
     def create(self, fields):
         if fields:
             return self.service.create(User(**fields))
+
+
+class EntityCreator(Creator):
+
+    def find(self, fields):
+        entity_id = fields.get('id')
+        if entity_id:
+            return self.service.get_by(id=entity_id)
+
+    def create(self, fields):
+        return None
+
+    def update(self, fields, model):
+        pass
 
 
 class VoicemailCreator(Creator):

@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.entity import dao as entity_dao
 
 from xivo_confd import api
 from xivo_confd.plugins.user_entity.service import build_service
@@ -32,10 +33,10 @@ class Plugin(object):
                          '/users/<int:user_id>/entities/<int:entity_id>',
                          '/users/<uuid:user_id>/entities/<int:entity_id>',
                          endpoint='user_entities',
-                         resource_class_args=(service, user_dao)
+                         resource_class_args=(service, user_dao, entity_dao)
                          )
         api.add_resource(UserEntityList,
                          '/users/<int:user_id>/entities',
                          '/users/<uuid:user_id>/entities',
-                         resource_class_args=(service, user_dao)
+                         resource_class_args=(service, user_dao, entity_dao)
                          )

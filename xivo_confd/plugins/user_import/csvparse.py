@@ -16,13 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from collections import namedtuple
 import time
 
-from xivo_dao.helpers import errors
-from xivo.unicode_csv import UnicodeDictReader
-
+from collections import namedtuple
 from flask import request
+
+from xivo.unicode_csv import UnicodeDictReader
+from xivo_dao.helpers import errors
 
 
 ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])
@@ -117,9 +117,12 @@ class CsvRow(object):
         BooleanRule('dtmf_hangup_enabled', 'dtmf_hangup_enabled'),
         BooleanRule('call_record_enabled', 'call_record_enabled'),
         BooleanRule('online_call_record_enabled', 'online_call_record_enabled'),
-        IntRule('entity_id', 'entity_id'),
         IntRule('ring_seconds', 'ring_seconds'),
         IntRule('simultaneous_calls', 'simultaneous_calls'),
+    )
+
+    ENTITY_RULES = (
+        IntRule('entity_id', 'id'),
     )
 
     VOICEMAIL_RULES = (
@@ -170,6 +173,7 @@ class CsvRow(object):
     def parse(self):
         return {
             'user': self.parse_rules(self.USER_RULES),
+            'entity': self.parse_rules(self.ENTITY_RULES),
             'voicemail': self.parse_rules(self.VOICEMAIL_RULES),
             'line': self.parse_rules(self.LINE_RULES),
             'sip': self.parse_rules(self.SIP_RULES),

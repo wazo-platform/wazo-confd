@@ -20,8 +20,6 @@ from xivo_confd.helpers.validator import AssociationValidator, Validator
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.helpers import errors
 
-from xivo_confd.database import entity as entity_db
-
 
 class UserEntityAssociationValidator(Validator):
 
@@ -29,7 +27,6 @@ class UserEntityAssociationValidator(Validator):
         self.user_line_dao = user_line_dao
 
     def validate(self, user, entity):
-        self.validate_entity_exists(entity)
         self.validate_user_not_already_associated(user, entity)
         self.validate_user_no_line_associated(user)
 
@@ -45,12 +42,6 @@ class UserEntityAssociationValidator(Validator):
             raise errors.resource_associated('User', 'Line',
                                              user_id=user.id,
                                              line_ids=line_ids)
-
-    # TODO: This should be deleted when entity dao will be implemented
-    def validate_entity_exists(self, entity):
-        exists = entity_db.entity_id_exists(entity.id)
-        if not exists:
-            raise errors.not_found('Entity', id=entity.id)
 
 
 def build_validator():

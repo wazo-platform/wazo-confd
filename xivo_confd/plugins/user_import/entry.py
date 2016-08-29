@@ -25,6 +25,7 @@ class Entry(object):
         self.number = number
         self.entry_dict = entry_dict
         self.user = None
+        self.entity = None
         self.voicemail = None
         self.line = None
         self.sip = None
@@ -53,20 +54,24 @@ class Entry(object):
         permissions = self.call_permissions or []
         return [permission.id for permission in permissions]
 
-    def create(self, resource, creator):
-        fields = self.entry_dict[resource]
-        setattr(self, resource, creator.create(fields))
-
-    def find_or_create(self, resource, creator):
+    def find(self, resource, creator):
         model = self.get_resource(resource)
         if model:
-            return
+            return True
 
         fields = self.entry_dict[resource]
         model = creator.find(fields)
         if model:
             setattr(self, resource, model)
-        else:
+            return True
+        return False
+
+    def create(self, resource, creator):
+        fields = self.entry_dict[resource]
+        setattr(self, resource, creator.create(fields))
+
+    def find_or_create(self, resource, creator):
+        if not self.find(resource, creator):
             self.create(resource, creator)
 
     def update(self, resource, creator):
@@ -91,6 +96,7 @@ class EntryCreator(object):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
         entry.create('user', self.creators['user'])
+        entry.find('entity', self.creators['entity'])
         entry.find_or_create('voicemail', self.creators['voicemail'])
         entry.find_or_create('call_permissions', self.creators['call_permissions'])
         entry.find_or_create('line', self.creators['line'])
@@ -120,11 +126,12 @@ class EntryAssociator(object):
 
 class EntryFinder(object):
 
-    def __init__(self, user_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
+    def __init__(self, user_dao, entity_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
                  user_cti_profile_dao, line_dao, user_line_dao, line_extension_dao,
                  sip_dao, sccp_dao, extension_dao, incall_dao, call_permission_dao,
                  user_call_permission_dao):
         self.user_dao = user_dao
+        self.entity_dao = entity_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
         self.cti_profile_dao = cti_profile_dao
@@ -146,6 +153,10 @@ class EntryFinder(object):
         user = entry.user = self.user_dao.get_by(uuid=uuid)
 
         entry.cti_profile = self.user_cti_profile_dao.find_profile_by_userid(user.id)
+
+        entity_id = entry.extract_field('entity', 'id')
+        if entity_id:
+            entry.entity = self.entity_dao.get_by(id=entity_id)
 
         user_call_permissions = self.user_call_permission_dao.find_all_by(user_id=user.id)
         for user_call_permission in user_call_permissions:

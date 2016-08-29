@@ -33,21 +33,20 @@ fields = {
 
 class UserEntityResource(ConfdResource):
 
-    def __init__(self, service, user_dao):
+    def __init__(self, service, user_dao, entity_dao):
         super(UserEntityResource, self).__init__()
         self.service = service
         self.user_dao = user_dao
-
-    def get_user(self, user_id):
-        return self.user_dao.get_by_id_uuid(user_id)
+        self.entity_dao = entity_dao
 
 
 class UserEntityItem(UserEntityResource):
 
     @required_acl('confd.users.{user_id}.entities.{entity_id}.update')
     def put(self, user_id, entity_id):
-        user = self.get_user(user_id)
-        self.service.associate(user, entity_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
+        entity = self.entity_dao.get(entity_id)
+        self.service.associate(user, entity)
         return '', 204
 
 
@@ -55,6 +54,6 @@ class UserEntityList(UserEntityResource):
 
     @required_acl('confd.users.{user_id}.entities.read')
     def get(self, user_id):
-        user = self.get_user(user_id)
-        item = self.service.find_by_user_id(user.id)
+        user = self.user_dao.get_by_id_uuid(user_id)
+        item = self.service.find_by(user_id=user.id)
         return marshal(item, fields)

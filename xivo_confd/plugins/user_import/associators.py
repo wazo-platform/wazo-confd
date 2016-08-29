@@ -130,6 +130,24 @@ class VoicemailAssociator(Associator):
         return self.service.find_by(user_id=user.id, voicemail_id=voicemail.id) is not None
 
 
+class EntityAssociator(Associator):
+
+    def associate(self, entry):
+        user = entry.get_resource('user')
+        entity = entry.get_resource('entity')
+        if user and entity and not self.associated(user, entity):
+            self.service.associate(user, entity)
+
+    def update(self, entry):
+        user = entry.get_resource('user')
+        entity = entry.get_resource('entity')
+        if user and entity and not self.associated(user, entity):
+            self.service.associate(user, entity)
+
+    def associated(self, user, entity):
+        return self.service.find_by(user_id=user.id, entity_id=entity.id) is not None
+
+
 class CtiProfileAssociator(Associator):
 
     def __init__(self, service, dao):
