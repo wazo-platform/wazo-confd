@@ -94,7 +94,7 @@ class AssociationManager(object):
                         .scalar())
 
         if context_type not in self.associators:
-            raise NotImplementedError("Cannot associate extension with context type '{}'".format(context_type))
+            raise NotImplementedError("Extension '{}' with context type '{}' is not supported".format(extension.id, context_type))
 
         return self.associators[context_type]
 
