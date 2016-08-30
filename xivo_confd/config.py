@@ -101,6 +101,7 @@ DEFAULT_CONFIG = {
         'line_plugin',
         'line_sip_plugin',
         'queue_member_plugin',
+        'sip_general_plugin',
         'switchboard_plugin',
         'user_agent_plugin',
         'user_call_permission_plugin',
