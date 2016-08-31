@@ -1,0 +1,198 @@
+{
+    "paths": {
+        "/trunks": {
+            "get": {
+                "operationId": "list_trunks",
+                "summary": "List tunks",
+                "description": "**Required ACL:** `confd.trunks.read`",
+                "tags": [
+                    "trunks"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trunks list",
+                        "schema": {
+                            "$ref": "#/definitions/TrunkItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_trunk",
+                "summary": "Create trunk",
+                "description": "**Required ACL:** `confd.trunks.create`",
+                "tags": [
+                    "trunks"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Trunk to create",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/Trunk"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Trunk created",
+                        "schema": {
+                            "$ref": "#/definitions/Trunk"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/trunks/{trunk_id}": {
+            "get": {
+                "operationId": "get_trunk",
+                "summary": "Get trunk",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.read`",
+                "tags": [
+                    "trunks"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trunk",
+                        "schema": {
+                            "$ref": "#/definitions/Trunk"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_trunk",
+                "summary": "Update trunk",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.update`",
+                "tags": [
+                    "trunks"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Trunk"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_trunk",
+                "summary": "Delete trunk",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.delete`",
+                "tags": [
+                    "trunks"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        }
+    },
+    "parameters": {
+        "trunkid": {
+            "description": "Trunk's ID",
+            "name": "trunk_id",
+            "in": "path",
+            "type": "integer",
+            "required": true
+        }
+    },
+    "definitions": {
+        "Trunk": {
+            "title": "Trunk",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the trunk"
+                },
+                "name": {
+                    "type": "string",
+                    "readOnly": true,
+                    "description": "The name of the trunk"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "The context of the trunk"
+                }
+            },
+            "required": [
+                "context"
+            ]
+        },
+        "TrunkItems": {
+            "title": "TrunkItems",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Trunk"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
