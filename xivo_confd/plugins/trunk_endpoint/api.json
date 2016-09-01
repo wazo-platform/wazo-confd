@@ -1,0 +1,284 @@
+{
+    "paths": {
+        "/endpoints/custom/{custom_id}/trunks": {
+            "get": {
+                "operationId": "get_endpoint_custom_trunk",
+                "summary": "Get Trunk associated to Custom endpoint",
+                "description": "**Required ACL:** `confd.endpoints.custom.{custom_id}.trunks.read`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/customid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Custom Endpoint and Trunk",
+                        "schema": {
+                            "$ref": "#/definitions/TrunkEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to trunk",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/endpoints/sip/{sip_id}/trunks": {
+            "get": {
+                "operationId": "get_endpoint_sip_trunk",
+                "summary": "Get Trunk associated to SIP endpoint",
+                "description": "**Required ACL:** `confd.endpoints.sip.{sip_id}.trunks.read`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/sipid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between SIP Endpoint and Trunk",
+                        "schema": {
+                            "$ref": "#/definitions/TrunkEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to trunk",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/trunks/{trunk_id}/endpoints/custom": {
+            "get": {
+                "operationId": "get_trunk_endpoint_custom",
+                "summary": "Get Custom endpoint associated to Trunk",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.endpoints.custom.read`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Trunk and Custom Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/TrunkEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to trunk",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/trunks/{trunk_id}/endpoints/custom/{custom_id}": {
+            "put": {
+                "operationId": "associate_trunk_endpoint_custom",
+                "summary": "Associate trunk and Custom endpoint",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.endpoints.custom.{custom_id}.update`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    },
+                    {
+                        "$ref": "#/parameters/customid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Trunk and Custom endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_trunk_endpoint_custom",
+                "summary": "Dissociate trunk and Custom endpoint",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.endpoints.custom.{custom_id}.delete`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "custom"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    },
+                    {
+                        "$ref": "#/parameters/customid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Trunk and Custom endpoint dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/trunks/{trunk_id}/endpoints/sip": {
+            "get": {
+                "operationId": "get_trunk_endpoint_sip",
+                "summary": "Get SIP endpoint associated to Trunk",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.read`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association between Trunk and SIP Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/TrunkEndpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "No endpoint associated to trunk",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/trunks/{trunk_id}/endpoints/sip/{sip_id}": {
+            "put": {
+                "operationId": "associate_trunk_endpoint_sip",
+                "summary": "Associate trunk and SIP endpoint",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.{sip_id}.update`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    },
+                    {
+                        "$ref": "#/parameters/sipid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Trunk and SIP endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_trunk_endpoint_sip",
+                "summary": "Dissociate trunk and SIP endpoint",
+                "description": "**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.{sip_id}.delete`",
+                "tags": [
+                    "trunks",
+                    "endpoints",
+                    "sip"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/trunkid"
+                    },
+                    {
+                        "$ref": "#/parameters/sipid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Trunk and SIP endpoint dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "TrunkEndpoint": {
+            "title": "TrunkEndpoint",
+            "properties": {
+                "trunk_id": {
+                    "type": "integer",
+                    "description": "Trunk ID"
+                },
+                "endpoint_id": {
+                    "type": "integer",
+                    "description": "Endpoint ID"
+                },
+                "endpoint": {
+                    "type": "string",
+                    "description": "Type of endpoint",
+                    "enum": [
+                        "sip",
+                        "custom"
+                    ]
+                }
+            }
+        }
+    }
+}
+

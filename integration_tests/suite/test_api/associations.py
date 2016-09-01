@@ -133,3 +133,17 @@ def queue_extension(queue, extension, check=True):
     h.queue_extension.associate(queue['id'], extension['id'], check)
     yield
     h.queue_extension.dissociate(queue['id'], extension['id'], check)
+
+
+@contextmanager
+def trunk_endpoint_sip(trunk, sip, check=True):
+    h.trunk_endpoint_sip.associate(trunk['id'], sip['id'], check)
+    yield
+    h.trunk_endpoint_sip.dissociate(trunk['id'], sip['id'], check)
+
+
+@contextmanager
+def trunk_endpoint_custom(trunk, custom, check=True):
+    h.trunk_endpoint_custom.associate(trunk['id'], custom['id'], check)
+    yield
+    h.trunk_endpoint_custom.dissociate(trunk['id'], custom['id'], check)
