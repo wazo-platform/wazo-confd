@@ -110,7 +110,6 @@ def check_sorting(trunk1, trunk2, field, search):
 def test_get(trunk):
     response = confd.trunks(trunk['id']).get()
     assert_that(response.item, has_entries(id=trunk['id'],
-                                           name=trunk['name'],
                                            context=trunk['context']))
 
 

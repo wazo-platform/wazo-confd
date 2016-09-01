@@ -166,19 +166,11 @@
                     "readOnly": true,
                     "description": "The id of the trunk"
                 },
-                "name": {
-                    "type": "string",
-                    "readOnly": true,
-                    "description": "The name of the trunk"
-                },
                 "context": {
                     "type": "string",
                     "description": "The context of the trunk"
                 }
-            },
-            "required": [
-                "context"
-            ]
+            }
         },
         "TrunkItems": {
             "title": "TrunkItems",

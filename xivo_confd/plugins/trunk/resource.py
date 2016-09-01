@@ -26,8 +26,7 @@ from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 
 class TrunkSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String(dump_only=True)
-    context = fields.String(required=True)
+    context = fields.String(allow_none=True)
     links = ListLink(Link('trunks'))
 
 
