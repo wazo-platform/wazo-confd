@@ -73,4 +73,4 @@ def build_service(endpoint, endpoint_dao):
                                 trunk_dao,
                                 endpoint_dao,
                                 build_validator(endpoint),
-                                build_notifier())
+                                build_notifier(endpoint))
