@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,6 +111,15 @@ def test_associate_when_endpoint_already_associated(line, sccp):
 def test_associate_with_another_endpoint_when_already_associated(line, sccp1, sccp2):
     with a.line_endpoint_sccp(line, sccp1):
         response = confd.lines(line['id']).endpoints.sccp(sccp2['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+
+
+@fixtures.line()
+@fixtures.line()
+@fixtures.sccp()
+def test_associate_multiple_lines_to_sccp(line1, line2, sccp):
+    with a.line_endpoint_sccp(line1, sccp):
+        response = confd.lines(line2['id']).endpoints.sccp(sccp['id']).put()
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
 
 

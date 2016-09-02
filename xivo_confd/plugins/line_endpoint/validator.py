@@ -23,14 +23,32 @@ from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_dao.resources.line import dao as line_dao
 
 from xivo_dao.helpers import errors
 
 
 class ValidateLineAssociation(Validator):
 
+    def __init__(self, endpoint, line_dao):
+        super(ValidateLineAssociation, self).__init__()
+        self.endpoint = endpoint
+        self.line_dao = line_dao
+
     def validate(self, line, endpoint):
+        self.validate_not_already_associated(line, endpoint)
+        self.validate_not_associated_to_line(line, endpoint)
+
+    def validate_not_already_associated(self, line, endpoint):
         if line.is_associated():
+            raise errors.resource_associated('Line', 'Endpoint',
+                                             line_id=line.id,
+                                             endpoint=line.endpoint,
+                                             endpoint_id=line.endpoint_id)
+
+    def validate_not_associated_to_line(self, line, endpoint):
+        line = self.line_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
+        if line:
             raise errors.resource_associated('Line', 'Endpoint',
                                              line_id=line.id,
                                              endpoint=line.endpoint,
@@ -77,10 +95,11 @@ class ValidateLineDissociation(Validator):
                                              line_id=line.id, device_id=line.device_id)
 
 
-def build_validator():
+def build_validator(endpoint):
     return AssociationValidator(
         association=[
-            ValidateLineAssociation(),
+            ValidateLineAssociation(endpoint,
+                                    line_dao)
         ],
         dissociation=[
             ValidateLineDissociation(user_line_dao,
