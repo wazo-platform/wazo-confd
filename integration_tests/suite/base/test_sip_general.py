@@ -43,12 +43,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'ordered_options', [['missing_value']]
     yield s.check_bogus_field_returns_error, url, 'ordered_options', [['too', 'much', 'value']]
     yield s.check_bogus_field_returns_error, url, 'ordered_options', [['wrong_value', 1234]]
+    yield s.check_bogus_field_returns_error, url, 'ordered_options', [['none_value', None]]
 
     yield s.check_bogus_field_returns_error, url, 'options', 123
     yield s.check_bogus_field_returns_error, url, 'options', None
     yield s.check_bogus_field_returns_error, url, 'options', 'string'
     yield s.check_bogus_field_returns_error, url, 'options', [['ordered', 'option']]
     yield s.check_bogus_field_returns_error, url, 'options', {'wrong_value': 23}
+    yield s.check_bogus_field_returns_error, url, 'options', {'none_value': None}
 
     yield s.check_bogus_field_returns_error, url, 'options', {'register': 'value'}
     yield s.check_bogus_field_returns_error, url, 'ordered_options', [['register', 'value']]
@@ -64,7 +66,7 @@ def test_edit_sip_general():
                                       ['allow', '127.0.0.1'],
                                       ['deny', '192.168.0.0'],
                                       ['allow', '192.168.0.1']],
-                  'options': {'nat': None,
+                  'options': {'nat': 'toto',
                               'username': 'Bob'}}
 
     response = confd.asterisk.sip.general.put(**parameters)
@@ -85,8 +87,8 @@ def test_edit_sip_general_with_no_option():
 
 
 def test_edit_sip_general_with_none_value():
-    parameters = {'ordered_options': [['bindport', None]],
-                  'options': {'nat': None}}
+    parameters = {'ordered_options': [['bindport', 'ip']],
+                  'options': {'nat': 'value'}}
 
     response = confd.asterisk.sip.general.put(**parameters)
     response.assert_updated()

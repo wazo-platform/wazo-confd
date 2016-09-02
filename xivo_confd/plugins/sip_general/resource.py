@@ -36,7 +36,6 @@ class SIPGeneralOption(BaseSchema):
                         attribute='var_name')
     value = fields.String(validate=Length(max=255),
                           required=True,
-                          allow_none=True,
                           attribute='var_val')
 
 
