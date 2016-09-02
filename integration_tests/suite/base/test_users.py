@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from test_api import scenarios as s
 from test_api import associations as a
-from test_api import errors as e
 from test_api import confd
 from test_api import fixtures
 from test_api import config
@@ -149,6 +148,24 @@ def test_put_errors(user):
         yield check
     for check in put_error_checks(user_put):
         yield check
+
+
+@fixtures.user(firstname='user1', username='unique_username', email='unique@email')
+@fixtures.user()
+def test_unique_errors(user1, user2):
+    url = confd.users(user2['id']).put
+    for check in unique_error_checks(url, user1):
+        yield check
+
+    required_body = {'firstname': 'user2'}
+    url = confd.users.post
+    for check in unique_error_checks(url, user1, required_body):
+        yield check
+
+
+def unique_error_checks(url, existing_resource, required_body=None):
+    yield s.check_bogus_field_returns_error, url, 'username', existing_resource['username'], required_body
+    yield s.check_bogus_field_returns_error, url, 'email', existing_resource['email'], required_body
 
 
 @fixtures.user()
@@ -479,16 +496,3 @@ def test_that_users_can_be_deleted_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
-
-
-@fixtures.user(email='common@email.com')
-def test_post_email_already_exists_then_error_raised(user):
-    response = confd.users.post(firstname='bob', email='common@email.com')
-    response.assert_match(400, e.resource_exists('User'))
-
-
-@fixtures.user(email='common@email.com')
-@fixtures.user(email='other@email.com')
-def test_put_email_already_exists_then_error_raised(_, user):
-    response = confd.users(user['uuid']).put(email='common@email.com')
-    response.assert_match(400, e.resource_exists('User'))

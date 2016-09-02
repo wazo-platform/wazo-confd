@@ -105,6 +105,10 @@ def build_validator():
             Optional('email',
                      UniqueField('email',
                                  lambda email: user_dao.find_by(email=email),
+                                 'User')),
+            Optional('username',
+                     UniqueField('username',
+                                 lambda username: user_dao.find_by(username=username),
                                  'User'))
         ],
         edit=[
@@ -119,6 +123,8 @@ def build_validator():
                            'enabled'),
             Optional('email',
                      UniqueFieldChanged('email', user_dao, 'User')),
+            Optional('username',
+                     UniqueFieldChanged('username', user_dao, 'User')),
         ]
     )
 

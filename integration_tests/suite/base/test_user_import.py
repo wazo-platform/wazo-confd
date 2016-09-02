@@ -416,7 +416,7 @@ def test_given_csv_incall_has_errors_then_errors_returned():
 
 def test_given_csv_has_cti_fields_then_cti_profile_associated():
     csv = [{"firstname": "Thômas",
-            "username": "thomas",
+            "username": "thomas1",
             "password": "secret",
             "cti_profile_enabled": "1",
             "cti_profile_name": "Client"}]
@@ -432,7 +432,7 @@ def test_given_csv_has_cti_fields_then_cti_profile_associated():
 
 def test_given_csv_cti_profile_has_errors_then_errors_returned():
     csv = [{"firstname": "Thômas",
-            "username": "thomas",
+            "username": "thomas2",
             "password": "secret",
             "cti_profile_enabled": "1",
             "cti_profile_name": "InvalidProfile"}]
@@ -671,7 +671,7 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
          "voicemail_ask_password": "1",
          "cti_profile_name": "Client",
          "cti_profile_enabled": "1",
-         "username": "moussa",
+         "username": "moussa2",
          "password": "secret",
          "call_permissions": perm2['name']},
     ]
@@ -1171,7 +1171,7 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
          "voicemail_ask_password": "1",
          "cti_profile_name": "Agent",
          "cti_profile_enabled": "1",
-         "username": "moussa",
+         "username": "moussa1",
          "password": "secret"},
     ]
 
