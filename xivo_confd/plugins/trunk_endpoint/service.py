@@ -44,7 +44,7 @@ class TrunkEndpointService(object):
             raise errors.not_found('TrunkEndpoint', trunk_id=trunk_id)
 
         return {'trunk_id': trunk.id,
-                'endpoint': self.endpoint,
+                'endpoint': trunk.endpoint,
                 'endpoint_id': trunk.endpoint_id}
 
     def get_association_from_endpoint(self, endpoint_id):
@@ -54,7 +54,7 @@ class TrunkEndpointService(object):
             raise errors.not_found('TrunkEndpoint', endpoint_id=endpoint_id)
 
         return {'trunk_id': trunk.id,
-                'endpoint': self.endpoint,
+                'endpoint': trunk.endpoint,
                 'endpoint_id': trunk.endpoint_id}
 
     def associate(self, trunk, endpoint):
@@ -72,5 +72,5 @@ def build_service(endpoint, endpoint_dao):
     return TrunkEndpointService(endpoint,
                                 trunk_dao,
                                 endpoint_dao,
-                                build_validator(),
+                                build_validator(endpoint),
                                 build_notifier())

@@ -88,8 +88,17 @@ def test_associate_multiple_sip_to_trunk(trunk, sip1, sip2):
 @fixtures.sip()
 def test_associate_multiple_trunks_to_sip(trunk1, trunk2, sip):
     with a.trunk_endpoint_sip(trunk1, sip):
-        response = confd.trunks(trunk1['id']).endpoints.sip(sip['id']).put()
+        response = confd.trunks(trunk2['id']).endpoints.sip(sip['id']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+
+
+@fixtures.trunk()
+@fixtures.line()
+@fixtures.sip()
+def test_associate_when_line_already_associated(trunk, line, sip):
+    with a.line_endpoint_sip(line, sip):
+        response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
 
 
 @fixtures.trunk()

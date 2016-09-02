@@ -124,6 +124,15 @@ def test_associate_multiple_lines_to_sip(line1, line2, sip):
 
 
 @fixtures.line()
+@fixtures.trunk()
+@fixtures.sip()
+def test_associate_when_trunk_already_associated(line, trunk, sip):
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.lines(line['id']).endpoints.sip(sip['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+
+
+@fixtures.line()
 @fixtures.sip()
 def test_dissociate(line, sip):
     with a.line_endpoint_sip(line, sip, check=False):

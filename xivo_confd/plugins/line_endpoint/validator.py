@@ -24,20 +24,23 @@ from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.trunk import dao as trunk_dao
 
 from xivo_dao.helpers import errors
 
 
 class ValidateLineAssociation(Validator):
 
-    def __init__(self, endpoint, line_dao):
+    def __init__(self, endpoint, line_dao, trunk_dao):
         super(ValidateLineAssociation, self).__init__()
         self.endpoint = endpoint
         self.line_dao = line_dao
+        self.trunk_dao = trunk_dao
 
     def validate(self, line, endpoint):
         self.validate_not_already_associated(line, endpoint)
         self.validate_not_associated_to_line(line, endpoint)
+        self.validate_not_associated_to_trunk(line, endpoint)
 
     def validate_not_already_associated(self, line, endpoint):
         if line.is_associated():
@@ -53,6 +56,14 @@ class ValidateLineAssociation(Validator):
                                              line_id=line.id,
                                              endpoint=line.endpoint,
                                              endpoint_id=line.endpoint_id)
+
+    def validate_not_associated_to_trunk(self, trunk, endpoint):
+        trunk = self.trunk_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
+        if trunk:
+            raise errors.resource_associated('Trunk', 'Endpoint',
+                                             trunk_id=trunk.id,
+                                             endpoint=trunk.endpoint,
+                                             endpoint_id=trunk.endpoint_id)
 
 
 class ValidateLineDissociation(Validator):
@@ -99,7 +110,8 @@ def build_validator(endpoint):
     return AssociationValidator(
         association=[
             ValidateLineAssociation(endpoint,
-                                    line_dao)
+                                    line_dao,
+                                    trunk_dao)
         ],
         dissociation=[
             ValidateLineDissociation(user_line_dao,

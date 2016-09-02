@@ -88,7 +88,7 @@ def test_associate_multiple_custom_to_trunk(trunk, custom1, custom2):
 @fixtures.custom()
 def test_associate_multiple_trunks_to_custom(trunk1, trunk2, custom):
     with a.trunk_endpoint_custom(trunk1, custom):
-        response = confd.trunks(trunk1['id']).endpoints.custom(custom['id']).put()
+        response = confd.trunks(trunk2['id']).endpoints.custom(custom['id']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
@@ -96,8 +96,9 @@ def test_associate_multiple_trunks_to_custom(trunk1, trunk2, custom):
 @fixtures.line()
 @fixtures.custom()
 def test_associate_when_line_already_associated(trunk, line, custom):
-    response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
-    response.assert_updated()
+    with a.line_endpoint_custom(line, custom):
+        response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
 
 
 @fixtures.trunk()
