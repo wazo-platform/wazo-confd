@@ -161,3 +161,9 @@ class cti_profile(IsolatedAction):
 
     actions = {'generate': h.cti_profile.generate_cti_profile,
                'delete': h.cti_profile.delete_cti_profile}
+
+
+class queue(IsolatedAction):
+
+    actions = {'generate': h.queue.generate_queue,
+               'delete': h.queue.delete_queue}
