@@ -55,3 +55,5 @@ import call_log
 import queue
 import queue_extension
 import trunk
+import trunk_endpoint_sip
+import trunk_endpoint_custom

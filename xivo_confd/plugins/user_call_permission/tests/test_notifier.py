@@ -28,7 +28,7 @@ from xivo_dao.alchemy.rightcall import RightCall as CallPermission
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 
-class TestLineDeviceNotifier(unittest.TestCase):
+class TestUserCallPermissionNotifier(unittest.TestCase):
 
     def setUp(self):
         self.bus = Mock()

@@ -23,6 +23,8 @@ from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
     option
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
+from .validator import (NAME_REGEX as USERNAME_REGEX,
+                        SECRET_REGEX)
 
 
 sip_fields = {
@@ -37,11 +39,11 @@ sip_fields = {
 
 sip_parser = reqparse.RequestParser()
 sip_parser.add_argument('username',
-                        type=inputs.regex(r"^[a-zA-Z0-9]+$"),
+                        type=inputs.regex(USERNAME_REGEX),
                         dest='name',
                         store_missing=False)
 sip_parser.add_argument('secret',
-                        type=inputs.regex(r"^[a-zA-Z0-9]+$"),
+                        type=inputs.regex(SECRET_REGEX),
                         store_missing=False)
 sip_parser.add_argument('type',
                         choices=('friend', 'peer', 'user'),

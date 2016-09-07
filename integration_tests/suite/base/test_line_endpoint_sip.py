@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -112,6 +112,24 @@ def test_associate_with_another_endpoint_when_already_associated(line, sip1, sip
     with a.line_endpoint_sip(line, sip1):
         response = confd.lines(line['id']).endpoints.sip(sip2['id']).put()
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+
+
+@fixtures.line()
+@fixtures.line()
+@fixtures.sip()
+def test_associate_multiple_lines_to_sip(line1, line2, sip):
+    with a.line_endpoint_sip(line1, sip):
+        response = confd.lines(line2['id']).endpoints.sip(sip['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+
+
+@fixtures.line()
+@fixtures.trunk()
+@fixtures.sip()
+def test_associate_when_trunk_already_associated(line, trunk, sip):
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.lines(line['id']).endpoints.sip(sip['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
 @fixtures.line()

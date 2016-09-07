@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -67,6 +67,6 @@ class LineEndpointService(object):
 
 
 def build_service(provd_client, endpoint, endpoint_service):
-    validator = build_validator()
+    validator = build_validator(endpoint)
     line_service = build_line_service(provd_client)
     return LineEndpointService(endpoint, line_service, endpoint_service, validator)

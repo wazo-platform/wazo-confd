@@ -115,6 +115,24 @@ def test_associate_with_another_endpoint_when_already_associated(line, custom1, 
 
 
 @fixtures.line()
+@fixtures.line()
+@fixtures.custom()
+def test_associate_multiple_lines_to_custom(line1, line2, custom):
+    with a.line_endpoint_custom(line1, custom):
+        response = confd.lines(line2['id']).endpoints.custom(custom['id']).put()
+        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+
+
+@fixtures.line()
+@fixtures.trunk()
+@fixtures.custom()
+def test_associate_when_trunk_already_associated(line, trunk, custom):
+    with a.trunk_endpoint_custom(trunk, custom):
+        response = confd.lines(line['id']).endpoints.custom(custom['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+
+
+@fixtures.line()
 @fixtures.custom()
 def test_dissociate(line, custom):
     with a.line_endpoint_custom(line, custom, check=False):

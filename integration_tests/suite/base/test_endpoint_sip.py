@@ -132,7 +132,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'username', 123
     yield s.check_bogus_field_returns_error, url, 'username', ']^',
     yield s.check_bogus_field_returns_error, url, 'secret', 123
-    yield s.check_bogus_field_returns_error, url, 'secret', ']^',
     yield s.check_bogus_field_returns_error, url, 'type', 123
     yield s.check_bogus_field_returns_error, url, 'username', 'ûsername'
     yield s.check_bogus_field_returns_error, url, 'secret', 'pâssword'
