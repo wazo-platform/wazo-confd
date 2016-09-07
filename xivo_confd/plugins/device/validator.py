@@ -23,24 +23,7 @@ from xivo_confd.helpers.validator import (Validator,
                                           Optional,
                                           UniqueField,
                                           UniqueFieldChanged,
-                                          RegexField,
                                           MemberOfSequence)
-
-
-IP_REGEX = r'(1?\d{1,2}|2([0-4][0-9]|5[0-5]))(\.(1?\d{1,2}|2([0-4][0-9]|5[0-5]))){3}$'
-MAC_REGEX = r'^([0-9A-Fa-f]{2})(:[0-9A-Fa-f]{2}){5}$'
-
-
-class OptionsValidator(Validator):
-
-    def validate(self, device):
-        options = device.options or {}
-        if not isinstance(options, dict):
-            raise errors.wrong_type('options', 'dict-like structure',
-                                    options=options)
-        if 'switchboard' in options and not isinstance(options['switchboard'], bool):
-            raise errors.wrong_type('options.switchboard', 'boolean',
-                                    options=options)
 
 
 class DeviceNotAssociated(Validator):
@@ -59,19 +42,12 @@ class DeviceNotAssociated(Validator):
 def build_validator(device_dao, line_dao):
     return ValidationGroup(
         common=[
-            Optional('ip',
-                     RegexField.compile('ip', IP_REGEX, "wrong type: IP Address")
-                     ),
-            Optional('mac',
-                     RegexField.compile('mac', MAC_REGEX, "wrong type: MAC Address")
-                     ),
             Optional('plugin',
                      MemberOfSequence('plugin', device_dao.plugins, 'Plugin')
                      ),
             Optional('template_id',
                      MemberOfSequence('template_id', device_dao.device_templates, 'DeviceTemplate')
                      ),
-            OptionsValidator(),
         ],
         create=[
             Optional('mac',

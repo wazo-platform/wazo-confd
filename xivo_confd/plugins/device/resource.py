@@ -17,57 +17,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
-from flask_restful import reqparse, fields
 
+from .schema import DeviceSchema
 from xivo_confd.authentication.confd_auth import required_acl
-
-from xivo_confd.helpers.restful import (FieldList,
-                                        Link,
-                                        ListResource,
-                                        ItemResource,
-                                        ConfdResource,
-                                        Strict)
-
+from xivo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
 from xivo_confd.plugins.device.model import Device
-
-options_fields = {
-    'switchboard': fields.Boolean
-}
-
-fields = {
-    'id': fields.String,
-    'ip': fields.String,
-    'mac': fields.String,
-    'sn': fields.String,
-    'plugin': fields.String,
-    'vendor': fields.String,
-    'model': fields.String,
-    'version': fields.String,
-    'description': fields.String,
-    'status': fields.String,
-    'template_id': fields.String,
-    'options': fields.Nested(options_fields, allow_null=True),
-    'links': FieldList(Link('devices'))
-}
-
-parser = reqparse.RequestParser()
-parser.add_argument('ip', type=Strict(unicode), store_missing=False)
-parser.add_argument('mac', type=Strict(unicode), store_missing=False)
-parser.add_argument('sn', type=Strict(unicode), store_missing=False)
-parser.add_argument('plugin', type=Strict(unicode), store_missing=False)
-parser.add_argument('vendor', type=Strict(unicode), store_missing=False)
-parser.add_argument('model', type=Strict(unicode), store_missing=False)
-parser.add_argument('version', type=Strict(unicode), store_missing=False)
-parser.add_argument('description', type=Strict(unicode), store_missing=False)
-parser.add_argument('template_id', type=Strict(unicode), store_missing=False)
-parser.add_argument('options', type=Strict(dict), store_missing=False)
 
 
 class DeviceList(ListResource):
 
     model = Device.from_args
-    fields = fields
-    parser = parser
+    schema = DeviceSchema()
 
     def build_headers(self, device):
         return {'Location': url_for('devices', id=device.id, _external=True)}
@@ -83,8 +43,7 @@ class DeviceList(ListResource):
 
 class DeviceItem(ItemResource):
 
-    fields = fields
-    parser = parser
+    schema = DeviceSchema()
 
     @required_acl('confd.devices.{id}.read')
     def get(self, id):
