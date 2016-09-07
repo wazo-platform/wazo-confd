@@ -30,7 +30,7 @@ class TrunkEndpointNotifier(object):
 
     def send_sysconfd_handlers(self):
         handlers = {'ctibus': [],
-                    'ipbx': ['sip reload', 'dialplan reload'],
+                    'ipbx': ['sip reload'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
