@@ -126,3 +126,10 @@ def context_entity(context, entity, check=True):
 def schedule_entity(schedule, entity, check=True):
     h.schedule_entity.associate(schedule['id'], entity['id'], check)
     yield
+
+
+@contextmanager
+def queue_extension(queue, extension, check=True):
+    h.queue_extension.associate(queue['id'], extension['id'], check)
+    yield
+    h.queue_extension.dissociate(queue['id'], extension['id'], check)

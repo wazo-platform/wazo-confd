@@ -163,6 +163,12 @@ class cti_profile(IsolatedAction):
                'delete': h.cti_profile.delete_cti_profile}
 
 
+class queue(IsolatedAction):
+
+    actions = {'generate': h.queue.generate_queue,
+               'delete': h.queue.delete_queue}
+
+
 class trunk(IsolatedAction):
 
     actions = {'generate': h.trunk.generate_trunk,
