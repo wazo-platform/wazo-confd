@@ -103,9 +103,11 @@ def check_missing_required_field_returns_error(request, field):
     response.assert_match(400, re.compile(re.escape(field)))
 
 
-def check_bogus_field_returns_error(request, field, bogus, message=None):
+def check_bogus_field_returns_error(request, field, bogus, required_field=None, message=None):
     message = message or field
-    response = request({field: bogus})
+    body = required_field if required_field else {}
+    body[field] = bogus
+    response = request(body)
     response.assert_match(400, re.compile(re.escape(message)))
 
 

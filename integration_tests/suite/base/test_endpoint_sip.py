@@ -121,7 +121,7 @@ def test_put_errors(sip):
     for check in error_checks(url):
         yield check
 
-    yield s.check_bogus_field_returns_error, url, 'username', None, 'name'
+    yield s.check_bogus_field_returns_error, url, 'username', None, None, 'name'
     yield s.check_bogus_field_returns_error, url, 'secret', None
     yield s.check_bogus_field_returns_error, url, 'type', None
     yield s.check_bogus_field_returns_error, url, 'host', None
