@@ -183,11 +183,11 @@ class EntryFinder(object):
         elif entry.line.endpoint == "sccp":
             entry.sccp = self.sccp_dao.get(entry.line.endpoint_id)
 
-        line_incalls = self.incall_dao.find_all_line_extensions_by_line_id(user_line.line_id)
-        if len(line_incalls) > 1:
+        incalls = self.incall_dao.find_all_by(user_id=user_line.user_id)
+        if len(incalls) > 1:
             raise errors.not_permitted('Cannot update when user has multiple incalls')
-        elif len(line_incalls) == 1:
-            entry.incall = self.extension_dao.get(line_incalls[0].extension_id)
+        elif len(incalls) == 1:
+            entry.incall = self.extension_dao.get_by(type='incall', typeval=str(incalls[0].id))
 
 
 class EntryUpdater(object):
