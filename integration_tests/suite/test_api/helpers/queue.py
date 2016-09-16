@@ -20,7 +20,6 @@ import random
 import string
 
 from test_api import db
-from test_api import confd
 
 
 def generate_queue(**parameters):
@@ -42,9 +41,8 @@ def delete_queue(queue_id, check=False):
 
 def generate_name():
     with db.queries() as queries:
-        queries.get_queues
-    response = confd.cti_profiles.get()
-    names = set(d['name'] for d in response.items)
+        response = queries.get_queues()
+    names = set(d['name'] for d in response)
     return _random_name(names)
 
 
