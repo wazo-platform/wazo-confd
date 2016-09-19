@@ -158,8 +158,8 @@ class IncallAssociator(AssociationService):
 
     def _create_incall(self, line, extension):
         main_user_line = self.user_line_dao.get_by(main_user=True, line_id=line.id)
-        incall = Incall(destination={'action': 'user',
-                                     'actionarg1': str(main_user_line.user_id)})
+        incall = Incall(destination=Dialaction(action='user',
+                                               actionarg1=str(main_user_line.user_id)))
         return self.incall_dao.create(incall)
 
     def dissociate(self, line, extension):
