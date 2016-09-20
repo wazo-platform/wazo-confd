@@ -173,3 +173,27 @@ class trunk(IsolatedAction):
 
     actions = {'generate': h.trunk.generate_trunk,
                'delete': h.trunk.delete_trunk}
+
+
+class incall(IsolatedAction):
+
+    actions = {'generate': h.incall.generate_incall,
+               'delete': h.incall.delete_incall}
+
+
+class conference(IsolatedAction):
+
+    actions = {'generate': h.conference.generate_conference,
+               'delete': h.conference.delete_conference}
+
+
+class group(IsolatedAction):
+
+    actions = {'generate': h.group.generate_group,
+               'delete': h.group.delete_group}
+
+
+class outcall(IsolatedAction):
+
+    actions = {'generate': h.outcall.generate_outcall,
+               'delete': h.outcall.delete_outcall}

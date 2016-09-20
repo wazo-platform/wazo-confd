@@ -22,26 +22,26 @@ import string
 from test_api import db
 
 
-def generate_queue(**parameters):
+def generate_conference(**parameters):
     parameters.setdefault('name', generate_name())
-    return add_queue(**parameters)
+    return add_conference(**parameters)
 
 
-def add_queue(**parameters):
+def add_conference(**parameters):
     with db.queries() as queries:
-        id_ = queries.insert_queue_only(**parameters)
+        id_ = queries.insert_conference_only(**parameters)
     parameters['id'] = id_
     return parameters
 
 
-def delete_queue(queue_id, check=False):
+def delete_conference(conference_id, check=False):
     with db.queries() as queries:
-        queries.delete_queue(queue_id)
+        queries.delete_conference(conference_id)
 
 
 def generate_name():
     with db.queries() as queries:
-        response = queries.get_queues()
+        response = queries.get_conferences()
     names = set(d['name'] for d in response)
     return _random_name(names)
 

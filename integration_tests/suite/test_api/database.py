@@ -135,6 +135,29 @@ class DatabaseQueries(object):
         query = text("UPDATE extensions SET type = 'user', typeval = 0 WHERE id = :extension_id")
         self.connection.execute(query, extension_id=extension_id)
 
+    def insert_outcall(self, name, context='default'):
+        query = text("""
+                     INSERT INTO outcall (name, context)
+                     VALUES (:name, :context)
+                     RETURNING id
+                     """)
+
+        outcall_id = (self.connection
+                      .execute(query,
+                               name=name,
+                               context=context)
+                      .scalar())
+
+        return outcall_id
+
+    def delete_outcall(self, outcall_id):
+        query = text("DELETE FROM outcall WHERE id = :outcall_id")
+        self.connection.execute(query, outcall_id=outcall_id)
+
+    def get_outcalls(self):
+        query = text("SELECT * FROM outcall")
+        return self.connection.execute(query)
+
     def insert_func_key(self, func_key_type, destination_type):
         func_key_query = text("""
         INSERT INTO func_key (type_id, destination_type_id)
@@ -161,7 +184,7 @@ class DatabaseQueries(object):
                                 func_key_id=func_key_id,
                                 destination_id=destination_id)
 
-    def insert_conference(self, name='myconf', number='2000', context='default'):
+    def insert_conference_only(self, name='myconf', number='2000', context='default'):
         conf_query = text("""
         INSERT INTO meetmefeatures
 
@@ -209,12 +232,25 @@ class DatabaseQueries(object):
                                   description='')
                          .scalar())
 
+        return conference_id
+
+    def insert_conference(self, name='myconf', number='2000', context='default'):
+        conference_id = self.insert_conference_only(name=name, number=number, context=context)
+
         self.insert_extension(number, context, 'meetme', conference_id)
 
         func_key_id = self.insert_func_key('speeddial', 'conference')
         self.insert_destination('conference', 'conference_id', func_key_id, conference_id)
 
         return conference_id
+
+    def delete_conference(self, meetme_id):
+        query = text("DELETE FROM meetmefeatures WHERE id = :meetme_id")
+        self.connection.execute(query, meetme_id=meetme_id)
+
+    def get_conferences(self):
+        query = text("SELECT * FROM meetmefeatures")
+        return self.connection.execute(query)
 
     def insert_extension(self, exten, context, type_, typeval):
         exten_query = text("""
@@ -231,7 +267,7 @@ class DatabaseQueries(object):
                          typeval=str(typeval))
                 .scalar())
 
-    def insert_group(self, name='mygroup', number='1234', context='default'):
+    def insert_group_only(self, name='mygroup', number='1234', context='default'):
         query = text("""
         INSERT INTO groupfeatures (name, number, context)
         VALUES (:name, :number, :context)
@@ -245,12 +281,20 @@ class DatabaseQueries(object):
                              context=context)
                     .scalar())
 
+        return group_id
+
+    def insert_group(self, name='mygroup', number='1234', context='default'):
+        group_id = self.insert_group_only(name=name, number=number, context=context)
         self.insert_extension(number, context, 'group', group_id)
 
         func_key_id = self.insert_func_key('speeddial', 'group')
         self.insert_destination('group', 'group_id', func_key_id, group_id)
 
         return group_id
+
+    def delete_group(self, group_id):
+        query = text("DELETE FROM groupfeatures WHERE id = :group_id")
+        self.connection.execute(query, group_id=group_id)
 
     def insert_agent(self, number='1000', context='default'):
         query = text("""

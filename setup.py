@@ -51,6 +51,7 @@ setup(
             'entity_plugin = xivo_confd.plugins.entity.plugin:Plugin',
             'extension_plugin = xivo_confd.plugins.extension.plugin:Plugin',
             'func_key_plugin = xivo_confd.plugins.func_key.plugin:Plugin',
+            'incall_plugin = xivo_confd.plugins.incall.plugin:Plugin',
             'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
             'line_device_plugin = xivo_confd.plugins.line_device.plugin:Plugin',
             'line_endpoint_plugin = xivo_confd.plugins.line_endpoint.plugin:Plugin',

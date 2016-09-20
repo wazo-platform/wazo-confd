@@ -30,8 +30,6 @@ from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.dialaction import Dialaction
 
-from xivo_dao.resources.incall.model import Incall as IncallModel
-
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
@@ -154,18 +152,19 @@ class IncallAssociator(AssociationService):
 
     def associate(self, line, extension):
         self.validator.validate_association(line, extension)
-        self._create_incall(line, extension)
+        incall = self._create_incall(line, extension)
+        self.extension_dao.associate_incall(incall, extension)
         return LineExtension(line_id=line.id, extension_id=extension.id)
 
     def _create_incall(self, line, extension):
         main_user_line = self.user_line_dao.get_by(main_user=True, line_id=line.id)
-        incall = IncallModel.user_destination(main_user_line.user_id,
-                                              extension.id)
-        self.incall_dao.create(incall)
+        incall = Incall(destination=Dialaction(action='user',
+                                               actionarg1=str(main_user_line.user_id)))
+        return self.incall_dao.create(incall)
 
     def dissociate(self, line, extension):
         self.validator.validate_dissociation(line, extension)
-        incall = self.incall_dao.find_by_extension_id(extension.id)
+        incall = self.incall_dao.find_by(exten=extension.exten, context=extension.context)
         self.incall_dao.delete(incall)
 
     def get_association(self, line, extension):
