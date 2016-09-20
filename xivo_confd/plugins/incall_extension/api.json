@@ -1,0 +1,146 @@
+{
+    "paths": {
+        "/incalls/{incall_id}/extensions": {
+            "get": {
+                "operationId": "get_incall_extension",
+                "summary": "List extensions associated to incall",
+                "description": "**Required ACL:** `confd.incalls.{incall_id}.extensions.read`",
+                "tags": [
+                    "incalls",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/incallid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of associations",
+                        "schema": {
+                            "$ref": "#/definitions/IncallExtensionItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/incalls/{incall_id}/extensions/{extension_id}": {
+            "put": {
+                "operationId": "associate_incall_extension",
+                "summary": "Associate incall and extension",
+                "description": "**Required ACL:** `confd.incalls.{incall_id}.extensions.{extension_id}.update`",
+                "tags": [
+                    "incalls",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/incallid"
+                    },
+                    {
+                        "$ref": "#/parameters/extensionid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Trunk and Custom endpoint associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "dissociate_incall_extension",
+                "summary": "Dissociate incall and extension",
+                "description": "**Required ACL:** `confd.incalls.{incall_id}.extensions.{extension_id}.delete`",
+                "tags": [
+                    "incalls",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/incallid"
+                    },
+                    {
+                        "$ref": "#/parameters/extensionid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Incall and Extension dissociated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        },
+        "/extensions/{extension_id}/incalls/{incall_id}": {
+            "get": {
+                "operationId": "get_extension_incall",
+                "summary": "List incalls associated to extension",
+                "description": "**Required ACL:** `confd.extensions.{extension_id}.incalls.read`",
+                "tags": [
+                    "incalls",
+                    "extensions"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/extensionid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of associations",
+                        "schema": {
+                            "$ref": "#/definitions/IncallExtensionItems"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "IncallExtensionItems": {
+            "title": "IncallExtensionItems",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/IncallExtension"
+                    },
+                    "type": "array"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "IncallExtension": {
+            "title": "IncallExtension",
+            "properties": {
+                "incall_id": {
+                    "type": "integer",
+                    "description": "Incall's ID"
+                },
+                "extension_id": {
+                    "type": "integer",
+                    "description": "Extension's ID"
+                }
+            }
+        }
+    }
+}
+

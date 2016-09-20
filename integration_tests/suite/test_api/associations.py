@@ -147,3 +147,10 @@ def trunk_endpoint_custom(trunk, custom, check=True):
     h.trunk_endpoint_custom.associate(trunk['id'], custom['id'], check)
     yield
     h.trunk_endpoint_custom.dissociate(trunk['id'], custom['id'], check)
+
+
+@contextmanager
+def incall_extension(incall, extension, check=True):
+    h.incall_extension.associate(incall['id'], extension['id'], check)
+    yield
+    h.incall_extension.dissociate(incall['id'], extension['id'], check)
