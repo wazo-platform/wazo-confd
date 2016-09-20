@@ -105,8 +105,8 @@ def test_associate_when_line_already_associated(trunk, line, sip):
 @fixtures.sip()
 def test_get_endpoint_associated_to_trunk(trunk, sip):
     expected = has_entries({'trunk_id': trunk['id'],
-                            'enpointd': 'sip',
-                            'enpointd_id': sip['id']}),
+                            'endpoint': 'sip',
+                            'endpoint_id': sip['id']})
 
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).endpoints.sip.get()
@@ -117,8 +117,8 @@ def test_get_endpoint_associated_to_trunk(trunk, sip):
 @fixtures.sip()
 def test_get_trunk_associated_to_endpoint(trunk, sip):
     expected = has_entries({'trunk_id': trunk['id'],
-                            'enpointd': 'sip',
-                            'enpointd_id': sip['id']}),
+                            'endpoint': 'sip',
+                            'endpoint_id': sip['id']})
 
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.endpoints.sip(sip['id']).trunks.get()
