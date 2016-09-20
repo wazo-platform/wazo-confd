@@ -73,6 +73,7 @@ view_fields = {
         'uuid': fields.String,
         'firstname': fields.String,
         'lastname': fields.String,
+        'email': fields.String,
         'extension': fields.String,
         'context': fields.String,
         'provisioning_code': fields.String,
