@@ -18,6 +18,7 @@
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 from xivo_dao.helpers import errors
+from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.extension import dao as extension_dao
@@ -25,12 +26,13 @@ from xivo_dao.resources.extension import dao as extension_dao
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
 
-class InternalAssociationValidator(Validator):
+class LineExtensionAssociationValidator(Validator):
 
     def validate(self, line, extension):
         self.validate_line_has_endpoint(line)
         self.validate_line_has_no_extension(line)
         self.validate_extension_not_associated_to_other_resource(extension)
+        self.validate_extension_is_in_internal_context(extension)
         self.validate_line_has_no_different_user(line, extension)
 
     def validate_line_has_endpoint(self, line):
@@ -53,6 +55,14 @@ class InternalAssociationValidator(Validator):
                                              id=extension.id,
                                              associated_id=extension.typeval)
 
+    def validate_extension_is_in_internal_context(self, extension):
+        context = context_dao.get(extension.context)
+        if context.type != 'internal':
+            raise errors.unhandled_context_type(context.type,
+                                                extension.context,
+                                                id=extension.id,
+                                                context=extension.context)
+
     def validate_line_has_no_different_user(self, line, extension):
         user_line = user_line_dao.find_by(line_id=line.id, main_user=True)
         if not user_line:
@@ -70,31 +80,14 @@ class InternalAssociationValidator(Validator):
                                                  line_id=other_user_line.line_id)
 
 
-class InternalDissociationValidator(Validator):
+class LineExtensionDissociationValidator(Validator):
 
     def validate(self, line, extension):
         ValidateLineHasNoDevice().validate(line)
 
 
-class IncallAssociationValidator(Validator):
-
-    def validate(self, line, extension):
-        self.validate_line_has_user(line)
-
-    def validate_line_has_user(self, line):
-        user_line = user_line_dao.find_by(line_id=line.id)
-        if not user_line:
-            raise errors.missing_association('Line', 'User')
-
-
-def build_internal_validator():
+def build_validator():
     return AssociationValidator(
-        association=[InternalAssociationValidator()],
-        dissociation=[InternalDissociationValidator()]
-    )
-
-
-def build_incall_validator():
-    return AssociationValidator(
-        association=[IncallAssociationValidator()]
+        association=[LineExtensionAssociationValidator()],
+        dissociation=[LineExtensionDissociationValidator()]
     )
