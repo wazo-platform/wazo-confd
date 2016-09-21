@@ -105,8 +105,8 @@ def test_associate_when_line_already_associated(trunk, line, custom):
 @fixtures.custom()
 def test_get_endpoint_associated_to_trunk(trunk, custom):
     expected = has_entries({'trunk_id': trunk['id'],
-                            'enpointd': 'custom',
-                            'enpointd_id': custom['id']}),
+                            'endpoint': 'custom',
+                            'endpoint_id': custom['id']})
 
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.trunks(trunk['id']).endpoints.custom.get()
@@ -117,8 +117,8 @@ def test_get_endpoint_associated_to_trunk(trunk, custom):
 @fixtures.custom()
 def test_get_trunk_associated_to_endpoint(trunk, custom):
     expected = has_entries({'trunk_id': trunk['id'],
-                            'enpointd': 'custom',
-                            'enpointd_id': custom['id']}),
+                            'endpoint': 'custom',
+                            'endpoint_id': custom['id']})
 
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.endpoints.custom(custom['id']).trunks.get()

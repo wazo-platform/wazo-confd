@@ -69,41 +69,4 @@ sysconfd:
     host: sysconfd
     port: 8668
 
-enabled_plugins:
-    - api_plugin
-    - call_log_plugin
-    - call_permission_plugin
-    - configuration_plugin
-    - cti_profile_plugin
-    - device_plugin
-    - endpoint_custom_plugin
-    - endpoint_sccp_plugin
-    - endpoint_sip_plugin
-    - entity_plugin
-    - extension_plugin
-    - func_key_plugin
-    - incall_plugin
-    - info_plugin
-    - line_device_plugin
-    - line_endpoint_plugin
-    - line_extension_plugin
-    - line_plugin
-    - line_sip_plugin
-    - queue_member_plugin
-    - sip_general_plugin
-    - switchboard_plugin
-    - trunk_endpoint_plugin
-    - trunk_plugin
-    - user_agent_plugin
-    - user_call_permission_plugin
-    - user_cti_profile_plugin
-    - user_entity_plugin
-    - user_import_plugin
-    - user_line_associated_plugin
-    - user_line_plugin
-    - user_plugin
-    - user_voicemail_plugin
-    - voicemail_plugin
-    - wizard_plugin
-
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c
