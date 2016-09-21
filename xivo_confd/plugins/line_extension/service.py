@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from . import notifier
+from .notifier import build_notifier
 from .validator import build_validator
 
 from xivo_dao.resources.line_extension import dao as line_extension_dao
@@ -50,5 +50,5 @@ class LineExtensionService(object):
 
 def build_service():
     return LineExtensionService(line_extension_dao,
-                                notifier,
+                                build_notifier(),
                                 build_validator())
