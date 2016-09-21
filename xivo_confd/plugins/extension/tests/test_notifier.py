@@ -57,7 +57,10 @@ class TestExtensionNotifier(unittest.TestCase):
 
     def test_when_extension_edited_then_handlers_sent(self):
         expected_handlers = {'ctibus': [],
-                             'ipbx': ['dialplan reload', 'sip reload', 'module reload chan_sccp.so'],
+                             'ipbx': ['dialplan reload',
+                                      'sip reload',
+                                      'module reload chan_sccp.so',
+                                      'module reload app_queue.so'],
                              'agentbus': []}
         updated_fields = ['exten']
         self.notifier.edited(self.extension, updated_fields)
@@ -66,7 +69,10 @@ class TestExtensionNotifier(unittest.TestCase):
 
     def test_when_extension_edited_and_undefined_change_then_handlers_sent(self):
         expected_handlers = {'ctibus': [],
-                             'ipbx': ['dialplan reload', 'sip reload', 'module reload chan_sccp.so'],
+                             'ipbx': ['dialplan reload',
+                                      'sip reload',
+                                      'module reload chan_sccp.so',
+                                      'module reload app_queue.so'],
                              'agentbus': []}
         self.notifier.edited(self.extension, None)
 
