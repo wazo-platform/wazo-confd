@@ -31,6 +31,7 @@ class Entry(object):
         self.sip = None
         self.sccp = None
         self.extension = None
+        self.extension_incall = None
         self.incall = None
         self.cti_profile = None
         self.call_permissions = []
@@ -45,7 +46,7 @@ class Entry(object):
             'sip_id': self.sip.id if self.sip else None,
             'sccp_id': self.sccp.id if self.sccp else None,
             'extension_id': self.extension.id if self.extension else None,
-            'incall_extension_id': self.incall.id if self.incall else None,
+            'incall_extension_id': self.extension_incall.id if self.extension_incall else None,
             'cti_profile_id': self.cti_profile.id if self.cti_profile else None,
             'call_permission_ids': self.extract_call_permission_ids(),
         }
@@ -101,6 +102,7 @@ class EntryCreator(object):
         entry.find_or_create('call_permissions', self.creators['call_permissions'])
         entry.find_or_create('line', self.creators['line'])
         entry.find_or_create('extension', self.creators['extension'])
+        entry.find_or_create('extension_incall', self.creators['extension_incall'])
         entry.find_or_create('incall', self.creators['incall'])
         entry.find_or_create('cti_profile', self.creators['cti_profile'])
         self.create_endpoint(entry)
@@ -170,6 +172,13 @@ class EntryFinder(object):
         if user_line:
             self.attach_line_resources(entry, user_line)
 
+        incalls = self.incall_dao.find_all_by(user_id=user.id)
+        if len(incalls) > 1:
+            raise errors.not_permitted('Cannot update when user has multiple incalls')
+        elif len(incalls) == 1:
+            entry.extension_incall = self.extension_dao.get_by(type='incall', typeval=str(incalls[0].id))
+            entry.incall = incalls[0]
+
         return entry
 
     def attach_line_resources(self, entry, user_line):
@@ -182,12 +191,6 @@ class EntryFinder(object):
             entry.sip = self.sip_dao.get(entry.line.endpoint_id)
         elif entry.line.endpoint == "sccp":
             entry.sccp = self.sccp_dao.get(entry.line.endpoint_id)
-
-        incalls = self.incall_dao.find_all_by(user_id=user_line.user_id)
-        if len(incalls) > 1:
-            raise errors.not_permitted('Cannot update when user has multiple incalls')
-        elif len(incalls) == 1:
-            entry.incall = self.extension_dao.get_by(type='incall', typeval=str(incalls[0].id))
 
 
 class EntryUpdater(object):
@@ -208,6 +211,7 @@ class EntryUpdater(object):
         entry.find_or_create('voicemail', self.creators['voicemail'])
         entry.find_or_create('call_permissions', self.creators['call_permissions'])
         entry.find_or_create('extension', self.creators['extension'])
+        entry.find_or_create('extension_incall', self.creators['extension_incall'])
         entry.find_or_create('incall', self.creators['incall'])
         entry.find_or_create('cti_profile', self.creators['cti_profile'])
         entry.find_or_create('line', self.creators['line'])

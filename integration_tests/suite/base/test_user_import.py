@@ -383,9 +383,9 @@ def test_given_csv_has_minimal_incall_fields_then_incall_created():
             "incall_context": config.INCALL_CONTEXT}]
 
     response = client.post("/users/import", csv)
-    incall_extension_id = get_import_field(response, 'incall_extension_id')
+    extension_incall_id = get_import_field(response, 'incall_extension_id')
 
-    extension = confd.extensions(incall_extension_id).get().item
+    extension = confd.extensions(extension_incall_id).get().item
     assert_that(extension, has_entries(exten=exten,
                                        context=config.INCALL_CONTEXT))
 
@@ -514,7 +514,7 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     line_id = get_import_field(response, 'line_id')
     voicemail_id = get_import_field(response, 'voicemail_id')
     extension_id = get_import_field(response, 'extension_id')
-    incall_extension_id = get_import_field(response, 'incall_extension_id')
+    extension_incall_id = get_import_field(response, 'incall_extension_id')
     sip_id = get_import_field(response, 'sip_id')
     cti_profile_id = get_import_field(response, 'cti_profile_id')
 
@@ -522,8 +522,10 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     assert_that(response.items, contains(has_entries(line_id=line_id)))
 
     response = confd.lines(line_id).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension_id),
-                                          has_entries(extension_id=incall_extension_id)))
+    assert_that(response.items, has_items(has_entries(extension_id=extension_id)))
+
+    response = confd.extensions(extension_incall_id).incalls.get()
+    assert_that(response.items, has_items(has_entries(extension_id=extension_incall_id)))
 
     response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail_id))
@@ -542,14 +544,19 @@ def test_given_csv_has_all_resources_then_all_relations_created():
 @fixtures.voicemail()
 @fixtures.call_permission()
 @fixtures.cti_profile()
-def test_given_resources_already_exist_when_importing_then_resources_associated(sip, extension, incall, voicemail, call_permission, cti_profile):
+def test_given_resources_already_exist_when_importing_then_resources_associated(sip,
+                                                                                extension,
+                                                                                extension_incall,
+                                                                                voicemail,
+                                                                                call_permission,
+                                                                                cti_profile):
     csv = [{"firstname": "importassociate",
             "exten": extension['exten'],
             "context": extension['context'],
             "line_protocol": "sip",
             "sip_username": sip['username'],
-            "incall_exten": incall['exten'],
-            "incall_context": incall['context'],
+            "incall_exten": extension_incall['exten'],
+            "incall_context": extension_incall['context'],
             "voicemail_number": voicemail['number'],
             "voicemail_context": voicemail['context'],
             "cti_profile_name": cti_profile['name'],
@@ -561,13 +568,16 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
 
     user_id = get_import_field(response, 'user_id')
     line_id = get_import_field(response, 'line_id')
+    extension_incall_id = get_import_field(response, 'incall_extension_id')
 
     response = confd.users(user_id).lines.get()
     assert_that(response.items, contains(has_entries(line_id=line_id)))
 
     response = confd.lines(line_id).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension['id']),
-                                          has_entries(extension_id=incall['id'])))
+    assert_that(response.items, has_items(has_entries(extension_id=extension['id'])))
+
+    response = confd.extensions(extension_incall_id).incalls.get()
+    assert_that(response.items, has_items(has_entries(extension_id=extension_incall['id'])))
 
     response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
@@ -955,9 +965,9 @@ def test_when_updating_incall_fields_then_incall_updated(entry):
             "incall_ring_seconds": "10"}]
 
     response = client.put("/users/import", csv)
-    incall_id = get_update_field(response, 'incall_extension_id')
+    extension_incall_id = get_update_field(response, 'incall_extension_id')
 
-    extension = confd.extensions(incall_id).get().item
+    extension = confd.extensions(extension_incall_id).get().item
     assert_that(extension, has_entries(exten=exten,
                                        context=config.INCALL_CONTEXT))
 
@@ -972,9 +982,9 @@ def test_when_adding_incall_then_incall_created(entry):
             "incall_ring_seconds": "10"}]
 
     response = client.put("/users/import", csv)
-    incall_id = get_update_field(response, 'incall_extension_id')
+    extension_incall_id = get_update_field(response, 'incall_extension_id')
 
-    extension = confd.extensions(incall_id).get().item
+    extension = confd.extensions(extension_incall_id).get().item
     assert_that(extension, has_entries(exten=exten,
                                        context=config.INCALL_CONTEXT))
 
@@ -1200,14 +1210,19 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.voicemail()
 @fixtures.call_permission()
-def test_given_resources_not_associated_when_updating_then_resources_associated(user, sip, extension, incall, voicemail, call_permission):
+def test_given_resources_not_associated_when_updating_then_resources_associated(user,
+                                                                                sip,
+                                                                                extension,
+                                                                                extension_incall,
+                                                                                voicemail,
+                                                                                call_permission):
     csv = [{"uuid": user['uuid'],
             "exten": extension['exten'],
             "context": extension['context'],
             "line_protocol": "sip",
             "sip_username": sip['username'],
-            "incall_exten": incall['exten'],
-            "incall_context": incall['context'],
+            "incall_exten": extension_incall['exten'],
+            "incall_context": extension_incall['context'],
             "voicemail_number": voicemail['number'],
             "voicemail_context": voicemail['context'],
             "cti_profile_name": "Client",
@@ -1222,8 +1237,10 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
 
     response = confd.lines(entry['line_id']).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=entry['extension_id']),
-                                          has_entries(extension_id=entry['incall_extension_id'])))
+    assert_that(response.items, has_items(has_entries(extension_id=entry['extension_id'])))
+
+    response = confd.extensions(entry['incall_extension_id']).incalls.get()
+    assert_that(response.items, has_items(has_entries(extension_id=entry['incall_extension_id'])))
 
     response = confd.users(entry['user_id']).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
@@ -1240,7 +1257,12 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
                                                                 user_id=entry['user_id'])))
 
 
-@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip", call_permissions=1)
+@fixtures.csv_entry(extension=True,
+                    voicemail=True,
+                    incall=True,
+                    cti_profile=True,
+                    line_protocol="sip",
+                    call_permissions=1)
 @fixtures.call_permission()
 def test_given_each_field_updated_individually_then_entry_updated(entry, call_permission):
     exten = h.extension.find_available_exten(config.CONTEXT)

@@ -23,12 +23,16 @@ from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from xivo_dao.helpers.exception import NotFoundError
 
+from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.extension import Extension
+from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.resources.voicemail.model import Voicemail
+
+from xivo_dao.resources.extension import dao as extension_dao
 
 
 class Creator(object):
@@ -189,14 +193,14 @@ class CtiProfileCreator(Creator):
             return self.dao.get(cti_profile_id)
 
 
-class IncallCreator(Creator):
+class ExtensionIncallCreator(Creator):
 
     def find(self, fields):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
             try:
-                return self.service.dao.get_by(exten=exten, context=context)
+                return self.service.get_by(exten=exten, context=context)
             except NotFoundError:
                 return None
 
@@ -210,6 +214,33 @@ class IncallCreator(Creator):
         extension_fields = self.extract_extension_fields(fields)
         self.update_model(extension_fields, resource)
         self.service.edit(resource)
+
+    def extract_extension_fields(self, fields):
+        return {key: fields[key]
+                for key in ('exten', 'context')
+                if fields.get(key) is not None}
+
+
+class IncallCreator(Creator):
+
+    def find(self, fields):
+        exten = fields.get('exten')
+        context = fields.get('context')
+        if exten and context:
+            try:
+                extension = extension_dao.get_by(exten=exten, context=context, type='incall')
+                return self.service.get(int(extension.typeval))
+            except NotFoundError:
+                return None
+
+    def create(self, fields):
+        fields = self.extract_extension_fields(fields)
+        if fields:
+            incall = Incall(destination=Dialaction(action='none'))
+            return self.service.create(incall)
+
+    def update(self, fields, resource):
+        pass
 
     def extract_extension_fields(self, fields):
         return {key: fields[key]

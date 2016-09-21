@@ -152,13 +152,15 @@ def test_given_user_has_extension_when_exporting_then_csv_has_extension_fields(u
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
+@fixtures.incall()
 @fixtures.extension(context=config.INCALL_CONTEXT)
-def test_given_user_has_incall_when_exporting_then_csv_has_incall_fields(user, line, sip, incall):
+def test_given_user_has_incall_when_exporting_then_csv_has_incall_fields(user, line, sip, incall, extension):
     expected = has_entries(uuid=user['uuid'],
-                           incall_exten=incall['exten'],
-                           incall_context=incall['context'])
+                           incall_exten=extension['exten'],
+                           incall_context=extension['context'])
 
-    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, incall):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
+            a.incall_extension(incall, extension), a.incall_user(incall, user):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 
@@ -166,18 +168,27 @@ def test_given_user_has_incall_when_exporting_then_csv_has_incall_fields(user, l
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
+@fixtures.incall()
+@fixtures.incall()
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.extension(context=config.INCALL_CONTEXT)
-def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fields(user, line, sip, incall1, incall2):
-    expected_incall = ";".join([incall1['exten'], incall2['exten']])
-    expected_context = ";".join([incall1['context'], incall2['context']])
+def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fields(user,
+                                                                                   line,
+                                                                                   sip,
+                                                                                   incall1,
+                                                                                   incall2,
+                                                                                   extension1,
+                                                                                   extension2):
+    expected_incall = ";".join([extension1['exten'], extension2['exten']])
+    expected_context = ";".join([extension1['context'], extension2['context']])
     expected = has_entries(uuid=user['uuid'],
                            incall_exten=expected_incall,
                            incall_context=expected_context
                            )
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
-            a.line_extension(line, incall1), a.line_extension(line, incall2):
+            a.incall_extension(incall1, extension1), a.incall_extension(incall2, extension2), \
+            a.incall_user(incall1, user), a.incall_user(incall2, user):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(expected))
 

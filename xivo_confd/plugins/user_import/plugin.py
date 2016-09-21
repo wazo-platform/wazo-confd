@@ -25,6 +25,8 @@ from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 from xivo_confd.plugins.entity.service import build_service as build_entity_service
 from xivo_confd.plugins.extension.service import build_service as build_extension_service
+from xivo_confd.plugins.incall.service import build_service as build_incall_service
+from xivo_confd.plugins.incall_extension.service import build_service as build_incall_extension_service
 from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
@@ -98,6 +100,8 @@ class Plugin(object):
         line_extension_service = build_line_extension_service()
         call_permission_service = build_call_permission_service()
         user_call_permission_service = build_user_call_permission_service()
+        incall_service = build_incall_service()
+        incall_extension_service = build_incall_extension_service()
 
         creators = {'user': UserCreator(user_service),
                     'entity': EntityCreator(entity_service),
@@ -106,7 +110,8 @@ class Plugin(object):
                     'sip': SipCreator(sip_service),
                     'sccp': SccpCreator(sccp_service),
                     'extension': ExtensionCreator(extension_service),
-                    'incall': IncallCreator(extension_service),
+                    'extension_incall': ExtensionCreator(extension_service),
+                    'incall': IncallCreator(incall_service),
                     'cti_profile': CtiProfileCreator(cti_profile_dao),
                     'call_permissions': CallPermissionCreator(call_permission_service),
                     }
@@ -121,7 +126,7 @@ class Plugin(object):
             ('sccp', SccpAssociator(line_sccp_service)),
             ('line', LineAssociator(user_line_service)),
             ('extension', ExtensionAssociator(line_extension_service)),
-            ('incall', IncallAssociator(line_extension_service)),
+            ('incall', IncallAssociator(incall_extension_service)),
             ('call_permissions', CallPermissionAssociator(user_call_permission_service,
                                                           call_permission_service)),
         ])
