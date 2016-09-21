@@ -49,7 +49,7 @@ class TestLineExtensionNotifier(unittest.TestCase):
 
         expected_sysconf_command = {
             'ctibus': ['xivo[phone,edit,1]', 'xivo[user,edit,3]'],
-            'ipbx': ['dialplan reload', 'sip reload'],
+            'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
             'agentbus': []
         }
 

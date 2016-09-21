@@ -43,7 +43,10 @@ class ExtensionNotifier(object):
 
     def edited(self, extension, updated_fields):
         if updated_fields is None or updated_fields:
-            self.send_sysconfd_handlers(['dialplan reload', 'sip reload', 'module reload chan_sccp.so'])
+            self.send_sysconfd_handlers(['dialplan reload',
+                                         'sip reload',
+                                         'module reload chan_sccp.so',
+                                         'module reload app_queue.so'])
         event = EditExtensionEvent(extension.id,
                                    extension.exten,
                                    extension.context)

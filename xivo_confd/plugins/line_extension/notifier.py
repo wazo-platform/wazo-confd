@@ -31,7 +31,7 @@ def associated(line_extension):
 def send_sysconf_commands(line_extension):
     command = {
         'ctibus': _generate_ctibus_commands(line_extension),
-        'ipbx': ['dialplan reload', 'sip reload'],
+        'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
         'agentbus': [],
     }
 
