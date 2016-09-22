@@ -33,7 +33,7 @@ class TrunkSchema(BaseSchema):
 class TrunkList(ListResource):
 
     model = Trunk
-    schema = TrunkSchema()
+    schema = TrunkSchema
 
     def build_headers(self, trunk):
         return {'Location': url_for('trunks', id=trunk.id, _external=True)}
@@ -49,7 +49,7 @@ class TrunkList(ListResource):
 
 class TrunkItem(ItemResource):
 
-    schema = TrunkSchema()
+    schema = TrunkSchema
 
     @required_acl('confd.trunks.{id}.read')
     def get(self, id):

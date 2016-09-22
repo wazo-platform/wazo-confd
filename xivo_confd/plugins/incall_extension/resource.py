@@ -44,26 +44,26 @@ class IncallExtensionResource(ConfdResource):
 
 class ExtensionIncallList(IncallExtensionResource):
 
-    schema = IncallExtensionSchema()
+    schema = IncallExtensionSchema
 
     @required_acl('confd.extensions.{extension_id}.incalls.read')
     def get(self, extension_id):
         extension = self.extension_dao.get(extension_id)
         items = self.service.find_all_by_extension_id(extension.id)
         return {'total': len(items),
-                'items': self.schema.dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True).data}
 
 
 class IncallExtensionList(IncallExtensionResource):
 
-    schema = IncallExtensionSchema()
+    schema = IncallExtensionSchema
 
     @required_acl('confd.incalls.{incall_id}.extensions.read')
     def get(self, incall_id):
         incall = self.incall_dao.get(incall_id)
         items = self.service.find_all_by_incall_id(incall.id)
         return {'total': len(items),
-                'items': self.schema.dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True).data}
 
 
 class IncallExtensionItem(IncallExtensionResource):

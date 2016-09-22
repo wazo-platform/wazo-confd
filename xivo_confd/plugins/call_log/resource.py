@@ -44,7 +44,7 @@ class PeriodSchema(BaseSchema):
 
 class CallLog(ConfdResource):
 
-    period_schema = PeriodSchema()
+    schema = PeriodSchema
 
     def __init__(self, service, serializer, mapper):
         super(CallLog, self).__init__()
@@ -54,7 +54,7 @@ class CallLog(ConfdResource):
 
     @required_acl('confd.call_logs.read')
     def get(self):
-        period = self.period_schema.load(request.args).data
+        period = self.schema().load(request.args).data
         if not period:
             call_logs = self.service.find_all()
         else:

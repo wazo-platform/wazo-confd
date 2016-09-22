@@ -73,14 +73,14 @@ class TrunkEndpointGet(TrunkEndpoint):
 
     def get(self, trunk_id):
         trunk_endpoint = self.service.get_association_from_trunk(trunk_id)
-        return self.schema.dump(trunk_endpoint).data
+        return self.schema().dump(trunk_endpoint).data
 
 
 class EndpointTrunkGet(TrunkEndpoint):
 
     def get(self, endpoint_id):
         trunk_endpoint = self.service.get_association_from_endpoint(endpoint_id)
-        return self.schema.dump(trunk_endpoint).data
+        return self.schema().dump(trunk_endpoint).data
 
 
 class TrunkEndpointAssociationSip(TrunkEndpointAssociation):
@@ -95,7 +95,7 @@ class TrunkEndpointAssociationSip(TrunkEndpointAssociation):
 
 
 class TrunkEndpointGetSip(TrunkEndpointGet):
-    schema = TrunkEndpointSipSchema()
+    schema = TrunkEndpointSipSchema
 
     @required_acl('confd.trunks.{trunk_id}.endpoints.sip.read')
     def get(self, trunk_id):
@@ -103,7 +103,7 @@ class TrunkEndpointGetSip(TrunkEndpointGet):
 
 
 class EndpointTrunkGetSip(EndpointTrunkGet):
-    schema = TrunkEndpointSipSchema()
+    schema = TrunkEndpointSipSchema
 
     @required_acl('confd.endpoints.sip.{endpoint_id}.trunks.read')
     def get(self, endpoint_id):
@@ -122,7 +122,7 @@ class TrunkEndpointAssociationCustom(TrunkEndpointAssociation):
 
 
 class TrunkEndpointGetCustom(TrunkEndpointGet):
-    schema = TrunkEndpointCustomSchema()
+    schema = TrunkEndpointCustomSchema
 
     @required_acl('confd.trunks.{trunk_id}.endpoints.custom.read')
     def get(self, trunk_id):
@@ -130,7 +130,7 @@ class TrunkEndpointGetCustom(TrunkEndpointGet):
 
 
 class EndpointTrunkGetCustom(EndpointTrunkGet):
-    schema = TrunkEndpointCustomSchema()
+    schema = TrunkEndpointCustomSchema
 
     @required_acl('confd.endpoints.custom.{endpoint_id}.trunks.read')
     def get(self, endpoint_id):

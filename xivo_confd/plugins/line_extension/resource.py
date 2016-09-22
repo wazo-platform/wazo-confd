@@ -49,26 +49,26 @@ class LineExtensionResource(ConfdResource):
 
 class ExtensionLineList(LineExtensionResource):
 
-    schema = LineExtensionSchema()
+    schema = LineExtensionSchema
 
     @required_acl('confd.extensions.{extension_id}.lines.read')
     def get(self, extension_id):
         extension = self.extension_dao.get(extension_id)
         items = self.service.find_all_by(extension_id=extension.id)
         return {'total': len(items),
-                'items': self.schema.dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True).data}
 
 
 class LineExtensionList(LineExtensionResource):
 
-    schema = LineExtensionSchema()
+    schema = LineExtensionSchema
 
     @required_acl('confd.lines.{line_id}.extensions.read')
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         items = self.service.find_all_by(line_id=line.id)
         return {'total': len(items),
-                'items': self.schema.dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True).data}
 
     @required_acl('confd.lines.{line_id}.extensions.create')
     def post(self, line_id):
@@ -79,7 +79,7 @@ class LineExtensionList(LineExtensionResource):
         extension = self.get_extension_or_fail()
         line_extension = self.service.associate(line, extension)
         headers = self.build_headers(line_extension)
-        return self.schema.dump(line_extension).data, 201, headers
+        return self.schema().dump(line_extension).data, 201, headers
 
     def build_headers(self, model):
         url = url_for('line_extensions',
@@ -89,7 +89,7 @@ class LineExtensionList(LineExtensionResource):
         return {'Location': url}
 
     def get_extension_or_fail(self):
-        form = self.schema.load(request.get_json()).data
+        form = self.schema().load(request.get_json()).data
         try:
             return self.extension_dao.get(form['extension_id'])
         except NotFoundError:

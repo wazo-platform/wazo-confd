@@ -127,14 +127,14 @@ class ListResource(ConfdResource):
         if getattr(self, 'parser', False):
             return self.parser.parse_args()
 
-        return self.schema.load(request.get_json()).data
+        return self.schema().load(request.get_json()).data
 
     def _dump_result(self, model):
         # old style
         if getattr(self, 'fields', False):
             return marshal(model, self.fields)
 
-        return self.schema.dump(model).data
+        return self.schema().dump(model).data
 
 
 class ItemResource(ConfdResource):
@@ -179,14 +179,14 @@ class ItemResource(ConfdResource):
         if getattr(self, 'parser', False):
             return self.parser.parse_args()
 
-        return self.schema.load(request.get_json(), partial=True).data
+        return self.schema().load(request.get_json(), partial=True).data
 
     def _dump_result(self, model):
         # old style
         if getattr(self, 'fields', False):
             return marshal(model, self.fields)
 
-        return self.schema.dump(model).data
+        return self.schema().dump(model).data
 
 
 class FieldList(fields.Raw):

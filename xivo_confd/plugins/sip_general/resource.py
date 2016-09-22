@@ -93,7 +93,7 @@ class SIPGeneralSchema(BaseSchema):
 class SIPGeneralList(ConfdResource):
 
     model = StaticSIP
-    schema = SIPGeneralSchema()
+    schema = SIPGeneralSchema
 
     def __init__(self, service):
         super(SIPGeneralList, self).__init__()
@@ -102,11 +102,11 @@ class SIPGeneralList(ConfdResource):
     @required_acl('confd.asterisk.sip.general.get')
     def get(self):
         options = self.service.list()
-        return self.schema.dump(options).data
+        return self.schema().dump(options).data
 
     @required_acl('confd.asterisk.sip.general.update')
     def put(self):
-        form = self.schema.load(request.get_json()).data
+        form = self.schema().load(request.get_json()).data
         sip_general = [StaticSIP(**option) for option in form]
         self.service.edit(sip_general)
         return '', 204

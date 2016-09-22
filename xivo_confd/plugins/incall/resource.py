@@ -35,18 +35,19 @@ def _create_destination(form):
 class IncallList(ListResource):
 
     model = Incall
-    schema = IncallSchema()
+    schema = IncallSchema
 
     def build_headers(self, incall):
         return {'Location': url_for('incalls', id=incall.id, _external=True)}
 
     @required_acl('confd.incalls.create')
     def post(self):
-        form = self.schema.load(request.get_json()).data
+        schema = self.schema()
+        form = schema.load(request.get_json()).data
         form['destination'] = _create_destination(form['destination'])
         model = self.model(**form)
         model = self.service.create(model)
-        return self.schema.dump(model).data, 201, self.build_headers(model)
+        return schema.dump(model).data, 201, self.build_headers(model)
 
     @required_acl('confd.incalls.read')
     def get(self):
@@ -55,7 +56,7 @@ class IncallList(ListResource):
 
 class IncallItem(ItemResource):
 
-    schema = IncallSchema()
+    schema = IncallSchema
 
     @required_acl('confd.incalls.{id}.read')
     def get(self, id):
@@ -66,7 +67,7 @@ class IncallItem(ItemResource):
         return super(IncallItem, self).put(id)
 
     def parse_and_update(self, model):
-        form = self.schema.load(request.get_json(), partial=True).data
+        form = self.schema().load(request.get_json(), partial=True).data
         updated_fields = self.find_updated_fields(model, form)
         form['destination'] = _create_destination(form['destination'])
 

@@ -50,13 +50,13 @@ class UserAgentItem(UserAgentResource):
 
 class UserAgentList(UserAgentResource):
 
-    schema = UserAgentSchema()
+    schema = UserAgentSchema
 
     @required_acl('confd.users.{user_id}.agents.read')
     def get(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
         item = self.service.find_by_user_id(user.id)
-        return self.schema.dump(item).data
+        return self.schema().dump(item).data
 
     @required_acl('confd.users.{user_id}.agents.delete')
     def delete(self, user_id):
