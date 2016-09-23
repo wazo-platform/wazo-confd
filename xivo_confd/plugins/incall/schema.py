@@ -18,6 +18,7 @@
 
 from marshmallow import Schema, fields, pre_dump, post_load, post_dump
 from marshmallow.validate import OneOf, Regexp, Predicate, Length
+from marshmallow.class_registry import register
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
@@ -313,3 +314,9 @@ class IncallSchema(BaseSchema):
     description = fields.String(allow_none=True)
     destination = IncallDestinationField(BaseDestinationSchema, required=True)
     links = ListLink(Link('incalls'))
+    extensions = fields.Nested('ExtensionSchema',
+                               only=['exten', 'context', 'links'],
+                               many=True,
+                               dump_only=True)
+
+register('IncallSchema', IncallSchema)

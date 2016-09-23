@@ -166,6 +166,13 @@
                     "readOnly": true,
                     "description": "The id of the incoming call"
                 },
+                "extensions": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/ExtensionRelation"
+                    }
+                },
                 "preprocess_subroutine": {
                     "type": "string",
                     "description": "Name of the subroutine to execute in asterisk before receiving a call"
@@ -207,6 +214,10 @@
                     "ring_time": 10.5
                 }
             }
+        },
+        "IncallRelation": {
+            "title": "IncallRelation",
+            "properties": {}
         },
         "IncallDestinationType": {
             "title": "IncallDestinationType",

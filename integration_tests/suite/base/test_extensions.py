@@ -18,22 +18,23 @@
 import re
 import datetime
 
-from hamcrest import assert_that
-from hamcrest import contains
-from hamcrest import contains_inanyorder
-from hamcrest import equal_to
-from hamcrest import has_entries
-from hamcrest import has_item
-from hamcrest import not_
+from hamcrest import (assert_that,
+                      contains,
+                      contains_inanyorder,
+                      equal_to,
+                      has_entries,
+                      has_item,
+                      has_key,
+                      not_)
 
 from test_api import confd
-from test_api import config
 from test_api import provd
 from test_api import associations as a
 from test_api import scenarios as s
 from test_api import helpers as h
 from test_api import errors as e
 from test_api import fixtures
+from test_api.config import CONTEXT, INCALL_CONTEXT
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 
@@ -84,28 +85,38 @@ def test_get(extension):
                                            commented=False))
 
 
+@fixtures.extension(context=INCALL_CONTEXT)
+@fixtures.incall()
+def test_get_relations(extension, incall):
+    expected = has_entries({'incall': has_key('links')})
+
+    with a.incall_extension(incall, extension):
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, expected)
+
+
 def test_create_minimal_parameters():
-    exten = h.extension.find_available_exten(config.CONTEXT)
+    exten = h.extension.find_available_exten(CONTEXT)
 
     response = confd.extensions.post(exten=exten,
-                                     context=config.CONTEXT)
+                                     context=CONTEXT)
     response.assert_created('extensions')
 
     assert_that(response.item, has_entries(exten=exten,
-                                           context=config.CONTEXT,
+                                           context=CONTEXT,
                                            commented=False))
 
 
 def test_create_with_commented_parameter():
-    exten = h.extension.find_available_exten(config.CONTEXT)
+    exten = h.extension.find_available_exten(CONTEXT)
 
     response = confd.extensions.post(exten=exten,
-                                     context=config.CONTEXT,
+                                     context=CONTEXT,
                                      commented=True)
     response.assert_created('extensions')
 
     assert_that(response.item, has_entries(exten=exten,
-                                           context=config.CONTEXT,
+                                           context=CONTEXT,
                                            commented=True))
 
 
@@ -154,9 +165,9 @@ def test_create_extension_outside_context_range():
 
 @fixtures.context(start='1000', end='9999')
 def test_create_2_extensions_same_exten_different_context(context):
-    exten = h.extension.find_available_exten(config.CONTEXT)
+    exten = h.extension.find_available_exten(CONTEXT)
 
-    response = confd.extensions.post(exten=exten, context=config.CONTEXT)
+    response = confd.extensions.post(exten=exten, context=CONTEXT)
     response.assert_created('extensions')
 
     response = confd.extensions.post(exten=exten, context=context['name'])

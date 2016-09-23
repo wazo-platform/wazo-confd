@@ -15,10 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from test_api import associations as a
 from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
+from test_api.config import INCALL_CONTEXT
 
 from hamcrest import (assert_that,
                       contains,
@@ -256,6 +258,19 @@ def test_get(incall):
                                            caller_id_mode=incall['caller_id_mode'],
                                            caller_id_name=incall['caller_id_name'],
                                            destination=incall['destination']))
+
+
+@fixtures.incall()
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_get_relations(incall, extension):
+    expected = has_entries({
+        'extensions': contains(has_entries({'exten': extension['exten'],
+                                            'context': extension['context']}))
+    })
+
+    with a.incall_extension(incall, extension):
+        response = confd.incalls(incall['id']).get()
+        assert_that(response.item, expected)
 
 
 def test_create_minimal_parameters():

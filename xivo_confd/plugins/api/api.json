@@ -4696,6 +4696,10 @@
                 },
                 "exten": {
                     "type": "string"
+                },
+                "incall": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/IncallRelation"
                 }
             },
             "required": [
@@ -4719,6 +4723,17 @@
             "required": [
                 "total"
             ]
+        },
+        "ExtensionRelation": {
+            "title": "ExtensionRelation",
+            "properties": {
+                "context": {
+                    "type": "string"
+                },
+                "exten": {
+                    "type": "string"
+                }
+            }
         },
         "FuncKeyDestination": {
             "title": "FuncKeyDestination",
