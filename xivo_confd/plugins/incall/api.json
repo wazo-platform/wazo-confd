@@ -664,9 +664,20 @@
                     "type": "integer",
                     "description": "The id of the voicemail"
                 },
-                "ring_time": {
-                    "type": "number",
-                    "format": "float"
+                "skip_instructions": {
+                    "type": "boolean",
+                    "description": "Skip the playback of instructions for leaving a message"
+                },
+                "greeting": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "busy",
+                        "unavailable"
+                    ],
+                    "description": "Play the specified greeting"
                 }
             },
             "required": [
