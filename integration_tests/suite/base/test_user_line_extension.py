@@ -76,40 +76,14 @@ def test_dissociate_extension_then_line_then_user(user, line, extension):
 @fixtures.user()
 @fixtures.line_sip()
 @fixtures.extension(context='default')
-@fixtures.extension(context='from-extern')
-def test_get_line_extension_associations(user, line, internal, incall):
+def test_get_line_extension_associations(user, line, extension):
     expected = has_items(has_entries({'line_id': line['id'],
-                                     'extension_id': internal['id']}),
-                         has_entries({'line_id': line['id'],
-                                      'extension_id': incall['id']})
+                                      'extension_id': extension['id']})
                          )
 
-    with a.user_line(user, line), a.line_extension(line, internal), a.line_extension(line, incall):
+    with a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).extensions.get()
         assert_that(response.items, expected)
-
-
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension(context='default')
-@fixtures.extension(context='from-extern')
-def test_associate_line_and_incall(user, line, internal, incall):
-    expected = has_entries({'line_id': line['id'],
-                            'extension_id': incall['id']})
-
-    with a.user_line(user, line):
-        response = confd.lines(line['id']).extensions.post(extension_id=incall['id'])
-        assert_that(response.item, expected)
-
-
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension(context='default')
-@fixtures.extension(context='from-extern')
-def test_dissociate_line_and_incall(user, line, internal, incall):
-    with a.user_line(user, line), a.line_extension(line, incall, check=False):
-        response = confd.lines(line['id']).extensions(incall['id']).delete()
-        response.assert_deleted()
 
 
 @fixtures.user(firstname="Jôhn", lastname="Smîth")

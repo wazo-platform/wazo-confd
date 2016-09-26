@@ -154,3 +154,10 @@ def incall_extension(incall, extension, check=True):
     h.incall_extension.associate(incall['id'], extension['id'], check)
     yield
     h.incall_extension.dissociate(incall['id'], extension['id'], check)
+
+
+@contextmanager
+def incall_user(incall, user, check=True):
+    h.incall_user.associate(incall['id'], user['id'], check)
+    yield
+    h.incall_user.dissociate(incall['id'], user['id'], check)

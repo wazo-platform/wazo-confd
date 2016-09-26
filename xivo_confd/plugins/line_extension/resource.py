@@ -66,7 +66,7 @@ class LineExtensionList(LineExtensionResource):
     @required_acl('confd.lines.{line_id}.extensions.read')
     def get(self, line_id):
         line = self.line_dao.get(line_id)
-        items = self.service.list(line.id)
+        items = self.service.find_all_by(line_id=line.id)
         return {'total': len(items),
                 'items': self.schema.dump(items, many=True).data}
 

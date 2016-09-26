@@ -92,15 +92,12 @@ def test_get_errors():
 
 
 @fixtures.extension()
-@fixtures.extension(context=config.INCALL_CONTEXT)
-def test_get_errors_deprecated(extension, incall):
+def test_get_errors_deprecated(extension):
     fake_extension_deprecated = confd.extensions(FAKE_ID).line.get
     not_associated_extension_deprecated = confd.extensions(extension['id']).line.get
-    not_associated_incall_deprecated = confd.extensions(incall['id']).line.get
 
     yield s.check_resource_not_found, fake_extension_deprecated, 'Extension'
     yield s.check_resource_not_found, not_associated_extension_deprecated, 'LineExtension'
-    yield s.check_resource_not_found, not_associated_incall_deprecated, 'LineExtension'
 
 
 @fixtures.line_sip()
@@ -131,11 +128,11 @@ def test_associate_line_and_internal_extension(line, extension):
                                                       'extension_id': extension['id']})))
 
 
-@fixtures.extension(context='from-extern')
+@fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.line_sip()
-def test_associate_incall_to_line_without_user(incall, line):
-    response = confd.lines(line['id']).extensions(incall['id']).put()
-    response.assert_match(400, e.missing_association('Line', 'User'))
+def test_associate_extension_not_in_internal_context(extension, line):
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_status(400)
 
 
 @fixtures.extension()

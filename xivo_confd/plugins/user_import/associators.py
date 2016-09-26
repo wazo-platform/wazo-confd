@@ -19,7 +19,6 @@
 
 import abc
 
-from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_dao.alchemy.dialaction import Dialaction
@@ -176,33 +175,31 @@ class CtiProfileAssociator(Associator):
 class IncallAssociator(Associator):
 
     def associate(self, entry):
-        line = entry.get_resource('line')
         incall = entry.get_resource('incall')
-        if line and incall:
-            self.service.associate(line, incall)
-            self.update_ring_seconds(entry)
+        extension = entry.get_resource('extension_incall')
+        if incall and extension:
+            self.service.associate(incall, extension)
+            self.update_destination(entry)
 
-    def update_ring_seconds(self, entry):
+    def update_destination(self, entry):
         ring_seconds = entry.extract_field('incall', 'ring_seconds')
-        if ring_seconds:
-            user = entry.get_resource('user')
-            (Session.query(Dialaction)
-             .filter_by(event='answer',
-                        category='incall',
-                        action='user',
-                        actionarg1=str(user.id))
-             .update({'actionarg2': str(ring_seconds)}))
+        user = entry.get_resource('user')
+        incall = entry.get_resource('incall')
+        incall.destination = Dialaction(action='user',
+                                        actionarg1=str(user.id),
+                                        actionarg2=str(ring_seconds) if ring_seconds else None)
 
     def update(self, entry):
-        line = entry.get_resource('line')
         incall = entry.get_resource('incall')
-        if line and incall and not self.associated(line, incall):
-            self.service.associate(line, incall)
-            self.update_ring_seconds(entry)
+        extension = entry.get_resource('extension_incall')
+        if incall and extension and not self.associated(incall, extension):
+            self.service.associate(incall, extension)
+        if incall:
+            self.update_destination(entry)
 
-    def associated(self, line, extension):
+    def associated(self, incall, extension):
         try:
-            self.service.get(line, extension)
+            self.service.get(incall, extension)
         except NotFoundError:
             return False
         return True

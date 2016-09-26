@@ -16,80 +16,55 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import patch, Mock
 
-from xivo_confd.plugins.line_extension.manager import LineExtension
-from xivo_dao.resources.user_line.model import UserLine
+from mock import Mock, patch
 
-from xivo_confd.plugins.line_extension import notifier
+from xivo_bus.resources.line_extension.event import (LineExtensionAssociatedEvent,
+                                                     LineExtensionDissociatedEvent)
+from ..notifier import LineExtensionNotifier
+
+USER_ID = 1
+LINE_ID = 2
+SYSCONFD_HANDLERS = {'ctibus': ['xivo[phone,edit,{}]'.format(LINE_ID),
+                                'xivo[user,edit,{}]'.format(USER_ID)],
+                     'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
+                     'agentbus': []}
 
 
+@patch('xivo_dao.resources.user_line.dao.find_all_by_line_id', Mock(return_value=[Mock(user_id=USER_ID)]))
 class TestLineExtensionNotifier(unittest.TestCase):
 
-    @patch('xivo_confd.plugins.line_extension.notifier.send_sysconf_commands')
-    @patch('xivo_confd.plugins.line_extension.notifier.send_bus_association_events')
-    def test_associated(self, send_bus_association_events, send_sysconf_association_commands):
-        line_extension = LineExtension(line_id=1, extension_id=2)
+    def setUp(self):
+        self.bus = Mock()
+        self.sysconfd = Mock()
+        self.line_extension = Mock(line_id=LINE_ID, extension_id=3)
 
-        notifier.associated(line_extension)
+        self.notifier = LineExtensionNotifier(self.bus, self.sysconfd)
 
-        send_sysconf_association_commands.assert_called_once_with(line_extension)
-        send_bus_association_events.assert_called_once_with(line_extension)
+    def test_associate_then_bus_event(self):
+        expected_event = LineExtensionAssociatedEvent(self.line_extension.line_id,
+                                                      self.line_extension.extension_id)
 
-    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
-    @patch('xivo_dao.resources.user_line.dao.find_all_by_line_id')
-    def test_send_sysconf_commands(self,
-                                   find_all_by_line_id,
-                                   exec_request_handlers):
-        line_extension = LineExtension(line_id=1, extension_id=2)
-        user_line_1 = Mock(UserLine, line_id=1, user_id=3)
-        user_line_2 = Mock(UserLine, line_id=1, user_id=None)
+        self.notifier.associated(self.line_extension)
 
-        find_all_by_line_id.return_value = [user_line_1, user_line_2]
+        self.bus.send_bus_event.assert_called_once_with(expected_event,
+                                                        expected_event.routing_key)
 
-        expected_sysconf_command = {
-            'ctibus': ['xivo[phone,edit,1]', 'xivo[user,edit,3]'],
-            'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
-            'agentbus': []
-        }
+    def test_associate_then_sysconfd_event(self):
+        self.notifier.associated(self.line_extension)
 
-        notifier.send_sysconf_commands(line_extension)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
-        exec_request_handlers.assert_called_once_with(expected_sysconf_command)
-        find_all_by_line_id.assert_called_once_with(line_extension.line_id)
+    def test_dissociate_then_bus_event(self):
+        expected_event = LineExtensionDissociatedEvent(self.line_extension.line_id,
+                                                       self.line_extension.extension_id)
 
-    @patch('xivo_bus.resources.line_extension.event.LineExtensionAssociatedEvent')
-    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
-    def test_send_bus_association_events(self, send_bus_event, LineExtensionAssociatedEvent):
-        new_event = LineExtensionAssociatedEvent.return_value = Mock()
+        self.notifier.dissociated(self.line_extension)
 
-        line_extension = LineExtension(line_id=1, extension_id=2)
+        self.bus.send_bus_event.assert_called_once_with(expected_event,
+                                                        expected_event.routing_key)
 
-        notifier.send_bus_association_events(line_extension)
+    def test_dissociate_then_sysconfd_event(self):
+        self.notifier.dissociated(self.line_extension)
 
-        LineExtensionAssociatedEvent.assert_called_once_with(line_extension.line_id,
-                                                             line_extension.extension_id)
-        send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
-
-    @patch('xivo_confd.plugins.line_extension.notifier.send_bus_dissociation_events')
-    @patch('xivo_confd.plugins.line_extension.notifier.send_sysconf_commands')
-    def test_dissociated(self, send_sysconf_commands, send_bus_dissociation_events):
-        line_extension = LineExtension(line_id=1, extension_id=2)
-
-        notifier.dissociated(line_extension)
-
-        send_sysconf_commands.assert_called_once_with(line_extension)
-        send_bus_dissociation_events.assert_called_once_with(line_extension)
-
-    @patch('xivo_bus.resources.line_extension.event.LineExtensionDissociatedEvent')
-    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
-    def test_send_bus_dissociation_events(self, send_bus_event, LineExtensionDissociatedEvent):
-        new_event = LineExtensionDissociatedEvent.return_value = Mock()
-
-        line_extension = LineExtension(line_id=1, extension_id=2)
-
-        notifier.send_bus_dissociation_events(line_extension)
-
-        LineExtensionDissociatedEvent.assert_called_once_with(line_extension.line_id,
-                                                              line_extension.extension_id)
-        send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)

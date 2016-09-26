@@ -178,6 +178,7 @@ class CsvRow(object):
             'line': self.parse_rules(self.LINE_RULES),
             'sip': self.parse_rules(self.SIP_RULES),
             'extension': self.parse_rules(self.EXTENSION_RULES),
+            'extension_incall': self.parse_rules(self.INCALL_RULES),
             'incall': self.parse_rules(self.INCALL_RULES),
             'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
             'extension': self.parse_rules(self.EXTENSION_RULES),

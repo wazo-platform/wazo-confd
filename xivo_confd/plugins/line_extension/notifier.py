@@ -15,52 +15,46 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_bus.resources.line_extension import event
-
+from xivo_confd import bus, sysconfd
+from xivo_bus.resources.line_extension.event import (LineExtensionAssociatedEvent,
+                                                     LineExtensionDissociatedEvent)
 from xivo_dao.resources.user_line import dao as user_line_dao
 
-from xivo_confd.helpers import bus_manager
-from xivo_confd.helpers import sysconfd_connector
+
+class LineExtensionNotifier(object):
+
+    def __init__(self, bus, sysconfd):
+        self.bus = bus
+        self.sysconfd = sysconfd
+
+    def send_sysconfd_handlers(self, line_extension):
+        handlers = {'ctibus': self._generate_ctibus_commands(line_extension),
+                    'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
+                    'agentbus': []}
+        self.sysconfd.exec_request_handlers(handlers)
+
+    def associated(self, line_extension):
+        self.send_sysconfd_handlers(line_extension)
+        event = LineExtensionAssociatedEvent(line_extension.line_id,
+                                             line_extension.extension_id)
+        self.bus.send_bus_event(event, event.routing_key)
+
+    def dissociated(self, line_extension):
+        self.send_sysconfd_handlers(line_extension)
+        event = LineExtensionDissociatedEvent(line_extension.line_id,
+                                              line_extension.extension_id)
+        self.bus.send_bus_event(event, event.routing_key)
+
+    def _generate_ctibus_commands(self, line_extension):
+        commands = ['xivo[phone,edit,%d]' % line_extension.line_id]
+
+        user_lines = user_line_dao.find_all_by_line_id(line_extension.line_id)
+        for user_line in user_lines:
+            if user_line.user_id:
+                commands.append('xivo[user,edit,%d]' % user_line.user_id)
+
+        return commands
 
 
-def associated(line_extension):
-    send_sysconf_commands(line_extension)
-    send_bus_association_events(line_extension)
-
-
-def send_sysconf_commands(line_extension):
-    command = {
-        'ctibus': _generate_ctibus_commands(line_extension),
-        'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
-        'agentbus': [],
-    }
-
-    sysconfd_connector.exec_request_handlers(command)
-
-
-def _generate_ctibus_commands(line_extension):
-    commands = ['xivo[phone,edit,%d]' % line_extension.line_id]
-
-    user_lines = user_line_dao.find_all_by_line_id(line_extension.line_id)
-    for user_line in user_lines:
-        if user_line.user_id:
-            commands.append('xivo[user,edit,%d]' % user_line.user_id)
-
-    return commands
-
-
-def send_bus_association_events(line_extension):
-    bus_event = event.LineExtensionAssociatedEvent(line_extension.line_id,
-                                                   line_extension.extension_id)
-    bus_manager.send_bus_event(bus_event, bus_event.routing_key)
-
-
-def dissociated(line_extension):
-    send_sysconf_commands(line_extension)
-    send_bus_dissociation_events(line_extension)
-
-
-def send_bus_dissociation_events(line_extension):
-    bus_event = event.LineExtensionDissociatedEvent(line_extension.line_id,
-                                                    line_extension.extension_id)
-    bus_manager.send_bus_event(bus_event, bus_event.routing_key)
+def build_notifier():
+    return LineExtensionNotifier(bus, sysconfd)
