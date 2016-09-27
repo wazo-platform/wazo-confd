@@ -33,10 +33,6 @@ from hamcrest import (assert_that,
                       is_not)
 
 
-def build_string(length):
-    return ''.join('a' for _ in range(length))
-
-
 def test_get_errors():
     fake_get = confd.entities(999999).get
     yield s.check_resource_not_found, fake_get, 'Entity'
@@ -53,14 +49,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', 'CAPITAL'
     yield s.check_bogus_field_returns_error, url, 'name', ''
-    yield s.check_bogus_field_returns_error, url, 'name', build_string(129)
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'display_name', 123
     yield s.check_bogus_field_returns_error, url, 'display_name', {}
     yield s.check_bogus_field_returns_error, url, 'display_name', []
-    yield s.check_bogus_field_returns_error, url, 'display_name', build_string(2)
-    yield s.check_bogus_field_returns_error, url, 'display_name', build_string(129)
+    yield s.check_bogus_field_returns_error, url, 'display_name', s.random_string(2)
+    yield s.check_bogus_field_returns_error, url, 'display_name', s.random_string(129)
 
 
 @fixtures.entity(name="search",

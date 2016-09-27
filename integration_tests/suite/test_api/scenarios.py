@@ -1,4 +1,23 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2016 Avencall
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
 import re
+import random
+import string
 
 from contextlib import contextmanager
 
@@ -114,3 +133,7 @@ def check_bogus_field_returns_error(request, field, bogus, required_field=None, 
 def check_bogus_field_returns_error_matching_regex(request, field, bogus, regex):
     response = request({field: bogus})
     response.assert_match(400, re.compile(regex))
+
+
+def random_string(length):
+    return ''.join(random.choice(string.lowercase) for _ in range(length))

@@ -36,10 +36,6 @@ from hamcrest import (assert_that,
                       none)
 
 
-def build_string(length):
-    return ''.join('a' for _ in range(length))
-
-
 def test_get_errors():
     fake_line_get = confd.lines(999999).get
     yield s.check_resource_not_found, fake_line_get, 'Line'
@@ -83,7 +79,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'position', {}
     yield s.check_bogus_field_returns_error, url, 'position', []
     yield s.check_bogus_field_returns_error, url, 'registrar', 123
-    yield s.check_bogus_field_returns_error, url, 'registrar', build_string(129)
+    yield s.check_bogus_field_returns_error, url, 'registrar', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'registrar', {}
     yield s.check_bogus_field_returns_error, url, 'registrar', []
     yield s.check_bogus_field_returns_error, url, 'caller_id_name', 123456
