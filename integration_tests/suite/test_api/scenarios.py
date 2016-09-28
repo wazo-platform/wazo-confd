@@ -20,8 +20,8 @@ import random
 import string
 
 from contextlib import contextmanager
-
-from hamcrest import assert_that, contains, equal_to
+from hamcrest import assert_that, contains, equal_to, has_length
+from bus import BusClient
 
 import errors as e
 
@@ -141,3 +141,11 @@ def random_string(length):
 
 def random_digits(length):
     return ''.join(random.choice(string.digits) for _ in range(length))
+
+
+def check_bus_event(event, url, body=None):
+    BusClient.listen_events(event)
+    url(body) if body else url()
+
+    def assert_function():
+        assert_that(BusClient.events(), has_length(1))

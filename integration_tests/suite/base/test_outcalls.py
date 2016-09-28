@@ -220,3 +220,11 @@ def test_delete(outcall):
     response.assert_deleted()
     response = confd.outcalls(outcall['id']).get()
     response.assert_match(404, e.not_found(resource='Outcall'))
+
+
+@fixtures.outcall()
+def test_bus_events(outcall):
+    yield s.check_bus_event, 'config.outcalls.created', confd.outcalls.post, {'name': 'a',
+                                                                              'context': CONTEXT}
+    yield s.check_bus_event, 'config.outcalls.updated', confd.outcalls(outcall['id']).put
+    yield s.check_bus_event, 'config.outcalls.deleted', confd.outcalls(outcall['id']).delete
