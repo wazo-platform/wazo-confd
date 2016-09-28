@@ -41,16 +41,16 @@ class QueueMemberResource(ConfdResource):
 
 class QueueMemberAssociation(QueueMemberResource):
 
-    schema = QueueMemberSchema()
+    schema = QueueMemberSchema
 
     @required_acl('confd.queues.{queue_id}.members.{agent_id}.read')
     def get(self, queue_id, agent_id):
         queue_member_agent = self.service.get(queue_id, agent_id)
-        return self.schema.dump(queue_member_agent).data
+        return self.schema().dump(queue_member_agent).data
 
     @required_acl('confd.queues.{queue_id}.members.{agent_id}.update')
     def put(self, queue_id, agent_id):
-        form = self.schema.load(request.get_json(), partial=True).data
+        form = self.schema().load(request.get_json(), partial=True).data
         model = self.service.get(queue_id, agent_id)
         setattr(model, 'penalty', form['penalty'])
         self.service.edit(model)
@@ -65,7 +65,7 @@ class QueueMemberAssociation(QueueMemberResource):
 
 class QueueMemberPost(QueueMemberResource):
 
-    schema = QueueMemberSchema()
+    schema = QueueMemberSchema
     model = QueueMemberAgent
 
     def build_headers(self, queue_member):
@@ -76,8 +76,8 @@ class QueueMemberPost(QueueMemberResource):
 
     @required_acl('confd.queues.{queue_id}.members.create')
     def post(self, queue_id):
-        form = self.schema.load(request.get_json()).data
+        form = self.schema().load(request.get_json()).data
         form['queue_id'] = queue_id
         model = self.model(**form)
         model = self.service.associate(model)
-        return self.schema.dump(model).data, 201, self.build_headers(model)
+        return self.schema().dump(model).data, 201, self.build_headers(model)

@@ -18,6 +18,7 @@
 
 from marshmallow import fields
 from marshmallow.validate import Predicate
+from marshmallow.class_registry import register
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
@@ -28,3 +29,8 @@ class ExtensionSchema(BaseSchema):
     context = fields.String(required=True)
     commented = fields.Boolean(attribute='legacy_commented')
     links = ListLink(Link('extensions'))
+    incall = fields.Nested('IncallSchema',
+                           only=['links'],
+                           dump_only=True)
+
+register('ExtensionSchema', ExtensionSchema)

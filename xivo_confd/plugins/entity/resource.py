@@ -38,7 +38,7 @@ class EntitySchema(BaseSchema):
 
 class EntityList(ListResource):
 
-    schema = EntitySchema()
+    schema = EntitySchema
     model = Entity
 
     def build_headers(self, entity):
@@ -55,7 +55,7 @@ class EntityList(ListResource):
 
 class EntityItem(ItemResource):
 
-    schema = EntitySchema()
+    schema = EntitySchema
 
     @required_acl('confd.entities.{id}.read')
     def get(self, id):

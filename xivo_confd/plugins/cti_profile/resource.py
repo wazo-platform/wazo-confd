@@ -30,7 +30,7 @@ class CtiProfileSchema(BaseSchema):
 
 class CtiProfileList(ListResource):
 
-    schema = CtiProfileSchema()
+    schema = CtiProfileSchema
 
     @required_acl('confd.cti_profiles.read')
     def get(self):
@@ -42,7 +42,7 @@ class CtiProfileList(ListResource):
 
 class CtiProfileItem(ItemResource):
 
-    schema = CtiProfileSchema()
+    schema = CtiProfileSchema
 
     @required_acl('confd.cti_profiles.{id}.read')
     def get(self, id):

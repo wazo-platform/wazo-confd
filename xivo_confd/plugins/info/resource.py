@@ -28,7 +28,7 @@ class InfoSchema(BaseSchema):
 
 class Info(ConfdResource):
 
-    schema = InfoSchema()
+    schema = InfoSchema
 
     def __init__(self, service):
         super(Info, self).__init__()
@@ -37,4 +37,4 @@ class Info(ConfdResource):
     @required_acl('confd.infos.read')
     def get(self):
         info = self.service.get()
-        return self.schema.dump(info).data
+        return self.schema().dump(info).data

@@ -27,7 +27,7 @@ from .schema import ExtensionSchema
 class ExtensionList(ListResource):
 
     model = Extension
-    schema = ExtensionSchema()
+    schema = ExtensionSchema
 
     def build_headers(self, extension):
         return {'Location': url_for('extensions', id=extension.id, _external=True)}
@@ -43,7 +43,7 @@ class ExtensionList(ListResource):
 
 class ExtensionItem(ItemResource):
 
-    schema = ExtensionSchema()
+    schema = ExtensionSchema
 
     @required_acl('confd.extensions.{id}.read')
     def get(self, id):

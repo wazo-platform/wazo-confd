@@ -30,7 +30,7 @@ class UserSubResource(ConfdResource):
 
     def get(self, user_id):
         user = self.service.get(user_id)
-        return self.schema.dump(user).data
+        return self.schema().dump(user).data
 
     def put(self, user_id):
         user = self.service.get(user_id)
@@ -38,10 +38,10 @@ class UserSubResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self.schema.load(request.get_json()).data
+        form = self.schema().load(request.get_json()).data
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model, self.schema)
+        self.service.edit(model, self.schema())
 
 
 class ServiceDNDSchema(BaseSchema):
@@ -69,7 +69,7 @@ class ServicesSchema(BaseSchema):
 
 class UserServiceDND(UserSubResource):
 
-    schema = ServiceDNDSchema()
+    schema = ServiceDNDSchema
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
     def get(self, user_id):
@@ -82,7 +82,7 @@ class UserServiceDND(UserSubResource):
 
 class UserServiceIncallFilter(UserSubResource):
 
-    schema = ServiceIncallFilterSchema()
+    schema = ServiceIncallFilterSchema
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
     def get(self, user_id):
@@ -95,7 +95,7 @@ class UserServiceIncallFilter(UserSubResource):
 
 class UserServiceList(UserSubResource):
 
-    schema = ServicesSchema()
+    schema = ServicesSchema
 
     @required_acl('confd.users.{user_id}.services.read')
     def get(self, user_id):
@@ -145,7 +145,7 @@ class ForwardsSchema(BaseSchema):
 
 class UserForwardBusy(UserSubResource):
 
-    schema = ForwardBusySchema()
+    schema = ForwardBusySchema
 
     @required_acl('confd.users.{user_id}.forwards.busy.read')
     def get(self, user_id):
@@ -158,7 +158,7 @@ class UserForwardBusy(UserSubResource):
 
 class UserForwardNoAnswer(UserSubResource):
 
-    schema = ForwardNoAnswerSchema()
+    schema = ForwardNoAnswerSchema
 
     @required_acl('confd.users.{user_id}.forwards.noanswer.read')
     def get(self, user_id):
@@ -171,7 +171,7 @@ class UserForwardNoAnswer(UserSubResource):
 
 class UserForwardUnconditional(UserSubResource):
 
-    schema = ForwardUnconditionalSchema()
+    schema = ForwardUnconditionalSchema
 
     @required_acl('confd.users.{user_id}.forwards.unconditional.read')
     def get(self, user_id):
@@ -184,7 +184,7 @@ class UserForwardUnconditional(UserSubResource):
 
 class UserForwardList(UserSubResource):
 
-    schema = ForwardsSchema()
+    schema = ForwardsSchema
 
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):

@@ -52,7 +52,7 @@ class Creator(object):
 
     def update(self, fields, model):
         if getattr(self, 'schema', False):
-            fields = self.schema.load(fields, partial=True).data
+            fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
 
         self.update_model(fields, model)
         self.service.edit(model)
@@ -89,7 +89,7 @@ class EntityCreator(Creator):
 
 class VoicemailCreator(Creator):
 
-    schema = VoicemailSchema(handle_error=False, strict=True)
+    schema = VoicemailSchema
 
     def find(self, fields):
         number = fields.get('number')
@@ -104,7 +104,7 @@ class VoicemailCreator(Creator):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
-            form = self.schema.load(fields).data
+            form = self.schema(handle_error=False, strict=True).load(fields).data
             return self.service.create(Voicemail(**form))
 
 
@@ -150,7 +150,7 @@ class SccpCreator(Creator):
 
 class ExtensionCreator(Creator):
 
-    schema = ExtensionSchema(handle_error=False, strict=True)
+    schema = ExtensionSchema
 
     def find(self, fields):
         exten = fields.get('exten')
@@ -165,7 +165,7 @@ class ExtensionCreator(Creator):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
-            form = self.schema.load(fields).data
+            form = self.schema(handle_error=False, strict=True).load(fields).data
             return self.service.create(Extension(**form))
 
 

@@ -27,7 +27,7 @@ from xivo_confd.plugins.device.model import Device
 class DeviceList(ListResource):
 
     model = Device.from_args
-    schema = DeviceSchema()
+    schema = DeviceSchema
 
     def build_headers(self, device):
         return {'Location': url_for('devices', id=device.id, _external=True)}
@@ -43,7 +43,7 @@ class DeviceList(ListResource):
 
 class DeviceItem(ItemResource):
 
-    schema = DeviceSchema()
+    schema = DeviceSchema
 
     @required_acl('confd.devices.{id}.read')
     def get(self, id):

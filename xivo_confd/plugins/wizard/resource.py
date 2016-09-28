@@ -106,21 +106,21 @@ class ConfiguredSchema(BaseSchema):
 
 class WizardResource(Resource):
 
-    wizard_schema = WizardSchema()
-    configured_schema = ConfiguredSchema()
+    wizard_schema = WizardSchema
+    configured_schema = ConfiguredSchema
 
     def __init__(self, service):
         self.service = service
 
     def get(self):
         configured = self.service.get()
-        return self.configured_schema.dump(configured).data
+        return self.configured_schema().dump(configured).data
 
     @xivo_unconfigured
     def post(self):
-        wizard = self.wizard_schema.load(request.get_json()).data
+        wizard = self.wizard_schema().load(request.get_json()).data
         wizard_with_uuid = self.service.create(wizard)
-        return self.wizard_schema.dump(wizard_with_uuid).data
+        return self.wizard_schema().dump(wizard_with_uuid).data
 
 
 class WizardDiscoverInterfaceSchema(BaseSchema):
@@ -145,7 +145,7 @@ class WizardDiscoverSchema(BaseSchema):
 
 class WizardDiscoverResource(Resource):
 
-    schema = WizardDiscoverSchema()
+    schema = WizardDiscoverSchema
 
     def __init__(self, service):
         self.service = service
@@ -159,4 +159,4 @@ class WizardDiscoverResource(Resource):
                     'hostname': self.service.get_hostname(),
                     'timezone': self.service.get_timezone(),
                     'domain': self.service.get_domain()}
-        return self.schema.dump(discover).data
+        return self.schema().dump(discover).data
