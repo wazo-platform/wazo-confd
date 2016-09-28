@@ -19,30 +19,30 @@
 import random
 import string
 
-from test_api import db
+from test_api import confd
+from test_api.config import CONTEXT
 
 
 def generate_outcall(**parameters):
     parameters.setdefault('name', generate_name())
+    parameters.setdefault('context', CONTEXT)
     return add_outcall(**parameters)
 
 
 def add_outcall(**parameters):
-    with db.queries() as queries:
-        id_ = queries.insert_outcall(**parameters)
-    parameters['id'] = id_
-    return parameters
+    response = confd.outcalls.post(parameters)
+    return response.item
 
 
 def delete_outcall(outcall_id, check=False):
-    with db.queries() as queries:
-        queries.delete_outcall(outcall_id)
+    response = confd.outcalls(outcall_id).delete()
+    if check:
+        response.assert_ok()
 
 
 def generate_name():
-    with db.queries() as queries:
-        response = queries.get_outcalls()
-    names = set(d['name'] for d in response)
+    response = confd.outcalls.get()
+    names = set(d['name'] for d in response.items)
     return _random_name(names)
 
 
