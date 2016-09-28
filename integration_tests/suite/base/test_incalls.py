@@ -300,9 +300,8 @@ def test_edit_minimal_parameters(incall):
     response.assert_updated()
 
 
-@fixtures.context()
 @fixtures.incall()
-def test_edit_all_parameters(context, incall):
+def test_edit_all_parameters(incall):
     parameters = {'destination': {'type': 'none'},
                   'preprocess_subroutine': 'default',
                   'caller_id_mode': 'append',
