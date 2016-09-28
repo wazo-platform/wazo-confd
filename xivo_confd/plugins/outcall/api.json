@@ -1,0 +1,256 @@
+{
+    "paths": {
+        "/outcalls": {
+            "get": {
+                "operationId": "list_outcalls",
+                "summary": "List outgoing calls",
+                "description": "**Required ACL:** `confd.outcalls.read`",
+                "tags": [
+                    "outcalls"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/order"
+                    },
+                    {
+                        "$ref": "#/parameters/direction"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Outgoing calls list",
+                        "schema": {
+                            "$ref": "#/definitions/OutcallItems"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "create_outcall",
+                "summary": "Create outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.create`",
+                "tags": [
+                    "outcalls"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Outgoing call to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Outcall"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Outgoing call created",
+                        "schema": {
+                            "$ref": "#/definitions/Outcall"
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/responses/CreateError"
+                    }
+                }
+            }
+        },
+        "/outcalls/{outcall_id}": {
+            "get": {
+                "operationId": "get_outcall",
+                "summary": "Get outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.read`",
+                "tags": [
+                    "outcalls"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/outcallid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Outgoing call",
+                        "schema": {
+                            "$ref": "#/definitions/Outcall"
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "update_outcall",
+                "summary": "Update outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.update`",
+                "tags": [
+                    "outcalls"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/outcallid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Outcall"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceUpdated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/UpdateError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "delete_outcall",
+                "summary": "Delete outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.delete`",
+                "tags": [
+                    "outcalls"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/outcallid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/responses/ResourceDeleted"
+                    },
+                    "400": {
+                        "$ref": "#/responses/DeleteError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        }
+    },
+    "parameters": {
+        "outcallid": {
+            "required": true,
+            "type": "integer",
+            "name": "outcall_id",
+            "in": "path",
+            "description": "Outgoing call's ID"
+        }
+    },
+    "definitions": {
+        "Outcall": {
+            "title": "Outcall",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the outgoing call"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "The context of the outcall"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Additional information about the outgoing call"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "internal_caller_id": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use the internal caller id"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the outcall"
+                },
+                "patterns": {
+                    "description": "The patterns on which the extension match",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OutcallPattern"
+                    }
+                },
+                "preprocess_subroutine": {
+                    "type": "string",
+                    "description": "Name of the subroutine to execute in asterisk before receiving a call"
+                },
+                "ring_time": {
+                    "type": "integer",
+                    "description": "Ringing time before hangup"
+                }
+            },
+            "required": [
+                "context",
+                "name"
+            ]
+        },
+        "OutcallPattern": {
+            "title": "OutcallDestinationType",
+            "properties": {
+                "external_prefix": {
+                    "type": "string",
+                    "description": "The prefix added to the outgoing call when sent on the trunk"
+                },
+                "prefix": {
+                    "type": "string",
+                    "description": "The prefix that the user need to dial before the pattern"
+                },
+                "pattern": {
+                    "type": "string",
+                    "description": "See Asterisk documentation about pattern matching"
+                },
+                "strip_digits": {
+                    "type": "integer",
+                    "description": "The number of leading digits to strip"
+                },
+                "caller_id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "pattern"
+            ]
+        },
+        "OutcallItems": {
+            "title": "OutcallItems",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Outcall"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "total"
+            ]
+        }
+    }
+}

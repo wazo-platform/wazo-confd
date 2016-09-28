@@ -137,3 +137,7 @@ def check_bogus_field_returns_error_matching_regex(request, field, bogus, regex)
 
 def random_string(length):
     return ''.join(random.choice(string.lowercase) for _ in range(length))
+
+
+def random_digits(length):
+    return ''.join(random.choice(string.digits) for _ in range(length))
