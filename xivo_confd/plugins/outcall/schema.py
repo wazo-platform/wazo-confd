@@ -32,7 +32,7 @@ class OutcallPatternSchema(BaseSchema):
     caller_id = fields.String(validate=Length(max=80), allow_none=True)
     external_prefix = fields.String(validate=(Length(max=64), Regexp(EXTERNAL_PREFIX_REGEX)), allow_none=True)
     prefix = fields.String(validate=(Length(max=32), Regexp(PREFIX_REGEX)), allow_none=True)
-    strip_digits = fields.Integer(validate=Range(min=0), allow_none=True)
+    strip_digits = fields.Integer(validate=Range(min=0))
 
 
 class OutcallSchema(BaseSchema):

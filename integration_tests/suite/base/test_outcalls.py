@@ -86,6 +86,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': 'X', 'caller_id': True}
     yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': 'X', 'caller_id': s.random_string(81)}
     yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': 'X', 'strip_digits': 'invalid'}
+    yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': 'X', 'strip_digits': None}
     yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': 'X', 'strip_digits': -1}
     yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': True}
     yield s.check_bogus_field_returns_error, url, 'patterns', {'pattern': None}
