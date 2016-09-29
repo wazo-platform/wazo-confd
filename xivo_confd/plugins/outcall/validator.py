@@ -34,12 +34,12 @@ class PatternsValidator(Validator):
 
     def validate(self, outcall):
         for pattern in outcall.patterns:
-            self.validate_pattern(outcall.context, pattern, outcall.extensions)
+            self.validate_pattern(outcall.context, pattern)
 
-    def validate_pattern(self, context, pattern, extensions):
+    def validate_pattern(self, context, pattern):
         extension = self.extension_dao.find_by(exten=pattern.pattern,
                                                context=context)
-        if extension and extension not in extensions:
+        if extension and extension != pattern.extension:
             raise errors.resource_exists('Extension',
                                          exten=extension.exten,
                                          context=extension.context)
