@@ -33,7 +33,7 @@ class SipSchema(BaseSchema):
     username = fields.String(validate=Regexp(USERNAME_REGEX), attribute='name')
     secret = fields.String(validate=Regexp(SECRET_REGEX))
     type = fields.String(validate=OneOf(['friend', 'peer', 'user']))
-    host = fields.String()
+    host = fields.String(validate=Length(max=255))
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('endpoint_sip'))
 
