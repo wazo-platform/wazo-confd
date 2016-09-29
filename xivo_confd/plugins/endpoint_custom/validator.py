@@ -16,27 +16,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import ValidationGroup, RequiredFields, UniqueField, RegexField, UniqueFieldChanged
+from xivo_confd.helpers.validator import ValidationGroup, UniqueField, UniqueFieldChanged
 
-from xivo_dao.resources.endpoint_custom import dao
-
-INTERFACE_REGEX = r"^[a-zA-Z0-9#*./_@:-]{1,128}$"
+from xivo_dao.resources.endpoint_custom import dao as custom_dao
 
 
 def find_by_interface(interface):
-    return dao.find_by(interface=interface)
+    return custom_dao.find_by(interface=interface)
 
 
 def build_validator():
     return ValidationGroup(
-        common=[
-            RequiredFields('interface'),
-            RegexField.compile('interface', INTERFACE_REGEX),
-        ],
         create=[
             UniqueField('interface', find_by_interface, 'CustomEndpoint')
         ],
         edit=[
-            UniqueFieldChanged('interface', dao, 'CustomEndpoint')
+            UniqueFieldChanged('interface', custom_dao, 'CustomEndpoint')
         ]
     )

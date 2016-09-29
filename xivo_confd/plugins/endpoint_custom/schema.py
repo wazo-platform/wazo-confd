@@ -21,7 +21,7 @@ from marshmallow.validate import Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
-from .validator import INTERFACE_REGEX
+INTERFACE_REGEX = r"^[a-zA-Z0-9#*./_@:-]{1,128}$"
 
 
 class CustomSchema(BaseSchema):
