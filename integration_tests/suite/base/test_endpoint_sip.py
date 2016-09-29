@@ -17,13 +17,20 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
 
-from hamcrest import assert_that, has_entries, has_length, has_items, \
-    instance_of, contains, has_entry
+from hamcrest import (assert_that,
+                      contains,
+                      has_entries,
+                      has_entry,
+                      has_items,
+                      has_key,
+                      has_length,
+                      instance_of)
 
 ALL_OPTIONS = [
     ['buggymwi', 'yes'],
@@ -182,6 +189,18 @@ def test_get(sip):
 
     response = confd.endpoints.sip(sip['id']).get()
     assert_that(response.item, expected)
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_get_trunk_relation(trunk, sip):
+    expected = has_entries({
+        'trunk': has_key('links')
+    })
+
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.endpoints.sip(sip['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.sip()

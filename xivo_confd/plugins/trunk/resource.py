@@ -17,6 +17,7 @@
 
 from flask import url_for
 from marshmallow import fields
+from marshmallow.class_registry import register
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -28,6 +29,10 @@ class TrunkSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     context = fields.String(allow_none=True)
     links = ListLink(Link('trunks'))
+    endpoint_sip = fields.Nested('SipSchema', only=['username', 'links'], dump_only=True)
+    endpoint_custom = fields.Nested('CustomSchema', only=['interface', 'links'], dump_only=True)
+
+register('TrunkSchema', TrunkSchema)
 
 
 class TrunkList(ListResource):

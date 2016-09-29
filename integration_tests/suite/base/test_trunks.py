@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from test_api import associations as a
 from test_api import scenarios as s
 from test_api import fixtures
 from test_api import confd
@@ -26,6 +27,7 @@ from hamcrest import (assert_that,
                       has_entry,
                       has_item,
                       is_not,
+                      none,
                       not_)
 
 
@@ -111,6 +113,32 @@ def test_get(trunk):
     response = confd.trunks(trunk['id']).get()
     assert_that(response.item, has_entries(id=trunk['id'],
                                            context=trunk['context']))
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_get_endpoint_sip_relation(trunk, sip):
+    expected = has_entries({
+        'endpoint_sip': has_entries({'username': sip['username']}),
+        'endpoint_custom': none()
+    })
+
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.trunk()
+@fixtures.custom()
+def test_get_endpoint_custom_relation(trunk, custom):
+    expected = has_entries({
+        'endpoint_sip': none(),
+        'endpoint_custom': has_entries({'interface': custom['interface']})
+    })
+
+    with a.trunk_endpoint_custom(trunk, custom):
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, expected)
 
 
 def test_create_minimal_parameters():
