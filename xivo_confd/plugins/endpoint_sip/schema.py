@@ -16,12 +16,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import re
+import string
+
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp, OneOf
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-from .validator import (NAME_REGEX as USERNAME_REGEX,
-                        SECRET_REGEX)
+
+USERNAME_REGEX = r"^[a-zA-Z0-9_-]{1,40}$"
+SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 
 
 class SipSchema(BaseSchema):
