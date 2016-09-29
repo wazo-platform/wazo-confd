@@ -142,7 +142,7 @@ class CsvRow(object):
     )
 
     SIP_RULES = (
-        UnicodeRule('sip_username', 'name'),
+        UnicodeRule('sip_username', 'username'),
         UnicodeRule('sip_secret', 'secret'),
     )
 

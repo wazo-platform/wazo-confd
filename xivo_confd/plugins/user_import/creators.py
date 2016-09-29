@@ -18,6 +18,7 @@
 
 import abc
 
+from xivo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
 from xivo_confd.plugins.extension.schema import ExtensionSchema
 from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
@@ -130,13 +131,17 @@ class LineCreator(Creator):
 
 class SipCreator(Creator):
 
+    schema = SipSchema
+    schema_nullable = SipSchemaNullable
+
     def find(self, fields):
-        name = fields.get('name')
+        name = fields.get('username')
         if name:
             return self.service.find_by(name=name)
 
     def create(self, fields):
-        return self.service.create(SIP(**fields))
+        form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
+        return self.service.create(SIP(**form))
 
 
 class SccpCreator(Creator):
