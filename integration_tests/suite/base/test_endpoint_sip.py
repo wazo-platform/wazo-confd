@@ -121,7 +121,7 @@ def test_put_errors(sip):
     for check in error_checks(url):
         yield check
 
-    yield s.check_bogus_field_returns_error, url, 'username', None, None, 'name'
+    yield s.check_bogus_field_returns_error, url, 'username', None
     yield s.check_bogus_field_returns_error, url, 'secret', None
     yield s.check_bogus_field_returns_error, url, 'type', None
     yield s.check_bogus_field_returns_error, url, 'host', None
@@ -131,12 +131,37 @@ def test_put_errors(sip):
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'username', 123
     yield s.check_bogus_field_returns_error, url, 'username', ']^',
-    yield s.check_bogus_field_returns_error, url, 'secret', 123
-    yield s.check_bogus_field_returns_error, url, 'type', 123
     yield s.check_bogus_field_returns_error, url, 'username', 'ûsername'
+    yield s.check_bogus_field_returns_error, url, 'username', [],
+    yield s.check_bogus_field_returns_error, url, 'username', {},
     yield s.check_bogus_field_returns_error, url, 'secret', 'pâssword'
+    yield s.check_bogus_field_returns_error, url, 'secret', 123
+    yield s.check_bogus_field_returns_error, url, 'secret', True
+    yield s.check_bogus_field_returns_error, url, 'secret', []
+    yield s.check_bogus_field_returns_error, url, 'secret', {}
+    yield s.check_bogus_field_returns_error, url, 'type', 123
+    yield s.check_bogus_field_returns_error, url, 'type', 'invalid_choice'
+    yield s.check_bogus_field_returns_error, url, 'type', True
+    yield s.check_bogus_field_returns_error, url, 'type', []
+    yield s.check_bogus_field_returns_error, url, 'type', {}
+    yield s.check_bogus_field_returns_error, url, 'host', 123
+    yield s.check_bogus_field_returns_error, url, 'host', True
+    yield s.check_bogus_field_returns_error, url, 'host', []
+    yield s.check_bogus_field_returns_error, url, 'host', {}
+    yield s.check_bogus_field_returns_error, url, 'options', 123
+    yield s.check_bogus_field_returns_error, url, 'options', None
+    yield s.check_bogus_field_returns_error, url, 'options', {}
+    yield s.check_bogus_field_returns_error, url, 'options', 'string'
     yield s.check_bogus_field_returns_error, url, 'options', [None]
-    yield s.check_bogus_field_returns_error, url, 'options', ["", ""]
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
+    yield s.check_bogus_field_returns_error, url, 'options', [123, 123]
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 123]
+    yield s.check_bogus_field_returns_error, url, 'options', [[]]
+    yield s.check_bogus_field_returns_error, url, 'options', [{'key': 'value'}]
+    yield s.check_bogus_field_returns_error, url, 'options', [['missing_value']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['too', 'much', 'value']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['wrong_value', 1234]]
+    yield s.check_bogus_field_returns_error, url, 'options', [['none_value', None]]
 
 
 @fixtures.sip()
