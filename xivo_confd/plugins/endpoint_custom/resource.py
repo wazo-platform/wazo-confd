@@ -17,29 +17,18 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
-from flask_restful import reqparse, fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource
+from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
 
-
-custom_fields = {
-    'id': fields.Integer,
-    'interface': fields.String,
-    'enabled': fields.Boolean,
-    'links': FieldList(Link('endpoint_custom'))
-}
+from .schema import CustomSchema
 
 
 class CustomList(ListResource):
 
     model = Custom
-    fields = custom_fields
-
-    parser = reqparse.RequestParser()
-    parser.add_argument('interface', required=True)
-    parser.add_argument('enabled', type=bool, store_missing=False)
+    schema = CustomSchema
 
     def build_headers(self, custom):
         return {'Location': url_for('endpoint_custom', id=custom.id, _external=True)}
@@ -55,11 +44,7 @@ class CustomList(ListResource):
 
 class CustomItem(ItemResource):
 
-    fields = custom_fields
-
-    parser = reqparse.RequestParser()
-    parser.add_argument('interface', store_missing=False, nullable=False)
-    parser.add_argument('enabled', type=bool, store_missing=False, nullable=False)
+    schema = CustomSchema
 
     @required_acl('confd.endpoints.custom.{id}.read')
     def get(self, id):

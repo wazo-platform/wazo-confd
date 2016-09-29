@@ -51,6 +51,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'interface', None
     yield s.check_bogus_field_returns_error, url, 'interface', 'custom/&&&~~~'
     yield s.check_bogus_field_returns_error, url, 'interface', long_interface
+    yield s.check_bogus_field_returns_error, url, 'interface', []
+    yield s.check_bogus_field_returns_error, url, 'interface', {}
 
 
 @fixtures.custom()
