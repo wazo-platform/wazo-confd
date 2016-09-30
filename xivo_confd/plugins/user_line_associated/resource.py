@@ -16,17 +16,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask_restful import marshal
-
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.plugins.endpoint_sip.resource import sip_fields
+from xivo_confd.plugins.endpoint_sip.schema import SipSchema
 from xivo_confd.database import user_line_associated as user_line_associated_db
 
 
 class UserLineAssociatedEndpointSipMain(ConfdResource):
 
-    fields = sip_fields
+    schema = SipSchema
 
     @required_acl('confd.users.{user_uuid}.lines.main.associated.endpoints.sip.read')
     def get(self, user_uuid):
@@ -34,4 +32,4 @@ class UserLineAssociatedEndpointSipMain(ConfdResource):
         if endpoint_sip is None:
             return 'Resource Not Found.', 404
 
-        return marshal(endpoint_sip, sip_fields)
+        return self.schema().dump(endpoint_sip).data

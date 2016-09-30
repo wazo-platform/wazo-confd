@@ -17,13 +17,20 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
 
-from hamcrest import assert_that, has_entries, has_length, has_items, \
-    instance_of, contains, has_entry
+from hamcrest import (assert_that,
+                      contains,
+                      has_entries,
+                      has_entry,
+                      has_items,
+                      has_key,
+                      has_length,
+                      instance_of)
 
 ALL_OPTIONS = [
     ['buggymwi', 'yes'],
@@ -121,7 +128,7 @@ def test_put_errors(sip):
     for check in error_checks(url):
         yield check
 
-    yield s.check_bogus_field_returns_error, url, 'username', None, None, 'name'
+    yield s.check_bogus_field_returns_error, url, 'username', None
     yield s.check_bogus_field_returns_error, url, 'secret', None
     yield s.check_bogus_field_returns_error, url, 'type', None
     yield s.check_bogus_field_returns_error, url, 'host', None
@@ -131,12 +138,37 @@ def test_put_errors(sip):
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'username', 123
     yield s.check_bogus_field_returns_error, url, 'username', ']^',
-    yield s.check_bogus_field_returns_error, url, 'secret', 123
-    yield s.check_bogus_field_returns_error, url, 'type', 123
     yield s.check_bogus_field_returns_error, url, 'username', 'ûsername'
+    yield s.check_bogus_field_returns_error, url, 'username', [],
+    yield s.check_bogus_field_returns_error, url, 'username', {},
     yield s.check_bogus_field_returns_error, url, 'secret', 'pâssword'
+    yield s.check_bogus_field_returns_error, url, 'secret', 123
+    yield s.check_bogus_field_returns_error, url, 'secret', True
+    yield s.check_bogus_field_returns_error, url, 'secret', []
+    yield s.check_bogus_field_returns_error, url, 'secret', {}
+    yield s.check_bogus_field_returns_error, url, 'type', 123
+    yield s.check_bogus_field_returns_error, url, 'type', 'invalid_choice'
+    yield s.check_bogus_field_returns_error, url, 'type', True
+    yield s.check_bogus_field_returns_error, url, 'type', []
+    yield s.check_bogus_field_returns_error, url, 'type', {}
+    yield s.check_bogus_field_returns_error, url, 'host', 123
+    yield s.check_bogus_field_returns_error, url, 'host', True
+    yield s.check_bogus_field_returns_error, url, 'host', []
+    yield s.check_bogus_field_returns_error, url, 'host', {}
+    yield s.check_bogus_field_returns_error, url, 'options', 123
+    yield s.check_bogus_field_returns_error, url, 'options', None
+    yield s.check_bogus_field_returns_error, url, 'options', {}
+    yield s.check_bogus_field_returns_error, url, 'options', 'string'
     yield s.check_bogus_field_returns_error, url, 'options', [None]
-    yield s.check_bogus_field_returns_error, url, 'options', ["", ""]
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
+    yield s.check_bogus_field_returns_error, url, 'options', [123, 123]
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 123]
+    yield s.check_bogus_field_returns_error, url, 'options', [[]]
+    yield s.check_bogus_field_returns_error, url, 'options', [{'key': 'value'}]
+    yield s.check_bogus_field_returns_error, url, 'options', [['missing_value']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['too', 'much', 'value']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['wrong_value', 1234]]
+    yield s.check_bogus_field_returns_error, url, 'options', [['none_value', None]]
 
 
 @fixtures.sip()
@@ -157,6 +189,18 @@ def test_get(sip):
 
     response = confd.endpoints.sip(sip['id']).get()
     assert_that(response.item, expected)
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_get_trunk_relation(trunk, sip):
+    expected = has_entries({
+        'trunk': has_key('links')
+    })
+
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.endpoints.sip(sip['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.sip()

@@ -322,6 +322,20 @@ def test_given_csv_has_minimal_sip_fields_then_sip_endpoint_created():
     assert_that(sip, has_entries(id=sip_id))
 
 
+def test_given_csv_has_none_sip_fields_then_sip_endpoint_created():
+    csv = [{"firstname": "Chârles",
+            "line_protocol": "sip",
+            "context": config.CONTEXT,
+            "sip_username": '',
+            "sip_secret": ''}]
+
+    response = client.post("/users/import", csv)
+    sip_id = get_import_field(response, 'sip_id')
+
+    sip = confd.endpoints.sip(sip_id).get().item
+    assert_that(sip, has_entries(id=sip_id))
+
+
 def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
     csv = [{"firstname": "Chârles",
             "line_protocol": "sip",
@@ -335,6 +349,18 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
     sip = confd.endpoints.sip(sip_id).get().item
     assert_that(sip, has_entries(username="sipusername",
                                  secret="sipsecret"))
+
+
+def test_given_csv_has_sip_error_then_error_raised():
+    csv = [{"firstname": "Chârles",
+            "line_protocol": "sip",
+            "context": config.CONTEXT,
+            "sip_username": "invalid^^",
+            "sip_secret": "\xe0"}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('username'))
+    assert_error(response, has_error_field('secret'))
 
 
 def test_given_csv_has_minimal_sccp_fields_then_sccp_endpoint_created():
@@ -855,6 +881,18 @@ def test_when_updating_sip_line_fields_then_sip_updated(entry):
     sip = confd.endpoints.sip(sip_id).get().item
     assert_that(sip, has_entries(username="mynewsipusername",
                                  secret="mynewsippassword"))
+
+
+@fixtures.csv_entry(line_protocol="sip")
+def test_when_updating_sip_line_fields_to_none_then_error_raised(entry):
+    csv = [{"uuid": entry["user_uuid"],
+            "sip_username": "",
+            "sip_secret": "",
+            }]
+
+    response = client.put("/users/import", csv)
+    assert_error(response, has_error_field('username'))
+    assert_error(response, has_error_field('secret'))
 
 
 @fixtures.csv_entry()

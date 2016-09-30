@@ -17,12 +17,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
 
-from hamcrest import assert_that, has_entries, has_items, instance_of, has_entry
+from hamcrest import assert_that, has_entries, has_items, instance_of, has_entry, has_key
 
 
 def test_get_errors():
@@ -51,6 +52,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'interface', None
     yield s.check_bogus_field_returns_error, url, 'interface', 'custom/&&&~~~'
     yield s.check_bogus_field_returns_error, url, 'interface', long_interface
+    yield s.check_bogus_field_returns_error, url, 'interface', []
+    yield s.check_bogus_field_returns_error, url, 'interface', {}
 
 
 @fixtures.custom()
@@ -68,6 +71,18 @@ def test_get(custom):
 
     response = confd.endpoints.custom(custom['id']).get()
     assert_that(response.item, expected)
+
+
+@fixtures.trunk()
+@fixtures.custom()
+def test_get_trunk_relation(trunk, custom):
+    expected = has_entries({
+        'trunk': has_key('links')
+    })
+
+    with a.trunk_endpoint_custom(trunk, custom):
+        response = confd.endpoints.custom(custom['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.custom()

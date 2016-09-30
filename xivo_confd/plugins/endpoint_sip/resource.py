@@ -17,50 +17,18 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
-from flask_restful import reqparse, inputs, fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
-    option
+from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
-from .validator import (NAME_REGEX as USERNAME_REGEX,
-                        SECRET_REGEX)
 
-
-sip_fields = {
-    'id': fields.Integer,
-    'username': fields.String(attribute='name'),
-    'secret': fields.String,
-    'type': fields.String,
-    'host': fields.String,
-    'options': fields.List(fields.List(fields.String)),
-    'links': FieldList(Link('endpoint_sip'))
-}
-
-sip_parser = reqparse.RequestParser()
-sip_parser.add_argument('username',
-                        type=inputs.regex(USERNAME_REGEX),
-                        dest='name',
-                        store_missing=False)
-sip_parser.add_argument('secret',
-                        type=inputs.regex(SECRET_REGEX),
-                        store_missing=False)
-sip_parser.add_argument('type',
-                        choices=('friend', 'peer', 'user'),
-                        store_missing=False)
-sip_parser.add_argument('host', store_missing=False)
-sip_parser.add_argument('options',
-                        action='append',
-                        type=option,
-                        store_missing=False,
-                        nullable=False)
+from .schema import SipSchema, SipSchemaNullable
 
 
 class SipList(ListResource):
 
     model = SIPEndpoint
-    fields = sip_fields
-    parser = sip_parser
+    schema = SipSchemaNullable
 
     def build_headers(self, sip):
         return {'Location': url_for('endpoint_sip', id=sip.id, _external=True)}
@@ -76,8 +44,7 @@ class SipList(ListResource):
 
 class SipItem(ItemResource):
 
-    fields = sip_fields
-    parser = sip_parser
+    schema = SipSchema
 
     @required_acl('confd.endpoints.sip.{id}.read')
     def get(self, id):

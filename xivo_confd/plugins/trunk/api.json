@@ -169,8 +169,20 @@
                 "context": {
                     "type": "string",
                     "description": "The context of the trunk"
+                },
+                "endpoint_sip": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/EndpointSipRelation"
+                },
+                "endpoint_custom": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/EndpointCustomRelation"
                 }
             }
+        },
+        "TrunRelationk": {
+            "title": "TrunkRelation",
+            "properties": {}
         },
         "TrunkItems": {
             "title": "TrunkItems",

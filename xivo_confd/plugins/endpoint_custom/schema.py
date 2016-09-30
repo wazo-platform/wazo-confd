@@ -16,21 +16,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import ValidationGroup, UniqueField, UniqueFieldChanged
+from marshmallow import fields
+from marshmallow.class_registry import register
+from marshmallow.validate import Regexp
 
-from xivo_dao.resources.endpoint_custom import dao as custom_dao
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+
+INTERFACE_REGEX = r"^[a-zA-Z0-9#*./_@:-]{1,128}$"
 
 
-def find_by_interface(interface):
-    return custom_dao.find_by(interface=interface)
+class CustomSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    interface = fields.String(validate=Regexp(INTERFACE_REGEX), required=True)
+    enabled = StrictBoolean()
+    links = ListLink(Link('endpoint_custom'))
+    trunk = fields.Nested('TrunkSchema', only=['links'], dump_only=True)
 
 
-def build_validator():
-    return ValidationGroup(
-        create=[
-            UniqueField('interface', find_by_interface, 'CustomEndpoint')
-        ],
-        edit=[
-            UniqueFieldChanged('interface', custom_dao, 'CustomEndpoint')
-        ]
-    )
+register('CustomSchema', CustomSchema)
