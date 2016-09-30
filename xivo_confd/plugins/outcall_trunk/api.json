@@ -1,0 +1,62 @@
+{
+    "paths": {
+        "/outcalls/{outcall_id}/trunks": {
+            "put": {
+                "operationId": "associate_outcall_trunks",
+                "summary": "Associate outcall and trunks",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.trunks.update`",
+                "tags": [
+                    "outcalls",
+                    "trunks"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/outcallid"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Trunks to associated",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TrunksId"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Outcall and Trunks associated"
+                    },
+                    "400": {
+                        "$ref": "#/responses/GenericError"
+                    },
+                    "404": {
+                        "$ref": "#/responses/NotFoundError"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "TrunksId": {
+            "title": "TrunksId",
+            "properties": {
+                "trunks": {
+                    "items": {
+                        "$ref": "#/definitions/TrunkId"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "TrunkId": {
+            "title": "TrunkId",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
+
