@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from marshmallow import fields
-from marshmallow.class_registry import register
 from marshmallow.validate import Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
@@ -31,6 +30,3 @@ class CustomSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('endpoint_custom'))
     trunk = fields.Nested('TrunkSchema', only=['links'], dump_only=True)
-
-
-register('CustomSchema', CustomSchema)
