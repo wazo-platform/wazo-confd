@@ -160,29 +160,56 @@
     "definitions": {
         "Trunk": {
             "title": "Trunk",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/TrunkRelationBase"
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer",
+                            "readOnly": true,
+                            "description": "The id of the trunk"
+                        },
+                        "context": {
+                            "type": "string",
+                            "description": "The context of the trunk"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/TrunkRelationEndpoints"
+                },
+                {
+                    "$ref": "#/definitions/TrunkRelationOutcalls"
+                }
+            ]
+        },
+        "TrunkRelationBase": {
+            "properties": {}
+        },
+        "TrunkRelationEndpoints": {
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "readOnly": true,
-                    "description": "The id of the trunk"
-                },
-                "context": {
-                    "type": "string",
-                    "description": "The context of the trunk"
-                },
                 "endpoint_sip": {
                     "readOnly": true,
-                    "$ref": "#/definitions/EndpointSipRelation"
+                    "$ref": "#/definitions/EndpointSipRelationBase"
                 },
                 "endpoint_custom": {
                     "readOnly": true,
-                    "$ref": "#/definitions/EndpointCustomRelation"
+                    "$ref": "#/definitions/EndpointCustomRelationBase"
                 }
             }
         },
-        "TrunkRelation": {
-            "title": "TrunkRelation",
-            "properties": {}
+        "TrunkRelationOutcalls": {
+            "properties": {
+                "outcalls": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/OutcallRelationBase"
+                    }
+                }
+            }
         },
         "TrunkItems": {
             "title": "TrunkItems",

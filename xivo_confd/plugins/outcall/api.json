@@ -160,49 +160,55 @@
     "definitions": {
         "Outcall": {
             "title": "Outcall",
-            "properties": {
-                "id": {
-                    "type": "integer",
-                    "readOnly": true,
-                    "description": "The id of the outgoing call"
+            "allOf": [
+                {
+                    "$ref": "#/definitions/OutcallRelationBase"
                 },
-                "context": {
-                    "type": "string",
-                    "description": "The context of the outcall"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Additional information about the outgoing call"
-                },
-                "enabled": {
-                    "type": "boolean",
-                    "default": true
-                },
-                "internal_caller_id": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Use the internal caller id"
-                },
-                "name": {
-                    "type": "string",
-                    "description": "The name of the outcall"
-                },
-                "patterns": {
-                    "description": "The patterns on which the extension match",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/OutcallPattern"
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer",
+                            "readOnly": true,
+                            "description": "The id of the outgoing call"
+                        },
+                        "context": {
+                            "type": "string",
+                            "description": "The context of the outcall"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Additional information about the outgoing call"
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "internal_caller_id": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Use the internal caller id"
+                        },
+                        "patterns": {
+                            "description": "The patterns on which the extension match",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/OutcallPattern"
+                            }
+                        },
+                        "preprocess_subroutine": {
+                            "type": "string",
+                            "description": "Name of the subroutine to execute in asterisk before receiving a call"
+                        },
+                        "ring_time": {
+                            "type": "integer",
+                            "description": "Ringing time before hangup"
+                        }
                     }
                 },
-                "preprocess_subroutine": {
-                    "type": "string",
-                    "description": "Name of the subroutine to execute in asterisk before receiving a call"
-                },
-                "ring_time": {
-                    "type": "integer",
-                    "description": "Ringing time before hangup"
+                {
+                    "$ref": "#/definitions/OutcallRelationTrunks"
                 }
-            },
+            ],
             "required": [
                 "context",
                 "name"
@@ -233,6 +239,35 @@
             },
             "required": [
                 "pattern"
+            ]
+        },
+        "OutcallRelationBase": {
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the outcall"
+                }
+            }
+        },
+        "OutcallRelationTrunks": {
+            "properties": {
+                "trunks": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/OutcallRelationTrunk"
+                    }
+                }
+            }
+        },
+        "OutcallRelationTrunk": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/TrunkRelationBase"
+                },
+                {
+                    "$ref": "#/definitions/TrunkRelationEndpoints"
+                }
             ]
         },
         "OutcallItems": {

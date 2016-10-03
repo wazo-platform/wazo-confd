@@ -160,45 +160,48 @@
     "definitions": {
         "Incall": {
             "title": "Incall",
-            "properties": {
-                "id": {
-                    "type": "integer",
-                    "readOnly": true,
-                    "description": "The id of the incoming call"
+            "allOf": [
+                {
+                    "$ref": "#/definitions/IncallRelationBase"
                 },
-                "extensions": {
-                    "type": "array",
-                    "readOnly": true,
-                    "items": {
-                        "$ref": "#/definitions/ExtensionRelation"
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer",
+                            "readOnly": true,
+                            "description": "The id of the incoming call"
+                        },
+                        "preprocess_subroutine": {
+                            "type": "string",
+                            "description": "Name of the subroutine to execute in asterisk before receiving a call"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Additional information about the incoming call"
+                        },
+                        "caller_id_mode": {
+                            "type": "string",
+                            "enum": [
+                                "prepend",
+                                "overwrite",
+                                "append"
+                            ],
+                            "description": "How the caller_id_name will be treated"
+                        },
+                        "caller_id_name": {
+                            "type": "string",
+                            "description": "Name to display when calling"
+                        },
+                        "destination": {
+                            "description": "The destination where the incoming call will be redirected",
+                            "$ref": "#/definitions/IncallDestinationType"
+                        }
                     }
                 },
-                "preprocess_subroutine": {
-                    "type": "string",
-                    "description": "Name of the subroutine to execute in asterisk before receiving a call"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Additional information about the incoming call"
-                },
-                "caller_id_mode": {
-                    "type": "string",
-                    "enum": [
-                        "prepend",
-                        "overwrite",
-                        "append"
-                    ],
-                    "description": "How the caller_id_name will be treated"
-                },
-                "caller_id_name": {
-                    "type": "string",
-                    "description": "Name to display when calling"
-                },
-                "destination": {
-                    "description": "The destination where the incoming call will be redirected",
-                    "$ref": "#/definitions/IncallDestinationType"
+                {
+                    "$ref": "#/definitions/IncallRelationExtensions"
                 }
-            },
+            ],
             "required": [
                 "destination"
             ],
@@ -215,9 +218,27 @@
                 }
             }
         },
-        "IncallRelation": {
+        "IncallRelationBase": {
             "title": "IncallRelation",
             "properties": {}
+        },
+        "IncallRelationExtensions": {
+            "properties": {
+                "extensions": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/IncallRelationExtension"
+                    }
+                }
+            }
+        },
+        "IncallRelationExtension": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/ExtensionRelationBase"
+                }
+            ]
         },
         "IncallDestinationType": {
             "title": "IncallDestinationType",
