@@ -58,6 +58,9 @@ class ExtensionRangeValidator(Validator):
         self.dao = dao
 
     def validate(self, extension):
+        if self._is_pattern(extension.exten):
+            return
+
         context_ranges = self.dao.find_all_context_ranges(extension.context)
         if not self.extension_in_range(extension.exten, context_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
@@ -65,6 +68,9 @@ class ExtensionRangeValidator(Validator):
     def extension_in_range(self, exten, context_ranges):
         return any(context_range.in_range(exten)
                    for context_range in context_ranges)
+
+    def _is_pattern(self, exten):
+        return exten.startswith('_')
 
 
 class ExtensionAssociationValidator(Validator):

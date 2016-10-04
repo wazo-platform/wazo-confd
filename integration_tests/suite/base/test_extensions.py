@@ -69,6 +69,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'exten', None
     yield s.check_bogus_field_returns_error, url, 'exten', True
     yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123'
+    yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX'
     yield s.check_bogus_field_returns_error, url, 'exten', {}
     yield s.check_bogus_field_returns_error, url, 'exten', []
     yield s.check_bogus_field_returns_error, url, 'context', None
@@ -163,6 +164,12 @@ def test_create_extension_outside_context_range():
     response.assert_match(400, outside_range_regex)
 
 
+def test_create_pattern():
+    response = confd.extensions.post(exten='_XXXX',
+                                     context='default')
+    response.assert_created('extensions')
+
+
 @fixtures.context(start='1000', end='9999')
 def test_create_2_extensions_same_exten_different_context(context):
     exten = h.extension.find_available_exten(CONTEXT)
@@ -186,6 +193,13 @@ def test_edit_extension_with_fake_context(extension):
     response = confd.extensions(extension['id']).put(exten='1234',
                                                      context='fakecontext')
     response.assert_match(400, e.not_found('Context'))
+
+
+@fixtures.extension()
+def test_edit_pattern(extension):
+    response = confd.extensions(extension['id']).put(exten='_X21',
+                                                     context='default')
+    response.assert_updated()
 
 
 @fixtures.extension()
