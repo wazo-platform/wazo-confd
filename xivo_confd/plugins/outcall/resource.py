@@ -15,18 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask import url_for, request
+from flask import url_for
 
-from xivo_dao.alchemy.dialpattern import DialPattern
 from xivo_dao.alchemy.outcall import Outcall
 
 from .schema import OutcallSchema
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
-
-
-def _create_patterns(form):
-    return [DialPattern(**item) for item in form]
 
 
 class OutcallList(ListResource):
@@ -39,12 +34,7 @@ class OutcallList(ListResource):
 
     @required_acl('confd.outcalls.create')
     def post(self):
-        form = self.schema().load(request.get_json()).data
-        if form.get('patterns'):
-            form['patterns'] = _create_patterns(form['patterns'])
-        model = self.model(**form)
-        model = self.service.create(model)
-        return self.schema().dump(model).data, 201, self.build_headers(model)
+        return super(OutcallList, self).post()
 
     @required_acl('confd.outcalls.read')
     def get(self):
@@ -62,16 +52,6 @@ class OutcallItem(ItemResource):
     @required_acl('confd.outcalls.{id}.update')
     def put(self, id):
         return super(OutcallItem, self).put(id)
-
-    def parse_and_update(self, model):
-        form = self.schema().load(request.get_json(), partial=True).data
-        updated_fields = self.find_updated_fields(model, form)
-        if form.get('patterns'):
-            form['patterns'] = _create_patterns(form['patterns'])
-
-        for name, value in form.iteritems():
-            setattr(model, name, value)
-        self.service.edit(model, updated_fields)
 
     @required_acl('confd.outcalls.{id}.delete')
     def delete(self, id):

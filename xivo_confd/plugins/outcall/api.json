@@ -171,10 +171,6 @@
                             "readOnly": true,
                             "description": "The id of the outgoing call"
                         },
-                        "context": {
-                            "type": "string",
-                            "description": "The context of the outcall"
-                        },
                         "description": {
                             "type": "string",
                             "description": "Additional information about the outgoing call"
@@ -187,13 +183,6 @@
                             "type": "boolean",
                             "default": false,
                             "description": "Use the internal caller id"
-                        },
-                        "patterns": {
-                            "description": "The patterns on which the extension match",
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/OutcallPattern"
-                            }
                         },
                         "preprocess_subroutine": {
                             "type": "string",
@@ -210,35 +199,7 @@
                 }
             ],
             "required": [
-                "context",
                 "name"
-            ]
-        },
-        "OutcallPattern": {
-            "title": "OutcallDestinationType",
-            "properties": {
-                "external_prefix": {
-                    "type": "string",
-                    "description": "The prefix added to the outgoing call when sent on the trunk"
-                },
-                "prefix": {
-                    "type": "string",
-                    "description": "The prefix that the user need to dial before the pattern"
-                },
-                "pattern": {
-                    "type": "string",
-                    "description": "See Asterisk documentation about pattern matching"
-                },
-                "strip_digits": {
-                    "type": "integer",
-                    "description": "The number of leading digits to strip"
-                },
-                "caller_id": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "pattern"
             ]
         },
         "OutcallRelationBase": {
