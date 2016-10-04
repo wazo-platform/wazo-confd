@@ -17,15 +17,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from marshmallow import fields
-from marshmallow.validate import Predicate
+from marshmallow.validate import Regexp
 from marshmallow.class_registry import register
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
+EXTEN_REGEX = r'^_[*#0-9_XxZzNn\[\].!-]{1,39}$|[*#0-9]{1,40}$'
+
 
 class ExtensionSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    exten = fields.String(validate=(Predicate('isdigit')), required=True)
+    exten = fields.String(validate=Regexp(EXTEN_REGEX), required=True)
     context = fields.String(required=True)
     commented = fields.Boolean(attribute='legacy_commented')
     links = ListLink(Link('extensions'))
