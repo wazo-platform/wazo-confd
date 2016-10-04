@@ -19,7 +19,7 @@ from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
 from xivo_confd import api
-from .resource import IncallExtensionItem, IncallExtensionList, ExtensionIncallList
+from .resource import IncallExtensionItem
 from .service import build_service
 
 
@@ -31,15 +31,5 @@ class Plugin(object):
         api.add_resource(IncallExtensionItem,
                          '/incalls/<int:incall_id>/extensions/<int:extension_id>',
                          endpoint='incall_extensions',
-                         resource_class_args=(service, incall_dao, extension_dao)
-                         )
-
-        api.add_resource(IncallExtensionList,
-                         '/incalls/<int:incall_id>/extensions',
-                         resource_class_args=(service, incall_dao, extension_dao)
-                         )
-
-        api.add_resource(ExtensionIncallList,
-                         '/extensions/<int:extension_id>/incalls',
                          resource_class_args=(service, incall_dao, extension_dao)
                          )

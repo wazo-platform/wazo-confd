@@ -16,11 +16,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from hamcrest import (assert_that,
-                      contains_inanyorder,
-                      empty,
-                      has_entries)
-
 from test_api import scenarios as s
 from test_api import confd
 from test_api import errors as e
@@ -52,14 +47,6 @@ def test_dissociate_errors(incall, extension):
     yield s.check_resource_not_found, fake_incall, 'Incall'
     yield s.check_resource_not_found, fake_extension, 'Extension'
     yield s.check_resource_not_found, fake_incall_extension, 'IncallExtension'
-
-
-def test_get_errors():
-    fake_incall = confd.incalls(FAKE_ID).extensions.get
-    fake_extension = confd.extensions(FAKE_ID).incalls.get
-
-    yield s.check_resource_not_found, fake_incall, 'Incall'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
 @fixtures.incall()
@@ -114,40 +101,6 @@ def test_associate_when_not_incall_context(incall, extension):
 
 @fixtures.incall()
 @fixtures.extension(context=INCALL_CONTEXT)
-def test_get_extensions_associated_to_incall(incall, extension):
-    expected = contains_inanyorder(has_entries({'incall_id': incall['id'],
-                                                'extension_id': extension['id']}))
-
-    with a.incall_extension(incall, extension):
-        response = confd.incalls(incall['id']).extensions.get()
-        assert_that(response.items, expected)
-
-
-@fixtures.incall()
-@fixtures.extension(context=INCALL_CONTEXT)
-def test_get_incalls_associated_to_extension(incall, extension):
-    expected = contains_inanyorder(has_entries({'incall_id': incall['id'],
-                                                'extension_id': extension['id']}))
-
-    with a.incall_extension(incall, extension):
-        response = confd.extensions(extension['id']).incalls.get()
-        assert_that(response.items, expected)
-
-
-@fixtures.incall()
-def test_get_no_extension(incall):
-    response = confd.incalls(incall['id']).extensions.get()
-    assert_that(response.items, empty())
-
-
-@fixtures.extension()
-def test_get_no_incall(extension):
-    response = confd.extensions(extension['id']).incalls.get()
-    assert_that(response.items, empty())
-
-
-@fixtures.incall()
-@fixtures.extension(context=INCALL_CONTEXT)
 def test_dissociate(incall, extension):
     with a.incall_extension(incall, extension, check=False):
         response = confd.incalls(incall['id']).extensions(extension['id']).delete()
@@ -158,13 +111,8 @@ def test_dissociate(incall, extension):
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_delete_incall_when_incall_and_extension_associated(incall, extension):
     with a.incall_extension(incall, extension, check=False):
-        confd.incalls(incall['id']).delete().assert_deleted()
-
-        deleted_incall = confd.incalls(incall['id']).extensions.get
-        yield s.check_resource_not_found, deleted_incall, 'Incall'
-
-        response = confd.extensions(extension['id']).incalls.get()
-        yield assert_that, response.items, empty()
+        response = confd.incalls(incall['id']).delete()
+        response.assert_deleted()
 
 
 def test_delete_extension_when_incall_and_extension_associated():

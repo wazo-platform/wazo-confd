@@ -31,12 +31,6 @@ class IncallExtensionService(object):
     def get(self, incall, extension):
         return self.extension_dao.get_by(type='incall', typeval=str(incall.id), id=extension.id)
 
-    def find_all_by_incall_id(self, incall_id):
-        return self.extension_dao.find_all_by(type='incall', typeval=str(incall_id))
-
-    def find_all_by_extension_id(self, extension_id):
-        return self.extension_dao.find_all_by(type='incall', id=extension_id)
-
     def associate(self, incall, extension):
         self.validator.validate_association(incall, extension)
         self.extension_dao.associate_incall(incall, extension)
