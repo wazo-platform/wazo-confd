@@ -25,6 +25,7 @@ from hamcrest import (assert_that,
                       equal_to,
                       has_entries,
                       has_items,
+                      has_key,
                       has_length,
                       is_not,
                       not_none,
@@ -550,8 +551,8 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     response = confd.lines(line_id).extensions.get()
     assert_that(response.items, has_items(has_entries(extension_id=extension_id)))
 
-    response = confd.extensions(extension_incall_id).incalls.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension_incall_id)))
+    response = confd.extensions(extension_incall_id).get()
+    assert_that(response.item['incall'], has_key('id'))
 
     response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail_id))
@@ -602,8 +603,8 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     response = confd.lines(line_id).extensions.get()
     assert_that(response.items, has_items(has_entries(extension_id=extension['id'])))
 
-    response = confd.extensions(extension_incall_id).incalls.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension_incall['id'])))
+    response = confd.extensions(extension_incall_id).get()
+    assert_that(response.item['incall'], has_key('id'))
 
     response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
@@ -1277,8 +1278,8 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     response = confd.lines(entry['line_id']).extensions.get()
     assert_that(response.items, has_items(has_entries(extension_id=entry['extension_id'])))
 
-    response = confd.extensions(entry['incall_extension_id']).incalls.get()
-    assert_that(response.items, has_items(has_entries(extension_id=entry['incall_extension_id'])))
+    response = confd.extensions(entry['incall_extension_id']).get()
+    assert_that(response.item['incall'], has_key('id'))
 
     response = confd.users(entry['user_id']).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
