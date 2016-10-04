@@ -315,7 +315,7 @@ class IncallSchema(BaseSchema):
     destination = IncallDestinationField(BaseDestinationSchema, required=True)
     links = ListLink(Link('incalls'))
     extensions = fields.Nested('ExtensionSchema',
-                               only=['exten', 'context', 'links'],
+                               only=['id', 'exten', 'context', 'links'],
                                many=True,
                                dump_only=True)
 

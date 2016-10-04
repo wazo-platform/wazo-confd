@@ -30,7 +30,7 @@ class ExtensionSchema(BaseSchema):
     commented = fields.Boolean(attribute='legacy_commented')
     links = ListLink(Link('extensions'))
     incall = fields.Nested('IncallSchema',
-                           only=['links'],
+                           only=['id', 'links'],
                            dump_only=True)
 
 register('ExtensionSchema', ExtensionSchema)

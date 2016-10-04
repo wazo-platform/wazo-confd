@@ -24,7 +24,6 @@ from hamcrest import (assert_that,
                       equal_to,
                       has_entries,
                       has_item,
-                      has_key,
                       not_)
 
 from test_api import confd
@@ -88,7 +87,9 @@ def test_get(extension):
 @fixtures.extension(context=INCALL_CONTEXT)
 @fixtures.incall()
 def test_get_relations(extension, incall):
-    expected = has_entries({'incall': has_key('links')})
+    expected = has_entries(
+        incall=has_entries(id=incall['id'])
+    )
 
     with a.incall_extension(incall, extension):
         response = confd.extensions(extension['id']).get()

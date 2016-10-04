@@ -263,10 +263,11 @@ def test_get(incall):
 @fixtures.incall()
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_get_relations(incall, extension):
-    expected = has_entries({
-        'extensions': contains(has_entries({'exten': extension['exten'],
-                                            'context': extension['context']}))
-    })
+    expected = has_entries(
+        extensions=contains(has_entries(id=extension['id'],
+                                        exten=extension['exten'],
+                                        context=extension['context']))
+    )
 
     with a.incall_extension(incall, extension):
         response = confd.incalls(incall['id']).get()
