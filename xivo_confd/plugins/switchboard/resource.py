@@ -15,47 +15,43 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from flask_restful import fields, marshal, reqparse
-from xivo_confd.representations.csv_ import output_csv
+from flask import request
+from marshmallow import fields
+
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.helpers.restful import DateTimeLocalZone
-from xivo_confd.helpers.restful import ListResource
+from xivo_confd.helpers.mallow import BaseSchema
+from xivo_confd.helpers.restful import ConfdResource, ListResource
+from xivo_confd.representations.csv_ import output_csv
 
 from xivo_confd.plugins.switchboard.model import Switchboard
 
-switchboard_fields = {
-    'id': fields.String,
-    'display_name': fields.String,
-}
-
 csv_header = ['date', 'entered', 'answered', 'transferred', 'abandoned', 'forwarded', 'waiting_time_average']
+
+
+class SwitchboardSchema(BaseSchema):
+    id = fields.String(dump_only=True)
+    display_name = fields.String(dump_only=True)
+
+    start_date = fields.DateTime(format='%Y-%m-%dT%H:%M:%S', load_only=True, missing=None)
+    end_date = fields.DateTime(format='%Y-%m-%dT%H:%M:%S', load_only=True, missing=None)
 
 
 class SwitchboardList(ListResource):
 
     model = Switchboard
-    fields = switchboard_fields
-
-    def __init__(self, service):
-        self.service = service
+    schema = SwitchboardSchema
 
     @required_acl('confd.switchboards.read')
     def get(self):
-        params = self.search_params()
-        result = self.service.search(params)
-        return {'total': result.total,
-                'items': [marshal(item, switchboard_fields) for item in result.items]}
+        return super(SwitchboardList, self).get()
+
+    def post(self):
+        return '', 405
 
 
 class SwitchboardStats(ConfdResource):
 
-    fields = switchboard_fields
-
-    parser = reqparse.RequestParser()
-    parser.add_argument('start_date', type=DateTimeLocalZone(), location='args')
-    parser.add_argument('end_date', type=DateTimeLocalZone(), location='args')
-
+    schema = SwitchboardSchema
     representations = {'text/csv; charset=utf-8': output_csv}
 
     def __init__(self, service):
@@ -63,8 +59,8 @@ class SwitchboardStats(ConfdResource):
 
     @required_acl('confd.switchboards.{id}.stats.read')
     def get(self, id):
-        args = self.parser.parse_args()
-        stats = self.service.stats(id, **args)
+        form = self.schema().load(request.args.to_dict()).data
+        stats = self.service.stats(id, **form)
         return {
             'headers': csv_header,
             'content': self._format_fields(stats)
