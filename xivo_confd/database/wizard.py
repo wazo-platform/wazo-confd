@@ -19,6 +19,9 @@
 from xivo_dao.alchemy.context import Context
 from xivo_dao.alchemy.contextinclude import ContextInclude
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
+from xivo_dao.alchemy.ctidirectories import CtiDirectories
+from xivo_dao.alchemy.ctidirectoryfields import CtiDirectoryFields
+from xivo_dao.alchemy.directories import Directories
 from xivo_dao.alchemy.entity import Entity
 from xivo_dao.alchemy.general import General
 from xivo_dao.alchemy.netiface import Netiface
@@ -146,6 +149,42 @@ def set_context_outcall(context, entity):
                         entity=entity,
                         contexttype='outcall',
                         description=''))
+
+
+def set_phonebook(entity, phonebook_body):
+    directories = Directories(uri='postgresql://asterisk:proformatique@localhost/asterisk',
+                              dirtype='dird_phonebook',
+                              name='phonebook',
+                              description='XiVO phonebook',
+                              dird_tenant='entity',
+                              dird_phonebook=phonebook_body['name'])
+    Session.add(directories)
+    Session.commit()
+    cti_directories = CtiDirectories(name='xivodir',
+                                     match_direct='["firstname", "lastname", "displayname", "society", "number_office"]',
+                                     match_reverse='["number_office", "number_mobile"]',
+                                     description='Default XiVO phonebook',
+                                     deletable=1,
+                                     directory_id=directories.id)
+    Session.add(cti_directories)
+    Session.commit()
+    name = '{firstname} {lastname}'
+    fields = [
+        ('fullname', name),
+        ('name', name),
+        ('display_name', '{displayname}'),
+        ('phone', '{number_office}'),
+        ('phone_mobile', '{number_mobile}'),
+        ('phone_home', '{number_home}'),
+        ('phone_other', '{number_other}'),
+        ('company', '{society}'),
+        ('reverse', name),
+    ]
+    for name, value in fields:
+        Session.add(CtiDirectoryFields(dir_id=cti_directories.id,
+                                       fieldname=name,
+                                       value=value))
+
 
 
 def include_outcall_context_in_internal_context():
