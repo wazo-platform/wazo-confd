@@ -17,33 +17,25 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
-from flask_restful import reqparse, fields
+from marshmallow import fields
+from marshmallow.validate import Length
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, \
-    option
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
 
-sccp_fields = {
-    'id': fields.Integer,
-    'options': fields.List(fields.List(fields.String)),
-    'links': FieldList(Link('endpoint_sccp'))
-}
-
-sccp_parser = reqparse.RequestParser()
-sccp_parser.add_argument('options',
-                         type=option,
-                         action='append',
-                         store_missing=False,
-                         nullable=False)
+class SccpSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
+    links = ListLink(Link('endpoint_sccp'))
 
 
 class SccpList(ListResource):
 
     model = SCCPEndpoint
-    fields = sccp_fields
-    parser = sccp_parser
+    schema = SccpSchema
 
     def build_headers(self, sccp):
         return {'Location': url_for('endpoint_sccp', id=sccp.id, _external=True)}
@@ -59,8 +51,7 @@ class SccpList(ListResource):
 
 class SccpItem(ItemResource):
 
-    fields = sccp_fields
-    parser = sccp_parser
+    schema = SccpSchema
 
     @required_acl('confd.endpoints.sccp.{id}.read')
     def get(self, id):

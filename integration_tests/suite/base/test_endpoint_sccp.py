@@ -46,17 +46,25 @@ def test_post_errors():
 @fixtures.sccp()
 def test_put_errors(sccp):
     url = confd.endpoints.sccp(sccp['id']).put
-
-    yield s.check_bogus_field_returns_error, url, 'options', None
-    yield s.check_bogus_field_returns_error, url, 'options', [None]
-    yield s.check_bogus_field_returns_error, url, 'options', ["a", "b"]
-
     for check in error_checks(url):
         yield check
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'options', "bogus"
+    yield s.check_bogus_field_returns_error, url, 'options', 123
+    yield s.check_bogus_field_returns_error, url, 'options', None
+    yield s.check_bogus_field_returns_error, url, 'options', {}
+    yield s.check_bogus_field_returns_error, url, 'options', 'string'
+    yield s.check_bogus_field_returns_error, url, 'options', [None]
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
+    yield s.check_bogus_field_returns_error, url, 'options', [123, 123]
+    yield s.check_bogus_field_returns_error, url, 'options', ['string', 123]
+    yield s.check_bogus_field_returns_error, url, 'options', [[]]
+    yield s.check_bogus_field_returns_error, url, 'options', [{'key': 'value'}]
+    yield s.check_bogus_field_returns_error, url, 'options', [['missing_value']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['too', 'much', 'value']]
+    yield s.check_bogus_field_returns_error, url, 'options', [['wrong_value', 1234]]
+    yield s.check_bogus_field_returns_error, url, 'options', [['none_value', None]]
 
 
 @fixtures.sccp()
