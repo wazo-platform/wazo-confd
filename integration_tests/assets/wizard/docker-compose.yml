@@ -25,6 +25,13 @@ sysconfd:
   volumes:
     - "./mocks/sysconfd.py:/tmp/sysconfd.py"
   command: "python /tmp/sysconfd.py"
+auth:
+  image: p0bailey/docker-flask
+  expose:
+    - "9497"
+  volumes:
+    - "./mocks/auth.py:/tmp/auth.py"
+  command: "python /tmp/auth.py"
 confd:
   image: xivo-confd-test
   expose:
@@ -32,6 +39,7 @@ confd:
   ports:
     - "9486:9486"
   links:
+    - auth
     - postgres
     - rabbitmq
     - provd
@@ -43,15 +51,17 @@ confd:
     - "./etc/ssl:/usr/share/xivo-certs"
     - "./etc/timezone:/etc/timezone"
     - "./etc/resolv.conf:/etc/resolv.conf"
+    - "./var/lib/xivo-auth-keys/xivo-wizard-key.yml:/var/lib/xivo-auth-keys/xivo-wizard-key.yml"
   domainname: example.com
 sync:
   image: n3llyb0y/wait
   links:
+    - auth
     - rabbitmq
     - postgres
     - provd
     - sysconfd
     - confd
   environment:
-    PORTS: "5432 5672 8666 8668 9486"
+    PORTS: "9497 5432 5672 8666 8668 9486"
     TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"
