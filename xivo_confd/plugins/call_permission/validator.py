@@ -16,32 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_confd.helpers.validator import (Optional,
-                                          RegexField,
-                                          RegexFieldList,
-                                          RequiredFields,
                                           UniqueField,
                                           UniqueFieldChanged,
                                           ValidationGroup)
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 
 
-NAME_REGEX = r"^[a-z0-9_-]{1,128}$"
-PASSWORD_REGEX = r"^[0-9#\*]{1,40}$"
-EXTENSION_REGEX = r"^(?:_?\+?[0-9NXZ\*#\-\[\]]+[\.\!]?){1,40}$"
-
-
 def build_validator():
     return ValidationGroup(
-        common=[
-            Optional('name',
-                     RegexField.compile('name', NAME_REGEX)),
-            Optional('password',
-                     RegexField.compile('password', PASSWORD_REGEX)),
-            Optional('extensions',
-                     RegexFieldList.compile('extensions', EXTENSION_REGEX)),
-        ],
         create=[
-            RequiredFields('name'),
             Optional('name',
                      UniqueField('name',
                                  lambda name: call_permission_dao.find_by(name=name),
