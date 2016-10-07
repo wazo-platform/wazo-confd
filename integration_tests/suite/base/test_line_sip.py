@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,7 +55,7 @@ def test_put_errors(line):
 
     yield s.check_missing_required_field_returns_error, line_put, 'context'
     yield s.check_bogus_field_returns_error, line_put, 'context', 123
-    yield s.check_bogus_field_returns_error, line_put, 'device_slot', '1'
+    yield s.check_bogus_field_returns_error, line_put, 'device_slot', 'invalid'
     yield s.check_bogus_field_returns_error, line_put, 'callerid', 'invalidcallerid'
     yield s.check_bogus_field_returns_error, line_put, 'secret', 123
     yield s.check_bogus_field_returns_error, line_put, 'username', 123
