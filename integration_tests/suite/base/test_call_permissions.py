@@ -50,20 +50,32 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'name', 'invalid_régèx!'
+    yield s.check_bogus_field_returns_error, url, 'name', {}
+    yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'password', 123
     yield s.check_bogus_field_returns_error, url, 'password', True
+    yield s.check_bogus_field_returns_error, url, 'password', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'password', {}
+    yield s.check_bogus_field_returns_error, url, 'password', []
     yield s.check_bogus_field_returns_error, url, 'description', 123
     yield s.check_bogus_field_returns_error, url, 'description', True
+    yield s.check_bogus_field_returns_error, url, 'description', {}
+    yield s.check_bogus_field_returns_error, url, 'description', []
     yield s.check_bogus_field_returns_error, url, 'mode', 123
     yield s.check_bogus_field_returns_error, url, 'mode', None
     yield s.check_bogus_field_returns_error, url, 'mode', False
+    yield s.check_bogus_field_returns_error, url, 'mode', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'enabled', None
     yield s.check_bogus_field_returns_error, url, 'enabled', 123
     yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'enabled', []
     yield s.check_bogus_field_returns_error, url, 'extensions', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'extensions', 123
     yield s.check_bogus_field_returns_error, url, 'extensions', True
     yield s.check_bogus_field_returns_error, url, 'extensions', None
+    yield s.check_bogus_field_returns_error, url, 'extensions', {}
 
 
 @fixtures.call_permission(name="search",
