@@ -30,3 +30,7 @@ class OutcallSchema(BaseSchema):
     ring_time = fields.Integer(validate=Range(min=0), allow_none=True)
     description = fields.String(allow_none=True)
     links = ListLink(Link('outcalls'))
+    trunks = fields.Nested('TrunkSchema',
+                           only=['id', 'endpoint_sip', 'endpoint_custom', 'links'],
+                           many=True,
+                           dump_only=True)
