@@ -85,7 +85,7 @@ def test_associate_multiple_incalls_to_extension(incall1, incall2, extension):
 @fixtures.incall()
 @fixtures.user()
 @fixtures.line_sip()
-@fixtures.extension()  # Cannot have context=INCALL_CONTEXT, since line_extension can associate incall ..
+@fixtures.extension()
 def test_associate_when_user_already_associated(incall, user, line_sip, extension):
     with a.user_line(user, line_sip), a.line_extension(line_sip, extension):
         response = confd.incalls(incall['id']).extensions(extension['id']).put()
