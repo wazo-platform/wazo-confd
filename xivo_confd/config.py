@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -144,8 +145,11 @@ DEFAULT_CONFIG = {
 
 
 def load(argv):
-    with open(KEY_FILE, 'r') as f:
-        key_config = {'wizard': yaml.load(f)}
+    try:
+        with open(KEY_FILE, 'r') as f:
+            key_config = {'wizard': yaml.load(f)}
+    except IOError:
+        key_config = {}
 
     cli_config = _parse_cli_args(argv)
     file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
