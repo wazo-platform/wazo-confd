@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,11 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import json
+
 from xivo_dao.alchemy.context import Context
 from xivo_dao.alchemy.contextinclude import ContextInclude
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
+from xivo_dao.alchemy.cti_contexts import CtiContexts
 from xivo_dao.alchemy.ctidirectories import CtiDirectories
 from xivo_dao.alchemy.ctidirectoryfields import CtiDirectoryFields
+from xivo_dao.alchemy.ctireversedirectories import CtiReverseDirectories
 from xivo_dao.alchemy.directories import Directories
 from xivo_dao.alchemy.entity import Entity
 from xivo_dao.alchemy.general import General
@@ -185,6 +190,20 @@ def set_phonebook(entity, phonebook_body):
                                        fieldname=name,
                                        value=value))
 
+    for profile in Session.query(CtiContexts).all():
+        available_directories = profile.directories.split(',')
+        available_directories.append('xivodir')
+        profile.directories = ','.join(available_directories)
+        Session.add(profile)
+
+    for profile in Session.query(CtiReverseDirectories).all():
+        if profile.directories:
+            available_directories = json.loads(profile.directories)
+        else:
+            available_directories = []
+        available_directories.append('xivodir')
+        profile.directories = json.dumps(available_directories)
+        Session.add(profile)
 
 
 def include_outcall_context_in_internal_context():
