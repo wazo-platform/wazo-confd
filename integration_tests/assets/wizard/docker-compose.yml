@@ -32,6 +32,13 @@ auth:
   volumes:
     - "./mocks/auth.py:/tmp/auth.py"
   command: "python /tmp/auth.py"
+dird:
+  image: p0bailey/docker-flask
+  expose:
+    - "9489"
+  volumes:
+    - "./mocks/dird.py:/tmp/dird.py"
+  command: "python /tmp/dird.py"
 confd:
   image: xivo-confd-test
   expose:
@@ -44,6 +51,7 @@ confd:
     - rabbitmq
     - provd
     - sysconfd
+    - dird
   command: "xivo-confd -f -d"
   volumes:
     - "../../..:/usr/src/xivo-confd"
@@ -62,6 +70,7 @@ sync:
     - provd
     - sysconfd
     - confd
+    - dird
   environment:
-    PORTS: "9497 5432 5672 8666 8668 9486"
+    PORTS: "9497 5432 5672 8666 8668 9486 9489"
     TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"

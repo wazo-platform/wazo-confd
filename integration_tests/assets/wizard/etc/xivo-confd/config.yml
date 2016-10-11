@@ -71,6 +71,10 @@ auth:
   host: auth
   https: false
 
+dird:
+  host: dird
+  https: false
+
 # Activate confd plugins
 # This is the recommended way to add plugins.
 enabled_plugins:
