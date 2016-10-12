@@ -21,7 +21,9 @@ import string
 
 from contextlib import contextmanager
 from hamcrest import assert_that, contains, equal_to, has_length
-from bus import BusClient
+from xivo_test_helpers import until
+
+from .bus import BusClient
 
 import errors as e
 
@@ -149,3 +151,5 @@ def check_bus_event(event, url, body=None):
 
     def assert_function():
         assert_that(BusClient.events(), has_length(1))
+
+    until.assert_(assert_function, tries=5)
