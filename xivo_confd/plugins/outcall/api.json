@@ -166,11 +166,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "readOnly": true,
-                            "description": "The id of the outgoing call"
-                        },
                         "description": {
                             "type": "string",
                             "description": "Additional information about the outgoing call"
@@ -204,6 +199,11 @@
         },
         "OutcallRelationBase": {
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the outgoing call"
+                },
                 "name": {
                     "type": "string",
                     "description": "The name of the outcall"

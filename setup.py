@@ -60,6 +60,7 @@ setup(
             'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'outcall_plugin = xivo_confd.plugins.outcall.plugin:Plugin',
+            'outcall_trunk_plugin = xivo_confd.plugins.outcall_trunk.plugin:Plugin',
             'queue_member_plugin = xivo_confd.plugins.queue_member.plugin:Plugin',
             'sip_general_plugin = xivo_confd.plugins.sip_general.plugin:Plugin',
             'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',

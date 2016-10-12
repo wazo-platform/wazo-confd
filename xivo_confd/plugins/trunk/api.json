@@ -166,11 +166,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "readOnly": true,
-                            "description": "The id of the trunk"
-                        },
                         "context": {
                             "type": "string",
                             "description": "The context of the trunk"
@@ -186,7 +181,13 @@
             ]
         },
         "TrunkRelationBase": {
-            "properties": {}
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the trunk"
+                }
+            }
         },
         "TrunkRelationEndpoints": {
             "properties": {

@@ -127,7 +127,8 @@ def test_get(outcall):
                                            description=outcall['description'],
                                            internal_caller_id=outcall['internal_caller_id'],
                                            name=outcall['name'],
-                                           ring_time=outcall['ring_time']))
+                                           ring_time=outcall['ring_time'],
+                                           trunks=empty()))
 
 
 def test_create_minimal_parameters():

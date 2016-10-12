@@ -161,3 +161,12 @@ def incall_user(incall, user, check=True):
     h.incall_user.associate(incall['id'], user['id'], check)
     yield
     h.incall_user.dissociate(incall['id'], user['id'], check)
+
+
+@contextmanager
+def outcall_trunk(outcall, *trunks, **kwargs):
+    trunk_ids = [trunk['id'] for trunk in trunks]
+    check = kwargs.get('check', True)
+    h.outcall_trunk.associate(outcall['id'], trunk_ids, check=check)
+    yield
+    h.outcall_trunk.dissociate(outcall['id'], check=check)

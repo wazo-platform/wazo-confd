@@ -63,3 +63,4 @@ import group
 import outcall
 import incall_extension
 import incall_user
+import outcall_trunk
