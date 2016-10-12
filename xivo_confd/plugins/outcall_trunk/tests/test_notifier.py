@@ -19,51 +19,27 @@ import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.incall_extension.event import (IncallExtensionAssociatedEvent,
-                                                       IncallExtensionDissociatedEvent)
-from ..notifier import IncallExtensionNotifier
+from xivo_bus.resources.outcall_trunk.event import OutcallTrunksAssociatedEvent
+from ..notifier import OutcallTrunkNotifier
 
-from xivo_dao.alchemy.extension import Extension
-from xivo_dao.alchemy.incall import Incall
-
-
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['dialplan reload'],
-                     'agentbus': []}
+from xivo_dao.alchemy.outcall import Outcall
+from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 
 
-class TestIncallExtensionNotifier(unittest.TestCase):
+class TestOutcallTrunkNotifier(unittest.TestCase):
 
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.extension = Mock(Extension, id=1)
-        self.incall = Mock(Incall, id=2)
+        self.outcall = Mock(Outcall, id=2)
+        self.trunk = Mock(Trunk, id=1)
 
-        self.notifier = IncallExtensionNotifier(self.bus, self.sysconfd)
+        self.notifier = OutcallTrunkNotifier(self.bus)
 
     def test_associate_then_bus_event(self):
-        expected_event = IncallExtensionAssociatedEvent(self.incall.id, self.extension.id)
+        expected_event = OutcallTrunksAssociatedEvent(self.outcall.id, [self.trunk.id])
 
-        self.notifier.associated(self.incall, self.extension)
-
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
-
-    def test_associate_then_sysconfd_event(self):
-        self.notifier.associated(self.incall, self.extension)
-
-        self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
-
-    def test_dissociate_then_bus_event(self):
-        expected_event = IncallExtensionDissociatedEvent(self.incall.id, self.extension.id)
-
-        self.notifier.dissociated(self.incall, self.extension)
+        self.notifier.associated_all_trunks(self.outcall, [self.trunk])
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
                                                         expected_event.routing_key)
-
-    def test_dissociate_then_sysconfd_event(self):
-        self.notifier.dissociated(self.incall, self.extension)
-
-        self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
