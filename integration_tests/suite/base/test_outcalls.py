@@ -187,5 +187,5 @@ def test_delete(outcall):
 @fixtures.outcall()
 def test_bus_events(outcall):
     yield s.check_bus_event, 'config.outcalls.created', confd.outcalls.post, {'name': 'a'}
-    yield s.check_bus_event, 'config.outcalls.updated', confd.outcalls(outcall['id']).put
+    yield s.check_bus_event, 'config.outcalls.edited', confd.outcalls(outcall['id']).put
     yield s.check_bus_event, 'config.outcalls.deleted', confd.outcalls(outcall['id']).delete
