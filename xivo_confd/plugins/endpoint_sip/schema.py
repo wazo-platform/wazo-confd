@@ -20,7 +20,6 @@ import re
 import string
 
 from marshmallow import fields
-from marshmallow.class_registry import register
 from marshmallow.validate import Length, Regexp, OneOf
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -47,6 +46,3 @@ class SipSchemaNullable(SipSchema):
         nullable_fields = ['username', 'host', 'secret']
         if field_name in nullable_fields:
             field_obj.allow_none = True
-
-
-register('SipSchema', SipSchema)

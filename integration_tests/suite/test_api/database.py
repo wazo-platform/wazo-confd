@@ -135,29 +135,6 @@ class DatabaseQueries(object):
         query = text("UPDATE extensions SET type = 'user', typeval = 0 WHERE id = :extension_id")
         self.connection.execute(query, extension_id=extension_id)
 
-    def insert_outcall(self, name, context='default'):
-        query = text("""
-                     INSERT INTO outcall (name, context)
-                     VALUES (:name, :context)
-                     RETURNING id
-                     """)
-
-        outcall_id = (self.connection
-                      .execute(query,
-                               name=name,
-                               context=context)
-                      .scalar())
-
-        return outcall_id
-
-    def delete_outcall(self, outcall_id):
-        query = text("DELETE FROM outcall WHERE id = :outcall_id")
-        self.connection.execute(query, outcall_id=outcall_id)
-
-    def get_outcalls(self):
-        query = text("SELECT * FROM outcall")
-        return self.connection.execute(query)
-
     def insert_func_key(self, func_key_type, destination_type):
         func_key_query = text("""
         INSERT INTO func_key (type_id, destination_type_id)

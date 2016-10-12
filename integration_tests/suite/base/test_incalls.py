@@ -32,10 +32,6 @@ from hamcrest import (assert_that,
                       not_)
 
 
-def build_string(length):
-    return ''.join('a' for _ in range(length))
-
-
 invalid_destinations = [
     None,
     1234,
@@ -49,38 +45,38 @@ invalid_destinations = [
     {'type': 'application', 'application': 'callback_disa', 'context': True},
     {'type': 'application', 'application': 'callback_disa', 'context': None},
     {'type': 'application', 'application': 'callback_disa', 'context': 'invalid_char_@'},
-    {'type': 'application', 'application': 'callback_disa', 'context': build_string(40)},
+    {'type': 'application', 'application': 'callback_disa', 'context': s.random_string(40)},
     {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': 'invalid'},
     {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': True},
     {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': 1234},
     {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': '#123'},
-    {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': build_string(41)},
+    {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': s.random_string(41)},
 
     {'type': 'application', 'application': 'directory', 'context': True},
     {'type': 'application', 'application': 'directory', 'context': None},
     {'type': 'application', 'application': 'directory', 'context': 'invalid_char_@'},
-    {'type': 'application', 'application': 'directory', 'context': build_string(40)},
+    {'type': 'application', 'application': 'directory', 'context': s.random_string(40)},
 
     {'type': 'application', 'application': 'disa', 'context': True},
     {'type': 'application', 'application': 'disa', 'context': None},
     {'type': 'application', 'application': 'disa', 'context': 'invalid_char_@'},
-    {'type': 'application', 'application': 'disa', 'context': build_string(40)},
+    {'type': 'application', 'application': 'disa', 'context': s.random_string(40)},
     {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': 'invalid'},
     {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': True},
     {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': 1234},
     {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': '#123'},
-    {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': build_string(41)},
+    {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': s.random_string(41)},
 
     {'type': 'application', 'application': 'fax_to_mail', 'email': 'invalid'},
     {'type': 'application', 'application': 'fax_to_mail', 'email': 1234},
     {'type': 'application', 'application': 'fax_to_mail', 'email': True},
     {'type': 'application', 'application': 'fax_to_mail', 'email': None},
-    {'type': 'application', 'application': 'fax_to_mail', 'email': build_string(81)},
+    {'type': 'application', 'application': 'fax_to_mail', 'email': s.random_string(81)},
 
     {'type': 'application', 'application': 'voicemail', 'context': True},
     {'type': 'application', 'application': 'voicemail', 'context': None},
     {'type': 'application', 'application': 'voicemail', 'context': 'invalid_char_@'},
-    {'type': 'application', 'application': 'voicemail', 'context': build_string(40)},
+    {'type': 'application', 'application': 'voicemail', 'context': s.random_string(40)},
 
     {'type': 'conference'},
     {'type': 'conference', 'missing_required_field': 123},
@@ -95,14 +91,14 @@ invalid_destinations = [
     {'type': 'custom', 'command': 'invalid'},
     {'type': 'custom', 'command': 'system(not_authorized)'},
     {'type': 'custom', 'command': 'trysystem(not_authorized)'},
-    {'type': 'custom', 'command': build_string(256)},
+    {'type': 'custom', 'command': s.random_string(256)},
 
     {'type': 'extension'},
     {'type': 'extension', 'missing_required_field': '123'},
     {'type': 'extension', 'context': True},
     {'type': 'extension', 'context': None},
     {'type': 'extension', 'context': 'invalid_char_@'},
-    {'type': 'extension', 'context': build_string(40)},
+    {'type': 'extension', 'context': s.random_string(40)},
     {'type': 'extension', 'context': 'default', 'exten': 1234},
     {'type': 'extension', 'context': 'default', 'exten': True},
     {'type': 'extension', 'context': 'default', 'exten': None},
@@ -133,7 +129,7 @@ invalid_destinations = [
     {'type': 'sound', 'missing_required_field': 'string'},
     {'type': 'sound', 'filename': 1234},
     {'type': 'sound', 'filename': None},
-    {'type': 'sound', 'filename': build_string(256)},
+    {'type': 'sound', 'filename': s.random_string(256)},
     {'type': 'sound', 'filename': 'daddy-cool', 'skip': None},
     {'type': 'sound', 'filename': 'daddy-cool', 'skip': 123},
     {'type': 'sound', 'filename': 'daddy-cool', 'skip': 'invalid'},
@@ -186,7 +182,7 @@ def test_put_errors(incall):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', build_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
@@ -196,7 +192,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id_name', 1234
     yield s.check_bogus_field_returns_error, url, 'caller_id_name', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'caller_id_name', s.random_string(81)
     yield s.check_bogus_field_returns_error, url, 'caller_id_name', []
     yield s.check_bogus_field_returns_error, url, 'caller_id_name', {}
     yield s.check_bogus_field_returns_error, url, 'description', 1234
@@ -304,9 +300,8 @@ def test_edit_minimal_parameters(incall):
     response.assert_updated()
 
 
-@fixtures.context()
 @fixtures.incall()
-def test_edit_all_parameters(context, incall):
+def test_edit_all_parameters(incall):
     parameters = {'destination': {'type': 'none'},
                   'preprocess_subroutine': 'default',
                   'caller_id_mode': 'append',

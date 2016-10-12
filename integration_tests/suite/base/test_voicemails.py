@@ -11,10 +11,6 @@ from test_api.helpers import context as context_helper
 from hamcrest import assert_that, has_items, contains, has_entry, has_entries, has_item, is_not
 
 
-def build_string(length):
-    return ''.join('a' for _ in range(length))
-
-
 def test_get_errors():
     fake_get = confd.voicemails(999999).get
     yield s.check_resource_not_found, fake_get, 'Voicemail'
@@ -43,14 +39,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(81)
     yield s.check_bogus_field_returns_error, url, 'number', 123
     yield s.check_bogus_field_returns_error, url, 'number', None
     yield s.check_bogus_field_returns_error, url, 'number', 'one'
     yield s.check_bogus_field_returns_error, url, 'number', '#1234'
     yield s.check_bogus_field_returns_error, url, 'number', '*1234'
-    yield s.check_bogus_field_returns_error, url, 'number', build_string(0)
-    yield s.check_bogus_field_returns_error, url, 'number', build_string(41)
+    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(0)
+    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(41)
     yield s.check_bogus_field_returns_error, url, 'context', 123
     yield s.check_bogus_field_returns_error, url, 'context', None
     yield s.check_bogus_field_returns_error, url, 'context', True
@@ -59,11 +55,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'password', 'one'
     yield s.check_bogus_field_returns_error, url, 'password', '#1234'
     yield s.check_bogus_field_returns_error, url, 'password', '*1234'
-    yield s.check_bogus_field_returns_error, url, 'password', build_string(0)
-    yield s.check_bogus_field_returns_error, url, 'password', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(0)
+    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(81)
     yield s.check_bogus_field_returns_error, url, 'email', 123
     yield s.check_bogus_field_returns_error, url, 'email', True
-    yield s.check_bogus_field_returns_error, url, 'email', build_string(81)
+    yield s.check_bogus_field_returns_error, url, 'email', s.random_string(81)
     yield s.check_bogus_field_returns_error, url, 'language', 123
     yield s.check_bogus_field_returns_error, url, 'language', True
     yield s.check_bogus_field_returns_error, url, 'timezone', 123

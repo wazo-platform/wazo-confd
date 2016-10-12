@@ -18,7 +18,6 @@
 
 from marshmallow import fields
 from marshmallow.validate import Regexp
-from marshmallow.class_registry import register
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
@@ -34,5 +33,3 @@ class ExtensionSchema(BaseSchema):
     incall = fields.Nested('IncallSchema',
                            only=['id', 'links'],
                            dump_only=True)
-
-register('ExtensionSchema', ExtensionSchema)

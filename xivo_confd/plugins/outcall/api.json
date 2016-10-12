@@ -1,12 +1,12 @@
 {
     "paths": {
-        "/trunks": {
+        "/outcalls": {
             "get": {
-                "operationId": "list_trunks",
-                "summary": "List tunks",
-                "description": "**Required ACL:** `confd.trunks.read`",
+                "operationId": "list_outcalls",
+                "summary": "List outgoing calls",
+                "description": "**Required ACL:** `confd.outcalls.read`",
                 "tags": [
-                    "trunks"
+                    "outcalls"
                 ],
                 "parameters": [
                     {
@@ -27,36 +27,36 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Trunks list",
+                        "description": "Outgoing calls list",
                         "schema": {
-                            "$ref": "#/definitions/TrunkItems"
+                            "$ref": "#/definitions/OutcallItems"
                         }
                     }
                 }
             },
             "post": {
-                "operationId": "create_trunk",
-                "summary": "Create trunk",
-                "description": "**Required ACL:** `confd.trunks.create`",
+                "operationId": "create_outcall",
+                "summary": "Create outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.create`",
                 "tags": [
-                    "trunks"
+                    "outcalls"
                 ],
                 "parameters": [
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Trunk to create",
-                        "required": false,
+                        "description": "Outgoing call to create",
+                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Trunk"
+                            "$ref": "#/definitions/Outcall"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Trunk created",
+                        "description": "Outgoing call created",
                         "schema": {
-                            "$ref": "#/definitions/Trunk"
+                            "$ref": "#/definitions/Outcall"
                         }
                     },
                     "400": {
@@ -65,24 +65,24 @@
                 }
             }
         },
-        "/trunks/{trunk_id}": {
+        "/outcalls/{outcall_id}": {
             "get": {
-                "operationId": "get_trunk",
-                "summary": "Get trunk",
-                "description": "**Required ACL:** `confd.trunks.{trunk_id}.read`",
+                "operationId": "get_outcall",
+                "summary": "Get outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.read`",
                 "tags": [
-                    "trunks"
+                    "outcalls"
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/trunkid"
+                        "$ref": "#/parameters/outcallid"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Trunk",
+                        "description": "Outgoing call",
                         "schema": {
-                            "$ref": "#/definitions/Trunk"
+                            "$ref": "#/definitions/Outcall"
                         }
                     },
                     "404": {
@@ -91,22 +91,22 @@
                 }
             },
             "put": {
-                "operationId": "update_trunk",
-                "summary": "Update trunk",
-                "description": "**Required ACL:** `confd.trunks.{trunk_id}.update`",
+                "operationId": "update_outcall",
+                "summary": "Update outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.update`",
                 "tags": [
-                    "trunks"
+                    "outcalls"
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/trunkid"
+                        "$ref": "#/parameters/outcallid"
                     },
                     {
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Trunk"
+                            "$ref": "#/definitions/Outcall"
                         }
                     }
                 ],
@@ -123,15 +123,15 @@
                 }
             },
             "delete": {
-                "operationId": "delete_trunk",
-                "summary": "Delete trunk",
-                "description": "**Required ACL:** `confd.trunks.{trunk_id}.delete`",
+                "operationId": "delete_outcall",
+                "summary": "Delete outgoing call",
+                "description": "**Required ACL:** `confd.outcalls.{outcall_id}.delete`",
                 "tags": [
-                    "trunks"
+                    "outcalls"
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/parameters/trunkid"
+                        "$ref": "#/parameters/outcallid"
                     }
                 ],
                 "responses": {
@@ -149,81 +149,104 @@
         }
     },
     "parameters": {
-        "trunkid": {
-            "description": "Trunk's ID",
-            "name": "trunk_id",
-            "in": "path",
+        "outcallid": {
+            "required": true,
             "type": "integer",
-            "required": true
+            "name": "outcall_id",
+            "in": "path",
+            "description": "Outgoing call's ID"
         }
     },
     "definitions": {
-        "Trunk": {
-            "title": "Trunk",
+        "Outcall": {
+            "title": "Outcall",
             "allOf": [
                 {
-                    "$ref": "#/definitions/TrunkRelationBase"
+                    "$ref": "#/definitions/OutcallRelationBase"
                 },
                 {
                     "properties": {
                         "id": {
                             "type": "integer",
                             "readOnly": true,
-                            "description": "The id of the trunk"
+                            "description": "The id of the outgoing call"
                         },
-                        "context": {
+                        "description": {
                             "type": "string",
-                            "description": "The context of the trunk"
+                            "description": "Additional information about the outgoing call"
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "internal_caller_id": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Use the internal caller id"
+                        },
+                        "preprocess_subroutine": {
+                            "type": "string",
+                            "description": "Name of the subroutine to execute in asterisk before receiving a call"
+                        },
+                        "ring_time": {
+                            "type": "integer",
+                            "description": "Ringing time before hangup"
                         }
                     }
                 },
                 {
-                    "$ref": "#/definitions/TrunkRelationEndpoints"
-                },
-                {
-                    "$ref": "#/definitions/TrunkRelationOutcalls"
+                    "$ref": "#/definitions/OutcallRelationTrunks"
                 }
+            ],
+            "required": [
+                "name"
             ]
         },
-        "TrunkRelationBase": {
-            "properties": {}
-        },
-        "TrunkRelationEndpoints": {
+        "OutcallRelationBase": {
             "properties": {
-                "endpoint_sip": {
-                    "readOnly": true,
-                    "$ref": "#/definitions/EndpointSipRelationBase"
-                },
-                "endpoint_custom": {
-                    "readOnly": true,
-                    "$ref": "#/definitions/EndpointCustomRelationBase"
+                "name": {
+                    "type": "string",
+                    "description": "The name of the outcall"
                 }
             }
         },
-        "TrunkRelationOutcalls": {
+        "OutcallRelationTrunks": {
             "properties": {
-                "outcalls": {
+                "trunks": {
                     "type": "array",
                     "readOnly": true,
                     "items": {
-                        "$ref": "#/definitions/OutcallRelationBase"
+                        "$ref": "#/definitions/OutcallRelationTrunk"
                     }
                 }
             }
         },
-        "TrunkItems": {
-            "title": "TrunkItems",
+        "OutcallRelationTrunk": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/TrunkRelationBase"
+                },
+                {
+                    "$ref": "#/definitions/TrunkRelationEndpoints"
+                }
+            ]
+        },
+        "OutcallItems": {
+            "title": "OutcallItems",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Trunk"
+                        "$ref": "#/definitions/Outcall"
                     }
                 },
                 "total": {
                     "type": "integer"
                 }
-            }
+            },
+            "required": [
+                "total"
+            ]
         }
     }
 }

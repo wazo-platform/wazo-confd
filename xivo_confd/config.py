@@ -102,6 +102,7 @@ DEFAULT_CONFIG = {
         'line_extension_plugin',
         'line_plugin',
         'line_sip_plugin',
+        'outcall_plugin',
         'queue_member_plugin',
         'sip_general_plugin',
         'switchboard_plugin',

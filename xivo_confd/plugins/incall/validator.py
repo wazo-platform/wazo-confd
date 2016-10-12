@@ -57,7 +57,7 @@ def build_validator():
         'endcall:hangup': [],
         'meetme': [ResourceExists('actionarg1', conference_dao.exists, 'Conference')],
         'none': [],
-        'outcall': [ResourceExists('actionarg1', outcall_dao.exists, 'Outcall')],
+        'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
         'queue': [ResourceExists('actionarg1', queue_dao.exists, 'Queue')],
         'sound': [],
         'user': [GetResource('actionarg1', user_dao.get, 'User')],
