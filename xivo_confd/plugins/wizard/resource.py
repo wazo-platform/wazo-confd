@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,6 +16,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from __future__ import unicode_literals
+
+import string
 
 from flask import request
 from flask_restful import Resource
@@ -95,7 +100,8 @@ class WizardSchema(BaseSchema):
 
     @validates('entity_name')
     def validate_entity_name(self, entity_name):
-        sub_name = ''.join(c for c in entity_name if c.isalnum())
+        sub_name = ''.join(c for c in entity_name if (c in string.ascii_letters or
+                                                      c in string.digits))
         if len(sub_name) < 3:
             raise ValidationError('Shorter than alphanumeric minimum length 3.')
 
