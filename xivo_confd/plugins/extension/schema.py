@@ -33,3 +33,6 @@ class ExtensionSchema(BaseSchema):
     incall = fields.Nested('IncallSchema',
                            only=['id', 'links'],
                            dump_only=True)
+    outcall = fields.Nested('OutcallSchema',
+                            only=['id', 'name', 'links'],
+                            dump_only=True)

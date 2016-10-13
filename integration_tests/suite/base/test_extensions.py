@@ -24,6 +24,7 @@ from hamcrest import (assert_that,
                       equal_to,
                       has_entries,
                       has_item,
+                      none,
                       not_)
 
 from test_api import confd
@@ -82,7 +83,9 @@ def test_get(extension):
     response = confd.extensions(extension['id']).get()
     assert_that(response.item, has_entries(exten=extension['exten'],
                                            context=extension['context'],
-                                           commented=False))
+                                           commented=False,
+                                           incall=none(),
+                                           outcall=none()))
 
 
 @fixtures.extension(context=INCALL_CONTEXT)

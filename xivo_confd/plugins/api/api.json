@@ -4733,6 +4733,9 @@
                 },
                 {
                     "$ref": "#/definitions/ExtensionRelationIncall"
+                },
+                {
+                    "$ref": "#/definitions/ExtensionRelationOutcall"
                 }
             ],
             "required": [
@@ -4772,6 +4775,14 @@
                 "incall": {
                     "readOnly": true,
                     "$ref": "#/definitions/IncallRelationBase"
+                }
+            }
+        },
+        "ExtensionRelationOutcall": {
+            "properties": {
+                "outcall": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/OutcallRelationBase"
                 }
             }
         },

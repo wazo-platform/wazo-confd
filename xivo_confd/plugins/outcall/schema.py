@@ -35,3 +35,7 @@ class OutcallSchema(BaseSchema):
                            only=['id', 'endpoint_sip', 'endpoint_custom', 'links'],
                            many=True,
                            dump_only=True)
+    extensions = fields.Nested('ExtensionSchema',
+                               only=['id', 'exten', 'context', 'links'],
+                               many=True,
+                               dump_only=True)

@@ -191,6 +191,9 @@
                 },
                 {
                     "$ref": "#/definitions/OutcallRelationTrunks"
+                },
+                {
+                    "$ref": "#/definitions/OutcallRelationExtensions"
                 }
             ],
             "required": [
@@ -228,6 +231,24 @@
                 },
                 {
                     "$ref": "#/definitions/TrunkRelationEndpoints"
+                }
+            ]
+        },
+        "OutcallRelationExtensions": {
+            "properties": {
+                "extensions": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/OutcallRelationExtension"
+                    }
+                }
+            }
+        },
+        "OutcallRelationExtension": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/ExtensionRelationBase"
                 }
             ]
         },

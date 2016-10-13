@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from hamcrest import (assert_that,
+                      contains,
+                      has_entries)
 from test_api import scenarios as s
 from test_api import confd
 from test_api import errors as e
@@ -143,6 +146,33 @@ def test_dissociate(outcall, extension):
     with a.outcall_extension(outcall, extension, check=False):
         response = confd.outcalls(outcall['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.outcall()
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_get_outcall_relations(outcall, extension):
+    expected = has_entries(
+        extensions=contains(has_entries(id=extension['id'],
+                                        exten=extension['exten'],
+                                        context=extension['context']))
+    )
+
+    with a.outcall_extension(outcall, extension):
+        response = confd.outcalls(outcall['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.outcall()
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_get_extension_relations(outcall, extension):
+    expected = has_entries(
+        outcall=has_entries(id=outcall['id'],
+                            name=outcall['name'])
+    )
+
+    with a.outcall_extension(outcall, extension):
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.outcall()
