@@ -18,8 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from hamcrest import (assert_that,
-                      has_entries,
-                      has_key)
+                      has_entries)
 
 from test_api import scenarios as s
 from test_api import confd
@@ -144,9 +143,10 @@ def test_dissociate(trunk, custom):
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_endpoint_custom_relation(trunk, custom):
-    expected = has_entries({
-        'endpoint_custom': has_entries({'interface': custom['interface']})
-    })
+    expected = has_entries(
+        endpoint_custom=has_entries(id=custom['id'],
+                                    interface=custom['interface'])
+    )
 
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.trunks(trunk['id']).get()
@@ -156,9 +156,9 @@ def test_get_endpoint_custom_relation(trunk, custom):
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_trunk_relation(trunk, custom):
-    expected = has_entries({
-        'trunk': has_key('links')
-    })
+    expected = has_entries(
+        trunk=has_entries(id=trunk['id'])
+    )
 
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.endpoints.custom(custom['id']).get()

@@ -29,4 +29,4 @@ class CustomSchema(BaseSchema):
     interface = fields.String(validate=Regexp(INTERFACE_REGEX), required=True)
     enabled = StrictBoolean()
     links = ListLink(Link('endpoint_custom'))
-    trunk = fields.Nested('TrunkSchema', only=['links'], dump_only=True)
+    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
