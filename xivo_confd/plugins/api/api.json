@@ -4720,11 +4720,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "description": "Extension ID",
-                            "readOnly": true
-                        },
                         "commented": {
                             "type": "boolean",
                             "description": "If True the extension is disabled"
@@ -4762,6 +4757,11 @@
         },
         "ExtensionRelationBase": {
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Extension ID",
+                    "readOnly": true
+                },
                 "context": {
                     "type": "string"
                 },
