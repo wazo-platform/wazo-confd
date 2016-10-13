@@ -120,14 +120,15 @@ def build_validator():
     return ValidationGroup(
         common=[
             GetResource('context', context_dao.get, 'Context'),
-            ExtensionRangeValidator(context_dao),
         ],
         create=[
             ExtenAvailableOnCreateValidator(extension_dao),
+            ExtensionRangeValidator(context_dao),
         ],
         edit=[
             ExtenAvailabelOnUpdateValidator(extension_dao),
             ContextOnUpdateValidator(context_dao),
+            ExtensionRangeValidator(context_dao),
         ],
         delete=[
             ExtensionAssociationValidator(extension_dao, line_extension_dao)
