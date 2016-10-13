@@ -72,6 +72,10 @@ class ExtensionRangeValidator(Validator):
         if self._is_pattern(extension.exten):
             return
 
+        context = self.dao.get(extension.context)
+        if context.type == 'outcall':
+            return
+
         context_ranges = self.dao.find_all_context_ranges(extension.context)
         if not self.extension_in_range(extension.exten, context_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
