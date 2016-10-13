@@ -75,6 +75,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'description', 1234
     yield s.check_bogus_field_returns_error, url, 'description', []
     yield s.check_bogus_field_returns_error, url, 'description', {}
+    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
+    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    yield s.check_bogus_field_returns_error, url, 'enabled', {}
 
 
 @fixtures.outcall(description='search')
@@ -145,7 +149,8 @@ def test_create_all_parameters():
                   'internal_caller_id': True,
                   'preprocess_subroutine': 'subroutine',
                   'ring_time': 10,
-                  'description': 'outcall description'}
+                  'description': 'outcall description',
+                  'enabled': False}
 
     response = confd.outcalls.post(**parameters)
     response.assert_created('outcalls')
@@ -167,7 +172,8 @@ def test_edit_all_parameters(outcall):
                   'internal_caller_id': True,
                   'preprocess_subroutine': 'subroutine',
                   'ring_time': 10,
-                  'description': 'outcall description'}
+                  'description': 'outcall description',
+                  'enabled': False}
 
     response = confd.outcalls(outcall['id']).put(**parameters)
     response.assert_updated()

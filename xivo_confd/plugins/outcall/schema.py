@@ -29,6 +29,7 @@ class OutcallSchema(BaseSchema):
     preprocess_subroutine = fields.String(validate=Length(max=39))
     ring_time = fields.Integer(validate=Range(min=0), allow_none=True)
     description = fields.String(allow_none=True)
+    enabled = StrictBoolean()
     links = ListLink(Link('outcalls'))
     trunks = fields.Nested('TrunkSchema',
                            only=['id', 'endpoint_sip', 'endpoint_custom', 'links'],
