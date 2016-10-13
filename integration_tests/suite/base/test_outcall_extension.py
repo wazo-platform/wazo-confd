@@ -21,7 +21,7 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
-from test_api.config import OUTCALL_CONTEXT
+from test_api.config import OUTCALL_CONTEXT, CONTEXT
 
 
 FAKE_ID = 999999999
@@ -143,6 +143,14 @@ def test_dissociate(outcall, extension):
     with a.outcall_extension(outcall, extension, check=False):
         response = confd.outcalls(outcall['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.outcall()
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_edit_context_to_internal_when_associated(outcall, extension):
+    with a.outcall_extension(outcall, extension):
+        response = confd.extensions(extension['id']).put(context=CONTEXT)
+        response.assert_status(400)
 
 
 @fixtures.outcall()

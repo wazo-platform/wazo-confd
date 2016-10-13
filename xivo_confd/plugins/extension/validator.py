@@ -59,7 +59,11 @@ class ContextOnUpdateValidator(Validator):
 
     def validate(self, extension):
         context = self.dao.get(extension.context)
+
         if extension.incall and context.type != 'incall':
+            raise errors.unhandled_context_type(context.type)
+
+        if extension.outcall and context.type != 'outcall':
             raise errors.unhandled_context_type(context.type)
 
 
