@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +18,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from hamcrest import (assert_that,
-                      has_entries)
+                      has_entries,
+                      has_key)
 
 from test_api import scenarios as s
 from test_api import confd
@@ -137,6 +139,30 @@ def test_dissociate(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
         response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_get_endpoint_sip_relation(trunk, sip):
+    expected = has_entries({
+        'endpoint_sip': has_entries({'username': sip['username']}),
+    })
+
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_get_trunk_relation(trunk, sip):
+    expected = has_entries({
+        'trunk': has_key('links')
+    })
+
+    with a.trunk_endpoint_sip(trunk, sip):
+        response = confd.endpoints.sip(sip['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.trunk()

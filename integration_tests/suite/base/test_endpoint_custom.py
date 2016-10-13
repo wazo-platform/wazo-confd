@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,13 +18,12 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
 
-from hamcrest import assert_that, has_entries, has_items, instance_of, has_entry, has_key
+from hamcrest import assert_that, has_entries, has_items, instance_of, has_entry
 
 
 def test_get_errors():
@@ -67,22 +67,11 @@ def test_delete_errors(custom):
 def test_get(custom):
     expected = has_entries({'id': instance_of(int),
                             'interface': custom['interface'],
-                            'enabled': True})
+                            'enabled': True,
+                            'trunk': None})
 
     response = confd.endpoints.custom(custom['id']).get()
     assert_that(response.item, expected)
-
-
-@fixtures.trunk()
-@fixtures.custom()
-def test_get_trunk_relation(trunk, custom):
-    expected = has_entries({
-        'trunk': has_key('links')
-    })
-
-    with a.trunk_endpoint_custom(trunk, custom):
-        response = confd.endpoints.custom(custom['id']).get()
-        assert_that(response.item, expected)
 
 
 @fixtures.custom()
