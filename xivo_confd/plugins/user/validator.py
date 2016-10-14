@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,11 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import (LANGUAGE_REGEX,
-                                          NumberRange,
-                                          Optional,
-                                          RegexField,
-                                          RequiredFields,
+from xivo_confd.helpers.validator import (Optional,
                                           UniqueField,
                                           UniqueFieldChanged,
                                           ValidationGroup,
@@ -29,13 +26,6 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
-
-
-MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
-CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
-USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
-PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
-CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
 
 
 class NoVoicemailAssociated(Validator):
@@ -78,25 +68,6 @@ class NoEmptyFieldWhenEnabled(Validator):
 
 def build_validator():
     return ValidationGroup(
-        common=[
-            RequiredFields('firstname'),
-            Optional('mobile_phone_number',
-                     RegexField.compile('mobile_phone_number', MOBILE_PHONE_NUMBER_REGEX)),
-            Optional('caller_id',
-                     RegexField.compile('caller_id', CALLER_ID_REGEX)),
-            Optional('username',
-                     RegexField.compile('username', USERNAME_REGEX)),
-            Optional('password',
-                     RegexField.compile('password', PASSWORD_REGEX)),
-            Optional('call_permission_password',
-                     RegexField.compile('call_permission_password', CALL_PERMISSION_PASSWORD_REGEX)),
-            Optional('ring_seconds',
-                     NumberRange('ring_seconds', minimum=0, maximum=60, step=5)),
-            Optional('simultaneous_calls',
-                     NumberRange('simultaneous_calls', minimum=1, maximum=20)),
-            Optional('language',
-                     RegexField.compile('language', LANGUAGE_REGEX)),
-        ],
         delete=[
             NoVoicemailAssociated(user_voicemail_dao),
             NoLineAssociated(user_line_dao)
@@ -112,15 +83,6 @@ def build_validator():
                                  'User'))
         ],
         edit=[
-            RequiredFields('call_transfer_enabled',
-                           'dtmf_hangup_enabled',
-                           'call_record_enabled',
-                           'online_call_record_enabled',
-                           'supervision_enabled',
-                           'ring_seconds',
-                           'simultaneous_calls',
-                           'caller_id',
-                           'enabled'),
             Optional('email',
                      UniqueFieldChanged('email', user_dao, 'User')),
             Optional('username',

@@ -185,7 +185,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', {}
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', []
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 6
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 61
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', {}
