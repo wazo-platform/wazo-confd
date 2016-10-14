@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,50 +18,44 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from flask_restful import marshal
+from marshmallow import fields
 
-from flask_restful import fields
 from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.helpers.restful import Link, FieldList
 
 
-sccp_fields = {
-    'line_id': fields.Integer,
-    'endpoint_id': fields.Integer,
-    'endpoint': fields.String,
-    'links': FieldList(Link('lines',
-                            field='line_id',
-                            target='id'),
-                       Link('endpoint_sccp',
-                            field='endpoint_id',
-                            target='id'))
-}
+class LineEndpointSchema(BaseSchema):
+    line_id = fields.Integer()
+    endpoint_id = fields.Integer()
+    endpoint = fields.String()
 
 
-sip_fields = {
-    'line_id': fields.Integer,
-    'endpoint_id': fields.Integer,
-    'endpoint': fields.String,
-    'links': FieldList(Link('lines',
-                            field='line_id',
-                            target='id'),
-                       Link('endpoint_sip',
-                            field='endpoint_id',
-                            target='id'))
-}
+class LineSccpSchema(LineEndpointSchema):
+    links = ListLink(Link('lines',
+                          field='line_id',
+                          target='id'),
+                     Link('endpoint_sccp',
+                          field='endpoint_id',
+                          target='id'))
 
-custom_fields = {
-    'line_id': fields.Integer,
-    'endpoint_id': fields.Integer,
-    'endpoint': fields.String,
-    'links': FieldList(Link('lines',
-                            field='line_id',
-                            target='id'),
-                       Link('endpoint_custom',
-                            field='endpoint_id',
-                            target='id'))
-}
+
+class LineSipSchema(LineEndpointSchema):
+    links = ListLink(Link('lines',
+                          field='line_id',
+                          target='id'),
+                     Link('endpoint_sip',
+                          field='endpoint_id',
+                          target='id'))
+
+
+class LineCustomSchema(LineEndpointSchema):
+    links = ListLink(Link('lines',
+                          field='line_id',
+                          target='id'),
+                     Link('endpoint_custom',
+                          field='endpoint_id',
+                          target='id'))
 
 
 class LineEndpoint(ConfdResource):
@@ -89,14 +84,14 @@ class LineEndpointGet(LineEndpoint):
 
     def get(self, line_id):
         line_endpoint = self.service.get_association_from_line(line_id)
-        return marshal(line_endpoint, self.fields)
+        return self.schema().dump(line_endpoint).data
 
 
 class EndpointLineGet(LineEndpoint):
 
     def get(self, endpoint_id):
         line_endpoint = self.service.get_association_from_endpoint(endpoint_id)
-        return marshal(line_endpoint, self.fields)
+        return self.schema().dump(line_endpoint).data
 
 
 class LineEndpointAssociationSip(LineEndpointAssociation):
@@ -111,7 +106,8 @@ class LineEndpointAssociationSip(LineEndpointAssociation):
 
 
 class LineEndpointGetSip(LineEndpointGet):
-    fields = sip_fields
+
+    schema = LineSipSchema
 
     @required_acl('confd.lines.{line_id}.endpoints.sip.read')
     def get(self, line_id):
@@ -119,7 +115,8 @@ class LineEndpointGetSip(LineEndpointGet):
 
 
 class EndpointLineGetSip(EndpointLineGet):
-    fields = sip_fields
+
+    schema = LineSipSchema
 
     @required_acl('confd.endpoints.sip.{endpoint_id}.lines.read')
     def get(self, endpoint_id):
@@ -138,7 +135,8 @@ class LineEndpointAssociationSccp(LineEndpointAssociation):
 
 
 class LineEndpointGetSccp(LineEndpointGet):
-    fields = sccp_fields
+
+    schema = LineSccpSchema
 
     @required_acl('confd.lines.{line_id}.endpoints.sccp.read')
     def get(self, line_id):
@@ -146,7 +144,8 @@ class LineEndpointGetSccp(LineEndpointGet):
 
 
 class EndpointLineGetSccp(EndpointLineGet):
-    fields = sccp_fields
+
+    schema = LineSccpSchema
 
     @required_acl('confd.endpoints.sccp.{endpoint_id}.lines.read')
     def get(self, endpoint_id):
@@ -165,7 +164,8 @@ class LineEndpointAssociationCustom(LineEndpointAssociation):
 
 
 class LineEndpointGetCustom(LineEndpointGet):
-    fields = custom_fields
+
+    schema = LineCustomSchema
 
     @required_acl('confd.lines.{line_id}.endpoints.custom.read')
     def get(self, line_id):
@@ -173,7 +173,8 @@ class LineEndpointGetCustom(LineEndpointGet):
 
 
 class EndpointLineGetCustom(EndpointLineGet):
-    fields = custom_fields
+
+    schema = LineCustomSchema
 
     @required_acl('confd.endpoints.custom.{endpoint_id}.lines.read')
     def get(self, endpoint_id):
