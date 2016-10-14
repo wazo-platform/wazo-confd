@@ -101,8 +101,8 @@ def test_associate_with_all_parameters(outcall, extension):
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_associate_already_associated(outcall, extension):
     with a.outcall_extension(outcall, extension):
-        response = confd.outcalls(outcall['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Outcall', 'Extension'))
+        response = confd.outcalls(outcall['id']).extensions(extension['id']).put(prefix='123')
+        response.assert_updated()
 
 
 @fixtures.outcall()
@@ -120,7 +120,7 @@ def test_associate_multiple_extensions_to_outcall(outcall, extension1, extension
 def test_associate_multiple_outcalls_to_extension(outcall1, outcall2, extension):
     with a.outcall_extension(outcall1, extension):
         response = confd.outcalls(outcall2['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Outcall', 'Extension'))
+        response.assert_match(400, e.resource_associated('outcall', 'Extension'))
 
 
 @fixtures.outcall()

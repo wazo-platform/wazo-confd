@@ -26,6 +26,10 @@ class OutcallExtensionService(object):
         self.validator = validator
 
     def associate(self, outcall, extension, outcall_extension):
+        if extension in outcall.extensions:
+            outcall.update_extension_association(extension, **outcall_extension)
+            return
+
         self.validator.validate_association(outcall, extension)
         outcall.associate_extension(extension, **outcall_extension)
         self.notifier.associated(outcall, extension)

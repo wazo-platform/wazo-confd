@@ -24,15 +24,8 @@ from xivo_confd.helpers.validator import Validator, AssociationValidator
 class OutcallExtensionAssociationValidator(Validator):
 
     def validate(self, outcall, extension):
-        self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_outcall_context(extension)
-
-    def validate_extension_not_already_associated(self, extension):
-        if extension.type == 'outcall':
-            raise errors.resource_associated('Outcall', 'Extension',
-                                             outcall_id=extension.typeval,
-                                             extension_id=extension.id)
 
     def validate_extension_not_associated_to_other_resource(self, extension):
         if not (extension.type == 'user' and extension.typeval == '0'):
