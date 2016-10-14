@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,19 +17,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from flask_restful import fields, marshal
+from marshmallow import fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ConfdResource
 
 
-fields = {
-    'user_id': fields.Integer,
-    'entity_id': fields.Integer,
-    'links': FieldList(Link('users',
-                            field='user_id',
-                            target='id'))
-}
+class UserEntitySchema(BaseSchema):
+    user_id = fields.Integer()
+    entity_id = fields.Integer()
+    links = ListLink(Link('users',
+                          field='user_id',
+                          target='id'),
+                     Link('entities',
+                          field='entity_id',
+                          target='id'))
 
 
 class UserEntityResource(ConfdResource):
@@ -52,8 +56,10 @@ class UserEntityItem(UserEntityResource):
 
 class UserEntityList(UserEntityResource):
 
+    schema = UserEntitySchema
+
     @required_acl('confd.users.{user_id}.entities.read')
     def get(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
         item = self.service.find_by(user_id=user.id)
-        return marshal(item, fields)
+        return self.schema().dump(item).data
