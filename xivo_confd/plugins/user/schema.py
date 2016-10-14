@@ -100,6 +100,7 @@ class UserSchemaNullable(UserSchema):
                            'enabled',
                            'online_call_record_enabled',
                            'ring_seconds',
+                           'simultaneous_calls',
                            'supervision_enabled']
         if field_name in nullable_fields:
             field_obj.allow_none = True
