@@ -20,6 +20,7 @@ import abc
 
 from xivo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
 from xivo_confd.plugins.extension.schema import ExtensionSchema
+from xivo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
 from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from xivo_dao.helpers.exception import NotFoundError
@@ -65,13 +66,17 @@ class Creator(object):
 
 class UserCreator(Creator):
 
+    schema = UserSchema
+    schema_nullable = UserSchemaNullable
+
     def find(self, fields):
         if 'uuid' in fields:
             return self.service.get_by(uuid=fields['uuid'])
 
     def create(self, fields):
         if fields:
-            return self.service.create(User(**fields))
+            form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
+            return self.service.create(User(**form))
 
 
 class EntityCreator(Creator):
