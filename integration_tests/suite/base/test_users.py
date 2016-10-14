@@ -93,38 +93,112 @@ def test_post_errors():
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'firstname', 123
     yield s.check_bogus_field_returns_error, url, 'firstname', None
+    yield s.check_bogus_field_returns_error, url, 'firstname', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'firstname', {}
+    yield s.check_bogus_field_returns_error, url, 'firstname', []
     yield s.check_bogus_field_returns_error, url, 'lastname', 123
+    yield s.check_bogus_field_returns_error, url, 'lastname', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'lastname', {}
+    yield s.check_bogus_field_returns_error, url, 'lastname', []
+    yield s.check_bogus_field_returns_error, url, 'email', s.random_string(255)
     yield s.check_bogus_field_returns_error, url, 'email', 123
+    yield s.check_bogus_field_returns_error, url, 'email', {}
+    yield s.check_bogus_field_returns_error, url, 'email', []
     yield s.check_bogus_field_returns_error, url, 'timezone', 123
+    yield s.check_bogus_field_returns_error, url, 'timezone', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'timezone', {}
+    yield s.check_bogus_field_returns_error, url, 'timezone', []
     yield s.check_bogus_field_returns_error, url, 'language', 123
+    yield s.check_bogus_field_returns_error, url, 'language', 'klingon'
+    yield s.check_bogus_field_returns_error, url, 'language', {}
+    yield s.check_bogus_field_returns_error, url, 'language', []
     yield s.check_bogus_field_returns_error, url, 'description', 123
+    yield s.check_bogus_field_returns_error, url, 'description', {}
+    yield s.check_bogus_field_returns_error, url, 'description', []
     yield s.check_bogus_field_returns_error, url, 'caller_id', 123
+    yield s.check_bogus_field_returns_error, url, 'caller_id', 'invalid_regex'
+    yield s.check_bogus_field_returns_error, url, 'caller_id', s.random_string(161)
+    yield s.check_bogus_field_returns_error, url, 'caller_id', {}
+    yield s.check_bogus_field_returns_error, url, 'caller_id', []
     yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', 123
+    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', s.random_string(81)
+    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', {}
+    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', []
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 123
-    yield s.check_bogus_field_returns_error, url, 'username', 123
-    yield s.check_bogus_field_returns_error, url, 'password', 123
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'userfield', 123
-    yield s.check_bogus_field_returns_error, url, 'caller_id', 'callerid'
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 'invalid_regex'
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', s.random_string(81)
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', {}
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', []
+    yield s.check_bogus_field_returns_error, url, 'username', 123
+    yield s.check_bogus_field_returns_error, url, 'username', 'invalid_régex'
+    yield s.check_bogus_field_returns_error, url, 'username', s.random_string(1)
+    yield s.check_bogus_field_returns_error, url, 'username', s.random_string(255)
+    yield s.check_bogus_field_returns_error, url, 'username', {}
+    yield s.check_bogus_field_returns_error, url, 'username', []
+    yield s.check_bogus_field_returns_error, url, 'password', 123
+    yield s.check_bogus_field_returns_error, url, 'password', 'invalid_régex'
+    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(3)
+    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(65)
+    yield s.check_bogus_field_returns_error, url, 'password', {}
+    yield s.check_bogus_field_returns_error, url, 'password', []
+    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
+    yield s.check_bogus_field_returns_error, url, 'music_on_hold', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
+    yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
+    yield s.check_bogus_field_returns_error, url, 'userfield', 123
+    yield s.check_bogus_field_returns_error, url, 'userfield', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'userfield', {}
+    yield s.check_bogus_field_returns_error, url, 'userfield', []
+    yield s.check_bogus_field_returns_error, url, 'caller_id', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'caller_id', 1234
+    yield s.check_bogus_field_returns_error, url, 'caller_id', s.random_string(161)
+    yield s.check_bogus_field_returns_error, url, 'caller_id', {}
+    yield s.check_bogus_field_returns_error, url, 'caller_id', []
     yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', []
     yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', []
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', []
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', []
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
+    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', []
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 'sixty'
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', -1
     yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 21
-    yield s.check_bogus_field_returns_error, url, 'username', 'ûsername',
+    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', {}
+    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', []
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', 6
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 65
-    yield s.check_bogus_field_returns_error, url, 'language', 'klingon'
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 61
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', {}
+    yield s.check_bogus_field_returns_error, url, 'ring_seconds', []
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', 1234
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', 'invalid_char'
+    yield s.check_bogus_field_returns_error, url, 'call_permission_password', {}
+    yield s.check_bogus_field_returns_error, url, 'call_permission_password', []
+    yield s.check_bogus_field_returns_error, url, 'call_permission_password', s.random_string(17)
     yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'enabled', []
 
 
 def put_error_checks(url):
