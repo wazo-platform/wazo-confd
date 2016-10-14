@@ -16,38 +16,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from flask import url_for
-from flask_restful import reqparse, fields, marshal
 
+from marshmallow import fields
+from marshmallow.validate import OneOf, Regexp
+
+from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ListResource, ItemResource, Strict
+from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_dao.alchemy.rightcall import RightCall as CallPermission
 
 
-call_permission_fields = {
-    'id': fields.Integer,
-    'name': fields.String,
-    'password': fields.String,
-    'description': fields.String,
-    'mode': fields.String,
-    'enabled': fields.Boolean,
-    'extensions': fields.List(fields.String),
-    'links': FieldList(Link('callpermissions'))
-}
+NAME_REGEX = r'^[a-z0-9_-]{1,128}$'
+PASSWORD_REGEX = r'^[0-9#\*]{1,40}$'
+EXTENSION_REGEX = r'^(?:_?\+?[0-9NXZ\*#\-\[\]]+[\.\!]?){1,40}$'
 
-parser = reqparse.RequestParser()
-parser.add_argument('name', type=Strict(unicode), store_missing=False, nullable=False)
-parser.add_argument('password', type=Strict(unicode), store_missing=False)
-parser.add_argument('description', type=Strict(unicode), store_missing=False)
-parser.add_argument('mode', type=Strict(unicode), store_missing=False, nullable=False)
-parser.add_argument('enabled', type=Strict(bool), store_missing=False, nullable=False)
-parser.add_argument('extensions', type=Strict(unicode), action='append', store_missing=False, nullable=False)
+
+class CallPermissionSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(validate=Regexp(NAME_REGEX))
+    password = fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
+    mode = fields.String(validate=OneOf(['allow', 'deny']))
+    extensions = fields.List(fields.String(validate=Regexp(EXTENSION_REGEX)))
+    enabled = StrictBoolean()
+    description = fields.String(allow_none=True)
+    links = ListLink(Link('callpermissions'))
 
 
 class CallPermissionList(ListResource):
 
     model = CallPermission
-    fields = call_permission_fields
-    parser = parser
+    schema = CallPermissionSchema
 
     def build_headers(self, call_permission):
         return {'Location': url_for('callpermissions', id=call_permission.id, _external=True)}
@@ -58,17 +56,12 @@ class CallPermissionList(ListResource):
 
     @required_acl('confd.callpermissions.read')
     def get(self):
-        params = self.search_params()
-        result = self.service.search(params)
-
-        return {'total': result.total,
-                'items': [marshal(item, self.fields) for item in result.items]}
+        return super(CallPermissionList, self).get()
 
 
 class CallPermissionItem(ItemResource):
 
-    fields = call_permission_fields
-    parser = parser
+    schema = CallPermissionSchema
 
     @required_acl('confd.callpermissions.{id}.read')
     def get(self, id):

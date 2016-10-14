@@ -19,29 +19,28 @@
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
-from flask import url_for
-from flask_restful import reqparse, fields, marshal
+from flask import url_for, request
+from marshmallow import fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import FieldList, Link, ConfdResource
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ConfdResource
 
 
-fields = {
-    'user_id': fields.Integer,
-    'voicemail_id': fields.Integer,
-    'links': FieldList(Link('voicemails',
-                            field='voicemail_id',
-                            target='id'),
-                       Link('users',
-                            field='user_id',
-                            target='id'))
-}
-
-parser = reqparse.RequestParser()
-parser.add_argument('voicemail_id', type=int, required=True)
+class UserVoicemailSchema(BaseSchema):
+    user_id = fields.Integer(dump_only=True)
+    voicemail_id = fields.Integer(required=True)
+    links = ListLink(Link('voicemails',
+                          field='voicemail_id',
+                          target='id'),
+                     Link('users',
+                          field='user_id',
+                          target='id'))
 
 
 class UserVoicemailResource(ConfdResource):
+
+    schema = UserVoicemailSchema
 
     def __init__(self, service, user_dao, voicemail_dao):
         super(ConfdResource, self).__init__()
@@ -69,7 +68,7 @@ class UserVoicemailList(UserVoicemailResource):
     def get(self, user_id):
         user = self.get_user(user_id)
         user_voicemail = self.service.get_by(user_id=user.id)
-        return marshal(user_voicemail, fields)
+        return self.schema().dump(user_voicemail).data
 
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
@@ -87,7 +86,7 @@ class VoicemailUserList(UserVoicemailResource):
         voicemail = self.voicemail_dao.get(voicemail_id)
         items = self.service.find_all_by(voicemail_id=voicemail.id)
         return {'total': len(items),
-                'items': [marshal(item, fields) for item in items]}
+                'items': self.schema().dump(items, many=True).data}
 
 
 class UserVoicemailLegacy(UserVoicemailResource):
@@ -96,14 +95,14 @@ class UserVoicemailLegacy(UserVoicemailResource):
     def get(self, user_id):
         user = self.get_user(user_id)
         user_voicemail = self.service.get_by(user_id=user.id)
-        return marshal(user_voicemail, fields)
+        return self.schema().dump(user_voicemail).data
 
     @required_acl('confd.users.{user_id}.voicemail.create')
     def post(self, user_id):
         user = self.get_user(user_id)
         voicemail = self.get_voicemail_or_fail()
         user_voicemail = self.service.associate(user, voicemail)
-        return marshal(user_voicemail, fields), 201, self.build_headers(user_voicemail)
+        return self.schema().dump(user_voicemail).data, 201, self.build_headers(user_voicemail)
 
     @required_acl('confd.users.{user_id}.voicemail.delete')
     def delete(self, user_id):
@@ -121,7 +120,7 @@ class UserVoicemailLegacy(UserVoicemailResource):
         return {'Location': url}
 
     def get_voicemail_or_fail(self):
-        form = parser.parse_args()
+        form = self.schema().load(request.get_json()).data
         try:
             return self.voicemail_dao.get(form['voicemail_id'])
         except NotFoundError:

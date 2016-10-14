@@ -17,50 +17,35 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from flask import url_for
-from flask_restful import reqparse, inputs, fields
+from marshmallow import fields
+from marshmallow.validate import Length, Predicate, Range, Regexp
 
-from xivo_confd.helpers.restful import FieldList, Link, DigitStr, \
-    ListResource, ItemResource, Strict
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ListResource, ItemResource
 from xivo_confd.plugins.line_sip.model import LineSip
 
 
-fields = {
-    'id': fields.Integer,
-    'username': fields.String,
-    'secret': fields.String,
-    'callerid': fields.String,
-    'device_slot': fields.Integer,
-    'context': fields.String,
-    'provisioning_extension': fields.String,
-    'links': FieldList(Link('lines'),
-                       Link('lines_sip')),
-}
+USERNAME_REGEX = r'^[a-zA-Z0-9]+$'
+SECRET_REGEX = r'^[a-zA-Z0-9]+$'
+CALLERID_REGEX = r'"[^"]+"(\s+<[+0-9]>)?'
 
 
-parser = reqparse.RequestParser()
-parser.add_argument('username',
-                    type=inputs.regex(r"^[a-zA-Z0-9]+$"),
-                    store_missing=False)
-parser.add_argument('secret',
-                    type=inputs.regex(r"^[a-zA-Z0-9]+$"),
-                    store_missing=False)
-parser.add_argument('context', required=True)
-parser.add_argument('provisioning_extension',
-                    type=DigitStr(6),
-                    store_missing=False)
-parser.add_argument('device_slot',
-                    type=Strict(int),
-                    store_missing=False)
-parser.add_argument('callerid',
-                    type=inputs.regex(r'"[^"]+"(\s+<[+0-9]>)?'),
-                    store_missing=False)
+class LineSipSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    username = fields.String(validate=Regexp(USERNAME_REGEX))
+    secret = fields.String(validate=Regexp(SECRET_REGEX))
+    callerid = fields.String(validate=Regexp(CALLERID_REGEX), allow_none=True)
+    device_slot = fields.Integer(validate=Range(min=0))
+    context = fields.String(required=True)
+    provisioning_extension = fields.String(validate=(Length(equal=6), Predicate('isdigit')))
+    links = ListLink(Link('lines'),
+                     Link('lines_sip'))
 
 
 class LineSipList(ListResource):
 
     model = LineSip
-    fields = fields
-    parser = parser
+    schema = LineSipSchema
 
     def build_headers(self, line):
         return {'Location': url_for('lines_sip', id=line.id, _external=True)}
@@ -68,6 +53,4 @@ class LineSipList(ListResource):
 
 class LineSipItem(ItemResource):
 
-    fields = fields
-    parser = parser.copy()
-    parser.replace_argument('context', store_missing=False)
+    schema = LineSipSchema
