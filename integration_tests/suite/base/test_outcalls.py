@@ -80,6 +80,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'enabled', []
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
 
+    for check in unique_error_checks(url):
+        yield check
+
+
+@fixtures.outcall(name='unique')
+def unique_error_checks(url, outcall):
+    yield s.check_bogus_field_returns_error, url, 'name', outcall['name']
+
 
 @fixtures.outcall(description='search')
 @fixtures.outcall(description='hidden')

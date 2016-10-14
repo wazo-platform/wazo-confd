@@ -166,11 +166,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "readOnly": true,
-                            "description": "The id of the incoming call"
-                        },
                         "preprocess_subroutine": {
                             "type": "string",
                             "description": "Name of the subroutine to execute in asterisk before receiving a call"
@@ -220,7 +215,13 @@
         },
         "IncallRelationBase": {
             "title": "IncallRelation",
-            "properties": {}
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "readOnly": true,
+                    "description": "The id of the incoming call"
+                }
+            }
         },
         "IncallRelationExtensions": {
             "properties": {

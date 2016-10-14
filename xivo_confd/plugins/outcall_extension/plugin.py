@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2015-2016 Avencall
+#
 # Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,33 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os
+from xivo_dao.resources.outcall import dao as outcall_dao
+from xivo_dao.resources.extension import dao as extension_dao
 
-CONTEXT = 'default'
-INCALL_CONTEXT = 'from-extern'
-OUTCALL_CONTEXT = 'to-extern'
-EXTENSION_RANGE = range(1000, 5001)
-ENTITY_NAME = 'xivotest'
-
-
-def confd_host():
-    return os.environ.get('HOST', 'localhost')
+from xivo_confd import api
+from .resource import OutcallExtensionItem
+from .service import build_service
 
 
-def confd_port():
-    return int(os.environ.get('PORT', 9486))
+class Plugin(object):
 
+    def load(self, core):
+        service = build_service()
 
-def confd_https():
-    return os.environ.get('HTTPS', '1') == '1'
-
-
-def confd_base_url(host=None, port=None, https=None):
-    if host is None:
-        host = confd_host()
-    if port is None:
-        port = confd_port()
-    if https is None:
-        https = confd_https()
-    scheme = 'https' if https else 'http'
-    return '{}://{}:{}/1.1'.format(scheme, host, port)
+        api.add_resource(OutcallExtensionItem,
+                         '/outcalls/<int:outcall_id>/extensions/<int:extension_id>',
+                         endpoint='outcall_extensions',
+                         resource_class_args=(service, outcall_dao, extension_dao)
+                         )

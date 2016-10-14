@@ -4580,11 +4580,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "description": "SIP Endpoint ID",
-                            "readOnly": true
-                        },
                         "secret": {
                             "type": "string",
                             "description": "SIP secret/password",
@@ -4620,6 +4615,11 @@
         },
         "EndpointSipRelationBase": {
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "SIP Endpoint ID",
+                    "readOnly": true
+                },
                 "username": {
                     "type": "string",
                     "description": "SIP username",
@@ -4649,11 +4649,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "description": "SCCP Endpoint ID",
-                            "readOnly": true
-                        },
                         "options": {
                             "description": "Advanced configuration options. Options are appended at the end of a \nSCCP account in the file 'sccp.conf' used by asterisk.\nPlease consult the asterisk documentation for further details on available\nparameters. Because of database limitations, only the following options are allowed:\n\n * cid_name\n * cid_num\n * allow\n * disallow\n \nOptions must have the following the form:\n\n```\n{\n  \"options\": [\n    [\"name1\", \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n```\n\nThe resulting configuration in sip.conf will have the following form:\n\n```\n[1000]\nname1=value1\nname2=value2\n```\n",
                             "type": "array",
@@ -4666,7 +4661,13 @@
             ]
         },
         "EndpointSccpRelationBase": {
-            "properties": {}
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "SCCP Endpoint ID",
+                    "readOnly": true
+                }
+            }
         },
         "Entity": {
             "title": "Entity",
@@ -4720,11 +4721,6 @@
                 },
                 {
                     "properties": {
-                        "id": {
-                            "type": "integer",
-                            "description": "Extension ID",
-                            "readOnly": true
-                        },
                         "commented": {
                             "type": "boolean",
                             "description": "If True the extension is disabled"
@@ -4733,6 +4729,9 @@
                 },
                 {
                     "$ref": "#/definitions/ExtensionRelationIncall"
+                },
+                {
+                    "$ref": "#/definitions/ExtensionRelationOutcall"
                 }
             ],
             "required": [
@@ -4759,6 +4758,11 @@
         },
         "ExtensionRelationBase": {
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Extension ID",
+                    "readOnly": true
+                },
                 "context": {
                     "type": "string"
                 },
@@ -4772,6 +4776,14 @@
                 "incall": {
                     "readOnly": true,
                     "$ref": "#/definitions/IncallRelationBase"
+                }
+            }
+        },
+        "ExtensionRelationOutcall": {
+            "properties": {
+                "outcall": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/OutcallRelationBase"
                 }
             }
         },

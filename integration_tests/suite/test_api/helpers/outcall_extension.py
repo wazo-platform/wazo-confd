@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,17 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from marshmallow import fields
-from marshmallow.validate import Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
-
-INTERFACE_REGEX = r"^[a-zA-Z0-9#*./_@:-]{1,128}$"
+from test_api import confd
 
 
-class CustomSchema(BaseSchema):
-    id = fields.Integer(dump_only=True)
-    interface = fields.String(validate=Regexp(INTERFACE_REGEX), required=True)
-    enabled = StrictBoolean()
-    links = ListLink(Link('endpoint_custom'))
-    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+def associate(outcall_id, extension_id, check=True):
+    response = confd.outcalls(outcall_id).extensions(extension_id).put()
+    if check:
+        response.assert_ok()
+
+
+def dissociate(outcall_id, extension_id, check=True):
+    response = confd.outcalls(outcall_id).extensions(extension_id).delete()
+    if check:
+        response.assert_ok()

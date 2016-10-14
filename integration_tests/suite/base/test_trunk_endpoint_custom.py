@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -137,6 +138,31 @@ def test_dissociate(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom, check=False):
         response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.trunk()
+@fixtures.custom()
+def test_get_endpoint_custom_relation(trunk, custom):
+    expected = has_entries(
+        endpoint_custom=has_entries(id=custom['id'],
+                                    interface=custom['interface'])
+    )
+
+    with a.trunk_endpoint_custom(trunk, custom):
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.trunk()
+@fixtures.custom()
+def test_get_trunk_relation(trunk, custom):
+    expected = has_entries(
+        trunk=has_entries(id=trunk['id'])
+    )
+
+    with a.trunk_endpoint_custom(trunk, custom):
+        response = confd.endpoints.custom(custom['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.trunk()

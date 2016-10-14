@@ -28,8 +28,8 @@ class TrunkSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     context = fields.String(allow_none=True)
     links = ListLink(Link('trunks'))
-    endpoint_sip = fields.Nested('SipSchema', only=['username', 'links'], dump_only=True)
-    endpoint_custom = fields.Nested('CustomSchema', only=['interface', 'links'], dump_only=True)
+    endpoint_sip = fields.Nested('SipSchema', only=['id', 'username', 'links'], dump_only=True)
+    endpoint_custom = fields.Nested('CustomSchema', only=['id', 'interface', 'links'], dump_only=True)
     outcalls = fields.Nested('OutcallSchema', only=['id', 'name', 'links'], many=True, dump_only=True)
 
 

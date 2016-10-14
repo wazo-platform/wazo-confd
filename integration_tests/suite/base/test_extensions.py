@@ -24,6 +24,7 @@ from hamcrest import (assert_that,
                       equal_to,
                       has_entries,
                       has_item,
+                      none,
                       not_)
 
 from test_api import confd
@@ -33,7 +34,7 @@ from test_api import scenarios as s
 from test_api import helpers as h
 from test_api import errors as e
 from test_api import fixtures
-from test_api.config import CONTEXT, INCALL_CONTEXT
+from test_api.config import CONTEXT
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 
@@ -82,19 +83,9 @@ def test_get(extension):
     response = confd.extensions(extension['id']).get()
     assert_that(response.item, has_entries(exten=extension['exten'],
                                            context=extension['context'],
-                                           commented=False))
-
-
-@fixtures.extension(context=INCALL_CONTEXT)
-@fixtures.incall()
-def test_get_relations(extension, incall):
-    expected = has_entries(
-        incall=has_entries(id=incall['id'])
-    )
-
-    with a.incall_extension(incall, extension):
-        response = confd.extensions(extension['id']).get()
-        assert_that(response.item, expected)
+                                           commented=False,
+                                           incall=none(),
+                                           outcall=none()))
 
 
 def test_create_minimal_parameters():

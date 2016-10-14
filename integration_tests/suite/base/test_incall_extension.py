@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from hamcrest import (assert_that,
+                      contains,
+                      has_entries)
 from test_api import scenarios as s
 from test_api import confd
 from test_api import errors as e
@@ -85,7 +88,7 @@ def test_associate_multiple_incalls_to_extension(incall1, incall2, extension):
 @fixtures.incall()
 @fixtures.user()
 @fixtures.line_sip()
-@fixtures.extension()  # Cannot have context=INCALL_CONTEXT, since line_extension can associate incall ..
+@fixtures.extension()
 def test_associate_when_user_already_associated(incall, user, line_sip, extension):
     with a.user_line(user, line_sip), a.line_extension(line_sip, extension):
         response = confd.incalls(incall['id']).extensions(extension['id']).put()
@@ -105,6 +108,32 @@ def test_dissociate(incall, extension):
     with a.incall_extension(incall, extension, check=False):
         response = confd.incalls(incall['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.incall()
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_get_incall_relation(incall, extension):
+    expected = has_entries(
+        extensions=contains(has_entries(id=extension['id'],
+                                        exten=extension['exten'],
+                                        context=extension['context']))
+    )
+
+    with a.incall_extension(incall, extension):
+        response = confd.incalls(incall['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.extension(context=INCALL_CONTEXT)
+@fixtures.incall()
+def test_get_extension_relation(extension, incall):
+    expected = has_entries(
+        incall=has_entries(id=incall['id'])
+    )
+
+    with a.incall_extension(incall, extension):
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.incall()
