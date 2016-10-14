@@ -52,6 +52,17 @@ class ExtenAvailabelOnUpdateValidator(Validator):
                                          context=extension.context)
 
 
+class ContextOnUpdateValidator(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, extension):
+        context = self.dao.get(extension.context)
+        if extension.incall and context.type != 'incall':
+            raise errors.unhandled_context_type(context.type)
+
+
 class ExtensionRangeValidator(Validator):
 
     def __init__(self, dao):
@@ -108,6 +119,7 @@ def build_validator():
         ],
         edit=[
             ExtenAvailabelOnUpdateValidator(extension_dao),
+            ContextOnUpdateValidator(context_dao),
         ],
         delete=[
             ExtensionAssociationValidator(extension_dao, line_extension_dao)
