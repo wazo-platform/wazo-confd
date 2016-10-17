@@ -161,7 +161,7 @@ def set_phonebook(entity, phonebook_body):
                               dirtype='dird_phonebook',
                               name='phonebook',
                               description='XiVO phonebook',
-                              dird_tenant='entity',
+                              dird_tenant=entity,
                               dird_phonebook=phonebook_body['name'])
     Session.add(directories)
     Session.commit()
