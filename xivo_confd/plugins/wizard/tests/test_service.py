@@ -28,7 +28,7 @@ from xivo_confd.plugins.wizard.service import WizardService
 class TestWizardService(unittest.TestCase):
 
     def setUp(self):
-        self.service = WizardService(Mock(), Mock(), Mock(), Mock(), Mock())
+        self.service = WizardService(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
 
     @patch('xivo_confd.plugins.wizard.service.netifaces')
     def test_get_interfaces(self, netifaces):

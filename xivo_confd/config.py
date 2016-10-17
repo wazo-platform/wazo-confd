@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
 import argparse
+import yaml
 
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
@@ -25,6 +27,7 @@ from xivo.xivo_logging import get_log_level_by_name
 
 
 API_VERSION = '1.1'
+KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
 
 DEFAULT_CONFIG = {
     'foreground': False,
@@ -74,6 +77,11 @@ DEFAULT_CONFIG = {
         'host': 'localhost',
         'port': 8500,
         'verify': '/usr/share/xivo-certs/server.crt',
+    },
+    'dird': {
+        'host': 'localhost',
+        'port': 9489,
+        'verify_certificate': '/usr/share/xivo-certs/server.crt',
     },
     'provd': {
     },
@@ -132,14 +140,24 @@ DEFAULT_CONFIG = {
         'ttl_interval': 30,
         'extra_tags': [],
     },
+    'wizard': {
+        'service_id': None,
+        'service_key': None,
+    },
 }
 
 
 def load(argv):
+    try:
+        with open(KEY_FILE, 'r') as f:
+            key_config = {'wizard': yaml.load(f)}
+    except IOError:
+        key_config = {}
+
     cli_config = _parse_cli_args(argv)
     file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
     reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
-    return ChainMap(reinterpreted_config, cli_config, file_config, DEFAULT_CONFIG)
+    return ChainMap(reinterpreted_config, key_config, cli_config, file_config, DEFAULT_CONFIG)
 
 
 def _parse_cli_args(argv):

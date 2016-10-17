@@ -29,16 +29,19 @@ from xivo_confd.database import wizard as wizard_db
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = '^nameserver (.*)'
+PHONEBOOK_BODY = {'name': 'xivo'}
 
 
 class WizardService(object):
 
-    def __init__(self, validator, notifier, infos_dao, provd_client, sysconfd):
+    def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, dird_client, sysconfd):
         self.validator = validator
         self.notifier = notifier
         self.infos_dao = infos_dao
         self.provd_client = provd_client
         self.sysconfd = sysconfd
+        self._auth_client = auth_client
+        self._dird_client = dird_client
 
     def get(self):
         return wizard_db.get_xivo_configured()
@@ -52,6 +55,7 @@ class WizardService(object):
                                 wizard['network']['domain'],
                                 wizard['network']['nameservers'])
         self._initialize_provd(wizard['network']['ip_address'], autoprov_username)
+        self._initialize_phonebook(wizard['entity_name'])
 
         wizard_db.set_xivo_configured()
         self.notifier.created()
@@ -69,6 +73,11 @@ class WizardService(object):
         self.sysconfd.flush()
         self.sysconfd.commonconf_apply()
         self.sysconfd.flush()
+
+    def _initialize_phonebook(self, entity):
+        token = self._auth_client.token.new('xivo_service', expiration=60)['token']
+        phonebook = self._dird_client.phonebook.create(tenant=entity, phonebook_body=PHONEBOOK_BODY, token=token)
+        wizard_db.set_phonebook(entity, phonebook)
 
     def _initialize_provd(self, address, autoprov_username):
         default_config = {'X_type': 'registrar',
@@ -173,9 +182,11 @@ class WizardService(object):
         return None
 
 
-def build_service(provd_client, infos_dao):
+def build_service(provd_client, auth_client, dird_client, infos_dao):
     return WizardService(build_validator(),
                          build_notifier(),
                          infos_dao,
                          provd_client,
+                         auth_client,
+                         dird_client,
                          sysconfd)
