@@ -173,7 +173,7 @@ def outcall_trunk(outcall, *trunks, **kwargs):
 
 
 @contextmanager
-def outcall_extension(outcall, extension, check=True):
-    h.outcall_extension.associate(outcall['id'], extension['id'], check)
+def outcall_extension(outcall, extension, **kwargs):
+    h.outcall_extension.associate(outcall['id'], extension['id'], **kwargs)
     yield
-    h.outcall_extension.dissociate(outcall['id'], extension['id'], check)
+    h.outcall_extension.dissociate(outcall['id'], extension['id'], **kwargs)
