@@ -42,6 +42,10 @@ class LineSchema(BaseSchema):
     endpoint_sip = fields.Nested('SipSchema', only=['id', 'username', 'links'], dump_only=True)
     endpoint_sccp = fields.Nested('SccpSchema', only=['id', 'links'], dump_only=True)
     endpoint_custom = fields.Nested('CustomSchema', only=['id', 'interface', 'links'], dump_only=True)
+    extensions = fields.Nested('ExtensionSchema',
+                               only=['id', 'exten', 'context', 'links'],
+                               many=True,
+                               dump_only=True)
 
 
 class LineSchemaNullable(LineSchema):

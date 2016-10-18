@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,9 +31,14 @@ class ExtensionSchema(BaseSchema):
     context = fields.String(required=True)
     commented = fields.Boolean(attribute='legacy_commented')
     links = ListLink(Link('extensions'))
+
     incall = fields.Nested('IncallSchema',
                            only=['id', 'links'],
                            dump_only=True)
     outcall = fields.Nested('OutcallSchema',
                             only=['id', 'name', 'links'],
                             dump_only=True)
+    lines = fields.Nested('LineSchema',
+                          only=['id', 'links'],
+                          many=True,
+                          dump_only=True)

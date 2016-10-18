@@ -30,6 +30,7 @@ from test_api import errors as e
 
 from hamcrest import (assert_that,
                       contains,
+                      empty,
                       has_entries,
                       has_entry,
                       has_items,
@@ -114,7 +115,8 @@ def test_get(line):
                             'provisioning_extension': has_length(6),
                             'endpoint_sip': none(),
                             'endpoint_sccp': none(),
-                            'endpoint_custom': none()}
+                            'endpoint_custom': none(),
+                            'extensions': empty()}
                            )
 
     response = confd.lines(line['id']).get()
