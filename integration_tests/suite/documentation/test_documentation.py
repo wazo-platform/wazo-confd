@@ -32,7 +32,7 @@ class TestDocumentation(AssetLaunchingTestCase):
     asset = 'documentation'
 
     def test_documentation_errors(self):
-        api_url = 'https://confd:9486/1.1/api/api.json'
+        api_url = 'https://confd:9486/1.1/api/api.yml'
         self.validate_api(api_url)
 
     def validate_api(self, url):
