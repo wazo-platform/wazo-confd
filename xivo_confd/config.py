@@ -147,11 +147,12 @@ DEFAULT_CONFIG = {
 }
 
 
-def load(argv):
+def load(logger, argv):
     try:
         with open(KEY_FILE, 'r') as f:
             key_config = {'wizard': yaml.load(f)}
     except IOError:
+        logger.info('starting without the wizard auth credentials')
         key_config = {}
 
     cli_config = _parse_cli_args(argv)
