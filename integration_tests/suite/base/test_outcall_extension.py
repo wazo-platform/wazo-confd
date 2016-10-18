@@ -154,10 +154,15 @@ def test_get_outcall_relations(outcall, extension):
     expected = has_entries(
         extensions=contains(has_entries(id=extension['id'],
                                         exten=extension['exten'],
-                                        context=extension['context']))
+                                        context=extension['context'],
+                                        external_prefix='123',
+                                        prefix='456',
+                                        strip_digits=2,
+                                        caller_id='toto'))
     )
 
-    with a.outcall_extension(outcall, extension):
+    with a.outcall_extension(outcall, extension,
+                             external_prefix='123', prefix='456', strip_digits=2, caller_id='toto'):
         response = confd.outcalls(outcall['id']).get()
         assert_that(response.item, expected)
 

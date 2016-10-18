@@ -20,13 +20,15 @@
 from test_api import confd
 
 
-def associate(outcall_id, extension_id, check=True):
-    response = confd.outcalls(outcall_id).extensions(extension_id).put()
+def associate(outcall_id, extension_id, **kwargs):
+    check = kwargs.pop('check', True)
+    response = confd.outcalls(outcall_id).extensions(extension_id).put(**kwargs)
     if check:
         response.assert_ok()
 
 
-def dissociate(outcall_id, extension_id, check=True):
+def dissociate(outcall_id, extension_id, **kwargs):
+    check = kwargs.get('check', True)
     response = confd.outcalls(outcall_id).extensions(extension_id).delete()
     if check:
         response.assert_ok()
