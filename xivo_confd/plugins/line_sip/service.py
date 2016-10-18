@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,15 +33,15 @@ class LineSipService(object):
 
     def get(self, id):
         line = self.line_service.get(id)
-        if line.sip_endpoint is None:
+        if line.endpoint_sip is None:
             raise errors.not_found('LineSIP', id=id)
-        return LineSip.from_line_and_sip(line, line.sip_endpoint)
+        return LineSip.from_line_and_sip(line, line.endpoint_sip)
 
     def search(self, params):
         total, items = self.line_service.search(params)
-        items = (LineSip.from_line_and_sip(line, line.sip_endpoint)
+        items = (LineSip.from_line_and_sip(line, line.endpoint_sip)
                  for line in items
-                 if line.sip_endpoint is not None)
+                 if line.endpoint_sip is not None)
         return total, items
 
     def create(self, line_sip):

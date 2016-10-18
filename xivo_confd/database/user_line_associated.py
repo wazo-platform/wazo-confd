@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +29,7 @@ def find_main_endpoint_sip_by_user(user_uuid):
     query = (Session.query(SIP)
              .join(User.main_line_rel)
              .join(UserLine.main_line_rel)
-             .join(Line.sip_endpoint)
+             .join(Line.endpoint_sip)
              .filter(User.uuid == str(user_uuid))
              )
 
