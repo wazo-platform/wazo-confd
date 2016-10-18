@@ -116,7 +116,8 @@ def test_get(line):
                             'endpoint_sip': none(),
                             'endpoint_sccp': none(),
                             'endpoint_custom': none(),
-                            'extensions': empty()}
+                            'extensions': empty(),
+                            'users': empty()}
                            )
 
     response = confd.lines(line['id']).get()

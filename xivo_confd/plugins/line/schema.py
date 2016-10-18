@@ -46,6 +46,10 @@ class LineSchema(BaseSchema):
                                only=['id', 'exten', 'context', 'links'],
                                many=True,
                                dump_only=True)
+    users = fields.Nested('UserSchema',
+                          only=['id', 'firstname', 'lastname', 'links'],
+                          many=True,
+                          dump_only=True)
 
 
 class LineSchemaNullable(LineSchema):

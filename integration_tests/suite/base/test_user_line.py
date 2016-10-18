@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -322,6 +323,37 @@ def test_dissociate_second_user_before_first(first_user, second_user, line):
     with a.user_line(first_user, line), a.user_line(second_user, line):
         response = confd.users(first_user['id']).lines(line['id']).delete()
         response.assert_match(400, secondary_user_regex)
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_users_relation(user, line):
+    expected = has_entries(
+        users=contains(has_entries(id=user['id'],
+                                   firstname=user['firstname'],
+                                   lastname=user['lastname']))
+    )
+
+    with a.user_line(user, line):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_lines_relation(user, line):
+    line = confd.lines(line['id']).get().item
+    expected = has_entries(
+        lines=contains(has_entries(id=line['id'],
+                                   endpoint_sip=line['endpoint_sip'],
+                                   endpoint_sccp=line['endpoint_sccp'],
+                                   endpoint_custom=line['endpoint_custom'],
+                                   extensions=line['extensions']))
+    )
+
+    with a.user_line(user, line):
+        response = confd.users(user['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.user()

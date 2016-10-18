@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@ from test_api import confd
 from test_api import fixtures
 from test_api import config
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not, contains, none
+from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not, contains, none, empty
 
 
 FULL_USER = {"firstname": "Jôhn",
@@ -458,6 +459,7 @@ def check_search(url, field, term, value):
 def test_get_user(user):
     response = confd.users(user['id']).get()
     assert_that(response.item, has_entries(FULL_USER))
+    assert_that(response.item, has_entries(lines=empty()))
 
 
 @fixtures.user(firstname="Snôm", lastname="Whîte")
