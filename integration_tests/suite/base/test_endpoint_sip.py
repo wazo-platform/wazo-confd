@@ -185,6 +185,7 @@ def test_get(sip):
                             'host': 'dynamic',
                             'options': instance_of(list),
                             'trunk': None,
+                            'line': None,
                             })
 
     response = confd.endpoints.sip(sip['id']).get()

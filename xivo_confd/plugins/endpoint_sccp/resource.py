@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,6 +31,8 @@ class SccpSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('endpoint_sccp'))
+
+    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
 
 class SccpList(ListResource):

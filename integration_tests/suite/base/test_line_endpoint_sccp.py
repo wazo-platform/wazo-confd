@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -154,6 +155,30 @@ def test_dissociate_when_associated_to_extension(line, sccp, extension):
     with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
+
+
+@fixtures.line()
+@fixtures.sccp()
+def test_get_endpoint_sccp_relation(line, sccp):
+    expected = has_entries(
+        endpoint_sccp=has_entries(id=sccp['id'])
+    )
+
+    with a.line_endpoint_sccp(line, sccp):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.line()
+@fixtures.sccp()
+def test_get_line_relation(line, sccp):
+    expected = has_entries(
+        line=has_entries(id=line['id'])
+    )
+
+    with a.line_endpoint_sccp(line, sccp):
+        response = confd.endpoints.sccp(sccp['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.line()

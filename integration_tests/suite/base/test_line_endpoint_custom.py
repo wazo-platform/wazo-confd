@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -163,6 +164,31 @@ def test_dissociate_when_associated_to_extension(line, custom, extension):
     with a.line_endpoint_custom(line, custom), a.line_extension(line, extension):
         response = confd.lines(line['id']).endpoints.custom(custom['id']).delete()
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
+
+
+@fixtures.line()
+@fixtures.custom()
+def test_get_endpoint_custom_relation(line, custom):
+    expected = has_entries(
+        endpoint_custom=has_entries(id=custom['id'],
+                                    interface=custom['interface'])
+    )
+
+    with a.line_endpoint_custom(line, custom):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.line()
+@fixtures.custom()
+def test_get_line_relation(line, custom):
+    expected = has_entries(
+        line=has_entries(id=line['id'])
+    )
+
+    with a.line_endpoint_custom(line, custom):
+        response = confd.endpoints.custom(custom['id']).get()
+        assert_that(response.item, expected)
 
 
 @fixtures.line()

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,8 +37,11 @@ class LineSchema(BaseSchema):
     caller_id_name = fields.String(allow_none=True)  # Validate length callerid_name + num = max(160)
     caller_id_num = fields.String(validate=Predicate('isdigit'), allow_none=True)
     registrar = fields.String(validate=Length(max=128))
-
     links = ListLink(Link('lines'))
+
+    endpoint_sip = fields.Nested('SipSchema', only=['id', 'username', 'links'], dump_only=True)
+    endpoint_sccp = fields.Nested('SccpSchema', only=['id', 'links'], dump_only=True)
+    endpoint_custom = fields.Nested('CustomSchema', only=['id', 'interface', 'links'], dump_only=True)
 
 
 class LineSchemaNullable(LineSchema):

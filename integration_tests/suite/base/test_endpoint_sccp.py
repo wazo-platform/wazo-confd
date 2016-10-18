@@ -77,7 +77,8 @@ def test_delete_errors(sccp):
 @fixtures.sccp()
 def test_get(sccp):
     expected = has_entries({'id': instance_of(int),
-                            'options': contains()})
+                            'options': contains(),
+                            'line': None})
 
     response = confd.endpoints.sccp(sccp['id']).get()
     assert_that(response.item, expected)

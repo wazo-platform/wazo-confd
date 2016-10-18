@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +37,9 @@ class SipSchema(BaseSchema):
     host = fields.String(validate=Length(max=255))
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('endpoint_sip'))
+
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
 
 class SipSchemaNullable(SipSchema):

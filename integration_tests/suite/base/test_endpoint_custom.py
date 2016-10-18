@@ -68,7 +68,8 @@ def test_get(custom):
     expected = has_entries({'id': instance_of(int),
                             'interface': custom['interface'],
                             'enabled': True,
-                            'trunk': None})
+                            'trunk': None,
+                            'line': None})
 
     response = confd.endpoints.custom(custom['id']).get()
     assert_that(response.item, expected)
