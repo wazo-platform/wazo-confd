@@ -3015,19 +3015,20 @@ definitions:
     allOf:
     - $ref: '#/definitions/EndpointCustomRelationBase'
     - properties:
-        id:
-          type: integer
-          description: Custom Endpoint ID
-          readOnly: true
         enabled:
           type: boolean
           description: Endpoint can be used when it is enabled
           default: true
     - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
     required:
     - interface
   EndpointCustomRelationBase:
     properties:
+      id:
+        type: integer
+        description: Custom Endpoint ID
+        readOnly: true
       interface:
         type: string
         description: Asterisk interface to use. (e.g. 'dahdi/i1')
@@ -3093,6 +3094,7 @@ definitions:
             $ref: '#/definitions/KeyValueOption'
           default: []
     - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
   EndpointSipRelationBase:
     properties:
       id:
@@ -3108,6 +3110,13 @@ definitions:
       trunk:
         $ref: '#/definitions/TrunkRelationBase'
         readOnly: true
+  EndpointRelationLine:
+    properties:
+      line:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/LineRelationBase'
   EndpointSccpItems:
     title: SCCP Endpoints
     properties:
@@ -3136,6 +3145,7 @@ definitions:
           items:
             $ref: '#/definitions/KeyValueOption'
     - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
   EndpointSccpRelationBase:
     properties:
       id:
@@ -3279,53 +3289,69 @@ definitions:
     minItems: 2
   LineView:
     title: Line
+    allOf:
+    - $ref: '#/definitions/LineRelationBase'
+    - properties:
+        context:
+          type: string
+          description: The name of an internal context
+        caller_id_name:
+          type: string
+          description: Name to display when calling
+        caller_id_num:
+          type: string
+          description: Number to display when calling
+        device_id:
+          type: string
+          description: ID of the device associated to the line
+          readOnly: true
+        device_slot:
+          type: integer
+          description: '*Deprecated* Please use `position`'
+          readOnly: true
+        name:
+          type: string
+          description: The name of the line
+          readOnly: true
+        protocol:
+          type: string
+          enum:
+          - sip
+          description: Line's protocol
+          readOnly: true
+        provisioning_extension:
+          type: string
+          description: '*Deprecated* Please use `provisioning_code`'
+          readOnly: true
+        provisioning_code:
+          type: string
+          description: Code used to provision a device
+        position:
+          type: integer
+          description: Line's position on the device
+        registrar:
+          type: string
+          description: Name of the template line used by the device
+    - $ref: '#/definitions/LineRelationEndpoints'
+    required:
+    - context
+  LineRelationBase:
     properties:
       id:
         type: integer
         description: Line ID
         readOnly: true
-      context:
-        type: string
-        description: The name of an internal context
-      caller_id_name:
-        type: string
-        description: Name to display when calling
-      caller_id_num:
-        type: string
-        description: Number to display when calling
-      device_id:
-        type: string
-        description: ID of the device associated to the line
+  LineRelationEndpoints:
+    properties:
+      endpoint_sip:
         readOnly: true
-      device_slot:
-        type: integer
-        description: '*Deprecated* Please use `position`'
+        $ref: '#/definitions/EndpointSipRelationBase'
+      endpoint_sccp:
         readOnly: true
-      name:
-        type: string
-        description: The name of the line
+        $ref: '#/definitions/EndpointSccpRelationBase'
+      endpoint_custom:
         readOnly: true
-      protocol:
-        type: string
-        enum:
-        - sip
-        description: Line's protocol
-        readOnly: true
-      provisioning_extension:
-        type: string
-        description: '*Deprecated* Please use `provisioning_code`'
-        readOnly: true
-      provisioning_code:
-        type: string
-        description: Code used to provision a device
-      position:
-        type: integer
-        description: Line's position on the device
-      registrar:
-        type: string
-        description: Name of the template line used by the device
-    required:
-    - context
+        $ref: '#/definitions/EndpointCustomRelationBase'
   Line:
     title: Line
     properties:
