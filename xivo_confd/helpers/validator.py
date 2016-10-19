@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import abc
-import re
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -99,61 +99,6 @@ class UniqueFieldChanged(Validator):
         if found is not None and found.id != model.id:
             metadata = {self.field: value}
             raise errors.resource_exists(self.resource, **metadata)
-
-
-class RegexField(Validator):
-
-    @classmethod
-    def compile(cls, field, text, message=None):
-        return cls(field, re.compile(text), message)
-
-    def __init__(self, field, regex, message=None):
-        self.field = field
-        self.regex = regex
-        self.message = message
-
-    def validate(self, model):
-        value = getattr(model, self.field)
-        if not self.regex.match(value):
-            if self.message:
-                message = self.message
-            else:
-                message = "string matching regex '{}'".format(self.regex.pattern)
-            raise errors.wrong_type(self.field, message)
-
-
-class RegexFieldList(RegexField):
-
-    def validate(self, model):
-        values = getattr(model, self.field)
-        for value in values:
-            if not self.regex.match(value):
-                message = "{} string matching regex '{}'".format(value, self.regex.pattern)
-                raise errors.wrong_type(self.field, message)
-
-
-class NumberRange(Validator):
-
-    def __init__(self, field, minimum=None, maximum=None, step=1):
-        self.field = field
-        self.minimum = minimum
-        self.maximum = maximum
-        self.step = step
-
-    def validate(self, model):
-        value = getattr(model, self.field)
-        if self.minimum is not None and value < self.minimum:
-            self.raise_error()
-        if self.maximum is not None and value > self.maximum:
-            self.raise_error()
-        if value % self.step != 0:
-            self.raise_error()
-
-    def raise_error(self):
-        raise errors.outside_range(self.field,
-                                   min=self.minimum,
-                                   max=self.maximum,
-                                   step=self.step)
 
 
 class FindResource(Validator):

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,25 +18,22 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from flask_restful import marshal
-
-from flask_restful import fields
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.helpers.restful import Link, FieldList
+from marshmallow import fields
 
 from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ConfdResource
 
 
-fields = {
-    'line_id': fields.Integer,
-    'device_id': fields.String,
-    'links': FieldList(Link('lines',
-                            field='line_id',
-                            target='id'),
-                       Link('devices',
-                            field='device_id',
-                            target='id'))
-}
+class LineDeviceSchema(BaseSchema):
+    line_id = fields.Integer()
+    device_id = fields.String()
+    links = ListLink(Link('lines',
+                          field='line_id',
+                          target='id'),
+                     Link('devices',
+                          field='device_id',
+                          target='id'))
 
 
 class LineDevice(ConfdResource):
@@ -66,18 +64,21 @@ class LineDeviceAssociation(LineDevice):
 
 class LineDeviceGet(LineDevice):
 
+    schema = LineDeviceSchema
+
     @required_acl('confd.lines.{line_id}.devices.read')
     def get(self, line_id):
         line_device = self.service.get_association_from_line(line_id)
-        return marshal(line_device, fields)
+        return self.schema().dump(line_device).data
 
 
 class DeviceLineGet(LineDevice):
+
+    schema = LineDeviceSchema
 
     @required_acl('confd.devices.{device_id}.lines.read')
     def get(self, device_id):
         device = self.device_dao.get(device_id)
         line_devices = self.service.find_all_associations_from_device(device.id)
         return {'total': len(line_devices),
-                'items': [marshal(line_device, fields) for line_device in line_devices]
-                }
+                'items': self.schema().dump(line_devices, many=True).data}

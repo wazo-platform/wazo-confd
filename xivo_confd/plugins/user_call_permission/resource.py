@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,25 +18,22 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from flask_restful import marshal
-
-from flask_restful import fields
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.helpers.restful import Link, FieldList
+from marshmallow import fields
 
 from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.restful import ConfdResource
 
 
-fields = {
-    'user_id': fields.Integer,
-    'call_permission_id': fields.Integer,
-    'links': FieldList(Link('users',
-                            field='user_id',
-                            target='id'),
-                       Link('callpermissions',
-                            field='call_permission_id',
-                            target='id'))
-}
+class UserCallPermissionSchema(BaseSchema):
+    user_id = fields.Integer()
+    call_permission_id = fields.Integer()
+    links = ListLink(Link('users',
+                          field='user_id',
+                          target='id'),
+                     Link('callpermissions',
+                          field='call_permission_id',
+                          target='id'))
 
 
 class UserCallPermission(ConfdResource):
@@ -69,21 +67,23 @@ class UserCallPermissionAssociation(UserCallPermission):
 
 class UserCallPermissionGet(UserCallPermission):
 
+    schema = UserCallPermissionSchema
+
     @required_acl('confd.users.{user_id}.callpermissions.read')
     def get(self, user_id):
         user = self.get_user(user_id)
         user_call_permissions = self.service.find_all_by(user_id=user.id)
         return {'total': len(user_call_permissions),
-                'items': [marshal(user_call_permission, fields) for user_call_permission in user_call_permissions]
-                }
+                'items': self.schema().dump(user_call_permissions, many=True).data}
 
 
 class CallPermissionUserGet(UserCallPermission):
+
+    schema = UserCallPermissionSchema
 
     @required_acl('confd.callpermissions.{call_permission_id}.users.read')
     def get(self, call_permission_id):
         call_permission = self.call_permission_dao.get(call_permission_id)
         user_call_permissions = self.service.find_all_by(call_permission_id=call_permission.id)
         return {'total': len(user_call_permissions),
-                'items': [marshal(user_call_permission, fields) for user_call_permission in user_call_permissions]
-                }
+                'items': self.schema().dump(user_call_permissions, many=True).data}

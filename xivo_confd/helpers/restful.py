@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,59 +17,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from datetime import datetime
-from flask import url_for, request
-from flask_restful import Resource, Api, fields, marshal
+from flask import request
+from flask_restful import Resource, Api
 
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.authentication.confd_auth import auth
 
 from xivo_dao.helpers import errors
-
-
-def option(option):
-    if not isinstance(option, list):
-        raise ValueError("item '{}' must be a pair of strings".format(option))
-    if len(option) != 2:
-        raise ValueError("item '{}' must be a pair of strings".format(option))
-    for i in option:
-        if not isinstance(i, (str, unicode)):
-            raise ValueError("value '{}' is not a string".format(i))
-    return option
-
-
-class Strict(object):
-
-    def __init__(self, typecast):
-        self.typecast = typecast
-
-    def __call__(self, value):
-        if not isinstance(value, self.typecast):
-            name = self.typecast.__name__
-            raise ValueError("value '{}' must be a {}".format(value, name))
-        return value
-
-
-class DigitStr(object):
-
-    def __init__(self, length=None):
-        self.length = length
-
-    def __call__(self, value):
-        if not value.isdigit():
-            raise ValueError("'{}' is not a string of digits".format(value))
-        if self.length and len(value) != self.length:
-            raise ValueError("'{}' must have a length of {}".format(value, self.length))
-        return value
-
-
-class DateTimeLocalZone(object):
-
-    def __call__(self, value):
-        try:
-            return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
-        except ValueError:
-            raise ValueError("'{}' must be of the form '2016-12-23T04:05:06'".format(value))
 
 
 class ConfdApi(Api):
@@ -94,7 +49,7 @@ class ListResource(ConfdResource):
         params = self.search_params()
         total, items = self.service.search(params)
         return {'total': total,
-                'items': [self._dump_result(item) for item in items]}
+                'items': self.schema().dump(items, many=True).data}
 
     def search_params(self):
         args = ((key, request.args[key]) for key in request.args)
@@ -114,27 +69,13 @@ class ListResource(ConfdResource):
         return int(value)
 
     def post(self):
-        form = self._load_form()
+        form = self.schema().load(request.get_json()).data
         model = self.model(**form)
         model = self.service.create(model)
-        return self._dump_result(model), 201, self.build_headers(model)
+        return self.schema().dump(model).data, 201, self.build_headers(model)
 
     def build_headers(self, model):
         raise NotImplementedError()
-
-    def _load_form(self):
-        # old style
-        if getattr(self, 'parser', False):
-            return self.parser.parse_args()
-
-        return self.schema().load(request.get_json()).data
-
-    def _dump_result(self, model):
-        # old style
-        if getattr(self, 'fields', False):
-            return marshal(model, self.fields)
-
-        return self.schema().dump(model).data
 
 
 class ItemResource(ConfdResource):
@@ -145,7 +86,7 @@ class ItemResource(ConfdResource):
 
     def get(self, id):
         model = self.service.get(id)
-        return self._dump_result(model)
+        return self.schema().dump(model).data
 
     def put(self, id):
         model = self.service.get(id)
@@ -153,7 +94,7 @@ class ItemResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self._load_form_partial()
+        form = self.schema().load(request.get_json(), partial=True).data
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.iteritems():
             setattr(model, name, value)
@@ -173,54 +114,3 @@ class ItemResource(ConfdResource):
         model = self.service.get(id)
         self.service.delete(model)
         return '', 204
-
-    def _load_form_partial(self):
-        # old style
-        if getattr(self, 'parser', False):
-            return self.parser.parse_args()
-
-        return self.schema().load(request.get_json(), partial=True).data
-
-    def _dump_result(self, model):
-        # old style
-        if getattr(self, 'fields', False):
-            return marshal(model, self.fields)
-
-        return self.schema().dump(model).data
-
-
-class FieldList(fields.Raw):
-
-    def __init__(self, *links, **kwargs):
-        super(FieldList, self).__init__(**kwargs)
-        self.links = links
-
-    def output(self, key, obj):
-        fields = []
-        for link in self.links:
-            output = link.output(key, obj)
-            if output:
-                fields.append(output)
-        return fields
-
-
-class Link(fields.Raw):
-
-    def __init__(self, resource, route=None, field='id', target=None, **kwargs):
-        super(Link, self).__init__(**kwargs)
-        self.resource = resource
-        self.route = route or resource
-        self.field = field
-        self.target = target or field
-
-    def output(self, key, obj):
-        value = self.extract_value(obj)
-        if value:
-            options = {self.target: value, '_external': True}
-            url = url_for(self.route, **options)
-            return {'rel': self.resource, 'href': url}
-
-    def extract_value(self, obj):
-        if isinstance(obj, dict):
-            return obj.get(self.field)
-        return getattr(obj, self.field)

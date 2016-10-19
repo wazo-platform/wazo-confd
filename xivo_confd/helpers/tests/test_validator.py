@@ -28,35 +28,12 @@ from xivo_confd.helpers.validator import (AssociationValidator,
                                           GetResource,
                                           MemberOfSequence,
                                           MissingFields,
-                                          NumberRange,
                                           Optional,
-                                          RegexField,
-                                          RegexFieldList,
-                                          RequiredFields,
                                           ResourceExists,
                                           UniqueField,
                                           UniqueFieldChanged,
                                           ValidationGroup,
                                           Validator)
-
-
-class TestRequiredFields(unittest.TestCase):
-
-    def setUp(self):
-        self.validator = RequiredFields('field1', 'field2')
-        self.model = Mock()
-
-    def test_given_required_fields_are_none_when_validating_then_raises_error(self):
-        self.model.field1 = None
-        self.model.field2 = None
-
-        self.assertRaises(InputError, self.validator.validate, self.model)
-
-    def test_given_required_fields_have_a_value_when_validating_then_validation_passes(self):
-        self.model.field1 = 'value1'
-        self.model.field2 = 'value2'
-
-        self.validator.validate(self.model)
 
 
 class TestMissingFields(unittest.TestCase):
@@ -172,83 +149,6 @@ class TestUniqueFieldChanged(unittest.TestCase):
 
         assert_that(calling(self.validator.validate).with_args(model),
                     raises(ResourceError))
-
-
-class TestRegexField(unittest.TestCase):
-
-    def setUp(self):
-        self.regex = Mock()
-        self.model = Mock(field=sentinel.field)
-        self.validator = RegexField('field', self.regex)
-
-    def test_given_regex_matches_then_validation_passes(self):
-        self.validator.validate(self.model)
-
-        self.regex.match.assert_called_once_with(sentinel.field)
-
-    def test_given_regex_does_not_match_then_validation_fails(self):
-        self.regex.match.return_value = None
-
-        assert_that(calling(self.validator.validate).with_args(self.model),
-                    raises(InputError))
-
-
-class TestRegexFieldList(unittest.TestCase):
-
-    def setUp(self):
-        self.regex = Mock()
-        self.model = Mock(field=[sentinel.field])
-        self.validator = RegexFieldList('field', self.regex)
-
-    def test_given_regex_matches_then_validation_passes(self):
-        self.validator.validate(self.model)
-
-        self.regex.match.assert_called_once_with(sentinel.field)
-
-    def test_given_regex_does_not_match_then_validation_fails(self):
-        self.regex.match.return_value = None
-
-        assert_that(calling(self.validator.validate).with_args(self.model),
-                    raises(InputError))
-
-
-class TestNumberRange(unittest.TestCase):
-
-    def test_given_value_lower_than_minimum_then_validation_fails(self):
-        validator = NumberRange('field', minimum=1)
-        model = Mock(field=0)
-
-        self.assertRaises(InputError, validator.validate, model)
-
-    def test_given_value_higher_or_equal_than_minimum_then_validation_passes(self):
-        validator = NumberRange('field', minimum=1)
-
-        validator.validate(Mock(field=1))
-        validator.validate(Mock(field=2))
-
-    def test_given_value_higher_than_maximum_then_validation_fails(self):
-        validator = NumberRange('field', maximum=1)
-        model = Mock(field=2)
-
-        self.assertRaises(InputError, validator.validate, model)
-
-    def test_given_value_lower_or_equal_than_maximum_then_validation_passes(self):
-        validator = NumberRange('field', maximum=1)
-
-        validator.validate(Mock(field=0))
-        validator.validate(Mock(field=1))
-
-    def test_given_value_not_a_multiple_of_step_then_validation_fails(self):
-        validator = NumberRange('field', step=2)
-        model = Mock(field=1)
-
-        self.assertRaises(InputError, validator.validate, model)
-
-    def test_given_value_is_a_multiple_of_step_then_validation_passes(self):
-        validator = NumberRange('field', step=2)
-        model = Mock(field=4)
-
-        validator.validate(model)
 
 
 class TestResourceExists(unittest.TestCase):
