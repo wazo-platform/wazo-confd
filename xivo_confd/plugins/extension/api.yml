@@ -1,0 +1,172 @@
+paths:
+  /extensions:
+    get:
+      operationId: list_extensions
+      summary: List extensions
+      description: '**Required ACL:** `confd.extensions.read`'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      - name: type
+        in: query
+        type: string
+        enum:
+        - internal
+        - incall
+        description: 'Filter extensions of a certain type. Internal: Used for calling
+          a line with an internal number (e.g. “1000@default”). Incall: Used for calling
+          a line from the outside (e.g. “from-extern” with a DID)'
+      - name: exten
+        in: query
+        type: string
+        description: Filter extensions by exten number
+      - name: context
+        in: query
+        type: string
+        description: Filter extensions by context name
+      responses:
+        '200':
+          description: Extension list
+          schema:
+            $ref: '#/definitions/ExtensionItems'
+    post:
+      operationId: create_extension
+      summary: Create extension
+      description: '**Required ACL:** `confd.extensions.create`
+
+
+        The extension number must be included in one of the extension ranges for the
+        given context.'
+      tags:
+      - extensions
+      parameters:
+      - name: body
+        in: body
+        description: Extension to create
+        required: true
+        schema:
+          $ref: '#/definitions/Extension'
+      responses:
+        '201':
+          description: Extension created
+          schema:
+            $ref: '#/definitions/Extension'
+        '400':
+          $ref: '#/responses/CreateError'
+  /extensions/{extension_id}:
+    get:
+      operationId: get_extension
+      summary: Get extension
+      description: '**Required ACL:** `confd.extensions.{extension_id}.read`'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '200':
+          description: Extension
+          schema:
+            $ref: '#/definitions/Extension'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_extension
+      summary: Update extension
+      description: '**Required ACL:** `confd.extensions.{extension_id}.update`
+
+
+        The new extension number must be included in one of the extension ranges for
+        the new context.'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/extensionid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Extension'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_extension
+      summary: Delete extension
+      description: '**Required ACL:** `confd.extensions.{extension_id}.delete`
+
+
+        An extension can not be deleted if it is associated to a line. You must delete
+        the association first.'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  extensionid:
+    required: true
+    type: integer
+    name: extension_id
+    in: path
+
+definitions:
+  Extension:
+    title: Extension
+    allOf:
+    - $ref: '#/definitions/ExtensionRelationBase'
+    - properties:
+        commented:
+          type: boolean
+          description: If True the extension is disabled
+    - $ref: '#/definitions/ExtensionRelationIncall'
+    - $ref: '#/definitions/ExtensionRelationOutcall'
+    required:
+    - context
+    - exten
+  ExtensionItems:
+    title: ExtensionItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/Extension'
+        type: array
+      total:
+        type: integer
+    required:
+    - total
+  ExtensionRelationBase:
+    properties:
+      id:
+        type: integer
+        description: Extension ID
+        readOnly: true
+      context:
+        type: string
+      exten:
+        type: string
+  ExtensionRelationIncall:
+    properties:
+      incall:
+        readOnly: true
+        $ref: '#/definitions/IncallRelationBase'
+  ExtensionRelationOutcall:
+    properties:
+      outcall:
+        readOnly: true
+        $ref: '#/definitions/OutcallRelationBase'
