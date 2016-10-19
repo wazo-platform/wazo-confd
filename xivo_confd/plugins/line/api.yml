@@ -154,6 +154,7 @@ definitions:
           description: Name of the template line used by the device
     - $ref: '#/definitions/LineRelationEndpoints'
     - $ref: '#/definitions/LineRelationExtensions'
+    - $ref: '#/definitions/LineRelationUsers'
     required:
     - context
   LineRelationBase:
@@ -180,6 +181,13 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/ExtensionRelationBase'
+  LineRelationUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
   Line:
     title: Line
     properties:
