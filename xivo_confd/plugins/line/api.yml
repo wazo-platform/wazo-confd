@@ -96,6 +96,17 @@ parameters:
     in: path
 
 definitions:
+  LineItems:
+    title: LineItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/LineView'
+        type: array
+      total:
+        type: integer
+    required:
+    - total
   LineView:
     title: Line
     allOf:
@@ -142,6 +153,7 @@ definitions:
           type: string
           description: Name of the template line used by the device
     - $ref: '#/definitions/LineRelationEndpoints'
+    - $ref: '#/definitions/LineRelationExtensions'
     required:
     - context
   LineRelationBase:
@@ -161,6 +173,13 @@ definitions:
       endpoint_custom:
         readOnly: true
         $ref: '#/definitions/EndpointCustomRelationBase'
+  LineRelationExtensions:
+    properties:
+      extensions:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ExtensionRelationBase'
   Line:
     title: Line
     properties:
@@ -188,14 +207,3 @@ definitions:
         description: Name of the template line used by the device
     required:
     - context
-  LineItems:
-    title: LineItems
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/LineView'
-        type: array
-      total:
-        type: integer
-    required:
-    - total

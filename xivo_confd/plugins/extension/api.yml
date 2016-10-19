@@ -126,19 +126,6 @@ parameters:
     in: path
 
 definitions:
-  Extension:
-    title: Extension
-    allOf:
-    - $ref: '#/definitions/ExtensionRelationBase'
-    - properties:
-        commented:
-          type: boolean
-          description: If True the extension is disabled
-    - $ref: '#/definitions/ExtensionRelationIncall'
-    - $ref: '#/definitions/ExtensionRelationOutcall'
-    required:
-    - context
-    - exten
   ExtensionItems:
     title: ExtensionItems
     properties:
@@ -150,6 +137,20 @@ definitions:
         type: integer
     required:
     - total
+  Extension:
+    title: Extension
+    allOf:
+    - $ref: '#/definitions/ExtensionRelationBase'
+    - properties:
+        commented:
+          type: boolean
+          description: If True the extension is disabled
+    - $ref: '#/definitions/ExtensionRelationIncall'
+    - $ref: '#/definitions/ExtensionRelationOutcall'
+    - $ref: '#/definitions/ExtensionRelationLines'
+    required:
+    - context
+    - exten
   ExtensionRelationBase:
     properties:
       id:
@@ -170,3 +171,10 @@ definitions:
       outcall:
         readOnly: true
         $ref: '#/definitions/OutcallRelationBase'
+  ExtensionRelationLines:
+    properties:
+      lines:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/LineRelationBase'
