@@ -56,7 +56,7 @@ def set_default_entity(display_name, name):
     Session.add(row)
 
 
-def get_entity(display_name):
+def entity_unique_name(display_name):
     return ''.join(c for c in display_name if c.isalnum()).lower()
 
 
@@ -224,7 +224,7 @@ def get_xivo_configured():
 
 def create(wizard, autoprov_username):
     network = wizard['network']
-    entity = get_entity(wizard['entity_name'])
+    entity = entity_unique_name(wizard['entity_name'])
 
     set_admin_password(wizard['admin_password'])
     set_autoprov_name(autoprov_username)
