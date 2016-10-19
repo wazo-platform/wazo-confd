@@ -1,0 +1,56 @@
+paths:
+  /outcalls/{outcall_id}/extensions/{extension_id}:
+    put:
+      operationId: associate_outcall_extension
+      summary: Associate outcall and extension
+      description: '**Required ACL:** `confd.outcalls.{outcall_id}.extensions.{extension_id}.update`'
+      tags:
+      - outcalls
+      - extensions
+      parameters:
+      - $ref: '#/parameters/outcallid'
+      - $ref: '#/parameters/extensionid'
+      - name: body
+        in: body
+        description: Outgoing Extension
+        schema:
+          $ref: '#/definitions/OutcallExtension'
+      responses:
+        '204':
+          description: Trunk and Custom endpoint associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_outcall_extension
+      summary: Dissociate outcall and extension
+      description: '**Required ACL:** `confd.outcalls.{outcall_id}.extensions.{extension_id}.delete`'
+      tags:
+      - outcalls
+      - extensions
+      parameters:
+      - $ref: '#/parameters/outcallid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Outcall and Extension dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  OutcallExtension:
+    title: OutcallExtension
+    properties:
+      external_prefix:
+        type: string
+        description: The prefix added to the outgoing call when sent on the trunk
+      prefix:
+        type: string
+        description: The prefix that the user need to dial before the pattern
+      strip_digits:
+        type: integer
+        description: The number of leading digits to strip
+      caller_id:
+        type: string

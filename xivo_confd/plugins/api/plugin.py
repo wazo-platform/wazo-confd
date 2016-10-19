@@ -25,4 +25,4 @@ class Plugin(object):
 
     def load(self, core):
         api.add_resource(SwaggerResource,
-                         '/api/api.json')
+                         '/api/api.yml')
