@@ -55,7 +55,9 @@ class WizardService(object):
                                 wizard['network']['domain'],
                                 wizard['network']['nameservers'])
         self._initialize_provd(wizard['network']['ip_address'], autoprov_username)
-        self._initialize_phonebook(wizard['entity_name'])
+        entity_display_name = wizard['entity_name']
+        entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
+        self._initialize_phonebook(entity_unique_name)
 
         wizard_db.set_xivo_configured()
         self.notifier.created()
