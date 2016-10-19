@@ -832,94 +832,6 @@ paths:
           description: Server information
           schema:
             $ref: '#/definitions/Info'
-  /lines:
-    get:
-      operationId: list_lines
-      summary: List lines
-      description: '**Required ACL:** `confd.lines.read`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/order'
-      - $ref: '#/parameters/direction'
-      - $ref: '#/parameters/limit'
-      - $ref: '#/parameters/offset'
-      - $ref: '#/parameters/search'
-      responses:
-        '200':
-          description: Line list
-          schema:
-            $ref: '#/definitions/LineItems'
-    post:
-      operationId: create_line
-      summary: Create line
-      description: '**Required ACL:** `confd.lines.create`'
-      tags:
-      - lines
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/Line'
-      responses:
-        '201':
-          description: Line created
-          schema:
-            $ref: '#/definitions/LineView'
-        '400':
-          $ref: '#/responses/CreateError'
-  /lines/{line_id}:
-    get:
-      operationId: get_line
-      summary: Get line
-      description: '**Required ACL:** `confd.lines.{line_id}.read`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/lineid'
-      responses:
-        '200':
-          description: Line
-          schema:
-            $ref: '#/definitions/LineView'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    put:
-      operationId: update_line
-      summary: Update line
-      description: '**Required ACL:** `confd.lines.{line_id}.update`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/lineid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/Line'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    delete:
-      operationId: delete_line
-      summary: Delete line
-      description: '**Required ACL:** `confd.lines.{line_id}.delete`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/lineid'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceDeleted'
-        '400':
-          $ref: '#/responses/DeleteError'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /lines/{line_id}/devices:
     get:
       operationId: get_line_device
@@ -2630,11 +2542,6 @@ parameters:
     name: position
     in: path
     description: position of the funckey
-  lineid:
-    required: true
-    type: integer
-    name: line_id
-    in: path
   limit:
     required: false
     name: limit
@@ -3120,98 +3027,6 @@ definitions:
       type: string
     maxItems: 2
     minItems: 2
-  LineView:
-    title: Line
-    allOf:
-    - $ref: '#/definitions/LineRelationBase'
-    - properties:
-        context:
-          type: string
-          description: The name of an internal context
-        caller_id_name:
-          type: string
-          description: Name to display when calling
-        caller_id_num:
-          type: string
-          description: Number to display when calling
-        device_id:
-          type: string
-          description: ID of the device associated to the line
-          readOnly: true
-        device_slot:
-          type: integer
-          description: '*Deprecated* Please use `position`'
-          readOnly: true
-        name:
-          type: string
-          description: The name of the line
-          readOnly: true
-        protocol:
-          type: string
-          enum:
-          - sip
-          description: Line's protocol
-          readOnly: true
-        provisioning_extension:
-          type: string
-          description: '*Deprecated* Please use `provisioning_code`'
-          readOnly: true
-        provisioning_code:
-          type: string
-          description: Code used to provision a device
-        position:
-          type: integer
-          description: Line's position on the device
-        registrar:
-          type: string
-          description: Name of the template line used by the device
-    - $ref: '#/definitions/LineRelationEndpoints'
-    required:
-    - context
-  LineRelationBase:
-    properties:
-      id:
-        type: integer
-        description: Line ID
-        readOnly: true
-  LineRelationEndpoints:
-    properties:
-      endpoint_sip:
-        readOnly: true
-        $ref: '#/definitions/EndpointSipRelationBase'
-      endpoint_sccp:
-        readOnly: true
-        $ref: '#/definitions/EndpointSccpRelationBase'
-      endpoint_custom:
-        readOnly: true
-        $ref: '#/definitions/EndpointCustomRelationBase'
-  Line:
-    title: Line
-    properties:
-      id:
-        type: integer
-        description: Line ID
-        readOnly: true
-      context:
-        type: string
-        description: The name of an internal context
-      position:
-        type: integer
-        description: Line's position on the device
-      caller_id_name:
-        type: string
-        description: Name to display when calling
-      caller_id_num:
-        type: string
-        description: Number to display when calling
-      provisioning_code:
-        type: string
-        description: Code used to provision a device
-      registrar:
-        type: string
-        description: Name of the template line used by the device
-    required:
-    - context
   LineEndpoint:
     title: LineEndpoint
     properties:
@@ -3264,17 +3079,6 @@ definitions:
       items:
         items:
           $ref: '#/definitions/LineExtension'
-        type: array
-      total:
-        type: integer
-    required:
-    - total
-  LineItems:
-    title: LineItems
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/LineView'
         type: array
       total:
         type: integer
