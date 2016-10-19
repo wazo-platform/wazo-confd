@@ -38,7 +38,7 @@ confd:
     - rabbitmq
     - provd
     - sysconfd
-  command: "xivo-confd -f -d"
+  command: "mprof run xivo-confd -f -d"
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"
