@@ -329,7 +329,7 @@ def test_dissociate_second_user_before_first(first_user, second_user, line):
 @fixtures.line_sip()
 def test_get_users_relation(user, line):
     expected = has_entries(
-        users=contains(has_entries(id=user['id'],
+        users=contains(has_entries(uuid=user['uuid'],
                                    firstname=user['firstname'],
                                    lastname=user['lastname']))
     )

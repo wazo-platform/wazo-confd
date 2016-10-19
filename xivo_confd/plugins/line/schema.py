@@ -47,7 +47,7 @@ class LineSchema(BaseSchema):
                                many=True,
                                dump_only=True)
     users = fields.Nested('UserSchema',
-                          only=['id', 'firstname', 'lastname', 'links'],
+                          only=['uuid', 'firstname', 'lastname', 'links'],
                           many=True,
                           dump_only=True)
 
