@@ -1,4 +1,22 @@
 paths:
+  /users/{user_uuid}/lines/{line_id}/associated/endpoints/sip:
+    get:
+      operationId: get_user_line_associated_endpoints_sip
+      summary: Get SIP endpoint of a line for a user
+      description: '**Required ACL:** `confd.users.{user_uuid}.lines.{line_id}.associated.endpoints.sip.read`'
+      tags:
+      - endpoints
+      - lines
+      - users
+      parameters:
+      - $ref: '#/parameters/useruuid'
+      - $ref: '#/parameters/lineid'
+      responses:
+        '200':
+          description: SIP endpoint of a line for a user
+          schema:
+            $ref: '#/definitions/EndpointSip'
+
   /users/{user_uuid}/lines/main/associated/endpoints/sip:
     get:
       operationId: get_user_line_main_associated_endpoints_sip
@@ -15,4 +33,3 @@ paths:
           description: SIP endpoint of main line for a user
           schema:
             $ref: '#/definitions/EndpointSip'
-
