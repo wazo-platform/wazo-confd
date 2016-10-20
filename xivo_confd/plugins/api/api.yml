@@ -640,124 +640,6 @@ paths:
             $ref: '#/definitions/Error'
         '404':
           $ref: '#/responses/NotFoundError'
-  /extensions:
-    get:
-      operationId: list_extensions
-      summary: List extensions
-      description: '**Required ACL:** `confd.extensions.read`'
-      tags:
-      - extensions
-      parameters:
-      - $ref: '#/parameters/order'
-      - $ref: '#/parameters/direction'
-      - $ref: '#/parameters/limit'
-      - $ref: '#/parameters/offset'
-      - $ref: '#/parameters/search'
-      - name: type
-        in: query
-        type: string
-        enum:
-        - internal
-        - incall
-        description: 'Filter extensions of a certain type. Internal: Used for calling
-          a line with an internal number (e.g. “1000@default”). Incall: Used for calling
-          a line from the outside (e.g. “from-extern” with a DID)'
-      - name: exten
-        in: query
-        type: string
-        description: Filter extensions by exten number
-      - name: context
-        in: query
-        type: string
-        description: Filter extensions by context name
-      responses:
-        '200':
-          description: Extension list
-          schema:
-            $ref: '#/definitions/ExtensionItems'
-    post:
-      operationId: create_extension
-      summary: Create extension
-      description: '**Required ACL:** `confd.extensions.create`
-
-
-        The extension number must be included in one of the extension ranges for the
-        given context.'
-      tags:
-      - extensions
-      parameters:
-      - name: body
-        in: body
-        description: Extension to create
-        required: true
-        schema:
-          $ref: '#/definitions/Extension'
-      responses:
-        '201':
-          description: Extension created
-          schema:
-            $ref: '#/definitions/Extension'
-        '400':
-          $ref: '#/responses/CreateError'
-  /extensions/{extension_id}:
-    get:
-      operationId: get_extension
-      summary: Get extension
-      description: '**Required ACL:** `confd.extensions.{extension_id}.read`'
-      tags:
-      - extensions
-      parameters:
-      - $ref: '#/parameters/extensionid'
-      responses:
-        '200':
-          description: Extension
-          schema:
-            $ref: '#/definitions/Extension'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    put:
-      operationId: update_extension
-      summary: Update extension
-      description: '**Required ACL:** `confd.extensions.{extension_id}.update`
-
-
-        The new extension number must be included in one of the extension ranges for
-        the new context.'
-      tags:
-      - extensions
-      parameters:
-      - $ref: '#/parameters/extensionid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/Extension'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    delete:
-      operationId: delete_extension
-      summary: Delete extension
-      description: '**Required ACL:** `confd.extensions.{extension_id}.delete`
-
-
-        An extension can not be deleted if it is associated to a line. You must delete
-        the association first.'
-      tags:
-      - extensions
-      parameters:
-      - $ref: '#/parameters/extensionid'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceDeleted'
-        '400':
-          $ref: '#/responses/DeleteError'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /extensions/{extension_id}/line:
     get:
       operationId: get_extension_line_association
@@ -950,94 +832,6 @@ paths:
           description: Server information
           schema:
             $ref: '#/definitions/Info'
-  /lines:
-    get:
-      operationId: list_lines
-      summary: List lines
-      description: '**Required ACL:** `confd.lines.read`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/order'
-      - $ref: '#/parameters/direction'
-      - $ref: '#/parameters/limit'
-      - $ref: '#/parameters/offset'
-      - $ref: '#/parameters/search'
-      responses:
-        '200':
-          description: Line list
-          schema:
-            $ref: '#/definitions/LineItems'
-    post:
-      operationId: create_line
-      summary: Create line
-      description: '**Required ACL:** `confd.lines.create`'
-      tags:
-      - lines
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/Line'
-      responses:
-        '201':
-          description: Line created
-          schema:
-            $ref: '#/definitions/LineView'
-        '400':
-          $ref: '#/responses/CreateError'
-  /lines/{line_id}:
-    get:
-      operationId: get_line
-      summary: Get line
-      description: '**Required ACL:** `confd.lines.{line_id}.read`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/lineid'
-      responses:
-        '200':
-          description: Line
-          schema:
-            $ref: '#/definitions/LineView'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    put:
-      operationId: update_line
-      summary: Update line
-      description: '**Required ACL:** `confd.lines.{line_id}.update`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/lineid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/Line'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    delete:
-      operationId: delete_line
-      summary: Delete line
-      description: '**Required ACL:** `confd.lines.{line_id}.delete`'
-      tags:
-      - lines
-      parameters:
-      - $ref: '#/parameters/lineid'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceDeleted'
-        '400':
-          $ref: '#/responses/DeleteError'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /lines/{line_id}/devices:
     get:
       operationId: get_line_device
@@ -1506,106 +1300,6 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /users:
-    get:
-      operationId: list_user
-      summary: List users
-      description: '**Required ACL:** `confd.users.read`'
-      tags:
-      - users
-      parameters:
-      - $ref: '#/parameters/order'
-      - $ref: '#/parameters/direction'
-      - $ref: '#/parameters/limit'
-      - $ref: '#/parameters/offset'
-      - $ref: '#/parameters/search'
-      - $ref: '#/parameters/view'
-      responses:
-        '200':
-          description: User list
-          schema:
-            $ref: '#/definitions/UserItems'
-    post:
-      operationId: create_user
-      summary: Create user
-      description: '**Required ACL:** `confd.users.create`'
-      tags:
-      - users
-      parameters:
-      - name: body
-        in: body
-        description: User to create
-        required: true
-        schema:
-          $ref: '#/definitions/User'
-      responses:
-        '201':
-          description: User created
-          schema:
-            $ref: '#/definitions/User'
-        '400':
-          $ref: '#/responses/CreateError'
-  /users/{user_id}:
-    get:
-      operationId: get_user
-      summary: Get user
-      description: '**Required ACL:** `confd.users.{user_id}.read`'
-      tags:
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      responses:
-        '200':
-          description: User
-          schema:
-            $ref: '#/definitions/User'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    put:
-      operationId: update_user
-      summary: Update user
-      description: '**Required ACL:** `confd.users.{user_id}.update`
-
-
-        If the firstname or the lastname is modified, the name of associated voicemail
-        is also updated.'
-      tags:
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/User'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    delete:
-      operationId: delete_user
-      summary: Delete user
-      description: '**Required ACL:** `confd.users.{user_id}.delete`
-
-
-        A user can not be deleted if he is associated to a line or a voicemail. Any
-        line or voicemail attached to the user must be dissociated first. The user
-        will also be removed from all queues, groups or other XiVO entities whom he
-        is member.'
-      tags:
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceDeleted'
-        '400':
-          $ref: '#/responses/DeleteError'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /users/export:
     get:
       operationId: export_users_csv
@@ -1760,76 +1454,6 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /users/{user_id}/forwards:
-    get:
-      operationId: list_user_forwards
-      summary: List forwards for a user
-      description: '**Required ACL:** `confd.users.{user_id}.forwards.read`'
-      tags:
-      - forwards
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      responses:
-        '200':
-          description: User-Forwards
-          schema:
-            $ref: '#/definitions/UserForwards'
-    put:
-      operationId: update_user_forwards
-      summary: Update all forwards for a user
-      description: '**Required ACL:** `confd.users.{user_id}.forwards.update`'
-      tags:
-      - forwards
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/UserForwards'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
-  /users/{user_id}/forwards/{forward_name}:
-    get:
-      operationId: get_user_forward
-      summary: Get forward for a user
-      description: '**Required ACL:** `confd.users.{user_id}.forward.{forward_name}.read`'
-      tags:
-      - forwards
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      - $ref: '#/parameters/forward'
-      responses:
-        '200':
-          description: User-Forward
-          schema:
-            $ref: '#/definitions/UserForward'
-    put:
-      operationId: update_user_forward
-      summary: Update a forward for a user
-      description: '**Required ACL:** `confd.users.{user_id}.forwards.{forward_name}.update`'
-      tags:
-      - forwards
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      - $ref: '#/parameters/forward'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/UserForward'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
   /users/{user_id}/funckeys:
     get:
       operationId: list_user_func_keys
@@ -2031,61 +1655,6 @@ paths:
           description: SIP endpoint of main line for a user
           schema:
             $ref: '#/definitions/EndpointSip'
-  /users/{user_id}/services:
-    get:
-      operationId: get_user_services
-      summary: Get status of all user's services
-      description: '**Required ACL:** `confd.users.{user_id}.services.read`'
-      tags:
-      - services
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      responses:
-        '200':
-          description: User-Services
-          schema:
-            $ref: '#/definitions/UserServices'
-        '404':
-          $ref: '#/responses/NotFoundError'
-  /users/{user_id}/services/{service_name}:
-    get:
-      operationId: get_user_service
-      summary: Get status of service
-      description: '**Required ACL:** `confd.users.{user_id}.services.{service}.read`'
-      tags:
-      - services
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      - $ref: '#/parameters/service'
-      responses:
-        '200':
-          description: User-Service
-          schema:
-            $ref: '#/definitions/UserService'
-        '404':
-          $ref: '#/responses/NotFoundError'
-    put:
-      operationId: update_user_service
-      summary: Enable/Disable service for a user
-      description: '**Required ACL:** `confd.users.{user_id}.services.{service}.update`'
-      tags:
-      - services
-      - users
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      - $ref: '#/parameters/service'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/UserService'
-      responses:
-        '204':
-          $ref: '#/responses/ResourceUpdated'
-        '400':
-          $ref: '#/responses/UpdateError'
   /users/{user_id}/voicemails:
     get:
       operationId: get_user_voicemail_association
@@ -2732,11 +2301,6 @@ parameters:
     type: string
     format: date-time
     required: false
-  extensionid:
-    required: true
-    type: integer
-    name: extension_id
-    in: path
   forward:
     required: true
     type: string
@@ -2753,11 +2317,6 @@ parameters:
     name: position
     in: path
     description: position of the funckey
-  lineid:
-    required: true
-    type: integer
-    name: line_id
-    in: path
   limit:
     required: false
     name: limit
@@ -2833,12 +2392,6 @@ parameters:
     type: integer
     name: template_id
     in: path
-  useriduuid:
-    required: true
-    type: string
-    name: user_id
-    in: path
-    description: the user's ID or UUID
   useruuid:
     required: true
     type: string
@@ -3015,18 +2568,20 @@ definitions:
     allOf:
     - $ref: '#/definitions/EndpointCustomRelationBase'
     - properties:
-        id:
-          type: integer
-          description: Custom Endpoint ID
-          readOnly: true
         enabled:
           type: boolean
           description: Endpoint can be used when it is enabled
           default: true
+    - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
     required:
     - interface
   EndpointCustomRelationBase:
     properties:
+      id:
+        type: integer
+        description: Custom Endpoint ID
+        readOnly: true
       interface:
         type: string
         description: Asterisk interface to use. (e.g. 'dahdi/i1')
@@ -3091,6 +2646,8 @@ definitions:
           items:
             $ref: '#/definitions/KeyValueOption'
           default: []
+    - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
   EndpointSipRelationBase:
     properties:
       id:
@@ -3101,6 +2658,18 @@ definitions:
         type: string
         description: SIP username
         default: autogenerated
+  EndpointRelationTrunk:
+    properties:
+      trunk:
+        $ref: '#/definitions/TrunkRelationBase'
+        readOnly: true
+  EndpointRelationLine:
+    properties:
+      line:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/LineRelationBase'
   EndpointSccpItems:
     title: SCCP Endpoints
     properties:
@@ -3128,6 +2697,8 @@ definitions:
           type: array
           items:
             $ref: '#/definitions/KeyValueOption'
+    - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
   EndpointSccpRelationBase:
     properties:
       id:
@@ -3164,50 +2735,6 @@ definitions:
     type: array
     items:
       type: string
-  Extension:
-    title: Extension
-    allOf:
-    - $ref: '#/definitions/ExtensionRelationBase'
-    - properties:
-        commented:
-          type: boolean
-          description: If True the extension is disabled
-    - $ref: '#/definitions/ExtensionRelationIncall'
-    - $ref: '#/definitions/ExtensionRelationOutcall'
-    required:
-    - context
-    - exten
-  ExtensionItems:
-    title: ExtensionItems
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/Extension'
-        type: array
-      total:
-        type: integer
-    required:
-    - total
-  ExtensionRelationBase:
-    properties:
-      id:
-        type: integer
-        description: Extension ID
-        readOnly: true
-      context:
-        type: string
-      exten:
-        type: string
-  ExtensionRelationIncall:
-    properties:
-      incall:
-        readOnly: true
-        $ref: '#/definitions/IncallRelationBase'
-  ExtensionRelationOutcall:
-    properties:
-      outcall:
-        readOnly: true
-        $ref: '#/definitions/OutcallRelationBase'
   FuncKeyDestination:
     title: FuncKeyDestination
     properties:
@@ -3269,82 +2796,6 @@ definitions:
       type: string
     maxItems: 2
     minItems: 2
-  LineView:
-    title: Line
-    properties:
-      id:
-        type: integer
-        description: Line ID
-        readOnly: true
-      context:
-        type: string
-        description: The name of an internal context
-      caller_id_name:
-        type: string
-        description: Name to display when calling
-      caller_id_num:
-        type: string
-        description: Number to display when calling
-      device_id:
-        type: string
-        description: ID of the device associated to the line
-        readOnly: true
-      device_slot:
-        type: integer
-        description: '*Deprecated* Please use `position`'
-        readOnly: true
-      name:
-        type: string
-        description: The name of the line
-        readOnly: true
-      protocol:
-        type: string
-        enum:
-        - sip
-        description: Line's protocol
-        readOnly: true
-      provisioning_extension:
-        type: string
-        description: '*Deprecated* Please use `provisioning_code`'
-        readOnly: true
-      provisioning_code:
-        type: string
-        description: Code used to provision a device
-      position:
-        type: integer
-        description: Line's position on the device
-      registrar:
-        type: string
-        description: Name of the template line used by the device
-    required:
-    - context
-  Line:
-    title: Line
-    properties:
-      id:
-        type: integer
-        description: Line ID
-        readOnly: true
-      context:
-        type: string
-        description: The name of an internal context
-      position:
-        type: integer
-        description: Line's position on the device
-      caller_id_name:
-        type: string
-        description: Name to display when calling
-      caller_id_num:
-        type: string
-        description: Number to display when calling
-      provisioning_code:
-        type: string
-        description: Code used to provision a device
-      registrar:
-        type: string
-        description: Name of the template line used by the device
-    required:
-    - context
   LineEndpoint:
     title: LineEndpoint
     properties:
@@ -3402,17 +2853,6 @@ definitions:
         type: integer
     required:
     - total
-  LineItems:
-    title: LineItems
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/LineView'
-        type: array
-      total:
-        type: integer
-    required:
-    - total
   LineSip:
     title: LineSip
     properties:
@@ -3462,20 +2902,6 @@ definitions:
     properties:
       enabled:
         type: boolean
-  UserService:
-    title: UserService
-    properties:
-      enabled:
-        type: boolean
-    required:
-    - enabled
-  UserServices:
-    title: UserServices
-    properties:
-      dnd:
-        $ref: '#/definitions/UserService'
-      incallfilter:
-        $ref: '#/definitions/UserService'
   Switchboard:
     title: Switchboard
     properties:
@@ -3502,113 +2928,6 @@ definitions:
     title: SwitchboardStats
     description: ''
     type: string
-  User:
-    title: User
-    properties:
-      id:
-        type: integer
-        description: User ID
-        readOnly: true
-      uuid:
-        type: string
-        description: User UUID. This ID is globally unique across multiple XiVO instances
-        readOnly: true
-      firstname:
-        type: string
-        description: User firstname
-      lastname:
-        type: string
-        description: User lastname
-      email:
-        type: string
-        description: User's email
-      timezone:
-        type: string
-        description: User timezone
-      language:
-        type: string
-        enum:
-        - de_DE
-        - en_US
-        - es_ES
-        - fr_FR
-        - fr_CA
-        - it_IT
-        - nl_NL
-        description: User language (e.g. "en_US")
-      description:
-        type: string
-        description: Additional information about the user
-      call_transfer_enabled:
-        type: boolean
-        default: false
-        description: Authorize call transfers
-      dtmf_hangup_enabled:
-        type: boolean
-        default: false
-        description: Authorize to hangup with DTMF
-      call_record_enabled:
-        type: boolean
-        default: false
-        description: Record all calls made by this user
-      online_call_record_enabled:
-        type: boolean
-        default: false
-        description: Allow user to record a call by pressing *3
-      caller_id:
-        type: string
-        description: Name that appears on the phone when calling. Formatted as "Firstname
-          Lastname" < number >
-      outgoing_caller_id:
-        type: string
-        enum:
-        - default
-        - anonymous
-        - '"Firstname Lastname" < number >'
-        description: Name that appears on the phone when calling
-      mobile_phone_number:
-        type: string
-        description: Phone number for the user’s mobile device
-      username:
-        type: string
-        description: Username for connecting to the CTI
-      password:
-        type: string
-        minLength: 4
-        description: Password for connecting to the CTI
-      music_on_hold:
-        type: string
-        description: Name of the MOH category to use for music on hold
-      ring_seconds:
-        type: integer
-        default: 30
-        description: Number of seconds a user's phone will ring before fallbacking
-      simultaneous_calls:
-        type: integer
-        default: 5
-        description: Number of allowed simultaneous calls on a user's phone
-      supervision_enabled:
-        type: boolean
-        default: true
-        description: Activate presence sharing in the xivo client
-      preprocess_subroutine:
-        type: string
-        description: Name of the subroutine to execute in asterisk before receiving
-          a call
-      userfield:
-        type: string
-        description: A custom field which purpose is left to the client. If the user
-          has no userfield, then this field is an empty string.
-      call_permission_password:
-        type: string
-        description: Overwrite all passwords set in call permissions associated to
-          the user
-      enabled:
-        type: boolean
-        default: true
-        description: Enable/Disable the user
-    required:
-    - firstname
   UserCallPermission:
     title: UserCallPermission
     properties:
@@ -3806,22 +3125,6 @@ definitions:
         type: array
       total:
         type: integer
-  UserForward:
-    title: UserForward
-    properties:
-      enabled:
-        type: boolean
-      destination:
-        type: string
-  UserForwards:
-    title: UserForwards
-    properties:
-      busy:
-        $ref: '#/definitions/UserForward'
-      noanswer:
-        $ref: '#/definitions/UserForward'
-      unconditional:
-        $ref: '#/definitions/UserForward'
   UserFuncKeyTemplate:
     title: UserFuncKeyTemplate
     description: Association between a User and a FuncKey Template

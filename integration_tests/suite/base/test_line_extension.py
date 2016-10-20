@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -301,3 +302,29 @@ def test_dissociation(line, extension):
         confd.lines(line['id']).extensions(extension['id']).delete().assert_deleted()
         response = confd.lines(line['id']).extensions.get()
         assert_that(response.items, empty())
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_get_extension_relation(line, extension):
+    expected = has_entries(
+        extensions=contains(has_entries(id=extension['id'],
+                                        exten=extension['exten'],
+                                        context=extension['context']))
+    )
+
+    with a.line_extension(line, extension):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, expected)
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_get_line_relation(line, extension):
+    expected = has_entries(
+        lines=contains(has_entries(id=line['id']))
+    )
+
+    with a.line_extension(line, extension):
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, expected)

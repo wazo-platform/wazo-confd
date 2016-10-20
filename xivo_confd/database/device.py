@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,7 +45,7 @@ def profile_for_device(device_id):
 
 def sip_lines_for_device(device_id):
     query = (Session.query(LineFeatures, UserSIP, Extension)
-             .join(LineFeatures.sip_endpoint)
+             .join(LineFeatures.endpoint_sip)
              .join(LineFeatures.user_lines)
              .join(UserLine.main_user_rel)
              .join(LineFeatures.line_extensions)

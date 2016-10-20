@@ -175,7 +175,7 @@ def export_query(separator=";"):
         .outerjoin(User.cti_profile)
         .outerjoin(User.main_line_rel)
         .outerjoin(UserLine.main_line_rel)
-        .outerjoin(Line.sip_endpoint)
+        .outerjoin(Line.endpoint_sip)
         .outerjoin(Line.line_extensions)
         .outerjoin(LineExtension.main_extension_rel)
         .outerjoin(grouped_incalls,

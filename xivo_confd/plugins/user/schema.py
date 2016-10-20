@@ -58,6 +58,16 @@ class UserSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('users'))
 
+    lines = fields.Nested('LineSchema',
+                          only=['id',
+                                'endpoint_sip',
+                                'endpoint_sccp',
+                                'endpoint_custom',
+                                'extensions',
+                                'links'],
+                          many=True,
+                          dump_only=True)
+
 
 class UserDirectorySchema(BaseSchema):
     id = fields.Integer()

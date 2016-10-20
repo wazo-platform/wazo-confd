@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +30,7 @@ from test_api import errors as e
 
 from hamcrest import (assert_that,
                       contains,
+                      empty,
                       has_entries,
                       has_entry,
                       has_items,
@@ -110,7 +112,12 @@ def test_get(line):
                             'caller_id_num': none(),
                             'registrar': 'default',
                             'provisioning_code': has_length(6),
-                            'provisioning_extension': has_length(6)}
+                            'provisioning_extension': has_length(6),
+                            'endpoint_sip': none(),
+                            'endpoint_sccp': none(),
+                            'endpoint_custom': none(),
+                            'extensions': empty(),
+                            'users': empty()}
                            )
 
     response = confd.lines(line['id']).get()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +23,7 @@ from hamcrest import (assert_that,
                       contains,
                       contains_inanyorder,
                       equal_to,
+                      empty,
                       has_entries,
                       has_item,
                       none,
@@ -85,7 +87,8 @@ def test_get(extension):
                                            context=extension['context'],
                                            commented=False,
                                            incall=none(),
-                                           outcall=none()))
+                                           outcall=none(),
+                                           lines=empty()))
 
 
 def test_create_minimal_parameters():

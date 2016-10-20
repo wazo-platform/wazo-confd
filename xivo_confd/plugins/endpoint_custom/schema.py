@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,4 +30,6 @@ class CustomSchema(BaseSchema):
     interface = fields.String(validate=Regexp(INTERFACE_REGEX), required=True)
     enabled = StrictBoolean()
     links = ListLink(Link('endpoint_custom'))
+
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
