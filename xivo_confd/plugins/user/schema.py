@@ -67,6 +67,7 @@ class UserSchema(BaseSchema):
                                 'links'],
                           many=True,
                           dump_only=True)
+    forwards = fields.Nested('ForwardsSchema', dump_only=True)
 
 
 class UserDirectorySchema(BaseSchema):
