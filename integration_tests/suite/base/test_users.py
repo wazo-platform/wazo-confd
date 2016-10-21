@@ -463,7 +463,9 @@ def test_get_user(user):
         lines=empty(),
         forwards={'busy': {'destination': None, 'enabled': False},
                   'noanswer': {'destination': None, 'enabled': False},
-                  'unconditional': {'destination': None, 'enabled': False}}
+                  'unconditional': {'destination': None, 'enabled': False}},
+        services={'dnd': {'enabled': False},
+                  'incallfilter': {'enabled': False}}
     ))
 
 
