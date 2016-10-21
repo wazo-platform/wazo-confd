@@ -41,6 +41,8 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
             line = user.lines[0]
         else:
             line = self.line_dao.get(line_id)
+            if line not in user.lines:
+                return 'Resource Not Found.', 404
 
         if not line.endpoint_sip:
             return 'Resource Not Found.', 404

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,8 +54,17 @@ def test_get_user_line_id_associated_endpoints_sip_when_endpoint_is_sccp(user, l
 
 @fixtures.user()
 def test_get_user_line_id_associated_endpoints_sip_when_line_does_not_exist(user):
-    response = confd.users(user['uuid']).lines(1).associated.endpoints.sip.get()
+    response = confd.users(user['uuid']).lines(999999).associated.endpoints.sip.get()
     assert_that(response.status, equal_to(404))
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+def test_get_user_line_id_associated_endpoints_sip_when_user_line_not_associated(user, line, sip):
+    with a.line_endpoint_sip(line, sip):
+        response = confd.users(user['uuid']).lines(line['id']).associated.endpoints.sip.get()
+        assert_that(response.status, equal_to(404))
 
 
 @fixtures.user()
