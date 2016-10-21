@@ -101,6 +101,9 @@ class UserServiceList(UserSubResource):
     def get(self, user_id):
         return super(UserServiceList, self).get(user_id)
 
+    def put(self, user_id):
+        return '', 405
+
 
 class ForwardBusySchema(BaseSchema):
     enabled = StrictBoolean(attribute='busy_enabled')

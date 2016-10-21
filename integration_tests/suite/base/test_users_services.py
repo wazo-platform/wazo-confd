@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import unicode_literals
-from hamcrest import assert_that, has_key, has_entry
+from hamcrest import assert_that, has_key, has_entry, has_entries
 
 from test_api import confd
 from test_api import fixtures
@@ -68,3 +68,15 @@ def test_put_error(user):
     yield s.check_bogus_field_returns_error, service_url, 'enabled', 123
     yield s.check_bogus_field_returns_error, service_url, 'enabled', []
     yield s.check_bogus_field_returns_error, service_url, 'enabled', {}
+
+
+@fixtures.user()
+def test_get_services_relation(user):
+    confd.users(user['uuid']).services.dnd.put(enabled=True).assert_updated()
+    confd.users(user['uuid']).services.incallfilter.put(enabled=True).assert_updated()
+
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item, has_entries(
+        services={'dnd': {'enabled': True},
+                  'incallfilter': {'enabled': True}}
+    ))

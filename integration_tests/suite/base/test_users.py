@@ -459,7 +459,14 @@ def check_search(url, field, term, value):
 def test_get_user(user):
     response = confd.users(user['id']).get()
     assert_that(response.item, has_entries(FULL_USER))
-    assert_that(response.item, has_entries(lines=empty()))
+    assert_that(response.item, has_entries(
+        lines=empty(),
+        forwards={'busy': {'destination': None, 'enabled': False},
+                  'noanswer': {'destination': None, 'enabled': False},
+                  'unconditional': {'destination': None, 'enabled': False}},
+        services={'dnd': {'enabled': False},
+                  'incallfilter': {'enabled': False}}
+    ))
 
 
 @fixtures.user(firstname="Snôm", lastname="Whîte")

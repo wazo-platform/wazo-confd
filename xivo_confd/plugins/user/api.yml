@@ -332,6 +332,8 @@ definitions:
           default: true
           description: Enable/Disable the user
     - $ref: '#/definitions/UserRelationLines'
+    - $ref: '#/definitions/UserRelationForwards'
+    - $ref: '#/definitions/UserRelationServices'
     required:
     - firstname
   UserRelationBase:
@@ -358,6 +360,16 @@ definitions:
       - $ref: '#/definitions/LineRelationBase'
       - $ref: '#/definitions/LineRelationEndpoints'
       - $ref: '#/definitions/LineRelationExtensions'
+  UserRelationForwards:
+    properties:
+      forwards:
+        readOnly: true
+        $ref: '#/definitions/UserForwards'
+  UserRelationServices:
+    properties:
+      services:
+        readOnly: true
+        $ref: '#/definitions/UserServices'
   UserService:
     title: UserService
     properties:
