@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,17 +20,31 @@
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.plugins.endpoint_sip.schema import SipSchema
-from xivo_confd.database import user_line_associated as user_line_associated_db
 
 
-class UserLineAssociatedEndpointSipMain(ConfdResource):
+class UserLineAssociatedEndpointSipItem(ConfdResource):
 
     schema = SipSchema
 
-    @required_acl('confd.users.{user_uuid}.lines.main.associated.endpoints.sip.read')
-    def get(self, user_uuid):
-        endpoint_sip = user_line_associated_db.find_main_endpoint_sip_by_user(user_uuid)
-        if endpoint_sip is None:
+    def __init__(self, user_dao, line_dao):
+        super(UserLineAssociatedEndpointSipItem, self).__init__()
+        self.user_dao = user_dao
+        self.line_dao = line_dao
+
+    @required_acl('confd.users.{user_uuid}.lines.{line_id}.associated.endpoints.sip.read')
+    def get(self, user_uuid, line_id):
+        user = self.user_dao.get_by(uuid=str(user_uuid))
+
+        if line_id == 'main':
+            if not user.lines:
+                return 'Resource Not Found.', 404
+            line = user.lines[0]
+        else:
+            line = self.line_dao.get(line_id)
+            if line not in user.lines:
+                return 'Resource Not Found.', 404
+
+        if not line.endpoint_sip:
             return 'Resource Not Found.', 404
 
-        return self.schema().dump(endpoint_sip).data
+        return self.schema().dump(line.endpoint_sip).data

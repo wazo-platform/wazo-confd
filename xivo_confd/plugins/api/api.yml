@@ -1639,22 +1639,6 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /users/{user_uuid}/lines/main/associated/endpoints/sip:
-    get:
-      operationId: get_user_line_main_associated_endpoints_sip
-      summary: Get SIP endpoint of main line for a user
-      description: '**Required ACL:** `confd.users.{user_uuid}.lines.main.associated.endpoints.sip.read`'
-      tags:
-      - endpoints
-      - lines
-      - users
-      parameters:
-      - $ref: '#/parameters/useruuid'
-      responses:
-        '200':
-          description: SIP endpoint of main line for a user
-          schema:
-            $ref: '#/definitions/EndpointSip'
   /users/{user_id}/voicemails:
     get:
       operationId: get_user_voicemail_association
