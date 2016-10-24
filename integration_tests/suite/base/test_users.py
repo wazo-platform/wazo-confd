@@ -382,7 +382,6 @@ def test_search_on_user_view(user):
         'userfield': 'jenkins userfield',
         'description': "jénkin's bio",
         'preprocess_subroutine': 'roy_preprocess',
-        'enabled': False,
     }
 
     for field, term in searches.items():
