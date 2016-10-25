@@ -19,6 +19,7 @@
 from flask import url_for
 from flask_restful import abort
 from marshmallow import Schema, fields, pre_load
+from marshmallow.exceptions import RegistryError
 
 
 class BaseSchema(Schema):
@@ -32,6 +33,8 @@ class BaseSchema(Schema):
             self.handle_error = handle_error_fn
 
     def on_bind_field(self, field_name, field_obj):
+        if self._registry_error_on_nested_field(field_name, field_obj):
+            return
         # Without this, the nested schema handle error and abort. So the error
         # message will not include parent key and the rest of the parent schema
         # will not be validated
@@ -42,6 +45,15 @@ class BaseSchema(Schema):
             field_obj.schema.handle_error = super(BaseSchema, self).handle_error
         if isinstance(field_obj, fields.List):
             self._inherit_handle_error(field_obj.container)
+
+    def _registry_error_on_nested_field(self, field_name, field_obj):
+        if isinstance(field_obj, fields.Nested):
+            try:
+                field_obj.schema
+            except RegistryError:
+                self.declared_fields.pop(field_name, None)
+                return True
+            return False
 
     @pre_load
     def ensure_dict(self, data):
