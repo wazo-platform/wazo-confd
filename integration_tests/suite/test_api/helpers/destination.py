@@ -17,17 +17,16 @@
 
 from test_api import scenarios as s
 
-
 def new_invalid_destinations():
     return [
         1234,
         'string',
         {'type': 'invalid'},
-    
+
         {'type': 'application'},
         {'type': 'application', 'missing_required_field': 'disa'},
         {'type': 'application', 'application': 'invalid'},
-    
+
         {'type': 'application', 'application': 'callback_disa', 'context': True},
         {'type': 'application', 'application': 'callback_disa', 'context': None},
         {'type': 'application', 'application': 'callback_disa', 'context': 'invalid_char_@'},
@@ -37,12 +36,12 @@ def new_invalid_destinations():
         {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': 1234},
         {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': '#123'},
         {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': s.random_string(41)},
-    
+
         {'type': 'application', 'application': 'directory', 'context': True},
         {'type': 'application', 'application': 'directory', 'context': None},
         {'type': 'application', 'application': 'directory', 'context': 'invalid_char_@'},
         {'type': 'application', 'application': 'directory', 'context': s.random_string(40)},
-    
+
         {'type': 'application', 'application': 'disa', 'context': True},
         {'type': 'application', 'application': 'disa', 'context': None},
         {'type': 'application', 'application': 'disa', 'context': 'invalid_char_@'},
@@ -52,23 +51,23 @@ def new_invalid_destinations():
         {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': 1234},
         {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': '#123'},
         {'type': 'application', 'application': 'disa', 'context': 'default', 'pin': s.random_string(41)},
-    
+
         {'type': 'application', 'application': 'fax_to_mail', 'email': 'invalid'},
         {'type': 'application', 'application': 'fax_to_mail', 'email': 1234},
         {'type': 'application', 'application': 'fax_to_mail', 'email': True},
         {'type': 'application', 'application': 'fax_to_mail', 'email': None},
         {'type': 'application', 'application': 'fax_to_mail', 'email': s.random_string(81)},
-    
+
         {'type': 'application', 'application': 'voicemail', 'context': True},
         {'type': 'application', 'application': 'voicemail', 'context': None},
         {'type': 'application', 'application': 'voicemail', 'context': 'invalid_char_@'},
         {'type': 'application', 'application': 'voicemail', 'context': s.random_string(40)},
-    
+
         {'type': 'conference'},
         {'type': 'conference', 'missing_required_field': 123},
         {'type': 'conference', 'conference_id': 'string'},
         {'type': 'conference', 'conference_id': None},
-    
+
         {'type': 'custom'},
         {'type': 'custom', 'missing_required_field': '123'},
         {'type': 'custom', 'command': 1234},
@@ -78,7 +77,7 @@ def new_invalid_destinations():
         {'type': 'custom', 'command': 'system(not_authorized)'},
         {'type': 'custom', 'command': 'trysystem(not_authorized)'},
         {'type': 'custom', 'command': s.random_string(256)},
-    
+
         {'type': 'extension'},
         {'type': 'extension', 'missing_required_field': '123'},
         {'type': 'extension', 'context': True},
@@ -89,33 +88,33 @@ def new_invalid_destinations():
         {'type': 'extension', 'context': 'default', 'exten': True},
         {'type': 'extension', 'context': 'default', 'exten': None},
         {'type': 'extension', 'context': 'default', 'exten': '*1234#??'},
-    
+
         {'type': 'group'},
         {'type': 'group', 'missing_required_field': 123},
         {'type': 'group', 'group_id': 'string'},
         {'type': 'group', 'group_id': None},
-    
+
         {'type': 'hangup', 'cause': 'invalid'},
-    
+
         {'type': 'hangup', 'cause': 'busy', 'timeout': 'invalid'},
-    
+
         {'type': 'hangup', 'cause': 'congestion', 'timeout': 'invalid'},
-    
+
         {'type': 'ivr'},
         {'type': 'ivr', 'missing_required_field': 123},
         {'type': 'ivr', 'ivr_id': 'string'},
         {'type': 'ivr', 'ivr_id': None},
-    
+
         {'type': 'outcall'},
         {'type': 'outcall', 'missing_required_field': 123},
         {'type': 'outcall', 'outcall_id': 'string'},
         {'type': 'outcall', 'outcall_id': None},
-    
+
         {'type': 'queue'},
         {'type': 'queue', 'missing_required_field': 123},
         {'type': 'queue', 'queue_id': 'string'},
         {'type': 'queue', 'queue_id': None},
-    
+
         {'type': 'sound'},
         {'type': 'sound', 'missing_required_field': 'string'},
         {'type': 'sound', 'filename': 1234},
@@ -131,12 +130,12 @@ def new_invalid_destinations():
         {'type': 'sound', 'filename': 'daddy-cool', 'no_answer': 'invalid'},
         {'type': 'sound', 'filename': 'daddy-cool', 'no_answer': []},
         {'type': 'sound', 'filename': 'daddy-cool', 'no_answer': {}},
-    
+
         {'type': 'user'},
         {'type': 'user', 'missing_required_field': 123},
         {'type': 'user', 'user_id': 'string'},
         {'type': 'user', 'user_id': None},
-    
+
         {'type': 'voicemail'},
         {'type': 'voicemail', 'missing_required_field': 123},
         {'type': 'voicemail', 'voicemail_id': 'string'},
