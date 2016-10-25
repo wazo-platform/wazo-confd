@@ -306,6 +306,14 @@ def test_dissociation(line, extension):
 
 @fixtures.line_sip()
 @fixtures.extension()
+def test_edit_context_to_incall_when_associated(line, extension):
+    with a.line_extension(line, extension, check=True):
+        response = confd.extensions(extension['id']).put(context=config.INCALL_CONTEXT)
+        response.assert_status(400)
+
+
+@fixtures.line_sip()
+@fixtures.extension()
 def test_get_extension_relation(line, extension):
     expected = has_entries(
         extensions=contains(has_entries(id=extension['id'],

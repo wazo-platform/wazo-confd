@@ -53,7 +53,7 @@ class DeviceUpdater(object):
         line_extension = self.line_extension_dao.find_by(extension_id=extension.id)
         if line_extension:
             user_line = self.user_line_dao.find_by(line_id=line_extension.line_id, main_user=True)
-            return user_line.user_id
+            return user_line.user_id if user_line else None
 
     def update_for_user(self, user):
         for user_line in self.user_line_dao.find_all_by_user_id(user.id):
