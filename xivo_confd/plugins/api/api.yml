@@ -2473,6 +2473,330 @@ definitions:
         items:
           $ref: '#/definitions/CtiProfile'
         type: array
+  DestinationType:
+    title: DestinationType
+    properties:
+      application:
+        $ref: '#/definitions/DestinationApplicationApplication'
+      conference:
+        $ref: '#/definitions/DestinationConference'
+      custom:
+        $ref: '#/definitions/DestinationCustom'
+      extension:
+        $ref: '#/definitions/DestinationExtension'
+      group:
+        $ref: '#/definitions/DestinationGroup'
+      hangup:
+        $ref: '#/definitions/DestinationHangupCause'
+      ivr:
+        $ref: '#/definitions/DestinationIVR'
+      none:
+        $ref: '#/definitions/DestinationNone'
+      outcall:
+        $ref: '#/definitions/DestinationOutcall'
+      sound:
+        $ref: '#/definitions/DestinationSound'
+      user:
+        $ref: '#/definitions/DestinationUser'
+      voicemail:
+        $ref: '#/definitions/DestinationVoicemail'
+  DestinationApplicationApplication:
+    title: DestinationApplicationApplication
+    properties:
+      callback_disa:
+        $ref: '#/definitions/DestinationApplicationCallbackDISA'
+      directory:
+        $ref: '#/definitions/DestinationApplicationDirectory'
+      disa:
+        $ref: '#/definitions/DestinationApplicationDISA'
+      fax_to_mail:
+        $ref: '#/definitions/DestinationApplicationFaxToMail'
+      voicemail:
+        $ref: '#/definitions/DestinationApplicationVoicemail'
+  DestinationApplication:
+    title: DestinationApplication
+    properties:
+      type:
+        type: string
+        description: MUST be 'application'
+    required:
+    - type
+  DestinationApplicationCallbackDISA:
+    title: DestinationApplicationCallbackDISA
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'callback_disa'
+        context:
+          type: integer
+          description: The context of the application
+        pin:
+          type: string
+          description: the pin of the application
+    required:
+    - application
+    - context
+  DestinationApplicationDirectory:
+    title: DestinationApplicationDirectory
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'directory'
+        context:
+          type: integer
+          description: The context of the application
+    required:
+    - application
+    - context
+  DestinationApplicationDISA:
+    title: DestinationApplicationDISA
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'disa'
+        context:
+          type: integer
+          description: The context of the application
+        pin:
+          type: string
+          description: the pin of the application
+    required:
+    - application
+    - context
+  DestinationApplicationFaxToMail:
+    title: DestinationApplicationFaxToMail
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'fax_to_mail'
+        email:
+          type: string
+          description: The email of the application
+    required:
+    - application
+    - email
+  DestinationApplicationVoicemail:
+    title: DestinationApplicationVoicemail
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'voicemail'
+        context:
+          type: integer
+          description: The context of the application
+    required:
+    - application
+    - context
+  DestinationConference:
+    title: DestinationConference
+    properties:
+      type:
+        type: string
+        description: MUST be 'conference'
+      conference_id:
+        type: integer
+        description: The id of the conference
+    required:
+    - type
+    - conference_id
+  DestinationCustom:
+    title: DestinationCustom
+    properties:
+      type:
+        type: string
+        description: MUST be 'custom'
+      command:
+        type: string
+        description: The command to execute
+    required:
+    - type
+    - command
+  DestinationExtension:
+    title: DestinationExtension
+    properties:
+      type:
+        type: string
+        description: MUST be 'extension'
+      exten:
+        type: string
+      context:
+        type: string
+        description: Context of the extension
+    required:
+    - type
+    - exten
+    - context
+  DestinationGroup:
+    title: DestinationGroup
+    properties:
+      type:
+        type: string
+        description: MUST be 'group'
+      group_id:
+        type: integer
+        description: The id of the group
+      ring_time:
+        type: number
+        format: float
+    required:
+    - type
+    - group_id
+  DestinationHangupCause:
+    title: DestinationHangupCause
+    properties:
+      busy:
+        $ref: '#/definitions/DestinationHangupBusy'
+      congestion:
+        $ref: '#/definitions/DestinationHangupCongestion'
+      normal:
+        $ref: '#/definitions/DestinationHangupNormal'
+  DestinationHangup:
+    title: DestinationHangup
+    properties:
+      type:
+        type: string
+        description: MUST be 'hangup'
+    required:
+    - type
+  DestinationHangupBusy:
+    title: DestinationHangupBusy
+    allOf:
+    - $ref: '#/definitions/DestinationHangup'
+    - properties:
+        cause:
+          type: string
+          description: MUST be 'busy'
+        timeout:
+          type: integer
+          description: The timeout of the hangup
+    required:
+    - cause
+  DestinationHangupCongestion:
+    title: DestinationHangupCongestion
+    allOf:
+    - $ref: '#/definitions/DestinationHangup'
+    - properties:
+        cause:
+          type: string
+          description: MUST be 'congestion'
+        timeout:
+          type: integer
+          description: The timeout of the hangup
+    required:
+    - cause
+  DestinationHangupNormal:
+    title: DestinationHangupNormal
+    allOf:
+    - $ref: '#/definitions/DestinationHangup'
+    - properties:
+        cause:
+          type: string
+          description: MUST be 'normal'
+    required:
+    - cause
+  DestinationIVR:
+    title: DestinationIVR
+    properties:
+      type:
+        type: string
+        description: MUST be 'ivr'
+      ivr_id:
+        type: integer
+        description: The id of the IVR
+    required:
+    - type
+    - ivr_id
+  DestinationNone:
+    title: DestinationNone
+    properties:
+      type:
+        type: string
+        description: MUST be 'none'
+    required:
+    - type
+  DestinationOutcall:
+    title: DestinationOutcall
+    properties:
+      type:
+        type: string
+        description: MUST be 'outcall'
+      exten:
+        type: string
+      outcall_id:
+        type: integer
+        description: The id of the outcall
+    required:
+    - type
+    - exten
+    - outcall_id
+  DestinationSound:
+    title: DestinationSound
+    properties:
+      type:
+        type: string
+        description: MUST be 'sound'
+      filename:
+        type: string
+        description: The filename of the sound. The file MUST be imported by to webi
+          in the playback directory. The extension of file SHOULD be not present.
+      skip:
+        type: boolean
+        description: Do not play this sound if the call is not answered
+      no_answer:
+        type: boolean
+        description: Play this sound without answering the call
+    required:
+    - type
+    - exten
+    - outcall_id
+  DestinationUser:
+    title: DestinationUser
+    properties:
+      type:
+        type: string
+        description: MUST be 'user'
+      user_id:
+        type: integer
+        description: The id of the user
+      ring_time:
+        type: number
+        format: float
+    required:
+    - type
+    - user_id
+  DestinationVoicemail:
+    title: DestinationVoicemail
+    properties:
+      type:
+        type: string
+        description: MUST be 'voicemail'
+      voicemail_id:
+        type: integer
+        description: The id of the voicemail
+      skip_instructions:
+        type: boolean
+        description: Skip the playback of instructions for leaving a message
+      greeting:
+        type:
+        - string
+        - 'null'
+        enum:
+        - busy
+        - unavailable
+        description: Play the specified greeting
+    required:
+    - type
+    - user_id
   Device:
     title: Device
     properties:

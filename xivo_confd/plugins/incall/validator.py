@@ -16,58 +16,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import (GetResource,
-                                          ResourceExists,
-                                          Validator,
+from xivo_confd.destination import DestinationValidator
+from xivo_confd.helpers.validator import (Validator,
                                           ValidationGroup)
-
-from xivo_dao.resources.conference import dao as conference_dao
-from xivo_dao.resources.group import dao as group_dao
-from xivo_dao.resources.ivr import dao as ivr_dao
-from xivo_dao.resources.outcall import dao as outcall_dao
-from xivo_dao.resources.queue import dao as queue_dao
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 
 class IncallModelValidator(Validator):
 
-    def __init__(self, destinations):
-        self.destinations = destinations
+    def __init__(self, destination_validator):
+        self._destination_validator = destination_validator
 
     def validate(self, incall):
-        self.validate_destination(incall)
-
-    def validate_destination(self, incall):
-        dest_type = incall.destination.action
-        for validator in self.destinations[dest_type]:
-            validator.validate(incall.destination)
+        self._destination_validator.validate(incall.destination)
 
 
 def build_validator():
-    destination_validators = {
-        'application:callbackdisa': [],
-        'application:directory': [],
-        'application:disa': [],
-        'application:faxtomail': [],
-        'application:voicemailmain': [],
-        'custom': [],
-        'extension': [],
-        'group': [ResourceExists('actionarg1', group_dao.exists, 'Group')],
-        'endcall:busy': [],
-        'endcall:congestion': [],
-        'endcall:hangup': [],
-        'ivr': [ResourceExists('actionarg1', ivr_dao.get, 'IVR')],
-        'meetme': [ResourceExists('actionarg1', conference_dao.exists, 'Conference')],
-        'none': [],
-        'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
-        'queue': [ResourceExists('actionarg1', queue_dao.exists, 'Queue')],
-        'sound': [],
-        'user': [GetResource('actionarg1', user_dao.get, 'User')],
-        'voicemail': [GetResource('actionarg1', voicemail_dao.get, 'Voicemail')],
-    }
-
-    incall_validator = IncallModelValidator(destination_validators)
+    incall_validator = IncallModelValidator(DestinationValidator())
 
     return ValidationGroup(
         create=[incall_validator],
