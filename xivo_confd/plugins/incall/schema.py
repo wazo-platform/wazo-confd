@@ -20,7 +20,7 @@
 from marshmallow import fields
 from marshmallow.validate import OneOf, Length
 
-from xivo_confd.destination import DestinationField
+from xivo_confd.helpers.destination import DestinationField
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 

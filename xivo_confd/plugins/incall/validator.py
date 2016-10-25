@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.destination import DestinationValidator
+from xivo_confd.helpers.destination import DestinationValidator
 from xivo_confd.helpers.validator import (Validator,
                                           ValidationGroup)
 

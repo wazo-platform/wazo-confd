@@ -19,8 +19,16 @@
 
 from marshmallow import Schema, fields, pre_dump, post_load, post_dump
 from marshmallow.validate import Length, OneOf, Regexp, Predicate
+from xivo_dao.resources.conference import dao as conference_dao
+from xivo_dao.resources.group import dao as group_dao
+from xivo_dao.resources.ivr import dao as ivr_dao
+from xivo_dao.resources.outcall import dao as outcall_dao
+from xivo_dao.resources.queue import dao as queue_dao
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from xivo_confd.helpers.mallow import StrictBoolean
+from xivo_confd.helpers.validator import GetResource, ResourceExists
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
 CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,39}$'
@@ -314,3 +322,32 @@ class DestinationField(fields.Nested):
             schema = self.hangup_schemas[base['cause']]
 
         return fields.Nested(schema)._serialize(nested_obj, attr, obj)
+
+
+class DestinationValidator(object):
+
+    _VALIDATORS = {
+        'application:callbackdisa': [],
+        'application:directory': [],
+        'application:disa': [],
+        'application:faxtomail': [],
+        'application:voicemailmain': [],
+        'custom': [],
+        'extension': [],
+        'group': [ResourceExists('actionarg1', group_dao.exists, 'Group')],
+        'endcall:busy': [],
+        'endcall:congestion': [],
+        'endcall:hangup': [],
+        'ivr': [ResourceExists('actionarg1', ivr_dao.get, 'IVR')],
+        'meetme': [ResourceExists('actionarg1', conference_dao.exists, 'Conference')],
+        'none': [],
+        'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
+        'queue': [ResourceExists('actionarg1', queue_dao.exists, 'Queue')],
+        'sound': [],
+        'user': [GetResource('actionarg1', user_dao.get, 'User')],
+        'voicemail': [GetResource('actionarg1', voicemail_dao.get, 'Voicemail')],
+    }
+
+    def validate(self, destination):
+        for validator in self._VALIDATORS[destination.action]:
+            validator.validate(destination)

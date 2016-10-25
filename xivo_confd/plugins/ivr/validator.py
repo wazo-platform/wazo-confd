@@ -17,7 +17,7 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.destination import DestinationValidator
+from xivo_confd.helpers.destination import DestinationValidator
 from xivo_confd.helpers.validator import (Validator,
                                           ValidationGroup)
 
