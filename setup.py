@@ -54,6 +54,7 @@ setup(
             'incall_extension_plugin = xivo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_plugin = xivo_confd.plugins.incall.plugin:Plugin',
             'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
+            'ivr_plugin = xivo_confd.plugins.ivr.plugin:Plugin',
             'line_device_plugin = xivo_confd.plugins.line_device.plugin:Plugin',
             'line_endpoint_plugin = xivo_confd.plugins.line_endpoint.plugin:Plugin',
             'line_extension_plugin = xivo_confd.plugins.line_extension.plugin:Plugin',

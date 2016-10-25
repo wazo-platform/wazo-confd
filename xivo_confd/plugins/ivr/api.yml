@@ -1,0 +1,189 @@
+paths:
+  /ivr:
+    get:
+      operationId: list_ivr
+      summary: List IVR
+      description: '**Required ACL:** `confd.ivr.read`'
+      tags:
+      - ivr
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: IVR list
+          schema:
+            $ref: '#/definitions/IvrItems'
+    post:
+      operationId: create_ivr
+      summary: Create IVR
+      description: '**Required ACL:** `confd.ivr.create`'
+      tags:
+      - ivr
+      parameters:
+      - name: body
+        in: body
+        description: IVR to create
+        required: true
+        schema:
+          $ref: '#/definitions/Ivr'
+      responses:
+        '201':
+          description: IVR created
+          schema:
+            $ref: '#/definitions/Ivr'
+        '400':
+          $ref: '#/responses/CreateError'
+  /ivr/{ivr_id}:
+    get:
+      operationId: get_ivr
+      summary: Get IVR
+      description: '**Required ACL:** `confd.ivr.{ivr_id}.read`'
+      tags:
+      - ivr
+      parameters:
+      - $ref: '#/parameters/ivrid'
+      responses:
+        '200':
+          description: IVR
+          schema:
+            $ref: '#/definitions/Ivr'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_ivr
+      summary: Update IVR
+      description: '**Required ACL:** `confd.ivr.{ivr_id}.update`'
+      tags:
+      - ivr
+      parameters:
+      - $ref: '#/parameters/ivrid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Ivr'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_ivr
+      summary: Delete IVR
+      description: '**Required ACL:** `confd.ivr.{ivr_id}.delete`'
+      tags:
+      - ivr
+      parameters:
+      - $ref: '#/parameters/ivrid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  ivrid:
+    required: true
+    type: integer
+    name: ivr_id
+    in: path
+    description: IVR's ID
+definitions:
+  Ivr:
+    title: IVR
+    allOf:
+    - properties:
+        id:
+          type: integer
+          readOnly: true
+          description: The id of the IVR
+        name:
+          type: string
+          description: The name of the IVR
+        description:
+          type: string
+          description: Additional information about the IVR
+        greeting_sound:
+          type: string
+          description: The sound played to greet the caller
+        menu_sound:
+          type: string
+          description: The sound played to prompt the caller for input
+        invalid_sound:
+          type: string
+          description: The sound played when the caller choose an invalid option. Not used if an invalid destination is set
+        abort_sound:
+          type: string
+          description: The sound played when the caller reach the maximum number of tries. Not used if an abort destination is set
+        timeout:
+          type: integer
+          default: 5
+          description: Number of seconds to wait after the menu sound is played before either replaying the menu, redirecting the call to the timeout destination (if set) or aborting the call (if the maximum number of tries has been reached)
+        max_tries:
+          type: integer
+          default: 3
+          description: The maximum number of tries before aborting the call. Both a timeout and an invalid choice counts toward the number of tries
+        invalid_destination:
+          description: The destination to redirect the caller to when he choose an invalid option. If not set, the menu will be replayed
+          $ref: '#/definitions/DestinationType'
+        timeout_destination:
+          description: The destination to redirect the caller to on timeout. If not set, the menu will be replayed
+          $ref: '#/definitions/DestinationType'
+        abort_destination:
+          description: The destination to redirect the caller to when the maximum number of tries is reached. If not set, the call will be hanged up after playing the abort sound (if set)
+          $ref: '#/definitions/DestinationType'
+        choices:
+          type: array
+          description: The menu's choices
+          items:
+            $ref: '#/definitions/IvrChoice'
+    required:
+    - name
+    - menu_sound
+    example:
+      name: ivr1
+      description: My IVR
+      greeting_sound: /var/lib/xivo/sounds/playback/ivr1-greeting
+      menu_sound: /var/lib/xivo/sounds/playback/ivr1-menu
+      abort_destination:
+        type: group
+        group_id: 1
+      choices:
+      - exten: "1"
+        destination:
+          type: user
+          user_id: 2
+      - exten: "0"
+        destination:
+          type: group
+          group_id: 1
+  IvrChoice:
+    title: IvrChoice
+    properties:
+      destination:
+        description: The destination to redirect the caller to when this choice is selected
+        $ref: '#/definitions/DestinationType'
+      exten:
+        type: string
+        description: The extension the caller has to dial to select this choice. Can be an extension pattern
+    required:
+    - destination
+    - exten
+  IvrItems:
+    title: IvrItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Ivr'
+      total:
+        type: integer
+    required:
+    - total

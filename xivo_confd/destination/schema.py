@@ -301,6 +301,8 @@ class DestinationField(fields.Nested):
 
     def _serialize(self, nested_obj, attr, obj):
         base = super(DestinationField, self)._serialize(nested_obj, attr, obj)
+        if not base:
+            return base
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
