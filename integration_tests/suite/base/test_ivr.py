@@ -19,7 +19,7 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
-from test_api.helpers.destination import new_invalid_destinations, new_valid_destinations
+from test_api.helpers.destination import invalid_destinations, valid_destinations
 
 from hamcrest import (assert_that,
                       contains,
@@ -100,13 +100,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': 123, 'destination': {'type': 'none'}}]
     yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': '1', 'destination': 'invalid'}]
 
-    invalid_destinations = new_invalid_destinations()
     required_fields = {'name': 'ivr', 'menu_sound': 'menu'}
-    for destination in invalid_destinations:
+    for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'invalid_destination', destination, required_fields
-    for destination in invalid_destinations:
+    for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'timeout_destination', destination, required_fields
-    for destination in invalid_destinations:
+    for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'abort_destination', destination, required_fields
 
 
@@ -249,7 +248,7 @@ def test_edit_all_parameters(ivr):
 @fixtures.user()
 @fixtures.voicemail()
 def test_valid_destinations(ivr, conference, dest_ivr, group, outcall, queue, user, voicemail):
-    for destination in new_valid_destinations(conference, dest_ivr, group, outcall, queue, user, voicemail):
+    for destination in valid_destinations(conference, dest_ivr, group, outcall, queue, user, voicemail):
         yield create_ivr_with_destination, destination
         yield update_ivr_with_destination, ivr['id'], destination
 

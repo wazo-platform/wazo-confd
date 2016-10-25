@@ -17,7 +17,7 @@
 
 from test_api import scenarios as s
 
-def new_invalid_destinations():
+def invalid_destinations():
     return [
         1234,
         'string',
@@ -147,7 +147,7 @@ def new_invalid_destinations():
     ]
 
 
-def new_valid_destinations(conference, ivr, group, outcall, queue, user, voicemail):
+def valid_destinations(conference, ivr, group, outcall, queue, user, voicemail):
     return [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
