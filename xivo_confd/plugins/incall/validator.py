@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +23,7 @@ from xivo_confd.helpers.validator import (GetResource,
 
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
+from xivo_dao.resources.ivr import dao as ivr_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
@@ -55,6 +57,7 @@ def build_validator():
         'endcall:busy': [],
         'endcall:congestion': [],
         'endcall:hangup': [],
+        'ivr': [ResourceExists('actionarg1', ivr_dao.get, 'IVR')],
         'meetme': [ResourceExists('actionarg1', conference_dao.exists, 'Conference')],
         'none': [],
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],

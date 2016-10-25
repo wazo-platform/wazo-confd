@@ -166,6 +166,8 @@ definitions:
         $ref: '#/definitions/IncallDestinationGroup'
       hangup:
         $ref: '#/definitions/IncallDestinationHangupCause'
+      ivr:
+        $ref: '#/definitions/IncallDestinationIVR'
       none:
         $ref: '#/definitions/IncallDestinationNone'
       outcall:
@@ -380,6 +382,18 @@ definitions:
           description: MUST be 'normal'
     required:
     - cause
+  IncallDestinationIVR:
+    title: IncallDestinationIVR
+    properties:
+      type:
+        type: string
+        description: MUST be 'ivr'
+      ivr_id:
+        type: integer
+        description: The id of the IVR
+    required:
+    - type
+    - ivr_id
   IncallDestinationNone:
     title: IncallDestinationNone
     properties:

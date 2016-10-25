@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,6 +35,7 @@ class BaseDestinationSchema(Schema):
                                          'extension',
                                          'group',
                                          'hangup',
+                                         'ivr',
                                          'none',
                                          'outcall',
                                          'queue',
@@ -170,6 +172,10 @@ class CongestionDestinationSchema(HangupDestinationSchema):
     timeout = fields.Float(attribute='actionarg1', allow_none=True)
 
 
+class IVRDestinationSchema(BaseDestinationSchema):
+    ivr_id = fields.Integer(attribute='actionarg1', required=True)
+
+
 class NormalDestinationSchema(HangupDestinationSchema):
     pass
 
@@ -267,6 +273,7 @@ class IncallDestinationField(fields.Nested):
         'group': GroupDestinationSchema,
         'hangup': HangupDestinationSchema,
         'endcall': HangupDestinationSchema,
+        'ivr': IVRDestinationSchema,
         'none': NoneDestinationSchema,
         'outcall': OutcallDestinationSchema,
         'queue': QueueDestinationSchema,

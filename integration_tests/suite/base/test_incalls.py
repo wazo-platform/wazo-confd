@@ -113,6 +113,11 @@ invalid_destinations = [
 
     {'type': 'hangup', 'cause': 'congestion', 'timeout': 'invalid'},
 
+    {'type': 'ivr'},
+    {'type': 'ivr', 'missing_required_field': 123},
+    {'type': 'ivr', 'ivr_id': 'string'},
+    {'type': 'ivr', 'ivr_id': None},
+
     {'type': 'outcall'},
     {'type': 'outcall', 'missing_required_field': 123},
     {'type': 'outcall', 'outcall_id': 'string'},
@@ -302,12 +307,13 @@ def test_edit_all_parameters(incall):
 
 @fixtures.incall()
 @fixtures.conference()
+@fixtures.ivr()
 @fixtures.group()
 @fixtures.outcall()
 @fixtures.queue()
 @fixtures.user()
 @fixtures.voicemail()
-def test_valid_destinations(incall, conference, group, outcall, queue, user, voicemail):
+def test_valid_destinations(incall, conference, ivr, group, outcall, queue, user, voicemail):
     valid_destinations = [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
@@ -340,6 +346,7 @@ def test_valid_destinations(incall, conference, group, outcall, queue, user, voi
         {'type': 'hangup', 'cause': 'congestion'},
         {'type': 'hangup', 'cause': 'congestion', 'timeout': 0.6},
         {'type': 'hangup', 'cause': 'congestion', 'timeout': None},
+        {'type': 'ivr', 'ivr_id': ivr['id']},
         {'type': 'none'},
         {'type': 'outcall', 'outcall_id': outcall['id'], 'exten': '1234567890'},
         {'type': 'queue', 'queue_id': queue['id']},
