@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
 # Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,24 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.destination import DestinationValidator
-from xivo_confd.helpers.validator import (Validator,
-                                          ValidationGroup)
+from .validator import build_validator
+from .notifier import build_notifier
+
+from xivo_confd.helpers.resource import CRUDService
+
+from xivo_dao.resources.ivr import dao as ivr_dao
 
 
-class IncallModelValidator(Validator):
-
-    def __init__(self, destination_validator):
-        self._destination_validator = destination_validator
-
-    def validate(self, incall):
-        self._destination_validator.validate(incall.destination)
-
-
-def build_validator():
-    incall_validator = IncallModelValidator(DestinationValidator())
-
-    return ValidationGroup(
-        create=[incall_validator],
-        edit=[incall_validator],
-    )
+def build_service():
+    return CRUDService(ivr_dao,
+                       build_validator(),
+                       build_notifier())

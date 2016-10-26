@@ -197,3 +197,9 @@ class outcall(IsolatedAction):
 
     actions = {'generate': h.outcall.generate_outcall,
                'delete': h.outcall.delete_outcall}
+
+
+class ivr(IsolatedAction):
+
+    actions = {'generate': h.ivr.generate_ivr,
+               'delete': h.ivr.delete_ivr}

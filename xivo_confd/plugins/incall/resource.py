@@ -25,13 +25,6 @@ from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
 
-def _create_destination(form):
-    destination = Dialaction()
-    for name, value in form.iteritems():
-        setattr(destination, name, value)
-    return destination
-
-
 class IncallList(ListResource):
 
     model = Incall
@@ -44,7 +37,7 @@ class IncallList(ListResource):
     def post(self):
         schema = self.schema()
         form = schema.load(request.get_json()).data
-        form['destination'] = _create_destination(form['destination'])
+        form['destination'] = Dialaction(**form['destination'])
         model = self.model(**form)
         model = self.service.create(model)
         return schema.dump(model).data, 201, self.build_headers(model)
@@ -69,7 +62,7 @@ class IncallItem(ItemResource):
     def parse_and_update(self, model):
         form = self.schema().load(request.get_json(), partial=True).data
         updated_fields = self.find_updated_fields(model, form)
-        form['destination'] = _create_destination(form['destination'])
+        form['destination'] = Dialaction(**form['destination'])
 
         for name, value in form.iteritems():
             setattr(model, name, value)

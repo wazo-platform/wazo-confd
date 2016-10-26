@@ -105,6 +105,7 @@ DEFAULT_CONFIG = {
         'incall_extension_plugin',
         'incall_plugin',
         'info_plugin',
+        'ivr_plugin',
         'line_device_plugin',
         'line_endpoint_plugin',
         'line_extension_plugin',

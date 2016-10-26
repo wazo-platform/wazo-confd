@@ -21,8 +21,7 @@ from marshmallow import fields
 from marshmallow.validate import Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-
-EXTEN_REGEX = r'^_[*#0-9_XxZzNn\[\].!-]{1,39}$|[*#0-9]{1,40}$'
+from xivo_confd.helpers.validator import EXTEN_REGEX
 
 
 class ExtensionSchema(BaseSchema):
