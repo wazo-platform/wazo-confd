@@ -272,3 +272,10 @@ def test_delete(ivr):
     response.assert_deleted()
     response = confd.ivr(ivr['id']).get()
     response.assert_match(404, e.not_found(resource='IVR'))
+
+
+@fixtures.ivr()
+def test_bus_events(ivr):
+    yield s.check_bus_event, 'config.ivr.created', confd.ivr.post, {'name': 'a', 'menu_sound': 'hello'}
+    yield s.check_bus_event, 'config.ivr.edited', confd.ivr(ivr['id']).put
+    yield s.check_bus_event, 'config.ivr.deleted', confd.ivr(ivr['id']).delete
