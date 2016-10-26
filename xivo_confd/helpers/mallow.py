@@ -16,10 +16,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import logging
+
 from flask import url_for
 from flask_restful import abort
 from marshmallow import Schema, fields, pre_load
 from marshmallow.exceptions import RegistryError
+
+logger = logging.getLogger(__name__)
 
 
 class BaseSchema(Schema):
@@ -33,8 +37,14 @@ class BaseSchema(Schema):
             self.handle_error = handle_error_fn
 
     def on_bind_field(self, field_name, field_obj):
-        if self._registry_error_on_nested_field(field_name, field_obj):
+        if isinstance(field_obj, fields.Nested) and not self._nested_field_is_loaded(field_obj):
+            logger.warning('"%s": No such schema. Removing attribute "%s.%s". Some API models will be incomplete.',
+                           field_obj.nested,
+                           self.__class__.__name__,
+                           field_name)
+            self.declared_fields.pop(field_name, None)
             return
+
         # Without this, the nested schema handle error and abort. So the error
         # message will not include parent key and the rest of the parent schema
         # will not be validated
@@ -46,14 +56,12 @@ class BaseSchema(Schema):
         if isinstance(field_obj, fields.List):
             self._inherit_handle_error(field_obj.container)
 
-    def _registry_error_on_nested_field(self, field_name, field_obj):
-        if isinstance(field_obj, fields.Nested):
-            try:
-                field_obj.schema
-            except RegistryError:
-                self.declared_fields.pop(field_name, None)
-                return True
+    def _nested_field_is_loaded(self, nested_field_obj):
+        try:
+            nested_field_obj.schema
+        except RegistryError:
             return False
+        return True
 
     @pre_load
     def ensure_dict(self, data):
