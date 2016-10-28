@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -132,6 +133,17 @@ def test_dissociate_using_uuid(user, voicemail):
     with a.user_voicemail(user, voicemail, check=False):
         response = confd.users(user['uuid']).voicemails.delete()
         response.assert_deleted()
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_voicemail_relation(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.users(user['id']).get()
+        assert_that(response.item, has_entries(
+            voicemail=has_entries(id=voicemail['id'],
+                                  name=voicemail['name'])
+        ))
 
 
 @fixtures.user()

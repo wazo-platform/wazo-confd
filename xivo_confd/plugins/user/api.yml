@@ -353,6 +353,7 @@ definitions:
     - $ref: '#/definitions/UserRelationLines'
     - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationServices'
+    - $ref: '#/definitions/UserRelationVoicemail'
     required:
     - firstname
   UserRelationBase:
@@ -389,6 +390,11 @@ definitions:
       services:
         readOnly: true
         $ref: '#/definitions/UserServices'
+  UserRelationVoicemail:
+    properties:
+      voicemail:
+        readOnly: true
+        $ref: '#/definitions/VoicemailRelationBase'
   UserService:
     title: UserService
     properties:

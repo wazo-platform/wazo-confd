@@ -464,7 +464,8 @@ def test_get_user(user):
                   'noanswer': {'destination': None, 'enabled': False},
                   'unconditional': {'destination': None, 'enabled': False}},
         services={'dnd': {'enabled': False},
-                  'incallfilter': {'enabled': False}}
+                  'incallfilter': {'enabled': False}},
+        voicemail=none(),
     ))
 
 

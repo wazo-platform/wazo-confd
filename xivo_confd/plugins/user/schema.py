@@ -69,6 +69,11 @@ class UserSchema(BaseSchema):
                           dump_only=True)
     forwards = fields.Nested('ForwardsSchema', dump_only=True)
     services = fields.Nested('ServicesSchema', dump_only=True)
+    voicemail = fields.Nested('VoicemailSchema',
+                              only=['id',
+                                    'name',
+                                    'links'],
+                              dump_only=True)
 
 
 class UserDirectorySchema(BaseSchema):
