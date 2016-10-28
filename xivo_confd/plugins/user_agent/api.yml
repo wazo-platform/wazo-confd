@@ -50,13 +50,7 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-parameters:
-  agentid:
-    required: true
-    type: integer
-    name: agent_id
-    in: path
-    description: Agent's ID
+
 definitions:
   UserAgent:
     title: UserAgent

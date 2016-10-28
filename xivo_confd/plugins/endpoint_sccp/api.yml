@@ -1,0 +1,139 @@
+paths:
+  /endpoints/sccp:
+    get:
+      operationId: list_endpoints_sccp
+      summary: List SCCP endpoints
+      description: '**Required ACL:** `confd.endpoints.sccp.read`'
+      tags:
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: SCCP endpoint list
+          schema:
+            $ref: '#/definitions/EndpointSccpItems'
+    post:
+      operationId: create_endpoint_sccp
+      summary: Create SCCP endpoint
+      description: '**Required ACL:** `confd.endpoints.sccp.create`'
+      tags:
+      - endpoints
+      - sccp
+      parameters:
+      - name: body
+        in: body
+        description: SCCP Endpoint to create
+        required: false
+        schema:
+          $ref: '#/definitions/EndpointSccp'
+      responses:
+        '201':
+          description: SCCP endpoint created
+          schema:
+            $ref: '#/definitions/EndpointSccp'
+        '400':
+          $ref: '#/responses/CreateError'
+  /endpoints/sccp/{sccp_id}:
+    get:
+      operationId: get_endpoint_sccp
+      summary: Get SCCP Endpoint
+      description: '**Required ACL:** `confd.endpoints.sccp.{sccp_id}.read`'
+      tags:
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/sccpid'
+      responses:
+        '200':
+          description: SCCP Endpoint
+          schema:
+            $ref: '#/definitions/EndpointSccp'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_endpoint_sccp
+      summary: Update SCCP Endpoint
+      description: '**Required ACL:** `confd.endpoints.sccp.{sccp_id}.update`'
+      tags:
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/sccpid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/EndpointSccp'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_endpoint_sccp
+      summary: Delete SCCP Endpoint
+      description: '**Required ACL:** `confd.endpoints.sccp.{sccp_id}.delete`'
+      tags:
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/sccpid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  sccpid:
+    required: true
+    type: integer
+    name: sccp_id
+    in: path
+
+definitions:
+  EndpointSccp:
+    title: SCCP Endpoint
+    allOf:
+    - $ref: '#/definitions/EndpointSccpRelationBase'
+    - properties:
+        options:
+          description: "Advanced configuration options. Options are appended at the\
+            \ end of a \nSCCP account in the file 'sccp.conf' used by asterisk.\n\
+            Please consult the asterisk documentation for further details on available\n\
+            parameters. Because of database limitations, only the following options\
+            \ are allowed:\n\n * cid_name\n * cid_num\n * allow\n * disallow\n \n\
+            Options must have the following the form:\n\n```\n{\n  \"options\": [\n\
+            \    [\"name1\", \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n```\n\
+            \nThe resulting configuration in sip.conf will have the following form:\n\
+            \n```\n[1000]\nname1=value1\nname2=value2\n```\n"
+          type: array
+          items:
+            $ref: '#/definitions/KeyValueOption'
+    - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
+  EndpointSccpRelationBase:
+    properties:
+      id:
+        type: integer
+        description: SCCP Endpoint ID
+        readOnly: true
+  EndpointSccpItems:
+    title: SCCP Endpoints
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/EndpointSccp'
+        type: array
+      total:
+        type: integer

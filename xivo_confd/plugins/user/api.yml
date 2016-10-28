@@ -226,6 +226,25 @@ paths:
           $ref: '#/responses/UpdateError'
 
 parameters:
+  forward:
+    required: true
+    type: string
+    enum:
+    - busy
+    - noanswer
+    - unconditional
+    name: forward_name
+    in: path
+    description: the forward name
+  service:
+    required: true
+    type: string
+    enum:
+    - dnd
+    - incallfilter
+    name: service_name
+    in: path
+    description: the service name
   useriduuid:
     required: true
     type: string
@@ -400,3 +419,14 @@ definitions:
         $ref: '#/definitions/UserForward'
       unconditional:
         $ref: '#/definitions/UserForward'
+  UserItems:
+    title: UserItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/User'
+      total:
+        type: integer
+    required:
+    - total

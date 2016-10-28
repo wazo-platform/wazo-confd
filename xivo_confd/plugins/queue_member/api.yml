@@ -1,0 +1,109 @@
+paths:
+  /queues/{queue_id}/members/agents:
+    post:
+      operationId: associate_agent_queue
+      summary: Associate an agent and queue
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.create`
+
+
+        Position in queue is set to max position + 1 or 0 if it is the first member
+        of the queue'
+      tags:
+      - agents
+      - queues
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/AgentQueue'
+      responses:
+        '200':
+          description: Agent and Queue associated
+          schema:
+            $ref: '#/definitions/AgentQueue'
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /queues/{queue_id}/members/agents/{agent_id}:
+    get:
+      operationId: get_agent_queue_association
+      summary: Get Agent-Queue association
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.read`'
+      tags:
+      - agents
+      - queues
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/agentid'
+      responses:
+        '200':
+          description: Agent-Queue association
+          schema:
+            $ref: '#/definitions/AgentQueue'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_agent_queue_association
+      summary: Update Agent-Queue association
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.update`'
+      tags:
+      - agents
+      - queues
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/agentid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/AgentQueue'
+      responses:
+        '204':
+          description: Association updated
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_agent_queue
+      summary: Dissociate agent and queue
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.delete`'
+      tags:
+      - agents
+      - queues
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/agentid'
+      responses:
+        '204':
+          description: Agent and Queue dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  AgentQueue:
+    title: AgentQueue
+    description: An association between an agent and a queue. Agents associated to
+      a Queue will receive calls when they are logged in.
+    required:
+    - agent_id
+    properties:
+      agent_id:
+        type: integer
+        format: int32
+        description: Agent's ID
+      queue_id:
+        type: integer
+        format: int32
+        description: Queue's ID
+        readOnly: true
+      penalty:
+        type: integer
+        format: int32
+        minimum: 0
+        description: Agent's penalty. A priority used for distributing calls.

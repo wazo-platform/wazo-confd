@@ -1,0 +1,45 @@
+paths:
+  /users/{user_id}/entities:
+    get:
+      operationId: get_user_entity_association
+      summary: Get entity of a user
+      description: '**Required ACL:** `confd.users.{user_id}.entities.read`'
+      tags:
+      - users
+      - entities
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User-Entity association
+          schema:
+            $ref: '#/definitions/UserEntity'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/entities/{entity_id}:
+    put:
+      operationId: associate_user_entity
+      summary: Change the entity of a user
+      description: '**Required ACL:** `confd.users.{user_id}.entities.{entity_id}.update`'
+      tags:
+      - users
+      - entities
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/entityid'
+      responses:
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  UserEntity:
+    title: UserEntity
+    properties:
+      user_id:
+        type: integer
+        description: User's ID
+      entity_id:
+        type: integer
+        description: Entity's ID

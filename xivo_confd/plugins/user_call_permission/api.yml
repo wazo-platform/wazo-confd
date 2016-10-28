@@ -1,0 +1,91 @@
+paths:
+  /callpermissions/{callpermission_id}/users:
+    get:
+      operationId: get_callpermission_user_association
+      summary: Get users associated to call permission
+      description: '**Required ACL:** `confd.callpermissions.{callpermission_id}.users.read`'
+      tags:
+      - users
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '200':
+          description: User-CallPermission association
+          schema:
+            $ref: '#/definitions/UserCallPermissionItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/callpermissions:
+    get:
+      operationId: get_user_callpermission_association
+      summary: Get call permissions associated to user
+      description: '**Required ACL:** `confd.users.{user_id}.callpermissions.read`'
+      tags:
+      - users
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User-CallPermission association
+          schema:
+            $ref: '#/definitions/UserCallPermissionItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/callpermissions/{callpermission_id}:
+    put:
+      operationId: associate_user_callpermission
+      summary: Associate user and call permission
+      description: '**Required ACL:** `confd.users.{user_id}.callpermissions.{call_permission_id}.update`'
+      tags:
+      - users
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_user_callpermission
+      summary: Dissociate user and call permission
+      description: '**Required ACL:** `confd.users.{user_id}.callpermissions.{call_permission_id}.delete`'
+      tags:
+      - users
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '204':
+          description: User and Call Permission dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  UserCallPermission:
+    title: UserCallPermission
+    properties:
+      user_id:
+        type: integer
+        description: User's ID
+      call_permission_id:
+        type: integer
+        description: Call Permission's ID
+    required:
+    - user_id
+    - call_permission_id
+  UserCallPermissionItems:
+    title: UserCallPermissionItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/UserCallPermission'
+        type: array
+      total:
+        type: integer

@@ -1,0 +1,37 @@
+paths:
+  /configuration/live_reload:
+    get:
+      operationId: get_configuration
+      summary: Get live reload status
+      description: '**Required ACL:** `confd.configuration.live_reload.read`'
+      tags:
+      - configuration
+      responses:
+        '200':
+          description: Live reload status
+          schema:
+            $ref: '#/definitions/LiveReload'
+    put:
+      operationId: update_configuration
+      summary: Update live reload status
+      description: '**Required ACL:** `confd.configuration.live_reload.update`'
+      tags:
+      - configuration
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/LiveReload'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+
+definitions:
+  LiveReload:
+    title: LiveReload
+    properties:
+      enabled:
+        type: boolean

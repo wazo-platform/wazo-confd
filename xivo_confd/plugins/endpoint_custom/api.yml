@@ -1,0 +1,135 @@
+paths:
+  /endpoints/custom:
+    get:
+      operationId: list_endpoints_custom
+      summary: List Custom endpoints
+      description: '**Required ACL:** `confd.endpoints.custom.read`'
+      tags:
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Custom endpoint list
+          schema:
+            $ref: '#/definitions/EndpointCustomItems'
+    post:
+      operationId: create_endpoint_custom
+      summary: Create Custom endpoint
+      description: '**Required ACL:** `confd.endpoints.custom.create`'
+      tags:
+      - endpoints
+      - custom
+      parameters:
+      - name: body
+        in: body
+        description: Custom Endpoint to create
+        required: true
+        schema:
+          $ref: '#/definitions/EndpointCustom'
+      responses:
+        '201':
+          description: Custom endpoint created
+          schema:
+            $ref: '#/definitions/EndpointCustom'
+        '400':
+          $ref: '#/responses/CreateError'
+  /endpoints/custom/{custom_id}:
+    get:
+      operationId: get_endpoint_custom
+      summary: Get Custom Endpoint
+      description: '**Required ACL:** `confd.endpoints.custom.{custom_id}.read`'
+      tags:
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/customid'
+      responses:
+        '200':
+          description: Custom Endpoint
+          schema:
+            $ref: '#/definitions/EndpointCustom'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_endpoint_custom
+      summary: Update Custom Endpoint
+      description: '**Required ACL:** `confd.endpoints.custom.{custom_id}.update`'
+      tags:
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/customid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/EndpointCustom'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_endpoint_custom
+      summary: Delete Custom Endpoint
+      description: '**Required ACL:** `confd.endpoints.custom.{custom_id}.delete`'
+      tags:
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/customid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  customid:
+    required: true
+    type: integer
+    name: custom_id
+    in: path
+
+definitions:
+  EndpointCustom:
+    title: Custom Endpoint
+    allOf:
+    - $ref: '#/definitions/EndpointCustomRelationBase'
+    - properties:
+        enabled:
+          type: boolean
+          description: Endpoint can be used when it is enabled
+          default: true
+    - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
+    required:
+    - interface
+  EndpointCustomRelationBase:
+    properties:
+      id:
+        type: integer
+        description: Custom Endpoint ID
+        readOnly: true
+      interface:
+        type: string
+        description: Asterisk interface to use. (e.g. 'dahdi/i1')
+  EndpointCustomItems:
+    title: Custom Endpoints
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/EndpointCustom'
+        type: array
+      total:
+        type: integer

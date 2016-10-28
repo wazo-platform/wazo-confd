@@ -1,0 +1,258 @@
+paths:
+  /endpoints/custom/{custom_id}/lines:
+    get:
+      operationId: get_endpoint_custom_line
+      summary: Get Line associated to Custom endpoint
+      description: '**Required ACL:** `confd.endpoints.custom.{custom_id}.lines.read`'
+      tags:
+      - lines
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/customid'
+      responses:
+        '200':
+          description: Association between Custom Endpoint and Line
+          schema:
+            $ref: '#/definitions/LineEndpoint'
+        '400':
+          description: No endpoint associated to line
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /endpoints/sccp/{sccp_id}/lines:
+    get:
+      operationId: get_endpoint_sccp_line
+      summary: Get Line associated to SCCP endpoint
+      description: '**Required ACL:** `confd.endpoints.sccp.{sccp_id}.lines.read`'
+      tags:
+      - lines
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/sccpid'
+      responses:
+        '200':
+          description: Association between SCCP Endpoint and Line
+          schema:
+            $ref: '#/definitions/LineEndpoint'
+        '400':
+          description: No endpoint associated to line
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /endpoints/sip/{sip_id}/lines:
+    get:
+      operationId: get_endpoint_sip_line
+      summary: Get Line associated to SIP endpoint
+      description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.lines.read`'
+      tags:
+      - lines
+      - endpoints
+      - sip
+      parameters:
+      - $ref: '#/parameters/sipid'
+      responses:
+        '200':
+          description: Association between SIP Endpoint and Line
+          schema:
+            $ref: '#/definitions/LineEndpoint'
+        '400':
+          description: No endpoint associated to line
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/endpoints/custom:
+    get:
+      operationId: get_line_endpoint_custom
+      summary: Get Custom endpoint associated to Line
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.custom.read`'
+      tags:
+      - lines
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/lineid'
+      responses:
+        '200':
+          description: Association between Line and Custom Endpoint
+          schema:
+            $ref: '#/definitions/LineEndpoint'
+        '400':
+          description: No endpoint associated to line
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/endpoints/custom/{custom_id}:
+    put:
+      operationId: associate_line_endpoint_custom
+      summary: Associate line and Custom endpoint
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.custom.{custom_id}.update`'
+      tags:
+      - lines
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/customid'
+      responses:
+        '204':
+          description: Line and Custom endpoint associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_line_endpoint_custom
+      summary: Dissociate line and Custom endpoint
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.custom.{custom_id}.delete`'
+      tags:
+      - lines
+      - endpoints
+      - custom
+      parameters:
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/customid'
+      responses:
+        '204':
+          description: Line and Custom endpoint dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/endpoints/sccp:
+    get:
+      operationId: get_line_endpoint_sccp
+      summary: Get SCCP endpoint associated to Line
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.read`'
+      tags:
+      - lines
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/lineid'
+      responses:
+        '200':
+          description: Association between Line and SCCP Endpoint
+          schema:
+            $ref: '#/definitions/LineEndpoint'
+        '400':
+          description: No endpoint associated to line
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/endpoints/sccp/{sccp_id}:
+    put:
+      operationId: associate_line_endpoint_sccp
+      summary: Associate line and SCCP endpoint
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.{sccp_id}.update`'
+      tags:
+      - lines
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/sccpid'
+      responses:
+        '204':
+          description: Line and SCCP endpoint associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_line_endpoint_sccp
+      summary: Dissociate line and SCCP endpoint
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.{sccp_id}.delete`'
+      tags:
+      - lines
+      - endpoints
+      - sccp
+      parameters:
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/sccpid'
+      responses:
+        '204':
+          description: Line and SCCP endpoint dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/endpoints/sip:
+    get:
+      operationId: get_line_endpoint_sip
+      summary: Get SIP endpoint associated to Line
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.read`'
+      tags:
+      - lines
+      - endpoints
+      - sip
+      parameters:
+      - $ref: '#/parameters/lineid'
+      responses:
+        '200':
+          description: Association between Line and SIP Endpoint
+          schema:
+            $ref: '#/definitions/LineEndpoint'
+        '400':
+          description: No endpoint associated to line
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/endpoints/sip/{sip_id}:
+    put:
+      operationId: associate_line_endpoint_sip
+      summary: Associate line and SIP endpoint
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_id}.update`'
+      tags:
+      - lines
+      - endpoints
+      - sip
+      parameters:
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/sipid'
+      responses:
+        '204':
+          description: Line and SIP endpoint associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_line_endpoint_sip
+      summary: Dissociate line and SIP endpoint
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_id}.delete`'
+      tags:
+      - lines
+      - endpoints
+      - sip
+      parameters:
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/sipid'
+      responses:
+        '204':
+          description: Line and SIP endpoint dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  LineEndpoint:
+    title: LineEndpoint
+    properties:
+      line_id:
+        type: integer
+        description: Line ID
+      endpoint_id:
+        type: integer
+        description: Endpoint ID
+      endpoint:
+        type: string
+        description: Type of endpoint (either SIP or SCCP)

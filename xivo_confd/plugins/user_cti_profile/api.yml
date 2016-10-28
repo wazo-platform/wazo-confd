@@ -1,0 +1,55 @@
+paths:
+  /users/{user_id}/cti:
+    get:
+      operationId: get_user_cti_profile_association
+      summary: Get CtiProfile associated to User
+      description: '**Required ACL:** `confd.users.{user_id}.cti.read`'
+      tags:
+      - users
+      - cti_profiles
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User-CtiProfile association
+          schema:
+            $ref: '#/definitions/UserCtiProfile'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_user_cti_profile_association
+      summary: Update User-CtiProfile association
+      description: '**Required ACL:** `confd.users.{user_id}.cti.update`'
+      tags:
+      - users
+      - cti_profiles
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserCtiProfile'
+      responses:
+        '204':
+          description: Association updated
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  UserCtiProfile:
+    title: UserCtiProfile
+    properties:
+      cti_profile_id:
+        type: integer
+        description: CTI profile ID
+        readOnly: true
+      enabled:
+        type: boolean
+      user_id:
+        type: integer
+    required:
+    - cti_profile_id
+    - enabled

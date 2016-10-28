@@ -1,0 +1,133 @@
+paths:
+  /lines/{line_id}/users:
+    get:
+      operationId: get_line_user_associations
+      summary: List users associated to lines
+      description: '**Required ACL:** `confd.lines.{line_id}.users.read`'
+      tags:
+      - users
+      - lines
+      parameters:
+      - $ref: '#/parameters/lineid'
+      responses:
+        '200':
+          description: Users associated to a Line
+          schema:
+            $ref: '#/definitions/UserLineItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/lines/{line_id}:
+    delete:
+      operationId: dissociate_user_line
+      summary: Dissociate user and line
+      description: '**Required ACL:** `confd.users.{user_id}.lines.{line_id}.delete`
+
+
+        Any devices that are attached the line must be removed before dissociating
+        a user from its line. A device can be dissociated be resetting it to autoprov
+        mode.'
+      tags:
+      - users
+      - lines
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/lineid'
+      responses:
+        '204':
+          description: User and Line dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: associate_user_line
+      summary: Associate user and line
+      description: '**Required ACL:** `confd.users.{user_id}.lines.{line_id}.update`'
+      tags:
+      - users
+      - lines
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/lineid'
+      responses:
+        '204':
+          description: User and Line associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/lines:
+    get:
+      operationId: get_user_line_associations
+      summary: List lines associated to user
+      description: '**Required ACL:** `confd.users.{user_id}.lines.read`'
+      tags:
+      - users
+      - lines
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: Lines associated to a User
+          schema:
+            $ref: '#/definitions/UserLineItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    post:
+      operationId: associate_user_line
+      summary: Associate user and line
+      deprecated: true
+      description: '**Required ACL:** `confd.users.{user_id}.lines.create`'
+      tags:
+      - deprecated
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserLine'
+      responses:
+        '201':
+          description: User associated with Line
+          schema:
+            $ref: '#/definitions/UserLine'
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  UserLine:
+    title: UserLine
+    properties:
+      line_id:
+        type: integer
+        description: Line's ID
+      main_line:
+        type: boolean
+        description: True if the line is the first to have been associated to the
+          user
+        readOnly: true
+      main_user:
+        type: boolean
+        description: True if the user is the first to have been associated to the
+          line
+        readOnly: true
+      user_id:
+        type: integer
+        description: User's ID
+        readOnly: true
+    required:
+    - line_id
+  UserLineItems:
+    title: UserLineItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/UserLine'
+        type: array
+      total:
+        type: integer
+    required:
+    - total
