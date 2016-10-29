@@ -177,3 +177,10 @@ def outcall_extension(outcall, extension, **kwargs):
     h.outcall_extension.associate(outcall['id'], extension['id'], **kwargs)
     yield
     h.outcall_extension.dissociate(outcall['id'], extension['id'], **kwargs)
+
+
+@contextmanager
+def queue_member_agent(queue, agent, **kwargs):
+    h.queue_member_agent.associate(queue['id'], agent['id'], **kwargs)
+    yield
+    h.queue_member_agent.dissociate(queue['id'], agent['id'], **kwargs)

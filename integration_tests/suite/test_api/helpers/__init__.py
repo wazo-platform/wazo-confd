@@ -67,3 +67,4 @@ import incall_user
 import outcall_trunk
 import outcall_extension
 import ivr
+import queue_member_agent
