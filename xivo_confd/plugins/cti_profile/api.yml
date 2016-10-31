@@ -1,0 +1,55 @@
+paths:
+  /cti_profiles:
+    get:
+      operationId: list_cti_profiles
+      summary: List CTI profiles
+      description: '**Required ACL:** `confd.cti_profiles.read`'
+      tags:
+      - cti_profiles
+      responses:
+        '200':
+          description: List of CTI profiles
+          schema:
+            $ref: '#/definitions/CtiProfileItems'
+  /cti_profiles/{cti_profile_id}:
+    get:
+      operationId: get_cti_profile
+      summary: Get CTI profile
+      description: '**Required ACL:** `confd.cti_profiles.{cti_profile_id}.read`'
+      tags:
+      - cti_profiles
+      parameters:
+      - required: true
+        type: integer
+        name: cti_profile_id
+        in: path
+        description: CTI Profile ID
+      responses:
+        '200':
+          description: CTI profile
+          schema:
+            $ref: '#/definitions/CtiProfile'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  CtiProfile:
+    title: CtiProfile
+    properties:
+      id:
+        type: integer
+        description: CtiProfile ID
+        readOnly: true
+      name:
+        type: string
+        description: Display name
+  CtiProfileItems:
+    title: CtiProfileItems
+    description: Listing all available CTI profiles
+    properties:
+      total:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/CtiProfile'
+        type: array

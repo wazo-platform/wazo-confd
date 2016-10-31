@@ -1,0 +1,21 @@
+paths:
+  /infos:
+    get:
+      operationId: get_infos
+      summary: Get server info
+      description: '**Required ACL:** `confd.infos.read`'
+      tags:
+      - infos
+      responses:
+        '200':
+          description: Server information
+          schema:
+            $ref: '#/definitions/Info'
+
+definitions:
+  Info:
+    title: Info
+    properties:
+      uuid:
+        type: string
+        description: UUID of the XiVO server

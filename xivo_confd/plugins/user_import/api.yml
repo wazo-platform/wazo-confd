@@ -1,0 +1,172 @@
+paths:
+  /users/export:
+    get:
+      operationId: export_users_csv
+      summary: Mass export users and associated resources
+      description: '**Required ACL:** `confd.users.export.read`
+
+
+        CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html'
+      externalDocs:
+        description: Complete documentation on the CSV data format and fields
+        url: http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+      tags:
+      - users
+      produces:
+      - text/csv; charset=utf-8
+      responses:
+        '200':
+          description: Users exported sucessfully
+          schema:
+            $ref: '#/definitions/UserExport'
+  /users/import:
+    post:
+      operationId: import_users_csv
+      summary: Mass import users and associated resources
+      description: '**Required ACL:** `confd.users.import.create`
+
+
+        CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html'
+      externalDocs:
+        description: Complete documentation on the CSV data format and fields
+        url: http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+      consumes:
+      - text/csv; charset=utf-8
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/csvbody'
+      responses:
+        '201':
+          description: Users imported sucessfully
+          schema:
+            $ref: '#/definitions/UserImport'
+        '400':
+          description: Errors occured during import
+          schema:
+            $ref: '#/definitions/UserImportError'
+    put:
+      operationId: import_users_csv
+      summary: Mass import users and associated resources
+      description: '**Required ACL:** `confd.users.import.update`
+
+
+        CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html'
+      externalDocs:
+        description: Complete documentation on the CSV data format and fields
+        url: http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+      consumes:
+      - text/csv; charset=utf-8
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/csvbody'
+      responses:
+        '200':
+          description: Users updated sucessfully
+          schema:
+            $ref: '#/definitions/UserUpdate'
+        '400':
+          description: Errors occured during update
+          schema:
+            $ref: '#/definitions/UserImportError'
+
+parameters:
+  csvbody:
+    name: body
+    in: body
+    required: true
+    description: CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+    schema:
+      type: string
+
+definitions:
+  UserExport:
+    title: UserExport
+    type: string
+  UserImport:
+    title: UserImport
+    description: List of users sucessfully imported
+    properties:
+      created:
+        type: array
+        items:
+          title: UserImportIDs
+          type: object
+          properties:
+            extension_id:
+              type: integer
+              description: Extension ID
+            user_id:
+              type: integer
+              description: User ID
+            line_id:
+              type: integer
+              description: Line ID
+            sip_id:
+              type: integer
+              description: SIP ID
+            voicemail_id:
+              type: integer
+              description: Voicemail ID
+            incall_extension_id:
+              type: integer
+              description: ID of the Extension used for incoming calls
+            row_number:
+              type: integer
+              description: Line number corresponding to the CSV data
+  UserUpdate:
+    title: UserUpdate
+    description: List of users sucessfully updated
+    properties:
+      updated:
+        type: array
+        items:
+          title: UserUpdateIDs
+          type: object
+          properties:
+            extension_id:
+              type: integer
+              description: Extension ID
+            user_id:
+              type: integer
+              description: User ID
+            line_id:
+              type: integer
+              description: Line ID
+            sip_id:
+              type: integer
+              description: SIP ID
+            voicemail_id:
+              type: integer
+              description: Voicemail ID
+            incall_extension_id:
+              type: integer
+              description: ID of the Extension used for incoming calls
+            row_number:
+              type: integer
+              description: Line number corresponding to the CSV data
+  UserImportError:
+    title: UserImportError
+    description: List of errors that occured during import
+    properties:
+      errors:
+        type: array
+        items:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Error message
+            timestamp:
+              type: integer
+              description: Time at which the error occured
+            details:
+              type: object
+              properties:
+                row_number:
+                  type: integer
+                  description: Line number corresponding to the CSV data
+                row:
+                  type: object
+                  description: Original data that caused the error

@@ -1,0 +1,148 @@
+paths:
+  /users/{user_id}/voicemails:
+    get:
+      operationId: get_user_voicemail_association
+      summary: Get voicemail associated to user
+      description: '**Required ACL:** `confd.users.{user_id}.voicemails.read`'
+      tags:
+      - users
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User-Voicemail association
+          schema:
+            $ref: '#/definitions/UserVoicemail'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_user_voicemail
+      summary: Dissociate user and voicemail
+      description: '**Required ACL:** `confd.users.{user_id}.voicemails.delete`'
+      tags:
+      - users
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '204':
+          description: User and Voicemail dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/voicemails/{voicemail_id}:
+    put:
+      operationId: associate_user_voicemail
+      summary: Associate user and voicemail
+      description: '**Required ACL:** `confd.users.{user_id}.voicemails.{voicemail_id}.update`'
+      tags:
+      - users
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/voicemailid'
+      responses:
+        '204':
+          description: User and voicemail associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /voicemails/{voicemail_id}/users:
+    get:
+      operationId: get_voicemail_user_association
+      summary: Get users associated to voicemail
+      description: '**Required ACL:** `confd.voicemails.{voicemail_id}.users.read`'
+      tags:
+      - users
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/voicemailid'
+      responses:
+        '200':
+          description: User-Voicemail associations
+          schema:
+            $ref: '#/definitions/UserVoicemailItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_id}/voicemail:
+    get:
+      operationId: get_user_voicemail_association_deprecated
+      summary: Get voicemail associated to user
+      deprecated: true
+      description: '**Required ACL:** `confd.users.{user_id}.voicemail.read`'
+      tags:
+      - deprecated
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User-Voicemail association
+          schema:
+            $ref: '#/definitions/UserVoicemail'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    post:
+      operationId: associate_user_voicemail_deprecated
+      summary: Associate user and voicemail
+      deprecated: true
+      description: '**Required ACL:** `confd.users.{user_id}.voicemail.create`'
+      tags:
+      - deprecated
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        description: User and Voicemail to associate
+        required: true
+        schema:
+          $ref: '#/definitions/UserVoicemail'
+      responses:
+        '200':
+          description: User and Voicemail associated
+          schema:
+            $ref: '#/definitions/UserVoicemail'
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_user_voicemail_deprecated
+      summary: Dissociate user and voicemail
+      deprecated: true
+      description: '**Required ACL:** `confd.users.{user_id}.voicemail.delete`'
+      tags:
+      - deprecated
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '204':
+          description: User and Voicemail dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  UserVoicemail:
+    title: UserVoicemail
+    properties:
+      user_id:
+        type: integer
+        description: User ID
+      voicemail_id:
+        type: integer
+        description: Voicemail ID
+    required:
+    - voicemail_id
+  UserVoicemailItems:
+    title: UserVoicemailItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/UserVoicemail'
+        type: array
+      total:
+        type: integer

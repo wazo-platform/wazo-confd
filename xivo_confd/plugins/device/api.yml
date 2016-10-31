@@ -1,0 +1,212 @@
+paths:
+  /devices:
+    get:
+      operationId: list_devices
+      summary: List devices
+      description: '**Required ACL:** `confd.devices.read`'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Device list
+          schema:
+            $ref: '#/definitions/DeviceItems'
+        '400':
+          $ref: '#/responses/GenericError'
+    post:
+      operationId: create_device
+      summary: Create device
+      description: '**Required ACL:** `confd.devices.create`'
+      tags:
+      - devices
+      parameters:
+      - name: body
+        in: body
+        description: Device to create
+        required: false
+        schema:
+          $ref: '#/definitions/Device'
+      responses:
+        '201':
+          description: Device created
+          schema:
+            $ref: '#/definitions/Device'
+        '400':
+          $ref: '#/responses/CreateError'
+  /devices/{device_id}:
+    get:
+      operationId: get_device
+      summary: Get device
+      description: '**Required ACL:** `confd.devices.{device_id}.read`'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/deviceid'
+      responses:
+        '200':
+          description: Device
+          schema:
+            $ref: '#/definitions/Device'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_device
+      summary: Update device
+      description: '**Required ACL:** `confd.devices.{device_id}.update`'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/deviceid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Device'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_device
+      summary: Delete device
+      description: '**Required ACL:** `confd.devices.{device_id}.delete`
+
+
+        A device can not be deleted if it is linked to a line. You must dissociate
+        the line and the device first.'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/deviceid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /devices/{device_id}/autoprov:
+    get:
+      operationId: reset_device_autoprov
+      summary: Reset device to autoprov
+      description: '**Required ACL:** `confd.devices.{device_id}.autoprov.read`
+
+
+        Resets a device into ‘autoprov’ mode. Once in autoprov, a device can be reprovisionned
+        using another provisioning code. The device’s configuration will be lost when
+        reset to autoprov mode.'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/deviceid'
+      responses:
+        '204':
+          description: Device synchronized
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /devices/{device_id}/synchronize:
+    get:
+      operationId: synchronize_device
+      summary: Synchronize device
+      description: '**Required ACL:** `confd.devices.{device_id}.synchronize.read`
+
+
+        Synchronize a device’s configuration. Used when a configuration has been modified
+        and the changes need to be sent to the device.'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/deviceid'
+      responses:
+        '204':
+          description: Device synchronized
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  deviceid:
+    required: true
+    type: string
+    name: device_id
+    in: path
+    description: Device's ID
+
+definitions:
+  Device:
+    title: Device
+    properties:
+      id:
+        type: string
+        description: Device ID
+        readOnly: true
+      description:
+        type: string
+      ip:
+        type: string
+        description: IP address (10.0.0.0)
+      mac:
+        type: string
+        description: MAC address (aa:bb:cc:dd:ee:ff)
+      model:
+        type: string
+        description: Device model
+      plugin:
+        type: string
+        description: Provisioning plugin to be used by device
+      options:
+        $ref: '#/definitions/DeviceOptions'
+        description: List of standard keys
+      sn:
+        type: string
+        description: Serial number
+      status:
+        type: string
+        default: not_configured
+        enum:
+        - autoprov
+        - configured
+        - not_configured
+        description: 'Device status. autoprov: Device can be provisionned using a
+          provisioning code, configured: Device is configured and ready to be used,
+          not_configured : Device has not been completely configured'
+        readOnly: true
+      template_id:
+        type: string
+        description: ID of the device template. All device using a device template
+          will have a certain number of common parameters preconfigured for the device
+      vendor:
+        type: string
+        description: Vendor name
+      version:
+        type: string
+        description: Firmware version
+  DeviceOptions:
+    title: DeviceOptions
+    properties:
+      switchboard:
+        type: boolean
+        description: Indicate if this device is a switchboard
+  DeviceItems:
+    title: DeviceItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/Device'
+        type: array
+      total:
+        type: integer
+    required:
+    - total

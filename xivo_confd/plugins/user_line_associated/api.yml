@@ -33,3 +33,12 @@ paths:
           description: SIP endpoint of main line for a user
           schema:
             $ref: '#/definitions/EndpointSip'
+
+parameters:
+  useruuid:
+    required: true
+    type: string
+    format: uuid
+    name: user_uuid
+    in: path
+    description: the user's UUID

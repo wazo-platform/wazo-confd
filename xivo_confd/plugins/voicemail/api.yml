@@ -1,0 +1,192 @@
+paths:
+  /voicemails:
+    get:
+      operationId: list_voicemails
+      summary: List voicemails
+      description: '**Required ACL:** `confd.voicemails.read`'
+      tags:
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Voicemail list
+          schema:
+            $ref: '#/definitions/VoicemailItems'
+    post:
+      operationId: create_voicemail
+      summary: Create voicemail
+      description: '**Required ACL:** `confd.voicemails.create`'
+      tags:
+      - voicemails
+      parameters:
+      - name: body
+        in: body
+        description: Voicemail to create
+        required: true
+        schema:
+          $ref: '#/definitions/Voicemail'
+      responses:
+        '201':
+          description: Voicemail created
+          schema:
+            $ref: '#/definitions/Voicemail'
+        '400':
+          $ref: '#/responses/CreateError'
+  /voicemails/{voicemail_id}:
+    get:
+      operationId: get_voicemail
+      summary: Get voicemail
+      description: '**Required ACL:** `confd.voicemails.{voicemail_id}.read`'
+      tags:
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/voicemailid'
+      responses:
+        '200':
+          description: Voicemail
+          schema:
+            $ref: '#/definitions/Voicemail'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_voicemail
+      summary: Update voicemail
+      description: '**Required ACL:** `confd.voicemails.{voicemail_id}.update`'
+      tags:
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/voicemailid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Voicemail'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_voicemail
+      summary: Delete voicemail
+      description: '**Required ACL:** `confd.voicemails.{voicemail_id}.delete`
+
+
+        A voicemail can not be deleted if it is still attached to a user. The user
+        must be dissociated first. Any extension that redirects to the voicemail (e.g.
+        an Incoming call) will be disabled after deletion.'
+      tags:
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/voicemailid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  voicemailid:
+    required: true
+    type: integer
+    name: voicemail_id
+    in: path
+
+definitions:
+  Voicemail:
+    title: Voicemail
+    description: Leave audio messages for someone
+    properties:
+      id:
+        type: integer
+        description: Voicemail ID
+        readOnly: true
+      name:
+        type: string
+        description: Voicemail name
+      number:
+        type: string
+        description: Mailbox number
+      context:
+        type: string
+        description: Voicemail context
+      password:
+        type: string
+        description: Numeric password used to access the voicemail
+      email:
+        type: string
+        description: Email address. Notifications and audio attachements will be sent
+          to this address
+      pager:
+        type: string
+        description: Email address. Summarized notifications will be sent to this
+          address
+      language:
+        type: string
+        enum:
+        - de_DE
+        - en_US
+        - es_ES
+        - fr_FR
+        - fr_CA
+        - it_IT
+        - nl_NL
+        default: The system default language
+        description: Language used for the voicemail menu prompt
+      timezone:
+        type: string
+        default: The system default timezone
+        description: Timezone used for announcing at what time a message was recorded
+      max_messages:
+        type: integer
+        description: Maximum number of messages to store
+      attach_audio:
+        type: boolean
+        description: Attach an audio file of the recorded message when sending an
+          email
+      delete_messages:
+        type: boolean
+        description: Delete messages once they have been listened to
+        default: false
+      ask_password:
+        type: boolean
+        description: Ask for password when accessing the voicemail menu
+        default: true
+      enabled:
+        type: boolean
+        description: Voicemail can be used when it is enabled
+        default: true
+      options:
+        description: "Advanced configuration options. Options are appended at the\
+          \ end of a \nvoicemail line in the file 'voicemail.conf' used by asterisk.\n\
+          Please consult the asterisk documentation for further details on available\n\
+          parameters. Options must have the following the form:\n\n```\n{\n  \"options\"\
+          : [\n    [\"name1\", \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n\
+          ```\n\nThe resulting configuration in voicemail.conf will have the following\
+          \ form:\n\n```\n1000 => ,Firstname Lastname,,,name1=value1|name2=value2\n\
+          ```\n"
+        type: array
+        items:
+          $ref: '#/definitions/KeyValueOption'
+    required:
+    - name
+    - number
+    - context
+  VoicemailItems:
+    title: VoicemailItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/Voicemail'
+        type: array
+      total:
+        type: integer

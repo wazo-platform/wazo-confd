@@ -1,0 +1,109 @@
+paths:
+  /entities:
+    get:
+      operationId: list_entities
+      summary: List entities
+      description: '**Required ACL:** `confd.entities.read`'
+      tags:
+      - entities
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Entities list
+          schema:
+            $ref: '#/definitions/EntityItems'
+    post:
+      operationId: create_entity
+      summary: Create entity
+      description: '**Required ACL:** `confd.entities.create`'
+      tags:
+      - entities
+      parameters:
+      - name: body
+        in: body
+        description: Entity to create
+        required: true
+        schema:
+          $ref: '#/definitions/Entity'
+      responses:
+        '201':
+          description: Entity created
+          schema:
+            $ref: '#/definitions/Entity'
+        '400':
+          $ref: '#/responses/CreateError'
+  /entities/{entity_id}:
+    get:
+      operationId: get_entity
+      summary: Get entity
+      description: '**Required ACL:** `confd.entities.{entity_id}.read`'
+      tags:
+      - entities
+      parameters:
+      - $ref: '#/parameters/entityid'
+      responses:
+        '200':
+          description: Entity
+          schema:
+            $ref: '#/definitions/Entity'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_entity
+      summary: Delete entity
+      description: '**Required ACL:** `confd.entities.{entity_id}.delete`
+
+
+        An entity can not be deleted if it is associated to an object.'
+      tags:
+      - entities
+      parameters:
+      - $ref: '#/parameters/entityid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  entityid:
+    required: true
+    type: integer
+    name: entity_id
+    in: path
+    description: Entity's ID
+
+definitions:
+  Entity:
+    title: Entity
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the call permission
+      name:
+        type: string
+        description: The name of the Entity. Must be unique
+      display_name:
+        type: string
+        description: The displayed name on the web interface
+    required:
+    - name
+  EntityItems:
+    title: EntityItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Entity'
+      total:
+        type: integer
+    required:
+    - total

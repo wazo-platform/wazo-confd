@@ -57,3 +57,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/KeyValueOption'
+  KeyValueOption:
+    title: Info
+    type: array
+    items:
+      type: string
+    maxItems: 2
+    minItems: 2
