@@ -39,21 +39,26 @@ def handle_error(error):
     exc_info = True
     code = 500
 
+    try:
+        error_message = unicode(error)
+    except UnicodeDecodeError:
+        error_message = str(error).decode('utf-8', errors='replace')
+
     if isinstance(error, NOT_FOUND_ERRORS):
-        messages = [unicode(error)]
+        messages = [error_message]
         code = 404
         exc_info = False
     elif isinstance(error, GENERIC_ERRORS):
-        messages = [unicode(error)]
+        messages = [error_message]
         code = 400
         exc_info = False
     elif isinstance(error, HTTPException):
         messages, code = extract_http_messages(error)
         exc_info = False
     else:
-        messages = [u'Unexpected error: {}'.format(error)]
+        messages = [u'Unexpected error: {}'.format(error_message)]
 
-    logger.error(error, exc_info=exc_info)
+    logger.error(error_message, exc_info=exc_info)
     return error_response(messages, code)
 
 
@@ -78,7 +83,7 @@ def extract_http_messages(error):
     message = data.get('message', None)
     if isinstance(message, dict):
         code = error.code
-        messages = ["Input Error - {}: {}".format(key, value)
+        messages = [u"Input Error - {}: {}".format(key, value)
                     for key, value in message.iteritems()]
     elif isinstance(message, unicode):
         code = error.code
