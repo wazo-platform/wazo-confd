@@ -185,3 +185,11 @@ def test_delete_custom_when_trunk_and_custom_associated(trunk, custom):
 
         response = confd.trunks(trunk['id']).endpoints.custom.get()
         response.assert_match(404, e.not_found('TrunkEndpoint'))
+
+
+@fixtures.trunk()
+@fixtures.custom()
+def test_bus_events(trunk, custom):
+    url = confd.trunks(trunk['id']).endpoints.custom(custom['id'])
+    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
+    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete

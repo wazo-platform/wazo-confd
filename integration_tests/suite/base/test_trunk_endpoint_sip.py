@@ -185,3 +185,11 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
 
         response = confd.trunks(trunk['id']).endpoints.sip.get()
         response.assert_match(404, e.not_found('TrunkEndpoint'))
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_bus_events(trunk, sip):
+    url = confd.trunks(trunk['id']).endpoints.sip(sip['id'])
+    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
+    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete

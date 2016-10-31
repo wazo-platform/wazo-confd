@@ -61,11 +61,13 @@ class TrunkEndpointService(object):
         self.validator.validate_association(trunk, endpoint)
         trunk.associate_endpoint(endpoint)
         self.trunk_dao.edit(trunk)
+        self.notifier.associated(trunk, endpoint)
 
     def dissociate(self, trunk, endpoint):
         self.validator.validate_dissociation(trunk, endpoint)
         trunk.remove_endpoint()
         self.trunk_dao.edit(trunk)
+        self.notifier.dissociated(trunk, endpoint)
 
 
 def build_service(endpoint, endpoint_dao):
