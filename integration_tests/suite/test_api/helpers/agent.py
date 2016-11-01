@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,14 +22,14 @@ import random
 from test_api import db
 
 
-def generate_agent():
-    number = generate_number()
-    return add_agent(number)
+def generate_agent(**parameters):
+    parameters.setdefault('number', generate_number())
+    return add_agent(**parameters)
 
 
-def add_agent(number):
+def add_agent(**parameters):
     with db.queries() as queries:
-        id = queries.insert_agent(number)
+        id = queries.insert_agent(**parameters)
     return {'id': id}
 
 

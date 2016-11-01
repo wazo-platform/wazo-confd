@@ -274,12 +274,12 @@ class DatabaseQueries(object):
         query = text("DELETE FROM groupfeatures WHERE id = :group_id")
         self.connection.execute(query, group_id=group_id)
 
-    def insert_agent(self, number='1000', context='default'):
+    def insert_agent(self, number='1000', context='default', group_name='default'):
         query = text("""
         INSERT INTO agentfeatures
         (numgroup, number, passwd, context, language, description)
         VALUES (
-            (SELECT groupid FROM agentgroup WHERE name = :context),
+            (SELECT groupid FROM agentgroup WHERE name = :group_name),
             :number,
             '',
             :context,
@@ -301,7 +301,8 @@ class DatabaseQueries(object):
         agent_id = (self.connection
                     .execute(query,
                              number=number,
-                             context=context)
+                             context=context,
+                             group_name=group_name)
                     .scalar())
 
         func_key_id = self.insert_func_key('speeddial', 'agent')
@@ -325,6 +326,20 @@ class DatabaseQueries(object):
 
         query = text("DELETE FROM agentfeatures WHERE id = :agent_id")
         self.connection.execute(query, agent_id=agent_id)
+
+    def insert_agent_login_status(self, context='default'):
+        query = text("""
+        INSERT INTO agent_login_status (agent_id, agent_number, extension, context, interface, state_interface)
+        VALUES (1, '1234', '1234', :context, 'interface', 'state')
+        RETURNING agent_id
+        """)
+
+        agent_id = (self.connection
+                    .execute(query,
+                             context=context)
+                    .scalar())
+
+        return agent_id
 
     def insert_paging(self, number='1234'):
         query = text("""

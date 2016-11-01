@@ -58,7 +58,7 @@ class ContextOnUpdateValidator(Validator):
         self.dao = dao
 
     def validate(self, extension):
-        context = self.dao.get(extension.context)
+        context = self.dao.get_by_name(extension.context)
 
         if extension.lines and context.type != 'internal':
             raise errors.unhandled_context_type(context.type)
@@ -79,11 +79,15 @@ class ExtensionRangeValidator(Validator):
         if self._is_pattern(extension.exten):
             return
 
-        context = self.dao.get(extension.context)
+        context = self.dao.get_by_name(extension.context)
         if context.type == 'outcall':
             return
 
-        context_ranges = self.dao.find_all_context_ranges(extension.context)
+        context_ranges = (context.user_ranges +
+                          context.group_ranges +
+                          context.queue_ranges +
+                          context.conference_room_ranges +
+                          context.incall_ranges)
         if not self.extension_in_range(extension.exten, context_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
 
@@ -122,7 +126,7 @@ class ExtensionAssociationValidator(Validator):
 def build_validator():
     return ValidationGroup(
         common=[
-            GetResource('context', context_dao.get, 'Context'),
+            GetResource('context', context_dao.get_by_name, 'Context'),
         ],
         create=[
             ExtenAvailableOnCreateValidator(extension_dao),

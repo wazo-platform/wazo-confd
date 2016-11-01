@@ -24,6 +24,7 @@ from test_api import confd
 
 def generate_context(**parameters):
     parameters.setdefault('name', generate_name())
+    parameters.setdefault('user_ranges', [{'start': '1000', 'end': '1999'}])
     return add_context(**parameters)
 
 

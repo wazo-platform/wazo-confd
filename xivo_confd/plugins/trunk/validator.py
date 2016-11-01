@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import ValidationGroup, FindResource, Optional
+from xivo_confd.helpers.validator import ValidationGroup, GetResource, Optional
 from xivo_dao.resources.context import dao as context_dao
 
 
@@ -23,10 +24,10 @@ def build_validator():
     return ValidationGroup(
         create=[
             Optional('context',
-                     FindResource('context', context_dao.find, 'Context')),
+                     GetResource('context', context_dao.get_by_name, 'Context')),
         ],
         edit=[
             Optional('context',
-                     FindResource('context', context_dao.find, 'Context')),
+                     GetResource('context', context_dao.get_by_name, 'Context')),
         ]
     )

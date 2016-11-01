@@ -18,24 +18,30 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.sip_general import dao as sip_general_dao
 from xivo_dao.resources.trunk import dao as trunk_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from xivo_confd.helpers.validator import (UniqueField,
                                           Validator,
                                           ValidationGroup)
+from xivo_confd.database import agent as agent_dao
+from xivo_confd.database import agent_status_login as agent_login_status_dao
 
 
 class ContextDeleteValidator(Validator):
 
-    def __init__(self, extension_dao, trunk_dao, voicemail_dao):
+    def __init__(self, agent_dao, agent_login_status_dao, extension_dao, sip_general_dao, trunk_dao, voicemail_dao):
+        self.agent_login_status_dao = agent_login_status_dao
+        self.agent_dao = agent_dao
         self.extension_dao = extension_dao
+        self.sip_general_dao = sip_general_dao
         self.trunk_dao = trunk_dao
         self.voicemail_dao = voicemail_dao
 
     def validate(self, context):
         self.validate_has_no_extensions(context)
-        # self.validate_has_no_voicemails(context)
+        self.validate_has_no_voicemails(context)
         self.validate_has_no_trunks(context)
         self.validate_has_no_agents(context)
         self.validate_has_no_agent_status(context)
@@ -49,11 +55,12 @@ class ContextDeleteValidator(Validator):
                                              extension_id=extension.id)
 
     def validate_has_no_voicemails(self, context):
-        voicemail = self.voicemail_dao.find_by(context=context.name)
-        if voicemail:
+        # Should be changed to use find_by when the voicemail_dao will be refactored
+        voicemails = self.voicemail_dao.search(context=context.name).items
+        if voicemails:
             raise errors.resource_associated('Context', 'Voicemail',
                                              context_id=context.id,
-                                             voicemail_id=voicemail.id)
+                                             voicemail_id=voicemails[0].id)
 
     def validate_has_no_trunks(self, context):
         trunk = self.trunk_dao.find_by(context=context.name)
@@ -63,27 +70,25 @@ class ContextDeleteValidator(Validator):
                                              trunk_id=trunk.id)
 
     def validate_has_no_agents(self, context):
-        pass
-        # agent = self.agent_dao.find_by(context=context.name)
-        # if agent:
-        #     raise errors.resource_associated('Context', 'Agent',
-        #                                      context_id=context.id,
-        #                                      agent_id=agent.id)
+        agent = self.agent_dao.find_by(context=context.name)
+        if agent:
+            raise errors.resource_associated('Context', 'Agent',
+                                             context_id=context.id,
+                                             agent_id=agent.id)
 
     def validate_has_no_agent_status(self, context):
-        pass
-        # agent_status = self.voicemail_dao.find_by(context=context.name)
-        # if agent_status:
-        #     # erreurs les agents doivent etre delogger
-        #     pass
+        agent_status = self.agent_login_status_dao.find_by(context=context.name)
+        if agent_status:
+            raise errors.resource_associated('Context', 'AgentLoginStatus',
+                                             context_id=context.id,
+                                             agent_id=agent_status.agent_id)
 
     def validate_has_no_sip_general(self, context):
-        pass
-        # sip_general_option = self.sip_general_dao.find_by(var_name='context', var_val=context.name)
-        # if sip_general_option:
-        #     raise errors.resource_associated('Context', 'SIP General',
-        #                                      context_id=context.id,
-        #                                      sip_general_option='context')
+        sip_general_option = self.sip_general_dao.find_by(var_name='context', var_val=context.name)
+        if sip_general_option:
+            raise errors.resource_associated('Context', 'SIP General',
+                                             context_id=context.id,
+                                             sip_general_option='context')
 
 
 def build_validator():
@@ -93,7 +98,10 @@ def build_validator():
                         lambda name: context_dao.find_by(name=name),
                         'Context'),
         ],
-        delete=[ContextDeleteValidator(extension_dao,
+        delete=[ContextDeleteValidator(agent_dao,
+                                       agent_login_status_dao,
+                                       extension_dao,
+                                       sip_general_dao,
                                        trunk_dao,
                                        voicemail_dao)]
     )

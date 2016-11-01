@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from test_api import confd
+from test_api import db
+from test_api import helpers as h
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
@@ -266,6 +268,55 @@ def test_delete(context):
     response.assert_deleted()
     response = confd.contexts(context['id']).get()
     response.assert_match(404, e.not_found(resource='Context'))
+
+
+@fixtures.context()
+@fixtures.extension()
+def test_delete_when_extension_associated(context, extension):
+    confd.extensions(extension['id']).put(context=context['name']).assert_updated()
+    response = confd.contexts(context['id']).delete()
+    response.assert_match(400, e.resource_associated('Context', 'Extension'))
+
+
+@fixtures.context()
+@fixtures.trunk()
+def test_delete_when_trunk_associated(context, trunk):
+    confd.trunks(trunk['id']).put(context=context['name']).assert_updated()
+    response = confd.contexts(context['id']).delete()
+    response.assert_match(400, e.resource_associated('Context', 'Trunk'))
+
+
+@fixtures.context()
+@fixtures.voicemail()
+def test_delete_when_voicemail_associated(context, voicemail):
+    confd.voicemails(voicemail['id']).put(context=context['name']).assert_updated()
+    response = confd.contexts(context['id']).delete()
+    response.assert_match(400, e.resource_associated('Context', 'Voicemail'))
+
+
+@fixtures.context()
+def test_delete_when_agent_associated(context):
+    h.agent.generate_agent(context=context['name'])
+    response = confd.contexts(context['id']).delete()
+    response.assert_match(400, e.resource_associated('Context', 'Agent'))
+
+
+@fixtures.context()
+def test_delete_when_agent_is_logged(context):
+    with db.queries() as q:
+        q.insert_agent_login_status(context=context['name'])
+    response = confd.contexts(context['id']).delete()
+    response.assert_match(400, e.resource_associated('Context', 'AgentLoginStatus'))
+
+
+@fixtures.context()
+def test_delete_when_sip_general_option_associated(context):
+    parameters = {'ordered_options': [],
+                  'options': {'context': context['name']}}
+    confd.asterisk.sip.general.put(**parameters).assert_updated()
+
+    response = confd.contexts(context['id']).delete()
+    response.assert_match(400, e.resource_associated('Context', 'SIP General'))
 
 
 @fixtures.context()
