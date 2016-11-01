@@ -100,13 +100,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': 123, 'destination': {'type': 'none'}}]
     yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': '1', 'destination': 'invalid'}]
 
-    required_fields = {'name': 'ivr', 'menu_sound': 'menu'}
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'invalid_destination', destination, required_fields
+        yield s.check_bogus_field_returns_error, url, 'invalid_destination', destination
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'timeout_destination', destination, required_fields
+        yield s.check_bogus_field_returns_error, url, 'timeout_destination', destination
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'abort_destination', destination, required_fields
+        yield s.check_bogus_field_returns_error, url, 'abort_destination', destination
 
 
 @fixtures.ivr(description='search')
@@ -194,17 +193,17 @@ def test_create_all_parameters(user1, user2, user3):
     response.assert_created('ivr')
 
     assert_that(response.item, has_entries(name='ivr1',
-                              greeting_sound='greeting',
-                              menu_sound='menu',
-                              invalid_sound='invalid',
-                              abort_sound='abort',
-                              timeout=4,
-                              max_tries=2,
-                              description='description',
-                              invalid_destination={'type': 'user', 'user_id': user1['id']},
-                              timeout_destination={'type': 'user', 'user_id': user2['id']},
-                              abort_destination={'type': 'user', 'user_id': user3['id']},
-                              choices=[{'exten': '1', 'destination': {'type': 'none'}}]))
+                                           greeting_sound='greeting',
+                                           menu_sound='menu',
+                                           invalid_sound='invalid',
+                                           abort_sound='abort',
+                                           timeout=4,
+                                           max_tries=2,
+                                           description='description',
+                                           invalid_destination={'type': 'user', 'user_id': user1['id']},
+                                           timeout_destination={'type': 'user', 'user_id': user2['id']},
+                                           abort_destination={'type': 'user', 'user_id': user3['id']},
+                                           choices=[{'exten': '1', 'destination': {'type': 'none'}}]))
 
 
 @fixtures.ivr(name='ivr1', menu_sound='menu')
