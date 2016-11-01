@@ -67,6 +67,9 @@ class BaseSchema(Schema):
     def ensure_dict(self, data):
         return data or {}
 
+    class Meta:
+        ordered = True
+
 
 class StrictBoolean(fields.Boolean):
 
