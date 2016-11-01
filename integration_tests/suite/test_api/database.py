@@ -398,30 +398,6 @@ class DatabaseQueries(object):
 
         return filter_member_id
 
-    def insert_context(self, **parameters):
-        parameters.setdefault('displayname', parameters['name'])
-        parameters.setdefault('description', '')
-        parameters.setdefault('commented', 0)
-        query = text("""
-                     INSERT INTO context(name, displayname, contexttype, description, commented, entity)
-                     VALUES (
-                                :name, :displayname, :contexttype, :description, :commented,
-                                (SELECT name FROM entity LIMIT 1)
-                            )
-                     """)
-
-        self.connection.execute(query, **parameters)
-
-        return parameters['name']
-
-    def insert_context_range(self, context, type_, start, end, didlength=0):
-        query = text("""
-                     INSERT INTO contextnumbers(context, type, numberbeg, numberend, didlength)
-                     VALUES (:context, :type, :numberbeg, :numberend, :didlength)
-                     """)
-
-        self.connection.execute(query, context=context, type=type_, numberbeg=start, numberend=end, didlength=didlength)
-
     def associate_context_entity(self, context_name, entity_name):
         query = text("UPDATE context SET entity = :entity_name WHERE name = :context_name")
         self.connection.execute(query, entity_name=entity_name, context_name=context_name)

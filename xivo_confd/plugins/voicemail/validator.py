@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao import context_dao
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.helpers.validator import (FindResource,
+from xivo_confd.helpers.validator import (GetResource,
                                           MemberOfSequence,
                                           Optional,
                                           ValidationGroup,
@@ -73,7 +73,7 @@ class AssociatedToUser(Validator):
 def build_validator():
     return ValidationGroup(
         common=[
-            FindResource('context', context_dao.get, 'Context'),
+            GetResource('context', context_dao.get_by_name, 'Context'),
             Optional('timezone', MemberOfSequence('timezone',
                                                   voicemail_dao.find_all_timezone,
                                                   'Timezone')),

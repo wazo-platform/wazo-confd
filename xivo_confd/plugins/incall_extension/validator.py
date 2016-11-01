@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +52,7 @@ class IncallExtensionAssociationValidator(Validator):
                                              associated_id=extension.typeval)
 
     def validate_extension_is_in_incall_context(self, extension):
-        context = context_dao.get(extension.context)
+        context = context_dao.get_by_name(extension.context)
         if context.type != 'incall':
             raise errors.unhandled_context_type(context.type,
                                                 extension.context,

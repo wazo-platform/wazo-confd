@@ -35,7 +35,7 @@ class OutcallExtensionAssociationValidator(Validator):
                                              associated_id=extension.typeval)
 
     def validate_extension_is_in_outcall_context(self, extension):
-        context = context_dao.get(extension.context)
+        context = context_dao.get_by_name(extension.context)
         if context.type != 'outcall':
             raise errors.unhandled_context_type(context.type,
                                                 extension.context,

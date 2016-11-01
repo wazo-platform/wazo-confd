@@ -134,7 +134,7 @@ def create_in_range(exten, context):
     response.assert_created('extensions')
 
 
-@fixtures.context(start='4185550000', end='4185559999', didlength=4)
+@fixtures.context(incall_ranges={'start': '4185550000', 'end': '4185559999', 'did_length': 4})
 def test_create_extension_in_context_with_did_length(context):
     response = confd.extensions.create(exten='1000', context=context['name'])
     response.assert_created('extensions')
@@ -165,7 +165,7 @@ def test_create_pattern():
     response.assert_created('extensions')
 
 
-@fixtures.context(start='1000', end='9999')
+@fixtures.context()
 def test_create_2_extensions_same_exten_different_context(context):
     exten = h.extension.find_available_exten(CONTEXT)
 
@@ -198,7 +198,7 @@ def test_edit_pattern(extension):
 
 
 @fixtures.extension()
-@fixtures.context(start='1000', end='9999')
+@fixtures.context()
 def test_update_required_parameters(extension, context):
     exten = h.extension.find_available_exten(context['name'])
     url = confd.extensions(extension['id'])

@@ -25,6 +25,10 @@ from test_api import confd
 def generate_context(**parameters):
     parameters.setdefault('name', generate_name())
     parameters.setdefault('user_ranges', [{'start': '1000', 'end': '1999'}])
+    parameters.setdefault('group_ranges', [{'start': '2000', 'end': '2999'}])
+    parameters.setdefault('queue_ranges', [{'start': '3000', 'end': '3999'}])
+    parameters.setdefault('conference_rooms_ranges', [{'start': '4000', 'end': '4999'}])
+    parameters.setdefault('incall_ranges', [{'start': '1000', 'end': '9999'}])
     return add_context(**parameters)
 
 

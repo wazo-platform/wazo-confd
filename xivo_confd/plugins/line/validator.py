@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import ValidationGroup, FindResource, Validator, Optional, MemberOfSequence
+from xivo_confd.helpers.validator import ValidationGroup, GetResource, Validator, Optional, MemberOfSequence
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.helpers import errors
@@ -50,10 +51,10 @@ def build_validator(device_dao):
             Optional('registrar',
                      MemberOfSequence('registrar', device_dao.registrars, 'Registrar')
                      ),
-            FindResource('context', context_dao.find, 'Context'),
+            GetResource('context', context_dao.get_by_name, 'Context'),
         ],
         edit=[
             ProvCodeChanged(line_dao),
             MemberOfSequence('registrar', device_dao.registrars, 'Registrar'),
-            FindResource('context', context_dao.find, 'Context'),
+            GetResource('context', context_dao.get_by_name, 'Context'),
         ])
