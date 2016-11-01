@@ -102,21 +102,6 @@ class UniqueFieldChanged(Validator):
             raise errors.resource_exists(self.resource, **metadata)
 
 
-class FindResource(Validator):
-
-    def __init__(self, field, dao_find, resource='Resource'):
-        self.field = field
-        self.dao_find = dao_find
-        self.resource = resource
-
-    def validate(self, model):
-        value = getattr(model, self.field)
-        found = self.dao_find(value)
-        if found is None:
-            metadata = {self.field: value}
-            raise errors.param_not_found(self.field, self.resource, **metadata)
-
-
 class ResourceExists(Validator):
 
     def __init__(self, field, dao_exist, resource='Resource'):

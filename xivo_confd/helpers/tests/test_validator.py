@@ -24,7 +24,6 @@ from xivo_dao.helpers.new_model import NewModel
 from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
 from xivo_confd.helpers.validator import (AssociationValidator,
-                                          FindResource,
                                           GetResource,
                                           MemberOfSequence,
                                           MissingFields,
@@ -75,28 +74,6 @@ class TestGetResource(unittest.TestCase):
         self.validator.validate(model)
 
         self.dao_get.assert_called_once_with(model.field)
-
-
-class TestFindResource(unittest.TestCase):
-
-    def setUp(self):
-        self.dao_find = Mock()
-        self.validator = FindResource('field', self.dao_find)
-
-    def test_given_resource_does_not_exist_then_raises_error(self):
-        model = Mock(field=sentinel.field)
-
-        self.dao_find.return_value = None
-
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(InputError))
-
-    def test_given_resource_exists_then_validation_passes(self):
-        model = Mock(field=sentinel.field)
-
-        self.validator.validate(model)
-
-        self.dao_find.assert_called_once_with(model.field)
 
 
 class TestUniqueField(unittest.TestCase):
