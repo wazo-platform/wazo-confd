@@ -38,7 +38,8 @@ class OutcallSchema(BaseSchema):
                            dump_only=True)
     extensions = fields.Nested('DialPatternSchema',
                                attribute='dialpatterns',
-                               many=True)
+                               many=True,
+                               dump_only=True)
 
 
 class DialPatternSchema(BaseSchema):
