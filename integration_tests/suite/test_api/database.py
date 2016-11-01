@@ -341,6 +341,10 @@ class DatabaseQueries(object):
 
         return agent_id
 
+    def delete_agent_login_status(self, agent_id):
+        query = text("DELETE FROM agent_login_status WHERE agent_id = :agent_id")
+        self.connection.execute(query, agent_id=agent_id)
+
     def insert_paging(self, number='1234'):
         query = text("""
         INSERT INTO paging (number, timeout)

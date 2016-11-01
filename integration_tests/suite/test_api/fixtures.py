@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -203,3 +204,9 @@ class ivr(IsolatedAction):
 
     actions = {'generate': h.ivr.generate_ivr,
                'delete': h.ivr.delete_ivr}
+
+
+class agent_login_status(IsolatedAction):
+
+    actions = {'generate': h.agent_login_status.generate_agent_login_status,
+               'delete': h.agent_login_status.delete_agent_login_status}

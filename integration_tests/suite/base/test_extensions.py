@@ -134,7 +134,7 @@ def create_in_range(exten, context):
     response.assert_created('extensions')
 
 
-@fixtures.context(incall_ranges={'start': '4185550000', 'end': '4185559999', 'did_length': 4})
+@fixtures.context(incall_ranges=[{'start': '4185550000', 'end': '4185559999', 'did_length': 4}])
 def test_create_extension_in_context_with_did_length(context):
     response = confd.extensions.create(exten='1000', context=context['name'])
     response.assert_created('extensions')
