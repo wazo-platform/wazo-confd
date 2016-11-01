@@ -1,0 +1,178 @@
+paths:
+  /contexts:
+    get:
+      operationId: list_contexts
+      summary: List contexts
+      description: '**Required ACL:** `confd.contexts.read`'
+      tags:
+      - contexts
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Contexts list
+          schema:
+            $ref: '#/definitions/ContextItems'
+    post:
+      operationId: create_context
+      summary: Create context
+      description: '**Required ACL:** `confd.contexts.create`'
+      tags:
+      - contexts
+      parameters:
+      - name: body
+        in: body
+        description: Context to create
+        required: true
+        schema:
+          $ref: '#/definitions/Context'
+      responses:
+        '201':
+          description: Context created
+          schema:
+            $ref: '#/definitions/Context'
+        '400':
+          $ref: '#/responses/CreateError'
+  /contexts/{context_id}:
+    get:
+      operationId: get_context
+      summary: Get outgoing call
+      description: '**Required ACL:** `confd.contexts.{context_id}.read`'
+      tags:
+      - contexts
+      parameters:
+      - $ref: '#/parameters/contextid'
+      responses:
+        '200':
+          description: Context
+          schema:
+            $ref: '#/definitions/Context'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_context
+      summary: Update outgoing call
+      description: '**Required ACL:** `confd.contexts.{context_id}.update`\n*Warning:* This will restart xivo-ctid '
+      tags:
+      - contexts
+      parameters:
+      - $ref: '#/parameters/contextid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Context'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_context
+      summary: Delete context
+      description: '**Required ACL:** `confd.contexts.{context_id}.delete`'
+      tags:
+      - contexts
+      parameters:
+      - $ref: '#/parameters/contextid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  contextid:
+    required: true
+    type: integer
+    name: context_id
+    in: path
+    description: context's ID
+definitions:
+  Context:
+    title: Context
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the context
+      name:
+        type: string
+        description: The name used by Asterisk (can only by set on create)
+      label:
+        type: string
+        description: The label of the context
+      type:
+        type: string
+        default: internal
+        enum:
+        - internal
+        - incall
+        - outcall
+        - services
+        - others
+      user_ranges:
+        type: array
+        items:
+          $ref: '#/definitions/ContextRange'
+      group_ranges:
+        type: array
+        items:
+          $ref: '#/definitions/ContextRange'
+      queue_ranges:
+        type: array
+        items:
+          $ref: '#/definitions/ContextRange'
+      conference_room_ranges:
+        type: array
+        items:
+          $ref: '#/definitions/ContextRange'
+      incall_ranges:
+        type: array
+        items:
+          $ref: '#/definitions/ContextIncallRange'
+      description:
+        type: string
+        description: Additional information about the context
+      enabled:
+        type: boolean
+        default: true
+    required:
+    - name
+  ContextRange:
+    title: ContextRange
+    properties:
+      start:
+        type: string
+      end:
+        type: string
+        default: <start>
+    required:
+    - start
+  ContextIncallRange:
+    title: ContextIncallRange
+    allOf:
+    - $ref: '#/definitions/ContextRange'
+    - properties:
+        did_length:
+          type: integer
+          default: 0
+          decription: The length of the did
+  ContextItems:
+    title: ContextItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Context'
+      total:
+        type: integer
+    required:
+    - total

@@ -94,6 +94,7 @@ DEFAULT_CONFIG = {
         'call_log_plugin',
         'call_permission_plugin',
         'configuration_plugin',
+        'context_plugin',
         'cti_profile_plugin',
         'device_plugin',
         'endpoint_custom_plugin',

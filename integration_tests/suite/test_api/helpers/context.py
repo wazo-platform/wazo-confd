@@ -1,29 +1,51 @@
+# -*- coding: UTF-8 -*-
+
+# Copyright (C) 2016 Proformatique Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 import random
 import string
 
-from test_api import db
+from test_api import confd
 
 
 def generate_context(**parameters):
-    name = 'ctx_' + ''.join(random.choice(string.ascii_letters) for _ in range(10))
-    parameters.setdefault('name', name)
-    parameters.setdefault('contexttype', 'internal')
-
-    start = parameters.pop('start', None)
-    end = parameters.pop('end', None)
-    didlength = parameters.pop('didlength', 0)
-    rangetype = parameters.pop('rangetype', 'user')
-
-    with db.queries() as queries:
-        id = queries.insert_context(**parameters)
-        if start and end:
-            queries.insert_context_range(id, rangetype, start, end, didlength)
-
-    return {'name': id,
-            'id': id,
-            'type': parameters['contexttype']}
+    parameters.setdefault('name', generate_name())
+    return add_context(**parameters)
 
 
-def delete_context(context, check=False):
-    with db.queries() as queries:
-        queries.delete_context(context)
+def add_context(**parameters):
+    response = confd.contexts.post(parameters)
+    return response.item
+
+
+def delete_context(context_id, check=False):
+    response = confd.contexts(context_id).delete()
+    if check:
+        response.assert_ok()
+
+
+def generate_name():
+    response = confd.contexts.get()
+    names = set(d['name'] for d in response.items)
+    return _random_name(names)
+
+
+def _random_name(names):
+    name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    if name in names:
+        return _random_name(names)
+    return name
