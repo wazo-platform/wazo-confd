@@ -238,6 +238,18 @@ def test_get_ivr_destination_relation(ivr):
     ))
 
 
+@fixtures.voicemail()
+def test_get_voicemail_destination_relation(voicemail):
+    incall = confd.incalls.post(destination={'type': 'voicemail',
+                                             'voicemail_id': voicemail['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(voicemail_id=voicemail['id'],
+                                voicemail_name=voicemail['name'])
+    ))
+
+
 @fixtures.user()
 def test_get_incalls_relation_when_user_destination(user):
     incall1 = confd.incalls.post(destination={'type': 'user',

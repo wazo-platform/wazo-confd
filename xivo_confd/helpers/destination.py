@@ -260,6 +260,10 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
     skip_instructions = StrictBoolean()
     greeting = fields.String(validate=OneOf(['busy', 'unavailable']), allow_none=True)
 
+    voicemail = fields.Nested('VoicemailSchema',
+                              only=['name'],
+                              dump_only=True)
+
     @pre_dump
     def separate_action(self, data):
         options = data.actionarg2 if data.actionarg2 else ''
@@ -274,6 +278,14 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
             'b' if greeting == 'busy' else 'u' if greeting == 'unavailable' else '',
             's' if data.pop('skip_instructions', False) else ''
         )
+        return data
+
+    @post_dump
+    def make_ivr_fields_flat(self, data):
+        if data.get('voicemail'):
+            data['voicemail_name'] = data['voicemail']['name']
+
+        data.pop('voicemail', None)
         return data
 
 
