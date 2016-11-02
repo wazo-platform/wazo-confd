@@ -56,7 +56,7 @@ paths:
     put:
       operationId: update_context
       summary: Update context
-      description: '**Required ACL:** `confd.contexts.{context_id}.update`\n*Warning:* This will restart xivo-ctid '
+      description: '**Required ACL:** `confd.contexts.{context_id}.update`'
       tags:
       - contexts
       parameters:
