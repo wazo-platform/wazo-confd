@@ -16,7 +16,7 @@ paths:
       - text/csv; charset=utf-8
       responses:
         '200':
-          description: Users exported sucessfully
+          description: Users exported successfully
           schema:
             $ref: '#/definitions/UserExport'
   /users/import:
@@ -38,11 +38,11 @@ paths:
       - $ref: '#/parameters/csvbody'
       responses:
         '201':
-          description: Users imported sucessfully
+          description: Users imported successfully
           schema:
             $ref: '#/definitions/UserImport'
         '400':
-          description: Errors occured during import
+          description: Errors occurred during import
           schema:
             $ref: '#/definitions/UserImportError'
     put:
@@ -63,11 +63,11 @@ paths:
       - $ref: '#/parameters/csvbody'
       responses:
         '200':
-          description: Users updated sucessfully
+          description: Users updated successfully
           schema:
             $ref: '#/definitions/UserUpdate'
         '400':
-          description: Errors occured during update
+          description: Errors occurred during update
           schema:
             $ref: '#/definitions/UserImportError'
 
@@ -86,7 +86,7 @@ definitions:
     type: string
   UserImport:
     title: UserImport
-    description: List of users sucessfully imported
+    description: List of users successfully imported
     properties:
       created:
         type: array
@@ -117,7 +117,7 @@ definitions:
               description: Line number corresponding to the CSV data
   UserUpdate:
     title: UserUpdate
-    description: List of users sucessfully updated
+    description: List of users successfully updated
     properties:
       updated:
         type: array
@@ -148,7 +148,7 @@ definitions:
               description: Line number corresponding to the CSV data
   UserImportError:
     title: UserImportError
-    description: List of errors that occured during import
+    description: List of errors that occurred during import
     properties:
       errors:
         type: array
@@ -160,7 +160,7 @@ definitions:
               description: Error message
             timestamp:
               type: integer
-              description: Time at which the error occured
+              description: Time at which the error occurred
             details:
               type: object
               properties:

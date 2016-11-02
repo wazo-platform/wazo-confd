@@ -121,19 +121,19 @@ responses:
     schema:
       $ref: '#/definitions/Error'
   GenericError:
-    description: An error occured during the operation
+    description: An error occurred during the operation
     schema:
       $ref: '#/definitions/Error'
   CreateError:
-    description: An error occured when creating the resource
+    description: An error occurred when creating the resource
     schema:
       $ref: '#/definitions/Error'
   UpdateError:
-    description: An error occured when updating the resource
+    description: An error occurred when updating the resource
     schema:
       $ref: '#/definitions/Error'
   DeleteError:
-    description: An error occured when deleting the resource
+    description: An error occurred when deleting the resource
     schema:
       $ref: '#/definitions/Error'
   NotFoundError:
@@ -141,9 +141,9 @@ responses:
     schema:
       $ref: '#/definitions/Error'
   ResourceUpdated:
-    description: Resource was updated sucessfully
+    description: Resource was updated successfully
   ResourceDeleted:
-    description: Resource was deleted sucessfully
+    description: Resource was deleted successfully
 definitions:
   DestinationType:
     title: DestinationType
