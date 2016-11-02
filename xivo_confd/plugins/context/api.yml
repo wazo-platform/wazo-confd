@@ -40,7 +40,7 @@ paths:
   /contexts/{context_id}:
     get:
       operationId: get_context
-      summary: Get outgoing call
+      summary: Get context
       description: '**Required ACL:** `confd.contexts.{context_id}.read`'
       tags:
       - contexts
@@ -55,7 +55,7 @@ paths:
           $ref: '#/responses/NotFoundError'
     put:
       operationId: update_context
-      summary: Update outgoing call
+      summary: Update context
       description: '**Required ACL:** `confd.contexts.{context_id}.update`\n*Warning:* This will restart xivo-ctid '
       tags:
       - contexts
