@@ -182,6 +182,18 @@ class CongestionDestinationSchema(HangupDestinationSchema):
 class IVRDestinationSchema(BaseDestinationSchema):
     ivr_id = fields.Integer(attribute='actionarg1', required=True)
 
+    ivr = fields.Nested('IvrSchema',
+                        only=['name'],
+                        dump_only=True)
+
+    @post_dump
+    def make_ivr_fields_flat(self, data):
+        if data.get('ivr'):
+            data['ivr_name'] = data['ivr']['name']
+
+        data.pop('ivr', None)
+        return data
+
 
 class NormalDestinationSchema(HangupDestinationSchema):
     pass

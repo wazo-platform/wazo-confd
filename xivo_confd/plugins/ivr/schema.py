@@ -47,6 +47,13 @@ class IvrSchema(BaseSchema):
     choices = fields.Nested(IvrChoiceSchema, many=True)
     links = ListLink(Link('ivr'))
 
+    incalls = fields.Nested('IncallSchema',
+                            only=['id',
+                                  'extensions',
+                                  'links'],
+                            many=True,
+                            dump_only=True)
+
     @post_load
     def create_objects(self, data):
         for key in ['invalid_destination', 'timeout_destination', 'abort_destination']:

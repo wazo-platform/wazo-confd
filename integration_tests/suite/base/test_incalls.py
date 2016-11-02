@@ -214,7 +214,7 @@ def test_delete(incall):
 
 
 @fixtures.user()
-def test_get_user_relation(user):
+def test_get_user_destination_relation(user):
     incall = confd.incalls.post(destination={'type': 'user',
                                              'user_id': user['id']}).item
 
@@ -226,14 +226,42 @@ def test_get_user_relation(user):
     ))
 
 
+@fixtures.ivr()
+def test_get_ivr_destination_relation(ivr):
+    incall = confd.incalls.post(destination={'type': 'ivr',
+                                             'ivr_id': ivr['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(ivr_id=ivr['id'],
+                                ivr_name=ivr['name'])
+    ))
+
+
 @fixtures.user()
-def test_get_incalls_relation(user):
+def test_get_incalls_relation_when_user_destination(user):
     incall1 = confd.incalls.post(destination={'type': 'user',
                                               'user_id': user['id']}).item
     incall2 = confd.incalls.post(destination={'type': 'user',
                                               'user_id': user['id']}).item
 
     response = confd.users(user['uuid']).get()
+    assert_that(response.item, has_entries(
+        incalls=contains_inanyorder(has_entries(id=incall1['id'],
+                                                extensions=incall1['extensions']),
+                                    has_entries(id=incall2['id'],
+                                                extensions=incall2['extensions']))
+    ))
+
+
+@fixtures.ivr()
+def test_get_incalls_relation_when_ivr_destination(ivr):
+    incall1 = confd.incalls.post(destination={'type': 'ivr',
+                                              'ivr_id': ivr['id']}).item
+    incall2 = confd.incalls.post(destination={'type': 'ivr',
+                                              'ivr_id': ivr['id']}).item
+
+    response = confd.ivr(ivr['id']).get()
     assert_that(response.item, has_entries(
         incalls=contains_inanyorder(has_entries(id=incall1['id'],
                                                 extensions=incall1['extensions']),

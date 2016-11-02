@@ -144,6 +144,7 @@ definitions:
           description: The menu's choices
           items:
             $ref: '#/definitions/IvrChoice'
+    - $ref: '#/definitions/IvrRelationIncalls'
     required:
     - name
     - menu_sound
@@ -164,6 +165,17 @@ definitions:
         destination:
           type: group
           group_id: 1
+  IvrRelationIncalls:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/IvrRelationIncall'
+  IvrRelationIncall:
+    allOf:
+      - $ref: '#/definitions/IncallRelationBase'
+      - $ref: '#/definitions/IncallRelationExtensions'
   IvrChoice:
     title: IvrChoice
     properties:

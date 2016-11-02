@@ -164,7 +164,8 @@ def test_get(ivr):
                                            invalid_destination=ivr['invalid_destination'],
                                            timeout_destination=ivr['timeout_destination'],
                                            abort_destination=ivr['abort_destination'],
-                                           choices=empty()))
+                                           choices=empty(),
+                                           incalls=empty()))
 
 
 def test_create_minimal_parameters():
