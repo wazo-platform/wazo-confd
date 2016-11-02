@@ -459,6 +459,7 @@ def test_get_user(user):
     response = confd.users(user['id']).get()
     assert_that(response.item, has_entries(FULL_USER))
     assert_that(response.item, has_entries(
+        incalls=empty(),
         lines=empty(),
         forwards={'busy': {'destination': None, 'enabled': False},
                   'noanswer': {'destination': None, 'enabled': False},

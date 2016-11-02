@@ -23,6 +23,7 @@ from test_api.helpers.destination import invalid_destinations, valid_destination
 
 from hamcrest import (assert_that,
                       contains,
+                      contains_inanyorder,
                       empty,
                       has_entries,
                       has_entry,
@@ -210,3 +211,32 @@ def test_delete(incall):
     response.assert_deleted()
     response = confd.incalls(incall['id']).get()
     response.assert_match(404, e.not_found(resource='Incall'))
+
+
+@fixtures.user()
+def test_get_user_relation(user):
+    incall = confd.incalls.post(destination={'type': 'user',
+                                             'user_id': user['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(user_id=user['id'],
+                                user_firstname=user['firstname'],
+                                user_lastname=user['lastname'])
+    ))
+
+
+@fixtures.user()
+def test_get_incalls_relation(user):
+    incall1 = confd.incalls.post(destination={'type': 'user',
+                                              'user_id': user['id']}).item
+    incall2 = confd.incalls.post(destination={'type': 'user',
+                                              'user_id': user['id']}).item
+
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item, has_entries(
+        incalls=contains_inanyorder(has_entries(id=incall1['id'],
+                                                extensions=incall1['extensions']),
+                                    has_entries(id=incall2['id'],
+                                                extensions=incall2['extensions']))
+    ))

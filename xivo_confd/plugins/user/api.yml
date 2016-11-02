@@ -350,6 +350,7 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the user
+    - $ref: '#/definitions/UserRelationIncalls'
     - $ref: '#/definitions/UserRelationLines'
     - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationServices'
@@ -368,6 +369,17 @@ definitions:
       lastname:
         type: string
         description: User lastname
+  UserRelationIncalls:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationIncall'
+  UserRelationIncall:
+    allOf:
+      - $ref: '#/definitions/IncallRelationBase'
+      - $ref: '#/definitions/IncallRelationExtensions'
   UserRelationLines:
     properties:
       lines:

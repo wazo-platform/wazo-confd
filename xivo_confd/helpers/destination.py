@@ -228,6 +228,20 @@ class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(attribute='actionarg1', required=True)
     ring_time = fields.Float(attribute='actionarg2', allow_none=True)
 
+    user = fields.Nested('UserSchema',
+                         only=['firstname',
+                               'lastname'],
+                         dump_only=True)
+
+    @post_dump
+    def make_user_fields_flat(self, data):
+        if data.get('user'):
+            data['user_firstname'] = data['user']['firstname']
+            data['user_lastname'] = data['user']['lastname']
+
+        data.pop('user', None)
+        return data
+
 
 class VoicemailDestinationSchema(BaseDestinationSchema):
     voicemail_id = fields.Integer(attribute='actionarg1', required=True)
