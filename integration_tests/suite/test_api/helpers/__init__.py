@@ -36,6 +36,7 @@ import entity
 import extension
 import funckey_template
 import group
+import group_extension
 import incall
 import incall_extension
 import incall_user

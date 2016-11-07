@@ -104,6 +104,7 @@ DEFAULT_CONFIG = {
         'extension_plugin',
         'func_key_plugin',
         'group_plugin',
+        'group_extension_plugin',
         'incall_extension_plugin',
         'incall_plugin',
         'info_plugin',

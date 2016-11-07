@@ -184,3 +184,10 @@ def queue_member_agent(queue, agent, **kwargs):
     h.queue_member_agent.associate(queue['id'], agent['id'], **kwargs)
     yield
     h.queue_member_agent.dissociate(queue['id'], agent['id'], **kwargs)
+
+
+@contextmanager
+def group_extension(group, extension, check=True):
+    h.group_extension.associate(group['id'], extension['id'], check)
+    yield
+    h.group_extension.dissociate(group['id'], extension['id'], check)

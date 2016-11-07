@@ -1,0 +1,36 @@
+paths:
+  /groups/{group_id}/extensions/{extension_id}:
+    put:
+      operationId: associate_group_extension
+      summary: Associate group and extension
+      description: '**Required ACL:** `confd.groups.{group_id}.extensions.{extension_id}.update`'
+      tags:
+      - groups
+      - extensions
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Group and Extension associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_group_extension
+      summary: Dissociate group and extension
+      description: '**Required ACL:** `confd.groups.{group_id}.extensions.{extension_id}.delete`'
+      tags:
+      - groups
+      - extensions
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Group and Extension dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

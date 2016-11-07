@@ -60,6 +60,9 @@ class ContextOnUpdateValidator(Validator):
     def validate(self, extension):
         context = self.dao.get_by_name(extension.context)
 
+        if extension.group and context.type != 'internal':
+            raise errors.unhandled_context_type(context.type)
+
         if extension.lines and context.type != 'internal':
             raise errors.unhandled_context_type(context.type)
 

@@ -45,6 +45,11 @@ class GroupSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('groups'))
 
+    extensions = fields.Nested('ExtensionSchema',
+                               only=['id', 'exten', 'context', 'links'],
+                               many=True,
+                               dump_only=True)
+
     @post_dump
     def convert_ring_strategy_to_user(self, data):
         ring_strategy = data.get('ring_strategy', None)

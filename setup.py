@@ -53,6 +53,7 @@ setup(
             'extension_plugin = xivo_confd.plugins.extension.plugin:Plugin',
             'func_key_plugin = xivo_confd.plugins.func_key.plugin:Plugin',
             'group_plugin = xivo_confd.plugins.group.plugin:Plugin',
+            'group_extension_plugin = xivo_confd.plugins.group_extension.plugin:Plugin',
             'incall_extension_plugin = xivo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_plugin = xivo_confd.plugins.incall.plugin:Plugin',
             'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
