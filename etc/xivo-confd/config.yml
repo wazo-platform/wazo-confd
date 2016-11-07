@@ -87,7 +87,7 @@ service_discovery:
   # if advertise_address is "auto" this interface will be used to find the ip
   # address to advertise. ignored otherwise
   advertise_address_interface: eth0
-  advertise_port: 9487
+  advertise_port: 9486
   # the number of seconds that consul will wait between 2 ttl messages to mark
   # this service as up
   ttl_interval: 30
