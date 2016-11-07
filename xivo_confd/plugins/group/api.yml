@@ -1,0 +1,166 @@
+paths:
+  /groups:
+    get:
+      operationId: list_groups
+      summary: List groups
+      description: '**Required ACL:** `confd.groups.read`'
+      tags:
+      - groups
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Groups list
+          schema:
+            $ref: '#/definitions/GroupItems'
+    post:
+      operationId: create_group
+      summary: Create group
+      description: '**Required ACL:** `confd.groups.create`'
+      tags:
+      - groups
+      parameters:
+      - name: body
+        in: body
+        description: Group to create
+        required: true
+        schema:
+          $ref: '#/definitions/Group'
+      responses:
+        '201':
+          description: Group created
+          schema:
+            $ref: '#/definitions/Group'
+        '400':
+          $ref: '#/responses/CreateError'
+  /groups/{group_id}:
+    get:
+      operationId: get_group
+      summary: Get group
+      description: '**Required ACL:** `confd.groups.{group_id}.read`'
+      tags:
+      - groups
+      parameters:
+      - $ref: '#/parameters/groupid'
+      responses:
+        '200':
+          description: Group
+          schema:
+            $ref: '#/definitions/Group'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_group
+      summary: Update group
+      description: '**Required ACL:** `confd.groups.{group_id}.update`'
+      tags:
+      - groups
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Group'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_group
+      summary: Delete group
+      description: '**Required ACL:** `confd.groups.{group_id}.delete`'
+      tags:
+      - groups
+      parameters:
+      - $ref: '#/parameters/groupid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  groupid:
+    required: true
+    type: integer
+    name: group_id
+    in: path
+    description: group's ID
+definitions:
+  Group:
+    title: Group
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the group
+      name:
+        type: string
+        description: The name of the group
+      ring_strategy:
+        type: string
+        default: all
+        enum:
+        - all
+        - random
+        - least_recent
+        - linear
+        - fewest_calls
+        - memorized_round_robin
+        - weight_random
+      preprocess_subroutine:
+        type: string
+      timeout:
+        type: integer
+        description: Number of seconds the group will ring before fallbacking
+      user_timeout:
+        type: integer
+        default: 15
+        description: Number of seconds the member of group will ring
+      retry_delay:
+        type: integer
+        default: 5
+        description: Number of seconds before the member of group will ring again
+      ring_in_use:
+        type: boolean
+        default: true
+        description: Notify the member even if it already in communication
+      music_on_hold:
+        type: string
+        description: Name of the MOH category to use for music on hold
+      caller_id_mode:
+        type: string
+        enum:
+        - prepend
+        - overwrite
+        - append
+        description: How the caller_id_name will be treated
+      caller_id_name:
+        type: string
+        description: Name to display
+      enabled:
+        type: boolean
+        default: true
+        description: Enable/Disable the group
+    required:
+    - name
+  GroupItems:
+    title: GroupItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Group'
+      total:
+        type: integer
+    required:
+    - total

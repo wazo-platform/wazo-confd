@@ -372,7 +372,7 @@ class DestinationValidator(object):
         'application:voicemailmain': [],
         'custom': [],
         'extension': [],
-        'group': [ResourceExists('actionarg1', group_dao.exists, 'Group')],
+        'group': [GetResource('actionarg1', group_dao.get, 'Group')],
         'endcall:busy': [],
         'endcall:congestion': [],
         'endcall:hangup': [],

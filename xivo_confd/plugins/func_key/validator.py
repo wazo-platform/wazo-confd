@@ -137,7 +137,7 @@ class BSFilterValidator(FuncKeyValidator):
 def build_validator():
     destination_validators = {
         'user': [GetResource('user_id', user_dao.get, 'User')],
-        'group': [ResourceExists('group_id', group_dao.exists, 'Group')],
+        'group': [GetResource('group_id', group_dao.get, 'Group')],
         'queue': [ResourceExists('queue_id', queue_dao.exists, 'Queue')],
         'conference': [ResourceExists('conference_id', conference_dao.exists, 'Conference')],
         'custom': [CustomValidator()],

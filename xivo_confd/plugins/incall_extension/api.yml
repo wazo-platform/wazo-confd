@@ -12,7 +12,7 @@ paths:
       - $ref: '#/parameters/extensionid'
       responses:
         '204':
-          description: Trunk and Custom endpoint associated
+          description: Incall and Extension associated
         '400':
           $ref: '#/responses/GenericError'
         '404':

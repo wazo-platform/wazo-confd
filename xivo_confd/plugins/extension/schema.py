@@ -31,13 +31,16 @@ class ExtensionSchema(BaseSchema):
     commented = fields.Boolean(attribute='legacy_commented')
     links = ListLink(Link('extensions'))
 
+    group = fields.Nested('GroupSchema',
+                          only=['id', 'name', 'links'],
+                          dump_only=True)
     incall = fields.Nested('IncallSchema',
                            only=['id', 'links'],
                            dump_only=True)
-    outcall = fields.Nested('OutcallSchema',
-                            only=['id', 'name', 'links'],
-                            dump_only=True)
     lines = fields.Nested('LineSchema',
                           only=['id', 'links'],
                           many=True,
                           dump_only=True)
+    outcall = fields.Nested('OutcallSchema',
+                            only=['id', 'name', 'links'],
+                            dump_only=True)
