@@ -26,13 +26,15 @@ class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
-    ring_strategy = fields.String(validate=OneOf(['all',
-                                                  'random',
-                                                  'least_recent',
-                                                  'linear',
-                                                  'fewest_calls',
-                                                  'memorized_round_robin',
-                                                  'weight_random']))
+    ring_strategy = fields.String(validate=OneOf([
+        'all',
+        'random',
+        'least_recent',
+        'linear',  # Issue when editing to this value: ASTERISK-17049
+        'fewest_calls',
+        'memorized_round_robin',
+        'weight_random'
+    ]))
     caller_id_mode = fields.String(validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True)
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
