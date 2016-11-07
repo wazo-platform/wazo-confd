@@ -103,6 +103,7 @@ DEFAULT_CONFIG = {
         'entity_plugin',
         'extension_plugin',
         'func_key_plugin',
+        'group_plugin',
         'incall_extension_plugin',
         'incall_plugin',
         'info_plugin',

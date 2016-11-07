@@ -245,22 +245,6 @@ class DatabaseQueries(object):
                          typeval=str(typeval))
                 .scalar())
 
-    def insert_group_only(self, name='mygroup', number='1234', context='default'):
-        query = text("""
-        INSERT INTO groupfeatures (name, number, context)
-        VALUES (:name, :number, :context)
-        RETURNING id
-        """)
-
-        group_id = (self.connection
-                    .execute(query,
-                             name=name,
-                             number=number,
-                             context=context)
-                    .scalar())
-
-        return group_id
-
     def insert_group(self, name='mygroup', number='1234', context='default'):
         group_id = self.insert_group_only(name=name, number=number, context=context)
         self.insert_extension(number, context, 'group', group_id)
@@ -269,10 +253,6 @@ class DatabaseQueries(object):
         self.insert_destination('group', 'group_id', func_key_id, group_id)
 
         return group_id
-
-    def delete_group(self, group_id):
-        query = text("DELETE FROM groupfeatures WHERE id = :group_id")
-        self.connection.execute(query, group_id=group_id)
 
     def insert_agent(self, number='1000', context='default', group_name='default'):
         query = text("""
