@@ -246,7 +246,18 @@ class DatabaseQueries(object):
                 .scalar())
 
     def insert_group(self, name='mygroup', number='1234', context='default'):
-        group_id = self.insert_group_only(name=name, number=number, context=context)
+        query = text("""
+        INSERT INTO groupfeatures (name, number, context)
+        VALUES (:name, :number, :context)
+        RETURNING id
+        """)
+
+        group_id = (self.connection
+                    .execute(query,
+                             name=name,
+                             number=number,
+                             context=context)
+                    .scalar())
         self.insert_extension(number, context, 'group', group_id)
 
         func_key_id = self.insert_func_key('speeddial', 'group')
