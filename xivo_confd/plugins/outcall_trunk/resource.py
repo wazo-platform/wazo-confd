@@ -21,10 +21,9 @@ from marshmallow import fields
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema
 from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.plugins.trunk.resource import TrunkSchema
 
 
-class TrunkSchemaIDLoad(TrunkSchema):
+class TrunkSchemaIDLoad(BaseSchema):
     id = fields.Integer(required=True)
 
 
