@@ -37,7 +37,7 @@ FAKE_ID = 999999999
 @fixtures.group()
 @fixtures.user()
 def test_associate_errors(group, user):
-    response = confd.groups(FAKE_ID).members.users.put(users=[{'uuid': user['uuid']}])
+    response = confd.groups(FAKE_ID).members.users.put(users=[user])
     response.assert_status(404)
 
     url = confd.groups(group['id']).members.users.put
@@ -64,8 +64,7 @@ def error_checks(url):
 @fixtures.line_sip()
 def test_associate(group, user, line):
     with a.user_line(user, line):
-        users = [{'uuid': user['uuid']}]
-        response = confd.groups(group['id']).members.users.put(users=users)
+        response = confd.groups(group['id']).members.users.put(users=[user])
         response.assert_updated()
 
 
@@ -78,8 +77,7 @@ def test_associate(group, user, line):
 @fixtures.line_sip()
 def test_associate_multiple(group, user1, user2, user3, line1, line2, line3):
     with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(user3, line3):
-        users = [{'uuid': user2['uuid']}, {'uuid': user3['uuid']}, {'uuid': user1['uuid']}]
-        response = confd.groups(group['id']).members.users.put(users=users)
+        response = confd.groups(group['id']).members.users.put(users=[user2, user3, user1])
         response.assert_updated()
 
         response = confd.groups(group['id']).get()
@@ -93,7 +91,7 @@ def test_associate_multiple(group, user1, user2, user3, line1, line2, line3):
 @fixtures.group()
 @fixtures.user()
 def test_associate_user_with_no_line(group, user):
-    response = confd.groups(group['id']).members.users.put(users=[{'uuid': user['uuid']}])
+    response = confd.groups(group['id']).members.users.put(users=[user])
     response.assert_match(400, e.missing_association('User', 'Line'))
 
 
@@ -103,8 +101,7 @@ def test_associate_user_with_no_line(group, user):
 @fixtures.line_sip()
 def test_associate_same_user(group, user, line1, line2):
     with a.user_line(user, line1), a.user_line(user, line2):
-        users = [{'uuid': user['uuid']}, {'uuid': user['uuid']}]
-        response = confd.groups(group['id']).members.users.put(users=users)
+        response = confd.groups(group['id']).members.users.put(users=[user, user])
         response.assert_status(400)
 
 
@@ -114,8 +111,7 @@ def test_associate_same_user(group, user, line1, line2):
 @fixtures.line_sip()
 def test_associate_multiple_user_with_same_line(group, user1, user2, line):
     with a.user_line(user1, line), a.user_line(user2, line):
-        users = [{'uuid': user1['uuid']}, {'uuid': user2['uuid']}]
-        response = confd.groups(group['id']).members.users.put(users=users)
+        response = confd.groups(group['id']).members.users.put(users=[user1, user2])
         response.assert_match(400, re.compile('Cannot associate different users with the same line'))
 
 
@@ -211,5 +207,5 @@ def test_delete_user_when_group_and_user_associated(group1, group2, user, line):
 def test_bus_events(group, user, line):
     with a.user_line(user, line):
         url = confd.groups(group['id']).members.users.put
-        body = {'users': [{'uuid': user['uuid']}]}
+        body = {'users': [user]}
         yield s.check_bus_event, 'config.groups.members.users.updated', url, body
