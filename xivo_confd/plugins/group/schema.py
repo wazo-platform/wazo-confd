@@ -22,6 +22,13 @@ from marshmallow.validate import Length, Range, OneOf
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
 
+class GroupMembersSchema(BaseSchema):
+    users = fields.Nested('UserSchema',
+                          only=['uuid', 'firstname', 'lastname', 'links'],
+                          many=True,
+                          dummp_only=True)
+
+
 class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
@@ -49,6 +56,8 @@ class GroupSchema(BaseSchema):
                                only=['id', 'exten', 'context', 'links'],
                                many=True,
                                dump_only=True)
+    members = fields.Nested('GroupMembersSchema',
+                            dump_only=True)
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):

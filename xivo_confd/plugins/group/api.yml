@@ -98,6 +98,58 @@ parameters:
 definitions:
   Group:
     title: Group
+    allOf:
+    - $ref: '#/definitions/GroupRelationBase'
+    - properties:
+        ring_strategy:
+          type: string
+          default: all
+          enum:
+          - all
+          - random
+          - least_recent
+          - linear
+          - fewest_calls
+          - memorized_round_robin
+          - weight_random
+        preprocess_subroutine:
+          type: string
+        timeout:
+          type: integer
+          description: Number of seconds the group will ring before fallbacking
+        user_timeout:
+          type: integer
+          default: 15
+          description: Number of seconds the member of group will ring
+        retry_delay:
+          type: integer
+          default: 5
+          description: Number of seconds before the member of group will ring again
+        ring_in_use:
+          type: boolean
+          default: true
+          description: Notify the member even if it already in communication
+        music_on_hold:
+          type: string
+          description: Name of the MOH category to use for music on hold
+        caller_id_mode:
+          type: string
+          enum:
+          - prepend
+          - overwrite
+          - append
+          description: How the caller_id_name will be treated
+        caller_id_name:
+          type: string
+          description: Name to display
+        enabled:
+          type: boolean
+          default: true
+          description: Enable/Disable the group
+    - $ref: '#/definitions/GroupRelationUsers'
+    required:
+    - name
+  GroupRelationBase:
     properties:
       id:
         type: integer
@@ -106,53 +158,13 @@ definitions:
       name:
         type: string
         description: The name of the group
-      ring_strategy:
-        type: string
-        default: all
-        enum:
-        - all
-        - random
-        - least_recent
-        - linear
-        - fewest_calls
-        - memorized_round_robin
-        - weight_random
-      preprocess_subroutine:
-        type: string
-      timeout:
-        type: integer
-        description: Number of seconds the group will ring before fallbacking
-      user_timeout:
-        type: integer
-        default: 15
-        description: Number of seconds the member of group will ring
-      retry_delay:
-        type: integer
-        default: 5
-        description: Number of seconds before the member of group will ring again
-      ring_in_use:
-        type: boolean
-        default: true
-        description: Notify the member even if it already in communication
-      music_on_hold:
-        type: string
-        description: Name of the MOH category to use for music on hold
-      caller_id_mode:
-        type: string
-        enum:
-        - prepend
-        - overwrite
-        - append
-        description: How the caller_id_name will be treated
-      caller_id_name:
-        type: string
-        description: Name to display
-      enabled:
-        type: boolean
-        default: true
-        description: Enable/Disable the group
-    required:
-    - name
+  GroupRelationUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
   GroupItems:
     title: GroupItems
     properties:
