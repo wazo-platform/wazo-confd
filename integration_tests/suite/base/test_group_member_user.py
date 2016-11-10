@@ -105,7 +105,7 @@ def test_associate_same_user(group, user, line1, line2):
     with a.user_line(user, line1), a.user_line(user, line2):
         users = [{'uuid': user['uuid']}, {'uuid': user['uuid']}]
         response = confd.groups(group['id']).members.users.put(users=users)
-        response.assert_match(400, re.compile('Cannot associate same user twice'))
+        response.assert_status(400)
 
 
 @fixtures.group()

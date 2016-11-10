@@ -36,7 +36,7 @@ class GroupMemberUserAssociationValidator(Validator):
 
     def validate_no_duplicate_user(self, users):
         if len(users) != len(set(users)):
-            raise errors.not_permitted('Cannot associate same user twice')
+            raise errors.not_permitted('Cannot associate same user more than once')
 
     def validate_no_users_have_same_line(self, users):
         all_lines = [user.lines[0] for user in users]
