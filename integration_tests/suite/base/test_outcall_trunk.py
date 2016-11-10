@@ -82,6 +82,14 @@ def test_associate_multiple(outcall, trunk1, trunk2, trunk3):
 
 @fixtures.outcall()
 @fixtures.trunk()
+def test_associate_same_trunk(outcall, trunk):
+    trunks = [{'id': trunk['id']}, {'id': trunk['id']}]
+    response = confd.outcalls(outcall['id']).trunks.put(trunks=trunks)
+    response.assert_status(400)
+
+
+@fixtures.outcall()
+@fixtures.trunk()
 @fixtures.trunk()
 def test_get_trunks_associated_to_outcall(outcall, trunk1, trunk2):
     expected = has_entries(trunks=contains(has_entries(id=trunk2['id'],
