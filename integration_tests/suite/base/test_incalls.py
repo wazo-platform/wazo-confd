@@ -213,6 +213,18 @@ def test_delete(incall):
     response.assert_match(404, e.not_found(resource='Incall'))
 
 
+@fixtures.group()
+def test_get_group_destination_relation(group):
+    incall = confd.incalls.post(destination={'type': 'group',
+                                             'group_id': group['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(group_id=group['id'],
+                                group_name=group['name'])
+    ))
+
+
 @fixtures.user()
 def test_get_user_destination_relation(user):
     incall = confd.incalls.post(destination={'type': 'user',
@@ -247,6 +259,22 @@ def test_get_voicemail_destination_relation(voicemail):
     assert_that(response.item, has_entries(
         destination=has_entries(voicemail_id=voicemail['id'],
                                 voicemail_name=voicemail['name'])
+    ))
+
+
+@fixtures.group()
+def test_get_incalls_relation_when_group_destination(group):
+    incall1 = confd.incalls.post(destination={'type': 'group',
+                                              'group_id': group['id']}).item
+    incall2 = confd.incalls.post(destination={'type': 'group',
+                                              'group_id': group['id']}).item
+
+    response = confd.groups(group['id']).get()
+    assert_that(response.item, has_entries(
+        incalls=contains_inanyorder(has_entries(id=incall1['id'],
+                                                extensions=incall1['extensions']),
+                                    has_entries(id=incall2['id'],
+                                                extensions=incall2['extensions']))
     ))
 
 

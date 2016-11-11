@@ -147,6 +147,7 @@ definitions:
           default: true
           description: Enable/Disable the group
     - $ref: '#/definitions/GroupRelationExtensions'
+    - $ref: '#/definitions/GroupRelationIncalls'
     - $ref: '#/definitions/GroupRelationMembers'
     required:
     - name
@@ -166,6 +167,17 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/ExtensionRelationBase'
+  GroupRelationIncalls:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/GroupRelationIncall'
+  GroupRelationIncall:
+    allOf:
+      - $ref: '#/definitions/IncallRelationBase'
+      - $ref: '#/definitions/IncallRelationExtensions'
   GroupRelationMembers:
     properties:
       members:

@@ -149,6 +149,18 @@ class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(attribute='actionarg1', required=True)
     ring_time = fields.Float(attribute='actionarg2', allow_none=True)
 
+    group = fields.Nested('GroupSchema',
+                          only=['name'],
+                          dump_only=True)
+
+    @post_dump
+    def make_group_fields_flat(self, data):
+        if data.get('group'):
+            data['group_name'] = data['group']['name']
+
+        data.pop('group', None)
+        return data
+
 
 class HangupDestinationSchema(BaseDestinationSchema):
     cause = fields.String(validate=OneOf(['busy',
