@@ -104,23 +104,32 @@ class DatabaseQueries(object):
         return queue_id
 
     def insert_queue_only(self, name, displayname='', number='', context=None):
-        queue_query = text("""
+        queuefeatures_query = text("""
         INSERT INTO queuefeatures (name, displayname, number, context)
         VALUES (:name, :displayname, :number, :context)
         RETURNING id
         """)
 
-        queue_id = (self.connection
-                    .execute(queue_query,
-                             name=name,
-                             displayname=name,
-                             number=number,
-                             context=context)
-                    .scalar())
+        queuefeatures_id = (self.connection
+                            .execute(queuefeatures_query,
+                                     name=name,
+                                     displayname=name,
+                                     number=number,
+                                     context=context)
+                            .scalar())
 
-        return queue_id
+        queue_query = text("""
+        INSERT INTO queue (name, category)
+        VALUES (:name, 'queue')
+        RETURNING name
+        """)
+        self.connection.execute(queue_query, name=name).scalar()
+
+        return queuefeatures_id
 
     def delete_queue(self, queue_id):
+        query = text("DELETE FROM queue WHERE name = (SELECT name FROM queuefeatures WHERE id = :queue_id)")
+        self.connection.execute(query, queue_id=queue_id)
         query = text("DELETE FROM queuefeatures WHERE id = :queue_id")
         self.connection.execute(query, queue_id=queue_id)
 

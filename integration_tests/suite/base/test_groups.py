@@ -110,8 +110,10 @@ def error_checks(url):
 
 
 @fixtures.group(name='unique')
-def unique_error_checks(url, group):
+@fixtures.queue(name='queue_name')
+def unique_error_checks(url, group, queue):
     yield s.check_bogus_field_returns_error, url, 'name', group['name']
+    yield s.check_bogus_field_returns_error, url, 'name', queue['name']
 
 
 @fixtures.group(name='hidden', preprocess_subroutine='hidden')
