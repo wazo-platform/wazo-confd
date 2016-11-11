@@ -25,7 +25,7 @@ paths:
 definitions:
   UsersUuid:
     properties:
-      trunks:
+      users:
         items:
           $ref: '#/definitions/UserUuid'
         type: array
