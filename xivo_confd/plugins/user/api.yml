@@ -350,6 +350,7 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the user
+    - $ref: '#/definitions/UserRelationGroups'
     - $ref: '#/definitions/UserRelationIncalls'
     - $ref: '#/definitions/UserRelationLines'
     - $ref: '#/definitions/UserRelationForwards'
@@ -369,6 +370,13 @@ definitions:
       lastname:
         type: string
         description: User lastname
+  UserRelationGroups:
+    properties:
+      groups:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/GroupRelationBase'
   UserRelationIncalls:
     properties:
       incalls:

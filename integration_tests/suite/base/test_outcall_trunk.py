@@ -34,7 +34,7 @@ FAKE_ID = 999999999
 @fixtures.outcall()
 @fixtures.trunk()
 def test_associate_errors(outcall, trunk):
-    response = confd.outcalls(FAKE_ID).trunks.put(trunks=[{'id': trunk['id']}])
+    response = confd.outcalls(FAKE_ID).trunks.put(trunks=[trunk])
     response.assert_status(404)
 
     url = confd.outcalls(outcall['id']).trunks().put
@@ -60,8 +60,7 @@ def error_checks(url):
 @fixtures.outcall()
 @fixtures.trunk()
 def test_associate(outcall, trunk):
-    trunks = [{'id': trunk['id']}]
-    response = confd.outcalls(outcall['id']).trunks().put(trunks=trunks)
+    response = confd.outcalls(outcall['id']).trunks().put(trunks=[trunk])
     response.assert_updated()
 
 
@@ -70,8 +69,7 @@ def test_associate(outcall, trunk):
 @fixtures.trunk()
 @fixtures.trunk()
 def test_associate_multiple(outcall, trunk1, trunk2, trunk3):
-    trunks = [{'id': trunk2['id']}, {'id': trunk3['id']}, {'id': trunk1['id']}]
-    response = confd.outcalls(outcall['id']).trunks.put(trunks=trunks)
+    response = confd.outcalls(outcall['id']).trunks.put(trunks=[trunk2, trunk3, trunk1])
     response.assert_updated()
 
     response = confd.outcalls(outcall['id']).get()

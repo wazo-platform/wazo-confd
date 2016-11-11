@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,28 +23,28 @@ from xivo_confd.helpers.mallow import BaseSchema
 from xivo_confd.helpers.restful import ConfdResource
 
 
-class TrunkSchemaIDLoad(BaseSchema):
-    id = fields.Integer(required=True)
+class UserSchemaUUIDLoad(BaseSchema):
+    uuid = fields.String(required=True)
 
 
-class TrunksSchema(BaseSchema):
-    trunks = fields.Nested(TrunkSchemaIDLoad, many=True, required=True)
+class UsersSchema(BaseSchema):
+    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
 
 
-class OutcallTrunkList(ConfdResource):
+class GroupMemberUserItem(ConfdResource):
 
-    schema = TrunksSchema
+    schema = UsersSchema
 
-    def __init__(self, service, outcall_dao, trunk_dao):
+    def __init__(self, service, group_dao, user_dao):
         super(ConfdResource, self).__init__()
         self.service = service
-        self.outcall_dao = outcall_dao
-        self.trunk_dao = trunk_dao
+        self.group_dao = group_dao
+        self.user_dao = user_dao
 
-    @required_acl('confd.outcalls.{outcall_id}.trunks.update')
-    def put(self, outcall_id):
+    @required_acl('confd.groups.{group_id}.members.users.update')
+    def put(self, group_id):
         form = self.schema().load(request.get_json()).data
-        outcall = self.outcall_dao.get(outcall_id)
-        trunks = [self.trunk_dao.get(ot['id']) for ot in form['trunks']]
-        self.service.associate_all_trunks(outcall, trunks)
+        group = self.group_dao.get(group_id)
+        users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+        self.service.associate_all_users(group, users)
         return '', 204

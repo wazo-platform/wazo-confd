@@ -191,3 +191,12 @@ def group_extension(group, extension, check=True):
     h.group_extension.associate(group['id'], extension['id'], check)
     yield
     h.group_extension.dissociate(group['id'], extension['id'], check)
+
+
+@contextmanager
+def group_member_user(group, *users, **kwargs):
+    user_uuids = [user['uuid'] for user in users]
+    check = kwargs.get('check', True)
+    h.group_member_user.associate(group['id'], user_uuids, check=check)
+    yield
+    h.group_member_user.dissociate(group['id'], check=check)

@@ -1,0 +1,35 @@
+paths:
+  /groups/{group_id}/members/users:
+    put:
+      operationId: associate_group_member_users
+      summary: Associate group and users
+      description: '**Required ACL:** `confd.groups.{group_id}.members.users.update`'
+      tags:
+      - groups
+      - users
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Group and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  UsersUuid:
+    properties:
+      trunks:
+        items:
+          $ref: '#/definitions/UserUuid'
+        type: array
+  UserUuid:
+    properties:
+      uuid:
+        type: string

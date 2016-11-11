@@ -58,6 +58,12 @@ class UserSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('users'))
 
+    groups = fields.Nested('GroupSchema',
+                           only=['id',
+                                 'name',
+                                 'links'],
+                           many=True,
+                           dump_only=True)
     incalls = fields.Nested('IncallSchema',
                             only=['id',
                                   'extensions',
