@@ -1,9 +1,13 @@
 paths:
   /groups/{group_id}/members/users:
     put:
-      operationId: associate_group_member_users
-      summary: Associate group and users
-      description: '**Required ACL:** `confd.groups.{group_id}.members.users.update`'
+      operationId: update_group_member_users
+      summary: Update group and users
+      description: '**Required ACL:** `confd.groups.{group_id}.members.users.update`
+
+      **WARNING**
+      This endpoint remove all members which are not defined.
+      The member order is important for linear ring_strategy'
       tags:
       - groups
       - users
