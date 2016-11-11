@@ -1,6 +1,6 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,22 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from .notifier import build_notifier
-from .validator import build_validator
+from xivo_dao.helpers import errors
+
+from xivo_confd.helpers.validator import Validator, AssociationValidator
 
 
-class OutcallTrunkService(object):
+class GroupTrunkAssociationValidator(Validator):
 
-    def __init__(self, notifier, validator):
-        self.notifier = notifier
-        self.validator = validator
+    def validate(self, group, trunks):
+        self.validate_no_duplicate_trunk(trunks)
 
-    def associate_all_trunks(self, outcall, trunks):
-        self.validator.validate_association(outcall, trunks)
-        outcall.trunks = trunks
-        self.notifier.associated_all_trunks(outcall, trunks)
+    def validate_no_duplicate_trunk(self, trunks):
+        if len(trunks) != len(set(trunks)):
+            raise errors.not_permitted('Cannot associate same trunk more than once')
 
 
-def build_service():
-    return OutcallTrunkService(build_notifier(),
-                               build_validator())
+def build_validator():
+    return AssociationValidator(
+        association=[GroupTrunkAssociationValidator()],
+    )
