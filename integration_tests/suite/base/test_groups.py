@@ -175,7 +175,9 @@ def test_get(group):
                                            user_timeout=group['user_timeout'],
                                            retry_delay=group['retry_delay'],
                                            enabled=group['enabled'],
-                                           members=has_entries(users=empty())))
+                                           extensions=empty(),
+                                           members=has_entries(users=empty()),
+                                           incalls=empty()))
 
 
 def test_create_minimal_parameters():

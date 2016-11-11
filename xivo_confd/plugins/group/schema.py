@@ -56,6 +56,12 @@ class GroupSchema(BaseSchema):
                                only=['id', 'exten', 'context', 'links'],
                                many=True,
                                dump_only=True)
+    incalls = fields.Nested('IncallSchema',
+                            only=['id',
+                                  'extensions',
+                                  'links'],
+                            many=True,
+                            dump_only=True)
     members = fields.Nested('GroupMembersSchema',
                             dump_only=True)
 
