@@ -461,6 +461,7 @@ def test_get_user(user):
     assert_that(response.item, has_entries(
         incalls=empty(),
         lines=empty(),
+        groups=empty(),
         forwards={'busy': {'destination': None, 'enabled': False},
                   'noanswer': {'destination': None, 'enabled': False},
                   'unconditional': {'destination': None, 'enabled': False}},

@@ -174,7 +174,8 @@ def test_get(group):
                                            ring_strategy=group['ring_strategy'],
                                            user_timeout=group['user_timeout'],
                                            retry_delay=group['retry_delay'],
-                                           enabled=group['enabled']))
+                                           enabled=group['enabled'],
+                                           members=has_entries(users=empty())))
 
 
 def test_create_minimal_parameters():
