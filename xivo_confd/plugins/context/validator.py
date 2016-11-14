@@ -55,8 +55,7 @@ class ContextDeleteValidator(Validator):
                                              extension_id=extension.id)
 
     def validate_has_no_voicemails(self, context):
-        # Should be changed to use find_by when the voicemail_dao will be refactored
-        voicemails = self.voicemail_dao.search(context=context.name).items
+        voicemails = self.voicemail_dao.find_by(context=context.name)
         if voicemails:
             raise errors.resource_associated('Context', 'Voicemail',
                                              context_id=context.id,

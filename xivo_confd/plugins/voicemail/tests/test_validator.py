@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,10 +21,9 @@ import unittest
 from mock import Mock, sentinel
 from hamcrest import assert_that, calling, raises
 
-from xivo_dao.resources.voicemail.model import Voicemail
+from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 from xivo_dao.helpers.exception import ResourceError
-from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_confd.plugins.voicemail import validator
 
@@ -35,16 +35,16 @@ class TestNumberContextExists(unittest.TestCase):
         self.validator = validator.NumberContextExists(self.dao)
 
     def test_when_number_and_context_do_not_exist_then_validation_passes(self):
-        self.dao.get_by_number_context.side_effect = NotFoundError
         model = Voicemail(number='1000',
                           context='context')
+        self.dao.find_by.return_value = None
 
         self.validator.validate(model)
 
     def test_when_number_and_context_exist_then_validation_fails(self):
         model = Voicemail(number='1000',
                           context='context')
-        self.dao.get_by_number_context.return_value = model
+        self.dao.find_by.return_value = model
 
         assert_that(
             calling(self.validator.validate).with_args(model),
@@ -58,34 +58,38 @@ class TestNumberContextChanged(unittest.TestCase):
         self.validator = validator.NumberContextChanged(self.dao)
 
     def test_when_number_and_context_do_not_exist_then_validation_passes(self):
-        self.dao.get_by_number_context.side_effect = NotFoundError
         model = Voicemail(number='1000',
                           context='context')
+        self.dao.find_by.return_value = None
 
         self.validator.validate(model)
 
     def test_when_number_and_context_have_not_changed_then_validation_passes(self):
-        model = Voicemail(number='1000',
+        model = Voicemail(id=1,
+                          number='1000',
                           context='context')
-        self.dao.get.return_value = model
+        self.dao.find_by.return_value = model
 
         self.validator.validate(model)
 
     def test_when_number_and_context_have_changed_and_new_number_context_do_not_exist_then_validation_passes(self):
-        model = Voicemail(number='1000',
+        model = Voicemail(id=1,
+                          number='1000',
                           context='context')
-        self.dao.get.return_value = model
-        self.dao.get_by_number_context.side_effect = NotFoundError
+        self.dao.find_by.return_value = model
+        model.number = '1001'
+        model.context = 'default'
 
         self.validator.validate(model)
 
     def test_when_number_and_context_have_changed_and_new_number_context_exist_then_validation_fails(self):
-        old_model = Voicemail(number='1000',
+        old_model = Voicemail(id=1,
+                              number='1000',
                               context='context')
-        new_model = Voicemail(number='1001',
+        new_model = Voicemail(id=2,
+                              number='1001',
                               context='context')
-        self.dao.get.return_value = old_model
-        self.dao.get_by_number_context.return_value = new_model
+        self.dao.find_by.return_value = old_model
 
         assert_that(
             calling(self.validator.validate).with_args(new_model),

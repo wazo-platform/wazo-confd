@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.context import dao as context_dao
 
+from xivo_confd.database import static_voicemail
 from xivo_confd.helpers.validator import (GetResource,
                                           MemberOfSequence,
                                           Optional,
@@ -34,26 +35,26 @@ class NumberContextExists(Validator):
         self.dao = dao
 
     def validate(self, model):
-        existing = self.find(model)
-        if existing:
+        voicemail = self.dao.find_by(number=model.number,
+                                     context=model.context)
+        if voicemail:
             raise errors.resource_exists('Voicemail',
-                                         number=existing.number,
-                                         context=existing.context)
-
-    def find(self, model):
-        try:
-            return self.dao.get_by_number_context(model.number,
-                                                  model.context)
-        except NotFoundError:
-            return None
+                                         number=voicemail.number,
+                                         context=voicemail.context)
 
 
-class NumberContextChanged(NumberContextExists):
+class NumberContextChanged(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
 
     def validate(self, model):
-        existing = self.dao.get(model.id)
-        if model.number_at_context != existing.number_at_context:
-            super(NumberContextChanged, self).validate(model)
+        voicemail = self.dao.find_by(number=model.number,
+                                     context=model.context)
+        if voicemail and voicemail.id != model.id:
+            raise errors.resource_exists('Voicemail',
+                                         number=voicemail.number,
+                                         context=voicemail.context)
 
 
 class AssociatedToUser(Validator):
@@ -75,7 +76,7 @@ def build_validator():
         common=[
             GetResource('context', context_dao.get_by_name, 'Context'),
             Optional('timezone', MemberOfSequence('timezone',
-                                                  voicemail_dao.find_all_timezone,
+                                                  static_voicemail.find_all_timezone,
                                                   'Timezone')),
         ],
         create=[

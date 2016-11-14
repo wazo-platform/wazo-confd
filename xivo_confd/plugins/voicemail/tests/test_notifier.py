@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +21,7 @@
 import unittest
 from mock import Mock
 
-from xivo_dao.resources.voicemail.model import Voicemail
+from xivo_dao.alchemy.voicemail import Voicemail
 
 from xivo_bus.resources.voicemail.event import (CreateVoicemailEvent,
                                                 DeleteVoicemailEvent,
