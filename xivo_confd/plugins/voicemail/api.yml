@@ -172,6 +172,7 @@ definitions:
           type: array
           items:
             $ref: '#/definitions/KeyValueOption'
+    - $ref: '#/definitions/VoicemailRelationUsers'
     required:
     - name
     - number
@@ -185,6 +186,13 @@ definitions:
         name:
           type: string
           description: Voicemail name
+  VoicemailRelationUsers:
+    properties:
+        users:
+          type: array
+          readOnly: True
+          items:
+            $ref: '#/definitions/UserRelationBase'
   VoicemailItems:
     title: VoicemailItems
     properties:
