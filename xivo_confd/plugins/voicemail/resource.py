@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,11 +18,11 @@
 
 from flask import url_for
 
-from xivo_dao.resources.voicemail.model import Voicemail
-from xivo_confd.plugins.voicemail.schema import VoicemailSchema
-
+from .schema import VoicemailSchema
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
+
+from xivo_dao.alchemy.voicemail import Voicemail
 
 
 class VoicemailList(ListResource):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,3 +43,11 @@ class VoicemailSchema(BaseSchema):
     enabled = StrictBoolean()
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('voicemails'))
+
+    users = fields.Nested('UserSchema',
+                          only=['uuid',
+                                'firstname',
+                                'lastname',
+                                'links'],
+                          many=True,
+                          dump_only=True)

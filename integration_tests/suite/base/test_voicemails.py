@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2016 Proformatique Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 
 from test_api import confd
 from test_api import fixtures
@@ -8,7 +26,14 @@ from test_api import errors as e
 from test_api.helpers import voicemail as vm_helper
 from test_api.helpers import context as context_helper
 
-from hamcrest import assert_that, has_items, contains, has_entry, has_entries, has_item, is_not
+from hamcrest import (assert_that,
+                      contains,
+                      empty,
+                      has_entries,
+                      has_entry,
+                      has_item,
+                      has_items,
+                      is_not)
 
 
 def test_get_errors():
@@ -176,6 +201,9 @@ def test_list_voicemails(first, second):
 def test_get_voicemail(voicemail):
     response = confd.voicemails(voicemail['id']).get()
     assert_that(response.item, has_entries(voicemail))
+    assert_that(response.item, has_entries(
+        users=empty(),
+    ))
 
 
 def test_create_minimal_voicemail():

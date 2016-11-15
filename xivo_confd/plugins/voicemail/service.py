@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from xivo_confd import sysconfd
@@ -31,10 +32,11 @@ class VoicemailService(CRUDService):
         self.sysconf = sysconf
 
     def edit(self, voicemail, updated_fields=None):
-        self.validator.validate_edit(voicemail)
-        old_voicemail = self.dao.get(voicemail.id)
+        old_number, old_context = voicemail.get_old_number_context()
+        with Session.no_autoflush:
+            self.validator.validate_edit(voicemail)
         self.dao.edit(voicemail)
-        self.move_voicemail(old_voicemail, voicemail)
+        self.move_voicemail(voicemail, old_number, old_context)
         self.notifier.edited(voicemail)
 
     def delete(self, voicemail):
@@ -47,10 +49,10 @@ class VoicemailService(CRUDService):
         self.sysconf.delete_voicemail(voicemail.number,
                                       voicemail.context)
 
-    def move_voicemail(self, old, new):
-        if old.number_at_context != new.number_at_context:
-            self.sysconf.move_voicemail(old.number, old.context,
-                                        new.number, new.context)
+    def move_voicemail(self, voicemail, old_number, old_context):
+        if (old_number != voicemail.number) or (old_context != voicemail.context):
+            self.sysconf.move_voicemail(old_number, old_context,
+                                        voicemail.number, voicemail.context)
 
 
 def build_service():
