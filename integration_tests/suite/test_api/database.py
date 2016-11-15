@@ -502,32 +502,6 @@ class DatabaseQueries(object):
         query = text("UPDATE linefeatures SET device = NULL WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)
 
-    def insert_switchboard(self, queue_id):
-        query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
-                        VALUES ('2016-02-29 00:00:00', 'abandoned', 15.2, :queue_id)
-                        RETURNING id""")
-        self.connection.execute(query, queue_id=queue_id)
-
-    def find_queue(self, queue_name):
-        query = text("""SELECT id from queuefeatures
-                        WHERE name = :name""")
-        return self.connection.execute(query, name=queue_name).first()
-
-    def insert_switchboard_stat(self, time, end_type, wait_time, queue_id):
-        query = text("""INSERT INTO stat_switchboard_queue(time, end_type, wait_time, queue_id)
-                        VALUES (:time, :end_type, :wait_time, :queue_id)
-                        RETURNING id""")
-        return self.connection.execute(query,
-                                       time=time,
-                                       end_type=end_type,
-                                       wait_time=wait_time,
-                                       queue_id=queue_id).scalar()
-
-    def delete_switchboard_stat(self, stat_id):
-        query = text("""DELETE from stat_switchboard_queue
-                        WHERE id = :id""")
-        self.connection.execute(query, id=stat_id)
-
     def line_has_sccp_device(self, line_id, sccp_device):
         query = text("""SELECT COUNT(*)
                      FROM linefeatures

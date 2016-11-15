@@ -121,7 +121,6 @@ DEFAULT_CONFIG = {
         'outcall_trunk_plugin',
         'queue_member_plugin',
         'sip_general_plugin',
-        'switchboard_plugin',
         'trunk_endpoint_plugin',
         'trunk_plugin',
         'user_agent_plugin',

@@ -93,17 +93,6 @@ class custom(IsolatedAction):
                'delete': h.endpoint_custom.delete_custom}
 
 
-class switchboard(IsolatedAction):
-
-    actions = {'generate': h.switchboard.generate_switchboard}
-
-
-class switchboard_stat(IsolatedAction):
-
-    actions = {'generate': h.switchboard.generate_switchboard_stat,
-               'delete': h.switchboard.delete_switchboard_stat}
-
-
 class registrar(IsolatedAction):
 
     actions = {'generate': h.device.generate_registrar,
