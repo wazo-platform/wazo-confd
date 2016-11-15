@@ -102,10 +102,7 @@ class VoicemailCreator(Creator):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
-            try:
-                return self.service.dao.get_by_number_context(number, context)
-            except NotFoundError:
-                return None
+            return self.service.dao.find_by(number=number, context=context)
 
     def create(self, fields):
         number = fields.get('number')

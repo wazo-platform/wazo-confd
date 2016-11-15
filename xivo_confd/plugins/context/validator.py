@@ -55,11 +55,11 @@ class ContextDeleteValidator(Validator):
                                              extension_id=extension.id)
 
     def validate_has_no_voicemails(self, context):
-        voicemails = self.voicemail_dao.find_by(context=context.name)
-        if voicemails:
+        voicemail = self.voicemail_dao.find_by(context=context.name)
+        if voicemail:
             raise errors.resource_associated('Context', 'Voicemail',
                                              context_id=context.id,
-                                             voicemail_id=voicemails[0].id)
+                                             voicemail_id=voicemail.id)
 
     def validate_has_no_trunks(self, context):
         trunk = self.trunk_dao.find_by(context=context.name)
