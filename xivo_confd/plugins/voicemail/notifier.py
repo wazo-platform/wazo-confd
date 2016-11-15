@@ -19,7 +19,9 @@ from xivo_confd import bus, sysconfd
 
 from xivo_bus.resources.voicemail.event import (CreateVoicemailEvent,
                                                 EditVoicemailEvent,
+                                                EditUserVoicemailEvent,
                                                 DeleteVoicemailEvent)
+from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 
 class VoicemailNotifier(object):
@@ -49,6 +51,9 @@ class VoicemailNotifier(object):
                                       'module reload chan_sccp.so'])
         event = EditVoicemailEvent(voicemail.id)
         self.bus.send_bus_event(event, event.routing_key)
+        for user_voicemail in user_voicemail_dao.find_all_by_voicemail_id(voicemail.id):
+            event = EditUserVoicemailEvent(user_voicemail.user_uuid, voicemail.id)
+            self.bus.send_bus_event(event, event.routing_key)
 
     def deleted(self, voicemail):
         self._send_sysconfd_handlers('xivo[voicemail,delete,%s]' % voicemail.id,
