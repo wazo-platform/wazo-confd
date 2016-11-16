@@ -126,6 +126,7 @@ def test_delete_user_when_user_and_agent_associated(agent, user):
 @fixtures.agent()
 @fixtures.user()
 def test_bus_events(agent, user):
-    url = confd.users(user['id']).agents(agent['id'])
-    yield s.check_bus_event, 'config.users.{}.agents.updated'.format(user['uuid']), url.put
-    yield s.check_bus_event, 'config.users.{}.agents.deleted'.format(user['uuid']), url.delete
+    url = confd.users(user['id']).agents(agent['id']).put
+    yield s.check_bus_event, 'config.users.{}.agents.updated'.format(user['uuid']), url
+    url = confd.users(user['id']).agents.delete
+    yield s.check_bus_event, 'config.users.{}.agents.deleted'.format(user['uuid']), url
