@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +22,6 @@ from xivo_bus.resources.voicemail.event import (CreateVoicemailEvent,
                                                 EditVoicemailEvent,
                                                 EditUserVoicemailEvent,
                                                 DeleteVoicemailEvent)
-from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 
 class VoicemailNotifier(object):
@@ -51,8 +51,8 @@ class VoicemailNotifier(object):
                                       'module reload chan_sccp.so'])
         event = EditVoicemailEvent(voicemail.id)
         self.bus.send_bus_event(event, event.routing_key)
-        for user_voicemail in user_voicemail_dao.find_all_by_voicemail_id(voicemail.id):
-            event = EditUserVoicemailEvent(user_voicemail.user_uuid, voicemail.id)
+        for user in voicemail.users:
+            event = EditUserVoicemailEvent(user.uuid, voicemail.id)
             self.bus.send_bus_event(event, event.routing_key)
 
     def deleted(self, voicemail):

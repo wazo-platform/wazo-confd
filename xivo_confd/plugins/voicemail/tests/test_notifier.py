@@ -38,7 +38,7 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.device_db = Mock()
-        self.voicemail = Mock(Voicemail, id=10)
+        self.voicemail = Mock(Voicemail, id=10, users=[])
         self.notifier = VoicemailNotifier(self.bus, self.sysconfd)
 
     def test_when_voicemail_created_then_event_sent_on_bus(self):
@@ -57,23 +57,19 @@ class TestVoicemailNotifier(unittest.TestCase):
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
-    @patch('xivo_dao.resources.user_voicemail.dao.find_all_by_voicemail_id')
-    def test_when_voicemail_edited_then_event_sent_on_bus(self, find_all_by_voicemail_id):
-        user_voicemail = Mock(user_uuid='abc-123')
-        find_all_by_voicemail_id.return_value = [user_voicemail]
+    def test_when_voicemail_edited_then_event_sent_on_bus(self):
+        user = Mock(uuid='abc-123')
+        self.voicemail.users = [user]
         expected_event1 = EditVoicemailEvent(self.voicemail.id)
-        expected_event2 = EditUserVoicemailEvent(user_voicemail.user_uuid, self.voicemail.id)
+        expected_event2 = EditUserVoicemailEvent(user.uuid, self.voicemail.id)
 
         self.notifier.edited(self.voicemail)
 
         assert_that(self.bus.send_bus_event.call_args_list,
                     contains(call(expected_event1, expected_event1.routing_key),
                              call(expected_event2, expected_event2.routing_key)))
-        find_all_by_voicemail_id.assert_called_once_with(self.voicemail.id)
 
-    @patch('xivo_dao.resources.user_voicemail.dao.find_all_by_voicemail_id')
-    def test_when_voicemail_edited_then_sysconfd_called(self, find_all_by_voicemail_id):
-        find_all_by_voicemail_id.return_value = []
+    def test_when_voicemail_edited_then_sysconfd_called(self):
         expected_handlers = {'ipbx': ['voicemail reload', 'sip reload', 'module reload chan_sccp.so'],
                              'agentbus': [],
                              'ctibus': ['xivo[voicemail,edit,{}]'.format(self.voicemail.id)]}
