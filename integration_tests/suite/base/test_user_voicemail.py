@@ -23,11 +23,8 @@ from test_api import errors as e
 from test_api import associations as a
 from test_api import confd
 from test_api import fixtures
-from test_api.bus import BusClient
 
-from xivo_test_helpers import until
-
-from hamcrest import assert_that, contains_inanyorder, has_entries, has_items, has_length
+from hamcrest import assert_that, contains_inanyorder, has_entries, has_items
 FAKE_ID = 999999999
 
 
@@ -207,23 +204,7 @@ def test_get_multiple_users_associated_to_voicemail(user1, user2, voicemail):
 
 @fixtures.user()
 @fixtures.voicemail()
-def test_bus_event_when_associate(user, voicemail):
-    BusClient.listen_events('config.users.{}.voicemails.updated'.format(user['uuid']))
-    with a.user_voicemail(user, voicemail):
-        def assert_function():
-            assert_that(BusClient.events(), has_length(1))
-
-        until.assert_(assert_function, tries=5)
-
-
-@fixtures.user()
-@fixtures.voicemail()
-def test_bus_event_when_dissociate(user, voicemail):
-    with a.user_voicemail(user, voicemail, check=False):
-        BusClient.listen_events('config.users.{}.voicemails.deleted'.format(user['uuid']))
-        confd.users(user['id']).voicemails().delete()
-
-        def assert_function():
-            assert_that(BusClient.events(), has_length(1))
-
-        until.assert_(assert_function, tries=5)
+def test_bus_events(user, voicemail):
+    url = confd.users(user['id']).voicemails(voicemail['id'])
+    yield s.check_bus_event, 'config.users.{}.voicemails.updated'.format(user['uuid']), url.put
+    yield s.check_bus_event, 'config.users.{}.voicemails.deleted'.format(user['uuid']), url.delete

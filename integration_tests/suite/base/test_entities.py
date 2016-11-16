@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,16 +21,12 @@ from test_api import scenarios as s
 from test_api import errors as e
 from test_api import fixtures
 from test_api import confd
-from test_api.bus import BusClient
-
-from xivo_test_helpers import until
 
 from hamcrest import (assert_that,
                       contains,
                       has_entries,
                       has_entry,
                       has_item,
-                      has_length,
                       is_not)
 
 
@@ -181,22 +178,7 @@ def test_delete_when_schedule_associated(entity, schedule):
         response.assert_match(400, e.resource_associated('Schedule'))
 
 
-def test_bus_event_when_created():
-    BusClient.listen_events('config.entity.created')
-    confd.entities.post(name='bus_event')
-
-    def assert_function():
-        assert_that(BusClient.events(), has_length(1))
-
-    until.assert_(assert_function, tries=5)
-
-
 @fixtures.entity()
-def test_bus_event_when_deleted(entity):
-    BusClient.listen_events('config.entity.deleted')
-    confd.entities(entity['id']).delete()
-
-    def assert_function():
-        assert_that(BusClient.events(), has_length(1))
-
-    until.assert_(assert_function, tries=5)
+def test_bus_events(entity):
+    yield s.check_bus_event, 'config.entity.created', confd.entities.post, {'name': 'bus_event'}
+    yield s.check_bus_event, 'config.entity.deleted', confd.entities(entity['id']).delete

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,11 +18,8 @@
 
 from test_api import scenarios as s
 from test_api import confd
-from test_api.bus import BusClient
 
-from xivo_test_helpers import until
-
-from hamcrest import assert_that, has_entries, has_length
+from hamcrest import assert_that, has_entries
 
 
 def test_put_errors():
@@ -98,11 +96,5 @@ def test_edit_sip_general_with_none_value():
 
 
 def test_bus_event_when_edited():
-    BusClient.listen_events('config.sip_general.edited')
-    confd.asterisk.sip.general.put({'ordered_options': [],
-                                    'options': {}}).assert_updated()
-
-    def assert_function():
-        assert_that(BusClient.events(), has_length(1))
-
-    until.assert_(assert_function, tries=5)
+    url = confd.asterisk.sip.general
+    yield s.check_bus_event, 'config.sip_general.edited', url.put, {'ordered_options': [], 'options': {}}
