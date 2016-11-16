@@ -16,49 +16,43 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_bus.resources.user_voicemail import event
-from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_confd.helpers import sysconfd_connector
 from xivo_confd.helpers import bus_manager
 
 
-def associated(user_voicemail):
-    sysconf_command_association_updated(user_voicemail)
-    bus_event_associated(user_voicemail)
+def associated(user, voicemail):
+    sysconf_command_association_updated(user)
+    bus_event_associated(user, voicemail)
 
 
-def dissociated(user_voicemail):
-    sysconf_command_association_updated(user_voicemail)
-    bus_event_dissociated(user_voicemail)
+def dissociated(user, voicemail):
+    sysconf_command_association_updated(user)
+    bus_event_dissociated(user, voicemail)
 
 
-def sysconf_command_association_updated(user_voicemail):
+def sysconf_command_association_updated(user):
     command = {
         'ipbx': ['sip reload', 'module reload chan_sccp.so'],
         'agentbus': [],
-        'ctibus': _generate_ctibus_commands(user_voicemail)
+        'ctibus': _generate_ctibus_commands(user)
     }
     sysconfd_connector.exec_request_handlers(command)
 
 
-def _generate_ctibus_commands(user_voicemail):
-    ctibus = ['xivo[user,edit,%d]' % user_voicemail.user_id]
+def _generate_ctibus_commands(user):
+    ctibus = ['xivo[user,edit,%d]' % user.id]
 
-    user_lines = user_line_dao.find_all_by_user_id(user_voicemail.user_id)
-    for user_line in user_lines:
-        ctibus.append('xivo[phone,edit,%d]' % user_line.line_id)
+    for line in user.lines:
+        ctibus.append('xivo[phone,edit,%d]' % line.id)
 
     return ctibus
 
 
-def bus_event_associated(user_voicemail):
-    bus_event = event.UserVoicemailAssociatedEvent(user_voicemail.user_id,
-                                                   user_voicemail.voicemail_id,
-                                                   user_voicemail.enabled)
+def bus_event_associated(user, voicemail):
+    bus_event = event.UserVoicemailAssociatedEvent(user.uuid, voicemail.id)
     bus_manager.send_bus_event(bus_event, bus_event.routing_key)
 
 
-def bus_event_dissociated(user_voicemail):
-    bus_event = event.UserVoicemailDissociatedEvent(user_voicemail.user_id,
-                                                    user_voicemail.voicemail_id,
-                                                    False)
+def bus_event_dissociated(user, voicemail):
+    bus_event = event.UserVoicemailDissociatedEvent(user.uuid, voicemail.id)
     bus_manager.send_bus_event(bus_event, bus_event.routing_key)

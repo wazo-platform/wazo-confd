@@ -200,3 +200,12 @@ def test_get_multiple_users_associated_to_voicemail(user1, user2, voicemail):
     with a.user_voicemail(user1, voicemail), a.user_voicemail(user2, voicemail):
         response = confd.voicemails(voicemail['id']).users.get()
         assert_that(response.items, expected)
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_bus_events(user, voicemail):
+    url = confd.users(user['id']).voicemails(voicemail['id']).put
+    yield s.check_bus_event, 'config.users.{}.voicemails.updated'.format(user['uuid']), url
+    url = confd.users(user['id']).voicemails.delete
+    yield s.check_bus_event, 'config.users.{}.voicemails.deleted'.format(user['uuid']), url

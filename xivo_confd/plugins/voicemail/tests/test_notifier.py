@@ -19,13 +19,15 @@
 
 
 import unittest
-from mock import Mock
+from hamcrest import assert_that, contains
+from mock import call, patch, Mock
 
 from xivo_dao.alchemy.voicemail import Voicemail
 
 from xivo_bus.resources.voicemail.event import (CreateVoicemailEvent,
                                                 DeleteVoicemailEvent,
-                                                EditVoicemailEvent)
+                                                EditVoicemailEvent,
+                                                EditUserVoicemailEvent)
 
 from xivo_confd.plugins.voicemail.notifier import VoicemailNotifier
 
@@ -36,7 +38,7 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.device_db = Mock()
-        self.voicemail = Mock(Voicemail, id=10)
+        self.voicemail = Mock(Voicemail, id=10, users=[])
         self.notifier = VoicemailNotifier(self.bus, self.sysconfd)
 
     def test_when_voicemail_created_then_event_sent_on_bus(self):
@@ -56,12 +58,16 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_voicemail_edited_then_event_sent_on_bus(self):
-        expected_event = EditVoicemailEvent(self.voicemail.id)
+        user = Mock(uuid='abc-123')
+        self.voicemail.users = [user]
+        expected_event1 = EditVoicemailEvent(self.voicemail.id)
+        expected_event2 = EditUserVoicemailEvent(user.uuid, self.voicemail.id)
 
         self.notifier.edited(self.voicemail)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        assert_that(self.bus.send_bus_event.call_args_list,
+                    contains(call(expected_event1, expected_event1.routing_key),
+                             call(expected_event2, expected_event2.routing_key)))
 
     def test_when_voicemail_edited_then_sysconfd_called(self):
         expected_handlers = {'ipbx': ['voicemail reload', 'sip reload', 'module reload chan_sccp.so'],

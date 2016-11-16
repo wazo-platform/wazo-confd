@@ -44,7 +44,7 @@ class UserVoicemailService(object):
                                     voicemail_id=voicemail.id)
         self.validator.validate_association(association)
         self.dao.associate(association)
-        self.notifier.associated(association)
+        self.notifier.associated(user, voicemail)
         return association
 
     def dissociate(self, user, voicemail):
@@ -52,7 +52,7 @@ class UserVoicemailService(object):
                                     voicemail_id=voicemail.id)
         self.validator.validate_dissociation(association)
         self.dao.dissociate(association)
-        self.notifier.dissociated(association)
+        self.notifier.dissociated(user, voicemail)
 
 
 def build_service():

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +20,6 @@
 from hamcrest import (assert_that,
                       empty,
                       has_entries,
-                      has_length,
                       not_)
 
 from test_api import associations as a
@@ -27,9 +27,6 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
-from test_api.bus import BusClient
-
-from xivo_test_helpers import until
 
 FAKE_ID = 999999999
 
@@ -128,23 +125,8 @@ def test_delete_user_when_user_and_agent_associated(agent, user):
 
 @fixtures.agent()
 @fixtures.user()
-def test_bus_event_when_associate(agent, user):
-    BusClient.listen_events('config.users.{}.agents.updated'.format(user['uuid']))
-    with a.user_agent(user, agent):
-        def assert_function():
-            assert_that(BusClient.events(), has_length(1))
-
-        until.assert_(assert_function, tries=5)
-
-
-@fixtures.agent()
-@fixtures.user()
-def test_bus_event_when_dissociate(agent, user):
-    with a.user_agent(user, agent, check=False):
-        BusClient.listen_events('config.users.{}.agents.deleted'.format(user['uuid']))
-        confd.users(user['id']).agents().delete()
-
-        def assert_function():
-            assert_that(BusClient.events(), has_length(1))
-
-        until.assert_(assert_function, tries=5)
+def test_bus_events(agent, user):
+    url = confd.users(user['id']).agents(agent['id']).put
+    yield s.check_bus_event, 'config.users.{}.agents.updated'.format(user['uuid']), url
+    url = confd.users(user['id']).agents.delete
+    yield s.check_bus_event, 'config.users.{}.agents.deleted'.format(user['uuid']), url
