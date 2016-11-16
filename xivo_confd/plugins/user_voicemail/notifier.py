@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_bus.resources.user_voicemail import event
-from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_confd.helpers import sysconfd_connector
 from xivo_confd.helpers import bus_manager
 
@@ -43,9 +42,8 @@ def sysconf_command_association_updated(user):
 def _generate_ctibus_commands(user):
     ctibus = ['xivo[user,edit,%d]' % user.id]
 
-    user_lines = user_line_dao.find_all_by_user_id(user.id)
-    for user_line in user_lines:
-        ctibus.append('xivo[phone,edit,%d]' % user_line.line_id)
+    for line in user.lines:
+        ctibus.append('xivo[phone,edit,%d]' % line.id)
 
     return ctibus
 

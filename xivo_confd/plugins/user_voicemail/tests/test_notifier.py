@@ -19,15 +19,13 @@
 import unittest
 from mock import patch, Mock
 
-from xivo_dao.resources.user_line.model import UserLine
-
 from xivo_confd.plugins.user_voicemail import notifier
 
 
 class TestUserVoicemailNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.user = Mock(id=1, uuid='1234-abc')
+        self.user = Mock(id=1, uuid='1234-abc', lines=[])
         self.voicemail = Mock(id=2)
 
     @patch('xivo_confd.plugins.user_voicemail.notifier.sysconf_command_association_updated')
@@ -39,12 +37,10 @@ class TestUserVoicemailNotifier(unittest.TestCase):
         bus_event_associated.assert_called_once_with(self.user, self.voicemail)
 
     @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
-    @patch('xivo_dao.resources.user_line.dao.find_all_by_user_id')
-    def test_send_sysconf_command_association_updated(self, find_all_by_user_id, exec_request_handlers):
-        user_line_1 = Mock(UserLine, line_id=3)
-        user_line_2 = Mock(UserLine, line_id=4)
-
-        find_all_by_user_id.return_value = [user_line_1, user_line_2]
+    def test_send_sysconf_command_association_updated(self, exec_request_handlers):
+        line_1 = Mock(id=3)
+        line_2 = Mock(id=4)
+        self.user.lines = [line_1, line_2]
 
         expected_sysconf_command = {
             'ctibus': ['xivo[user,edit,1]', 'xivo[phone,edit,3]', 'xivo[phone,edit,4]'],
@@ -55,7 +51,6 @@ class TestUserVoicemailNotifier(unittest.TestCase):
         notifier.sysconf_command_association_updated(self.user)
 
         exec_request_handlers.assert_called_once_with(expected_sysconf_command)
-        find_all_by_user_id.assert_called_once_with(self.user.id)
 
     @patch('xivo_bus.resources.user_voicemail.event.UserVoicemailAssociatedEvent')
     @patch('xivo_confd.helpers.bus_manager.send_bus_event')
