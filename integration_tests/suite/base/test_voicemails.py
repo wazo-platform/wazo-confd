@@ -20,6 +20,7 @@
 from test_api import confd
 from test_api import fixtures
 from test_api import mocks
+from test_api import associations as a
 from test_api import scenarios as s
 from test_api import errors as e
 
@@ -389,3 +390,10 @@ def test_update_fields_with_null_value(voicemail):
                                             'timezone': None,
                                             'max_messages': None,
                                             'attach_audio': None}))
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_user_voicemail_edited_bus_event(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        routing_key = 'config.users.{}.voicemails.edited'.format(user['uuid'])
+        yield s.check_bus_event, routing_key, confd.voicemails(voicemail['id']).put, {'name': 'bostwana'}
