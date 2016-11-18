@@ -77,6 +77,12 @@ NULL_USER = {"firstname": "Jôhn",
              "simultaneous_calls": 5}
 
 
+def test_search_errors():
+    url = confd.users.get
+    for check in s.search_error_checks(url):
+        yield check
+
+
 def test_get_errors():
     fake_get = confd.users(999999).get
     yield s.check_resource_not_found, fake_get, 'User'
@@ -452,6 +458,33 @@ def check_search(url, field, term, value):
     expected = has_item(has_entry(field, value))
     response = url.get(search=term)
     assert_that(response.items, expected)
+
+
+@fixtures.user(firstname="firstname1",
+               lastname="lastname1",
+               email="email1@example.com",
+               mobile_phone_number="+5551",
+               userfield="userfield1",
+               description="description1")
+@fixtures.user(firstname="firstname2",
+               lastname="lastname2",
+               email="email2@example.com",
+               mobile_phone_number="+5552",
+               userfield="userfield2",
+               description="description2")
+def test_sorting_offset_limit(user1, user2):
+    url = confd.users.get
+    yield s.check_sorting, url, user1, user2, 'firstname', 'firstname'
+    yield s.check_sorting, url, user1, user2, 'lastname', 'lastname'
+    yield s.check_sorting, url, user1, user2, 'email', 'email'
+    yield s.check_sorting, url, user1, user2, 'mobile_phone_number', '+555'
+    yield s.check_sorting, url, user1, user2, 'userfield', 'userfield'
+    yield s.check_sorting, url, user1, user2, 'description', 'description'
+
+    yield s.check_offset, url, user1, user2, 'firstname', 'firstname'
+    yield s.check_offset_legacy, url, user1, user2, 'firstname', 'firstname'
+
+    yield s.check_limit, url, user1, user2, 'firstname', 'firstname'
 
 
 @fixtures.user(**FULL_USER)

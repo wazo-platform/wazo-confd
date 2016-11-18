@@ -24,8 +24,10 @@ from hamcrest import (assert_that,
                       contains_inanyorder,
                       equal_to,
                       empty,
+                      has_entry,
                       has_entries,
                       has_item,
+                      is_not,
                       none,
                       not_)
 
@@ -41,6 +43,12 @@ from test_api.config import CONTEXT
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 
 FAKE_ID = 999999999
+
+
+def test_search_errors():
+    url = confd.extensions.get
+    for check in s.search_error_checks(url):
+        yield check
 
 
 def test_get_errors():
@@ -273,17 +281,44 @@ def test_edit_extension_with_no_change_device_not_updated(user1, user2,
         assert_that(provd.updated_count(device['id'], timestamp), equal_to(device_updated_count))
 
 
-def test_search_extensions():
-    exten = h.extension.find_available_exten('default')
-    exten2 = h.extension.find_available_exten('from-extern')
+@fixtures.extension(exten='1001', context='default')
+@fixtures.extension(exten='9999', context='from-extern')
+def test_search(extension, hidden):
+    url = confd.extensions
+    searches = {'exten': '100',
+                'context': 'fault'}
 
-    with fixtures.extension(exten=exten, context='default') as extension1, \
-            fixtures.extension(exten=exten, context='from-extern') as extension2, \
-            fixtures.extension(exten=exten2, context='from-extern'):
+    for field, term in searches.items():
+        yield check_search, url, extension, hidden, field, term
 
-        expected = contains_inanyorder(extension1, extension2)
-        response = confd.extensions.get(search=exten)
-        assert_that(response.items, expected)
+
+def check_search(url, extension, hidden, field, term):
+    response = url.get(search=term)
+
+    expected_extension = has_item(has_entry(field, extension[field]))
+    hidden_extension = is_not(has_item(has_entry(field, hidden[field])))
+    assert_that(response.items, expected_extension)
+    assert_that(response.items, hidden_extension)
+
+    response = url.get(**{field: extension[field]})
+
+    expected_extension = has_item(has_entry('id', extension['id']))
+    hidden_extension = is_not(has_item(has_entry('id', hidden['id'])))
+    assert_that(response.items, expected_extension)
+    assert_that(response.items, hidden_extension)
+
+
+@fixtures.extension(exten='9998', context='from-extern')
+@fixtures.extension(exten='9999', context='to-extern')
+def test_sorting_offset_limit(extension1, extension2):
+    url = confd.extensions.get
+    yield s.check_sorting, url, extension1, extension2, 'exten', '999'
+    yield s.check_sorting, url, extension1, extension2, 'context', 'extern'
+
+    yield s.check_offset, url, extension1, extension2, 'exten', '999'
+    yield s.check_offset_legacy, url, extension1, extension2, 'exten', '999'
+
+    yield s.check_limit, url, extension1, extension2, 'exten', '999'
 
 
 def test_search_extensions_in_context():

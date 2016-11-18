@@ -21,7 +21,6 @@ from test_api import fixtures
 from test_api import scenarios as s
 
 from hamcrest import (assert_that,
-                      contains,
                       empty,
                       has_entries,
                       has_entry,
@@ -117,18 +116,14 @@ def check_search(url, outcall, hidden, field, term):
 
 @fixtures.outcall(description='sort1')
 @fixtures.outcall(description='sort2')
-def test_sorting(outcall1, outcall2):
-    yield check_sorting, outcall1, outcall2, 'description', 'sort'
+def test_sorting_offset_limit(outcall1, outcall2):
+    url = confd.outcalls.get
+    yield s.check_sorting, url, outcall1, outcall2, 'description', 'sort'
 
+    yield s.check_offset, url, outcall1, outcall2, 'description', 'sort'
+    yield s.check_offset_legacy, url, outcall1, outcall2, 'description', 'sort'
 
-def check_sorting(outcall1, outcall2, field, search):
-    response = confd.outcalls.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=outcall1['id']),
-                                         has_entries(id=outcall2['id'])))
-
-    response = confd.outcalls.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=outcall2['id']),
-                                         has_entries(id=outcall1['id'])))
+    yield s.check_limit, url, outcall1, outcall2, 'description', 'sort'
 
 
 @fixtures.outcall()

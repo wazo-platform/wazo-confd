@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +22,6 @@ from test_api import fixtures
 from test_api import confd
 
 from hamcrest import (assert_that,
-                      contains,
                       has_entries,
                       has_entry,
                       has_item,
@@ -103,19 +103,15 @@ def test_search_on_call_permission(call_permission, hidden):
                           description="Sort 1")
 @fixtures.call_permission(name="sort2",
                           description="Sort 2")
-def test_call_permission_sorting(call_permission1, call_permission2):
-    yield check_call_permission_sorting, call_permission1, call_permission2, 'name', 'sort'
-    yield check_call_permission_sorting, call_permission1, call_permission2, 'description', 'Sort'
+def test_sorting_offset_limit(call_permission1, call_permission2):
+    url = confd.callpermissions.get
+    yield s.check_sorting, url, call_permission1, call_permission2, 'name', 'sort'
+    yield s.check_sorting, url, call_permission1, call_permission2, 'description', 'Sort'
 
+    yield s.check_offset, url, call_permission1, call_permission2, 'name', 'sort'
+    yield s.check_offset_legacy, url, call_permission1, call_permission2, 'name', 'sort'
 
-def check_call_permission_sorting(call_permission1, call_permission2, field, search):
-    response = confd.callpermissions.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=call_permission1['id']),
-                                         has_entries(id=call_permission2['id'])))
-
-    response = confd.callpermissions.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=call_permission2['id']),
-                                         has_entries(id=call_permission1['id'])))
+    yield s.check_limit, url, call_permission1, call_permission2, 'name', 'sort'
 
 
 def check_search(url, call_permission, hidden, field, term):

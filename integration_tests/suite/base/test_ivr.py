@@ -22,7 +22,6 @@ from test_api import scenarios as s
 from test_api.helpers.destination import invalid_destinations, valid_destinations
 
 from hamcrest import (assert_that,
-                      contains,
                       empty,
                       has_entries,
                       has_entry,
@@ -136,18 +135,14 @@ def check_search(url, ivr, hidden, field, term):
 
 @fixtures.ivr(description='sort1')
 @fixtures.ivr(description='sort2')
-def test_sorting(ivr1, ivr2):
-    yield check_sorting, ivr1, ivr2, 'description', 'sort'
+def test_sorting_offset_limit(ivr1, ivr2):
+    url = confd.ivr.get
+    yield s.check_sorting, url, ivr1, ivr2, 'description', 'sort'
 
+    yield s.check_offset, url, ivr1, ivr2, 'description', 'sort'
+    yield s.check_offset_legacy, url, ivr1, ivr2, 'description', 'sort'
 
-def check_sorting(ivr1, ivr2, field, search):
-    response = confd.ivr.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=ivr1['id']),
-                                         has_entries(id=ivr2['id'])))
-
-    response = confd.ivr.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=ivr2['id']),
-                                         has_entries(id=ivr1['id'])))
+    yield s.check_limit, url, ivr1, ivr2, 'description', 'sort'
 
 
 @fixtures.ivr()

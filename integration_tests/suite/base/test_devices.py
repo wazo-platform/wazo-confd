@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +38,6 @@ from hamcrest import (assert_that,
                       is_not,
                       has_item,
                       starts_with,
-                      contains,
                       empty)
 
 
@@ -61,6 +61,12 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
         self.provd.assert_device_has_autoprov_config(device)
         self.provd.assert_config_use_device_template(config, self.template_id)
         self.provd.assert_config_does_not_exist(device_id)
+
+
+def test_search_errors():
+    url = confd.devices.get
+    for check in s.search_error_checks(url):
+        yield check
 
 
 def test_get_errors():
@@ -109,7 +115,7 @@ def error_checks(url):
                  vendor="HiddenVendor",
                  version="2.0",
                  description="HiddenDesc")
-def test_search_on_device(device, hidden):
+def test_search(device, hidden):
     url = confd.devices
     searches = {'ip': '20.30',
                 'mac': 'bb:aa',
@@ -122,39 +128,6 @@ def test_search_on_device(device, hidden):
 
     for field, term in searches.items():
         yield check_search, url, device, hidden, field, term
-
-
-@fixtures.device(ip="99.20.30.40",
-                 mac="aa:bb:aa:cc:01:23",
-                 model="SortModel1",
-                 sn="SortSn1",
-                 vendor='SortVendor1',
-                 version='1.0',
-                 description='SortDesc1')
-@fixtures.device(ip="99.21.30.40",
-                 mac="bb:cc:dd:aa:bb:cc",
-                 model="SortModel2",
-                 sn="SortSn2",
-                 vendor="SortVendor2",
-                 version="1.1",
-                 description="SortDesc2")
-def test_device_sorting(device1, device2):
-    yield check_device_sorting, device1, device2, 'ip', '99.'
-    yield check_device_sorting, device1, device2, 'model', 'SortModel'
-    yield check_device_sorting, device1, device2, 'sn', 'SortSn'
-    yield check_device_sorting, device1, device2, 'vendor', 'SortVendor'
-    yield check_device_sorting, device1, device2, 'version', '1.'
-    yield check_device_sorting, device1, device2, 'description', 'SortDesc'
-
-
-def check_device_sorting(device1, device2, field, search):
-    response = confd.devices.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=device1['id']),
-                                         has_entries(id=device2['id'])))
-
-    response = confd.devices.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=device2['id']),
-                                         has_entries(id=device1['id'])))
 
 
 def check_search(url, device, hidden, field, term):
@@ -171,6 +144,35 @@ def check_search(url, device, hidden, field, term):
     hidden_device = is_not(has_item(has_entry('id', hidden['id'])))
     assert_that(response.items, expected_device)
     assert_that(response.items, hidden_device)
+
+
+@fixtures.device(ip="99.20.30.40",
+                 mac="aa:bb:aa:cc:01:23",
+                 model="SortModel1",
+                 sn="SortSn1",
+                 vendor='SortVendor1',
+                 version='1.0',
+                 description='SortDesc1')
+@fixtures.device(ip="99.21.30.40",
+                 mac="bb:cc:dd:aa:bb:cc",
+                 model="SortModel2",
+                 sn="SortSn2",
+                 vendor="SortVendor2",
+                 version="1.1",
+                 description="SortDesc2")
+def test_sorting_offset_limit(device1, device2):
+    url = confd.devices.get
+    yield s.check_sorting, url, device1, device2, 'ip', '99.'
+    yield s.check_sorting, url, device1, device2, 'model', 'SortModel'
+    yield s.check_sorting, url, device1, device2, 'sn', 'SortSn'
+    yield s.check_sorting, url, device1, device2, 'vendor', 'SortVendor'
+    yield s.check_sorting, url, device1, device2, 'version', '1.'
+    yield s.check_sorting, url, device1, device2, 'description', 'SortDesc'
+
+    yield s.check_offset, url, device1, device2, 'mac', 'aa:bb'
+    yield s.check_offset_legacy, url, device1, device2, 'mac', 'aa:bb'
+
+    yield s.check_limit, url, device1, device2, 'mac', 'aa:bb'
 
 
 @fixtures.device(template_id="mockdevicetemplate",

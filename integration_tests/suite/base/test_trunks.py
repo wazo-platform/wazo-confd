@@ -21,7 +21,6 @@ from test_api import fixtures
 from test_api import confd
 
 from hamcrest import (assert_that,
-                      contains,
                       empty,
                       has_entries,
                       has_entry,
@@ -94,18 +93,14 @@ def check_search(url, trunk, hidden, field, term):
 @fixtures.context(name='sort2')
 @fixtures.trunk(context='sort1')
 @fixtures.trunk(context='sort2')
-def test_sorting(_, __, trunk1, trunk2):
-    yield check_sorting, trunk1, trunk2, 'context', 'sort'
+def test_sorting_offset_limit(_, __, trunk1, trunk2):
+    url = confd.trunks.get
+    yield s.check_sorting, url, trunk1, trunk2, 'context', 'sort'
 
+    yield s.check_offset, url, trunk1, trunk2, 'context', 'sort'
+    yield s.check_offset_legacy, url, trunk1, trunk2, 'context', 'sort'
 
-def check_sorting(trunk1, trunk2, field, search):
-    response = confd.trunks.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=trunk1['id']),
-                                         has_entries(id=trunk2['id'])))
-
-    response = confd.trunks.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=trunk2['id']),
-                                         has_entries(id=trunk1['id'])))
+    yield s.check_limit, url, trunk1, trunk2, 'context', 'sort'
 
 
 @fixtures.trunk()
