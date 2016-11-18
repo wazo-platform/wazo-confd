@@ -43,6 +43,12 @@ outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for con
 FAKE_ID = 999999999
 
 
+def test_search_errors():
+    url = confd.extensions.get
+    for check in s.search_error_checks(url):
+        yield check
+
+
 def test_get_errors():
     url = confd.extensions(FAKE_ID).get
     yield s.check_resource_not_found, url, 'Extension'

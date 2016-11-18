@@ -37,6 +37,12 @@ from hamcrest import (assert_that,
                       is_not)
 
 
+def test_search_errors():
+    url = confd.voicemails.get
+    for check in s.search_error_checks(url):
+        yield check
+
+
 def test_get_errors():
     fake_get = confd.voicemails(999999).get
     yield s.check_resource_not_found, fake_get, 'Voicemail'
@@ -390,6 +396,7 @@ def test_update_fields_with_null_value(voicemail):
                                             'timezone': None,
                                             'max_messages': None,
                                             'attach_audio': None}))
+
 
 @fixtures.user()
 @fixtures.voicemail()

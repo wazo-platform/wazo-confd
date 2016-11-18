@@ -77,6 +77,12 @@ NULL_USER = {"firstname": "Jôhn",
              "simultaneous_calls": 5}
 
 
+def test_search_errors():
+    url = confd.users.get
+    for check in s.search_error_checks(url):
+        yield check
+
+
 def test_get_errors():
     fake_get = confd.users(999999).get
     yield s.check_resource_not_found, fake_get, 'User'

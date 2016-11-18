@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,6 +62,12 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
         self.provd.assert_device_has_autoprov_config(device)
         self.provd.assert_config_use_device_template(config, self.template_id)
         self.provd.assert_config_does_not_exist(device_id)
+
+
+def test_search_errors():
+    url = confd.devices.get
+    for check in s.search_error_checks(url):
+        yield check
 
 
 def test_get_errors():

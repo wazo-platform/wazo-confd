@@ -153,3 +153,19 @@ def check_bus_event(event, url, body=None):
         assert_that(BusClient.events(), has_length(1))
 
     until.assert_(assert_function, tries=5)
+
+
+def search_error_checks(url):
+    yield check_bogus_query_string_returns_error, url, 'order', 'invalid_column'
+    yield check_bogus_query_string_returns_error, url, 'direction', 'invalid'
+    yield check_bogus_query_string_returns_error, url, 'limit', -42
+    yield check_bogus_query_string_returns_error, url, 'limit', 'invalid'
+    yield check_bogus_query_string_returns_error, url, 'skip', -42
+    yield check_bogus_query_string_returns_error, url, 'skip', 'invalid'
+    yield check_bogus_query_string_returns_error, url, 'offset', -42
+    yield check_bogus_query_string_returns_error, url, 'offset', 'invalid'
+
+
+def check_bogus_query_string_returns_error(request, query_string, bogus):
+    response = request(**{query_string: bogus})
+    response.assert_match(400, re.compile(re.escape(query_string)))
