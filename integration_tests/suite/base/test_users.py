@@ -460,6 +460,33 @@ def check_search(url, field, term, value):
     assert_that(response.items, expected)
 
 
+@fixtures.user(firstname="firstname1",
+               lastname="lastname1",
+               email="email1@example.com",
+               mobile_phone_number="+5551",
+               userfield="userfield1",
+               description="description1")
+@fixtures.user(firstname="firstname2",
+               lastname="lastname2",
+               email="email2@example.com",
+               mobile_phone_number="+5552",
+               userfield="userfield2",
+               description="description2")
+def test_sorting_offset_limit(user1, user2):
+    url = confd.users.get
+    yield s.check_sorting, url, user1, user2, 'firstname', 'firstname'
+    yield s.check_sorting, url, user1, user2, 'lastname', 'lastname'
+    yield s.check_sorting, url, user1, user2, 'email', 'email'
+    yield s.check_sorting, url, user1, user2, 'mobile_phone_number', '+555'
+    yield s.check_sorting, url, user1, user2, 'userfield', 'userfield'
+    yield s.check_sorting, url, user1, user2, 'description', 'description'
+
+    yield s.check_offset, url, user1, user2, 'firstname', 'firstname'
+    yield s.check_offset_legacy, url, user1, user2, 'firstname', 'firstname'
+
+    yield s.check_limit, url, user1, user2, 'firstname', 'firstname'
+
+
 @fixtures.user(**FULL_USER)
 def test_get_user(user):
     response = confd.users(user['id']).get()

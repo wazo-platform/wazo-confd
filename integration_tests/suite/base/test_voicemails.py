@@ -175,7 +175,7 @@ def test_edit_voicemail_with_same_number_and_context(first_voicemail, second_voi
 @fixtures.voicemail(name="HiddenVoicemail",
                     email="hiddenvoicemail@proformatique.com",
                     pager="hiddenpager@proformatique.com")
-def test_search_voicemail(voicemail, hidden):
+def test_search(voicemail, hidden):
     url = confd.voicemails
 
     searches = {'name': 'searchv',
@@ -187,13 +187,41 @@ def test_search_voicemail(voicemail, hidden):
         yield check_search, url, voicemail, hidden, field, term
 
 
-def check_search(url, device, hidden, field, term):
+def check_search(url, voicemail, hidden, field, term):
     response = url.get(search=term)
 
-    expected_device = has_item(has_entry(field, device[field]))
-    hidden_device = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_device)
-    assert_that(response.items, hidden_device)
+    expected_voicemail = has_item(has_entry(field, voicemail[field]))
+    hidden_voicemail = is_not(has_item(has_entry(field, hidden[field])))
+    assert_that(response.items, expected_voicemail)
+    assert_that(response.items, hidden_voicemail)
+
+    response = url.get(**{field: voicemail[field]})
+
+    expected_voicemail = has_item(has_entry('id', voicemail['id']))
+    hidden_voicemail = is_not(has_item(has_entry('id', hidden['id'])))
+    assert_that(response.items, expected_voicemail)
+    assert_that(response.items, hidden_voicemail)
+
+
+@fixtures.voicemail(name='name1',
+                    number='1001',
+                    email='email1@example.com',
+                    pager='pager1@example.com')
+@fixtures.voicemail(name='name2',
+                    number='1002',
+                    email='email2@example.com',
+                    pager='pager2@example.com')
+def test_sorting_offset_limit(voicemail1, voicemail2):
+    url = confd.voicemails.get
+    yield s.check_sorting, url, voicemail1, voicemail2, 'name', 'name'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'number', '100'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'email', 'email'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'pager', 'pager'
+
+    yield s.check_offset, url, voicemail1, voicemail2, 'name', 'name'
+    yield s.check_offset_legacy, url, voicemail1, voicemail2, 'name', 'name'
+
+    yield s.check_limit, url, voicemail1, voicemail2, 'name', 'name'
 
 
 @fixtures.voicemail()

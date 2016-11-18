@@ -20,7 +20,7 @@ import random
 import string
 
 from contextlib import contextmanager
-from hamcrest import assert_that, contains, equal_to, has_length
+from hamcrest import assert_that, contains, equal_to, has_length, has_entries
 from xivo_test_helpers import until
 
 from .bus import BusClient
@@ -169,3 +169,28 @@ def search_error_checks(url):
 def check_bogus_query_string_returns_error(request, query_string, bogus):
     response = request(**{query_string: bogus})
     response.assert_match(400, re.compile(re.escape(query_string)))
+
+
+def check_sorting(url, resource1, resource2, field, search):
+    response = url(search=search, order=field, direction='asc')
+    assert_that(response.items, contains(has_entries(id=resource1['id']),
+                                         has_entries(id=resource2['id'])))
+
+    response = url(search=search, order=field, direction='desc')
+    assert_that(response.items, contains(has_entries(id=resource2['id']),
+                                         has_entries(id=resource1['id'])))
+
+
+def check_offset(url, resource1, resource2, field, search):
+    response = url(search=search, order=field, offset=1)
+    assert_that(response.items, contains(has_entries(id=resource2['id'])))
+
+
+def check_offset_legacy(url, resource1, resource2, field, search):
+    response = url(search=search, order=field, skip=1)
+    assert_that(response.items, contains(has_entries(id=resource2['id'])))
+
+
+def check_limit(url, resource1, resource2, field, search):
+    response = url(search=search, order=field, limit=1)
+    assert_that(response.items, contains(has_entries(id=resource1['id'])))
