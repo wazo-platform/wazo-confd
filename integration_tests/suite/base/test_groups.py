@@ -21,7 +21,6 @@ from test_api import fixtures
 from test_api import scenarios as s
 
 from hamcrest import (assert_that,
-                      contains,
                       empty,
                       has_entries,
                       has_entry,
@@ -145,19 +144,15 @@ def check_search(url, group, hidden, field, term):
 
 @fixtures.group(name='sort1', preprocess_subroutine='sort1')
 @fixtures.group(name='sort2', preprocess_subroutine='sort2')
-def test_sorting(group1, group2):
-    yield check_sorting, group1, group2, 'name', 'sort'
-    yield check_sorting, group1, group2, 'preprocess_subroutine', 'sort'
+def test_sorting_offset_limit(group1, group2):
+    url = confd.groups.get
+    yield s.check_sorting, url, group1, group2, 'name', 'sort'
+    yield s.check_sorting, url, group1, group2, 'preprocess_subroutine', 'sort'
 
+    yield s.check_offset, url, group1, group2, 'name', 'sort'
+    yield s.check_offset_legacy, url, group1, group2, 'name', 'sort'
 
-def check_sorting(group1, group2, field, search):
-    response = confd.groups.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=group1['id']),
-                                         has_entries(id=group2['id'])))
-
-    response = confd.groups.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=group2['id']),
-                                         has_entries(id=group1['id'])))
+    yield s.check_limit, url, group1, group2, 'name', 'sort'
 
 
 @fixtures.group()

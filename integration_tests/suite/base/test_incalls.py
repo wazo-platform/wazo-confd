@@ -22,7 +22,6 @@ from test_api import scenarios as s
 from test_api.helpers.destination import invalid_destinations, valid_destinations
 
 from hamcrest import (assert_that,
-                      contains,
                       contains_inanyorder,
                       empty,
                       has_entries,
@@ -107,18 +106,14 @@ def check_search(url, incall, hidden, field, term):
 
 @fixtures.incall(description='sort1')
 @fixtures.incall(description='sort2')
-def test_sorting(incall1, incall2):
-    yield check_sorting, incall1, incall2, 'description', 'sort'
+def test_sorting_offset_limit(incall1, incall2):
+    url = confd.incalls.get
+    yield s.check_sorting, url, incall1, incall2, 'description', 'sort'
 
+    yield s.check_offset, url, incall1, incall2, 'description', 'sort'
+    yield s.check_offset_legacy, url, incall1, incall2, 'description', 'sort'
 
-def check_sorting(incall1, incall2, field, search):
-    response = confd.incalls.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=incall1['id']),
-                                         has_entries(id=incall2['id'])))
-
-    response = confd.incalls.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=incall2['id']),
-                                         has_entries(id=incall1['id'])))
+    yield s.check_limit, url, incall1, incall2, 'description', 'sort'
 
 
 @fixtures.incall()

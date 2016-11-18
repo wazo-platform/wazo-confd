@@ -21,7 +21,6 @@ from test_api import fixtures
 from test_api import scenarios as s
 
 from hamcrest import (assert_that,
-                      contains,
                       empty,
                       has_entries,
                       has_entry,
@@ -165,19 +164,15 @@ def check_search(url, context, hidden, field, term):
 
 @fixtures.context(name='sort1', description='sort1')
 @fixtures.context(name='sort2', description='sort2')
-def test_sorting(context1, context2):
-    yield check_sorting, context1, context2, 'name', 'sort'
-    yield check_sorting, context1, context2, 'description', 'sort'
+def test_sorting_offset_limit(context1, context2):
+    url = confd.contexts.get
+    yield s.check_sorting, url, context1, context2, 'name', 'sort'
+    yield s.check_sorting, url, context1, context2, 'description', 'sort'
 
+    yield s.check_offset, url, context1, context2, 'name', 'sort'
+    yield s.check_offset_legacy, url, context1, context2, 'name', 'sort'
 
-def check_sorting(context1, context2, field, search):
-    response = confd.contexts.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=context1['id']),
-                                         has_entries(id=context2['id'])))
-
-    response = confd.contexts.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=context2['id']),
-                                         has_entries(id=context1['id'])))
+    yield s.check_limit, url, context1, context2, 'name', 'sort'
 
 
 @fixtures.context()
