@@ -137,8 +137,8 @@ definitions:
             \ disallow\n * allow\n * autoframing\n * mohinterpret\n * useclientcode\n\
             \ * progressinband\n * t38pt_udptl\n * t38pt_usertpsource\n * rtptimeout\n\
             \ * rtpholdtimeout\n * rtpkeepalive\n * deny\n * permit\n * defaultip\n\
-            \ * port\n * regexten\n * subscribecontext\n * fullcontact\n * vmexten\n\
-            \ * callingpres\n * ipaddr\n * regseconds\n * regserver\n * lastms\n *\
+            \ * port\n * regexten\n * subscribecontext\n * vmexten\n\
+            \ * callingpres\n *\
             \ parkinglot\n * protocol\n * outboundproxy\n * transport\n * remotesecret\n\
             \ * directmedia\n * callcounter\n * busylevel\n * ignoresdpversion\n *\
             \ session-timers\n * session-expires\n * session-minse\n * session-refresher\n\
