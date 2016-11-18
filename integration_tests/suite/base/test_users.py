@@ -464,13 +464,13 @@ def check_search(url, field, term, value):
                lastname="lastname1",
                email="email1@example.com",
                mobile_phone_number="+5551",
-               userfield="userfield1",
+               userfield="sort userfield1",
                description="description1")
 @fixtures.user(firstname="firstname2",
                lastname="lastname2",
                email="email2@example.com",
                mobile_phone_number="+5552",
-               userfield="userfield2",
+               userfield="sort userfield2",
                description="description2")
 def test_sorting_offset_limit(user1, user2):
     url = confd.users.get
@@ -478,7 +478,7 @@ def test_sorting_offset_limit(user1, user2):
     yield s.check_sorting, url, user1, user2, 'lastname', 'lastname'
     yield s.check_sorting, url, user1, user2, 'email', 'email'
     yield s.check_sorting, url, user1, user2, 'mobile_phone_number', '+555'
-    yield s.check_sorting, url, user1, user2, 'userfield', 'userfield'
+    yield s.check_sorting, url, user1, user2, 'userfield', 'sort userfield'
     yield s.check_sorting, url, user1, user2, 'description', 'description'
 
     yield s.check_offset, url, user1, user2, 'firstname', 'firstname'

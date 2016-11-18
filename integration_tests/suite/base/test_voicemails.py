@@ -204,17 +204,17 @@ def check_search(url, voicemail, hidden, field, term):
 
 
 @fixtures.voicemail(name='name1',
-                    number='1001',
+                    number='8001',
                     email='email1@example.com',
                     pager='pager1@example.com')
 @fixtures.voicemail(name='name2',
-                    number='1002',
+                    number='8002',
                     email='email2@example.com',
                     pager='pager2@example.com')
 def test_sorting_offset_limit(voicemail1, voicemail2):
     url = confd.voicemails.get
     yield s.check_sorting, url, voicemail1, voicemail2, 'name', 'name'
-    yield s.check_sorting, url, voicemail1, voicemail2, 'number', '100'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'number', '800'
     yield s.check_sorting, url, voicemail1, voicemail2, 'email', 'email'
     yield s.check_sorting, url, voicemail1, voicemail2, 'pager', 'pager'
 
