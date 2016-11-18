@@ -19,9 +19,10 @@ from flask import url_for
 
 from xivo_dao.alchemy.context import Context
 
-from .schema import ContextSchema, ContextSchemaPUT
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
+
+from .schema import ContextSchema, ContextSchemaPUT
 
 
 class ContextList(ListResource):

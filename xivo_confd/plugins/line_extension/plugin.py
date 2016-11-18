@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,26 +37,21 @@ class Plugin(object):
         api.add_resource(LineExtensionItem,
                          '/lines/<int:line_id>/extensions/<int:extension_id>',
                          endpoint='line_extensions',
-                         resource_class_args=class_args
-                         )
+                         resource_class_args=class_args)
 
         api.add_resource(LineExtensionList,
                          '/lines/<int:line_id>/extensions',
-                         resource_class_args=class_args
-                         )
+                         resource_class_args=class_args)
 
         api.add_resource(ExtensionLineList,
                          '/extensions/<int:extension_id>/lines',
-                         resource_class_args=class_args
-                         )
+                         resource_class_args=class_args)
 
         api.add_resource(LineExtensionLegacy,
                          '/lines/<int:line_id>/extension',
                          endpoint='line_extension_legacy',
-                         resource_class_args=legacy_class_args
-                         )
+                         resource_class_args=legacy_class_args)
 
         api.add_resource(ExtensionLineLegacy,
                          '/extensions/<int:extension_id>/line',
-                         resource_class_args=legacy_class_args
-                         )
+                         resource_class_args=legacy_class_args)

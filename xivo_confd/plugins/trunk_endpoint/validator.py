@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +20,8 @@
 from xivo_confd.helpers.validator import Validator, AssociationValidator
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.trunk import dao as trunk_dao
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.trunk import dao as trunk_dao_module
 
 
 class TrunkEndpointAssociationValidator(Validator):
@@ -52,7 +53,7 @@ class TrunkEndpointAssociationValidator(Validator):
                                              endpoint_id=trunk.endpoint_id)
 
     def validate_not_associated_to_line(self, trunk, endpoint):
-        line = line_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
+        line = self.line_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
         if line:
             raise errors.resource_associated('Line', 'Endpoint',
                                              trunk_id=line.id,
@@ -76,8 +77,8 @@ def build_validator(endpoint):
     return AssociationValidator(
         association=[
             TrunkEndpointAssociationValidator(endpoint,
-                                              trunk_dao,
-                                              line_dao)
+                                              trunk_dao_module,
+                                              line_dao_module)
         ],
         dissociation=[
             TrunkEndpointDissociationValidator()

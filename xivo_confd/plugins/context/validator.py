@@ -17,16 +17,16 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
-from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.sip_general import dao as sip_general_dao
-from xivo_dao.resources.trunk import dao as trunk_dao
-from xivo_dao.resources.voicemail import dao as voicemail_dao
+from xivo_dao.resources.extension import dao as extension_dao_module
+from xivo_dao.resources.sip_general import dao as sip_general_dao_module
+from xivo_dao.resources.trunk import dao as trunk_dao_module
+from xivo_dao.resources.voicemail import dao as voicemail_dao_module
 
 from xivo_confd.helpers.validator import (UniqueField,
                                           Validator,
                                           ValidationGroup)
-from xivo_confd.database import agent as agent_dao
-from xivo_confd.database import agent_status_login as agent_login_status_dao
+from xivo_confd.database import agent as agent_dao_module
+from xivo_confd.database import agent_status_login as agent_login_status_dao_module
 
 
 class ContextDeleteValidator(Validator):
@@ -97,10 +97,10 @@ def build_validator():
                         lambda name: context_dao.find_by(name=name),
                         'Context'),
         ],
-        delete=[ContextDeleteValidator(agent_dao,
-                                       agent_login_status_dao,
-                                       extension_dao,
-                                       sip_general_dao,
-                                       trunk_dao,
-                                       voicemail_dao)]
+        delete=[ContextDeleteValidator(agent_dao_module,
+                                       agent_login_status_dao_module,
+                                       extension_dao_module,
+                                       sip_general_dao_module,
+                                       trunk_dao_module,
+                                       voicemail_dao_module)]
     )

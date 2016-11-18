@@ -18,11 +18,12 @@
 
 from flask import url_for
 
-from .schema import VoicemailSchema
+from xivo_dao.alchemy.voicemail import Voicemail
+
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
-from xivo_dao.alchemy.voicemail import Voicemail
+from .schema import VoicemailSchema
 
 
 class VoicemailList(ListResource):

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,10 +22,10 @@ from xivo_confd.helpers.validator import Validator
 
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
-from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.trunk import dao as trunk_dao
+from xivo_dao.resources.user_line import dao as user_line_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.trunk import dao as trunk_dao_module
 
 from xivo_dao.helpers import errors
 
@@ -110,11 +111,11 @@ def build_validator(endpoint):
     return AssociationValidator(
         association=[
             ValidateLineAssociation(endpoint,
-                                    line_dao,
-                                    trunk_dao)
+                                    line_dao_module,
+                                    trunk_dao_module)
         ],
         dissociation=[
-            ValidateLineDissociation(user_line_dao,
-                                     line_extension_dao)
+            ValidateLineDissociation(user_line_dao_module,
+                                     line_extension_dao_module)
         ]
     )

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,9 +21,10 @@ from flask import url_for, request
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.incall import Incall
 
-from .schema import IncallSchema
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
+
+from .schema import IncallSchema
 
 
 class IncallList(ListResource):

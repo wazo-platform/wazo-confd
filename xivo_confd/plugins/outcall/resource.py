@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +20,10 @@ from flask import url_for
 
 from xivo_dao.alchemy.outcall import Outcall
 
-from .schema import OutcallSchema
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
+
+from .schema import OutcallSchema
 
 
 class OutcallList(ListResource):

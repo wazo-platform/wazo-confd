@@ -19,9 +19,10 @@ from flask import url_for
 
 from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 
-from .schema import GroupSchema
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
+
+from .schema import GroupSchema
 
 
 class GroupList(ListResource):

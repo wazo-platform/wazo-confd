@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,24 +35,20 @@ class Plugin(object):
 
         api.add_resource(VoicemailUserList,
                          '/voicemails/<int:voicemail_id>/users',
-                         resource_class_args=(service, user_dao, voicemail_dao)
-                         )
+                         resource_class_args=(service, user_dao, voicemail_dao))
 
         api.add_resource(UserVoicemailList,
                          '/users/<int:user_id>/voicemails',
                          '/users/<uuid:user_id>/voicemails',
                          endpoint='user_voicemails',
-                         resource_class_args=(service, user_dao, voicemail_dao)
-                         )
+                         resource_class_args=(service, user_dao, voicemail_dao))
 
         api.add_resource(UserVoicemailItem,
                          '/users/<int:user_id>/voicemails/<int:voicemail_id>',
                          '/users/<uuid:user_id>/voicemails/<int:voicemail_id>',
-                         resource_class_args=(service, user_dao, voicemail_dao)
-                         )
+                         resource_class_args=(service, user_dao, voicemail_dao))
 
         api.add_resource(UserVoicemailLegacy,
                          '/users/<int:user_id>/voicemail',
                          '/users/<uuid:user_id>/voicemail',
-                         resource_class_args=(service, user_dao, voicemail_dao)
-                         )
+                         resource_class_args=(service, user_dao, voicemail_dao))

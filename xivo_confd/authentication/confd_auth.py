@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +19,10 @@
 import logging
 import requests
 
+from functools import wraps
+
 from flask import request
 from flask_httpauth import HTTPDigestAuth
-from functools import wraps
 
 from xivo_dao import accesswebservice_dao
 from xivo.auth_verifier import AuthVerifier, required_acl
@@ -76,20 +78,20 @@ class ConfdAuth(HTTPDigestAuth):
     def _verify_token(self, func, *args, **kwargs):
         try:
             token = self.auth_verifier.token()
-            required_acl = self._acl(func, *args, **kwargs)
-            token_is_valid = self.auth_verifier.client().token.is_valid(token, required_acl)
+            current_required_acl = self._acl(func, *args, **kwargs)
+            token_is_valid = self.auth_verifier.client().token.is_valid(token, current_required_acl)
         except requests.RequestException as e:
-            message = 'Authentication server on {host}:{port} unreachable: {error}'
-            logger.error(message.format(host=self._auth_host, port=self._auth_port, error=e))
+            logger.error('Authentication server on %s:%s unreachable: %s',
+                         self._auth_host, self._auth_port, e)
             return False
 
         return token_is_valid
 
     def _acl(self, func, *args, **kwargs):
-        required_acl = self.auth_verifier.acl(func, *args, **kwargs)
-        if not required_acl:
+        current_required_acl = self.auth_verifier.acl(func, *args, **kwargs)
+        if not current_required_acl:
             return 'confd.#'
-        return required_acl
+        return current_required_acl
 
 
 auth = ConfdAuth()

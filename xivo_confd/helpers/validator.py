@@ -31,7 +31,7 @@ class Validator(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def validate(self, model):
+    def validate(self, *model):
         return
 
 

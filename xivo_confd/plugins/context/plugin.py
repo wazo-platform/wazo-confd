@@ -27,11 +27,9 @@ class Plugin(object):
 
         api.add_resource(ContextList,
                          '/contexts',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(ContextItem,
                          '/contexts/<int:id>',
                          endpoint='contexts',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))

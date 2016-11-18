@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +19,11 @@
 
 from flask import url_for
 
-from .schema import DeviceSchema
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
 from xivo_confd.plugins.device.model import Device
+
+from .schema import DeviceSchema
 
 
 class DeviceList(ListResource):

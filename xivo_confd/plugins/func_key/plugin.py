@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,53 +45,44 @@ class Plugin(object):
         # Funckey destination plugin
         api.add_resource(FuncKeyDestination,
                          '/funckeys/destinations',
-                         endpoint='func_keys'
-                         )
+                         endpoint='func_keys')
 
         # Funckey Template plugin
         api.add_resource(FuncKeyTemplateList,
                          '/funckeys/templates',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(FuncKeyTemplateItem,
                          '/funckeys/templates/<int:id>',
                          endpoint='func_keys_templates',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         api.add_resource(FuncKeyTemplateItemPosition,
                          '/funckeys/templates/<int:id>/<int:position>',
-                         resource_class_args=(service,)
-                         )
+                         resource_class_args=(service,))
 
         # User-Funckey plugin
         api.add_resource(UserFuncKeyItemPosition,
                          '/users/<uuid:user_id>/funckeys/<int:position>',
                          '/users/<int:user_id>/funckeys/<int:position>',
-                         resource_class_args=(service, user_dao, template_dao)
-                         )
+                         resource_class_args=(service, user_dao, template_dao))
 
         api.add_resource(UserFuncKeyList,
                          '/users/<uuid:user_id>/funckeys',
                          '/users/<int:user_id>/funckeys',
-                         resource_class_args=(service, user_dao, template_dao)
-                         )
+                         resource_class_args=(service, user_dao, template_dao))
 
         # User-Funckey Template plugin
         api.add_resource(UserFuncKeyTemplateAssociation,
                          '/users/<uuid:user_id>/funckeys/templates/<int:template_id>',
                          '/users/<int:user_id>/funckeys/templates/<int:template_id>',
-                         resource_class_args=(service_association, user_dao, template_dao)
-                         )
+                         resource_class_args=(service_association, user_dao, template_dao))
 
         api.add_resource(UserFuncKeyTemplateGet,
                          '/users/<uuid:user_id>/funckeys/templates',
                          '/users/<int:user_id>/funckeys/templates',
-                         resource_class_args=(service_association, user_dao, template_dao)
-                         )
+                         resource_class_args=(service_association, user_dao, template_dao))
 
         api.add_resource(FuncKeyTemplateUserGet,
                          '/funckeys/templates/<int:template_id>/users',
-                         resource_class_args=(service_association, user_dao, template_dao)
-                         )
+                         resource_class_args=(service_association, user_dao, template_dao))
