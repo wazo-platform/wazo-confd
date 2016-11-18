@@ -124,32 +124,100 @@ definitions:
           description: Hosts that are allowed to use this SIP account
           default: dynamic
         options:
-          description: "Advanced configuration options. Options are appended at the\
-            \ end of a \nSIP account in the file 'sip.conf' used by asterisk.\nPlease\
-            \ consult the asterisk documentation for further details on available\n\
-            parameters. Because of database limitations, the following options can\
-            \ only be configured once:\n\n * md5secret\n * language\n * accountcode\n\
-            \ * amaflags\n * allowtransfer\n * fromuser\n * fromdomain\n * subscribemwi\n\
-            \ * buggymwi\n * call-limit\n * callerid\n * fullname\n * cid_number\n\
-            \ * maxcallbitrate\n * insecure\n * nat\n * promiscredir\n * usereqphone\n\
-            \ * videosupport\n * trustrpid\n * sendrpid\n * allowsubscribe\n * allowoverlap\n\
-            \ * dtmfmode\n * rfc2833compensate\n * qualify\n * g726nonstandard\n *\
-            \ disallow\n * allow\n * autoframing\n * mohinterpret\n * useclientcode\n\
-            \ * progressinband\n * t38pt_udptl\n * t38pt_usertpsource\n * rtptimeout\n\
-            \ * rtpholdtimeout\n * rtpkeepalive\n * deny\n * permit\n * defaultip\n\
-            \ * port\n * regexten\n * subscribecontext\n * fullcontact\n * vmexten\n\
-            \ * callingpres\n * ipaddr\n * regseconds\n * regserver\n * lastms\n *\
-            \ parkinglot\n * protocol\n * outboundproxy\n * transport\n * remotesecret\n\
-            \ * directmedia\n * callcounter\n * busylevel\n * ignoresdpversion\n *\
-            \ session-timers\n * session-expires\n * session-minse\n * session-refresher\n\
-            \ * callbackextension\n * timert1\n * timerb\n * qualifyfreq\n * contactpermit\n\
-            \ * contactdeny\n * unsolicited_mailbox\n * use_q850_reason\n * encryption\n\
-            \ * snom_aoc_enabled\n * maxforwards\n * disallowed_methods\n * textsupport\n\
-            \nAny other options may be repeated as many times as needed. Options must\
-            \ have the following form:\n\n```\n{\n  \"options\": [\n    [\"name1\"\
-            , \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n```\n\nThe resulting\
-            \ configuration in sip.conf will have the following form:\n\n```\n[sipusername]\n\
-            context=default\nsecret=sipsecret\nname1=value1\nname2=value2\n```\n"
+          description: |
+            Advanced configuration: options. Options are appended at the end of a SIP account in the file 'sip.conf' used by asterisk. Please consult the asterisk documentation for further details on available parameters. Because of database limitations, the following options can only be configured once:
+
+            * md5secret
+            * language
+            * accountcode
+            * amaflags
+            * allowtransfer
+            * fromuser
+            * fromdomain
+            * subscribemwi
+            * buggymwi
+            * call-limit
+            * callerid
+            * fullname
+            * cid_number
+            * maxcallbitrate
+            * insecure
+            * nat
+            * promiscredir
+            * usereqphone
+            * videosupport
+            * trustrpid
+            * sendrpid
+            * allowsubscribe
+            * allowoverlap
+            * dtmfmode
+            * rfc2833compensate
+            * qualify
+            * g726nonstandard
+            * disallow
+            * allow
+            * autoframing
+            * mohinterpret
+            * useclientcode
+            * progressinband
+            * t38pt_udptl
+            * t38pt_usertpsource
+            * rtptimeout
+            * rtpholdtimeout
+            * rtpkeepalive
+            * deny
+            * permit
+            * defaultip
+            * port
+            * regexten
+            * subscribecontext
+            * vmexten
+            * callingpres
+            * parkinglot
+            * protocol
+            * outboundproxy
+            * transport
+            * remotesecret
+            * directmedia
+            * callcounter
+            * busylevel
+            * ignoresdpversion
+            * session-timers
+            * session-expires
+            * session-minse
+            * session-refresher
+            * callbackextension
+            * timert1
+            * timerb
+            * qualifyfreq
+            * contactpermit
+            * contactdeny
+            * unsolicited_mailbox
+            * use_q850_reason
+            * encryption
+            * snom_aoc_enabled
+            * maxforwards
+            * disallowed_methods
+            * textsupport
+
+            Any other options may be repeated as many times as needed. Options must have the following form:
+            ```
+            {
+              "options": [
+                 ["name1", "value1"],
+                 ["name2", "value2"]
+              ]
+            }
+            ```
+
+            The resulting configuration in sip.conf will have the following form:
+            ```
+            [sipusername]
+            context=default
+            secret=sipsecret
+            name1=value1
+            name2=value2
+            ```
           type: array
           items:
             $ref: '#/definitions/KeyValueOption'
