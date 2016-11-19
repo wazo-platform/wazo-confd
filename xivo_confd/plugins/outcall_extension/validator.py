@@ -18,10 +18,10 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class OutcallExtensionAssociationValidator(Validator):
+class OutcallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, outcall, extension):
         self.validate_extension_not_associated_to_other_resource(extension)
@@ -43,7 +43,7 @@ class OutcallExtensionAssociationValidator(Validator):
                                                 context=extension.context)
 
 
-class OutcallExtensionDissociationValidator(Validator):
+class OutcallExtensionDissociationValidator(ValidatorAssociation):
 
     def validate(self, outcall, extension):
         self.validate_outcall_extension_exists(outcall, extension)

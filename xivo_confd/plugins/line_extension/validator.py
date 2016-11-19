@@ -24,10 +24,10 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class LineExtensionAssociationValidator(Validator):
+class LineExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, line, extension):
         self.validate_line_has_endpoint(line)
@@ -81,7 +81,7 @@ class LineExtensionAssociationValidator(Validator):
                                                  line_id=other_user_line.line_id)
 
 
-class LineExtensionDissociationValidator(Validator):
+class LineExtensionDissociationValidator(ValidatorAssociation):
 
     def validate(self, line, extension):
         ValidateLineHasNoDevice().validate(line)

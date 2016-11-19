@@ -18,10 +18,10 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class GroupExtensionAssociationValidator(Validator):
+class GroupExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, group, extension):
         self.validate_group_not_already_associated(group)
@@ -57,7 +57,7 @@ class GroupExtensionAssociationValidator(Validator):
                                                 context=extension.context)
 
 
-class GroupExtensionDissociationValidator(Validator):
+class GroupExtensionDissociationValidator(ValidatorAssociation):
 
     def validate(self, group, extension):
         self.validate_group_extension_exists(group, extension)

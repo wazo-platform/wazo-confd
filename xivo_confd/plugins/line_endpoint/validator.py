@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_confd.helpers.validator import ValidationAssociation
-from xivo_confd.helpers.validator import Validator
+from xivo_confd.helpers.validator import ValidatorAssociation
 
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
@@ -30,7 +30,7 @@ from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.helpers import errors
 
 
-class ValidateLineAssociation(Validator):
+class ValidateLineAssociation(ValidatorAssociation):
 
     def __init__(self, endpoint, line_dao, trunk_dao):
         super(ValidateLineAssociation, self).__init__()
@@ -67,7 +67,7 @@ class ValidateLineAssociation(Validator):
                                              endpoint_id=trunk.endpoint_id)
 
 
-class ValidateLineDissociation(Validator):
+class ValidateLineDissociation(ValidatorAssociation):
 
     def __init__(self, user_line_dao, line_extension_dao):
         self.user_line_dao = user_line_dao

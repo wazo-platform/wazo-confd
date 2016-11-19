@@ -17,14 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 
 
-class TrunkEndpointAssociationValidator(Validator):
+class TrunkEndpointAssociationValidator(ValidatorAssociation):
 
     def __init__(self, endpoint, trunk_dao, line_dao):
         super(TrunkEndpointAssociationValidator, self).__init__()
@@ -61,7 +61,7 @@ class TrunkEndpointAssociationValidator(Validator):
                                              endpoint_id=line.endpoint_id)
 
 
-class TrunkEndpointDissociationValidator(Validator):
+class TrunkEndpointDissociationValidator(ValidatorAssociation):
 
     def validate(self, trunk, endpoint):
         self.validate_endpoint(trunk, endpoint)

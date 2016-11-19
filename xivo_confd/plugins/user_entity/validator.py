@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.helpers.validator import ValidationAssociation, Validator
+from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.helpers import errors
 
 
-class UserEntityAssociationValidator(Validator):
+class UserEntityAssociationValidator(ValidatorAssociation):
 
     def __init__(self, user_line_dao):
         self.user_line_dao = user_line_dao

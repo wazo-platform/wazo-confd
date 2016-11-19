@@ -17,10 +17,10 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class GroupMemberUserAssociationValidator(Validator):
+class GroupMemberUserAssociationValidator(ValidatorAssociation):
 
     def validate(self, group, users):
         for user in users:

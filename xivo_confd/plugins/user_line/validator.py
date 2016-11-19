@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user_line import dao as user_line_dao
@@ -25,7 +26,7 @@ from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 
-class UserLineAssociationValidator(Validator):
+class UserLineAssociationValidator(ValidatorAssociation):
 
     def validate(self, user, line):
         self.validate_line_has_endpoint(line)
@@ -67,7 +68,7 @@ class UserLineAssociationValidator(Validator):
                                              extension_id=main_line_extension.extension_id)
 
 
-class UserLineDissociationValidator(Validator):
+class UserLineDissociationValidator(ValidatorAssociation):
 
     def validate(self, user, line):
         self.validate_no_secondary_users(user, line)

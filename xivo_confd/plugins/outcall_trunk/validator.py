@@ -17,10 +17,10 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class GroupTrunkAssociationValidator(Validator):
+class GroupTrunkAssociationValidator(ValidatorAssociation):
 
     def validate(self, group, trunks):
         self.validate_no_duplicate_trunk(trunks)

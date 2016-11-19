@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from xivo_confd.helpers.validator import ValidationAssociation
-from xivo_confd.helpers.validator import Validator
+from xivo_confd.helpers.validator import Validator, ValidatorAssociation
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao_module
@@ -33,13 +34,13 @@ class ValidateLineHasNoDevice(Validator):
                                              line_id=line.id, device_id=line.device_id)
 
 
-class ValidateLineDeviceAssociation(Validator):
+class ValidateLineDeviceAssociation(ValidatorAssociation):
 
     def validate(self, line, device):
         ValidateLineHasNoDevice().validate(line)
 
 
-class ValidateLineDeviceDissociation(Validator):
+class ValidateLineDeviceDissociation(ValidatorAssociation):
 
     def validate(self, line, device):
         if line.device_id != device.id:
@@ -47,7 +48,7 @@ class ValidateLineDeviceDissociation(Validator):
                                                  line_id=line.id, device_id=device.id)
 
 
-class ValidateLinePosition(Validator):
+class ValidateLinePosition(ValidatorAssociation):
 
     def __init__(self, line_dao):
         self.line_dao = line_dao
@@ -59,7 +60,7 @@ class ValidateLinePosition(Validator):
             raise errors.ResourceError(msg)
 
 
-class ValidateRequiredResources(Validator):
+class ValidateRequiredResources(ValidatorAssociation):
 
     def __init__(self, user_line_dao, line_extension_dao):
         self.user_line_dao = user_line_dao
@@ -85,7 +86,7 @@ class ValidateRequiredResources(Validator):
             raise errors.missing_association('User', 'Line', line_id=line.id)
 
 
-class ValidateMultipleLines(Validator):
+class ValidateMultipleLines(ValidatorAssociation):
 
     def __init__(self, line_dao):
         self.line_dao = line_dao

@@ -20,10 +20,10 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
-from xivo_confd.helpers.validator import Validator, ValidationAssociation
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class IncallExtensionAssociationValidator(Validator):
+class IncallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, incall, extension):
         self.validate_incall_not_already_associated(incall)
@@ -60,7 +60,7 @@ class IncallExtensionAssociationValidator(Validator):
                                                 context=extension.context)
 
 
-class IncallExtensionDissociationValidator(Validator):
+class IncallExtensionDissociationValidator(ValidatorAssociation):
 
     def validate(self, incall, extension):
         self.validate_incall_extension_exists(incall, extension)

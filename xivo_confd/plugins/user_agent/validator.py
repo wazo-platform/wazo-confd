@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,11 +18,11 @@
 
 
 from xivo_confd.database import agent as agent_db
-from xivo_confd.helpers.validator import ValidationAssociation, Validator
+from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 from xivo_dao.helpers import errors
 
 
-class UserAgentAssociationValidator(Validator):
+class UserAgentAssociationValidator(ValidatorAssociation):
 
     def __init__(self, agent_db):
         self.agent_db = agent_db
@@ -41,7 +42,7 @@ class UserAgentAssociationValidator(Validator):
             raise errors.not_found('Agent', id=agent.id)
 
 
-class UserAgentDissociationValidator(Validator):
+class UserAgentDissociationValidator(ValidatorAssociation):
 
     def validate(self, user, agent):
         self.validate_user_agent_exists(user)

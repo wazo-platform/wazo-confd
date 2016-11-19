@@ -31,7 +31,16 @@ class Validator(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def validate(self, *model):
+    def validate(self, model):
+        return
+
+
+class ValidatorAssociation(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def validate(self, model1, model2):
         return
 
 
