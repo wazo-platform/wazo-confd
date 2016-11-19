@@ -17,7 +17,7 @@
 
 
 from xivo_confd.database import agent as agent_db
-from xivo_confd.helpers.validator import AssociationValidator, Validator
+from xivo_confd.helpers.validator import ValidationAssociation, Validator
 from xivo_dao.helpers import errors
 
 
@@ -52,7 +52,7 @@ class UserAgentDissociationValidator(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[
             UserAgentAssociationValidator(agent_db)
         ],

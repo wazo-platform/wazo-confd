@@ -17,7 +17,7 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.validator import Validator, AssociationValidator
+from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 
 class GroupMemberUserAssociationValidator(Validator):
@@ -47,6 +47,6 @@ class GroupMemberUserAssociationValidator(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[GroupMemberUserAssociationValidator()],
     )

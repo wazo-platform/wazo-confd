@@ -24,7 +24,7 @@ from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
-from xivo_confd.helpers.validator import Validator, AssociationValidator
+from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 
 class LineExtensionAssociationValidator(Validator):
@@ -88,7 +88,7 @@ class LineExtensionDissociationValidator(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[LineExtensionAssociationValidator()],
         dissociation=[LineExtensionDissociationValidator()]
     )

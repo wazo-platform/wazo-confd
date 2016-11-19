@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from xivo_confd.helpers.validator import AssociationValidator
+from xivo_confd.helpers.validator import ValidationAssociation
 from xivo_confd.helpers.validator import Validator
 
 from xivo_dao.helpers import errors
@@ -102,7 +102,7 @@ class ValidateMultipleLines(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[
             ValidateLineDeviceAssociation(),
             ValidateLinePosition(line_dao_module),

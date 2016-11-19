@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.helpers.validator import AssociationValidator, Validator
+from xivo_confd.helpers.validator import ValidationAssociation, Validator
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.helpers import errors
 
@@ -45,7 +45,7 @@ class UserEntityAssociationValidator(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[
             UserEntityAssociationValidator(user_line_dao)
         ]

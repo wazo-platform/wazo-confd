@@ -18,7 +18,7 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.helpers.validator import Validator, AssociationValidator
+from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 
 class GroupExtensionAssociationValidator(Validator):
@@ -70,7 +70,7 @@ class GroupExtensionDissociationValidator(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[GroupExtensionAssociationValidator()],
         dissociation=[GroupExtensionDissociationValidator()]
     )

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.helpers.validator import Validator, AssociationValidator
+from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
@@ -36,7 +36,7 @@ class UserCallPermissionAssociationValidator(Validator):
 
 
 def build_validator():
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[
             UserCallPermissionAssociationValidator()
         ]

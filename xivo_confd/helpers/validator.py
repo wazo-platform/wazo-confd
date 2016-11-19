@@ -166,7 +166,7 @@ class ValidationGroup(object):
             validator.validate(model)
 
 
-class AssociationValidator(object):
+class ValidationAssociation(object):
 
     def __init__(self, common=None, association=None, dissociation=None):
         self.common = common or []

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,14 +24,14 @@ from mock import Mock, sentinel
 from xivo_dao.helpers.new_model import NewModel
 from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
-from xivo_confd.helpers.validator import (AssociationValidator,
-                                          GetResource,
+from xivo_confd.helpers.validator import (GetResource,
                                           MemberOfSequence,
                                           MissingFields,
                                           Optional,
                                           ResourceExists,
                                           UniqueField,
                                           UniqueFieldChanged,
+                                          ValidationAssociation,
                                           ValidationGroup,
                                           Validator)
 
@@ -243,14 +244,14 @@ class TestValidationGroup(unittest.TestCase):
         delete.validate.assert_called_once_with(model)
 
 
-class TestAssociationValidator(unittest.TestCase):
+class TestValidationAssociation(unittest.TestCase):
 
     def test_when_validating_association_then_calls_common_and_association_validators(self):
         common = Mock(Validator)
         association = Mock(Validator)
         model = Mock()
 
-        validator = AssociationValidator(common=[common], association=[association])
+        validator = ValidationAssociation(common=[common], association=[association])
 
         validator.validate_association(model)
 
@@ -264,7 +265,7 @@ class TestAssociationValidator(unittest.TestCase):
         model1 = Mock()
         model2 = Mock()
 
-        validator = AssociationValidator(common=[common], association=[association], dissociation=[dissociation])
+        validator = ValidationAssociation(common=[common], association=[association], dissociation=[dissociation])
 
         validator.validate_association(model1, model2)
         validator.validate_dissociation(model1, model2)
@@ -278,7 +279,7 @@ class TestAssociationValidator(unittest.TestCase):
         dissociation = Mock(Validator)
         model = Mock()
 
-        validator = AssociationValidator(common=[common], dissociation=[dissociation])
+        validator = ValidationAssociation(common=[common], dissociation=[dissociation])
 
         validator.validate_dissociation(model)
 

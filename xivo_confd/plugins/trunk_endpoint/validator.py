@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from xivo_confd.helpers.validator import Validator, AssociationValidator
+from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao_module
@@ -74,7 +74,7 @@ class TrunkEndpointDissociationValidator(Validator):
 
 
 def build_validator(endpoint):
-    return AssociationValidator(
+    return ValidationAssociation(
         association=[
             TrunkEndpointAssociationValidator(endpoint,
                                               trunk_dao_module,
