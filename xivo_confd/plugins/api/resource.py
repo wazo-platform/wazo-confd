@@ -18,8 +18,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import collections
-import yaml
 import logging
+import yaml
 
 from flask import make_response
 from flask.ext.restful import Resource

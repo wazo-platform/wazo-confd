@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,7 +42,7 @@ class LineExtensionSchema(BaseSchema):
 class LineExtensionResource(ConfdResource):
 
     def __init__(self, service, line_dao, extension_dao):
-        super(ConfdResource, self).__init__()
+        super(LineExtensionResource, self).__init__()
         self.service = service
         self.line_dao = line_dao
         self.extension_dao = extension_dao

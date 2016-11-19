@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +23,7 @@ from xivo_confd.helpers.restful import ConfdResource
 class IncallExtensionItem(ConfdResource):
 
     def __init__(self, service, incall_dao, extension_dao):
-        super(ConfdResource, self).__init__()
+        super(IncallExtensionItem, self).__init__()
         self.service = service
         self.incall_dao = incall_dao
         self.extension_dao = extension_dao

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +43,7 @@ class UserCtiProfileRoot(ConfdResource):
     schema = UserCtiProfileSchema
 
     def __init__(self, service, user_dao, cti_profile_dao):
-        super(ConfdResource, self).__init__()
+        super(UserCtiProfileRoot, self).__init__()
         self.service = service
         self.user_dao = user_dao
         self.cti_profile_dao = cti_profile_dao

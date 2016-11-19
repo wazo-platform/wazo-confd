@@ -22,7 +22,7 @@ from xivo_confd.helpers.restful import ConfdResource
 class GroupExtensionItem(ConfdResource):
 
     def __init__(self, service, group_dao, extension_dao):
-        super(ConfdResource, self).__init__()
+        super(GroupExtensionItem, self).__init__()
         self.service = service
         self.group_dao = group_dao
         self.extension_dao = extension_dao

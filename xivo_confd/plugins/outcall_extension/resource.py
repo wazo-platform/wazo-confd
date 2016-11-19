@@ -41,7 +41,7 @@ class OutcallExtensionItem(ConfdResource):
     schema = OutcallExtensionSchema
 
     def __init__(self, service, outcall_dao, extension_dao):
-        super(ConfdResource, self).__init__()
+        super(OutcallExtensionItem, self).__init__()
         self.service = service
         self.outcall_dao = outcall_dao
         self.extension_dao = extension_dao

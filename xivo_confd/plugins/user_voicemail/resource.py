@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2015-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,7 +44,7 @@ class UserVoicemailResource(ConfdResource):
     schema = UserVoicemailSchema
 
     def __init__(self, service, user_dao, voicemail_dao):
-        super(ConfdResource, self).__init__()
+        super(UserVoicemailResource, self).__init__()
         self.service = service
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao

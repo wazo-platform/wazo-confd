@@ -36,7 +36,7 @@ class GroupMemberUserItem(ConfdResource):
     schema = UsersSchema
 
     def __init__(self, service, group_dao, user_dao):
-        super(ConfdResource, self).__init__()
+        super(GroupMemberUserItem, self).__init__()
         self.service = service
         self.group_dao = group_dao
         self.user_dao = user_dao
