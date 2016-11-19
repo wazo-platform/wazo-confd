@@ -203,25 +203,25 @@ def check_search(url, voicemail, hidden, field, term):
     assert_that(response.items, hidden_voicemail)
 
 
-@fixtures.voicemail(name='name1',
+@fixtures.voicemail(name='sort1',
                     number='8001',
-                    email='email1@example.com',
-                    pager='pager1@example.com')
-@fixtures.voicemail(name='name2',
+                    email='sort1@example.com',
+                    pager='sort1@example.com')
+@fixtures.voicemail(name='sort2',
                     number='8002',
-                    email='email2@example.com',
-                    pager='pager2@example.com')
+                    email='sort2@example.com',
+                    pager='sort2@example.com')
 def test_sorting_offset_limit(voicemail1, voicemail2):
     url = confd.voicemails.get
-    yield s.check_sorting, url, voicemail1, voicemail2, 'name', 'name'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'name', 'sort'
     yield s.check_sorting, url, voicemail1, voicemail2, 'number', '800'
-    yield s.check_sorting, url, voicemail1, voicemail2, 'email', 'email'
-    yield s.check_sorting, url, voicemail1, voicemail2, 'pager', 'pager'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'email', 'sort'
+    yield s.check_sorting, url, voicemail1, voicemail2, 'pager', 'sort'
 
-    yield s.check_offset, url, voicemail1, voicemail2, 'name', 'name'
-    yield s.check_offset_legacy, url, voicemail1, voicemail2, 'name', 'name'
+    yield s.check_offset, url, voicemail1, voicemail2, 'name', 'sort'
+    yield s.check_offset_legacy, url, voicemail1, voicemail2, 'name', 'sort'
 
-    yield s.check_limit, url, voicemail1, voicemail2, 'name', 'name'
+    yield s.check_limit, url, voicemail1, voicemail2, 'name', 'sort'
 
 
 @fixtures.voicemail()
