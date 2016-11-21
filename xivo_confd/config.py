@@ -105,6 +105,7 @@ DEFAULT_CONFIG = {
         'func_key_plugin',
         'group_plugin',
         'group_extension_plugin',
+        'group_fallback_plugin',
         'group_member_user_plugin',
         'incall_extension_plugin',
         'incall_plugin',
