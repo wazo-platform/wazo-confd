@@ -147,6 +147,7 @@ definitions:
           default: true
           description: Enable/Disable the group
     - $ref: '#/definitions/GroupRelationExtensions'
+    - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
     - $ref: '#/definitions/GroupRelationMembers'
     required:
@@ -167,6 +168,11 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/ExtensionRelationBase'
+  GroupRelationFallbacks:
+    properties:
+      fallbacks:
+        readOnly: true
+        $ref: '#/definitions/GroupFallbacks'
   GroupRelationIncalls:
     properties:
       incalls:
