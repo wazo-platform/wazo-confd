@@ -76,6 +76,7 @@ setup(
             'parking_lot_plugin = xivo_confd.plugins.parking_lot.plugin:Plugin',
             'queue_member_plugin = xivo_confd.plugins.queue_member.plugin:Plugin',
             'sip_general_plugin = xivo_confd.plugins.sip_general.plugin:Plugin',
+            'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
             'trunk_endpoint_plugin = xivo_confd.plugins.trunk_endpoint.plugin:Plugin',
             'trunk_plugin = xivo_confd.plugins.trunk.plugin:Plugin',
             'user_agent_plugin = xivo_confd.plugins.user_agent.plugin:Plugin',

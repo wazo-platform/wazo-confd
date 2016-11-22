@@ -216,3 +216,9 @@ class paging(IsolatedAction):
 
     actions = {'generate': h.paging.generate_paging,
                'delete': h.paging.delete_paging}
+
+
+class switchboard(IsolatedAction):
+
+    actions = {'generate': h.switchboard.generate_switchboard,
+               'delete': h.switchboard.delete_switchboard}

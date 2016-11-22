@@ -1,0 +1,94 @@
+paths:
+  /switchboards:
+    get:
+      summary: List switchboards
+      description: '**Required ACL:** `confd.switchboards.read`'
+      tags:
+        - switchboards
+      responses:
+        '200':
+          description: List of switchboards
+          schema:
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/definitions/Switchboard'
+    post:
+      summary: Create a switchboard
+      description: '**Required ACL:** `confd.switchboard.create`'
+      parameters:
+      - name: body
+        in: body
+        description: Switchboard parameters
+        required: true
+        schema:
+          $ref: '#/definitions/Switchboard'
+      tags:
+        - switchboards
+      responses:
+        '201':
+          description: The switchboard has been created
+          schema:
+            $ref: '#/definitions/Switchboard'
+        '400':
+          $ref: '#/definitions/CreateError'
+  /switchboards/{switchboard_id}:
+    get:
+      summary: Get a switchboard
+      description: '**Required ACL:** `confd.switchboards.{switchboard_id}.read`'
+      tags:
+        - switchboards
+      parameters:
+        - $ref: '#/parameters/switchboard_id'
+      responses:
+        '200':
+          description: Switchboard
+          schema:
+            $ref: '#/definitions/Switchboard'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      summary: Update a switchboard
+      description: '**Required ACL:** `confd.switchboards.{switchboard_id}.update`'
+      tags:
+        - switchboards
+      parameters:
+        - $ref: '#/parameters/switchboard_id'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Switchboard'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      summary: Delete a switchboard
+      description: '**Required ACL:** `confd.switchboard.{switchboard_id}.delete`'
+      tags:
+        - switchboards
+      parameters:
+        - $ref: '#/parameters/switchboard_id'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  Switchboard:
+    type: object
+    properties:
+      name:
+        type: string
+parameters:
+  switchboard_id:
+    name: switchboard_id
+    in: path
+    required: True
+    type: string
