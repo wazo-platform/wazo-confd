@@ -48,6 +48,16 @@ def test_post_errors():
         yield check
 
 
+@fixtures.group()
+def test_put_errors(group):
+    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_ID).put
+    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+
+    url = confd.groups(group['id']).put
+    for check in error_checks(url):
+        yield check
+
+
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', True
@@ -116,6 +126,16 @@ def test_create_minimal_parameters():
     confd.switchboards(response.item['id']).delete().assert_deleted()
 
 
+@fixtures.switchboard(name='before_edit')
+def test_edit_minimal_parameters(switchboard):
+    response = confd.switchboards(switchboard['id']).put(name='after_edit')
+    response.assert_updated()
+
+    expected = {'name': 'after_edit'}
+    response = confd.switchboards(switchboard['id']).get()
+    assert_that(response.item, has_entries(expected))
+
+
 @fixtures.switchboard()
 def test_delete(switchboard):
     response = confd.switchboards(switchboard['id']).delete()
@@ -127,4 +147,5 @@ def test_delete(switchboard):
 @fixtures.switchboard()
 def test_bus_events(switchboard):
     yield s.check_bus_event, 'config.switchboards.*.created', confd.switchboards.post, {'name': 'bus_event'}
+    yield s.check_bus_event, 'config.switchboards.{id}.edited'.format(id=switchboard['id']), confd.switchboards(switchboard['id']).put
     yield s.check_bus_event, 'config.switchboards.{id}.deleted'.format(id=switchboard['id']), confd.switchboards(switchboard['id']).delete
