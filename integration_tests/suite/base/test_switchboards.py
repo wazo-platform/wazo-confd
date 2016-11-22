@@ -29,14 +29,16 @@ from hamcrest import (assert_that,
                       is_not,
                       not_)
 
+NOT_FOUND_SWITCHBOARD_ID = 999999
+
 
 def test_get_errors():
-    fake_switchboard = confd.switchboards(999999).get
+    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_ID).get
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
 
 def test_delete_errors():
-    fake_switchboard = confd.switchboards(999999).delete
+    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_ID).delete
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
 
