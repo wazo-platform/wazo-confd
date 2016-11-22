@@ -18,7 +18,6 @@
 
 from hamcrest import (assert_that,
                       equal_to,
-                      empty,
                       has_entries)
 from test_api import scenarios as s
 from test_api import confd
@@ -52,7 +51,7 @@ def error_checks(url):
 @fixtures.group()
 def test_get(group):
     response = confd.groups(group['id']).fallbacks.get()
-    assert_that(response.item, empty())
+    assert_that(response.item, has_entries(noanswer_destination=None))
 
 
 @fixtures.group()
@@ -77,6 +76,18 @@ def test_edit_with_all_parameters(group):
 
 
 @fixtures.group()
+def test_edit_to_none(group):
+    parameters = {'noanswer_destination': {'type': 'none'}}
+    confd.groups(group['id']).fallbacks.put(parameters).assert_updated()
+
+    response = confd.groups(group['id']).fallbacks.put(noanswer_destination=None)
+    response.assert_updated
+
+    response = confd.groups(group['id']).fallbacks.get()
+    assert_that(response.item, has_entries(noanswer_destination=None))
+
+
+@fixtures.group()
 @fixtures.conference()
 @fixtures.ivr()
 @fixtures.group()
@@ -94,17 +105,6 @@ def _update_group_fallbacks_with_destination(group_id, destination):
     response.assert_updated()
     response = confd.groups(group_id).fallbacks.get()
     assert_that(response.item, has_entries(noanswer_destination=has_entries(**destination)))
-
-
-@fixtures.group()
-def test_delete_all(group):
-    parameters = {'noanswer_destination': {'type': 'none'}}
-    confd.groups(group['id']).fallbacks.put(parameters).assert_updated()
-
-    confd.groups(group['id']).fallbacks.put().assert_updated
-
-    response = confd.groups(group['id']).fallbacks.get()
-    assert_that(response.item, empty())
 
 
 @fixtures.group()
