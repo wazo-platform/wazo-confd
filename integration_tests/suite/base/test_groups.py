@@ -26,6 +26,7 @@ from hamcrest import (assert_that,
                       has_entry,
                       has_item,
                       is_not,
+                      none,
                       not_)
 
 
@@ -158,21 +159,24 @@ def test_sorting_offset_limit(group1, group2):
 @fixtures.group()
 def test_get(group):
     response = confd.groups(group['id']).get()
-    assert_that(response.item, has_entries(id=group['id'],
-                                           name=group['name'],
-                                           caller_id_mode=group['caller_id_mode'],
-                                           caller_id_name=group['caller_id_name'],
-                                           timeout=group['timeout'],
-                                           music_on_hold=group['music_on_hold'],
-                                           preprocess_subroutine=group['preprocess_subroutine'],
-                                           ring_in_use=group['ring_in_use'],
-                                           ring_strategy=group['ring_strategy'],
-                                           user_timeout=group['user_timeout'],
-                                           retry_delay=group['retry_delay'],
-                                           enabled=group['enabled'],
-                                           extensions=empty(),
-                                           members=has_entries(users=empty()),
-                                           incalls=empty()))
+    assert_that(response.item, has_entries(
+        id=group['id'],
+        name=group['name'],
+        caller_id_mode=group['caller_id_mode'],
+        caller_id_name=group['caller_id_name'],
+        timeout=group['timeout'],
+        music_on_hold=group['music_on_hold'],
+        preprocess_subroutine=group['preprocess_subroutine'],
+        ring_in_use=group['ring_in_use'],
+        ring_strategy=group['ring_strategy'],
+        user_timeout=group['user_timeout'],
+        retry_delay=group['retry_delay'],
+        enabled=group['enabled'],
+        extensions=empty(),
+        members=has_entries(users=empty()),
+        incalls=empty(),
+        fallbacks=has_entries(noanswer_destination=none())
+    ))
 
 
 def test_create_minimal_parameters():

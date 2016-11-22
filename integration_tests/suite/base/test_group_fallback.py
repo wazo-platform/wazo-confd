@@ -111,3 +111,12 @@ def _update_group_fallbacks_with_destination(group_id, destination):
 def test_bus_events(group):
     url = confd.groups(group['id']).fallbacks.put
     yield s.check_bus_event, 'config.groups.fallbacks.edited', url
+
+
+@fixtures.group()
+def test_get_fallbacks_relation(group):
+    confd.groups(group['id']).fallbacks.put(noanswer_destination={'type': 'none'}).assert_updated
+    response = confd.groups(group['id']).get()
+    assert_that(response.item, has_entries(
+        fallbacks=has_entries(noanswer_destination=has_entries(type='none'))
+    ))
