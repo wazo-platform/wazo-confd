@@ -21,8 +21,12 @@ from test_api import fixtures
 from test_api import scenarios as s
 
 from hamcrest import (assert_that,
+                      contains,
                       empty,
                       has_entries,
+                      has_item,
+                      has_entry,
+                      is_not,
                       not_)
 
 
@@ -49,6 +53,55 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
+
+
+@fixtures.switchboard(name='hidden', preprocess_subroutine='hidden')
+@fixtures.switchboard(name='search', preprocess_subroutine='search')
+def test_search(hidden, switchboard):
+    url = confd.switchboards
+    searches = {'name': 'search'}
+
+    for field, term in searches.items():
+        yield check_search, url, switchboard, hidden, field, term
+
+
+def check_search(url, switchboard, hidden, field, term):
+    response = url.get(search=term)
+
+    expected = has_item(has_entry(field, switchboard[field]))
+    not_expected = has_item(has_entry(field, hidden[field]))
+    assert_that(response.items, expected)
+    assert_that(response.items, is_not(not_expected))
+
+    response = url.get(**{field: switchboard[field]})
+
+    expected = has_item(has_entry('id', switchboard['id']))
+    not_expected = has_item(has_entry('id', hidden['id']))
+    assert_that(response.items, expected)
+    assert_that(response.items, is_not(not_expected))
+
+
+@fixtures.switchboard(name='sort1')
+@fixtures.switchboard(name='sort2')
+def test_sorting(switchboard1, switchboard2):
+    yield check_sorting, switchboard1, switchboard2, 'name', 'sort'
+
+
+def check_sorting(switchboard1, switchboard2, field, search):
+    response = confd.switchboards.get(search=search, order=field, direction='asc')
+    assert_that(response.items, contains(has_entries(id=switchboard1['id']),
+                                         has_entries(id=switchboard2['id'])))
+
+    response = confd.switchboards.get(search=search, order=field, direction='desc')
+    assert_that(response.items, contains(has_entries(id=switchboard2['id']),
+                                         has_entries(id=switchboard1['id'])))
+
+
+@fixtures.switchboard()
+def test_get(switchboard):
+    response = confd.switchboards(switchboard['id']).get()
+    assert_that(response.item, has_entries(id=switchboard['id'],
+                                           name=switchboard['name']))
 
 
 def test_create_minimal_parameters():
