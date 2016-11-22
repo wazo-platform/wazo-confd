@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,13 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 from xivo_dao.helpers import errors
-from xivo_confd.helpers.validator import Validator, ValidationAssociation, \
-    MissingFields, GetResource
+from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 
 class UserHasNoVoicemail(Validator):
@@ -39,11 +37,6 @@ class UserHasNoVoicemail(Validator):
 
 def build_validator():
     return ValidationAssociation(
-        common=[
-            MissingFields(),
-            GetResource('user_id', user_dao.get, 'User'),
-            GetResource('voicemail_id', voicemail_dao.get, 'Voicemail')
-        ],
         association=[
             UserHasNoVoicemail(user_voicemail_dao)
         ]

@@ -21,12 +21,10 @@ import unittest
 from hamcrest import assert_that, raises, calling, equal_to
 from mock import Mock, sentinel
 
-from xivo_dao.helpers.new_model import NewModel
 from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
 from xivo_confd.helpers.validator import (GetResource,
                                           MemberOfSequence,
-                                          MissingFields,
                                           Optional,
                                           ResourceExists,
                                           UniqueField,
@@ -34,25 +32,6 @@ from xivo_confd.helpers.validator import (GetResource,
                                           ValidationAssociation,
                                           ValidationGroup,
                                           Validator)
-
-
-class TestMissingFields(unittest.TestCase):
-
-    def setUp(self):
-        self.validator = MissingFields()
-
-    def test_given_missing_fields_when_validating_then_raises_error(self):
-        model = Mock(NewModel)
-        model.missing_parameters.return_value = ['foobar']
-
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(InputError))
-
-    def test_given_no_missing_fields_when_validating_then_passes(self):
-        model = Mock(NewModel)
-        model.missing_parameters.return_value = []
-
-        self.validator.validate(model)
 
 
 class TestGetResource(unittest.TestCase):

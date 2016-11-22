@@ -56,6 +56,8 @@ class GroupSchema(BaseSchema):
                                only=['id', 'exten', 'context', 'links'],
                                many=True,
                                dump_only=True)
+    fallbacks = fields.Nested('GroupFallbackSchema',
+                              dump_only=True)
     incalls = fields.Nested('IncallSchema',
                             only=['id',
                                   'extensions',

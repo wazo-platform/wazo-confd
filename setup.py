@@ -54,6 +54,7 @@ setup(
             'func_key_plugin = xivo_confd.plugins.func_key.plugin:Plugin',
             'group_plugin = xivo_confd.plugins.group.plugin:Plugin',
             'group_extension_plugin = xivo_confd.plugins.group_extension.plugin:Plugin',
+            'group_fallback_plugin = xivo_confd.plugins.group_fallback.plugin:Plugin',
             'group_member_user_plugin = xivo_confd.plugins.group_member.plugin:Plugin',
             'incall_extension_plugin = xivo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_plugin = xivo_confd.plugins.incall.plugin:Plugin',

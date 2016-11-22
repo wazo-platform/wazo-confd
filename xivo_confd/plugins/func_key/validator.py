@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +22,6 @@ from collections import Counter
 from xivo_confd.helpers.validator import (Validator,
                                           GetResource,
                                           ResourceExists,
-                                          MissingFields,
                                           ValidationGroup)
 
 from xivo_dao.helpers import errors
@@ -156,10 +156,9 @@ def build_validator():
     mapping_validator = FuncKeyMappingValidator(funckey_validator)
     similar_validator = SimilarFuncKeyValidator()
 
-    required_validator = MissingFields()
     private_template_validator = PrivateTemplateValidator()
 
-    return ValidationGroup(common=[required_validator, mapping_validator, similar_validator],
+    return ValidationGroup(common=[mapping_validator, similar_validator],
                            delete=[private_template_validator])
 
 

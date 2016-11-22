@@ -44,26 +44,6 @@ class ValidatorAssociation(object):
         return
 
 
-class MissingFields(Validator):
-
-    def validate(self, model):
-        missing = model.missing_parameters()
-        if missing:
-            raise errors.missing(*missing)
-
-
-class RequiredFields(Validator):
-
-    def __init__(self, *fields):
-        self.fields = fields
-
-    def validate(self, model):
-        required = [field for field in self.fields
-                    if getattr(model, field) is None]
-        if required:
-            raise errors.missing(*required)
-
-
 class GetResource(Validator):
 
     def __init__(self, field, dao_get, resource='Resource'):
