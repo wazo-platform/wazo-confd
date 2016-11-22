@@ -145,8 +145,8 @@ def random_digits(length):
     return ''.join(random.choice(string.digits) for _ in range(length))
 
 
-def check_bus_event(event, url, body=None):
-    BusClient.listen_events(event)
+def check_bus_event(routing_key, url, body=None):
+    BusClient.listen_events(routing_key)
     url(body) if body else url()
 
     def assert_function():
