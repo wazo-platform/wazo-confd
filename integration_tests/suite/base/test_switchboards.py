@@ -29,7 +29,7 @@ from hamcrest import (assert_that,
                       is_not,
                       not_)
 
-NOT_FOUND_SWITCHBOARD_ID = 999999
+NOT_FOUND_SWITCHBOARD_ID = 'uuid-not-found'
 
 
 def test_get_errors():
