@@ -20,9 +20,6 @@ from xivo_dao.helpers.db_manager import Session
 from .notifier import build_notifier
 from .validator import build_validator
 
-import logging
-logger = logging.getLogger(__name__)
-
 
 class GroupFallbackService(object):
 
