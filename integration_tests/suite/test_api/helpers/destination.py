@@ -153,7 +153,7 @@ def invalid_destinations():
     ]
 
 
-def valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail, conference):
+def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
     return [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
@@ -202,6 +202,9 @@ def valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail, conf
          'skip': True, 'no_answer': True},
         {'type': 'sound', 'filename': 'filename_without_extension',
          'skip': False, 'no_answer': False},
+        {'type': 'switchboard', 'switchboard_id': switchboard['id']},
+        {'type': 'switchboard', 'switchboard_id': switchboard['id'], 'ring_time': 1.5},
+        {'type': 'switchboard', 'switchboard_id': switchboard['id'], 'ring_time': None},
         {'type': 'user', 'user_id': user['id']},
         {'type': 'user', 'user_id': user['id'], 'ring_time': 2},
         {'type': 'user', 'user_id': user['id'], 'ring_time': None},

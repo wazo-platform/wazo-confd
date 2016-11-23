@@ -179,11 +179,12 @@ def test_edit_all_parameters(incall):
 @fixtures.group()
 @fixtures.outcall()
 @fixtures.queue()
+@fixtures.switchboard()
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(incall, meetme, ivr, group, outcall, queue, user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail, conference):
+def test_valid_destinations(incall, meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
         yield create_incall_with_destination, destination
         yield update_incall_with_destination, incall['id'], destination
 
@@ -258,6 +259,18 @@ def test_get_conference_destination_relation(conference):
     ))
 
 
+@fixtures.switchboard()
+def test_get_switchboard_destination_relation(switchboard):
+    incall = confd.incalls.post(destination={'type': 'switchboard',
+                                             'switchboard_id': switchboard['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(switchboard_id=switchboard['id'],
+                                switchboard_name=switchboard['name'])
+    ))
+
+
 @fixtures.voicemail()
 def test_get_voicemail_destination_relation(voicemail):
     incall = confd.incalls.post(destination={'type': 'voicemail',
@@ -326,6 +339,22 @@ def test_get_incalls_relation_when_conference_destination(conference):
                                               'conference_id': conference['id']}).item
 
     response = confd.conferences(conference['id']).get()
+    assert_that(response.item, has_entries(
+        incalls=contains_inanyorder(has_entries(id=incall1['id'],
+                                                extensions=incall1['extensions']),
+                                    has_entries(id=incall2['id'],
+                                                extensions=incall2['extensions']))
+    ))
+
+
+@fixtures.switchboard()
+def test_get_incalls_relation_when_switchboard_destination(switchboard):
+    incall1 = confd.incalls.post(destination={'type': 'switchboard',
+                                              'switchboard_id': switchboard['id']}).item
+    incall2 = confd.incalls.post(destination={'type': 'switchboard',
+                                              'switchboard_id': switchboard['id']}).item
+
+    response = confd.switchboards(switchboard['id']).get()
     assert_that(response.item, has_entries(
         incalls=contains_inanyorder(has_entries(id=incall1['id'],
                                                 extensions=incall1['extensions']),

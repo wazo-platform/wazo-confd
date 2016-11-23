@@ -24,6 +24,7 @@ from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.queue import dao as queue_dao
+from xivo_dao.resources.switchboard import dao as switchboard_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
@@ -48,6 +49,7 @@ class BaseDestinationSchema(Schema):
                                          'outcall',
                                          'queue',
                                          'sound',
+                                         'switchboard',
                                          'user',
                                          'voicemail']),
                          required=True)
@@ -261,6 +263,23 @@ class SoundDestinationSchema(BaseDestinationSchema):
         return data
 
 
+class SwitchboardDestinationSchema(BaseDestinationSchema):
+    switchboard_id = fields.UUID(attribute='actionarg1', required=True)
+    ring_time = fields.Float(attribute='actionarg2', allow_none=True)
+
+    switchboard = fields.Nested('SwitchboardSchema',
+                                only=['name'],
+                                dump_only=True)
+
+    @post_dump
+    def make_switchboard_fields_flat(self, data):
+        if data.get('switchboard'):
+            data['switchboard_name'] = data['switchboard']['name']
+
+        data.pop('switchboard', None)
+        return data
+
+
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(attribute='actionarg1', required=True)
     ring_time = fields.Float(attribute='actionarg2', allow_none=True)
@@ -348,6 +367,7 @@ class DestinationField(fields.Nested):
         'outcall': OutcallDestinationSchema,
         'queue': QueueDestinationSchema,
         'sound': SoundDestinationSchema,
+        'switchboard': SwitchboardDestinationSchema,
         'user': UserDestinationSchema,
         'voicemail': VoicemailDestinationSchema,
     }
@@ -408,6 +428,7 @@ class DestinationValidator(object):
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
         'queue': [ResourceExists('actionarg1', queue_dao.exists, 'Queue')],
         'sound': [],
+        'switchboard': [GetResource('actionarg1', switchboard_dao.get, 'Switchboard')],
         'user': [GetResource('actionarg1', user_dao.get, 'User')],
         'voicemail': [GetResource('actionarg1', voicemail_dao.get, 'Voicemail')],
     }
