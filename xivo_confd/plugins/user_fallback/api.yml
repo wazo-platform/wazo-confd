@@ -23,7 +23,7 @@ paths:
       tags:
       - users
       parameters:
-      - $ref: '#/parameters/userid'
+      - $ref: '#/parameters/useriduuid'
       - name: body
         in: body
         description: Fallbacks for user
