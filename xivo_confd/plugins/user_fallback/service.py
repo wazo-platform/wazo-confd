@@ -21,19 +21,19 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class GroupFallbackService(object):
+class UserFallbackService(object):
 
     def __init__(self, notifier, validator):
         self.validator = validator
         self.notifier = notifier
 
-    def edit(self, group, fallbacks):
+    def edit(self, user, fallbacks):
         with Session.no_autoflush:
-            self.validator.validate_edit(group)
-        group.fallbacks = fallbacks
-        self.notifier.edited(group)
+            self.validator.validate_edit(user)
+        user.fallbacks = fallbacks
+        self.notifier.edited(user)
 
 
 def build_service():
-    return GroupFallbackService(build_notifier(),
-                                build_validator())
+    return UserFallbackService(build_notifier(),
+                               build_validator())

@@ -127,6 +127,7 @@ DEFAULT_CONFIG = {
         'user_call_permission_plugin',
         'user_cti_profile_plugin',
         'user_entity_plugin',
+        'user_fallback_plugin',
         'user_import_plugin',
         'user_line_associated_plugin',
         'user_line_plugin',

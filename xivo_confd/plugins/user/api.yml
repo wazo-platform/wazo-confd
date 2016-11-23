@@ -350,10 +350,11 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the user
+    - $ref: '#/definitions/UserRelationFallbacks'
+    - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationGroups'
     - $ref: '#/definitions/UserRelationIncalls'
     - $ref: '#/definitions/UserRelationLines'
-    - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationServices'
     - $ref: '#/definitions/UserRelationVoicemail'
     required:
@@ -400,6 +401,11 @@ definitions:
       - $ref: '#/definitions/LineRelationBase'
       - $ref: '#/definitions/LineRelationEndpoints'
       - $ref: '#/definitions/LineRelationExtensions'
+  UserRelationFallbacks:
+    properties:
+      fallbacks:
+        readOnly: true
+        $ref: '#/definitions/UserFallbacks'
   UserRelationForwards:
     properties:
       forwards:

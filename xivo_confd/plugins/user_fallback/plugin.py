@@ -1,5 +1,5 @@
-# -*- coding: UTF-8 -*-
-
+# -*- coding: utf-8 -*-
+#
 # Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,25 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.db_manager import Session
+from xivo_dao.resources.user import dao as user_dao
 
-from .notifier import build_notifier
-from .validator import build_validator
-
-
-class GroupFallbackService(object):
-
-    def __init__(self, notifier, validator):
-        self.validator = validator
-        self.notifier = notifier
-
-    def edit(self, group, fallbacks):
-        with Session.no_autoflush:
-            self.validator.validate_edit(group)
-        group.fallbacks = fallbacks
-        self.notifier.edited(group)
+from xivo_confd import api
+from .resource import UserFallbackList
+from .service import build_service
 
 
-def build_service():
-    return GroupFallbackService(build_notifier(),
-                                build_validator())
+class Plugin(object):
+
+    def load(self, core):
+        service = build_service()
+
+        api.add_resource(UserFallbackList,
+                         '/users/<uuid:user_id>/fallbacks',
+                         '/users/<int:user_id>/fallbacks',
+                         resource_class_args=(service, user_dao)
+                         )

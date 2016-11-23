@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Proformatique Inc.
 #
@@ -15,25 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.helpers.db_manager import Session
-
-from .notifier import build_notifier
-from .validator import build_validator
+from xivo_confd import bus
+from xivo_bus.resources.user.event import EditUserFallbackEvent
 
 
-class GroupFallbackService(object):
+class UserFallbackNotifier(object):
 
-    def __init__(self, notifier, validator):
-        self.validator = validator
-        self.notifier = notifier
+    def __init__(self, bus):
+        self.bus = bus
 
-    def edit(self, group, fallbacks):
-        with Session.no_autoflush:
-            self.validator.validate_edit(group)
-        group.fallbacks = fallbacks
-        self.notifier.edited(group)
+    def edited(self, user):
+        event = EditUserFallbackEvent(user.id, user.uuid)
+        self.bus.send_bus_event(event, event.routing_key)
 
 
-def build_service():
-    return GroupFallbackService(build_notifier(),
-                                build_validator())
+def build_notifier():
+    return UserFallbackNotifier(bus)

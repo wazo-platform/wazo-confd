@@ -58,6 +58,8 @@ class UserSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('users'))
 
+    fallbacks = fields.Nested('UserFallbackSchema',
+                              dump_only=True)
     groups = fields.Nested('GroupSchema',
                            only=['id',
                                  'name',

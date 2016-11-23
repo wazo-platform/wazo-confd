@@ -1,0 +1,66 @@
+paths:
+  /users/{user_id}/fallbacks:
+    get:
+      operationId: get_user_fallback
+      summary: List all fallbacks for user
+      description: '**Required ACL:** `confd.users.{user_id}.fallbacks.read`'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: Fallbacks for user
+          schema:
+            $ref: '#/definitions/UserFallbacks'
+    put:
+      operationId: update_user_fallback
+      summary: Update user's fallbacks
+      description: '**Required ACL:** `confd.users.{user_id}.fallbacks.update`
+
+
+        **WARNING** This endpoint delete all fields that are not defined.'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/userid'
+      - name: body
+        in: body
+        description: Fallbacks for user
+        schema:
+          $ref: '#/definitions/UserFallbacks'
+      responses:
+        '204':
+          description: User's fallbacks updated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  UserFallbacks:
+    properties:
+      noanswer_destination:
+        description: The destination to redirect the caller to when there are no answer
+        $ref: '#/definitions/DestinationType'
+      busy_destination:
+        description: The destination to redirect the caller to when there are busy
+        $ref: '#/definitions/DestinationType'
+      congestion_destination:
+        description: The destination to redirect the caller to when there are congestion
+        $ref: '#/definitions/DestinationType'
+      fail_destination:
+        description: The destination to redirect the caller to when the call fail
+        $ref: '#/definitions/DestinationType'
+    example:
+      noanswer_destination:
+        type: user
+        user_id: 1
+      busy_destination:
+        type: group
+        group_id: 2
+      congestion_destination:
+        type: ivr
+        ivr_id: 3
+      fail_destination:
+        type: voicemail
+        voicemail_id: 4

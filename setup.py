@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright (C) 2012-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -76,6 +77,7 @@ setup(
             'user_call_permission_plugin = xivo_confd.plugins.user_call_permission.plugin:Plugin',
             'user_cti_profile_plugin = xivo_confd.plugins.user_cti_profile.plugin:Plugin',
             'user_entity_plugin = xivo_confd.plugins.user_entity.plugin:Plugin',
+            'user_fallback_plugin = xivo_confd.plugins.user_fallback.plugin:Plugin',
             'user_import_plugin = xivo_confd.plugins.user_import.plugin:Plugin',
             'user_line_associated_plugin = xivo_confd.plugins.user_line_associated.plugin:Plugin',
             'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',
