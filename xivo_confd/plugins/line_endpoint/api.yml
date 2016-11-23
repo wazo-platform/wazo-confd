@@ -4,10 +4,9 @@ paths:
       operationId: get_endpoint_custom_line
       summary: Get Line associated to Custom endpoint
       description: '**Required ACL:** `confd.endpoints.custom.{custom_id}.lines.read`'
+      deprecated: true
       tags:
-      - lines
-      - endpoints
-      - custom
+      - deprecated
       parameters:
       - $ref: '#/parameters/customid'
       responses:
@@ -26,10 +25,9 @@ paths:
       operationId: get_endpoint_sccp_line
       summary: Get Line associated to SCCP endpoint
       description: '**Required ACL:** `confd.endpoints.sccp.{sccp_id}.lines.read`'
+      deprecated: true
       tags:
-      - lines
-      - endpoints
-      - sccp
+      - deprecated
       parameters:
       - $ref: '#/parameters/sccpid'
       responses:
@@ -48,10 +46,9 @@ paths:
       operationId: get_endpoint_sip_line
       summary: Get Line associated to SIP endpoint
       description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.lines.read`'
+      deprecated: true
       tags:
-      - lines
-      - endpoints
-      - sip
+      - deprecated
       parameters:
       - $ref: '#/parameters/sipid'
       responses:
@@ -70,10 +67,9 @@ paths:
       operationId: get_line_endpoint_custom
       summary: Get Custom endpoint associated to Line
       description: '**Required ACL:** `confd.lines.{line_id}.endpoints.custom.read`'
+      deprecated: true
       tags:
-      - lines
-      - endpoints
-      - custom
+      - deprecated
       parameters:
       - $ref: '#/parameters/lineid'
       responses:
@@ -129,10 +125,9 @@ paths:
       operationId: get_line_endpoint_sccp
       summary: Get SCCP endpoint associated to Line
       description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sccp.read`'
+      deprecated: true
       tags:
-      - lines
-      - endpoints
-      - sccp
+      - deprecated
       parameters:
       - $ref: '#/parameters/lineid'
       responses:
@@ -188,10 +183,9 @@ paths:
       operationId: get_line_endpoint_sip
       summary: Get SIP endpoint associated to Line
       description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.read`'
+      deprecated: true
       tags:
-      - lines
-      - endpoints
-      - sip
+      - deprecated
       parameters:
       - $ref: '#/parameters/lineid'
       responses:

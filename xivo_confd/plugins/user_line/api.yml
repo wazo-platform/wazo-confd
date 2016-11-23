@@ -4,9 +4,9 @@ paths:
       operationId: get_line_user_associations
       summary: List users associated to lines
       description: '**Required ACL:** `confd.lines.{line_id}.users.read`'
+      deprecated: true
       tags:
-      - users
-      - lines
+      - deprecated
       parameters:
       - $ref: '#/parameters/lineid'
       responses:
@@ -61,9 +61,9 @@ paths:
       operationId: get_user_line_associations
       summary: List lines associated to user
       description: '**Required ACL:** `confd.users.{user_id}.lines.read`'
+      deprecated: true
       tags:
-      - users
-      - lines
+      - deprecated
       parameters:
       - $ref: '#/parameters/useriduuid'
       responses:

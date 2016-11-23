@@ -4,9 +4,9 @@ paths:
       operationId: get_user_cti_profile_association
       summary: Get CtiProfile associated to User
       description: '**Required ACL:** `confd.users.{user_id}.cti.read`'
+      deprecated: true
       tags:
-      - users
-      - cti_profiles
+      - deprecated
       parameters:
       - $ref: '#/parameters/useriduuid'
       responses:
@@ -47,6 +47,7 @@ definitions:
         description: CTI profile ID
       enabled:
         type: boolean
+        description: deprecated
       user_id:
         type: integer
         readOnly: true
