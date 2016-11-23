@@ -25,4 +25,5 @@ class Plugin(object):
 
     def load(self, core):
         api.add_resource(SwaggerResource,
-                         '/api/api.yml')
+                         '/api/api.yml',
+                         resource_class_args=(core.config,))

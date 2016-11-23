@@ -32,14 +32,18 @@ class SwaggerResource(Resource):
 
     api_filename = "api.yml"
 
+    def __init__(self, config):
+        self._enabled_plugins = config['enabled_plugins']
+
     def get(self):
         api_spec = {}
-        for module in iter_entry_points(group='xivo_confd.plugins'):
+        entry_points = (e for e in iter_entry_points(group='xivo_confd.plugins') if e.name in self._enabled_plugins)
+        for entry_point in entry_points:
             try:
-                spec = yaml.load(resource_string(module.module_name, self.api_filename))
+                spec = yaml.load(resource_string(entry_point.module_name, self.api_filename))
                 api_spec = self.update(api_spec, spec)
             except IOError:
-                logger.debug('API spec for module "%s" does not exist', module.module_name)
+                logger.debug('API spec for module "%s" does not exist', entry_point.module_name)
 
         if not api_spec.get('info'):
             return {'error': "API spec does not exist"}, 404
