@@ -57,8 +57,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'context', 123
     yield s.check_bogus_field_returns_error, url, 'context', []
     yield s.check_bogus_field_returns_error, url, 'context', {}
-
     yield s.check_bogus_field_returns_error, url, 'context', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'twilio_incoming', 123
+    yield s.check_bogus_field_returns_error, url, 'twilio_incoming', []
+    yield s.check_bogus_field_returns_error, url, 'twilio_incoming', {}
 
 
 @fixtures.context(name='search')
@@ -108,6 +110,7 @@ def test_get(trunk):
     response = confd.trunks(trunk['id']).get()
     assert_that(response.item, has_entries(id=trunk['id'],
                                            context=trunk['context'],
+                                           twilio_incoming=trunk['twilio_incoming'],
                                            endpoint_sip=none(),
                                            endpoint_custom=none(),
                                            outcalls=empty()))
@@ -122,10 +125,10 @@ def test_create_minimal_parameters():
 
 @fixtures.context()
 def test_create_all_parameters(context):
-    response = confd.trunks.post(context=context['name'])
+    response = confd.trunks.post(context=context['name'], twilio_incoming=True)
     response.assert_created('trunks')
 
-    assert_that(response.item, has_entries(context=context['name']))
+    assert_that(response.item, has_entries(context=context['name'], twilio_incoming=True))
 
 
 @fixtures.trunk()
@@ -139,7 +142,10 @@ def test_edit_minimal_parameters(trunk):
 @fixtures.context(name='not_default')
 @fixtures.trunk()
 def test_edit_all_parameters(context, trunk):
-    parameters = {'context': context['name']}
+    parameters = {
+        'context': context['name'],
+        'twilio_incoming': True,
+    }
 
     response = confd.trunks(trunk['id']).put(**parameters)
     response.assert_updated()
