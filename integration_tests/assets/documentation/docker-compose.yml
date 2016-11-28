@@ -21,7 +21,7 @@ confd:
   command: "xivo-confd -f -d"
 
 postgres:
-  image: xivo/postgres
+  image: wazopbx/postgres
   expose:
     - "5432"
 

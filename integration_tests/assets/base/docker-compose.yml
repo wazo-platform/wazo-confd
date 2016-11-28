@@ -1,5 +1,5 @@
 provd:
-  image: xivo/xivo-provd
+  image: wazopbx/xivo-provd
   ports:
     - "8666:8666"
   expose:
@@ -9,7 +9,7 @@ provd:
     - "./provd/null:/var/lib/xivo-provd/plugins/null"
     - "./provd/zero:/var/lib/xivo-provd/plugins/zero"
 postgres:
-  image: xivo/postgres-test
+  image: wazopbx/postgres-test
   expose:
     - "5432"
   ports:
