@@ -27,7 +27,7 @@ setup(
     description='XIVO CONFD daemon',
     author='Avencall',
     author_email='dev@avencall.com',
-    url='http://github.com/xivo-pbx/xivo-confd',
+    url='http://github.com/wazo-pbx/xivo-confd',
     license='GPLv3',
     packages=find_packages(),
     scripts=[
