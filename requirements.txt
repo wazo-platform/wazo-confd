@@ -1,10 +1,10 @@
-git+https://github.com/xivo-pbx/xivo-auth-client.git
-git+https://github.com/xivo-pbx/xivo-dird-client.git
-git+https://github.com/xivo-pbx/xivo-bus.git
-git+https://github.com/xivo-pbx/xivo-dao.git
-git+https://github.com/xivo-pbx/xivo-lib-python.git
-git+https://github.com/xivo-pbx/xivo-lib-rest-client.git  # from xivo-auth-client
-git+https://github.com/xivo-pbx/xivo-provd-client.git
+git+https://github.com/wazo-pbx/xivo-auth-client.git
+git+https://github.com/wazo-pbx/xivo-dird-client.git
+git+https://github.com/wazo-pbx/xivo-bus.git
+git+https://github.com/wazo-pbx/xivo-dao.git
+git+https://github.com/wazo-pbx/xivo-lib-python.git
+git+https://github.com/wazo-pbx/xivo-lib-rest-client.git  # from xivo-auth-client
+git+https://github.com/wazo-pbx/xivo-provd-client.git
 cherrypy==3.7.0
 flask-cors==1.10.3
 flask-httpauth==2.2.1
