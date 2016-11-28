@@ -1,7 +1,7 @@
 XiVO confd
 ==========
 
-[![Build Status](https://travis-ci.org/xivo-pbx/xivo-confd.png?branch=master)](https://travis-ci.org/xivo-pbx/xivo-confd)
+[![Build Status](https://travis-ci.org/wazo-pbx/xivo-confd.png?branch=master)](https://travis-ci.org/wazo-pbx/xivo-confd)
 
 XiVO CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
 service for configuring and managing a XiVO server. Further details on how to use the API can be found on
