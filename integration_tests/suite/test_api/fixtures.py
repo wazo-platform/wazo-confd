@@ -2,6 +2,7 @@
 
 # Copyright (C) 2016 Avencall
 # Copyright (C) 2016 Proformatique Inc.
+# Copyright (C) 2016 Francois Blackburn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -171,10 +172,10 @@ class incall(IsolatedAction):
                'delete': h.incall.delete_incall}
 
 
-class conference(IsolatedAction):
+class meetme(IsolatedAction):
 
-    actions = {'generate': h.conference.generate_conference,
-               'delete': h.conference.delete_conference}
+    actions = {'generate': h.meetme.generate_conference,
+               'delete': h.meetme.delete_conference}
 
 
 class group(IsolatedAction):
