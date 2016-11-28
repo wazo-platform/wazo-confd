@@ -93,6 +93,7 @@ DEFAULT_CONFIG = {
         'api_plugin',
         'call_log_plugin',
         'call_permission_plugin',
+        'conference_plugin',
         'configuration_plugin',
         'context_plugin',
         'cti_profile_plugin',

@@ -200,3 +200,9 @@ class agent_login_status(IsolatedAction):
 
     actions = {'generate': h.agent_login_status.generate_agent_login_status,
                'delete': h.agent_login_status.delete_agent_login_status}
+
+
+class conference(IsolatedAction):
+
+    actions = {'generate': h.conference.generate_conference,
+               'delete': h.conference.delete_conference}

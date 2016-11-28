@@ -43,6 +43,7 @@ setup(
             'api_plugin = xivo_confd.plugins.api.plugin:Plugin',
             'call_log_plugin = xivo_confd.plugins.call_log.plugin:Plugin',
             'call_permission_plugin = xivo_confd.plugins.call_permission.plugin:Plugin',
+            'conference_plugin = xivo_confd.plugins.conference.plugin:Plugin',
             'context_plugin = xivo_confd.plugins.context.plugin:Plugin',
             'configuration_plugin = xivo_confd.plugins.configuration.plugin:Plugin',
             'cti_profile_plugin = xivo_confd.plugins.cti_profile.plugin:Plugin',
