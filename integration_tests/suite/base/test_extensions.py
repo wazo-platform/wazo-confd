@@ -2,6 +2,7 @@
 
 # Copyright (C) 2015-2016 Avencall
 # Copyright (C) 2016 Proformatique Inc.
+# Copyright (C) 2016 Francois Blackburn
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,7 +97,8 @@ def test_get(extension):
                                            commented=False,
                                            incall=none(),
                                            outcall=none(),
-                                           lines=empty()))
+                                           lines=empty(),
+                                           conference=none()))
 
 
 def test_create_minimal_parameters():

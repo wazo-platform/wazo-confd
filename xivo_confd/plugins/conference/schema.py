@@ -35,3 +35,8 @@ class ConferenceSchema(BaseSchema):
     announce_only_user = fields.Boolean()
     music_on_hold = fields.String(allow_none=True, validate=Length(max=128))
     links = ListLink(Link('conferences'))
+
+    extensions = fields.Nested('ExtensionSchema',
+                               only=['id', 'exten', 'context', 'links'],
+                               many=True,
+                               dump_only=True)

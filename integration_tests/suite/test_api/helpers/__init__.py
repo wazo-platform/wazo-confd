@@ -27,6 +27,7 @@ import call_permission
 import call_pickup
 import call_pickup_entity
 import conference
+import conference_extension
 import context_entity
 import cti_profile
 import device

@@ -1,0 +1,36 @@
+paths:
+  /conferences/{conference_id}/extensions/{extension_id}:
+    put:
+      operationId: associate_conference_extension
+      summary: Associate conference and extension
+      description: '**Required ACL:** `confd.conferences.{conference_id}.extensions.{extension_id}.update`'
+      tags:
+      - conferences
+      - extensions
+      parameters:
+      - $ref: '#/parameters/conferenceid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Conference and Extension associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_conference_extension
+      summary: Dissociate conference and extension
+      description: '**Required ACL:** `confd.conferences.{conference_id}.extensions.{extension_id}.delete`'
+      tags:
+      - conferences
+      - extensions
+      parameters:
+      - $ref: '#/parameters/conferenceid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Conference and Extension dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

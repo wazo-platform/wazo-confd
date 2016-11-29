@@ -151,7 +151,8 @@ def test_get(conference):
                                            announce_join_leave=conference['announce_join_leave'],
                                            announce_user_count=conference['announce_user_count'],
                                            announce_only_user=conference['announce_only_user'],
-                                           music_on_hold=conference['music_on_hold']))
+                                           music_on_hold=conference['music_on_hold'],
+                                           extensions=empty()))
 
 
 def test_create_minimal_parameters():

@@ -200,3 +200,10 @@ def group_member_user(group, *users, **kwargs):
     h.group_member_user.associate(group['id'], user_uuids, check=check)
     yield
     h.group_member_user.dissociate(group['id'], check=check)
+
+
+@contextmanager
+def conference_extension(conference, extension, check=True):
+    h.conference_extension.associate(conference['id'], extension['id'], check)
+    yield
+    h.conference_extension.dissociate(conference['id'], extension['id'], check)

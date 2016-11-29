@@ -2,6 +2,7 @@
 
 # Copyright (C) 2013-2016 Avencall
 # Copyright (C) 2016 Proformatique
+# Copyright (C) 2016 Francois Blackburn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,6 +95,7 @@ DEFAULT_CONFIG = {
         'call_log_plugin',
         'call_permission_plugin',
         'conference_plugin',
+        'conference_extension_plugin',
         'configuration_plugin',
         'context_plugin',
         'cti_profile_plugin',

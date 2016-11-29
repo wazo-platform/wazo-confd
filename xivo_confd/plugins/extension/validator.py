@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Francois Blackburn
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -59,6 +60,9 @@ class ContextOnUpdateValidator(Validator):
 
     def validate(self, extension):
         context = self.dao.get_by_name(extension.context)
+
+        if extension.conference and context.type != 'internal':
+            raise errors.unhandled_context_type(context.type)
 
         if extension.group and context.type != 'internal':
             raise errors.unhandled_context_type(context.type)
