@@ -104,6 +104,9 @@ definitions:
         context:
           type: string
           description: The context of the trunk
+        twilio_incoming:
+          type: boolean
+          description: Use this trunk's settings to handle incoming calls from Twilio
     - $ref: '#/definitions/TrunkRelationEndpoints'
     - $ref: '#/definitions/TrunkRelationOutcalls'
   TrunkRelationBase:
