@@ -14,14 +14,14 @@ test-setup: build-provd build-confd egg-info
 	docker pull swaggerapi/swagger-validator
 
 build-confd:
-	docker build -t xivo/xivo-confd ..
+	docker build -t wazopbx/xivo-confd ..
 	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
 
 update-db:
-	docker build --no-cache -t xivo/postgres-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
+	docker build --no-cache -t wazopbx/postgres-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
-	docker build -t xivo/xivo-provd $(PROVD_DIR)
+	docker build -t wazopbx/xivo-provd $(PROVD_DIR)
 
 stop:
 	cd assets/base && \
