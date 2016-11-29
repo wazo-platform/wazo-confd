@@ -1,3 +1,9 @@
+xivo-confd (16.16~20161123.212314.24c5023) wazo-dev; urgency=medium
+
+  * update distribution
+
+ -- Etienne Lessard <elessard@proformatique.com>  Tue, 29 Nov 2016 09:53:48 -0500
+
 xivo-confd (14.16~20140826.174122.43b3a6e) xivo-dev; urgency=low
 
   * rename package restapi to confd
