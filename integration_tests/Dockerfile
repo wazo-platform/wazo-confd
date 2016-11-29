@@ -1,4 +1,4 @@
-FROM xivo/xivo-confd
+FROM wazopbx/xivo-confd
 
 COPY . /usr/src/xivo-confd
 WORKDIR /usr/src/xivo-confd
