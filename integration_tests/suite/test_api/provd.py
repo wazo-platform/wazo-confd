@@ -28,7 +28,7 @@ from xivo_provd_client import new_provisioning_client, NotFoundError
 
 class ProvdHelper(object):
 
-    DOCKER_PROVD_IMAGE = "xivo/xivo-provd"
+    DOCKER_PROVD_IMAGE = "wazopbx/xivo-provd"
 
     DEFAULT_CONFIGS = [{u'X_type': u'registrar',
                         u'deletable': False,
