@@ -111,10 +111,10 @@ definitions:
       admin_pin:
         type: string
         description: Administrator pin to enter in the conference
-      notify_join_leave:
+      quiet_join_leave:
         type: boolean
         description: Play 'beep' notification when join/leave a conference
-        default: true
+        default: false
       announce_join_leave:
         type: boolean
         description: Record name and announce join/leave

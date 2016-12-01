@@ -29,7 +29,7 @@ class ConferenceSchema(BaseSchema):
     record = fields.Boolean()
     pin = fields.String(validate=(Length(max=80), Predicate('isdigit')))
     admin_pin = fields.String(validate=(Length(max=80), Predicate('isdigit')))
-    notify_join_leave = fields.Boolean()
+    quiet_join_leave = fields.Boolean()
     announce_join_leave = fields.Boolean()
     announce_user_count = fields.Boolean()
     announce_only_user = fields.Boolean()

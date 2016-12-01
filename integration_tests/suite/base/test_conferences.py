@@ -76,10 +76,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'announce_join_leave', None
     yield s.check_bogus_field_returns_error, url, 'announce_join_leave', []
     yield s.check_bogus_field_returns_error, url, 'announce_join_leave', {}
-    yield s.check_bogus_field_returns_error, url, 'notify_join_leave', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'notify_join_leave', None
-    yield s.check_bogus_field_returns_error, url, 'notify_join_leave', []
-    yield s.check_bogus_field_returns_error, url, 'notify_join_leave', {}
+    yield s.check_bogus_field_returns_error, url, 'quiet_join_leave', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'quiet_join_leave', None
+    yield s.check_bogus_field_returns_error, url, 'quiet_join_leave', []
+    yield s.check_bogus_field_returns_error, url, 'quiet_join_leave', {}
     yield s.check_bogus_field_returns_error, url, 'announce_user_count', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'announce_user_count', None
     yield s.check_bogus_field_returns_error, url, 'announce_user_count', []
@@ -147,7 +147,7 @@ def test_get(conference):
                                            record=conference['record'],
                                            pin=conference['pin'],
                                            admin_pin=conference['admin_pin'],
-                                           notify_join_leave=conference['notify_join_leave'],
+                                           quiet_join_leave=conference['quiet_join_leave'],
                                            announce_join_leave=conference['announce_join_leave'],
                                            announce_user_count=conference['announce_user_count'],
                                            announce_only_user=conference['announce_only_user'],
@@ -171,7 +171,7 @@ def test_create_all_parameters():
                   'record': True,
                   'pin': '7654',
                   'admin_pin': '7654',
-                  'notify_join_leave': False,
+                  'quiet_join_leave': True,
                   'announce_join_leave': True,
                   'announce_user_count': True,
                   'announce_only_user': False,
@@ -200,7 +200,7 @@ def test_edit_all_parameters(conference):
                   'record': True,
                   'pin': '7654',
                   'admin_pin': '7654',
-                  'notify_join_leave': False,
+                  'quiet_join_leave': True,
                   'announce_join_leave': True,
                   'announce_user_count': True,
                   'announce_only_user': False,
