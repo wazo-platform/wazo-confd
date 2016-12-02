@@ -20,7 +20,28 @@ paths:
     post:
       operationId: create_conference
       summary: Create conference
-      description: '**Required ACL:** `confd.conferences.create`'
+      description: |
+        **Required ACL:** `confd.conferences.create`
+
+        All conferences have the same menu. Please consult the asterisk documentation for definitions:
+        ```
+        * = playback_and_continue
+        1 = toggle_mute
+        4 = decrease_listening_volume
+        5 = reset_listening_volume
+        6 = increase_listening_volume
+        7 = decrease_talking_volume
+        8 = reset_talking_volume
+        9 = increase_talking_volume
+        ```
+
+        And the following options are added to the admin user:
+        ```
+        2 = admin_toggle_conference_lock
+        3 = admin_kick_last
+        0 = admin_toggle_mute_participants'
+        ```
+
       tags:
       - conferences
       parameters:
@@ -118,9 +139,11 @@ definitions:
       announce_join_leave:
         type: boolean
         description: Record name and announce join/leave
+        default: false
       announce_user_count:
         type: boolean
         description: Announce the number of participants
+        default: false
       announce_only_user:
         type: boolean
         description: Announce when a participant is alone in conference
