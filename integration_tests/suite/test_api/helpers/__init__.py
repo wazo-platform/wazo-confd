@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +25,7 @@ import call_permission
 import call_pickup
 import call_pickup_entity
 import conference
+import conference_extension
 import context_entity
 import cti_profile
 import device
@@ -49,6 +49,7 @@ import line_endpoint_sccp
 import line_endpoint_sip
 import line_extension
 import line_sip
+import meetme
 import outcall
 import outcall_extension
 import outcall_trunk

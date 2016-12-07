@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright (C) 2015-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,7 +95,8 @@ def test_get(extension):
                                            commented=False,
                                            incall=none(),
                                            outcall=none(),
-                                           lines=empty()))
+                                           lines=empty(),
+                                           conference=none()))
 
 
 def test_create_minimal_parameters():
@@ -281,11 +281,11 @@ def test_edit_extension_with_no_change_device_not_updated(user1, user2,
         assert_that(provd.updated_count(device['id'], timestamp), equal_to(device_updated_count))
 
 
-@fixtures.extension(exten='1001', context='default')
+@fixtures.extension(exten='4999', context='default')
 @fixtures.extension(exten='9999', context='from-extern')
 def test_search(extension, hidden):
     url = confd.extensions
-    searches = {'exten': '100',
+    searches = {'exten': '499',
                 'context': 'fault'}
 
     for field, term in searches.items():

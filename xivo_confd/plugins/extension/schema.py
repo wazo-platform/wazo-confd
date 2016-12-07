@@ -31,6 +31,9 @@ class ExtensionSchema(BaseSchema):
     commented = fields.Boolean(attribute='legacy_commented')
     links = ListLink(Link('extensions'))
 
+    conference = fields.Nested('ConferenceSchema',
+                               only=['id', 'name', 'links'],
+                               dump_only=True)
     group = fields.Nested('GroupSchema',
                           only=['id', 'name', 'links'],
                           dump_only=True)

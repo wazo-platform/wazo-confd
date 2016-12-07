@@ -1,0 +1,164 @@
+paths:
+  /conferences:
+    get:
+      operationId: list_conferences
+      summary: List conference
+      description: '**Required ACL:** `confd.conferences.read`'
+      tags:
+      - conferences
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Conferences list
+          schema:
+            $ref: '#/definitions/ConferenceItems'
+    post:
+      operationId: create_conference
+      summary: Create conference
+      description: |
+        **Required ACL:** `confd.conferences.create`
+
+        All conferences have the same menu. Please consult the asterisk documentation for definitions:
+        ```
+        * = playback_and_continue
+        1 = toggle_mute
+        4 = decrease_listening_volume
+        5 = reset_listening_volume
+        6 = increase_listening_volume
+        7 = decrease_talking_volume
+        8 = reset_talking_volume
+        9 = increase_talking_volume
+        ```
+
+        And the following options are added to the admin user:
+        ```
+        2 = admin_toggle_conference_lock
+        3 = admin_kick_last
+        0 = admin_toggle_mute_participants'
+        ```
+
+      tags:
+      - conferences
+      parameters:
+      - name: body
+        in: body
+        description: Conference to create
+        required: false
+        schema:
+          $ref: '#/definitions/Conference'
+      responses:
+        '201':
+          description: Conference created
+          schema:
+            $ref: '#/definitions/Conference'
+        '400':
+          $ref: '#/responses/CreateError'
+  /conferences/{conference_id}:
+    get:
+      operationId: get_conference
+      summary: Get conference
+      description: '**Required ACL:** `confd.conferences.{conference_id}.read`'
+      tags:
+      - conferences
+      parameters:
+      - $ref: '#/parameters/conferenceid'
+      responses:
+        '200':
+          description: Conference
+          schema:
+            $ref: '#/definitions/Conference'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_conference
+      summary: Update conference
+      description: '**Required ACL:** `confd.conferences.{conference_id}.update`'
+      tags:
+      - conferences
+      parameters:
+      - $ref: '#/parameters/conferenceid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Conference'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_conference
+      summary: Delete conference
+      description: '**Required ACL:** `confd.conferences.{conference_id}.delete`'
+      tags:
+      - conferences
+      parameters:
+      - $ref: '#/parameters/conferenceid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  conferenceid:
+    required: true
+    type: integer
+    name: conference_id
+    in: path
+    description: Conference's ID
+definitions:
+  Conference:
+    title: Conference
+    properties:
+      name:
+        type: string
+        description: name to identify the conference
+      preprocess_subroutine:
+        type: string
+        description: Name of the subroutine to execute in asterisk before entering the conference
+      pin:
+        type: string
+        description: Pin to enter in the conference
+      admin_pin:
+        type: string
+        description: Administrator pin to enter in the conference
+      quiet_join_leave:
+        type: boolean
+        description: Play 'beep' notification when join/leave a conference
+        default: false
+      announce_join_leave:
+        type: boolean
+        description: Record name and announce join/leave
+        default: false
+      announce_user_count:
+        type: boolean
+        description: Announce the number of participants
+        default: false
+      announce_only_user:
+        type: boolean
+        description: Announce when a participant is alone in conference
+        default: true
+      music_on_hold:
+        type: string
+        description: Name of the MOH category to use for music on hold
+  ConferenceItems:
+    title: ConferenceItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Conference'
+      total:
+        type: integer
+    required:
+    - total

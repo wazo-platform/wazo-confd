@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Francois Blackburn
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -174,7 +175,7 @@ def test_edit_all_parameters(incall):
 
 
 @fixtures.incall()
-@fixtures.conference()
+@fixtures.meetme()
 @fixtures.ivr()
 @fixtures.group()
 @fixtures.outcall()

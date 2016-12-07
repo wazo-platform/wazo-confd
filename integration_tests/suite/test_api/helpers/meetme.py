@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright (C) 2016 Avencall
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,19 +16,38 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import confd
+import random
+import string
+
+from test_api import db
 
 
 def generate_conference(**parameters):
+    parameters.setdefault('name', generate_name())
     return add_conference(**parameters)
 
 
 def add_conference(**parameters):
-    response = confd.conferences.post(parameters)
-    return response.item
+    with db.queries() as queries:
+        id_ = queries.insert_conference_only(**parameters)
+    parameters['id'] = id_
+    return parameters
 
 
 def delete_conference(conference_id, check=False):
-    response = confd.conferences(conference_id).delete()
-    if check:
-        response.assert_ok()
+    with db.queries() as queries:
+        queries.delete_conference(conference_id)
+
+
+def generate_name():
+    with db.queries() as queries:
+        response = queries.get_conferences()
+    names = set(d['name'] for d in response)
+    return _random_name(names)
+
+
+def _random_name(names):
+    name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    if name in names:
+        return _random_name(names)
+    return name

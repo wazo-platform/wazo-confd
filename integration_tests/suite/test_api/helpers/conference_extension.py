@@ -16,19 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+
 from test_api import confd
 
 
-def generate_conference(**parameters):
-    return add_conference(**parameters)
+def associate(conference_id, extension_id, check=True):
+    response = confd.conferences(conference_id).extensions(extension_id).put()
+    if check:
+        response.assert_ok()
 
 
-def add_conference(**parameters):
-    response = confd.conferences.post(parameters)
-    return response.item
-
-
-def delete_conference(conference_id, check=False):
-    response = confd.conferences(conference_id).delete()
+def dissociate(conference_id, extension_id, check=True):
+    response = confd.conferences(conference_id).extensions(extension_id).delete()
     if check:
         response.assert_ok()
