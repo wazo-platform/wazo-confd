@@ -281,11 +281,11 @@ def test_edit_extension_with_no_change_device_not_updated(user1, user2,
         assert_that(provd.updated_count(device['id'], timestamp), equal_to(device_updated_count))
 
 
-@fixtures.extension(exten='1001', context='default')
+@fixtures.extension(exten='4999', context='default')
 @fixtures.extension(exten='9999', context='from-extern')
 def test_search(extension, hidden):
     url = confd.extensions
-    searches = {'exten': '100',
+    searches = {'exten': '499',
                 'context': 'fault'}
 
     for field, term in searches.items():
