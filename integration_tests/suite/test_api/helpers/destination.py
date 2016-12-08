@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from test_api import scenarios as s
+
 
 def invalid_destinations():
     return [
@@ -63,10 +64,10 @@ def invalid_destinations():
         {'type': 'application', 'application': 'voicemail', 'context': 'invalid_char_@'},
         {'type': 'application', 'application': 'voicemail', 'context': s.random_string(40)},
 
-        {'type': 'conference'},
-        {'type': 'conference', 'missing_required_field': 123},
-        {'type': 'conference', 'conference_id': 'string'},
-        {'type': 'conference', 'conference_id': None},
+        {'type': 'meetme'},
+        {'type': 'meetme', 'missing_required_field': 123},
+        {'type': 'meetme', 'conference_id': 'string'},
+        {'type': 'meetme', 'conference_id': None},
 
         {'type': 'custom'},
         {'type': 'custom', 'missing_required_field': '123'},
@@ -147,7 +148,7 @@ def invalid_destinations():
     ]
 
 
-def valid_destinations(conference, ivr, group, outcall, queue, user, voicemail):
+def valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail):
     return [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
@@ -167,7 +168,7 @@ def valid_destinations(conference, ivr, group, outcall, queue, user, voicemail):
          'email': 'toto@example.com'},
         {'type': 'application', 'application': 'voicemail',
          'context': 'name'},
-        {'type': 'conference', 'conference_id': conference['id']},
+        {'type': 'meetme', 'conference_id': meetme['id']},
         {'type': 'custom', 'command': 'Playback(toto)'},
         {'type': 'extension', 'exten': '1001', 'context': 'name'},
         {'type': 'group', 'group_id': group['id']},
