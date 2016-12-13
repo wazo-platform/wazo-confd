@@ -133,6 +133,18 @@ class MeetmeDestinationSchema(BaseDestinationSchema):
 class ConferenceDestinationSchema(BaseDestinationSchema):
     conference_id = fields.Integer(attribute='actionarg1', required=True)
 
+    conference = fields.Nested('ConferenceSchema',
+                               only=['name'],
+                               dump_only=True)
+
+    @post_dump
+    def make_conference_fields_flat(self, data):
+        if data.get('conference'):
+            data['conference_name'] = data['conference']['name']
+
+        data.pop('conference', None)
+        return data
+
 
 class CustomDestinationSchema(BaseDestinationSchema):
     command = fields.String(validate=(Regexp(COMMAND_REGEX), Length(max=255)),

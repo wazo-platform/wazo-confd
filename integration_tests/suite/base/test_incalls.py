@@ -246,6 +246,18 @@ def test_get_ivr_destination_relation(ivr):
     ))
 
 
+@fixtures.conference()
+def test_get_conference_destination_relation(conference):
+    incall = confd.incalls.post(destination={'type': 'conference',
+                                             'conference_id': conference['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(conference_id=conference['id'],
+                                conference_name=conference['name'])
+    ))
+
+
 @fixtures.voicemail()
 def test_get_voicemail_destination_relation(voicemail):
     incall = confd.incalls.post(destination={'type': 'voicemail',
@@ -298,6 +310,22 @@ def test_get_incalls_relation_when_ivr_destination(ivr):
                                               'ivr_id': ivr['id']}).item
 
     response = confd.ivr(ivr['id']).get()
+    assert_that(response.item, has_entries(
+        incalls=contains_inanyorder(has_entries(id=incall1['id'],
+                                                extensions=incall1['extensions']),
+                                    has_entries(id=incall2['id'],
+                                                extensions=incall2['extensions']))
+    ))
+
+
+@fixtures.conference()
+def test_get_incalls_relation_when_conference_destination(conference):
+    incall1 = confd.incalls.post(destination={'type': 'conference',
+                                              'conference_id': conference['id']}).item
+    incall2 = confd.incalls.post(destination={'type': 'conference',
+                                              'conference_id': conference['id']}).item
+
+    response = confd.conferences(conference['id']).get()
     assert_that(response.item, has_entries(
         incalls=contains_inanyorder(has_entries(id=incall1['id'],
                                                 extensions=incall1['extensions']),
