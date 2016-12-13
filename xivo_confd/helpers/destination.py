@@ -19,6 +19,7 @@
 from marshmallow import Schema, fields, pre_dump, post_load, post_dump
 from marshmallow.validate import Length, OneOf, Regexp, Predicate
 from xivo_dao.resources.conference import dao as meetme_dao
+from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
@@ -36,12 +37,13 @@ EXTEN_REGEX = r'^[0-9*#]{1,255}$'
 
 class BaseDestinationSchema(Schema):
     type = fields.String(validate=OneOf(['application',
-                                         'meetme',
+                                         'conference',
                                          'custom',
                                          'extension',
                                          'group',
                                          'hangup',
                                          'ivr',
+                                         'meetme',
                                          'none',
                                          'outcall',
                                          'queue',
@@ -125,6 +127,10 @@ class VoicemailMainDestinationSchema(ApplicationDestinationSchema):
 
 
 class MeetmeDestinationSchema(BaseDestinationSchema):
+    conference_id = fields.Integer(attribute='actionarg1', required=True)
+
+
+class ConferenceDestinationSchema(BaseDestinationSchema):
     conference_id = fields.Integer(attribute='actionarg1', required=True)
 
 
@@ -318,13 +324,14 @@ class DestinationField(fields.Nested):
 
     destination_schemas = {
         'application': ApplicationDestinationSchema,
-        'meetme': MeetmeDestinationSchema,
+        'conference': ConferenceDestinationSchema,
         'custom': CustomDestinationSchema,
         'extension': ExtensionDestinationSchema,
         'group': GroupDestinationSchema,
         'hangup': HangupDestinationSchema,
         'endcall': HangupDestinationSchema,
         'ivr': IVRDestinationSchema,
+        'meetme': MeetmeDestinationSchema,
         'none': NoneDestinationSchema,
         'outcall': OutcallDestinationSchema,
         'queue': QueueDestinationSchema,
@@ -376,6 +383,7 @@ class DestinationValidator(object):
         'application:disa': [],
         'application:faxtomail': [],
         'application:voicemailmain': [],
+        'conference': [GetResource('actionarg1', conference_dao.get, 'Conference')],
         'custom': [],
         'extension': [],
         'group': [GetResource('actionarg1', group_dao.get, 'Group')],

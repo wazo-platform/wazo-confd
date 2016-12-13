@@ -150,8 +150,8 @@ definitions:
     properties:
       application:
         $ref: '#/definitions/DestinationApplicationApplication'
-      meetme:
-        $ref: '#/definitions/DestinationMeetme'
+      conference:
+        $ref: '#/definitions/DestinationConference'
       custom:
         $ref: '#/definitions/DestinationCustom'
       extension:
@@ -162,6 +162,8 @@ definitions:
         $ref: '#/definitions/DestinationHangupCause'
       ivr:
         $ref: '#/definitions/DestinationIVR'
+      meetme:
+        $ref: '#/definitions/DestinationMeetme'
       none:
         $ref: '#/definitions/DestinationNone'
       outcall:
@@ -275,6 +277,18 @@ definitions:
       type:
         type: string
         description: MUST be 'meetme'
+      conference_id:
+        type: integer
+        description: The id of the conference
+    required:
+    - type
+    - conference_id
+  DestinationConference:
+    title: DestinationConference
+    properties:
+      type:
+        type: string
+        description: MUST be 'conference'
       conference_id:
         type: integer
         description: The id of the conference

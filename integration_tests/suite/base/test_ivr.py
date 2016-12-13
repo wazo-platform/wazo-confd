@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
-# Copyright (C) 2016 Francois Blackburn
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -243,8 +242,9 @@ def test_edit_all_parameters(ivr):
 @fixtures.queue()
 @fixtures.user()
 @fixtures.voicemail()
-def test_valid_destinations(ivr, conference, dest_ivr, group, outcall, queue, user, voicemail):
-    for destination in valid_destinations(conference, dest_ivr, group, outcall, queue, user, voicemail):
+@fixtures.conference()
+def test_valid_destinations(ivr, meetme, dest_ivr, group, outcall, queue, user, voicemail, conference):
+    for destination in valid_destinations(meetme, dest_ivr, group, outcall, queue, user, voicemail, conference):
         yield create_ivr_with_destination, destination
         yield update_ivr_with_destination, ivr['id'], destination
 

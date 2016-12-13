@@ -69,6 +69,11 @@ def invalid_destinations():
         {'type': 'meetme', 'conference_id': 'string'},
         {'type': 'meetme', 'conference_id': None},
 
+        {'type': 'conference'},
+        {'type': 'conference', 'missing_required_field': 123},
+        {'type': 'conference', 'conference_id': 'string'},
+        {'type': 'conference', 'conference_id': None},
+
         {'type': 'custom'},
         {'type': 'custom', 'missing_required_field': '123'},
         {'type': 'custom', 'command': 1234},
@@ -148,7 +153,7 @@ def invalid_destinations():
     ]
 
 
-def valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail):
+def valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail, conference):
     return [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
@@ -169,6 +174,7 @@ def valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail):
         {'type': 'application', 'application': 'voicemail',
          'context': 'name'},
         {'type': 'meetme', 'conference_id': meetme['id']},
+        {'type': 'conference', 'conference_id': conference['id']},
         {'type': 'custom', 'command': 'Playback(toto)'},
         {'type': 'extension', 'exten': '1001', 'context': 'name'},
         {'type': 'group', 'group_id': group['id']},
