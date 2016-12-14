@@ -150,8 +150,8 @@ definitions:
     properties:
       application:
         $ref: '#/definitions/DestinationApplicationApplication'
-      conference:
-        $ref: '#/definitions/DestinationConference'
+      meetme:
+        $ref: '#/definitions/DestinationMeetme'
       custom:
         $ref: '#/definitions/DestinationCustom'
       extension:
@@ -269,12 +269,12 @@ definitions:
     required:
     - application
     - context
-  DestinationConference:
-    title: DestinationConference
+  DestinationMeetme:
+    title: DestinationMeetme
     properties:
       type:
         type: string
-        description: MUST be 'conference'
+        description: MUST be 'meetme'
       conference_id:
         type: integer
         description: The id of the conference

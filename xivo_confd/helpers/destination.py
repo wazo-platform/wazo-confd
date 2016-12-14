@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +18,7 @@
 
 from marshmallow import Schema, fields, pre_dump, post_load, post_dump
 from marshmallow.validate import Length, OneOf, Regexp, Predicate
-from xivo_dao.resources.conference import dao as conference_dao
+from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
@@ -37,7 +36,7 @@ EXTEN_REGEX = r'^[0-9*#]{1,255}$'
 
 class BaseDestinationSchema(Schema):
     type = fields.String(validate=OneOf(['application',
-                                         'conference',
+                                         'meetme',
                                          'custom',
                                          'extension',
                                          'group',
@@ -55,16 +54,12 @@ class BaseDestinationSchema(Schema):
     def convert_type_to_user(self, data):
         if data['type'] == 'endcall':
             data['type'] = 'hangup'
-        elif data['type'] == 'meetme':
-            data['type'] = 'conference'
         return data
 
     @post_load
     def convert_type_to_database(self, data):
         if data['type'] == 'hangup':
             data['type'] = 'endcall'
-        elif data['type'] == 'conference':
-            data['type'] = 'meetme'
         return data
 
 
@@ -129,7 +124,7 @@ class VoicemailMainDestinationSchema(ApplicationDestinationSchema):
                             attribute='actionarg1', required=True)
 
 
-class ConferenceDestinationSchema(BaseDestinationSchema):
+class MeetmeDestinationSchema(BaseDestinationSchema):
     conference_id = fields.Integer(attribute='actionarg1', required=True)
 
 
@@ -323,8 +318,7 @@ class DestinationField(fields.Nested):
 
     destination_schemas = {
         'application': ApplicationDestinationSchema,
-        'conference': ConferenceDestinationSchema,
-        'meetme': ConferenceDestinationSchema,
+        'meetme': MeetmeDestinationSchema,
         'custom': CustomDestinationSchema,
         'extension': ExtensionDestinationSchema,
         'group': GroupDestinationSchema,
@@ -389,7 +383,7 @@ class DestinationValidator(object):
         'endcall:congestion': [],
         'endcall:hangup': [],
         'ivr': [ResourceExists('actionarg1', ivr_dao.get, 'IVR')],
-        'meetme': [ResourceExists('actionarg1', conference_dao.exists, 'Conference')],
+        'meetme': [ResourceExists('actionarg1', meetme_dao.exists, 'Conference')],
         'none': [],
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
         'queue': [ResourceExists('actionarg1', queue_dao.exists, 'Queue')],
