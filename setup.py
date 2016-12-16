@@ -70,6 +70,7 @@ setup(
             'outcall_extension_plugin = xivo_confd.plugins.outcall_extension.plugin:Plugin',
             'outcall_plugin = xivo_confd.plugins.outcall.plugin:Plugin',
             'outcall_trunk_plugin = xivo_confd.plugins.outcall_trunk.plugin:Plugin',
+            'parking_lot_plugin = xivo_confd.plugins.parking_lot.plugin:Plugin',
             'queue_member_plugin = xivo_confd.plugins.queue_member.plugin:Plugin',
             'sip_general_plugin = xivo_confd.plugins.sip_general.plugin:Plugin',
             'trunk_endpoint_plugin = xivo_confd.plugins.trunk_endpoint.plugin:Plugin',

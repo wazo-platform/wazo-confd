@@ -204,3 +204,9 @@ class conference(IsolatedAction):
 
     actions = {'generate': h.conference.generate_conference,
                'delete': h.conference.delete_conference}
+
+
+class parking_lot(IsolatedAction):
+
+    actions = {'generate': h.parking_lot.generate_parking_lot,
+               'delete': h.parking_lot.delete_parking_lot}

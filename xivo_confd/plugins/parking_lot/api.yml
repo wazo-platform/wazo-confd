@@ -1,0 +1,126 @@
+paths:
+  /parkinglots:
+    get:
+      operationId: list_parking_lots
+      summary: List parking lots
+      description: '**Required ACL:** `confd.parkinglots.read`'
+      tags:
+      - parking_lots
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Parking lots list
+          schema:
+            $ref: '#/definitions/ParkingLotItems'
+    post:
+      operationId: create_parking_lot
+      summary: Create parking lot
+      description: '**Required ACL:** `confd.parkinglots.create`'
+      tags:
+      - parking_lots
+      parameters:
+      - name: body
+        in: body
+        description: Parking lot to create
+        required: false
+        schema:
+          $ref: '#/definitions/ParkingLot'
+      responses:
+        '201':
+          description: Parking lot created
+          schema:
+            $ref: '#/definitions/ParkingLot'
+        '400':
+          $ref: '#/responses/CreateError'
+  /parkinglots/{parking_lot_id}:
+    get:
+      operationId: get_parking_lot
+      summary: Get parking lot
+      description: '**Required ACL:** `confd.parkinglots.{parking_lot_id}.read`'
+      tags:
+      - parking_lots
+      parameters:
+      - $ref: '#/parameters/parkinglotid'
+      responses:
+        '200':
+          description: Parking lot
+          schema:
+            $ref: '#/definitions/ParkingLot'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_parking_lot
+      summary: Update parking lot
+      description: '**Required ACL:** `confd.parkinglots.{parking_lot_id}.update`'
+      tags:
+      - parking_lots
+      parameters:
+      - $ref: '#/parameters/parkinglotid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ParkingLot'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_parking_lot
+      summary: Delete parking lot
+      description: '**Required ACL:** `confd.parkinglots.{parking_lot_id}.delete`'
+      tags:
+      - parking_lots
+      parameters:
+      - $ref: '#/parameters/parkinglotid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  parkinglotid:
+    required: true
+    type: integer
+    name: parking_lot_id
+    in: path
+    description: Parking Lot's ID
+definitions:
+  ParkingLot:
+    properties:
+      name:
+        type: string
+        description: name to identify the parking lot
+      slots_start:
+        type: string
+        description: Starting extension to park calls
+      slots_end:
+        type: string
+        description: Ending extension to park calls
+      timeout:
+        type: integer
+        description: Maximum time on parking
+        default: 45
+      music_on_hold:
+        type: string
+        description: Name of the MOH category to use for music on hold
+  ParkingLotItems:
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/ParkingLot'
+      total:
+        type: integer
+    required:
+    - total

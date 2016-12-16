@@ -50,6 +50,7 @@ import line_endpoint_sip
 import line_extension
 import line_sip
 import meetme
+import parking_lot
 import outcall
 import outcall_extension
 import outcall_trunk
