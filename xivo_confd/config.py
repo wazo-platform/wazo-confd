@@ -117,6 +117,7 @@ DEFAULT_CONFIG = {
         'line_extension_plugin',
         'line_plugin',
         'line_sip_plugin',
+        'parking_lot_extension_plugin',
         'parking_lot_plugin',
         'outcall_extension_plugin',
         'outcall_plugin',

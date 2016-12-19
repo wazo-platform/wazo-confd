@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -131,7 +131,8 @@ def test_get(parking_lot):
                                            slots_start=parking_lot['slots_start'],
                                            slots_end=parking_lot['slots_end'],
                                            timeout=parking_lot['timeout'],
-                                           music_on_hold=parking_lot['music_on_hold']))
+                                           music_on_hold=parking_lot['music_on_hold'],
+                                           extensions=empty()))
 
 
 def test_create_minimal_parameters():

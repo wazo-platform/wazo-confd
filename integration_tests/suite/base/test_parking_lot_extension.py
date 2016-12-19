@@ -1,0 +1,154 @@
+# -*- coding: utf-8 -*-
+
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from hamcrest import (assert_that,
+                      contains,
+                      has_entries)
+from test_api import scenarios as s
+from test_api import confd
+from test_api import errors as e
+from test_api import fixtures
+from test_api import associations as a
+from test_api.config import INCALL_CONTEXT
+
+
+FAKE_ID = 999999999
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_associate_errors(parking_lot, extension):
+    fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).put
+    fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).put
+
+    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_dissociate_errors(parking_lot, extension):
+    fake_parking_lot_extension = confd.parkinglots(parking_lot['id']).extensions(extension['id']).delete
+    fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).delete
+    fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).delete
+
+    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+    yield s.check_resource_not_found, fake_parking_lot_extension, 'ParkingLotExtension'
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_associate(parking_lot, extension):
+    response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
+    response.assert_updated()
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_associate_already_associated(parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension):
+        response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
+        response.assert_match(400, e.resource_associated('ParkingLot', 'Extension'))
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+@fixtures.extension()
+def test_associate_multiple_extensions_to_parking_lot(parking_lot, extension1, extension2):
+    with a.parking_lot_extension(parking_lot, extension1):
+        response = confd.parkinglots(parking_lot['id']).extensions(extension2['id']).put()
+        response.assert_match(400, e.resource_associated('ParkingLot', 'Extension'))
+
+
+@fixtures.parking_lot()
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_associate_multiple_parking_lots_to_extension(parking_lot1, parking_lot2, extension):
+    with a.parking_lot_extension(parking_lot1, extension):
+        response = confd.parkinglots(parking_lot2['id']).extensions(extension['id']).put()
+        response.assert_match(400, e.resource_associated('ParkingLot', 'Extension'))
+
+
+@fixtures.parking_lot()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.extension()
+def test_associate_when_user_already_associated(parking_lot, user, line_sip, extension):
+    with a.user_line(user, line_sip), a.line_extension(line_sip, extension):
+        response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
+        response.assert_match(400, e.resource_associated('user', 'Extension'))
+
+
+@fixtures.parking_lot()
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_associate_when_not_internal_context(parking_lot, extension):
+    response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
+    response.assert_status(400)
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_dissociate(parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension, check=False):
+        response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).delete()
+        response.assert_deleted()
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_get_parking_lot_relation(parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension):
+        response = confd.parkinglots(parking_lot['id']).get()
+        assert_that(response.item, has_entries(
+            extensions=contains(has_entries(id=extension['id'],
+                                            exten=extension['exten'],
+                                            context=extension['context']))
+        ))
+
+
+@fixtures.extension()
+@fixtures.parking_lot()
+def test_get_extension_relation(extension, parking_lot):
+    with a.parking_lot_extension(parking_lot, extension):
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, has_entries(
+            parking_lot=has_entries(id=parking_lot['id'],
+                                    name=parking_lot['name'])
+        ))
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_edit_context_to_parking_lot_when_associated(parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension):
+        response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
+        response.assert_status(400)
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_delete_parking_lot_when_parking_lot_and_extension_associated(parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension, check=False):
+        response = confd.parkinglots(parking_lot['id']).delete()
+        response.assert_deleted()
+
+
+def test_delete_extension_when_parking_lot_and_extension_associated():
+    # It is impossible to delete an extension while it associated to an object
+    pass

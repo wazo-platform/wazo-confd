@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,7 +96,8 @@ def test_get(extension):
                                            incall=none(),
                                            outcall=none(),
                                            lines=empty(),
-                                           conference=none()))
+                                           conference=none(),
+                                           parking_lot=none()))
 
 
 def test_create_minimal_parameters():

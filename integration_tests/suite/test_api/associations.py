@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -207,3 +207,10 @@ def conference_extension(conference, extension, check=True):
     h.conference_extension.associate(conference['id'], extension['id'], check)
     yield
     h.conference_extension.dissociate(conference['id'], extension['id'], check)
+
+
+@contextmanager
+def parking_lot_extension(parking_lot, extension, check=True):
+    h.parking_lot_extension.associate(parking_lot['id'], extension['id'], check)
+    yield
+    h.parking_lot_extension.dissociate(parking_lot['id'], extension['id'], check)

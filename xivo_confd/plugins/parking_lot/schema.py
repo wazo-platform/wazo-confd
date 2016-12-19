@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,6 +30,11 @@ class ParkingLotSchema(BaseSchema):
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)  # add default to 45 secondes
     music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
     links = ListLink(Link('parkinglots'))
+
+    extensions = fields.Nested('ExtensionSchema',
+                               only=['id', 'exten', 'context', 'links'],
+                               many=True,
+                               dump_only=True)
 
     @validates_schema
     def validate_slots_range(self, data):

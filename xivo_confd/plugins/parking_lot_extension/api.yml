@@ -1,0 +1,36 @@
+paths:
+  /parkinglots/{parking_lot_id}/extensions/{extension_id}:
+    put:
+      operationId: associate_parking_lot_extension
+      summary: Associate parking_lot and extension
+      description: '**Required ACL:** `confd.parkinglots.{parking_lot_id}.extensions.{extension_id}.update`'
+      tags:
+      - parking_lots
+      - extensions
+      parameters:
+      - $ref: '#/parameters/parkinglotid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Parking Lot and Extension associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_parking_lot_extension
+      summary: Dissociate parking lot and extension
+      description: '**Required ACL:** `confd.parkinglots.{parking_lot_id}.extensions.{extension_id}.delete`'
+      tags:
+      - parking_lots
+      - extensions
+      parameters:
+      - $ref: '#/parameters/parkinglotid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Parking Lot and Extension dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

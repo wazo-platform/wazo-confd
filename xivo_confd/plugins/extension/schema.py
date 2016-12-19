@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,6 +33,9 @@ class ExtensionSchema(BaseSchema):
     conference = fields.Nested('ConferenceSchema',
                                only=['id', 'name', 'links'],
                                dump_only=True)
+    parking_lot = fields.Nested('ParkingLotSchema',
+                                only=['id', 'name', 'links'],
+                                dump_only=True)
     group = fields.Nested('GroupSchema',
                           only=['id', 'name', 'links'],
                           dump_only=True)

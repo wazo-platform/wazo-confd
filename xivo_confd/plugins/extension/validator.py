@@ -63,6 +63,9 @@ class ContextOnUpdateValidator(Validator):
         if extension.conference and context.type != 'internal':
             raise errors.unhandled_context_type(context.type)
 
+        if extension.parking_lot and context.type != 'internal':
+            raise errors.unhandled_context_type(context.type)
+
         if extension.group and context.type != 'internal':
             raise errors.unhandled_context_type(context.type)
 
