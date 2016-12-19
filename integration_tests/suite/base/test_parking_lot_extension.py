@@ -102,6 +102,21 @@ def test_associate_when_not_internal_context(parking_lot, extension):
     response.assert_status(400)
 
 
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1725')
+def test_associate_when_in_slots_range(parking_lot, extension):
+    response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
+    response.assert_status(400)
+
+
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1700')
+@fixtures.extension(exten='1725')
+def test_associate_when_other_extension_exists(parking_lot, extension1, extension2):
+    response = confd.parkinglots(parking_lot['id']).extensions(extension1['id']).put()
+    response.assert_status(400)
+
+
 @fixtures.parking_lot()
 @fixtures.extension()
 def test_dissociate(parking_lot, extension):

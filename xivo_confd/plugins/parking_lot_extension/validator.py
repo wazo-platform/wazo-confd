@@ -17,6 +17,7 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.extension import dao as extension_dao
 
 from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
@@ -28,6 +29,7 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
+        self.validate_slots_do_not_conflict_with_extension_context(parking_lot, extension)
 
     def validate_parking_lot_not_already_associated(self, parking_lot):
         if parking_lot.extensions:
@@ -55,6 +57,15 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
                                                 extension.context,
                                                 id=extension.id,
                                                 context=extension.context)
+
+    def validate_slots_do_not_conflict_with_extension_context(self, parking_lot, extension):
+        extensions = extension_dao.find_all_by(context=extension.context)
+        for extension in extensions:
+            if parking_lot.in_slots_range(extension.exten):
+                raise errors.resource_exists('Extension',
+                                             id=extension.id,
+                                             exten=extension.exten,
+                                             context=extension.context)
 
 
 class ParkingLotExtensionDissociationValidator(ValidatorAssociation):
