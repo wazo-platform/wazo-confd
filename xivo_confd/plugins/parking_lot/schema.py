@@ -27,8 +27,8 @@ class ParkingLotSchema(BaseSchema):
     name = fields.String(allow_none=True, validate=Length(max=128))
     slots_start = fields.String(validate=(Length(max=40), Predicate('isdigit')), required=True)
     slots_end = fields.String(validate=(Length(max=40), Predicate('isdigit')), required=True)
-    timeout = fields.Integer(validate=Range(min=0), allow_none=True)  # add default to 45 secondes
-    music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
+    timeout = fields.Integer(validate=Range(min=0), allow_none=True, missing=45)
+    music_on_hold = fields.String(validate=Length(max=128), allow_none=True, missing='default')
     links = ListLink(Link('parkinglots'))
 
     extensions = fields.Nested('ExtensionSchema',
