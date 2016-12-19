@@ -89,11 +89,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'record', []
     yield s.check_bogus_field_returns_error, url, 'record', {}
     yield s.check_bogus_field_returns_error, url, 'pin', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'pin', None
     yield s.check_bogus_field_returns_error, url, 'pin', []
     yield s.check_bogus_field_returns_error, url, 'pin', {}
     yield s.check_bogus_field_returns_error, url, 'admin_pin', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'admin_pin', None
     yield s.check_bogus_field_returns_error, url, 'admin_pin', []
     yield s.check_bogus_field_returns_error, url, 'admin_pin', {}
 
