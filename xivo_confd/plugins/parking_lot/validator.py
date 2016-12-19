@@ -29,6 +29,8 @@ class SlotsAvailableValidator(Validator):
 
         extensions = extension_dao.find_all_by(context=parking_lot.extensions[0].context)
         for extension in extensions:
+            if extension.is_pattern():
+                continue
             if parking_lot.in_slots_range(extension.exten):
                 raise errors.resource_exists('Extension',
                                              id=extension.id,

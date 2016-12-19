@@ -198,6 +198,15 @@ def test_edit_slots_when_other_exten_exists(parking_lot, extension, _):
         response.assert_status(400)
 
 
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1700')
+@fixtures.extension(exten='_182X')
+def test_edit_slots_when_other_exten_exists_and_is_pattern(parking_lot, extension, _):
+    with a.parking_lot_extension(parking_lot, extension):
+        response = confd.parkinglots(parking_lot['id']).put(slots_start='1801', slots_end='1850')
+        response.assert_updated()
+
+
 @fixtures.parking_lot()
 @fixtures.extension()
 def test_delete_parking_lot_when_parking_lot_and_extension_associated(parking_lot, extension):

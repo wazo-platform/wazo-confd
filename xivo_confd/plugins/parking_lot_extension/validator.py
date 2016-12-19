@@ -66,6 +66,8 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
     def validate_slots_do_not_conflict_with_extension_context(self, parking_lot, extension):
         extensions = extension_dao.find_all_by(context=extension.context)
         for extension in extensions:
+            if extension.is_pattern():
+                continue
             if parking_lot.in_slots_range(extension.exten):
                 raise errors.resource_exists('Extension',
                                              id=extension.id,
