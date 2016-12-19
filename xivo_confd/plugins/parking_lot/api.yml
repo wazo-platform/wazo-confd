@@ -27,7 +27,7 @@ paths:
       - name: body
         in: body
         description: Parking lot to create
-        required: false
+        required: true
         schema:
           $ref: '#/definitions/ParkingLot'
       responses:
@@ -114,6 +114,10 @@ definitions:
       music_on_hold:
         type: string
         description: Name of the MOH category to use for music on hold
+        default: 'default'
+    required:
+    - slots_start
+    - slots_end
   ParkingLotItems:
     properties:
       items:
