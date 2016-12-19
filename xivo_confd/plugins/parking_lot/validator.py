@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_confd.helpers.validator import ValidationGroup
+from xivo_dao.helpers import errors
+from xivo_dao.resources.extension import dao as extension_dao
+
+from xivo_confd.helpers.validator import ValidationGroup, Validator
 
 
-# Need to validate slots range, when the exten@context will be associated
+class SlotsAvailableValidator(Validator):
+
+    def validate(self, parking_lot):
+        if not parking_lot.extensions:
+            return
+
+        extensions = extension_dao.find_all_by(context=parking_lot.extensions[0].context)
+        for extension in extensions:
+            if parking_lot.in_slots_range(extension.exten):
+                raise errors.resource_exists('Extension',
+                                             id=extension.id,
+                                             exten=extension.exten,
+                                             context=extension.context)
+
+
 def build_validator():
-    return ValidationGroup()
+    return ValidationGroup(
+        edit=[
+            SlotsAvailableValidator(),
+        ]
+    )
