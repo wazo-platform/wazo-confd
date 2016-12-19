@@ -19,15 +19,36 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 
 
 from xivo_confd.helpers.validator import Validator, ValidationGroup, GetResource
 
 
-class ExtenAvailableOnCreateValidator(Validator):
+class ExtenAvailableValidator(Validator):
 
-    def __init__(self, dao):
+    def __init__(self, dao, dao_parking_lot):
         self.dao = dao
+        self.parking_lot_dao = dao_parking_lot
+
+    def _validate_parking_lots(self, extension):
+        if self._is_pattern(extension.exten):
+            return
+
+        parking_lots = self.parking_lot_dao.find_all_by()
+        for parking_lot in parking_lots:
+            if parking_lot.extensions and parking_lot.extensions[0].context == extension.context:
+                if parking_lot.in_slots_range(extension.exten):
+                    raise errors.resource_exists('ParkingLot',
+                                                 id=parking_lot.id,
+                                                 slots_start=parking_lot.slots_start,
+                                                 slots_end=parking_lot.slots_end)
+
+    def _is_pattern(self, exten):
+        return exten.startswith('_')
+
+
+class ExtenAvailableOnCreateValidator(ExtenAvailableValidator):
 
     def validate(self, extension):
         existing = self.dao.find_by(exten=extension.exten,
@@ -37,11 +58,10 @@ class ExtenAvailableOnCreateValidator(Validator):
                                          exten=extension.exten,
                                          context=extension.context)
 
+        self._validate_parking_lots(extension)
 
-class ExtenAvailabelOnUpdateValidator(Validator):
 
-    def __init__(self, dao):
-        self.dao = dao
+class ExtenAvailabelOnUpdateValidator(ExtenAvailableValidator):
 
     def validate(self, extension):
         existing = self.dao.find_by(exten=extension.exten,
@@ -50,6 +70,8 @@ class ExtenAvailabelOnUpdateValidator(Validator):
             raise errors.resource_exists('Extension',
                                          exten=extension.exten,
                                          context=extension.context)
+
+        self._validate_parking_lots(extension)
 
 
 class ContextOnUpdateValidator(Validator):
@@ -138,11 +160,11 @@ def build_validator():
             GetResource('context', context_dao.get_by_name, 'Context'),
         ],
         create=[
-            ExtenAvailableOnCreateValidator(extension_dao),
+            ExtenAvailableOnCreateValidator(extension_dao, parking_lot_dao),
             ExtensionRangeValidator(context_dao),
         ],
         edit=[
-            ExtenAvailabelOnUpdateValidator(extension_dao),
+            ExtenAvailabelOnUpdateValidator(extension_dao, parking_lot_dao),
             ContextOnUpdateValidator(context_dao),
             ExtensionRangeValidator(context_dao),
         ],

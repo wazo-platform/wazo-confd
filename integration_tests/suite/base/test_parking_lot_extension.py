@@ -24,7 +24,7 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
-from test_api.config import INCALL_CONTEXT
+from test_api.config import INCALL_CONTEXT, CONTEXT
 
 
 FAKE_ID = 999999999
@@ -139,6 +139,32 @@ def test_edit_context_to_parking_lot_when_associated(parking_lot, extension):
     with a.parking_lot_extension(parking_lot, extension):
         response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
         response.assert_status(400)
+
+
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1700')
+def test_create_exten_in_parking_lot_range(parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension):
+        response = confd.extensions().post(exten='1725', context=CONTEXT)
+        response.assert_status(400)
+
+
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1700')
+@fixtures.extension()
+def test_edit_exten_in_parking_lot_range(parking_lot, extension1, extension2):
+    with a.parking_lot_extension(parking_lot, extension1):
+        response = confd.extensions(extension2['id']).put(exten='1725')
+        response.assert_status(400)
+
+
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1700', context=CONTEXT)
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_edit_exten_in_parking_lot_range_when_different_context(parking_lot, extension1, extension2):
+    with a.parking_lot_extension(parking_lot, extension1):
+        response = confd.extensions(extension2['id']).put(exten='1725')
+        response.assert_updated()
 
 
 @fixtures.parking_lot()
