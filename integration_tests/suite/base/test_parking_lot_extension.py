@@ -117,6 +117,13 @@ def test_associate_when_other_extension_exists(parking_lot, extension1, extensio
     response.assert_status(400)
 
 
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='_XXXX')
+def test_associate_when_exten_is_pattern(parking_lot, extension):
+    response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
+    response.assert_status(400)
+
+
 @fixtures.parking_lot()
 @fixtures.extension()
 def test_dissociate(parking_lot, extension):

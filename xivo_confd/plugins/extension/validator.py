@@ -32,7 +32,7 @@ class ExtenAvailableValidator(Validator):
         self.parking_lot_dao = dao_parking_lot
 
     def _validate_parking_lots(self, extension):
-        if self._is_pattern(extension.exten):
+        if extension.is_pattern():
             return
 
         parking_lots = self.parking_lot_dao.find_all_by()
@@ -43,9 +43,6 @@ class ExtenAvailableValidator(Validator):
                                                  id=parking_lot.id,
                                                  slots_start=parking_lot.slots_start,
                                                  slots_end=parking_lot.slots_end)
-
-    def _is_pattern(self, exten):
-        return exten.startswith('_')
 
 
 class ExtenAvailableOnCreateValidator(ExtenAvailableValidator):

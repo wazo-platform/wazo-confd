@@ -29,6 +29,7 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
+        self.validate_extension_is_not_pattern(extension)
         self.validate_slots_do_not_conflict_with_extension_context(parking_lot, extension)
 
     def validate_parking_lot_not_already_associated(self, parking_lot):
@@ -57,6 +58,10 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
                                                 extension.context,
                                                 id=extension.id,
                                                 context=extension.context)
+
+    def validate_extension_is_not_pattern(self, extension):
+        if extension.is_pattern():
+            raise errors.invalid_exten_pattern(extension.exten)
 
     def validate_slots_do_not_conflict_with_extension_context(self, parking_lot, extension):
         extensions = extension_dao.find_all_by(context=extension.context)
