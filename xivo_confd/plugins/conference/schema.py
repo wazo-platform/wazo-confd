@@ -22,7 +22,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 
 class ConferenceSchema(BaseSchema):
-    id = fields.Integer()
+    id = fields.Integer(dump_only=True)
     name = fields.String(allow_none=True, validate=Length(max=128))
     preprocess_subroutine = fields.String(allow_none=True, validate=Length(max=39))
     max_users = fields.Integer(validate=Range(min=0))

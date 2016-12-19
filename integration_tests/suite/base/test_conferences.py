@@ -212,6 +212,19 @@ def test_edit_all_parameters(conference):
 
 
 @fixtures.conference()
+def test_dump_only_parameters(conference):
+    parameters = {'id': 'invalid_id',
+                  'extensions': 'invalid_extensions',
+                  'incalls': 'invalid_incalls'}
+
+    response = confd.conferences(conference['id']).put(**parameters)
+    response.assert_updated()
+
+    response = confd.conferences(conference['id']).get()
+    assert_that(response.item, has_entries(conference))
+
+
+@fixtures.conference()
 def test_delete(conference):
     response = confd.conferences(conference['id']).delete()
     response.assert_deleted()
