@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -524,6 +524,20 @@ def test_delete_user_when_user_and_funckey_template_associated(user, funckey_tem
         confd.users(user['id']).delete().assert_deleted()
         response = confd.funckeys.templates(funckey_template['id']).users.get()
         assert_that(response.items, empty())
+
+
+@fixtures.user()
+def test_get_user_destination_relation(user):
+    response = confd.users(user['id']).funckeys(1).put(destination={'type': 'user',
+                                                                    'user_id': user['id']})
+    response.assert_updated()
+
+    response = confd.users(user['id']).funckeys(1).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(user_id=user['id'],
+                                user_firstname=user['firstname'],
+                                user_lastname=user['lastname'])
+    ))
 
 
 class TestBlfFuncKeys(BaseTestFuncKey):

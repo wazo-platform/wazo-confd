@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,6 +71,12 @@ class BaseDestinationSchema(Schema):
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(required=True)
 
+    user = fields.Nested('UserSchema',
+                         attribute='userfeatures',
+                         only=['firstname',
+                               'lastname'],
+                         dump_only=True)
+
     endpoint_list = 'users_list'
 
     @post_dump
@@ -78,6 +84,15 @@ class UserDestinationSchema(BaseDestinationSchema):
         user_id = output['user_id']
         output['href'] = url_for('users', id=user_id, _external=True)
         return output
+
+    @post_dump
+    def make_user_fields_flat(self, data):
+        if data.get('user'):
+            data['user_firstname'] = data['user']['firstname']
+            data['user_lastname'] = data['user']['lastname']
+
+        data.pop('user', None)
+        return data
 
 
 class GroupDestinationSchema(BaseDestinationSchema):
