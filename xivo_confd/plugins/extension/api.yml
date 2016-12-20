@@ -145,8 +145,11 @@ definitions:
         commented:
           type: boolean
           description: If True the extension is disabled
+    - $ref: '#/definitions/ExtensionRelationConference'
+    - $ref: '#/definitions/ExtensionRelationGroup'
     - $ref: '#/definitions/ExtensionRelationIncall'
     - $ref: '#/definitions/ExtensionRelationOutcall'
+    - $ref: '#/definitions/ExtensionRelationParkingLot'
     - $ref: '#/definitions/ExtensionRelationLines'
     required:
     - context
@@ -161,6 +164,16 @@ definitions:
         type: string
       exten:
         type: string
+  ExtensionRelationConference:
+    properties:
+      conference:
+        readOnly: true
+        $ref: '#/definitions/ConferenceRelationBase'
+  ExtensionRelationGroup:
+    properties:
+      group:
+        readOnly: true
+        $ref: '#/definitions/GroupRelationBase'
   ExtensionRelationIncall:
     properties:
       incall:
@@ -171,6 +184,11 @@ definitions:
       outcall:
         readOnly: true
         $ref: '#/definitions/OutcallRelationBase'
+  ExtensionRelationParkingLot:
+    properties:
+      parking_lot:
+        readOnly: true
+        $ref: '#/definitions/ParkingLotRelationBase'
   ExtensionRelationLines:
     properties:
       lines:

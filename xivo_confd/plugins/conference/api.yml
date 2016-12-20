@@ -119,38 +119,53 @@ parameters:
 definitions:
   Conference:
     title: Conference
+    allOf:
+    - $ref: '#/definitions/ConferenceRelationBase'
+    - properties:
+        preprocess_subroutine:
+          type: string
+          description: Name of the subroutine to execute in asterisk before entering the conference
+        pin:
+          type: string
+          description: Pin to enter in the conference
+        admin_pin:
+          type: string
+          description: Administrator pin to enter in the conference
+        quiet_join_leave:
+          type: boolean
+          description: Play 'beep' notification when join/leave a conference
+          default: false
+        announce_join_leave:
+          type: boolean
+          description: Record name and announce join/leave
+          default: false
+        announce_user_count:
+          type: boolean
+          description: Announce the number of participants
+          default: false
+        announce_only_user:
+          type: boolean
+          description: Announce when a participant is alone in conference
+          default: true
+        music_on_hold:
+          type: string
+          description: Name of the MOH category to use for music on hold
+    - $ref: '#/definitions/GroupRelationExtensions'
+  ConferenceRelationBase:
     properties:
+      id:
+        type: integer
+        readOnly: true
       name:
         type: string
         description: name to identify the conference
-      preprocess_subroutine:
-        type: string
-        description: Name of the subroutine to execute in asterisk before entering the conference
-      pin:
-        type: string
-        description: Pin to enter in the conference
-      admin_pin:
-        type: string
-        description: Administrator pin to enter in the conference
-      quiet_join_leave:
-        type: boolean
-        description: Play 'beep' notification when join/leave a conference
-        default: false
-      announce_join_leave:
-        type: boolean
-        description: Record name and announce join/leave
-        default: false
-      announce_user_count:
-        type: boolean
-        description: Announce the number of participants
-        default: false
-      announce_only_user:
-        type: boolean
-        description: Announce when a participant is alone in conference
-        default: true
-      music_on_hold:
-        type: string
-        description: Name of the MOH category to use for music on hold
+  ConferenceRelationExtensions:
+    properties:
+      extensions:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ExtensionRelationBase'
   ConferenceItems:
     title: ConferenceItems
     properties:

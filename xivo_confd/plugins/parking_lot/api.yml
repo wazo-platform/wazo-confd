@@ -97,27 +97,42 @@ parameters:
     description: Parking Lot's ID
 definitions:
   ParkingLot:
-    properties:
-      name:
-        type: string
-        description: name to identify the parking lot
-      slots_start:
-        type: string
-        description: Starting extension to park calls
-      slots_end:
-        type: string
-        description: Ending extension to park calls
-      timeout:
-        type: integer
-        description: Maximum time on parking
-        default: 45
-      music_on_hold:
-        type: string
-        description: Name of the MOH category to use for music on hold
-        default: 'default'
+    allOf:
+    - $ref: '#/definitions/ParkingLotRelationBase'
+    - properties:
+        slots_start:
+          type: string
+          description: Starting extension to park calls
+        slots_end:
+          type: string
+          description: Ending extension to park calls
+        timeout:
+          type: integer
+          description: Maximum time on parking
+          default: 45
+        music_on_hold:
+          type: string
+          description: Name of the MOH category to use for music on hold
+          default: 'default'
+    - $ref: '#/definitions/GroupRelationExtensions'
     required:
     - slots_start
     - slots_end
+  ParkingLotRelationBase:
+    properties:
+      id:
+        type: integer
+        readOnly: true
+      name:
+        type: string
+        description: name to identify the parking lot
+  ParkingLotRelationExtensions:
+    properties:
+      extensions:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ExtensionRelationBase'
   ParkingLotItems:
     properties:
       items:
