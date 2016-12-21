@@ -540,6 +540,20 @@ def test_get_user_destination_relation(user):
     ))
 
 
+@fixtures.user()
+@fixtures.group()
+def test_get_group_destination_relation(user, group):
+    response = confd.users(user['id']).funckeys(1).put(destination={'type': 'group',
+                                                                    'group_id': group['id']})
+    response.assert_updated()
+
+    response = confd.users(user['id']).funckeys(1).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(group_id=group['id'],
+                                group_name=group['name'])
+    ))
+
+
 class TestBlfFuncKeys(BaseTestFuncKey):
 
     def setUp(self):

@@ -98,6 +98,19 @@ class UserDestinationSchema(BaseDestinationSchema):
 class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
 
+    group = fields.Nested('GroupSchema',
+                          attribute='groupfeatures',
+                          only=['name'],
+                          dump_only=True)
+
+    @post_dump
+    def make_group_fields_flat(self, data):
+        if data.get('group'):
+            data['group_name'] = data['group']['name']
+
+        data.pop('group', None)
+        return data
+
 
 class QueueDestinationSchema(BaseDestinationSchema):
     queue_id = fields.Integer(required=True)
