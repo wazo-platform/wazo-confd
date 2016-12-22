@@ -56,7 +56,7 @@ class BaseDestinationSchema(Schema):
         parameters = []
         exclude_fields = ['href', 'type']
         for field_name, field_obj in self.declared_fields.iteritems():
-            if field_name is None or field_name in exclude_fields:
+            if field_name is None or field_name in exclude_fields or field_obj.dump_only:
                 continue
 
             parameter = {'name': field_name}
