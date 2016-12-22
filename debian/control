@@ -1,12 +1,10 @@
 Source: xivo-confd
 Section: python
 Priority: extra
-Maintainer: XiVO Dev Team <dev+pkg@proformatique.com>
-Uploaders: XiVO Builder Team <dev+pkg@proformatique.com>
+Maintainer: Wazo Maintainers <dev.wazo@gmail.com>
 Build-Depends: debhelper (>= 9), dh-python, dh-systemd (>= 1.5), python-all (>= 2.7), python-setuptools
-Standards-Version: 3.9.4
+Standards-Version: 3.9.6
 X-Python-Version: >= 2.7
-Homepage: http://xivo.io
 
 Package: xivo-confd
 Architecture: all
@@ -14,8 +12,8 @@ Depends: ${python:Depends}, ${misc:Depends}, xivo-libconfd (>= ${binary:Version}
 Provides: xivo-restapi
 Conflicts: xivo-restapi
 Replaces: xivo-restapi
-Description: XIVO confd server
- XIVO is a system based on a powerful IPBX, to bring an easy to
+Description: Wazo confd server
+ Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
  .
 
@@ -42,7 +40,7 @@ Depends: ${python:Depends},
 Provides: xivo-librestapi
 Conflicts: xivo-librestapi
 Replaces: xivo-librestapi
-Description: XIVO confd lib
- XIVO is a system based on a powerful IPBX, to bring an easy to
+Description: Wazo confd lib
+ Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
  .

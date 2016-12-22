@@ -23,10 +23,10 @@ from setuptools import find_packages
 setup(
     name='xivo-confd',
     version='0.1',
-    description='XIVO CONFD daemon',
-    author='Avencall',
-    author_email='dev@avencall.com',
-    url='http://github.com/wazo-pbx/xivo-confd',
+    description='Wazo confd daemon',
+    author='Wazo Authors',
+    author_email='dev.wazo@gmail.com',
+    url='http://wazo.community',
     license='GPLv3',
     packages=find_packages(),
     scripts=[
