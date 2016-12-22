@@ -18,4 +18,7 @@ definitions:
     properties:
       uuid:
         type: string
-        description: UUID of the XiVO server
+        description: UUID of the Wazo server
+      wazo_version:
+        type: string
+        description: Version of the Wazo server
