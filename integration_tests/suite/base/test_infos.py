@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from hamcrest import assert_that, has_entries, is_not, none
 from test_api import confd
 
 
 def test_get():
     response = confd.infos.get()
-    response.assert_ok()
+    assert_that(response.item, has_entries(
+        uuid=is_not(none()),
+        wazo_version=is_not(none())
+    ))
