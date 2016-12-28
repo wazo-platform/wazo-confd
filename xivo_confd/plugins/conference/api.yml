@@ -150,6 +150,13 @@ definitions:
         music_on_hold:
           type: string
           description: Name of the MOH category to use for music on hold
+        max_users:
+          type: integer
+          description: Maximum users allowed in the conference. This exclude admin.
+        record:
+          type: boolean
+          description: Record the conference
+          default: false
     - $ref: '#/definitions/GroupRelationExtensions'
   ConferenceRelationBase:
     properties:
