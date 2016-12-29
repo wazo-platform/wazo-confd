@@ -25,32 +25,23 @@ from xivo_confd.plugins.user.validator import (NoEmptyFieldWhenEnabled,
 from xivo_dao.helpers.exception import ResourceError
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.user_line import UserLine
-from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 
 class TestValidateNoVoicemailAssociated(unittest.TestCase):
 
     def setUp(self):
         self.dao = Mock()
-        self.validator = NoVoicemailAssociated(self.dao)
+        self.validator = NoVoicemailAssociated()
 
     def test_given_voicemail_associated_then_validation_fails(self):
-        user = Mock(User, id=sentinel.id)
-        self.dao.find_by_user_id.return_value = Mock(UserVoicemail,
-                                                     user_id=sentinel.user_id,
-                                                     voicemail_id=sentinel.voicemail_id)
+        user = Mock(User, id=sentinel.id, voicemail=Mock(id=sentinel.id))
 
         self.assertRaises(ResourceError, self.validator.validate, user)
 
-        self.dao.find_by_user_id.assert_called_once_with(user.id)
-
     def test_given_no_voicemail_associated_then_validation_passes(self):
-        user = Mock(User, id=sentinel.id)
-        self.dao.find_by_user_id.return_value = None
+        user = Mock(User, id=sentinel.id, voicemail=None)
 
         self.validator.validate(user)
-
-        self.dao.find_by_user_id.assert_called_once_with(user.id)
 
 
 class TestValidateNoLineAssociated(unittest.TestCase):

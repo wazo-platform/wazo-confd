@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
@@ -40,18 +38,14 @@ class UserVoicemailService(object):
         return self.dao.find_all_by(**criteria)
 
     def associate(self, user, voicemail):
-        association = UserVoicemail(user_id=user.id,
-                                    voicemail_id=voicemail.id)
-        self.validator.validate_association(association)
-        self.dao.associate(association)
+        self.validator.validate_association(user, voicemail)
+        self.dao.associate(user, voicemail)
         self.notifier.associated(user, voicemail)
-        return association
+        return self.dao.get_by(user_id=user.id)
 
     def dissociate(self, user, voicemail):
-        association = UserVoicemail(user_id=user.id,
-                                    voicemail_id=voicemail.id)
-        self.validator.validate_dissociation(association)
-        self.dao.dissociate(association)
+        self.validator.validate_dissociation(user, voicemail)
+        self.dao.dissociate(user, voicemail)
         self.notifier.dissociated(user, voicemail)
 
 

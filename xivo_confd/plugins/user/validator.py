@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,21 +24,16 @@ from xivo_confd.helpers.validator import (Optional,
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
 
 class NoVoicemailAssociated(Validator):
 
-    def __init__(self, dao):
-        self.dao = dao
-
     def validate(self, user):
-        user_voicemail = self.dao.find_by_user_id(user.id)
-        if user_voicemail:
+        if user.voicemail:
             raise errors.resource_associated('User',
                                              'Voicemail',
-                                             user_id=user_voicemail.user_id,
-                                             voicemail_id=user_voicemail.voicemail_id)
+                                             user_id=user.id,
+                                             voicemail_id=user.voicemail.id)
 
 
 class NoLineAssociated(Validator):
@@ -69,7 +63,7 @@ class NoEmptyFieldWhenEnabled(Validator):
 def build_validator():
     return ValidationGroup(
         delete=[
-            NoVoicemailAssociated(user_voicemail_dao),
+            NoVoicemailAssociated(),
             NoLineAssociated(user_line_dao)
         ],
         create=[

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,28 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
-
 from xivo_dao.helpers import errors
 from xivo_confd.helpers.validator import Validator, ValidationAssociation
 
 
 class UserHasNoVoicemail(Validator):
 
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, association):
-        existing = self.dao.find_by_user_id(association.user_id)
-        if existing:
+    def validate(self, user, voicemail):
+        if user.voicemail:
             raise errors.resource_associated('User', 'Voicemail',
-                                             user_id=association.user_id,
-                                             voicemail_id=association.voicemail_id)
+                                             user_id=user.id,
+                                             voicemail_id=voicemail.id)
 
 
 def build_validator():
     return ValidationAssociation(
         association=[
-            UserHasNoVoicemail(user_voicemail_dao)
+            UserHasNoVoicemail()
         ]
     )

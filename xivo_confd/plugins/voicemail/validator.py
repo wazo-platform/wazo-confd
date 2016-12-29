@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +17,6 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.voicemail import dao as voicemail_dao
-from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.context import dao as context_dao
 
 from xivo_confd.database import static_voicemail
@@ -59,15 +57,11 @@ class NumberContextChanged(Validator):
 
 class AssociatedToUser(Validator):
 
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, model):
-        associations = self.dao.find_all_by_voicemail_id(model.id)
-        if len(associations) > 0:
-            user_ids = ", ".join(str(uv.user_id) for uv in associations)
+    def validate(self, voicemail):
+        if voicemail.users:
+            user_ids = ", ".join(str(user.id) for user in voicemail.users)
             raise errors.resource_associated('Voicemail', 'User',
-                                             voicemail_id=model.id,
+                                             voicemail_id=voicemail.id,
                                              user_ids=user_ids)
 
 
@@ -86,5 +80,5 @@ def build_validator():
             NumberContextChanged(voicemail_dao)
         ],
         delete=[
-            AssociatedToUser(user_voicemail_dao)
+            AssociatedToUser()
         ])
