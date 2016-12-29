@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2013-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,6 +117,7 @@ DEFAULT_CONFIG = {
         'line_extension_plugin',
         'line_plugin',
         'line_sip_plugin',
+        'paging_plugin',
         'parking_lot_extension_plugin',
         'parking_lot_plugin',
         'outcall_extension_plugin',

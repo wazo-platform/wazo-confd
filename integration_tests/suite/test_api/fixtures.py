@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -210,3 +210,9 @@ class parking_lot(IsolatedAction):
 
     actions = {'generate': h.parking_lot.generate_parking_lot,
                'delete': h.parking_lot.delete_parking_lot}
+
+
+class paging(IsolatedAction):
+
+    actions = {'generate': h.paging.generate_paging,
+               'delete': h.paging.delete_paging}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ import line_endpoint_sip
 import line_extension
 import line_sip
 import meetme
+import paging
 import parking_lot
 import parking_lot_extension
 import outcall
