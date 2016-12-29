@@ -6,10 +6,10 @@ paths:
       description: '**Required ACL:** `confd.users.export.read`
 
 
-        CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html'
+        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
-        url: http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+        url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
       tags:
       - users
       produces:
@@ -26,10 +26,10 @@ paths:
       description: '**Required ACL:** `confd.users.import.create`
 
 
-        CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html'
+        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
-        url: http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+        url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
       consumes:
       - text/csv; charset=utf-8
       tags:
@@ -51,10 +51,10 @@ paths:
       description: '**Required ACL:** `confd.users.import.update`
 
 
-        CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html'
+        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
-        url: http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+        url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
       consumes:
       - text/csv; charset=utf-8
       tags:
@@ -76,7 +76,7 @@ parameters:
     name: body
     in: body
     required: true
-    description: CSV field list available at http://documentation.xivo.io/en/stable/administration/users/csv_import.html
+    description: CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html
     schema:
       type: string
 

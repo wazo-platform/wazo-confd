@@ -307,7 +307,7 @@ parameters:
 definitions:
   FuncKey:
     title: FuncKey
-    description: Further documentation at http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html
+    description: Further documentation at http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
     properties:
       blf:
         type: boolean
@@ -347,7 +347,7 @@ definitions:
     type: array
   FuncKeyTemplate:
     title: FuncKeyTemplate
-    description: Further documentation at http://documentation.xivo.io/en/stable/api_sdk/rest_api/confd/func_keys.html
+    description: Further documentation at http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
     properties:
       name:
         type: string

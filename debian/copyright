@@ -1,6 +1,6 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: xivo-confd
-Source: https://github.com/xivo-pbx/xivo-confd.git
+Source: https://github.com/wazo-pbx/xivo-confd.git
 
 Files: *
 Copyright: 2012 Avencall

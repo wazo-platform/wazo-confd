@@ -4,15 +4,15 @@ XiVO confd
 [![Build Status](https://travis-ci.org/wazo-pbx/xivo-confd.png?branch=master)](https://travis-ci.org/wazo-pbx/xivo-confd)
 
 XiVO CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
-service for configuring and managing a XiVO server. Further details on how to use the API can be found on
-the [XiVO API web site](http://api.xivo.io)
+service for configuring and managing a Wazo server. Further details on how to use the API can be found on
+the [Wazo API web site](http://api.wazo.community)
 
 
 Installing xivo-confd
 ---------------------
 
-The server is already provided as a part of [XiVO](http://documentation.xivo.io).
-Please refer to [the documentation](ttp://documentation.xivo.io/production/installation/installsystem.html) for
+The server is already provided as a part of [Wazo](http://documentation.wazo.community).
+Please refer to [the documentation](http://documentation.wazo.community/en/stable/installation/installsystem.html) for
 further details on installing one.
 
 
@@ -35,8 +35,8 @@ You need the repos xivo-manage-db and xivo-provisioning.
 To clone them:
 
 ```
-git clone https://github.com/xivo-pbx/xivo-manage-db
-git clone https://github.com/xivo-pbx/xivo-provisioning
+git clone https://github.com/wazo-pbx/xivo-manage-db
+git clone https://github.com/wazo-pbx/xivo-provisioning
 ```
 
 If you already have them:
