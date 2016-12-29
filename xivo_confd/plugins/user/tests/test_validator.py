@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from xivo_confd.plugins.user.validator import (NoEmptyFieldWhenEnabled,
                                                NoVoicemailAssociated)
 from xivo_dao.helpers.exception import ResourceError
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.resources.user_line.model import UserLine
+from xivo_dao.alchemy.user_line import UserLine
 from xivo_dao.resources.user_voicemail.model import UserVoicemail
 
 
