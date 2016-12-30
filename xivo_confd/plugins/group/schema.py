@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,13 +20,6 @@ from marshmallow import fields, post_load, post_dump
 from marshmallow.validate import Length, Range, OneOf
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
-
-
-class GroupMembersSchema(BaseSchema):
-    users = fields.Nested('UserSchema',
-                          only=['uuid', 'firstname', 'lastname', 'links'],
-                          many=True,
-                          dummp_only=True)
 
 
 class GroupSchema(BaseSchema):
@@ -64,8 +57,10 @@ class GroupSchema(BaseSchema):
                                   'links'],
                             many=True,
                             dump_only=True)
-    members = fields.Nested('GroupMembersSchema',
-                            dump_only=True)
+    users_member = fields.Nested('UserSchema',
+                                 only=['uuid', 'firstname', 'lastname', 'links'],
+                                 many=True,
+                                 dummp_only=True)
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):
@@ -80,6 +75,11 @@ class GroupSchema(BaseSchema):
             data['ring_strategy'] = 'memorized_round_robin'
         elif ring_strategy == 'wrandom':
             data['ring_strategy'] = 'weight_random'
+        return data
+
+    @post_dump
+    def wrap_users_member(self, data):
+        data['members'] = {'users': data.pop('users_member', [])}
         return data
 
     @post_load
