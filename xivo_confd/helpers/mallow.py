@@ -71,6 +71,14 @@ class BaseSchema(Schema):
         ordered = True
 
 
+class UserSchemaUUIDLoad(BaseSchema):
+    uuid = fields.String(required=True)
+
+
+class UsersUUIDSchema(BaseSchema):
+    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
+
+
 class StrictBoolean(fields.Boolean):
 
     def _deserialize(self, value, attr, data):
