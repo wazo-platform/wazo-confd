@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright (C) 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,8 @@ class TestWizardService(unittest.TestCase):
         netifaces.AF_INET = 4
         netifaces.gateways.return_value = {4: [('192.168.2.0', 'eth0'), ('192.168.32.0', 'eth1')]}
         expected_result = [{'gateway': '192.168.2.0', 'interface': 'eth0'},
-                           {'gateway': '192.168.32.0', 'interface': 'eth1'}]
+                           {'gateway': '192.168.32.0', 'interface': 'eth1'},
+                           {'gateway': '0.0.0.0', 'interface': None}]
 
         result = self.service.get_gateways()
 
@@ -81,10 +82,11 @@ class TestWizardService(unittest.TestCase):
     def test_get_gateways_return_empty_list_when_no_gateways(self, netifaces):
         netifaces.AF_INET = 4
         netifaces.gateways.return_value = {}
+        expected_result = [{'gateway': '0.0.0.0', 'interface': None}]
 
         result = self.service.get_gateways()
 
-        assert_that(result, empty())
+        assert_that(result, equal_to(expected_result))
 
     def test_get_timezone(self):
         with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data='America/Montreal'), create=True) as mopen:
