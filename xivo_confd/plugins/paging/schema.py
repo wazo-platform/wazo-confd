@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from marshmallow import fields
+from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Predicate
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -33,3 +33,18 @@ class PagingSchema(BaseSchema):
     record = fields.Boolean(attribute='record_bool')
     enabled = fields.Boolean()
     links = ListLink(Link('pagings'))
+
+    users_caller = fields.Nested('UserSchema',
+                                 only=['uuid', 'firstname', 'lastname', 'links'],
+                                 many=True,
+                                 dummp_only=True)
+    users_member = fields.Nested('UserSchema',
+                                 only=['uuid', 'firstname', 'lastname', 'links'],
+                                 many=True,
+                                 dummp_only=True)
+
+    @post_dump
+    def wrap_users(self, data):
+        data['callers'] = {'users': data.pop('users_caller', [])}
+        data['members'] = {'users': data.pop('users_member', [])}
+        return data
