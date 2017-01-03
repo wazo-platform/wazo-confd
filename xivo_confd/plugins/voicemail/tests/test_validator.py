@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +21,6 @@ from mock import Mock, sentinel
 from hamcrest import assert_that, calling, raises
 
 from xivo_dao.alchemy.voicemail import Voicemail
-from xivo_dao.resources.user_voicemail.model import UserVoicemail
 from xivo_dao.helpers.exception import ResourceError
 
 from xivo_confd.plugins.voicemail import validator
@@ -100,20 +98,16 @@ class TestAssociatedToUser(unittest.TestCase):
 
     def setUp(self):
         self.dao = Mock()
-        self.validator = validator.AssociatedToUser(self.dao)
+        self.validator = validator.AssociatedToUser()
 
     def test_when_no_associations_found_then_validation_passes(self):
-        model = Voicemail(id=sentinel.id)
-        self.dao.find_all_by_voicemail_id.return_value = []
+        voicemail = Mock(Voicemail, id=sentinel.id, users=[])
 
-        self.validator.validate(model)
+        self.validator.validate(voicemail)
 
     def test_when_associations_found_then_validation_fails(self):
-        model = Voicemail(id=sentinel.id)
-        self.dao.find_all_by_voicemail_id.return_value = [Mock(UserVoicemail,
-                                                               user_id=sentinel.user_id,
-                                                               voicemail_id=sentinel.id)]
+        voicemail = Mock(Voicemail, id=sentinel.id, users=[Mock(id=sentinel.user_id)])
 
         assert_that(
-            calling(self.validator.validate).with_args(model),
+            calling(self.validator.validate).with_args(voicemail),
             raises(ResourceError))

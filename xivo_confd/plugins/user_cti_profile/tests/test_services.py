@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ from mock import patch, Mock
 from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_services
 
 from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
-from xivo_dao.resources.cti_profile.model import CtiProfile
+from xivo_dao.alchemy.cti_profile import CtiProfile
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from hamcrest import none
@@ -35,7 +35,7 @@ class TestUserCtiProfile(unittest.TestCase):
     @patch('xivo_dao.resources.user_cti_profile.dao.find_profile_by_userid')
     def test_get(self, dao_find_profile_by_userid, dao_user_get):
         userid = 1
-        cti_profile = CtiProfile(id=2)
+        cti_profile = Mock(CtiProfile, id=2)
         dao_find_profile_by_userid.return_value = cti_profile
         dao_user_get.return_value = Mock(User, cti_enabled=True)
 
