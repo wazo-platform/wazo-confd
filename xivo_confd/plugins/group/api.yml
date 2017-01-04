@@ -187,10 +187,8 @@ definitions:
   GroupRelationMembers:
     properties:
       members:
-        type: array
         readOnly: true
-        items:
-          $ref: '#/definitions/GroupRelationMemberUsers'
+        $ref: '#/definitions/GroupRelationMemberUsers'
   GroupRelationMemberUsers:
     properties:
       users:
