@@ -118,7 +118,7 @@ DEFAULT_CONFIG = {
         'line_plugin',
         'line_sip_plugin',
         'paging_plugin',
-        'paging_user',
+        'paging_user_plugin',
         'parking_lot_extension_plugin',
         'parking_lot_plugin',
         'outcall_extension_plugin',
