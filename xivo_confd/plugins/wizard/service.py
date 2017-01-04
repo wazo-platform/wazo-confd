@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright (C) 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -140,10 +140,12 @@ class WizardService(object):
         return result
 
     def get_gateways(self):
+        default_gateway = {'gateway': '0.0.0.0', 'interface': None}
         gateways = []
         for gateway in netifaces.gateways().get(netifaces.AF_INET, []):
             gateways.append({'gateway': gateway[0],
                              'interface': gateway[1]})
+        gateways.append(default_gateway)
         return gateways
 
     def get_nameservers(self):
