@@ -3,10 +3,11 @@ paths:
     put:
       operationId: update_paging_caller_users
       summary: Update paging and callers
-      description: '**Required ACL:** `confd.pagings.{paging_id}.callers.users.update`
+      description: |
+        **Required ACL:** `confd.pagings.{paging_id}.callers.users.update`
 
-      **WARNING**
-      This endpoint remove all callers which are not defined.'
+        **WARNING**
+        This endpoint remove all callers which are not defined.
       tags:
       - pagings
       - users
@@ -29,10 +30,11 @@ paths:
     put:
       operationId: update_paging_member_users
       summary: Update paging and members
-      description: '**Required ACL:** `confd.pagings.{paging_id}.members.users.update`
+      description: |
+        **Required ACL:** `confd.pagings.{paging_id}.members.users.update`
 
-      **WARNING**
-      This endpoint remove all members which are not defined.'
+        **WARNING**
+        This endpoint remove all members which are not defined.
       tags:
       - pagings
       - users

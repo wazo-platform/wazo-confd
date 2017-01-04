@@ -104,13 +104,13 @@ definitions:
         readOnly: true
       name:
         type: string
-        description: name to identify the paging
+        description: The name to identify the paging
       number:
         type: string
-        description: The suffix of the extension to page
+        description: The number of the paging
       announce_caller:
         type: boolean
-        description: Play an announcement to caller
+        description: Play the announce sound to the caller
         default: True
       announce_sound:
         type: string
