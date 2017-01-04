@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,28 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.user_cti_profile import dao
+from xivo_dao.helpers.db_manager import Session
 
 from xivo_confd.plugins.user_cti_profile import validator, notifier
 
 
-def get(user_id):
-    cti_profile = dao.find_profile_by_userid(user_id)
-    cti_profile_id = None if cti_profile is None else cti_profile.id
-    user = user_dao.get(user_id)
-    return UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id, enabled=user.cti_enabled)
+def edit(user, form):
+    cti_profile_id = form.get('cti_profile_id', None)
+    cti_enabled = form.get('cti_enabled', None)
+    if cti_enabled is not None:
+        user.cti_enabled = cti_enabled
 
+    with Session.no_autoflush:
+        validator.validate_edit(user, cti_profile_id)
 
-def edit(user_cti_profile):
-    validator.validate_edit(user_cti_profile)
-    dao.edit(user_cti_profile)
-    notifier.edited(user_cti_profile)
+    if cti_profile_id is not None:
+        user.cti_profile_id = cti_profile_id
 
-
-def associate(user, cti_profile):
-    profile = UserCtiProfile(user_id=user.id,
-                             cti_profile_id=cti_profile.id,
-                             enabled=user.cti_enabled)
-    edit(profile)
+    notifier.edited(user)

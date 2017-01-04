@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,14 +26,14 @@ from xivo_confd.helpers.restful import ConfdResource
 
 
 class UserCtiProfileSchema(BaseSchema):
-    user_id = fields.Integer(dump_only=True)
-    enabled = StrictBoolean()
-    cti_profile_id = fields.Integer(missing=None)
+    user_id = fields.Integer(dump_only=True, attribute='id')
+    enabled = StrictBoolean(attribute='cti_enabled')
+    cti_profile_id = fields.Integer(missing=None, attribute='cti_profile_id')
     links = ListLink(Link('cti_profiles',
                           field='cti_profile_id',
                           target='id'),
                      Link('users',
-                          field='user_id',
+                          field='id',
                           target='id'))
 
 
@@ -51,18 +50,11 @@ class UserCtiProfileRoot(ConfdResource):
     @required_acl('confd.users.{user_id}.cti.read')
     def get(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
-        association = self.service.get(user.id)
-        return self.schema().dump(association).data
+        return self.schema().dump(user).data
 
     @required_acl('confd.users.{user_id}.cti.update')
     def put(self, user_id):
-        form = self.schema().load(request.get_json()).data
         user = self.user_dao.get_by_id_uuid(user_id)
-        association = self.service.get(user.id)
-        self.update_model(association, form)
-        self.service.edit(association)
+        form = self.schema().load(request.get_json()).data
+        self.service.edit(user, form)
         return '', 204
-
-    def update_model(self, association, form):
-        for key, value in form.iteritems():
-            setattr(association, key, value)

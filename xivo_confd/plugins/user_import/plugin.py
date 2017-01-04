@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,7 +74,6 @@ from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
-from xivo_dao.resources.user_cti_profile import dao as user_cti_profile_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
@@ -138,7 +137,6 @@ class Plugin(object):
                                    voicemail_dao,
                                    user_voicemail_dao,
                                    cti_profile_dao,
-                                   user_cti_profile_dao,
                                    line_dao,
                                    user_line_dao,
                                    line_extension_dao,

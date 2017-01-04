@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ class EntryAssociator(object):
 class EntryFinder(object):
 
     def __init__(self, user_dao, entity_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
-                 user_cti_profile_dao, line_dao, user_line_dao, line_extension_dao,
+                 line_dao, user_line_dao, line_extension_dao,
                  sip_dao, sccp_dao, extension_dao, incall_dao, call_permission_dao,
                  user_call_permission_dao):
         self.user_dao = user_dao
@@ -137,7 +137,6 @@ class EntryFinder(object):
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
         self.cti_profile_dao = cti_profile_dao
-        self.user_cti_profile_dao = user_cti_profile_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
         self.line_extension_dao = line_extension_dao
@@ -154,7 +153,8 @@ class EntryFinder(object):
         uuid = entry.extract_field('user', 'uuid')
         user = entry.user = self.user_dao.get_by(uuid=uuid)
 
-        entry.cti_profile = self.user_cti_profile_dao.find_profile_by_userid(user.id)
+        if user.cti_profile_id:
+            entry.cti_profile = self.cti_profile_dao.get(user.cti_profile_id)
 
         entity_id = entry.extract_field('entity', 'id')
         if entity_id:

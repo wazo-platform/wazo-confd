@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,22 +19,22 @@ from xivo_bus.resources.user_cti_profile import event
 from xivo_confd.helpers import bus_manager, sysconfd_connector
 
 
-def edited(user_cti_profile):
-    bus_event = event.UserCtiProfileEditedEvent(user_cti_profile.user_id,
-                                                user_cti_profile.cti_profile_id,
-                                                user_cti_profile.enabled)
+def edited(user):
+    bus_event = event.UserCtiProfileEditedEvent(user.id,
+                                                user.cti_profile_id,
+                                                user.cti_enabled)
     bus_manager.send_bus_event(bus_event, bus_event.routing_key)
-    _send_sysconfd_command(user_cti_profile)
+    _send_sysconfd_command(user)
 
 
-def _send_sysconfd_command(user_cti_profile):
+def _send_sysconfd_command(user):
     command_dict = {
-        'ctibus': _generate_cti_commands(user_cti_profile),
+        'ctibus': _generate_cti_commands(user),
         'ipbx': [],
         'agentbus': [],
     }
     sysconfd_connector.exec_request_handlers(command_dict)
 
 
-def _generate_cti_commands(user_cti_profile):
-    return ['xivo[user,edit,%d]' % user_cti_profile.user_id]
+def _generate_cti_commands(user):
+    return ['xivo[user,edit,%d]' % user.id]

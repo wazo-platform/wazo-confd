@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,32 +18,22 @@
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
-from xivo_dao.resources.user import dao as user_dao
 
 
-def validate_edit(user_cti_profile):
-    _validate_user_exists(user_cti_profile)
-    if user_cti_profile.cti_profile_id:
-        _validate_cti_profile_exists(user_cti_profile)
-    _validate_user_has_login_passwd(user_cti_profile)
+def validate_edit(user, cti_profile_id):
+    if cti_profile_id:
+        _validate_cti_profile_exists(cti_profile_id)
+    _validate_user_has_login_passwd(user)
 
 
-def _validate_cti_profile_exists(user_cti_profile):
+def _validate_cti_profile_exists(cti_profile_id):
     try:
-        cti_profile_dao.get(user_cti_profile.cti_profile_id)
+        cti_profile_dao.get(cti_profile_id)
     except NotFoundError:
         raise errors.param_not_found('cti_profile_id', 'CtiProfile')
 
 
-def _validate_user_exists(user_cti_profile):
-    try:
-        user_dao.get(user_cti_profile.user_id)
-    except NotFoundError:
-        raise errors.param_not_found('user_id', 'User')
-
-
-def _validate_user_has_login_passwd(user_cti_profile):
-    if user_cti_profile.enabled:
-        user = user_dao.get(user_cti_profile.user_id)
+def _validate_user_has_login_passwd(user):
+    if user.cti_enabled:
         if not user.username or not user.password:
             raise errors.missing_cti_parameters(user_id=user.id)
