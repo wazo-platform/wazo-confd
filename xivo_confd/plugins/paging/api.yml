@@ -98,44 +98,47 @@ parameters:
 definitions:
   Paging:
     title: Paging
-    properties:
-      id:
-        type: integer
-        readOnly: true
-      name:
-        type: string
-        description: The name to identify the paging
-      number:
-        type: string
-        description: The number of the paging
-      announce_caller:
-        type: boolean
-        description: Play the announce sound to the caller
-        default: True
-      announce_sound:
-        type: string
-        description: The sound played to everyone
-      caller_notification:
-        type: boolean
-        description: Play a notification to caller
-        default: false
-      duplex:
-        type: boolean
-        description: Duplex audio
-        default: false
-      record:
-        type: boolean
-        description: Record the paging
-        default: false
-      ignore_forward:
-        type: boolean
-        description: Ignore attemps to forward the call
-        default: false
-      enabled:
-        type: boolean
-        default: true
-    required:
-    - number
+    allOf:
+    - properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: The name to identify the paging
+        number:
+          type: string
+          description: The number of the paging
+        announce_caller:
+          type: boolean
+          description: Play the announce sound to the caller
+          default: True
+        announce_sound:
+          type: string
+          description: The sound played to everyone
+        caller_notification:
+          type: boolean
+          description: Play a notification to caller
+          default: false
+        duplex:
+          type: boolean
+          description: Duplex audio
+          default: false
+        record:
+          type: boolean
+          description: Record the paging
+          default: false
+        ignore_forward:
+          type: boolean
+          description: Ignore attemps to forward the call
+          default: false
+        enabled:
+          type: boolean
+          default: true
+      required:
+      - number
+    - $ref: '#/definitions/PagingRelationCallers'
+    - $ref: '#/definitions/PagingRelationMembers'
   PagingItems:
     title: PagingItems
     properties:
@@ -147,3 +150,20 @@ definitions:
         type: integer
     required:
     - total
+  PagingRelationCallers:
+    properties:
+      callers:
+        readOnly: true
+        $ref: '#/definitions/PagingRelationMemberUsers'
+  PagingRelationMembers:
+    properties:
+      members:
+        readOnly: true
+        $ref: '#/definitions/PagingRelationMemberUsers'
+  PagingRelationMemberUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
