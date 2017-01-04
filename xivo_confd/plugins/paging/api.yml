@@ -1,0 +1,169 @@
+paths:
+  /pagings:
+    get:
+      operationId: list_pagings
+      summary: List paging
+      description: '**Required ACL:** `confd.pagings.read`'
+      tags:
+      - pagings
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Pagings list
+          schema:
+            $ref: '#/definitions/PagingItems'
+    post:
+      operationId: create_paging
+      summary: Create paging
+      description: '**Required ACL:** `confd.pagings.create`'
+      tags:
+      - pagings
+      parameters:
+      - name: body
+        in: body
+        description: Paging to create
+        required: true
+        schema:
+          $ref: '#/definitions/Paging'
+      responses:
+        '201':
+          description: Paging created
+          schema:
+            $ref: '#/definitions/Paging'
+        '400':
+          $ref: '#/responses/CreateError'
+  /pagings/{paging_id}:
+    get:
+      operationId: get_paging
+      summary: Get paging
+      description: '**Required ACL:** `confd.pagings.{paging_id}.read`'
+      tags:
+      - pagings
+      parameters:
+      - $ref: '#/parameters/pagingid'
+      responses:
+        '200':
+          description: Paging
+          schema:
+            $ref: '#/definitions/Paging'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_paging
+      summary: Update paging
+      description: '**Required ACL:** `confd.pagings.{paging_id}.update`'
+      tags:
+      - pagings
+      parameters:
+      - $ref: '#/parameters/pagingid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Paging'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_paging
+      summary: Delete paging
+      description: '**Required ACL:** `confd.pagings.{paging_id}.delete`'
+      tags:
+      - pagings
+      parameters:
+      - $ref: '#/parameters/pagingid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  pagingid:
+    required: true
+    type: integer
+    name: paging_id
+    in: path
+    description: Paging's ID
+definitions:
+  Paging:
+    title: Paging
+    allOf:
+    - properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: The name to identify the paging
+        number:
+          type: string
+          description: The number of the paging
+        announce_caller:
+          type: boolean
+          description: Play the announce sound to the caller
+          default: true
+        announce_sound:
+          type: string
+          description: The sound played to everyone
+        caller_notification:
+          type: boolean
+          description: Play a notification to caller
+          default: true
+        duplex:
+          type: boolean
+          description: Duplex audio
+          default: false
+        record:
+          type: boolean
+          description: Record the paging
+          default: false
+        ignore_forward:
+          type: boolean
+          description: Ignore attemps to forward the call
+          default: false
+        enabled:
+          type: boolean
+          default: true
+      required:
+      - number
+    - $ref: '#/definitions/PagingRelationCallers'
+    - $ref: '#/definitions/PagingRelationMembers'
+  PagingItems:
+    title: PagingItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Paging'
+      total:
+        type: integer
+    required:
+    - total
+  PagingRelationCallers:
+    properties:
+      callers:
+        readOnly: true
+        $ref: '#/definitions/PagingRelationMemberUsers'
+  PagingRelationMembers:
+    properties:
+      members:
+        readOnly: true
+        $ref: '#/definitions/PagingRelationMemberUsers'
+  PagingRelationMemberUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'

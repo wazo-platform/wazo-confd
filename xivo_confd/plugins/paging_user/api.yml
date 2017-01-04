@@ -1,0 +1,55 @@
+paths:
+  /pagings/{paging_id}/callers/users:
+    put:
+      operationId: update_paging_caller_users
+      summary: Update paging and callers
+      description: |
+        **Required ACL:** `confd.pagings.{paging_id}.callers.users.update`
+
+        **WARNING**
+        This endpoint remove all callers which are not defined.
+      tags:
+      - pagings
+      - users
+      parameters:
+      - $ref: '#/parameters/pagingid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Group and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /pagings/{paging_id}/members/users:
+    put:
+      operationId: update_paging_member_users
+      summary: Update paging and members
+      description: |
+        **Required ACL:** `confd.pagings.{paging_id}.members.users.update`
+
+        **WARNING**
+        This endpoint remove all members which are not defined.
+      tags:
+      - pagings
+      - users
+      parameters:
+      - $ref: '#/parameters/pagingid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Group and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

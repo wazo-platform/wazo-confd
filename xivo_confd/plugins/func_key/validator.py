@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -148,7 +147,7 @@ def build_validator():
         'park_position': [ParkPositionValidator(feature_dao)],
         'parking': [],
         'onlinerec': [],
-        'paging': [ResourceExists('paging_id', paging_dao.exists, 'Paging')],
+        'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
         'bsfilter': [ResourceExists('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
     }
 

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ class PagingConverter(FuncKeyConverter):
 
     def build(self, user, line, position, funckey):
         prefix_exten = self.extension_dao.get_by(type='extenfeatures', typeval='paging')
-        extension = self.paging_dao.get_number(funckey.destination.paging_id)
+        extension = self.paging_dao.get(funckey.destination.paging_id).number
         value = '{}{}'.format(prefix_exten.clean_exten(), extension)
         return self.provd_funckey(line, position, funckey, value)
 

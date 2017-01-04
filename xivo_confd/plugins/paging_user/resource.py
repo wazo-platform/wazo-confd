@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,20 +22,34 @@ from xivo_confd.helpers.mallow import UsersUUIDSchema
 from xivo_confd.helpers.restful import ConfdResource
 
 
-class GroupMemberUserItem(ConfdResource):
+class PagingUserItem(ConfdResource):
 
     schema = UsersUUIDSchema
 
-    def __init__(self, service, group_dao, user_dao):
-        super(GroupMemberUserItem, self).__init__()
+    def __init__(self, service, paging_dao, user_dao):
+        super(PagingUserItem, self).__init__()
         self.service = service
-        self.group_dao = group_dao
+        self.paging_dao = paging_dao
         self.user_dao = user_dao
 
-    @required_acl('confd.groups.{group_id}.members.users.update')
-    def put(self, group_id):
+
+class PagingCallerUserItem(PagingUserItem):
+
+    @required_acl('confd.pagings.{paging_id}.callers.users.update')
+    def put(self, paging_id):
+        paging = self.paging_dao.get(paging_id)
         form = self.schema().load(request.get_json()).data
-        group = self.group_dao.get(group_id)
         users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
-        self.service.associate_all_users(group, users)
+        self.service.associate_all_caller_users(paging, users)
+        return '', 204
+
+
+class PagingMemberUserItem(PagingUserItem):
+
+    @required_acl('confd.pagings.{paging_id}.members.users.update')
+    def put(self, paging_id):
+        paging = self.paging_dao.get(paging_id)
+        form = self.schema().load(request.get_json()).data
+        users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+        self.service.associate_all_member_users(paging, users)
         return '', 204

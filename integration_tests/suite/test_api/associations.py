@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -214,3 +214,21 @@ def parking_lot_extension(parking_lot, extension, check=True):
     h.parking_lot_extension.associate(parking_lot['id'], extension['id'], check)
     yield
     h.parking_lot_extension.dissociate(parking_lot['id'], extension['id'], check)
+
+
+@contextmanager
+def paging_member_user(paging, *users, **kwargs):
+    user_uuids = [user['uuid'] for user in users]
+    check = kwargs.get('check', True)
+    h.paging_member_user.associate(paging['id'], user_uuids, check=check)
+    yield
+    h.paging_member_user.dissociate(paging['id'], check=check)
+
+
+@contextmanager
+def paging_caller_user(paging, *users, **kwargs):
+    user_uuids = [user['uuid'] for user in users]
+    check = kwargs.get('check', True)
+    h.paging_caller_user.associate(paging['id'], user_uuids, check=check)
+    yield
+    h.paging_caller_user.dissociate(paging['id'], check=check)

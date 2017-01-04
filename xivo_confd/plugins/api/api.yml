@@ -499,3 +499,13 @@ definitions:
     type: array
     items:
       type: string
+  UsersUuid:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/UserUuid'
+        type: array
+  UserUuid:
+    properties:
+      uuid:
+        type: string

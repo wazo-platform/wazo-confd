@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2012-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -70,6 +70,8 @@ setup(
             'outcall_extension_plugin = xivo_confd.plugins.outcall_extension.plugin:Plugin',
             'outcall_plugin = xivo_confd.plugins.outcall.plugin:Plugin',
             'outcall_trunk_plugin = xivo_confd.plugins.outcall_trunk.plugin:Plugin',
+            'paging_plugin = xivo_confd.plugins.paging.plugin:Plugin',
+            'paging_user_plugin = xivo_confd.plugins.paging_user.plugin:Plugin',
             'parking_lot_extension_plugin = xivo_confd.plugins.parking_lot_extension.plugin:Plugin',
             'parking_lot_plugin = xivo_confd.plugins.parking_lot.plugin:Plugin',
             'queue_member_plugin = xivo_confd.plugins.queue_member.plugin:Plugin',
