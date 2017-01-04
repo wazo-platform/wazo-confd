@@ -112,14 +112,14 @@ definitions:
         announce_caller:
           type: boolean
           description: Play the announce sound to the caller
-          default: True
+          default: true
         announce_sound:
           type: string
           description: The sound played to everyone
         caller_notification:
           type: boolean
           description: Play a notification to caller
-          default: false
+          default: true
         duplex:
           type: boolean
           description: Duplex audio
