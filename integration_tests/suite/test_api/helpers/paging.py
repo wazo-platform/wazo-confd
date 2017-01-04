@@ -28,7 +28,7 @@ def generate_paging(**parameters):
 
 
 def _generate_number():
-    response = confd.groups.get()
+    response = confd.pagings.get()
     numbers = set(d['number'] for d in response.items)
     return _random_number(numbers)
 
