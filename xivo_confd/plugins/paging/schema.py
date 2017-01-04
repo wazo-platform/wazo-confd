@@ -37,11 +37,11 @@ class PagingSchema(BaseSchema):
     users_caller = fields.Nested('UserSchema',
                                  only=['uuid', 'firstname', 'lastname', 'links'],
                                  many=True,
-                                 dummp_only=True)
+                                 dump_only=True)
     users_member = fields.Nested('UserSchema',
                                  only=['uuid', 'firstname', 'lastname', 'links'],
                                  many=True,
-                                 dummp_only=True)
+                                 dump_only=True)
 
     @post_dump
     def wrap_users(self, data):

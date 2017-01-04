@@ -60,7 +60,7 @@ class GroupSchema(BaseSchema):
     users_member = fields.Nested('UserSchema',
                                  only=['uuid', 'firstname', 'lastname', 'links'],
                                  many=True,
-                                 dummp_only=True)
+                                 dump_only=True)
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):
