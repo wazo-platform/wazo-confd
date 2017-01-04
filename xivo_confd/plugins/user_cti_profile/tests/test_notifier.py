@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@ from mock import patch, Mock
 
 from xivo_confd.plugins.user_cti_profile import notifier
 
-from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
-
 
 class TestUserCtiProfileNotifier(unittest.TestCase):
 
@@ -37,13 +35,13 @@ class TestUserCtiProfileNotifier(unittest.TestCase):
     @patch('xivo_confd.helpers.bus_manager.send_bus_event')
     def test_edited(self, send_bus_event, UserCtiProfileEditedEvent, exec_request_handler):
         new_event = UserCtiProfileEditedEvent.return_value = Mock()
-        user_cti_profile = UserCtiProfile(user_id=1, cti_profile_id=2, enabled=True)
+        user = Mock(id=1, cti_profile_id=2, cti_enabled=True)
         self.sysconfd_command['ctibus'] = ['xivo[user,edit,1]']
 
-        notifier.edited(user_cti_profile)
+        notifier.edited(user)
 
-        UserCtiProfileEditedEvent.assert_called_once_with(user_cti_profile.user_id,
-                                                          user_cti_profile.cti_profile_id,
-                                                          user_cti_profile.enabled)
+        UserCtiProfileEditedEvent.assert_called_once_with(user.id,
+                                                          user.cti_profile_id,
+                                                          user.cti_enabled)
         send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
         exec_request_handler.assert_called_once_with(self.sysconfd_command)

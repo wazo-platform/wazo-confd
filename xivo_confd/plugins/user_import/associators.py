@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import abc
 from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_dao.alchemy.dialaction import Dialaction
-from xivo_dao.resources.user_cti_profile.model import UserCtiProfile
 
 
 class Associator(object):
@@ -165,11 +164,9 @@ class CtiProfileAssociator(Associator):
         user = entry.get_resource('user')
         name = entry.extract_field('cti_profile', 'name')
         if name:
-            cti_profile_id = self.dao.get_id_by_name(name)
-            association = UserCtiProfile(user_id=user.id,
-                                         cti_profile_id=cti_profile_id,
-                                         enabled=entry.extract_field('cti_profile', 'enabled'))
-            self.service.edit(association)
+            form = {'cti_profile_id': self.dao.get_id_by_name(name),
+                    'cti_enabled': entry.extract_field('cti_profile', 'enabled')}
+            self.service.edit(user, form)
 
 
 class IncallAssociator(Associator):
