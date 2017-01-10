@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright (C) 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -306,7 +306,7 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_dump
-    def make_ivr_fields_flat(self, data):
+    def make_voicemail_fields_flat(self, data):
         if data.get('voicemail'):
             data['voicemail_name'] = data['voicemail']['name']
 
