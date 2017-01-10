@@ -59,12 +59,13 @@ Development
 
 ### xivo-dao
 
-In case you need to mount xivo_dao inside the xivo-confd container, add the
-following line in confd volumes in
-integration_tests/assets/base/docker-compose.yml
+In case you need to mount xivo_dao inside the xivo-confd container:
+
+* uncomment the confd volumes in ```integration_tests/assets/base/docker-compose.yml```
+* set the environment variable:
 
 ```
-- "/path/to/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
+export LOCAL_GIT_REPOS=/parent/directory/to/all/git/repos
 ```
 
 ### Modified database
