@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@ from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import UsersUUIDSchema
 from xivo_confd.helpers.restful import ConfdResource
 
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import NotFoundError
+
 
 class GroupMemberUserItem(ConfdResource):
 
@@ -36,6 +39,11 @@ class GroupMemberUserItem(ConfdResource):
     def put(self, group_id):
         form = self.schema().load(request.get_json()).data
         group = self.group_dao.get(group_id)
-        users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+        try:
+            users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+        except NotFoundError as e:
+            raise errors.param_not_found('users', 'User', **e.metadata)
+
         self.service.associate_all_users(group, users)
+
         return '', 204

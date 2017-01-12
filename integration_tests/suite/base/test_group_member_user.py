@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ from test_api import associations as a
 
 
 FAKE_ID = 999999999
+FAKE_UUID = '99999999-9999-9999-9999-999999999999'
 
 
 @fixtures.group()
@@ -57,6 +58,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
     yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
     yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
+    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
 
 
 @fixtures.group()
