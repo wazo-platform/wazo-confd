@@ -116,8 +116,5 @@ def test_delete_user_when_switchboard_and_user_associated(switchboard1, switchbo
 def test_bus_events(switchboard, user):
     url = confd.switchboards(switchboard['id']).members.users.put
     body = {'users': [{'uuid': user['uuid']}]}
-    routing_key = 'config.switchboards.{switchboard_id}.members.users.updated'.format(
-        switchboard_id=switchboard['id'],
-        user_id=user['id']
-    )
+    routing_key = 'config.switchboards.{switchboard_id}.members.users.updated'.format(switchboard_id=switchboard['id'])
     yield s.check_bus_event, routing_key, url, body
