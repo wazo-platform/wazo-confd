@@ -21,6 +21,9 @@ from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import UsersUUIDSchema
 from xivo_confd.helpers.restful import ConfdResource
 
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import NotFoundError
+
 
 class SwitchboardMemberUserItem(ConfdResource):
 
@@ -36,7 +39,10 @@ class SwitchboardMemberUserItem(ConfdResource):
     def put(self, switchboard_id):
         switchboard = self.switchboard_dao.get(switchboard_id)
         form = self.schema().load(request.get_json()).data
-        users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+        try:
+            users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+        except NotFoundError as e:
+            raise errors.param_not_found('users', 'User', **e.metadata)
 
         self.service.associate_all_member_users(switchboard, users)
 

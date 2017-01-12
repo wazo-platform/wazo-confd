@@ -38,9 +38,21 @@ def test_associate_errors(switchboard, user):
     response = confd.switchboards(FAKE_UUID).members.users.put(users=users)
     response.assert_status(404)
 
-    users = [{'uuid': FAKE_UUID}]
-    response = confd.switchboards(switchboard['id']).members.users.put(users=users)
-    response.assert_status(404)
+    url = confd.switchboards(switchboard['id']).members.users.put
+
+    yield s.check_missing_required_field_returns_error, url, 'users'
+    yield s.check_bogus_field_returns_error, url, 'users', 123
+    yield s.check_bogus_field_returns_error, url, 'users', None
+    yield s.check_bogus_field_returns_error, url, 'users', True
+    yield s.check_bogus_field_returns_error, url, 'users', 'string'
+    yield s.check_bogus_field_returns_error, url, 'users', [123]
+    yield s.check_bogus_field_returns_error, url, 'users', [None]
+    yield s.check_bogus_field_returns_error, url, 'users', ['string']
+    yield s.check_bogus_field_returns_error, url, 'users', [{}]
+    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
+    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
+    yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
+    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
 
 
 @fixtures.switchboard()
