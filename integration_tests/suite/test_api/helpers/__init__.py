@@ -64,6 +64,7 @@ import queue_member_agent
 import schedule
 import schedule_entity
 import switchboard
+import switchboard_member_user
 import trunk
 import trunk_endpoint_custom
 import trunk_endpoint_sip

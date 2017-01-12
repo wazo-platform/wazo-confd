@@ -232,3 +232,11 @@ def paging_caller_user(paging, *users, **kwargs):
     h.paging_caller_user.associate(paging['id'], user_uuids, check=check)
     yield
     h.paging_caller_user.dissociate(paging['id'], check=check)
+
+
+@contextmanager
+def switchboard_member_user(switchboard, users, check=True):
+    user_uuids = [user['uuid'] for user in users]
+    h.switchboard_member_user.associate(switchboard['id'], user_uuids, check=check)
+    yield
+    h.switchboard_member_user.dissociate(switchboard['id'], check=check)

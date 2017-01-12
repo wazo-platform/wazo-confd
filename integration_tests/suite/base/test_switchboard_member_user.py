@@ -1,0 +1,111 @@
+# -*- coding: utf-8 -*-
+
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from hamcrest import assert_that
+from hamcrest import contains_inanyorder
+from hamcrest import empty
+from hamcrest import has_entries
+
+from test_api import associations as a
+from test_api import confd
+from test_api import helpers as h
+from test_api import fixtures
+from test_api import scenarios as s
+
+
+FAKE_UUID = 'uuid-not-found'
+
+
+@fixtures.switchboard()
+@fixtures.user()
+def test_associate_errors(switchboard, user):
+    users = [{'uuid': user['uuid']}]
+    response = confd.switchboards(FAKE_UUID).members.users.put(users=users)
+    response.assert_status(404)
+
+    users = [{'uuid': FAKE_UUID}]
+    response = confd.switchboards(switchboard['id']).members.users.put(users=users)
+    response.assert_status(404)
+
+
+@fixtures.switchboard()
+@fixtures.user()
+def test_associate(switchboard, user):
+    users = [{'uuid': user['uuid']}]
+    response = confd.switchboards(switchboard['id']).members.users.put(users=users)
+    response.assert_updated()
+
+
+@fixtures.switchboard()
+@fixtures.user()
+def test_associate_same_user_twice(switchboard, user):
+    users = [{'uuid': user['uuid']}, {'uuid': user['uuid']}]
+    response = confd.switchboards(switchboard['id']).members.users.put(users=users)
+    response.assert_updated()
+
+
+@fixtures.switchboard()
+@fixtures.user()
+@fixtures.user()
+def test_get_users_associated_to_switchboard(switchboard, user1, user2):
+    with (a.switchboard_member_user(switchboard, [user1, user2])):
+        response = confd.switchboards(switchboard['id']).get()
+        assert_that(response.item, has_entries(
+            members=has_entries(users=contains_inanyorder(has_entries(uuid=user2['uuid'],
+                                                                      firstname=user2['firstname'],
+                                                                      lastname=user2['lastname']),
+                                                          has_entries(uuid=user1['uuid'],
+                                                                      firstname=user1['firstname'],
+                                                                      lastname=user1['lastname'])))
+        ))
+
+
+@fixtures.switchboard()
+@fixtures.user()
+@fixtures.user()
+def test_delete_switchboard_when_switchboard_and_user_associated(switchboard, user1, user2):
+    h.switchboard_member_user.associate(switchboard['id'], [user1['uuid'], user2['uuid']])
+
+    confd.switchboards(switchboard['id']).delete().assert_deleted()
+
+
+@fixtures.switchboard()
+@fixtures.switchboard()
+@fixtures.user()
+def test_delete_user_when_switchboard_and_user_associated(switchboard1, switchboard2, user):
+    with a.switchboard_member_user(switchboard2, [user]), \
+         a.switchboard_member_user(switchboard1, [user]):
+        confd.users(user['uuid']).delete().assert_deleted()
+
+        response = confd.switchboards(switchboard1['id']).get()
+        yield assert_that, response.item['members']['users'], empty()
+
+        response = confd.switchboards(switchboard2['id']).get()
+        yield assert_that, response.item['members']['users'], empty()
+
+
+@fixtures.switchboard()
+@fixtures.user()
+def test_bus_events(switchboard, user):
+    url = confd.switchboards(switchboard['id']).members.users.put
+    body = {'users': [{'uuid': user['uuid']}]}
+    routing_key = 'config.switchboards.{switchboard_id}.members.users.updated'.format(
+        switchboard_id=switchboard['id'],
+        user_id=user['id']
+    )
+    yield s.check_bus_event, routing_key, url, body

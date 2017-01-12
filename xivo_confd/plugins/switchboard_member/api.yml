@@ -1,0 +1,28 @@
+paths:
+  /switchboards/{switchboard_id}/members/users:
+    put:
+      operationId: update_switchboard_member_users
+      summary: Update switchboard and members
+      description: |
+        **Required ACL:** `confd.switchboards.{switchboard_id}.members.users.update`
+
+        **WARNING**
+        This endpoint removes all members which are not defined.
+      tags:
+        - switchboards
+        - users
+      parameters:
+        - $ref: '#/parameters/switchboard_id'
+        - name: body
+          in: body
+          description: Users to associate with the switchboard
+          required: true
+          schema:
+            $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Switchboard and users have been associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

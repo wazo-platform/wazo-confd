@@ -127,6 +127,7 @@ DEFAULT_CONFIG = {
         'queue_member_plugin',
         'sip_general_plugin',
         'switchboard_plugin',
+        'switchboard_member_plugin',
         'trunk_endpoint_plugin',
         'trunk_plugin',
         'user_agent_plugin',

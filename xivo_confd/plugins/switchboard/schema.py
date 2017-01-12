@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 
 from marshmallow import fields
+from marshmallow import post_dump
 from marshmallow.validate import Length, Range
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -39,3 +40,13 @@ class SwitchboardSchema(BaseSchema):
                                   'links'],
                             many=True,
                             dump_only=True)
+
+    user_members = fields.Nested('UserSchema',
+                                 only=['uuid', 'firstname', 'lastname', 'links'],
+                                 many=True,
+                                 dump_only=True)
+
+    @post_dump
+    def wrap_users(self, data):
+        data['members'] = {'users': data.pop('user_members', [])}
+        return data
