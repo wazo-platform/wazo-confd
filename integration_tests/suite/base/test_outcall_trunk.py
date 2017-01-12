@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': 'string'}]
     yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': 1}, {'id': None}]
     yield s.check_bogus_field_returns_error, url, 'trunks', [{'not_id': 123}]
+    yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': FAKE_ID}]
 
 
 @fixtures.outcall()

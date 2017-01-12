@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,9 @@ from marshmallow import fields
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema
 from xivo_confd.helpers.restful import ConfdResource
+
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import NotFoundError
 
 
 class TrunkSchemaIDLoad(BaseSchema):
@@ -46,6 +49,11 @@ class OutcallTrunkList(ConfdResource):
     def put(self, outcall_id):
         form = self.schema().load(request.get_json()).data
         outcall = self.outcall_dao.get(outcall_id)
-        trunks = [self.trunk_dao.get(ot['id']) for ot in form['trunks']]
+        try:
+            trunks = [self.trunk_dao.get(ot['id']) for ot in form['trunks']]
+        except NotFoundError as e:
+            raise errors.param_not_found('trunks', 'Trunk', **e.metadata)
+
         self.service.associate_all_trunks(outcall, trunks)
+
         return '', 204
