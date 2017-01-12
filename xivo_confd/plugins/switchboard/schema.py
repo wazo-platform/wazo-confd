@@ -24,12 +24,12 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 
 class SwitchboardSchema(BaseSchema):
-    id = fields.UUID(dump_only=True)
+    uuid = fields.UUID(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     queue_music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
     waiting_room_music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
-    links = ListLink(Link('switchboards'))
+    links = ListLink(Link('switchboards', field='uuid'))
     extensions = fields.Nested('ExtensionSchema',
                                only=['id', 'exten', 'context', 'links'],
                                many=True,

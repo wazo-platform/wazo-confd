@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class SwitchboardList(ListResource):
     schema = SwitchboardSchema
 
     def build_headers(self, switchboard):
-        return {'Location': url_for('switchboards', id=switchboard.id, _external=True)}
+        return {'Location': url_for('switchboards', uuid=switchboard.uuid, _external=True)}
 
     @required_acl('confd.switchboards.create')
     def post(self):
@@ -45,14 +45,14 @@ class SwitchboardItem(ItemResource):
 
     schema = SwitchboardSchema
 
-    @required_acl('confd.switchboards.{id}.read')
-    def get(self, id):
-        return super(SwitchboardItem, self).get(id)
+    @required_acl('confd.switchboards.{uuid}.read')
+    def get(self, uuid):
+        return super(SwitchboardItem, self).get(uuid)
 
-    @required_acl('confd.switchboards.{id}.update')
-    def put(self, id):
-        return super(SwitchboardItem, self).put(id)
+    @required_acl('confd.switchboards.{uuid}.update')
+    def put(self, uuid):
+        return super(SwitchboardItem, self).put(uuid)
 
-    @required_acl('confd.switchboards.{id}.delete')
-    def delete(self, id):
-        return super(SwitchboardItem, self).delete(id)
+    @required_acl('confd.switchboards.{uuid}.delete')
+    def delete(self, uuid):
+        return super(SwitchboardItem, self).delete(uuid)

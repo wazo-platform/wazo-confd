@@ -1,10 +1,10 @@
 paths:
-  /switchboards/{switchboard_id}/members/users:
+  /switchboards/{switchboard_uuid}/members/users:
     put:
       operationId: update_switchboard_member_users
       summary: Update switchboard and members
       description: |
-        **Required ACL:** `confd.switchboards.{switchboard_id}.members.users.update`
+        **Required ACL:** `confd.switchboards.{switchboard_uuid}.members.users.update`
 
         **WARNING**
         This endpoint removes all members which are not defined.
@@ -12,7 +12,7 @@ paths:
         - switchboards
         - users
       parameters:
-        - $ref: '#/parameters/switchboard_id'
+        - $ref: '#/parameters/switchboard_uuid'
         - name: body
           in: body
           description: Users to associate with the switchboard

@@ -14,6 +14,10 @@ class IsolatedAction(object):
     the resource will be passed as the context resource, and deleted
     once the context scope exits.
 
+    Usage: inherit this class and override the following fields:
+      - id_field (default is 'id')
+      - actions
+
     Code example:
 
         def create_user(**parameters):
@@ -38,6 +42,7 @@ class IsolatedAction(object):
     """
 
     actions = {}
+    id_field = 'id'
 
     def __init__(self, *args, **kwargs):
         self.args = args
@@ -86,4 +91,4 @@ class IsolatedAction(object):
         # reused by the decorator for deleting resources
         callback = self.actions.get('delete')
         if callback:
-            callback(self.resource['id'], check=False)
+            callback(self.resource[self.id_field], check=False)

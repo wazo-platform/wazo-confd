@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class Plugin(object):
                          )
 
         api.add_resource(SwitchboardItem,
-                         '/switchboards/<id>',
+                         '/switchboards/<uuid>',
                          endpoint='switchboards',
                          resource_class_args=(service,)
                          )

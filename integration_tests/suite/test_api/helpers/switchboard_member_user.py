@@ -19,14 +19,14 @@
 from test_api import confd
 
 
-def associate(switchboard_id, user_uuids, check=True):
+def associate(switchboard_uuid, user_uuids, check=True):
     users = [{'uuid': user_uuid} for user_uuid in user_uuids]
-    response = confd.switchboards(switchboard_id).members.users.put(users=users)
+    response = confd.switchboards(switchboard_uuid).members.users.put(users=users)
     if check:
         response.assert_ok()
 
 
-def dissociate(switchboard_id, check=True):
-    response = confd.switchboards(switchboard_id).members.users.put(users=[])
+def dissociate(switchboard_uuid, check=True):
+    response = confd.switchboards(switchboard_uuid).members.users.put(users=[])
     if check:
         response.assert_ok()

@@ -34,14 +34,14 @@ paths:
             $ref: '#/definitions/Switchboard'
         '400':
           $ref: '#/definitions/CreateError'
-  /switchboards/{switchboard_id}:
+  /switchboards/{switchboard_uuid}:
     get:
       summary: Get a switchboard
-      description: '**Required ACL:** `confd.switchboards.{switchboard_id}.read`'
+      description: '**Required ACL:** `confd.switchboards.{switchboard_uuid}.read`'
       tags:
         - switchboards
       parameters:
-        - $ref: '#/parameters/switchboard_id'
+        - $ref: '#/parameters/switchboard_uuid'
       responses:
         '200':
           description: Switchboard
@@ -51,11 +51,11 @@ paths:
           $ref: '#/responses/NotFoundError'
     put:
       summary: Update a switchboard
-      description: '**Required ACL:** `confd.switchboards.{switchboard_id}.update`'
+      description: '**Required ACL:** `confd.switchboards.{switchboard_uuid}.update`'
       tags:
         - switchboards
       parameters:
-        - $ref: '#/parameters/switchboard_id'
+        - $ref: '#/parameters/switchboard_uuid'
         - name: body
           in: body
           required: true
@@ -70,11 +70,11 @@ paths:
           $ref: '#/responses/NotFoundError'
     delete:
       summary: Delete a switchboard
-      description: '**Required ACL:** `confd.switchboard.{switchboard_id}.delete`'
+      description: '**Required ACL:** `confd.switchboard.{switchboard_uuid}.delete`'
       tags:
         - switchboards
       parameters:
-        - $ref: '#/parameters/switchboard_id'
+        - $ref: '#/parameters/switchboard_uuid'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
@@ -84,11 +84,13 @@ definitions:
   Switchboard:
     type: object
     properties:
+      uuid:
+        type: string
       name:
         type: string
 parameters:
-  switchboard_id:
-    name: switchboard_id
+  switchboard_uuid:
+    name: switchboard_uuid
     in: path
     required: True
     type: string

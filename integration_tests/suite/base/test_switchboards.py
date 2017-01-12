@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,16 +29,16 @@ from hamcrest import (assert_that,
                       is_not,
                       not_)
 
-NOT_FOUND_SWITCHBOARD_ID = 'uuid-not-found'
+NOT_FOUND_SWITCHBOARD_UUID = 'uuid-not-found'
 
 
 def test_get_errors():
-    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_ID).get
+    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).get
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
 
 def test_delete_errors():
-    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_ID).delete
+    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).delete
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
 
@@ -50,7 +50,7 @@ def test_post_errors():
 
 @fixtures.group()
 def test_put_errors(group):
-    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_ID).put
+    fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
     url = confd.groups(group['id']).put
@@ -87,8 +87,8 @@ def check_search(url, switchboard, hidden, field, term):
 
     response = url.get(**{field: switchboard[field]})
 
-    expected = has_item(has_entry('id', switchboard['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
+    expected = has_item(has_entry('uuid', switchboard['uuid']))
+    not_expected = has_item(has_entry('uuid', hidden['uuid']))
     assert_that(response.items, expected)
     assert_that(response.items, is_not(not_expected))
 
@@ -101,18 +101,18 @@ def test_sorting(switchboard1, switchboard2):
 
 def check_sorting(switchboard1, switchboard2, field, search):
     response = confd.switchboards.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=switchboard1['id']),
-                                         has_entries(id=switchboard2['id'])))
+    assert_that(response.items, contains(has_entries(uuid=switchboard1['uuid']),
+                                         has_entries(uuid=switchboard2['uuid'])))
 
     response = confd.switchboards.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=switchboard2['id']),
-                                         has_entries(id=switchboard1['id'])))
+    assert_that(response.items, contains(has_entries(uuid=switchboard2['uuid']),
+                                         has_entries(uuid=switchboard1['uuid'])))
 
 
 @fixtures.switchboard()
 def test_get(switchboard):
-    response = confd.switchboards(switchboard['id']).get()
-    assert_that(response.item, has_entries(id=switchboard['id'],
+    response = confd.switchboards(switchboard['uuid']).get()
+    assert_that(response.item, has_entries(uuid=switchboard['uuid'],
                                            name=switchboard['name']))
 
 
@@ -120,32 +120,32 @@ def test_create_minimal_parameters():
     response = confd.switchboards.post(name='MySwitchboard')
     response.assert_created('switchboards')
 
-    assert_that(response.item, has_entries(id=not_(empty()),
+    assert_that(response.item, has_entries(uuid=not_(empty()),
                                            name='MySwitchboard'))
 
-    confd.switchboards(response.item['id']).delete().assert_deleted()
+    confd.switchboards(response.item['uuid']).delete().assert_deleted()
 
 
 @fixtures.switchboard(name='before_edit')
 def test_edit_minimal_parameters(switchboard):
-    response = confd.switchboards(switchboard['id']).put(name='after_edit')
+    response = confd.switchboards(switchboard['uuid']).put(name='after_edit')
     response.assert_updated()
 
     expected = {'name': 'after_edit'}
-    response = confd.switchboards(switchboard['id']).get()
+    response = confd.switchboards(switchboard['uuid']).get()
     assert_that(response.item, has_entries(expected))
 
 
 @fixtures.switchboard()
 def test_delete(switchboard):
-    response = confd.switchboards(switchboard['id']).delete()
+    response = confd.switchboards(switchboard['uuid']).delete()
     response.assert_deleted()
-    response = confd.switchboards(switchboard['id']).get()
+    response = confd.switchboards(switchboard['uuid']).get()
     response.assert_match(404, e.not_found(resource='Switchboard'))
 
 
 @fixtures.switchboard()
 def test_bus_events(switchboard):
     yield s.check_bus_event, 'config.switchboards.*.created', confd.switchboards.post, {'name': 'bus_event'}
-    yield s.check_bus_event, 'config.switchboards.{id}.edited'.format(id=switchboard['id']), confd.switchboards(switchboard['id']).put
-    yield s.check_bus_event, 'config.switchboards.{id}.deleted'.format(id=switchboard['id']), confd.switchboards(switchboard['id']).delete
+    yield s.check_bus_event, 'config.switchboards.{uuid}.edited'.format(uuid=switchboard['uuid']), confd.switchboards(switchboard['uuid']).put
+    yield s.check_bus_event, 'config.switchboards.{uuid}.deleted'.format(uuid=switchboard['uuid']), confd.switchboards(switchboard['uuid']).delete

@@ -31,9 +31,9 @@ class SwitchboardMemberUserNotifier(object):
 
     def members_associated(self, switchboard, users):
         name = 'switchboard_member_user_associated'
-        routing_key = 'config.switchboards.{switchboard.id}.members.users.updated'
-        acl = 'switchboards.{switchboard.id}.members.users.updated'
-        body = {'switchboard_id': switchboard.id,
+        routing_key = 'config.switchboards.{switchboard.uuid}.members.users.updated'
+        acl = 'switchboards.{switchboard.uuid}.members.users.updated'
+        body = {'switchboard_uuid': switchboard.uuid,
                 'users': [{'uuid': user.uuid} for user in users]}
         event = ArbitraryEvent(name, body, acl)
 

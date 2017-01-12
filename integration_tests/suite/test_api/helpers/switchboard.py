@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ def add_switchboard(**parameters):
     return response.item
 
 
-def delete_switchboard(switchboard_id, check=False):
-    response = confd.switchboards(switchboard_id).delete()
+def delete_switchboard(switchboard_uuid, check=False):
+    response = confd.switchboards(switchboard_uuid).delete()
     if check:
         response.assert_ok()
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -202,9 +202,9 @@ def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, vo
          'skip': True, 'no_answer': True},
         {'type': 'sound', 'filename': 'filename_without_extension',
          'skip': False, 'no_answer': False},
-        {'type': 'switchboard', 'switchboard_id': switchboard['id']},
-        {'type': 'switchboard', 'switchboard_id': switchboard['id'], 'ring_time': 1.5},
-        {'type': 'switchboard', 'switchboard_id': switchboard['id'], 'ring_time': None},
+        {'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']},
+        {'type': 'switchboard', 'switchboard_uuid': switchboard['uuid'], 'ring_time': 1.5},
+        {'type': 'switchboard', 'switchboard_uuid': switchboard['uuid'], 'ring_time': None},
         {'type': 'user', 'user_id': user['id']},
         {'type': 'user', 'user_id': user['id'], 'ring_time': 2},
         {'type': 'user', 'user_id': user['id'], 'ring_time': None},

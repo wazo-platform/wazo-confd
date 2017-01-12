@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -262,11 +262,11 @@ def test_get_conference_destination_relation(conference):
 @fixtures.switchboard()
 def test_get_switchboard_destination_relation(switchboard):
     incall = confd.incalls.post(destination={'type': 'switchboard',
-                                             'switchboard_id': switchboard['id']}).item
+                                             'switchboard_uuid': switchboard['uuid']}).item
 
     response = confd.incalls(incall['id']).get()
     assert_that(response.item, has_entries(
-        destination=has_entries(switchboard_id=switchboard['id'],
+        destination=has_entries(switchboard_uuid=switchboard['uuid'],
                                 switchboard_name=switchboard['name'])
     ))
 
@@ -350,11 +350,11 @@ def test_get_incalls_relation_when_conference_destination(conference):
 @fixtures.switchboard()
 def test_get_incalls_relation_when_switchboard_destination(switchboard):
     incall1 = confd.incalls.post(destination={'type': 'switchboard',
-                                              'switchboard_id': switchboard['id']}).item
+                                              'switchboard_uuid': switchboard['uuid']}).item
     incall2 = confd.incalls.post(destination={'type': 'switchboard',
-                                              'switchboard_id': switchboard['id']}).item
+                                              'switchboard_uuid': switchboard['uuid']}).item
 
-    response = confd.switchboards(switchboard['id']).get()
+    response = confd.switchboards(switchboard['uuid']).get()
     assert_that(response.item, has_entries(
         incalls=contains_inanyorder(has_entries(id=incall1['id'],
                                                 extensions=incall1['extensions']),

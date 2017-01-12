@@ -35,9 +35,9 @@ class SwitchboardMemberUserItem(ConfdResource):
         self.switchboard_dao = switchboard_dao
         self.user_dao = user_dao
 
-    @required_acl('confd.switchboards.{switchboard_id}.members.users.update')
-    def put(self, switchboard_id):
-        switchboard = self.switchboard_dao.get(switchboard_id)
+    @required_acl('confd.switchboards.{switchboard_uuid}.members.users.update')
+    def put(self, switchboard_uuid):
+        switchboard = self.switchboard_dao.get(switchboard_uuid)
         form = self.schema().load(request.get_json()).data
         try:
             users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]

@@ -264,7 +264,7 @@ class SoundDestinationSchema(BaseDestinationSchema):
 
 
 class SwitchboardDestinationSchema(BaseDestinationSchema):
-    switchboard_id = fields.UUID(attribute='actionarg1', required=True)
+    switchboard_uuid = fields.UUID(attribute='actionarg1', required=True)
     ring_time = fields.Float(attribute='actionarg2', allow_none=True)
 
     switchboard = fields.Nested('SwitchboardSchema',

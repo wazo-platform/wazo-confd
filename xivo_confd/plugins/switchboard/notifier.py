@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,22 +29,22 @@ class SwitchboardNotifier(object):
     def created(self, switchboard):
         event = ArbitraryEvent(name='switchboard_created',
                                body=SwitchboardSchema().dump(switchboard).data,
-                               required_acl='switchboards.{id}.created'.format(id=switchboard.id))
-        routing_key = 'config.switchboards.{id}.created'.format(id=switchboard.id)
+                               required_acl='switchboards.{uuid}.created'.format(uuid=switchboard.uuid))
+        routing_key = 'config.switchboards.{uuid}.created'.format(uuid=switchboard.uuid)
         self.bus.send_bus_event(event, routing_key)
 
     def edited(self, switchboard):
         event = ArbitraryEvent(name='switchboard_edited',
                                body=SwitchboardSchema().dump(switchboard).data,
-                               required_acl='switchboards.{id}.edited'.format(id=switchboard.id))
-        routing_key = 'config.switchboards.{id}.edited'.format(id=switchboard.id)
+                               required_acl='switchboards.{uuid}.edited'.format(uuid=switchboard.uuid))
+        routing_key = 'config.switchboards.{uuid}.edited'.format(uuid=switchboard.uuid)
         self.bus.send_bus_event(event, routing_key)
 
     def deleted(self, switchboard):
         event = ArbitraryEvent(name='switchboard_deleted',
                                body=SwitchboardSchema().dump(switchboard).data,
-                               required_acl='switchboards.{id}.deleted'.format(id=switchboard.id))
-        routing_key = 'config.switchboards.{id}.deleted'.format(id=switchboard.id)
+                               required_acl='switchboards.{uuid}.deleted'.format(uuid=switchboard.uuid))
+        routing_key = 'config.switchboards.{uuid}.deleted'.format(uuid=switchboard.uuid)
         self.bus.send_bus_event(event, routing_key)
 
 
