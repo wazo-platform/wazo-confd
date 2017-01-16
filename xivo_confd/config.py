@@ -125,6 +125,7 @@ DEFAULT_CONFIG = {
         'outcall_plugin',
         'outcall_trunk_plugin',
         'queue_member_plugin',
+        'schedule_plugin',
         'sip_general_plugin',
         'switchboard_plugin',
         'switchboard_member_plugin',
