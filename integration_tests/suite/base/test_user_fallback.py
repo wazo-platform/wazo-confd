@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -112,11 +112,12 @@ def test_edit_to_none(user):
 @fixtures.group()
 @fixtures.outcall()
 @fixtures.queue()
+@fixtures.switchboard()
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(user, meetme, ivr, group, outcall, queue, dest_user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, dest_user, voicemail, conference):
+def test_valid_destinations(user, meetme, ivr, group, outcall, queue, switchboard, dest_user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, dest_user, voicemail, conference):
         yield _update_user_fallbacks_with_destination, user['uuid'], destination
 
 
