@@ -16,6 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from hamcrest import (assert_that,
+                      contains,
+                      has_entries)
 from test_api import scenarios as s
 from test_api import confd
 from test_api import errors as e
@@ -87,6 +90,27 @@ def test_dissociate(incall, schedule):
     with a.incall_schedule(incall, schedule, check=False):
         response = confd.incalls(incall['id']).schedules(schedule['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.incall()
+@fixtures.schedule()
+def test_get_incall_relation(incall, schedule):
+    with a.incall_schedule(incall, schedule):
+        response = confd.incalls(incall['id']).get()
+        assert_that(response.item, has_entries(
+            schedules=contains(has_entries(id=schedule['id'],
+                                           name=schedule['name']))
+        ))
+
+
+@fixtures.schedule()
+@fixtures.incall()
+def test_get_schedule_relation(schedule, incall):
+    with a.incall_schedule(incall, schedule):
+        response = confd.schedules(schedule['id']).get()
+        assert_that(response.item, has_entries(
+            incalls=contains(has_entries(id=incall['id']))
+        ))
 
 
 @fixtures.incall()

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +31,12 @@ class IncallSchema(BaseSchema):
     description = fields.String(allow_none=True)
     destination = DestinationField(required=True)
     links = ListLink(Link('incalls'))
+
     extensions = fields.Nested('ExtensionSchema',
                                only=['id', 'exten', 'context', 'links'],
                                many=True,
                                dump_only=True)
+    schedules = fields.Nested('ScheduleSchema',
+                              only=['id', 'name', 'links'],
+                              many=True,
+                              dump_only=True)

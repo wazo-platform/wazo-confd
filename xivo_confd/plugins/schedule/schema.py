@@ -102,6 +102,11 @@ class ScheduleSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('schedules'))
 
+    incalls = fields.Nested('IncallSchema',
+                            only=['id', 'links'],
+                            many=True,
+                            dump_only=True)
+
     @post_load
     def unwrap_cosed_destination(self, data):
         if 'closed_destination' in data:
