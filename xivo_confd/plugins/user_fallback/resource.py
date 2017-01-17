@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class UserFallbackList(ConfdResource):
 
     @required_acl('confd.users.{user_id}.fallbacks.update')
     def put(self, user_id):
-        fallbacks = self.schema().load(request.get_json()).data
         user = self.user_dao.get_by_id_uuid(user_id)
+        fallbacks = self.schema().load(request.get_json()).data
         self.service.edit(user, fallbacks)
         return '', 204

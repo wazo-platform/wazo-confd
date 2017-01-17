@@ -37,8 +37,8 @@ class GroupMemberUserItem(ConfdResource):
 
     @required_acl('confd.groups.{group_id}.members.users.update')
     def put(self, group_id):
-        form = self.schema().load(request.get_json()).data
         group = self.group_dao.get(group_id)
+        form = self.schema().load(request.get_json()).data
         try:
             users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
         except NotFoundError as e:

@@ -47,8 +47,8 @@ class OutcallTrunkList(ConfdResource):
 
     @required_acl('confd.outcalls.{outcall_id}.trunks.update')
     def put(self, outcall_id):
-        form = self.schema().load(request.get_json()).data
         outcall = self.outcall_dao.get(outcall_id)
+        form = self.schema().load(request.get_json()).data
         try:
             trunks = [self.trunk_dao.get(ot['id']) for ot in form['trunks']]
         except NotFoundError as e:
