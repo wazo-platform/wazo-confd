@@ -1,0 +1,36 @@
+paths:
+  /incalls/{incall_id}/schedules/{schedule_id}:
+    put:
+      operationId: associate_incall_schedule
+      summary: Associate incall and schedule
+      description: '**Required ACL:** `confd.incalls.{incall_id}.schedules.{schedule_id}.update`'
+      tags:
+      - incalls
+      - schedules
+      parameters:
+      - $ref: '#/parameters/incallid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Incall and Schedule associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_incall_schedule
+      summary: Dissociate incall and schedule
+      description: '**Required ACL:** `confd.incalls.{incall_id}.schedules.{schedule_id}.delete`'
+      tags:
+      - incalls
+      - schedules
+      parameters:
+      - $ref: '#/parameters/incallid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Incall and Schedule dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

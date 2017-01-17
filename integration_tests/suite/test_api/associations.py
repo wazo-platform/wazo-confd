@@ -240,3 +240,10 @@ def switchboard_member_user(switchboard, users, check=True):
     h.switchboard_member_user.associate(switchboard['uuid'], user_uuids, check=check)
     yield
     h.switchboard_member_user.dissociate(switchboard['uuid'], check=check)
+
+
+@contextmanager
+def incall_schedule(incall, schedule, check=True):
+    h.incall_schedule.associate(incall['id'], schedule['id'], check)
+    yield
+    h.incall_schedule.dissociate(incall['id'], schedule['id'], check)

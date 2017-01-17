@@ -40,6 +40,7 @@ import group_extension
 import group_member_user
 import incall
 import incall_extension
+import incall_schedule
 import incall_user
 import ivr
 import line

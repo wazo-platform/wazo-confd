@@ -110,6 +110,7 @@ DEFAULT_CONFIG = {
         'group_member_user_plugin',
         'incall_extension_plugin',
         'incall_plugin',
+        'incall_schedule_plugin',
         'info_plugin',
         'ivr_plugin',
         'line_device_plugin',

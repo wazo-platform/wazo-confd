@@ -60,6 +60,7 @@ setup(
             'group_member_user_plugin = xivo_confd.plugins.group_member.plugin:Plugin',
             'incall_extension_plugin = xivo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_plugin = xivo_confd.plugins.incall.plugin:Plugin',
+            'incall_schedule_plugin = xivo_confd.plugins.incall_schedule.plugin:Plugin',
             'info_plugin = xivo_confd.plugins.info.plugin:Plugin',
             'ivr_plugin = xivo_confd.plugins.ivr.plugin:Plugin',
             'line_device_plugin = xivo_confd.plugins.line_device.plugin:Plugin',
