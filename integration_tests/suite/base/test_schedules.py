@@ -307,11 +307,12 @@ def test_edit_all_parameters(schedule):
 @fixtures.group()
 @fixtures.outcall()
 @fixtures.queue()
+@fixtures.switchboard()
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(schedule, meetme, ivr, group, outcall, queue, user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, user, voicemail, conference):
+def test_valid_destinations(schedule, meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
         yield create_schedule_with_destination, destination
         yield update_schedule_with_destination, schedule['id'], destination
 
