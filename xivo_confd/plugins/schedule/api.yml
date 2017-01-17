@@ -1,0 +1,167 @@
+paths:
+  /schedules:
+    get:
+      operationId: list_schedules
+      summary: List schedule
+      description: '**Required ACL:** `confd.schedules.read`'
+      tags:
+      - schedules
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Schedules list
+          schema:
+            $ref: '#/definitions/ScheduleItems'
+    post:
+      operationId: create_schedule
+      summary: Create schedule
+      description: '**Required ACL:** `confd.schedules.create`'
+      tags:
+      - schedules
+      parameters:
+      - name: body
+        in: body
+        description: Schedule to create
+        required: true
+        schema:
+          $ref: '#/definitions/Schedule'
+      responses:
+        '201':
+          description: Schedule created
+          schema:
+            $ref: '#/definitions/Schedule'
+        '400':
+          $ref: '#/responses/CreateError'
+  /schedules/{schedule_id}:
+    get:
+      operationId: get_schedule
+      summary: Get schedule
+      description: '**Required ACL:** `confd.schedules.{schedule_id}.read`'
+      tags:
+      - schedules
+      parameters:
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '200':
+          description: Schedule
+          schema:
+            $ref: '#/definitions/Schedule'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_schedule
+      summary: Update schedule
+      description: '**Required ACL:** `confd.schedules.{schedule_id}.update`'
+      tags:
+      - schedules
+      parameters:
+      - $ref: '#/parameters/scheduleid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Schedule'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_schedule
+      summary: Delete schedule
+      description: '**Required ACL:** `confd.schedules.{schedule_id}.delete`'
+      tags:
+      - schedules
+      parameters:
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  scheduleid:
+    required: true
+    type: integer
+    name: schedule_id
+    in: path
+    description: Schedule's ID
+definitions:
+  Schedule:
+    title: Schedule
+    properties:
+      id:
+        type: integer
+        readOnly: true
+      name:
+        type: string
+        description: The name to identify the schedule
+      timezone:
+        type: string
+        description: The number of the schedule
+      closed_destination:
+          description: The destination to redirect the caller to when the schedule is not opened
+          $ref: '#/definitions/DestinationType'
+      open_periods:
+        type: array
+        items:
+          $ref: '#/definitions/ScheduleOpenPeriod'
+      exceptional_periods:
+        type: array
+        items:
+          $ref: '#/definitions/ScheduleExceptionalPeriod'
+      enabled:
+        type: boolean
+        default: true
+    required:
+    - closed_destination
+  ScheduleItems:
+    title: ScheduleItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Schedule'
+      total:
+        type: integer
+    required:
+    - total
+  ScheduleOpenPeriod:
+    properties:
+      hours_start:
+        type: string
+        description: The start hour of the period. Format <HH:MM>
+      hours_end:
+        type: string
+        description: The end hour of the period. Format <HH:MM>
+      week_days:
+        description: The week days of the period. Week day start with Monday(1) and end with Sunday(7)
+        type: array
+        items:
+          type: integer
+      month_days:
+        description: The month days of the period.
+        type: array
+        items:
+          type: integer
+      months:
+        description: The months of the period. Month start with January(1) and end with December(12)
+        type: array
+        items:
+          type: integer
+  ScheduleExceptionalPeriod:
+    allOf:
+    - $ref: '#/definitions/ScheduleOpenPeriod'
+    - properties:
+        destination:
+          description: The destination to redirect the caller to when the given period is satisfied
+          $ref: '#/definitions/DestinationType'

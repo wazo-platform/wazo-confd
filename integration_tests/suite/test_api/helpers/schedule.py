@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,15 +16,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import db
+from test_api import confd
 
 
 def generate_schedule(**parameters):
-    with db.queries() as queries:
-        id = queries.insert_schedule(**parameters)
-    return {'id': id}
+    parameters.setdefault('closed_destination', {'type': 'none'})
+    return add_schedule(**parameters)
 
 
-def delete_schedule(schedule, check=False):
-    with db.queries() as queries:
-        queries.delete_schedule(schedule)
+def add_schedule(**parameters):
+    response = confd.schedules.post(parameters)
+    return response.item
+
+
+def delete_schedule(schedule_id, check=False):
+    response = confd.schedules(schedule_id).delete()
+    if check:
+        response.assert_ok()

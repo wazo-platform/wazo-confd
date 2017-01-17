@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -474,21 +473,6 @@ class DatabaseQueries(object):
     def associate_call_filter_entity(self, call_filter_id, entity_id):
         query = text("UPDATE callfilter SET entity_id = :entity_id WHERE id = :call_filter_id")
         self.connection.execute(query, entity_id=entity_id, call_filter_id=call_filter_id)
-
-    def insert_schedule(self):
-        query = text("""
-        INSERT INTO schedule DEFAULT VALUES RETURNING id
-        """)
-
-        schedule_id = (self.connection
-                       .execute(query)
-                       .scalar())
-
-        return schedule_id
-
-    def delete_schedule(self, schedule_id):
-        query = text("DELETE FROM schedule WHERE id = :id")
-        self.connection.execute(query, id=schedule_id)
 
     def associate_schedule_entity(self, schedule_id, entity_id):
         query = text("UPDATE schedule SET entity_id = :entity_id WHERE id = :schedule_id")
