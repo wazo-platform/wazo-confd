@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import os
 
 from datetime import datetime
 
-from docker import Client as DockerClient
+from docker import APIClient as DockerClient
 from hamcrest import assert_that, equal_to, has_item, starts_with
 from xivo_provd_client import new_provisioning_client, NotFoundError
 

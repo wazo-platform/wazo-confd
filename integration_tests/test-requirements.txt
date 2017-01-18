@@ -1,7 +1,7 @@
 git+https://github.com/wazo-pbx/xivo-test-helpers.git
 git+https://github.com/wazo-pbx/xivo-provd-client.git
 docker-compose
-docker-py
+docker
 nose
 pyhamcrest
 psycopg2  # sqlalchemy engine
