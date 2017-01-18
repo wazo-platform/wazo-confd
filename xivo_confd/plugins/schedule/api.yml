@@ -98,6 +98,30 @@ parameters:
 definitions:
   Schedule:
     title: Schedule
+    allOf:
+    - $ref: '#/definitions/ScheduleRelationBase'
+    - properties:
+        timezone:
+          type: string
+          description: The number of the schedule
+        closed_destination:
+            description: The destination to redirect the caller to when the schedule is not opened
+            $ref: '#/definitions/DestinationType'
+        open_periods:
+          type: array
+          items:
+            $ref: '#/definitions/ScheduleOpenPeriod'
+        exceptional_periods:
+          type: array
+          items:
+            $ref: '#/definitions/ScheduleExceptionalPeriod'
+        enabled:
+          type: boolean
+          default: true
+    - $ref: '#/definitions/ScheduleRelationIncalls'
+    required:
+    - closed_destination
+  ScheduleRelationBase:
     properties:
       id:
         type: integer
@@ -105,36 +129,6 @@ definitions:
       name:
         type: string
         description: The name to identify the schedule
-      timezone:
-        type: string
-        description: The number of the schedule
-      closed_destination:
-          description: The destination to redirect the caller to when the schedule is not opened
-          $ref: '#/definitions/DestinationType'
-      open_periods:
-        type: array
-        items:
-          $ref: '#/definitions/ScheduleOpenPeriod'
-      exceptional_periods:
-        type: array
-        items:
-          $ref: '#/definitions/ScheduleExceptionalPeriod'
-      enabled:
-        type: boolean
-        default: true
-    required:
-    - closed_destination
-  ScheduleItems:
-    title: ScheduleItems
-    properties:
-      items:
-        type: array
-        items:
-          $ref: '#/definitions/Schedule'
-      total:
-        type: integer
-    required:
-    - total
   ScheduleOpenPeriod:
     properties:
       hours_start:
@@ -165,3 +159,21 @@ definitions:
         destination:
           description: The destination to redirect the caller to when the given period is satisfied
           $ref: '#/definitions/DestinationType'
+  ScheduleRelationIncalls:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/IncallRelationBase'
+  ScheduleItems:
+    title: ScheduleItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Schedule'
+      total:
+        type: integer
+    required:
+    - total

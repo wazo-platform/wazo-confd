@@ -122,6 +122,7 @@ definitions:
           description: The destination where the incoming call will be redirected
           $ref: '#/definitions/DestinationType'
     - $ref: '#/definitions/IncallRelationExtensions'
+    - $ref: '#/definitions/IncallRelationSchedules'
     required:
     - destination
     example:
@@ -147,10 +148,14 @@ definitions:
         type: array
         readOnly: true
         items:
-          $ref: '#/definitions/IncallRelationExtension'
-  IncallRelationExtension:
-    allOf:
-    - $ref: '#/definitions/ExtensionRelationBase'
+          $ref: '#/definitions/ExtensionRelationBase'
+  IncallRelationSchedules:
+    properties:
+      schedules:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ScheduleRelationBase'
   IncallItems:
     title: IncallItems
     properties:
