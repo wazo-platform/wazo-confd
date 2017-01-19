@@ -1,0 +1,212 @@
+paths:
+  /moh:
+    get:
+      operationId: list_moh
+      summary: List MOH classes
+      description: '**Required ACL:** `confd.moh.read`'
+      tags:
+      - moh
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: MOH list
+          schema:
+            $ref: '#/definitions/MohItems'
+    post:
+      operationId: create_moh
+      summary: Create MOH class
+      description: '**Required ACL:** `confd.moh.create`'
+      tags:
+      - moh
+      parameters:
+      - name: body
+        in: body
+        description: MOH class to create
+        required: true
+        schema:
+          $ref: '#/definitions/Moh'
+      responses:
+        '201':
+          description: MOH class created
+          schema:
+            $ref: '#/definitions/Moh'
+        '400':
+          $ref: '#/responses/CreateError'
+  /moh/{moh_uuid}:
+    get:
+      operationId: get_moh
+      summary: Get MOH class
+      description: '**Required ACL:** `confd.moh.{moh_uuid}.read`'
+      tags:
+      - moh
+      parameters:
+      - $ref: '#/parameters/moh_uuid'
+      responses:
+        '200':
+          description: MOH class
+          schema:
+            $ref: '#/definitions/Moh'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_moh
+      summary: Update MOH class
+      description: '**Required ACL:** `confd.moh.{moh_uuid}.update`'
+      tags:
+      - moh
+      parameters:
+      - $ref: '#/parameters/moh_uuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Moh'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_moh
+      summary: Delete MOH class
+      description: |
+        **Required ACL:** `confd.moh.{moh_uuid}.delete`
+
+        Delete the MOH class and associated audio files.
+      tags:
+      - moh
+      parameters:
+      - $ref: '#/parameters/moh_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /moh/{moh_uuid}/files/{filename}:
+    get:
+      operationId: get_moh_files
+      summary: Get audio file
+      description: '**Required ACL:** `confd.moh.{moh_uuid}.files.{filename}.read`'
+      tags:
+      - moh
+      parameters:
+      - $ref: '#/parameters/moh_uuid'
+      - $ref: '#/parameters/moh_file'
+      produces:
+      - application/octet-stream
+      responses:
+        '200':
+          description: Audio file
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationdId: update_moh_files
+      summary: Add or update audio file
+      description: '**Required ACL:** `confd.moh.{moh_uuid}.files.{filename}.update`'
+      tags:
+      - moh
+      consumes:
+      - application/octet-stream
+      parameters:
+      - $ref: '#/parameters/moh_uuid'
+      - $ref: '#/parameters/moh_file'
+      - name: body
+        in: body
+        type: string
+        format: binary
+        required: true
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationdId: delete_moh_files
+      summary: Delete audio file
+      description: '**Required ACL:** `confd.moh.{moh_uuid}.files.{filename}.delete`'
+      tags:
+      - moh
+      parameters:
+      - $ref: '#/parameters/moh_uuid'
+      - $ref: '#/parameters/moh_file'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  moh_uuid:
+    required: true
+    type: string
+    name: moh_uuid
+    in: path
+  moh_file:
+    required: true
+    type: string
+    name: filename
+    in: path
+definitions:
+  Moh:
+    allOf:
+    - properties:
+        uuid:
+          type: string
+          readOnly: true
+          description: The UUID of the MOH class
+        name:
+          type: string
+          description: The name used by Asterisk (can only by set on create and must be unique)
+        label:
+          type: string
+          description: The label of the MOH class
+        mode:
+          type: string
+          description: The play mode of the MOH class
+          default: files
+          enum:
+          - custom
+          - files
+          - mp3
+        application:
+          type: string
+          description: The command to run (only used when mode is "custom")
+        sort:
+          type: string
+          description: The order in which files are played (only used when mode is "files")
+          enum:
+          - alphabetical
+          - random
+          - random_start
+        files:
+          type: array
+          readOnly: true
+          description: The audio files
+          items:
+            $ref: '#/definitions/MohFile'
+    required:
+    - name
+    - mode
+  MohFile:
+    properties:
+      name:
+        type: string
+        description: The name of the file
+  MohItems:
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Moh'
+      total:
+        type: integer
+    required:
+    - total

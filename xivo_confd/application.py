@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ from xivo_confd import plugin_manager
 from xivo_confd.authentication.confd_auth import auth
 from xivo_confd.core_rest_api import CoreRestApi
 from xivo_confd.helpers.common import handle_error
+from xivo_confd.helpers.converter import FilenameConverter
 from xivo_confd.helpers.restful import ConfdApi
 from xivo_confd.helpers.bus_publisher import BusPublisher
 from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
@@ -43,6 +44,8 @@ logger = logging.getLogger(__name__)
 app = Flask('xivo_confd')
 
 api = ConfdApi(app, prefix="/1.1")
+
+_do_not_log_data_endpoints = []
 
 
 def get_bus_publisher():
@@ -67,11 +70,16 @@ def log_requests():
         'method': request.method,
         'url': url,
     }
-    if request.data:
+    if request.data and request.endpoint not in _do_not_log_data_endpoints:
         params.update({'data': request.data})
         logger.info("%(method)s %(url)s with data %(data)s ", params)
     else:
         logger.info("%(method)s %(url)s", params)
+
+
+def add_endpoint_to_do_not_log_data_list(endpoint):
+    # XXX name is bad
+    _do_not_log_data_endpoints.append(endpoint)
 
 
 @app.after_request
@@ -118,6 +126,8 @@ def error_handler(error):
 def setup_app(config):
     app.secret_key = os.urandom(24)
     app.config.update(config)
+    app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
+    app.url_map.converters['filename'] = FilenameConverter
 
     http_helpers.add_logger(app, logger)
 

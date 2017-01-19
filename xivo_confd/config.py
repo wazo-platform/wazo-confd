@@ -118,6 +118,7 @@ DEFAULT_CONFIG = {
         'line_extension_plugin',
         'line_plugin',
         'line_sip_plugin',
+        'moh_plugin',
         'outcall_extension_plugin',
         'outcall_plugin',
         'outcall_trunk_plugin',

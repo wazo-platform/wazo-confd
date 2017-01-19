@@ -171,26 +171,26 @@ def check_bogus_query_string_returns_error(request, query_string, bogus):
     response.assert_match(400, re.compile(re.escape(query_string)))
 
 
-def check_sorting(url, resource1, resource2, field, search):
+def check_sorting(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=resource1['id']),
-                                         has_entries(id=resource2['id'])))
+    assert_that(response.items, contains(has_entries(**{id_field: resource1[id_field]}),
+                                         has_entries(**{id_field: resource2[id_field]})))
 
     response = url(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=resource2['id']),
-                                         has_entries(id=resource1['id'])))
+    assert_that(response.items, contains(has_entries(**{id_field: resource2[id_field]}),
+                                         has_entries(**{id_field: resource1[id_field]})))
 
 
-def check_offset(url, resource1, resource2, field, search):
+def check_offset(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, offset=1)
-    assert_that(response.items, contains(has_entries(id=resource2['id'])))
+    assert_that(response.items, contains(has_entries(**{id_field: resource2[id_field]})))
 
 
-def check_offset_legacy(url, resource1, resource2, field, search):
+def check_offset_legacy(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, skip=1)
-    assert_that(response.items, contains(has_entries(id=resource2['id'])))
+    assert_that(response.items, contains(has_entries(**{id_field: resource2[id_field]})))
 
 
-def check_limit(url, resource1, resource2, field, search):
+def check_limit(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, limit=1)
-    assert_that(response.items, contains(has_entries(id=resource1['id'])))
+    assert_that(response.items, contains(has_entries(**{id_field: resource1[id_field]})))
