@@ -48,12 +48,12 @@ def test_post_errors():
         yield check
 
 
-@fixtures.group()
-def test_put_errors(group):
+@fixtures.switchboard()
+def test_put_errors(switchboard):
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
-    url = confd.groups(group['id']).put
+    url = confd.switchboards(switchboard['uuid']).put
     for check in error_checks(url):
         yield check
 
