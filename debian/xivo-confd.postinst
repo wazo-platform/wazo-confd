@@ -3,6 +3,7 @@
 #
 # see: dh_installdeb(1)
 
+DAEMONNAME='xivo-confd'
 CRON_FILE='/etc/cron.d/xivo-restapi'
 LOG_FILENAME='/var/log/xivo-confd.log'
 
@@ -23,6 +24,12 @@ case "$1" in
         fi
 
         chown www-data: "$LOG_FILENAME"
+
+        if dpkg --compare-versions "$2" lt '17.03'; then
+            ln -sf  /etc/nginx/locations/https-available/$DAEMONNAME \
+                    /etc/nginx/locations/https-enabled/$DAEMONNAME
+        fi
+
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
 
