@@ -83,11 +83,37 @@ paths:
 definitions:
   Switchboard:
     type: object
+    allOf:
+    - properties:
+        uuid:
+          type: string
+        name:
+          type: string
+    - $ref: '#/definitions/SwitchboardRelationIncalls'
+    - $ref: '#/definitions/SwitchboardRelationMembers'
+  SwitchboardRelationIncalls:
     properties:
-      uuid:
-        type: string
-      name:
-        type: string
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/SwitchboardRelationIncall'
+  SwitchboardRelationIncall:
+    allOf:
+      - $ref: '#/definitions/IncallRelationBase'
+      - $ref: '#/definitions/IncallRelationExtensions'
+  SwitchboardRelationMembers:
+    properties:
+      members:
+        readOnly: true
+        $ref: '#/definitions/SwitchboardRelationMemberUsers'
+  SwitchboardRelationMemberUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
 parameters:
   switchboard_uuid:
     name: switchboard_uuid

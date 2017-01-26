@@ -170,6 +170,8 @@ definitions:
         $ref: '#/definitions/DestinationOutcall'
       sound:
         $ref: '#/definitions/DestinationSound'
+      switchboard:
+        $ref: '#/definitions/DestinationSwitchboard'
       user:
         $ref: '#/definitions/DestinationUser'
       voicemail:
@@ -443,8 +445,19 @@ definitions:
         description: Play this sound without answering the call
     required:
     - type
-    - exten
-    - outcall_id
+    - filename
+  DestinationSwitchboard:
+    title: DestinationSwitchboard
+    properties:
+      type:
+        type: string
+        description: MUST be 'switchboard'
+      switchboard_uuid:
+        type: string
+        description: The UUID of the switchboard.
+    required:
+    - type
+    - switchboard_uuid
   DestinationUser:
     title: DestinationUser
     properties:
