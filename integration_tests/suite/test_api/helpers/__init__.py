@@ -51,6 +51,7 @@ import line_endpoint_sip
 import line_extension
 import line_sip
 import meetme
+import moh
 import paging
 import paging_caller_user
 import paging_member_user

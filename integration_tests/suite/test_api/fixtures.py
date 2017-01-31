@@ -223,3 +223,10 @@ class switchboard(IsolatedAction):
     id_field = 'uuid'
     actions = {'generate': h.switchboard.generate_switchboard,
                'delete': h.switchboard.delete_switchboard}
+
+
+class moh(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {'generate': h.moh.generate_moh,
+               'delete': h.moh.delete_moh}

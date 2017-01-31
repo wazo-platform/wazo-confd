@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 import unittest
 
 from mock import Mock
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, calling, equal_to, raises
 from marshmallow import ValidationError, fields
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, AsteriskSection
 
 
 class TestStrictBolean(unittest.TestCase):
@@ -45,3 +45,33 @@ class TestBaseSchema(unittest.TestCase):
         fake = Mock(uuid='abcd-1234', unloaded=Mock(uuid='efgh-5678'))
         data = FakeSchema().dump(fake).data
         assert_that(data, equal_to({'uuid': 'abcd-1234'}))
+
+
+class TestAsteriskSection(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = AsteriskSection()
+
+    def test_valid_section_names(self):
+        values = [
+            'default',
+            'abc-def_013.Z',
+        ]
+        for value in values:
+            assert_that(self.validator(value), equal_to(value))
+
+    def test_invalid_section_names(self):
+        values = [
+            '',
+            'a' * 80,
+            'foo bar',
+            'foo;',
+            'foo\nbar',
+            'foo\n#exec /bin/rm -rf /',
+            'foo]',
+            '[foo',
+            'general',
+        ]
+        for value in values:
+            assert_that(calling(self.validator).with_args(value),
+                        raises(ValidationError))

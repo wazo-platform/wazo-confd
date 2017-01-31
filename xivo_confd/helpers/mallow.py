@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import re
 import logging
 
 from flask import url_for
 from flask_restful import abort
 from marshmallow import Schema, fields, pre_load
-from marshmallow.exceptions import RegistryError
+from marshmallow.exceptions import RegistryError, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -126,3 +127,25 @@ class ListLink(fields.Field):
             if link_obj:
                 output.append(link_obj)
         return output
+
+
+class AsteriskSection(object):
+
+    DEFAULT_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
+    DEFAULT_RESERVED_NAMES = ['general']
+
+    def __init__(self, max_length=79, regex=DEFAULT_REGEX, reserved_names=DEFAULT_RESERVED_NAMES):
+        self._max_length = max_length
+        self._regex = re.compile(regex) if isinstance(regex, basestring) else regex
+        self._reserved_names = reserved_names
+
+    def __call__(self, value):
+        if not value:
+            raise ValidationError('Shorter than minimum length 1')
+        if len(value) > self._max_length:
+            raise ValidationError('Longer than maximum length {}'.format(self._max_length))
+        if value in self._reserved_names:
+            raise ValidationError('Reserved Asterisk section name')
+        if self._regex.match(value) is None:
+            raise ValidationError('Not a valid Asterisk section name')
+        return value
