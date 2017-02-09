@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # Copyright (C) 2016 Proformatique, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -158,15 +158,15 @@ def set_phonebook(entity, phonebook_body):
     directories = Directories(uri='postgresql://asterisk:proformatique@localhost/asterisk',
                               dirtype='dird_phonebook',
                               name='phonebook',
-                              description='XiVO phonebook',
+                              description='Wazo phonebook',
                               dird_tenant=entity,
                               dird_phonebook=phonebook_body['name'])
     Session.add(directories)
     Session.commit()
-    cti_directories = CtiDirectories(name='xivodir',
+    cti_directories = CtiDirectories(name='wazophonebook',
                                      match_direct='["firstname", "lastname", "displayname", "society", "number_office"]',
                                      match_reverse='["number_office", "number_mobile"]',
-                                     description='Default XiVO phonebook',
+                                     description='Default Wazo phonebook',
                                      deletable=1,
                                      directory_id=directories.id)
     Session.add(cti_directories)
@@ -194,10 +194,10 @@ def set_phonebook(entity, phonebook_body):
             available_directories = []
         else:
             available_directories = profile.directories.split(',')
-        available_directories.append('xivodir')
+        available_directories.append('wazophonebook')
         profile.directories = ','.join(available_directories)
         Session.add(profile)
-    Session.add(CtiReverseDirectories(directories='[xivodir]'))
+    Session.add(CtiReverseDirectories(directories='[wazophonebook]'))
 
 
 def include_outcall_context_in_internal_context():

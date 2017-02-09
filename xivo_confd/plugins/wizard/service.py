@@ -29,7 +29,7 @@ from xivo_confd.database import wizard as wizard_db
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = '^nameserver (.*)'
-PHONEBOOK_BODY = {'name': 'xivo'}
+PHONEBOOK_BODY = {'name': 'wazo'}
 
 
 class WizardService(object):
