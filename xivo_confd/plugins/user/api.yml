@@ -350,6 +350,7 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the user
+    - $ref: '#/definitions/UserRelationCtiProfile'
     - $ref: '#/definitions/UserRelationFallbacks'
     - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationGroups'
@@ -372,6 +373,11 @@ definitions:
       lastname:
         type: string
         description: User lastname
+  UserRelationCtiProfile:
+    properties:
+      cti_profile:
+        readOnly: true
+        $ref: '#/definitions/CtiProfileRelationBase'
   UserRelationGroups:
     properties:
       groups:

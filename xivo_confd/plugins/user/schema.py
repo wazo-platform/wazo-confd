@@ -58,6 +58,11 @@ class UserSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('users'))
 
+    cti_profile = fields.Nested('CtiProfileSchema',
+                                only=['id',
+                                      'name',
+                                      'links'],
+                                dump_only=True)
     fallbacks = fields.Nested('UserFallbackSchema',
                               dump_only=True)
     groups = fields.Nested('GroupSchema',

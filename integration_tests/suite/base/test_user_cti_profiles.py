@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,3 +94,17 @@ def test_get_association_using_uuid(cti_profile, user):
         response = confd.users(user['uuid']).cti.get()
         assert_that(response.item, has_entries(cti_profile_id=cti_profile['id'],
                                                user_id=user['id']))
+
+
+@fixtures.cti_profile(name='my-profile')
+@fixtures.user(username="username", password="password")
+def test_get_cti_profile_associated_to_user(cti_profile, user):
+    with a.user_cti_profile(user, cti_profile):
+        response = confd.users(user['uuid']).get()
+
+        assert_that(response.item, has_entries(
+            cti_profile=has_entries(
+                id=cti_profile['id'],
+                name=cti_profile['name']
+            )
+        ))
