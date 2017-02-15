@@ -45,6 +45,12 @@ class PagingSchema(BaseSchema):
 
     @post_dump
     def wrap_users(self, data):
-        data['callers'] = {'users': data.pop('users_caller', [])}
-        data['members'] = {'users': data.pop('users_member', [])}
+        users_member = data.pop('users_member', [])
+        users_caller = data.pop('users_caller', [])
+
+        if not self.only or 'members' in self.only:
+            data['members'] = {'users': users_member}
+        if not self.only or 'callers' in self.only:
+            data['callers'] = {'users': users_caller}
+
         return data

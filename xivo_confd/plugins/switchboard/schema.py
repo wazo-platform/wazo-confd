@@ -48,5 +48,7 @@ class SwitchboardSchema(BaseSchema):
 
     @post_dump
     def wrap_users(self, data):
-        data['members'] = {'users': data.pop('user_members', [])}
+        user_members = data.pop('user_members', [])
+        if not self.only or 'members' in self.only:
+            data['members'] = {'users': user_members}
         return data
