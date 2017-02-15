@@ -356,6 +356,7 @@ definitions:
     - $ref: '#/definitions/UserRelationIncalls'
     - $ref: '#/definitions/UserRelationLines'
     - $ref: '#/definitions/UserRelationServices'
+    - $ref: '#/definitions/UserRelationSwitchboards'
     - $ref: '#/definitions/UserRelationVoicemail'
     required:
     - firstname
@@ -416,6 +417,13 @@ definitions:
       services:
         readOnly: true
         $ref: '#/definitions/UserServices'
+  UserRelationSwitchboards:
+    properties:
+      switchboards:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/SwitchboardRelationBase'
   UserRelationVoicemail:
     properties:
       voicemail:

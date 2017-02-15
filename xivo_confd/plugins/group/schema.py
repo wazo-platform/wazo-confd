@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,7 +79,9 @@ class GroupSchema(BaseSchema):
 
     @post_dump
     def wrap_users_member(self, data):
-        data['members'] = {'users': data.pop('users_member', [])}
+        users_member = data.pop('users_member', [])
+        if not self.only or 'members' in self.only:
+            data['members'] = {'users': users_member}
         return data
 
     @post_load

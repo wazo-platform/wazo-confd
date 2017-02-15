@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,6 +83,12 @@ class UserSchema(BaseSchema):
                           dump_only=True)
     forwards = fields.Nested('ForwardsSchema', dump_only=True)
     services = fields.Nested('ServicesSchema', dump_only=True)
+    switchboards = fields.Nested('SwitchboardSchema',
+                                 only=['uuid',
+                                       'name',
+                                       'links'],
+                                 many=True,
+                                 dump_only=True)
     voicemail = fields.Nested('VoicemailSchema',
                               only=['id',
                                     'name',

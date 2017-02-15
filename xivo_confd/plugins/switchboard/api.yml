@@ -91,6 +91,15 @@ definitions:
           type: string
     - $ref: '#/definitions/SwitchboardRelationIncalls'
     - $ref: '#/definitions/SwitchboardRelationMembers'
+  SwitchboardRelationBase:
+    properties:
+        uuid:
+          type: string
+          description: Switchboard UUID
+          readOnly: true
+        name:
+          type: string
+          description: Switchboard name
   SwitchboardRelationIncalls:
     properties:
       incalls:
