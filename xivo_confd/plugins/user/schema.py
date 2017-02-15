@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +58,11 @@ class UserSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('users'))
 
+    cti_profile = fields.Nested('CtiProfileSchema',
+                                only=['id',
+                                      'name',
+                                      'links'],
+                                dump_only=True)
     fallbacks = fields.Nested('UserFallbackSchema',
                               dump_only=True)
     groups = fields.Nested('GroupSchema',

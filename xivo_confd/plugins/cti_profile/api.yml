@@ -53,3 +53,12 @@ definitions:
         items:
           $ref: '#/definitions/CtiProfile'
         type: array
+  CtiProfileRelationBase:
+    properties:
+        id:
+          type: integer
+          description: CTI profile ID
+          readOnly: true
+        name:
+          type: string
+          description: CTI profile name
