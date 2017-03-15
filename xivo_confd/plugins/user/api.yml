@@ -350,6 +350,7 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the user
+    - $ref: '#/definitions/UserRelationAgent'
     - $ref: '#/definitions/UserRelationCtiProfile'
     - $ref: '#/definitions/UserRelationFallbacks'
     - $ref: '#/definitions/UserRelationForwards'
@@ -435,6 +436,18 @@ definitions:
       voicemail:
         readOnly: true
         $ref: '#/definitions/VoicemailRelationBase'
+  UserRelationAgent:
+    properties:
+      agent:
+        readOnly: true
+        $ref: '#/definitions/AgentRelationBase'
+  AgentRelationBase:
+    properties:
+      id:
+        type: integer
+        readOnly: True
+      number:
+        type: string
   UserService:
     title: UserService
     properties:

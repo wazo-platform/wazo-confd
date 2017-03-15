@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -110,6 +109,17 @@ def test_dissociate(agent, user):
     with a.user_agent(user, agent, check=False):
         response = confd.users(user['uuid']).agents().delete()
         response.assert_deleted()
+
+
+@fixtures.agent()
+@fixtures.user()
+def test_get_agent_relation(agent, user):
+    with a.user_agent(user, agent):
+        response = confd.users(user['id']).get()
+        assert_that(response.item, has_entries(
+            agent=has_entries(id=agent['id'],
+                              number=agent['number'])
+        ))
 
 
 @fixtures.agent()

@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +29,8 @@ def generate_agent(**parameters):
 def add_agent(**parameters):
     with db.queries() as queries:
         id = queries.insert_agent(**parameters)
-    return {'id': id}
+    return {'id': id,
+            'number': parameters.get('number')}
 
 
 def delete_agent(agent_id, check=False):
