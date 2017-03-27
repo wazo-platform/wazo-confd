@@ -10,11 +10,19 @@ RUN pip install -r requirements.txt
 RUN python setup.py install
 
 # Configure environment
+RUN cp -av etc/xivo-confd /etc
+RUN mkdir -p /etc/xivo-confd/conf.d
+
 RUN touch /var/log/xivo-confd.log
-RUN mkdir /etc/xivo-confd/
-RUN cp /usr/src/xivo-confd/etc/xivo-confd/*.yml /etc/xivo-confd/
-RUN mkdir -p /etc/xivo-confd/conf.d /var/run/xivo-confd /var/lib/asterisk/moh
+RUN chown www-data /var/log/xivo-confd.log
+
+RUN mkdir -p /var/run/xivo-confd /var/lib/asterisk/moh
 RUN chown www-data /var/run/xivo-confd /var/lib/asterisk/moh
+
+ADD ./contribs/docker/certs /usr/share/xivo-certs
+WORKDIR /usr/share/xivo-certs
+RUN openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -config openssl.cfg -days 3650
+WORKDIR /usr/src/xivo-confd
 
 EXPOSE 9486
 
