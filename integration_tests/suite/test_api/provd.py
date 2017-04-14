@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
@@ -16,12 +16,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
+import docker
 import os
 
 from datetime import datetime
 
-from docker import APIClient as DockerClient
 from hamcrest import assert_that, equal_to, has_item, starts_with
 from xivo_provd_client import new_provisioning_client, NotFoundError
 
@@ -156,7 +155,7 @@ class ProvdHelper(object):
         return count
 
     def find_provd_logs(self, timestamp):
-        client = DockerClient()
+        client = docker.from_env().api
         for container in client.containers(filters={'status': 'running'}):
             info = client.inspect_container(container['Id'])
             if info['Config']['Image'] == self.DOCKER_PROVD_IMAGE:
