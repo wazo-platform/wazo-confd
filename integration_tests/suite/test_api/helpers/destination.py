@@ -137,6 +137,10 @@ def invalid_destinations():
         {'type': 'sound', 'filename': 'daddy-cool', 'no_answer': []},
         {'type': 'sound', 'filename': 'daddy-cool', 'no_answer': {}},
 
+        {'type': 'switchboard'},
+        {'type': 'switchboard', 'missing_required_field': 123},
+        {'type': 'switchboard', 'switchboard_id': 'string'},
+        {'type': 'switchboard', 'switchboard_id': None},
         {'type': 'user'},
         {'type': 'user', 'missing_required_field': 123},
         {'type': 'user', 'user_id': 'string'},
