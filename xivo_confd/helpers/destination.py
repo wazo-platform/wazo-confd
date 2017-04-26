@@ -422,7 +422,7 @@ class DestinationValidator(object):
         'endcall:busy': [],
         'endcall:congestion': [],
         'endcall:hangup': [],
-        'ivr': [ResourceExists('actionarg1', ivr_dao.get, 'IVR')],
+        'ivr': [GetResource('actionarg1', ivr_dao.get, 'IVR')],
         'meetme': [ResourceExists('actionarg1', meetme_dao.exists, 'Conference')],
         'none': [],
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
