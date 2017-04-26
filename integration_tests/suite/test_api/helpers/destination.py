@@ -99,6 +99,7 @@ def invalid_destinations():
         {'type': 'group', 'missing_required_field': 123},
         {'type': 'group', 'group_id': 'string'},
         {'type': 'group', 'group_id': None},
+        {'type': 'group', 'group_id': 1, 'ring_time': -10},
 
         {'type': 'hangup', 'cause': 'invalid'},
 
@@ -120,6 +121,7 @@ def invalid_destinations():
         {'type': 'queue', 'missing_required_field': 123},
         {'type': 'queue', 'queue_id': 'string'},
         {'type': 'queue', 'queue_id': None},
+        {'type': 'queue', 'queue_id': 1, 'ring_time': -10},
 
         {'type': 'sound'},
         {'type': 'sound', 'missing_required_field': 'string'},
@@ -141,10 +143,13 @@ def invalid_destinations():
         {'type': 'switchboard', 'missing_required_field': 123},
         {'type': 'switchboard', 'switchboard_id': 'string'},
         {'type': 'switchboard', 'switchboard_id': None},
+        {'type': 'switchboard', 'switchboard_id': 1, 'ring_time': -10},
+
         {'type': 'user'},
         {'type': 'user', 'missing_required_field': 123},
         {'type': 'user', 'user_id': 'string'},
         {'type': 'user', 'user_id': None},
+        {'type': 'user', 'user_id': 1, 'ring_time': -10},
 
         {'type': 'voicemail'},
         {'type': 'voicemail', 'missing_required_field': 123},

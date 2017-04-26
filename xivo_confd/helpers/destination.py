@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from marshmallow import Schema, fields, pre_dump, post_load, post_dump
-from marshmallow.validate import Length, OneOf, Regexp, Predicate
+from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
@@ -162,7 +162,7 @@ class ExtensionDestinationSchema(BaseDestinationSchema):
 
 class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(attribute='actionarg1', required=True)
-    ring_time = fields.Float(attribute='actionarg2', allow_none=True)
+    ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
     group = fields.Nested('GroupSchema',
                           only=['name'],
@@ -239,7 +239,7 @@ class OutcallDestinationSchema(BaseDestinationSchema):
 
 class QueueDestinationSchema(BaseDestinationSchema):
     queue_id = fields.Integer(attribute='actionarg1', required=True)
-    ring_time = fields.Float(attribute='actionarg2', allow_none=True)
+    ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
 
 class SoundDestinationSchema(BaseDestinationSchema):
@@ -265,7 +265,7 @@ class SoundDestinationSchema(BaseDestinationSchema):
 
 class SwitchboardDestinationSchema(BaseDestinationSchema):
     switchboard_uuid = fields.UUID(attribute='actionarg1', required=True)
-    ring_time = fields.Float(attribute='actionarg2', allow_none=True)
+    ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
     switchboard = fields.Nested('SwitchboardSchema',
                                 only=['name'],
@@ -282,7 +282,7 @@ class SwitchboardDestinationSchema(BaseDestinationSchema):
 
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(attribute='actionarg1', required=True)
-    ring_time = fields.Float(attribute='actionarg2', allow_none=True)
+    ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
     user = fields.Nested('UserSchema',
                          only=['firstname',
