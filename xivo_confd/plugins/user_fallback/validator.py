@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ class UserFallbackValidator(Validator):
     def __init__(self, destination_validator):
         self._destination_validator = destination_validator
 
-    def validate(self, user):
-        for fallback in user.fallbacks.values():
+    def validate(self, fallbacks):
+        for fallback in fallbacks.values():
             self._destination_validator.validate(fallback)
 
 
