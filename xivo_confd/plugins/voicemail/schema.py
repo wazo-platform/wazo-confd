@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from marshmallow import fields
-from marshmallow.validate import Regexp, Length
+from marshmallow.validate import Length, Range, Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 from xivo_confd.helpers.validator import LANGUAGE_REGEX
@@ -36,7 +35,7 @@ class VoicemailSchema(BaseSchema):
     language = fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
     timezone = fields.String(allow_none=True)
     pager = fields.String(validate=Length(max=80), allow_none=True)
-    max_messages = fields.Integer(allow_none=True)
+    max_messages = fields.Integer(validate=Range(min=0), allow_none=True)
     attach_audio = StrictBoolean(allow_none=True)
     delete_messages = StrictBoolean()
     ask_password = StrictBoolean()

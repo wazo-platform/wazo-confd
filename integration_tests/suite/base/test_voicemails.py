@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'timezone', 123
     yield s.check_bogus_field_returns_error, url, 'timezone', True
     yield s.check_bogus_field_returns_error, url, 'max_messages', 'string'
+    yield s.check_bogus_field_returns_error, url, 'max_messages', -1
     yield s.check_bogus_field_returns_error, url, 'max_messages', {}
     yield s.check_bogus_field_returns_error, url, 'max_messages', []
     yield s.check_bogus_field_returns_error, url, 'attach_audio', 'false'
