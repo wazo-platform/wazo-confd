@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 from flask import request
 from marshmallow import fields, pre_dump, post_load
+from marshmallow.validate import Length
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
@@ -107,21 +108,21 @@ class UserServiceList(UserSubResource):
 
 class ForwardBusySchema(BaseSchema):
     enabled = StrictBoolean(attribute='busy_enabled')
-    destination = fields.String(attribute='busy_destination', allow_none=True)
+    destination = fields.String(attribute='busy_destination', validate=Length(max=128), allow_none=True)
 
     types = ['busy']
 
 
 class ForwardNoAnswerSchema(BaseSchema):
     enabled = StrictBoolean(attribute='noanswer_enabled')
-    destination = fields.String(attribute='noanswer_destination', allow_none=True)
+    destination = fields.String(attribute='noanswer_destination', validate=Length(max=128), allow_none=True)
 
     types = ['noanswer']
 
 
 class ForwardUnconditionalSchema(BaseSchema):
     enabled = StrictBoolean(attribute='unconditional_enabled')
-    destination = fields.String(attribute='unconditional_destination', allow_none=True)
+    destination = fields.String(attribute='unconditional_destination', validate=Length(max=128), allow_none=True)
 
     types = ['unconditional']
 

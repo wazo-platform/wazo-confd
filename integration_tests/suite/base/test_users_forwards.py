@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,7 @@ def test_put_error(user):
     yield s.check_bogus_field_returns_error, forward_url, 'enabled', {}
     yield s.check_bogus_field_returns_error, forward_url, 'destination', True
     yield s.check_bogus_field_returns_error, forward_url, 'destination', 123
+    yield s.check_bogus_field_returns_error, forward_url, 'destination', s.random_string(129)
     yield s.check_bogus_field_returns_error, forward_url, 'destination', {}
 
 
