@@ -21,7 +21,7 @@ from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 
 
 def validate_edit(user, cti_profile_id):
-    if cti_profile_id:
+    if cti_profile_id is not None:
         _validate_cti_profile_exists(cti_profile_id)
     _validate_user_has_login_passwd(user)
 
