@@ -110,6 +110,28 @@ def _update_group_fallbacks_with_destination(group_id, destination):
 
 
 @fixtures.group()
+def test_nonexistent_destinations(group):
+    meetme = ivr = dest_group = outcall = queue = user = voicemail = conference = {'id': 99999999}
+    switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
+    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard, user, voicemail, conference):
+        if destination['type'] in ('meetme',
+                                   'ivr',
+                                   'group',
+                                   'outcall',
+                                   'queue',
+                                   'switchboard',
+                                   'user',
+                                   'voicemail',
+                                   'conference'):
+            yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
+
+
+def _update_user_fallbacks_with_nonexistent_destination(group_id, destination):
+    response = confd.groups(group_id).fallbacks.put(noanswer_destination=destination)
+    response.assert_status(400)
+
+
+@fixtures.group()
 def test_bus_events(group):
     url = confd.groups(group['id']).fallbacks.put
     yield s.check_bus_event, 'config.groups.fallbacks.edited', url
