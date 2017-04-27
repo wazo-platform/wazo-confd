@@ -45,11 +45,11 @@ definitions:
       cti_profile_id:
         type: integer
         description: CTI profile ID
-        readOnly: true
       enabled:
         type: boolean
       user_id:
         type: integer
+        readOnly: true
     required:
     - cti_profile_id
     - enabled
