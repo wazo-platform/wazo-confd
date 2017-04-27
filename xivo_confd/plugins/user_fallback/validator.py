@@ -26,7 +26,8 @@ class UserFallbackValidator(Validator):
 
     def validate(self, fallbacks):
         for fallback in fallbacks.values():
-            self._destination_validator.validate(fallback)
+            if fallback is not None:
+                self._destination_validator.validate(fallback)
 
 
 def build_validator():
