@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class UserFallbackService(object):
 
     def edit(self, user, fallbacks):
         with Session.no_autoflush:
-            self.validator.validate_edit(user)
+            self.validator.validate_edit(fallbacks)
         user.fallbacks = fallbacks
         self.notifier.edited(user)
 
