@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ EXTENSION_REGEX = r'^(?:_?\+?[0-9NXZ\*#\-\[\]]+[\.\!]?){1,40}$'
 
 class CallPermissionSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String(validate=Regexp(NAME_REGEX))
+    name = fields.String(validate=Regexp(NAME_REGEX), required=True)
     password = fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
     mode = fields.String(validate=OneOf(['allow', 'deny']))
     extensions = fields.List(fields.String(validate=Regexp(EXTENSION_REGEX)))

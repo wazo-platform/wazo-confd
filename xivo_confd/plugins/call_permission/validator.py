@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,10 +25,9 @@ from xivo_dao.resources.call_permission import dao as call_permission_dao
 def build_validator():
     return ValidationGroup(
         create=[
-            Optional('name',
-                     UniqueField('name',
-                                 lambda name: call_permission_dao.find_by(name=name),
-                                 'CallPermission'))
+            UniqueField('name',
+                        lambda name: call_permission_dao.find_by(name=name),
+                        'CallPermission')
         ],
         edit=[
             Optional('name',

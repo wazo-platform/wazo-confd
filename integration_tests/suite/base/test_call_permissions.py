@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -169,6 +168,11 @@ def test_create_call_permission_all_parameters():
     response = confd.callpermissions.post(**parameters)
     response.assert_created('callpermissions')
     assert_that(response.item, has_entries(parameters))
+
+
+def test_create_call_permission_without_name():
+    response = confd.callpermissions.post()
+    response.assert_status(400)
 
 
 @fixtures.call_permission()
