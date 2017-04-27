@@ -21,15 +21,15 @@ from xivo_confd.plugins.user_cti_profile import validator, notifier
 
 
 def edit(user, form):
-    cti_profile_id = form.get('cti_profile_id', None)
-    cti_enabled = form.get('cti_enabled', None)
-    if cti_enabled is not None:
+    cti_profile_id = form.get('cti_profile_id')
+    cti_enabled = form.get('cti_enabled')
+    if 'cti_enabled' in form:
         user.cti_enabled = cti_enabled
 
     with Session.no_autoflush:
         validator.validate_edit(user, cti_profile_id)
 
-    if cti_profile_id is not None:
+    if 'cti_profile_id' in form:
         user.cti_profile_id = cti_profile_id
 
     notifier.edited(user)

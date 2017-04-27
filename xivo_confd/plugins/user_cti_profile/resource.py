@@ -28,7 +28,7 @@ from xivo_confd.helpers.restful import ConfdResource
 class UserCtiProfileSchema(BaseSchema):
     user_id = fields.Integer(dump_only=True, attribute='id')
     enabled = StrictBoolean(attribute='cti_enabled')
-    cti_profile_id = fields.Integer(missing=None, attribute='cti_profile_id')
+    cti_profile_id = fields.Integer(allow_none=True, attribute='cti_profile_id')
     links = ListLink(Link('cti_profiles',
                           field='cti_profile_id',
                           target='id'),

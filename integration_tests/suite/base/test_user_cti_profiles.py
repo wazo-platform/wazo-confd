@@ -50,6 +50,22 @@ def test_enable_cti_for_user_without_username_or_password(user):
     response.assert_match(400, missing_username_password_regex)
 
 
+@fixtures.cti_profile()
+@fixtures.user()
+def test_associate_user_with_null_cti_profile(cti_profile, user):
+    response = confd.users(user['id']).cti.put(cti_profile_id=cti_profile['id'])
+    response.assert_updated()
+    response = confd.users(user['id']).cti.get()
+    assert_that(response.item, has_entries(user_id=user['id'],
+                                           cti_profile_id=cti_profile['id']))
+
+    response = confd.users(user['id']).cti.put(cti_profile_id=None)
+    response.assert_updated()
+    response = confd.users(user['id']).cti.get()
+    assert_that(response.item, has_entries(user_id=user['id'],
+                                           cti_profile_id=None))
+
+
 @fixtures.user()
 def test_get_user_cti_profile_when_not_associated(user):
     response = confd.users(user['id']).cti.get()
