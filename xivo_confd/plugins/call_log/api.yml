@@ -3,6 +3,7 @@ paths:
     get:
       operationId: list_call_logs
       summary: List call logs
+      deprecated: true
       description: '**Required ACL:** `confd.call_logs.read`
 
 
@@ -20,7 +21,7 @@ paths:
 
         Period: number of seconds of the call. Default: 0 if not answered'
       tags:
-      - call_logs
+      - deprecated
       produces:
       - text/csv; charset=utf-8
       parameters:
