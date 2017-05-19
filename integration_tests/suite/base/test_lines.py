@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +26,7 @@ from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
+from test_api import associations as a
 
 from hamcrest import (assert_that,
                       contains,
@@ -259,3 +259,25 @@ def test_when_line_has_no_endpoint_then_caller_id_can_be_set_to_null(line):
 def test_delete_line(line):
     response = confd.lines(line['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_delete_line_then_associatons_are_removed(user, line1, line2):
+    with a.user_line(user, line1, check=False), a.user_line(user, line2, check=False):
+        response = confd.users(user['id']).lines.get()
+        assert_that(response.items, contains(
+            has_entries(line_id=line1['id'],
+                        main_line=True),
+            has_entries(line_id=line2['id'],
+                        main_line=False),
+        ))
+
+        confd.lines(line1['id']).delete()
+
+        response = confd.users(user['id']).lines.get()
+        assert_that(response.items, contains(
+            has_entries(line_id=line2['id'],
+                        main_line=True)
+        ))
