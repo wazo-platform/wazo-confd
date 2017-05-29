@@ -9,7 +9,7 @@ script: nosetests xivo_confd
 notifications:
   email:
     recipients:
-      - dev.wazo+tests-reports@gmail.com
+      - dev+tests-reports@wazo.community
     on_success: change
     on_failure: change
 branches:
