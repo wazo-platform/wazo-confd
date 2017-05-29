@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright (C) 2012-2016 Avencall
+# Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from hamcrest import assert_that, has_entries, has_entry
 from mock import Mock
 from unittest import TestCase
@@ -31,14 +31,14 @@ class TestCallLogsMapper(TestCase):
         pass
 
     def test_to_api(self):
-        call_log = Mock(date=datetime(2013, 1, 31),
+        call_log = Mock(date=datetime(2013, 1, 31, 00, 00, 00),
+                        date_answer=datetime(2013, 1, 31, 00, 00, 2),
+                        date_end=datetime(2013, 1, 31, 00, 00, 5),
                         source_name='source1',
                         source_exten='1001',
                         destination_name='',
                         destination_exten='2001',
-                        user_field='',
-                        answered=True,
-                        duration=timedelta(seconds=2.95))
+                        user_field='')
 
         result = mapper.to_api(call_log)
 
@@ -51,7 +51,7 @@ class TestCallLogsMapper(TestCase):
         }))
 
     def test_to_api_user_field_none(self):
-        call_log = Mock(duration=timedelta(seconds=0), user_field=None)
+        call_log = Mock(date_answer=None, user_field=None)
 
         result = mapper.to_api(call_log)
 

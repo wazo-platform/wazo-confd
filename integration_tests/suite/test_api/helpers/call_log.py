@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 from test_api import db
 
 
-def generate_call_log(date, source_name, source_exten, destination_exten, duration, answered, user_field=''):
+def generate_call_log(date, date_answer, date_end, source_name, source_exten, destination_exten, user_field=''):
     call_log = {'date': date,
+                'date_answer': date_answer,
+                'date_end': date_end,
                 'source_name': source_name,
                 'source_exten': source_exten,
                 'destination_exten': destination_exten,
-                'duration': duration,
-                'answered': answered,
                 'user_field': user_field}
 
     with db.queries() as queries:
