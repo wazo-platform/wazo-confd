@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 import unittest
 
 from datetime import datetime
-from datetime import timedelta
 from hamcrest import assert_that
 from hamcrest import contains
 from hamcrest import empty
@@ -58,24 +57,24 @@ class TestCallLogs(unittest.TestCase):
                               e.missing_parameters(field='end_date', type='datetime'))
 
     @fixtures.call_log(date=datetime(2013, 1, 30, 8, 46, 20),
+                       date_answer=datetime(2013, 1, 30, 8, 46, 20),
+                       date_end=datetime(2013, 1, 30, 8, 46, 23),
                        source_name=u'Père Noël',
                        source_exten='1009',
-                       destination_exten='1001',
-                       duration=timedelta(seconds=3),
-                       answered=True)
+                       destination_exten='1001')
     @fixtures.call_log(date=datetime(2013, 1, 30, 11, 3, 47),
+                       date_answer=None,
+                       date_end=datetime(2013, 1, 30, 11, 3, 47),
                        source_name='Bob Marley',
                        source_exten='1002',
-                       destination_exten='4185550155',
-                       duration=timedelta(seconds=0),
-                       answered=False)
+                       destination_exten='4185550155')
     @fixtures.call_log(date=datetime(2013, 1, 30, 11, 20, 8),
+                       date_answer=datetime(2013, 1, 30, 11, 20, 8),
+                       date_end=datetime(2013, 1, 30, 11, 20, 11),
                        source_name='Bob Marley',
                        source_exten='1002',
                        destination_exten='4185550155',
-                       duration=timedelta(seconds=3),
-                       user_field=u'Père Noël',
-                       answered=True)
+                       user_field=u'Père Noël')
     def test_list_call_logs(self, _, __, ___):
         expected = contains({'Call Date': '2013-01-30T08:46:20',
                              'Caller': u'Père Noël (1009)',
@@ -98,11 +97,11 @@ class TestCallLogs(unittest.TestCase):
         assert_that(response.csv(), expected)
 
     @fixtures.call_log(date=datetime(2013, 1, 30, 8, 46, 20),
+                       date_answer=datetime(2013, 1, 30, 8, 46, 20),
+                       date_end=datetime(2013, 1, 30, 8, 46, 23),
                        source_name=u'Père, Noël',
                        source_exten='1009',
-                       destination_exten='1001',
-                       duration=timedelta(seconds=3),
-                       answered=True)
+                       destination_exten='1001')
     def test_list_call_logs_with_csv_separator_inside_fields(self, _):
         expected = contains({'Call Date': '2013-01-30T08:46:20',
                              'Caller': u'Père, Noël (1009)',
@@ -115,11 +114,11 @@ class TestCallLogs(unittest.TestCase):
         assert_that(response.csv(), expected)
 
     @fixtures.call_log(date=datetime(2013, 1, 30, 8, 46, 20),
+                       date_answer=datetime(2013, 1, 30, 8, 46, 20),
+                       date_end=datetime(2013, 1, 30, 8, 46, 23),
                        source_name=u'Père, Noël',
                        source_exten='1009',
-                       destination_exten='1001',
-                       duration=timedelta(seconds=3),
-                       answered=True)
+                       destination_exten='1001')
     def test_list_end_sooner_than_start(self, _):
         expected = empty()
 
@@ -129,24 +128,24 @@ class TestCallLogs(unittest.TestCase):
         assert_that(response.csv(), expected)
 
     @fixtures.call_log(date=datetime(2013, 1, 29, 8, 46, 20),
+                       date_answer=datetime(2013, 1, 29, 8, 46, 20),
+                       date_end=datetime(2013, 1, 29, 8, 46, 23),
                        source_name=u'Père Noël',
                        source_exten='1009',
-                       destination_exten='1001',
-                       duration=timedelta(seconds=3),
-                       answered=True)
+                       destination_exten='1001')
     @fixtures.call_log(date=datetime(2013, 1, 30, 11, 13, 47),
+                       date_answer=None,
+                       date_end=datetime(2013, 1, 30, 11, 13, 48),
                        source_name='Bob Marley',
                        source_exten='1002',
-                       destination_exten='4185550155',
-                       duration=timedelta(seconds=0),
-                       answered=False)
+                       destination_exten='4185550155')
     @fixtures.call_log(date=datetime(2013, 1, 31, 11, 20, 8),
+                       date_answer=datetime(2013, 1, 31, 11, 20, 9),
+                       date_end=datetime(2013, 1, 31, 11, 20, 12),
                        source_name='Bob Marley',
                        source_exten='1002',
                        destination_exten='4185550155',
-                       duration=timedelta(seconds=3),
-                       user_field=u'Père Noël',
-                       answered=True)
+                       user_field=u'Père Noël')
     def test_when_list_in_period_then_call_logs_are_filtered(self, _, __, ___):
         expected = contains({'Call Date': '2013-01-30T11:13:47',
                              'Caller': 'Bob Marley (1002)',

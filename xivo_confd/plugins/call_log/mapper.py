@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@ def to_api(call_log):
     result['Call Date'] = call_log.date.isoformat()
     result['Caller'] = '%s (%s)' % (call_log.source_name, call_log.source_exten)
     result['Called'] = call_log.destination_exten
-    result['Period'] = _format_duration(call_log.duration)
+    if call_log.date_answer and call_log.date_end:
+        result['Period'] = _format_duration(call_log.date_end-call_log.date_answer)
+    else:
+        result['Period'] = 0
     result['user Field'] = call_log.user_field or ''
     return result
 
