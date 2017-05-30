@@ -22,7 +22,7 @@ def to_api(call_log):
     result['Caller'] = '%s (%s)' % (call_log.source_name, call_log.source_exten)
     result['Called'] = call_log.destination_exten
     if call_log.date_answer and call_log.date_end:
-        result['Period'] = _format_duration(call_log.date_end-call_log.date_answer)
+        result['Period'] = _format_duration(call_log.date_end - call_log.date_answer)
     else:
         result['Period'] = 0
     result['user Field'] = call_log.user_field or ''
