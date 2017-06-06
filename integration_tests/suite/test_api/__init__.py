@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2014-2016 Avencall
+# Copyright (C) 2014-2017 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 
 import os
-from setup import setup_docker, stop_docker, new_client, new_confd, \
+from setup import setup_docker, stop_docker, new_confd, \
     setup_provd, setup_database
 from provd import create_helper as create_provd_helper
 from database import create_helper as create_database_helper
@@ -56,6 +56,5 @@ def teardown():
 
 confd = SingletonProxy(new_confd)
 confd_csv = SingletonProxy(new_confd, {'Accept': 'text/csv; charset=utf-8'})
-client = SingletonProxy(new_client)
 provd = SingletonProxy(create_provd_helper)
 db = SingletonProxy(create_database_helper)
