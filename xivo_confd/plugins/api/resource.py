@@ -40,4 +40,4 @@ class SwaggerResource(Resource):
         if not api_spec.get('info'):
             return {'error': "API spec does not exist"}, 404
 
-        return make_response(yaml.dump(api_spec), 200, {'Content-Type': 'application/x-yaml'})
+        return make_response(yaml.dump(dict(api_spec)), 200, {'Content-Type': 'application/x-yaml'})
