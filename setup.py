@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
 #
@@ -25,7 +25,7 @@ setup(
     version='0.1',
     description='Wazo confd daemon',
     author='Wazo Authors',
-    author_email='dev.wazo@gmail.com',
+    author_email='dev@wazo.community',
     url='http://wazo.community',
     license='GPLv3',
     packages=find_packages(),

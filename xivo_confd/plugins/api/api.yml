@@ -21,7 +21,7 @@ info:
   contact:
     name: Dev Team
     url: http://wazo.community
-    email: dev.wazo@gmail.com
+    email: dev@wazo.community
 schemes:
 - https
 basePath: /1.1

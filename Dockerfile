@@ -1,7 +1,7 @@
 ## Image to build from sources
 
 FROM python:2.7.9
-MAINTAINER Wazo Maintainers <dev.wazo@gmail.com>
+MAINTAINER Wazo Maintainers <dev@wazo.community>
 
 # Install xivo-confd
 ADD . /usr/src/xivo-confd
