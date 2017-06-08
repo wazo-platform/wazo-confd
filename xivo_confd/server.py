@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,8 @@ import signal
 import logging
 import cherrypy
 
-from cherrypy import wsgiserver
 from cherrypy.process.servers import ServerAdapter
-from cherrypy.wsgiserver import CherryPyWSGIServer
+from cheroot import wsgi
 from werkzeug.contrib.profiler import ProfilerMiddleware
 from xivo import http_helpers
 
@@ -41,7 +40,7 @@ def run_server(app):
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
                                           profile_dir=app.config['profile'])
 
-    wsgi_app = wsgiserver.WSGIPathInfoDispatcher({'/': app})
+    wsgi_app = wsgi.WSGIPathInfoDispatcher({'/': app})
 
     cherrypy.server.unsubscribe()
     cherrypy.config.update({'environment': 'production'})
@@ -53,8 +52,8 @@ def run_server(app):
     if https_config['enabled']:
         try:
             bind_addr_https = (https_config['listen'], https_config['port'])
-            server_https = CherryPyWSGIServer(bind_addr=bind_addr_https,
-                                              wsgi_app=wsgi_app)
+            server_https = wsgi.WSGIServer(bind_addr=bind_addr_https,
+                                           wsgi_app=wsgi_app)
             server_https.ssl_adapter = http_helpers.ssl_adapter(https_config['certificate'],
                                                                 https_config['private_key'],
                                                                 https_config['ciphers'])
@@ -69,8 +68,8 @@ def run_server(app):
 
     if http_config['enabled']:
         bind_addr_http = (http_config['listen'], http_config['port'])
-        server_http = CherryPyWSGIServer(bind_addr=bind_addr_http,
-                                         wsgi_app=wsgi_app)
+        server_http = wsgi.WSGIServer(bind_addr=bind_addr_http,
+                                      wsgi_app=wsgi_app)
         ServerAdapter(cherrypy.engine, server_http).subscribe()
 
         logger.debug('HTTP server starting on %s:%s', *bind_addr_http)
