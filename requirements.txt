@@ -15,7 +15,6 @@ kombu==3.0.34
 marshmallow==2.10.3
 netifaces
 psycopg2==2.5.4  # from xivo-dao
-pyopenssl==0.14  # from xivo-lib-python
 python-consul==0.4.7
 pyyaml==3.11
 requests==2.4.3
