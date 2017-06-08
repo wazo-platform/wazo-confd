@@ -55,8 +55,7 @@ def run_server(app):
             server_https = wsgi.WSGIServer(bind_addr=bind_addr_https,
                                            wsgi_app=wsgi_app)
             server_https.ssl_adapter = http_helpers.ssl_adapter(https_config['certificate'],
-                                                                https_config['private_key'],
-                                                                https_config['ciphers'])
+                                                                https_config['private_key'])
             ServerAdapter(cherrypy.engine, server_https).subscribe()
 
             logger.debug('HTTPS server starting on %s:%s', *bind_addr_https)
