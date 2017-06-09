@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ class TestSysconfdClient(TestCase):
 
     def test_xivo_service_start(self):
         self.session.request.return_value = Mock(status_code=200)
-        data = {'xivo-service': 'start'}
+        data = {'wazo-service': 'start'}
 
         self.client.xivo_service_start()
         self.client.flush()
@@ -79,7 +79,7 @@ class TestSysconfdClient(TestCase):
 
     def test_xivo_service_enable(self):
         self.session.request.return_value = Mock(status_code=200)
-        data = {'xivo-service': 'enable'}
+        data = {'wazo-service': 'enable'}
 
         self.client.xivo_service_enable()
         self.client.flush()
