@@ -164,7 +164,7 @@ definitions:
         did_length:
           type: integer
           default: 0
-          decription: The length of the did
+          description: The length of the did
   ContextItems:
     title: ContextItems
     properties:

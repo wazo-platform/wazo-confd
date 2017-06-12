@@ -33,7 +33,7 @@ paths:
           schema:
             $ref: '#/definitions/Switchboard'
         '400':
-          $ref: '#/definitions/CreateError'
+          $ref: '#/responses/CreateError'
   /switchboards/{switchboard_uuid}:
     get:
       summary: Get a switchboard

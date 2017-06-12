@@ -109,7 +109,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
     put:
-      operationdId: update_moh_files
+      operationId: update_moh_files
       summary: Add or update audio file
       description: '**Required ACL:** `confd.moh.{moh_uuid}.files.{moh_filename}.update`'
       tags:
@@ -121,16 +121,16 @@ paths:
       - $ref: '#/parameters/moh_filename'
       - name: body
         in: body
-        type: string
-        format: binary
         required: true
+        schema:
+          format: binary
       responses:
         '204':
           $ref: '#/responses/ResourceUpdated'
         '404':
           $ref: '#/responses/NotFoundError'
     delete:
-      operationdId: delete_moh_files
+      operationId: delete_moh_files
       summary: Delete audio file
       description: '**Required ACL:** `confd.moh.{moh_uuid}.files.{moh_filename}.delete`'
       tags:
