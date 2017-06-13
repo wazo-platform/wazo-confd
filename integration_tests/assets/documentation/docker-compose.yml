@@ -16,6 +16,8 @@ confd:
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/ssl:/usr/share/xivo-certs"
+    # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
+    # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
   environment:
     XIVO_UUID: "abcd-1234"
   command: "xivo-confd -f -d"

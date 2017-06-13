@@ -88,6 +88,7 @@ setup(
             'user_cti_profile_plugin = xivo_confd.plugins.user_cti_profile.plugin:Plugin',
             'user_entity_plugin = xivo_confd.plugins.user_entity.plugin:Plugin',
             'user_fallback_plugin = xivo_confd.plugins.user_fallback.plugin:Plugin',
+            'user_group_plugin = xivo_confd.plugins.user_group.plugin:Plugin',
             'user_import_plugin = xivo_confd.plugins.user_import.plugin:Plugin',
             'user_line_associated_plugin = xivo_confd.plugins.user_line_associated.plugin:Plugin',
             'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',

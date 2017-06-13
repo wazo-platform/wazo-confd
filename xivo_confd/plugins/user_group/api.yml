@@ -1,0 +1,40 @@
+paths:
+  /users/{user_id}/groups:
+    put:
+      operationId: update_user_groups
+      summary: Update user and groups
+      description: '**Required ACL:** `confd.users.{user_id}.groups`
+
+      **WARNING**
+      This endpoint remove all groups which are not defined.'
+      tags:
+      - groups
+      - users
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/GroupsID'
+      responses:
+        '204':
+          description: Group and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+
+definitions:
+  GroupID:
+    properties:
+      id:
+        type: integer
+  GroupsID:
+    properties:
+      groups:
+        items:
+          $ref: '#/definitions/GroupID'
+        type: array
