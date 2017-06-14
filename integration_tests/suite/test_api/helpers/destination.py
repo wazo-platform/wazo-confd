@@ -104,8 +104,10 @@ def invalid_destinations():
         {'type': 'hangup', 'cause': 'invalid'},
 
         {'type': 'hangup', 'cause': 'busy', 'timeout': 'invalid'},
+        {'type': 'hangup', 'cause': 'busy', 'timeout': -9},
 
         {'type': 'hangup', 'cause': 'congestion', 'timeout': 'invalid'},
+        {'type': 'hangup', 'cause': 'congestion', 'timeout': -10},
 
         {'type': 'ivr'},
         {'type': 'ivr', 'missing_required_field': 123},

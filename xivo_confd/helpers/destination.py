@@ -199,11 +199,11 @@ class HangupDestinationSchema(BaseDestinationSchema):
 
 
 class BusyDestinationSchema(HangupDestinationSchema):
-    timeout = fields.Float(attribute='actionarg1', allow_none=True)
+    timeout = fields.Float(attribute='actionarg1', validate=Range(min=0), allow_none=True)
 
 
 class CongestionDestinationSchema(HangupDestinationSchema):
-    timeout = fields.Float(attribute='actionarg1', allow_none=True)
+    timeout = fields.Float(attribute='actionarg1', validate=Range(min=0), allow_none=True)
 
 
 class IVRDestinationSchema(BaseDestinationSchema):
