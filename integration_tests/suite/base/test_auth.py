@@ -19,7 +19,7 @@ import unittest
 import requests
 
 from hamcrest import assert_that, equal_to
-from test_api.config import confd_base_url
+from xivo_test_helpers.confd.config import confd_base_url
 
 
 class TestAuthentication(unittest.TestCase):

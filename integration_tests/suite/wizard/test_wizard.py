@@ -33,7 +33,7 @@ from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers import until
 
 from test_api import confd, provd, db, mocks
-from test_api.bus import BusClient
+from xivo_test_helpers.confd.bus import BusClient
 
 ASSET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']

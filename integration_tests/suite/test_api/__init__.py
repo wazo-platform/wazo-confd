@@ -20,8 +20,10 @@ import os
 from .setup import setup_docker, stop_docker
 from xivo_test_helpers.confd import (
     SingletonProxy,
+    associations,
     bus,
     confd,
+    config,
     db,
     errors,
     fixtures,

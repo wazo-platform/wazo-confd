@@ -37,7 +37,7 @@ from test_api import scenarios as s
 from test_api import helpers as h
 from test_api import errors as e
 from test_api import fixtures
-from test_api.config import CONTEXT
+from xivo_test_helpers.confd.config import CONTEXT
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 

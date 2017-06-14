@@ -17,8 +17,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api.helpers.line_sip import generate_line, delete_line
-from test_api.helpers.extension import generate_extension, delete_extension
+from xivo_test_helpers.confd.helpers.line_sip import generate_line, delete_line
+from xivo_test_helpers.confd.helpers.extension import generate_extension, delete_extension
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a

@@ -24,7 +24,7 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
-from test_api.config import INCALL_CONTEXT, CONTEXT
+from xivo_test_helpers.confd.config import INCALL_CONTEXT, CONTEXT
 
 
 FAKE_ID = 999999999
