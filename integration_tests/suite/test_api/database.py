@@ -492,7 +492,7 @@ class DatabaseQueries(object):
                         INNER JOIN sccpline
                             ON linefeatures.protocol = 'sccp'
                             AND linefeatures.protocolid = sccpline.id
-                            INNER JOIN sccpdevice ON sccpdevice.line = linefeatures.number
+                            INNER JOIN sccpdevice ON sccpdevice.line = linefeatures.name
                      WHERE
                         linefeatures.id = :line_id
                         AND sccpdevice.device = :sccp_device
