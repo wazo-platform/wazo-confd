@@ -17,29 +17,27 @@
 
 
 import os
-from setup import setup_docker, stop_docker, new_confd, \
-    setup_provd, setup_database
-from provd import create_helper as create_provd_helper
-from database import create_helper as create_database_helper
-
-
-class SingletonProxy(object):
-
-    def __init__(self, func, *args, **kwargs):
-        self.func = func
-        self.func_args = args
-        self.func_kwargs = kwargs
-        self.obj = None
-
-    def __getattr__(self, name):
-        if self.obj is None:
-            self.obj = self.func(*self.func_args, **self.func_kwargs)
-        return getattr(self.obj, name)
-
-    def __call__(self, *args, **kwargs):
-        if self.obj is None:
-            self.obj = self.func(*self.func_args, **self.func_kwargs)
-        return self.obj(*args, **kwargs)
+from .setup import setup_docker, stop_docker
+from xivo_test_helpers.confd import (
+    SingletonProxy,
+    associations,
+    bus,
+    confd,
+    config,
+    db,
+    errors,
+    fixtures,
+    helpers,
+    mocks,
+    new_confd,
+    provd,
+    provd,
+    scenarios,
+)
+from xivo_test_helpers.confd.setup import (
+    setup_provd,
+    setup_database
+)
 
 
 def setup():
@@ -54,7 +52,4 @@ def teardown():
         stop_docker()
 
 
-confd = SingletonProxy(new_confd)
 confd_csv = SingletonProxy(new_confd, {'Accept': 'text/csv; charset=utf-8'})
-provd = SingletonProxy(create_provd_helper)
-db = SingletonProxy(create_database_helper)

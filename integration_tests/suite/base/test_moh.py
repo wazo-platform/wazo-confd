@@ -19,7 +19,7 @@ from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
-from test_api.setup import new_client
+from xivo_test_helpers.confd import new_client
 
 
 from hamcrest import (assert_that,

@@ -22,7 +22,7 @@ from hamcrest import (assert_that,
 from test_api import scenarios as s
 from test_api import confd
 from test_api import fixtures
-from test_api.helpers.destination import invalid_destinations, valid_destinations
+from xivo_test_helpers.confd.helpers.destination import invalid_destinations, valid_destinations
 
 
 FAKE_ID = 999999999

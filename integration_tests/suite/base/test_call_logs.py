@@ -26,7 +26,7 @@ from hamcrest import empty
 
 from test_api import errors as e
 from test_api import fixtures
-from test_api.setup import new_client
+from xivo_test_helpers.confd import new_client
 
 
 class TestCallLogs(unittest.TestCase):

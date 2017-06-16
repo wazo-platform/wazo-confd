@@ -24,8 +24,8 @@ from test_api import associations as a
 from test_api import scenarios as s
 from test_api import errors as e
 
-from test_api.helpers import voicemail as vm_helper
-from test_api.helpers import context as context_helper
+from xivo_test_helpers.confd.helpers import voicemail as vm_helper
+from xivo_test_helpers.confd.helpers import context as context_helper
 
 from hamcrest import (assert_that,
                       contains,
