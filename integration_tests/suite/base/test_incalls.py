@@ -150,12 +150,13 @@ def test_create_all_parameters():
                                            destination={'type': 'none'}))
 
 
-@fixtures.incall(destination={'type': 'hangup'})
+@fixtures.incall()
 def test_edit_minimal_parameters(incall):
-    parameters = {'destination': {'type': 'none'}}
-
-    response = confd.incalls(incall['id']).put(**parameters)
+    response = confd.incalls(incall['id']).put()
     response.assert_updated()
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(incall))
 
 
 @fixtures.incall()
