@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,7 +63,8 @@ class IncallItem(ItemResource):
     def parse_and_update(self, model):
         form = self.schema().load(request.get_json(), partial=True).data
         updated_fields = self.find_updated_fields(model, form)
-        form['destination'] = Dialaction(**form['destination'])
+        if 'destination' in form:
+            form['destination'] = Dialaction(**form['destination'])
 
         for name, value in form.iteritems():
             setattr(model, name, value)
