@@ -58,15 +58,16 @@ def test_get(user):
                                            fail_destination=None))
 
 
-@fixtures.user()
+@fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},
+                          'busy_destination': {'type': 'none'},
+                          'congestion_destination': {'type': 'none'},
+                          'fail_destination': {'type': 'none'}})
 def test_get_all_parameters(user):
-    parameters = {'noanswer_destination': {'type': 'none'},
-                  'busy_destination': {'type': 'none'},
-                  'congestion_destination': {'type': 'none'},
-                  'fail_destination': {'type': 'none'}}
-    confd.users(user['id']).fallbacks.put(parameters).assert_updated()
     response = confd.users(user['uuid']).fallbacks.get()
-    assert_that(response.item, has_entries(**parameters))
+    assert_that(response.item, has_entries(noanswer_destination={'type': 'none'},
+                                           busy_destination={'type': 'none'},
+                                           congestion_destination={'type': 'none'},
+                                           fail_destination={'type': 'none'}))
 
 
 @fixtures.user()
@@ -85,14 +86,11 @@ def test_edit_with_all_parameters(user):
     response.assert_updated()
 
 
-@fixtures.user()
+@fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},
+                          'busy_destination': {'type': 'none'},
+                          'congestion_destination': {'type': 'none'},
+                          'fail_destination': {'type': 'none'}})
 def test_edit_to_none(user):
-    parameters = {'noanswer_destination': {'type': 'none'},
-                  'busy_destination': {'type': 'none'},
-                  'congestion_destination': {'type': 'none'},
-                  'fail_destination': {'type': 'none'}}
-    confd.users(user['uuid']).fallbacks.put(parameters).assert_updated()
-
     response = confd.users(user['uuid']).fallbacks.put(noanswer_destination=None,
                                                        busy_destination=None,
                                                        congestion_destination=None,
@@ -165,12 +163,11 @@ def test_bus_events(user):
     yield s.check_bus_event, 'config.users.fallbacks.edited', url
 
 
-@fixtures.user()
+@fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},
+                          'busy_destination': {'type': 'none'},
+                          'congestion_destination': {'type': 'none'},
+                          'fail_destination': {'type': 'none'}})
 def test_get_fallbacks_relation(user):
-    confd.users(user['uuid']).fallbacks.put(noanswer_destination={'type': 'none'},
-                                            busy_destination={'type': 'none'},
-                                            congestion_destination={'type': 'none'},
-                                            fail_destination={'type': 'none'}).assert_updated
     response = confd.users(user['uuid']).get()
     assert_that(response.item, has_entries(
         fallbacks=has_entries(noanswer_destination=has_entries(type='none'),

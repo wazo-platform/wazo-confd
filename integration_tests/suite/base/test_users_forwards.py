@@ -99,12 +99,13 @@ def test_put_error(user):
     yield s.check_bogus_field_returns_error, forward_url, 'destination', {}
 
 
-@fixtures.user()
+@fixtures.user(forwards={'busy': {'enabled': True, 'destination': '123'},
+                         'noanswer': {'enabled': True, 'destination': '456'},
+                         'unconditional': {'enabled': True, 'destination': '789'}})
 def test_get_forwards_relation(user):
-    forwards = {'busy': {'enabled': True, 'destination': '123'},
-                'noanswer': {'enabled': True, 'destination': '456'},
-                'unconditional': {'enabled': True, 'destination': '789'}}
-    confd.users(user['uuid']).forwards.put(**forwards).assert_updated()
-
     response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(forwards=forwards))
+    assert_that(response.item, has_entries(
+        forwards={'busy': {'enabled': True, 'destination': '123'},
+                  'noanswer': {'enabled': True, 'destination': '456'},
+                  'unconditional': {'enabled': True, 'destination': '789'}}
+    ))

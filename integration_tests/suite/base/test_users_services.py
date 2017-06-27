@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -70,11 +70,8 @@ def test_put_error(user):
     yield s.check_bogus_field_returns_error, service_url, 'enabled', {}
 
 
-@fixtures.user()
+@fixtures.user(services={'dnd': {'enabled': True}, 'incallfilter': {'enabled': True}})
 def test_get_services_relation(user):
-    confd.users(user['uuid']).services.dnd.put(enabled=True).assert_updated()
-    confd.users(user['uuid']).services.incallfilter.put(enabled=True).assert_updated()
-
     response = confd.users(user['uuid']).get()
     assert_that(response.item, has_entries(
         services={'dnd': {'enabled': True},
