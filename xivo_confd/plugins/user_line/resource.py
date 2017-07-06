@@ -54,14 +54,14 @@ class UserLineResource(ConfdResource):
 
 class UserLineList(UserLineResource):
 
-    schema = UserLineSchema
+    deprecated_schema = UserLineSchema
 
     @required_acl('confd.users.{user_id}.lines.read')
     def get(self, user_id):
         user = self.get_user(user_id)
         items = self.service.find_all_by(user_id=user.id)
         return {'total': len(items),
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.deprecated_schema().dump(items, many=True).data}
 
     @required_acl('confd.users.{user_id}.lines.create')
     def post(self, user_id):
@@ -71,10 +71,10 @@ class UserLineList(UserLineResource):
         user = self.get_user(user_id)
         line = self.get_line_or_fail()
         user_line = self.service.associate(user, line)
-        return self.schema().dump(user_line).data, 201, self.build_headers(user_line)
+        return self.deprecated_schema().dump(user_line).data, 201, self.build_headers(user_line)
 
     def get_line_or_fail(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.deprecated_schema().load(request.get_json()).data
         try:
             return self.line_dao.get(form['line_id'])
         except NotFoundError:
