@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -264,6 +263,67 @@ def test_associate_user_to_line_with_endpoint(user, line, sip):
         response = confd.users(user['id']).lines.get()
         assert_that(response.items, contains(has_entries({'user_id': user['id'],
                                                           'line_id': line['id']})))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_associate_lines_to_user(user, line1, line2):
+    response = confd.users(user['uuid']).lines.put(lines=[line2, line1])
+    response.assert_updated()
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item['lines'], contains(has_entries({'id': line2['id']}),
+                                                 has_entries({'id': line1['id']})))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+def test_associate_lines_to_swap_main_line(user, line1, line2):
+    response = confd.users(user['uuid']).lines.put(lines=[line1, line2])
+    response.assert_updated()
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item['lines'], contains(has_entries({'id': line1['id']}),
+                                                 has_entries({'id': line2['id']})))
+    response = confd.users(user['uuid']).lines.put(lines=[line2, line1])
+    response.assert_updated()
+    response = confd.users(user['uuid']).get()
+    assert_that(response.item['lines'], contains(has_entries({'id': line2['id']}),
+                                                 has_entries({'id': line1['id']})))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_associate_lines_twice_with_same_line(user, line):
+    response = confd.users(user['uuid']).lines.put(lines=[line])
+    response.assert_updated()
+    response = confd.users(user['uuid']).lines.put(lines=[line])
+    response.assert_updated()
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_associate_lines_same_line(user, line):
+    response = confd.users(user['uuid']).lines.put(lines=[line, line])
+    response.assert_status(400)
+
+
+# Tests that /users/id/lines execute the same validator as /users/id/lines/id
+@fixtures.user()
+@fixtures.line()
+def test_associate_lines_without_endpoint(user, line):
+    response = confd.users(user['uuid']).lines.put(lines=[line])
+    response.assert_match(400, e.missing_association('Line', 'Endpoint'))
+
+
+# Tests that /users/id/lines execute the same validator as /users/id/lines/id
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+def test_dissociate_lines_second_user_before_first(user1, user2, line):
+    with a.user_line(user1, line), a.user_line(user2, line):
+        response = confd.users(user1['uuid']).lines.put(lines=[])
+        response.assert_match(400, secondary_user_regex)
 
 
 @fixtures.user()
