@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -126,6 +126,7 @@ def error_funckeys_checks(url):
 
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'keys', True
     yield s.check_bogus_field_returns_error, url, 'keys', None
     yield s.check_bogus_field_returns_error, url, 'keys', 'string'

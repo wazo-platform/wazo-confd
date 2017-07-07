@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import re
 
 from flask import url_for
 from marshmallow import Schema, fields, validates, post_dump
-from marshmallow.validate import OneOf, Regexp, Range
+from marshmallow.validate import OneOf, Regexp, Range, Length
 from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
@@ -246,7 +246,7 @@ class FuncKeyPositionField(fields.Field):
 
 class FuncKeyTemplateSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String()
+    name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(fields.Integer(validate=Range(min=1)),
                                 fields.Nested(FuncKeySchema, required=True))
     links = ListLink(Link('func_keys_templates'))
@@ -254,7 +254,7 @@ class FuncKeyTemplateSchema(BaseSchema):
 
 class FuncKeyUnifiedTemplateSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String()
+    name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(fields.Integer(validate=Range(min=1)),
                                 fields.Nested(FuncKeySchema, required=True))
 
