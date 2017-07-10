@@ -16,6 +16,7 @@ confd:
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/ssl:/usr/share/xivo-certs"
+    - "./etc/xivo-confd:/etc/xivo-confd"
     # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
     # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
   environment:
@@ -23,7 +24,7 @@ confd:
   command: "xivo-confd -f -d"
 
 postgres:
-  image: wazopbx/postgres
+  image: wazopbx/postgres-test
   expose:
     - "5432"
 
