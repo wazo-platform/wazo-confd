@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,14 @@ class UserLineSchema(BaseSchema):
                           target='id'))
 
 
+class LineSchemaIDLoad(BaseSchema):
+    id = fields.Integer(required=True)
+
+
+class LinesIDSchema(BaseSchema):
+    lines = fields.Nested(LineSchemaIDLoad, many=True, required=True)
+
+
 class UserLineResource(ConfdResource):
 
     def __init__(self, service, user_dao, line_dao):
@@ -54,14 +62,27 @@ class UserLineResource(ConfdResource):
 
 class UserLineList(UserLineResource):
 
-    schema = UserLineSchema
+    deprecated_schema = UserLineSchema
+    schema = LinesIDSchema
 
     @required_acl('confd.users.{user_id}.lines.read')
     def get(self, user_id):
         user = self.get_user(user_id)
         items = self.service.find_all_by(user_id=user.id)
         return {'total': len(items),
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.deprecated_schema().dump(items, many=True).data}
+
+    @required_acl('confd.users.{user_id}.lines.update')
+    def put(self, user_id):
+        user = self.get_user(user_id)
+        form = self.schema().load(request.get_json()).data
+        try:
+            lines = [self.line_dao.get(line['id']) for line in form['lines']]
+        except NotFoundError as e:
+            raise errors.param_not_found('lines', 'Line', **e.metadata)
+
+        self.service.associate_all_lines(user, lines)
+        return '', 204
 
     @required_acl('confd.users.{user_id}.lines.create')
     def post(self, user_id):
@@ -71,10 +92,10 @@ class UserLineList(UserLineResource):
         user = self.get_user(user_id)
         line = self.get_line_or_fail()
         user_line = self.service.associate(user, line)
-        return self.schema().dump(user_line).data, 201, self.build_headers(user_line)
+        return self.deprecated_schema().dump(user_line).data, 201, self.build_headers(user_line)
 
     def get_line_or_fail(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.deprecated_schema().load(request.get_json()).data
         try:
             return self.line_dao.get(form['line_id'])
         except NotFoundError:

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from xivo_dao.helpers import errors
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_confd.plugins.user_line import notifier
 from xivo_confd.plugins.user_line.validator import build_validator
@@ -48,6 +49,28 @@ class UserLineService(object):
         user_line = self.dao.get_by(user_id=user.id, line_id=line.id)
         self.notifier.dissociated(user_line)
         self.dao.dissociate(user, line)
+
+    def associate_all_lines(self, user, lines):
+        if len(lines) != len(set(lines)):
+            raise errors.not_permitted('Cannot associate same line more than once')
+
+        for existing_line in user.lines:
+            if existing_line not in lines:
+                self.validator.validate_dissociation(user, existing_line)
+
+        for line in lines:
+            if line not in user.lines:
+                self.validator.validate_association(user, line)
+
+        for existing_line in user.lines:
+            if existing_line not in lines:
+                user_line = self.find_by(user_id=user.id, line_id=existing_line.id)
+                self.notifier.dissociated(user_line)
+
+        user_lines = self.dao.associate_all_lines(user, lines)
+
+        for user_line in user_lines:
+            self.notifier.associated(user_line)
 
 
 def build_service():
