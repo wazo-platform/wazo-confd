@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from __future__ import unicode_literals
+
 import os
 import requests
 import pprint
@@ -21,6 +23,8 @@ import pprint
 from hamcrest import assert_that, empty
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+
+requests.packages.urllib3.disable_warnings()
 
 ASSET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 
@@ -32,10 +36,11 @@ class TestDocumentation(AssetLaunchingTestCase):
     asset = 'documentation'
 
     def test_documentation_errors(self):
-        api_url = 'https://confd:9486/1.1/api/api.yml'
-        self.validate_api(api_url)
+        api_url = 'https://localhost:9486/1.1/api/api.yml'
+        api = requests.get(api_url, verify=False)
+        self.validate_api(api)
 
-    def validate_api(self, url):
-        validator_url = u'http://localhost:18080/debug'
-        response = requests.get(validator_url, params={'url': url})
+    def validate_api(self, api):
+        validator_url = 'http://localhost:18080/debug'
+        response = requests.post(validator_url, data=api)
         assert_that(response.json(), empty(), pprint.pformat(response.json()))
