@@ -22,7 +22,9 @@ import cherrypy
 from cherrypy.process.servers import ServerAdapter
 from cheroot import wsgi
 from werkzeug.contrib.profiler import ProfilerMiddleware
+from werkzeug.contrib.fixers import ProxyFix
 from xivo import http_helpers
+from xivo.http_helpers import ReverseProxied
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ def run_server(app):
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
                                           profile_dir=app.config['profile'])
 
-    wsgi_app = wsgi.WSGIPathInfoDispatcher({'/': app})
+    wsgi_app = ReverseProxied(ProxyFix(wsgi.WSGIPathInfoDispatcher({'/': app})))
 
     cherrypy.server.unsubscribe()
     cherrypy.config.update({'environment': 'production'})

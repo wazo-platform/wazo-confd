@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2014-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2014-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +68,7 @@ class ConfdAuth(HTTPDigestAuth):
 
     def _remote_address_allowed(self):
         # check localhost first to avoid accessing the database for nothing
-        remote_addr = request.remote_addr
+        remote_addr = request.environ.get('werkzeug.proxy_fix.orig_remote_addr', request.remote_addr)
         remote_port = request.environ['SERVER_PORT']
         if remote_addr == self.ALLOWED_HOST and remote_port == self._allowed_port:
             return True
