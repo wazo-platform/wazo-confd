@@ -10,7 +10,7 @@ sync:
 confd:
   image: xivo-confd-test
   ports:
-    - "9486:9486"
+    - "9486"
   links:
     - postgres
   volumes:
@@ -31,6 +31,6 @@ postgres:
 swagger-validator:
   image: swaggerapi/swagger-validator
   ports:
-    - "18080:8080"
+    - "8080"
   links:
     - confd
