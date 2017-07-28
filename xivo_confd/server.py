@@ -72,8 +72,5 @@ def run_server(app):
     else:
         logger.debug('HTTP server is disabled')
 
-    try:
-        cherrypy.engine.start()
-        cherrypy.engine.block()
-    except KeyboardInterrupt:
-        cherrypy.engine.stop()
+    cherrypy.engine.start()
+    cherrypy.engine.block()
