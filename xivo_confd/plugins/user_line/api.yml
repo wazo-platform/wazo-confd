@@ -73,6 +73,27 @@ paths:
             $ref: '#/definitions/UserLineItems'
         '404':
           $ref: '#/responses/NotFoundError'
+    put:
+      operationId: associate_user_lines
+      summary: Associate user and lines
+      description: '**Required ACL:** `confd.users.{user_id}.lines.update`'
+      tags:
+      - users
+      - lines
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/LinesID'
+      responses:
+        '204':
+          description: User and Lines associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
     post:
       operationId: associate_user_line
       summary: Associate user and line
@@ -131,3 +152,13 @@ definitions:
         type: integer
     required:
     - total
+  LineID:
+    properties:
+      id:
+        type: integer
+  LinesID:
+    properties:
+      lines:
+        items:
+          $ref: '#/definitions/LineID'
+        type: array
