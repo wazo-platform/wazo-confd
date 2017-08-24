@@ -35,7 +35,8 @@ from hamcrest import (assert_that,
                       has_entry,
                       has_items,
                       has_length,
-                      none)
+                      none,
+                      not_)
 
 
 def test_get_errors():
@@ -264,8 +265,11 @@ def test_delete_line(line):
 @fixtures.user()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_delete_line_then_associatons_are_removed(user, line1, line2):
-    with a.user_line(user, line1, check=False), a.user_line(user, line2, check=False):
+@fixtures.extension()
+@fixtures.device()
+def test_delete_line_then_associatons_are_removed(user, line1, line2, extension, device):
+    with a.user_line(user, line1, check=False), a.user_line(user, line2, check=False), \
+            a.line_extension(line1, extension, check=False), a.line_device(line1, device, check=False):
         response = confd.users(user['id']).lines.get()
         assert_that(response.items, contains(
             has_entries(line_id=line1['id'],
@@ -273,6 +277,11 @@ def test_delete_line_then_associatons_are_removed(user, line1, line2):
             has_entries(line_id=line2['id'],
                         main_line=False),
         ))
+        response = confd.devices(device['id']).lines.get()
+        assert_that(response.items, not_(empty()))
+
+        response = confd.extensions(extension['id']).lines.get()
+        assert_that(response.items, not_(empty()))
 
         confd.lines(line1['id']).delete()
 
@@ -281,3 +290,8 @@ def test_delete_line_then_associatons_are_removed(user, line1, line2):
             has_entries(line_id=line2['id'],
                         main_line=True)
         ))
+        response = confd.devices(device['id']).lines.get()
+        assert_that(response.items, empty())
+
+        response = confd.extensions(extension['id']).lines.get()
+        assert_that(response.items, empty())
