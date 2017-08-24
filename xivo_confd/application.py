@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
@@ -25,12 +25,12 @@ from flask_cors import CORS
 from sqlalchemy.exc import SQLAlchemyError
 
 from xivo import http_helpers
+from xivo import plugin_helpers
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
 
-from xivo_confd import plugin_manager
 from xivo_confd.authentication.confd_auth import auth
 from xivo_confd.core_rest_api import CoreRestApi
 from xivo_confd.helpers.common import handle_error
@@ -135,7 +135,11 @@ def setup_app(config):
 
     auth.set_config(config)
     core = CoreRestApi(app, api, auth)
-    plugin_manager.load_plugins(core)
+    plugin_helpers.load(
+        namespace='xivo_confd.plugins',
+        names=plugin_helpers.from_list(core.config['enabled_plugins']),
+        dependencies=core,
+    )
 
     load_cors(app)
 
