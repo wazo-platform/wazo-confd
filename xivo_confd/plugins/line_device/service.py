@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 from xivo_dao.helpers import errors
 
 from xivo_confd.database import device as device_db
+from xivo_dao.resources.line import dao as line_dao
 
 from xivo_confd.plugins.device.builder import build_device_updater
-from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_confd.plugins.line_device.validator import build_validator
 from xivo_confd.plugins.line_device.notifier import build_notifier
 
@@ -39,9 +39,9 @@ class LineDevice(object):
 
 class LineDeviceService(object):
 
-    def __init__(self, validator, line_service, notifier, device_updater):
+    def __init__(self, validator, line_dao, notifier, device_updater):
         self.validator = validator
-        self.line_service = line_service
+        self.line_dao = line_dao
         self.notifier = notifier
         self.device_updater = device_updater
 
@@ -52,7 +52,7 @@ class LineDeviceService(object):
 
     def associate_line_device(self, line, device):
         line.associate_device(device)
-        self.line_service.edit(line)
+        self.device_updater.update_device(device)
         if line.endpoint == "sccp":
             device_db.associate_sccp_device(line, device)
 
@@ -64,24 +64,22 @@ class LineDeviceService(object):
 
     def dissociate_line_device(self, line, device):
         line.remove_device()
-        self.line_service.edit(line)
+        self.device_updater.update_device(device)
         if line.endpoint == "sccp":
             device_db.dissociate_sccp_device(line, device)
 
-    def get_association_from_line(self, line_id):
-        line = self.line_service.get(line_id)
+    def get_association_from_line(self, line):
         if not line.device_id:
-            raise errors.not_found('LineDevice', line_id=line_id)
+            raise errors.not_found('LineDevice', line_id=line.id)
         return LineDevice.from_line(line)
 
-    def find_all_associations_from_device(self, device_id):
-        lines = self.line_service.find_all_by(device=device_id)
+    def find_all_associations_from_device(self, device):
+        lines = self.line_dao.find_all_by(device=device.id)
         return [LineDevice.from_line(line) for line in lines]
 
 
 def build_service(provd_client):
     validator = build_validator()
     updater = build_device_updater(provd_client)
-    service = build_line_service(provd_client)
     notifier = build_notifier()
-    return LineDeviceService(validator, service, notifier, updater)
+    return LineDeviceService(validator, line_dao, notifier, updater)
