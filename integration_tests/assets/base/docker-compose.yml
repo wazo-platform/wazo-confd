@@ -1,3 +1,14 @@
+sync:
+  image: n3llyb0y/wait
+  links:
+    - rabbitmq
+    - postgres
+    - provd
+    - sysconfd
+    - confd
+  environment:
+    PORTS: "5432 5672 8666 8668 9486"
+    TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"
 provd:
   image: wazopbx/xivo-provd
   ports:
@@ -46,16 +57,3 @@ confd:
     # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
     # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
     # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
-tests:
-  # This image checks that all the links are up by pinging the ports.
-  # Used to make sure everything is ready before executing tests
-  image: n3llyb0y/wait
-  links:
-    - rabbitmq
-    - postgres
-    - provd
-    - sysconfd
-    - confd
-  environment:
-    PORTS: "5432 5672 8666 8668 9486"
-    TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"

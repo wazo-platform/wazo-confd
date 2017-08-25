@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2014-2017 Avencall
+# Copyright 2014-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-import os
-from .setup import setup_docker, stop_docker
 from xivo_test_helpers.confd import (
     SingletonProxy,
     associations,
@@ -31,25 +29,20 @@ from xivo_test_helpers.confd import (
     mocks,
     new_confd,
     provd,
-    provd,
     scenarios,
 )
-from xivo_test_helpers.confd.setup import (
-    setup_provd,
-    setup_database
-)
 
-
-def setup():
-    if os.environ.get('DOCKER', '1') == '1':
-        setup_docker()
-    setup_provd()
-    setup_database()
-
-
-def teardown():
-    if os.environ.get('DOCKER', '1') == '1':
-        stop_docker()
-
-
+__all__ = [
+    associations,
+    bus,
+    confd,
+    config,
+    db,
+    errors,
+    fixtures,
+    helpers,
+    mocks,
+    provd,
+    scenarios,
+]
 confd_csv = SingletonProxy(new_confd, {'Accept': 'text/csv; charset=utf-8'})
