@@ -67,6 +67,14 @@ class ServicesSchema(BaseSchema):
     def add_envelope(self, data):
         return {type_: data for type_ in self.types}
 
+    @post_load
+    def remove_envelope(self, data):
+        result = {}
+        for service in data.itervalues():
+            for key, value in service.iteritems():
+                result[key] = value
+        return result
+
 
 class UserServiceDND(UserSubResource):
 
@@ -102,8 +110,9 @@ class UserServiceList(UserSubResource):
     def get(self, user_id):
         return super(UserServiceList, self).get(user_id)
 
+    @required_acl('confd.users.{user_id}.services.update')
     def put(self, user_id):
-        return '', 405
+        return super(UserServiceList, self).put(user_id)
 
 
 class ForwardBusySchema(BaseSchema):
