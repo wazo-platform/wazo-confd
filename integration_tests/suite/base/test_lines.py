@@ -30,6 +30,7 @@ from test_api import associations as a
 
 from hamcrest import (assert_that,
                       contains,
+                      contains_inanyorder,
                       empty,
                       has_entries,
                       has_entry,
@@ -271,7 +272,7 @@ def test_delete_line_then_associatons_are_removed(user, line1, line2, extension,
     with a.user_line(user, line1, check=False), a.user_line(user, line2, check=False), \
             a.line_extension(line1, extension, check=False), a.line_device(line1, device, check=False):
         response = confd.users(user['id']).lines.get()
-        assert_that(response.items, contains(
+        assert_that(response.items, contains_inanyorder(
             has_entries(line_id=line1['id'],
                         main_line=True),
             has_entries(line_id=line2['id'],
