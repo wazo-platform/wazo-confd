@@ -17,7 +17,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import unicode_literals
-from hamcrest import assert_that, has_key, has_entry, has_entries
+from hamcrest import (
+    assert_that,
+    equal_to,
+    has_key,
+    has_entry,
+    has_entries,
+)
 
 from test_api import confd
 from test_api import fixtures
@@ -58,6 +64,20 @@ def _update_service(service_url, value):
 def _read_service(service_url, value):
     response = service_url.get()
     assert_that(response.item, has_entry('enabled', value))
+
+
+@fixtures.user()
+def test_put_services(user):
+    services_url = confd.users(user['uuid']).services
+    yield _update_services, services_url, {'enabled': True}, {'enabled': False}
+
+
+def _update_services(services_url, dnd={}, incallfilter={}):
+    response = services_url.put(dnd=dnd, incallfilter=incallfilter)
+    response.assert_ok()
+
+    response = services_url.get()
+    assert_that(response.item, equal_to({'dnd': dnd, 'incallfilter': incallfilter}))
 
 
 @fixtures.user()

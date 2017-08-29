@@ -186,6 +186,25 @@ paths:
             $ref: '#/definitions/UserServices'
         '404':
           $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_user_services
+      summary: Update all services for a user
+      description: '**Required ACL:** `confd.users.{user_id}.services.update`'
+      tags:
+      - services
+      - users
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserServices'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
   /users/{user_id}/services/{service_name}:
     get:
       operationId: get_user_service
