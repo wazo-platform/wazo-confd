@@ -22,16 +22,19 @@ from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.plugins.line.validator import build_validator
 from xivo_confd.plugins.line.notifier import build_notifier
 from xivo_confd.plugins.device import builder as device_builder
+from xivo_confd.plugins.line_device.service import build_service as line_device_build_service
 from xivo_confd.plugins.user_line.service import build_service as user_line_build_service
 from xivo_dao.helpers.db_manager import Session
 
 
 class LineService(CRUDService):
 
-    def __init__(self, dao, validator, notifier, device_updater, user_line_service):
+    def __init__(self, dao, validator, notifier, device_updater, device_dao, user_line_service, line_device_service):
         super(LineService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
+        self.device_dao = device_dao
         self.user_line_service = user_line_service
+        self.line_device_service = line_device_service
 
     def find_by(self, **criteria):
         return self.dao.find_by(**criteria)
@@ -48,6 +51,9 @@ class LineService(CRUDService):
 
     def delete(self, line):
         self.validator.validate_delete(line)
+        if line.device_id:
+            device = self.device_dao.get(line.device_id)
+            self.line_device_service.dissociate(line, device)
         for user in line.users:
             self.user_line_service.dissociate(user, line)
         self.dao.delete(line)
@@ -62,4 +68,6 @@ def build_service(provd_client):
                        build_validator(device_dao),
                        build_notifier(),
                        device_updater,
-                       user_line_build_service())
+                       device_dao,
+                       user_line_build_service(),
+                       line_device_build_service(provd_client))
