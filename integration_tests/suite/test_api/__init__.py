@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from base import provd, mocks
+from .base import IntegrationTest
+from . import mocks
 from xivo_test_helpers.confd import (
     SingletonProxy,
     associations,
@@ -41,10 +42,7 @@ __all__ = [
     fixtures,
     helpers,
     scenarios,
+    mocks,
 ]
 confd_csv = SingletonProxy(new_confd, {'Accept': 'text/csv; charset=utf-8'})
-
-# TODO change all import to remove this line
-# Also fix other assets
-provd = provd
-mocks = mocks
+provd = SingletonProxy(IntegrationTest.create_provd)
