@@ -1,6 +1,6 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class UserServiceNotifier(object):
         for type_ in schema.types:
             service = services.get(type_, services)
             event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
-            self.bus.send_bus_event(event, event.routing_key)
+            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid': user.uuid})
 
 
 def build_notifier_service():
@@ -88,7 +88,7 @@ class UserForwardNotifier(object):
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
             event = EditUserForwardEvent(user.uuid, type_, forward['enabled'], forward['destination'])
-            self.bus.send_bus_event(event, event.routing_key)
+            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid': user.uuid})
 
 
 def build_notifier_forward():

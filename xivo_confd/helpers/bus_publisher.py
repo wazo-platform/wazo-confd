@@ -23,11 +23,11 @@ class BusPublisher(object):
         self.uuid = uuid
         self.messages = []
 
-    def send_bus_event(self, message, routing_key):
-        self.publish(message, routing_key)
+    def send_bus_event(self, message, routing_key, headers=None):
+        self.publish(message, routing_key, headers)
 
-    def publish(self, message, routing_key):
-        self.messages.append((message, routing_key))
+    def publish(self, message, routing_key, headers=None):
+        self.messages.append((message, routing_key, headers))
 
     def flush(self):
         exchange = Exchange(self.exchange_name, self.exchange_type)
@@ -40,9 +40,11 @@ class BusPublisher(object):
             self.send_messages(marshaler, publish)
 
     def send_messages(self, marshaler, publish):
-        for event, routing_key in self.messages:
+        for event, routing_key, headers in self.messages:
             message = marshaler.marshal_message(event)
-            publish(message, content_type=marshaler.content_type, routing_key=routing_key)
+            all_headers = dict(marshaler.metadata(event))
+            all_headers.update(headers or {})
+            publish(message, content_type=marshaler.content_type, routing_key=routing_key, headers=all_headers)
 
     def publish_error(self, exc, interval):
         logger.error('Error: %s', exc, exc_info=1)
