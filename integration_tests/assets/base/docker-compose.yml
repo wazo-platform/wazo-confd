@@ -12,7 +12,7 @@ sync:
 provd:
   image: wazopbx/xivo-provd
   ports:
-    - "8666:8666"
+    - "8666"
   expose:
     - "8666"
   volumes:

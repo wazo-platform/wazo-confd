@@ -17,8 +17,10 @@
 
 import os
 
+from xivo_test_helpers.confd import SingletonProxy
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
-from xivo_test_helpers.confd.setup import setup_provd, setup_database
+from xivo_test_helpers.confd.setup import setup_database
+from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
 
 
 class BaseIntegrationTest(AssetLaunchingTestCase):
@@ -26,12 +28,33 @@ class BaseIntegrationTest(AssetLaunchingTestCase):
     service = 'confd'
     assets_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'assets'))
 
+    @classmethod
+    def setUpClass(cls):
+        super(BaseIntegrationTest, cls).setUpClass()
+        cls.setup_provd()
+        setup_database()
+
+    @classmethod
+    def setup_provd(cls):
+        helper = cls.create_provd()
+        helper.reset()
+        return helper
+
+    @classmethod
+    def create_provd(cls):
+        return provd_create_helper(port=cls.service_port(8666, 'provd'))
+
+    @classmethod
+    def tearDownClass(cls):
+        super(BaseIntegrationTest, cls).tearDownClass()
+
 
 def setUpModule():
     BaseIntegrationTest.setUpClass()
-    setup_provd()
-    setup_database()
 
 
 def tearDownModule():
     BaseIntegrationTest.tearDownClass()
+
+
+provd = SingletonProxy(BaseIntegrationTest.create_provd)
