@@ -1,6 +1,6 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -114,7 +114,8 @@ class TestUserServiceNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+                                                        expected_event.routing_key,
+                                                        headers={'user_uuid': self.user.uuid})
 
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
         schema = ServiceIncallFilterSchema()
@@ -125,7 +126,8 @@ class TestUserServiceNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+                                                        expected_event.routing_key,
+                                                        headers={'user_uuid': self.user.uuid})
 
 
 class TestUserForwardNotifier(unittest.TestCase):
@@ -149,7 +151,8 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+                                                        expected_event.routing_key,
+                                                        headers={'user_uuid': self.user.uuid})
 
     def test_when_user_forward_noanswer_edited_then_event_sent_on_bus(self):
         schema = ForwardNoAnswerSchema()
@@ -161,7 +164,8 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+                                                        expected_event.routing_key,
+                                                        headers={'user_uuid': self.user.uuid})
 
     def test_when_user_forward_unconditional_edited_then_event_sent_on_bus(self):
         schema = ForwardUnconditionalSchema()
@@ -173,7 +177,8 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+                                                        expected_event.routing_key,
+                                                        headers={'user_uuid': self.user.uuid})
 
     def test_when_user_forwards_edited_then_event_sent_on_bus(self):
         schema = ForwardsSchema()
@@ -192,7 +197,13 @@ class TestUserForwardNotifier(unittest.TestCase):
                                                             'unconditional',
                                                             self.user.unconditional_enabled,
                                                             self.user.unconditional_destination)
-        expected_calls = [call(expected_busy_event, expected_busy_event.routing_key),
-                          call(expected_noanswer_event, expected_noanswer_event.routing_key),
-                          call(expected_unconditional_event, expected_unconditional_event.routing_key)]
+        expected_calls = [call(expected_busy_event,
+                               expected_busy_event.routing_key,
+                               headers={'user_uuid': self.user.uuid}),
+                          call(expected_noanswer_event,
+                               expected_noanswer_event.routing_key,
+                               headers={'user_uuid': self.user.uuid}),
+                          call(expected_unconditional_event,
+                               expected_unconditional_event.routing_key,
+                               headers={'user_uuid': self.user.uuid})]
         self.bus.send_bus_event.assert_has_calls(expected_calls)
