@@ -71,7 +71,7 @@ class UserServiceNotifier(object):
         for type_ in schema.types:
             service = services.get(type_, services)
             event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
-            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid': user.uuid})
+            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
 
 
 def build_notifier_service():
@@ -88,7 +88,7 @@ class UserForwardNotifier(object):
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
             event = EditUserForwardEvent(user.uuid, type_, forward['enabled'], forward['destination'])
-            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid': user.uuid})
+            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
 
 
 def build_notifier_forward():
