@@ -37,12 +37,12 @@ tags:
     url: http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
     description: Documentation on function key models
 securityDefinitions:
-  xivo_auth_token:
+  wazo_auth_token:
     type: apiKey
     name: X-Auth-Token
     in: header
 security:
-- xivo_auth_token: []
+- wazo_auth_token: []
 parameters:
   agentid:
     required: true
