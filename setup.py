@@ -29,14 +29,14 @@ setup(
     url='http://wazo.community',
     license='GPLv3',
     packages=find_packages(),
-    scripts=[
-        'bin/xivo-confd'
-    ],
 
     package_data={'xivo_confd.plugins': ['*/api.yml']},
 
     zip_safe=False,
     entry_points={
+        'console_scripts': [
+            'xivo-confd=xivo_confd.bin.daemon:main',
+        ],
         'xivo_confd.plugins': [
             'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
             'api_plugin = xivo_confd.plugins.api.plugin:Plugin',
