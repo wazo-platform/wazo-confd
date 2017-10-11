@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ from xivo_confd.controller import Controller
 logger = logging.getLogger(__name__)
 
 
-def main(argv):
+def main(argv=None):
+    argv = argv or sys.argv[1:]
     config = load_config(argv)
 
     xivo_logging.setup_logging(config['log_filename'], config['foreground'],
@@ -50,7 +51,3 @@ def main(argv):
 
     with pidfile_context(config['pid_filename'], config['foreground']):
         controller.run()
-
-
-if __name__ == '__main__':
-    main(sys.argv[1:])
