@@ -8,17 +8,9 @@ X-Python-Version: >= 2.7
 
 Package: xivo-confd
 Architecture: all
-Depends: ${python:Depends}, ${misc:Depends}, xivo-libconfd (>= ${binary:Version})
-Provides: xivo-restapi
-Conflicts: xivo-restapi
-Replaces: xivo-restapi
-Description: Wazo confd server
- Wazo is a system based on a powerful IPBX, to bring an easy to
- install solution for telephony and related services.
- .
-
-Package: xivo-libconfd
-Architecture: all
+Provides: xivo-restapi, xivo-librestapi, xivo-libconfd
+Conflicts: xivo-restapi, xivo-librestapi, xivo-libconfd
+Replaces: xivo-restapi, xivo-librestapi, xivo-libconfd
 Depends: ${python:Depends},
          ${misc:Depends},
          xivo-auth-client,
@@ -38,10 +30,7 @@ Depends: ${python:Depends},
          python-requests (>= 2.4.3),
          python-netifaces,
          python-marshmallow
-Provides: xivo-librestapi
-Conflicts: xivo-librestapi
-Replaces: xivo-librestapi
-Description: Wazo confd lib
+Description: Wazo confd server
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
  .
