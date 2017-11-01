@@ -82,6 +82,11 @@ def test_search_errors():
         yield check
 
 
+def test_head_errors():
+    response = confd.users(999999).head()
+    response.assert_status(404)
+
+
 def test_get_errors():
     fake_get = confd.users(999999).get
     yield s.check_resource_not_found, fake_get, 'User'
@@ -484,6 +489,12 @@ def test_sorting_offset_limit(user1, user2):
     yield s.check_offset_legacy, url, user1, user2, 'firstname', 'firstname'
 
     yield s.check_limit, url, user1, user2, 'firstname', 'firstname'
+
+
+@fixtures.user()
+def test_head_user(user):
+    response = confd.users(user['uuid']).head()
+    response.assert_ok()
 
 
 @fixtures.user(**FULL_USER)

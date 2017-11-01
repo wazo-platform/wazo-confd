@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,6 +61,11 @@ class UserList(ListResource):
 class UserItem(ItemResource):
 
     schema = UserSchema
+
+    @required_acl('confd.users.{id}.read')
+    def head(self, id):
+        self.service.get(id)
+        return '', 200
 
     @required_acl('confd.users.{id}.read')
     def get(self, id):

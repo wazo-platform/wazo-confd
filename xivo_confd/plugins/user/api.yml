@@ -39,6 +39,19 @@ paths:
         '400':
           $ref: '#/responses/CreateError'
   /users/{user_id}:
+    head:
+      operationId: head_user
+      summary: Check if user exists
+      description: '**Required ACL:** `confd.users.{user_id}.read`'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User exists
+        '404':
+          description: User does not exist
     get:
       operationId: get_user
       summary: Get user
