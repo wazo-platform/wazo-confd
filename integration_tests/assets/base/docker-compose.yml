@@ -34,7 +34,7 @@ sysconfd:
   expose:
     - "8668"
   ports:
-    - "18668:8668"
+    - "8668"
   volumes:
     - "./mocks/sysconfd.py:/tmp/sysconfd.py"
   command: "python /tmp/sysconfd.py"

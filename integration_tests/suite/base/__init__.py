@@ -38,5 +38,10 @@ class mocks(object):
 
         actions = {'generate': BaseIntegrationTest.setup_provd}
 
+    @classmethod
+    class sysconfd(IsolatedAction):
+
+        actions = {'generate': BaseIntegrationTest.setup_sysconfd}
+
 
 provd = SingletonProxy(BaseIntegrationTest.create_provd)

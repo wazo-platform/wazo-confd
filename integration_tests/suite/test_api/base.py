@@ -20,6 +20,7 @@ import os
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers.confd.setup import setup_database
 from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
+from xivo_test_helpers.confd.sysconfd import SysconfdMock
 from xivo_test_helpers.confd.helpers import device
 
 
@@ -43,3 +44,14 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def create_provd(cls):
         return provd_create_helper(port=cls.service_port(8666, 'provd'))
+
+    @classmethod
+    def setup_sysconfd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
+        helper = cls.create_sysconfd()
+        helper.clear()
+        return helper
+
+    @classmethod
+    def create_sysconfd(cls):
+        url = 'http://localhost:{port}'.format(port=cls.service_port(8668, 'sysconfd'))
+        return SysconfdMock(url)
