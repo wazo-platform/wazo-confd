@@ -23,6 +23,12 @@ from xivo_test_helpers.confd.wrappers import IsolatedAction
 class BaseIntegrationTest(IntegrationTest):
     asset = 'base'
 
+    @classmethod
+    def setUpClass(cls):
+        super(IntegrationTest, cls).setUpClass()
+        cls.setup_provd()
+        cls.setup_database()
+
 
 def setUpModule():
     BaseIntegrationTest.setUpClass()

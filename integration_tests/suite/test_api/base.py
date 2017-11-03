@@ -35,8 +35,6 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def setUpClass(cls):
         super(IntegrationTest, cls).setUpClass()
-        cls.setup_provd()
-        cls.setup_database()
         cls.setup_helpers()
 
     @classmethod

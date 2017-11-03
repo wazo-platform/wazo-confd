@@ -17,7 +17,6 @@
 
 import copy
 import json
-import os
 import re
 
 from hamcrest import (assert_that,
@@ -29,13 +28,14 @@ from hamcrest import (assert_that,
                       is_not,
                       starts_with)
 
-from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers import until
-
-from test_api import confd, provd, db, mocks
+from xivo_test_helpers.confd import SingletonProxy
 from xivo_test_helpers.confd.bus import BusClient
+from xivo_test_helpers.confd.wrappers import IsolatedAction
 
-ASSET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
+from test_api.base import IntegrationTest as BaseIntegrationTest
+
+
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']
 TIMEZONE = 'America/Montreal'
 DOMAIN = 'example.com'
@@ -80,11 +80,22 @@ def build_string(length):
     return ''.join('a' for _ in range(length))
 
 
-class IntegrationTest(AssetLaunchingTestCase):
-
-    assets_root = ASSET_ROOT
-    service = 'confd'
+class IntegrationTest(BaseIntegrationTest):
     asset = 'wizard'
+
+    @classmethod
+    def setUpClass(cls):
+        super(IntegrationTest, cls).setUpClass()
+        cls.confd = SingletonProxy(cls.create_confd)
+        cls.provd = SingletonProxy(cls.create_provd)
+        cls.db = SingletonProxy(cls.create_database)
+
+
+class mocks(object):
+    @classmethod
+    class sysconfd(IsolatedAction):
+
+        actions = {'generate': IntegrationTest.setup_sysconfd}
 
 
 class TestWizardErrors(IntegrationTest):
@@ -235,7 +246,7 @@ class TestWizardErrors(IntegrationTest):
         else:
             body[sub_field][field] = bogus
 
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape(field)))
 
     def check_network_bogus_field_returns_error(self, field, bogus):
@@ -253,36 +264,36 @@ class TestWizardErrors(IntegrationTest):
     def test_context_internal_bad_range(self):
         body = {'context_internal': {'number_start': '3000',
                                      'number_end': '2000'}}
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_internal')))
 
     def test_context_internal_bad_length(self):
         body = {'context_internal': {'number_start': '100',
                                      'number_end': '0199'}}
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_internal')))
 
     def test_context_incall_bad_range(self):
         body = {'context_incall': {'number_start': '3000',
                                    'number_end': '2000'}}
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_incall')))
 
     def test_context_incall_bad_length(self):
         body = {'context_incall': {'number_start': '100',
                                    'number_end': '0199'}}
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_incall')))
 
     def test_context_incall_missing_number(self):
         body = {'context_incall': {'number_start': '2000'}}
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_incall')))
 
     def test_context_incall_missing_did_length(self):
         body = {'context_incall': {'number_start': '2000',
                                    'number_end': '3000'}}
-        result = confd.wizard.post(body)
+        result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('did_length')))
 
 
@@ -305,7 +316,7 @@ class TestWizardDiscover(IntegrationTest):
             'interfaces': has_item(has_entry('ip_address', ip_address))
         }
 
-        response = confd.wizard.discover.get()
+        response = self.confd.wizard.discover.get()
         assert_that(response.item, has_entries(expected_response))
 
     def test_wizard_discover_ignores_interface_lo(self):
@@ -313,7 +324,7 @@ class TestWizardDiscover(IntegrationTest):
             'interfaces': is_not(has_item(has_entry('interface', 'lo')))
         }
 
-        response = confd.wizard.discover.get()
+        response = self.confd.wizard.discover.get()
         assert_that(response.item, has_entries(expected_response))
 
 
@@ -321,13 +332,13 @@ class TestWizardErrorConfigured(IntegrationTest):
 
     def test_error_configured(self):
         body = copy.deepcopy(MINIMAL_POST_BODY)
-        response = confd.wizard.post(body)
+        response = self.confd.wizard.post(body)
         response.assert_ok()
 
-        response = confd.wizard.post(body)
+        response = self.confd.wizard.post(body)
         response.assert_match(403, re.compile(re.escape('configured')))
 
-        response = confd.wizard.discover.get()
+        response = self.confd.wizard.discover.get()
         response.assert_match(403, re.compile(re.escape('configured')))
 
 
@@ -335,10 +346,10 @@ class TestWizardDefaultValue(IntegrationTest):
 
     def test_default_configuration(self):
         body = copy.deepcopy(MINIMAL_POST_BODY)
-        response = confd.wizard.post(body)
+        response = self.confd.wizard.post(body)
         response.assert_ok()
 
-        with db.queries() as queries:
+        with self.db.queries() as queries:
             assert_that(queries.sip_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))
@@ -356,13 +367,13 @@ class TestWizard(IntegrationTest):
         data = copy.deepcopy(COMPLETE_POST_BODY)
         BusClient.listen_events('config.wizard.created')
 
-        response = confd.wizard.get()
+        response = self.confd.wizard.get()
         assert_that(response.item, equal_to({'configured': False}))
 
-        response = confd.wizard.post(data)
+        response = self.confd.wizard.post(data)
         response.assert_ok()
 
-        response = confd.wizard.get()
+        response = self.confd.wizard.get()
         assert_that(response.item, equal_to({'configured': True}))
 
         self.validate_db(data)
@@ -377,7 +388,7 @@ class TestWizard(IntegrationTest):
         until.assert_(assert_function, tries=5)
 
     def validate_db(self, data):
-        with db.queries() as queries:
+        with self.db.queries() as queries:
             assert_that(queries.admin_has_password(data['admin_password']))
             assert_that(queries.autoprov_is_configured())
             assert_that(queries.entity_has_name_displayname('testentity', data['entity_name']))
@@ -426,7 +437,7 @@ class TestWizard(IntegrationTest):
                                 method='GET')
 
     def validate_provd(self, ip_address):
-        configs = provd.configs.find()
+        configs = self.provd.configs.find()
 
         autoprov_username = configs[1]['raw_config']['sip_lines']['1']['username']
         assert_that(autoprov_username, starts_with('ap'))
