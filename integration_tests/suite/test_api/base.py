@@ -34,7 +34,7 @@ class IntegrationTest(AssetLaunchingTestCase):
         setup_database()
 
     @classmethod
-    def setup_provd(cls):
+    def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
         helper = cls.create_provd()
         helper.reset()
         device.provd = helper

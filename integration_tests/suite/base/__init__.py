@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from test_api import IntegrationTest
+from test_api.base import IntegrationTest
+from test_api import SingletonProxy
+from xivo_test_helpers.confd.wrappers import IsolatedAction
 
 
 class BaseIntegrationTest(IntegrationTest):
@@ -28,3 +30,13 @@ def setUpModule():
 
 def tearDownModule():
     BaseIntegrationTest.tearDownClass()
+
+
+class mocks(object):
+    @classmethod
+    class provd(IsolatedAction):
+
+        actions = {'generate': BaseIntegrationTest.setup_provd}
+
+
+provd = SingletonProxy(BaseIntegrationTest.create_provd)

@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from .base import IntegrationTest
 from . import mocks
 from xivo_test_helpers.confd import (
     SingletonProxy,
@@ -45,4 +44,3 @@ __all__ = [
     mocks,
 ]
 confd_csv = SingletonProxy(new_confd, {'Accept': 'text/csv; charset=utf-8'})
-provd = SingletonProxy(IntegrationTest.create_provd)
