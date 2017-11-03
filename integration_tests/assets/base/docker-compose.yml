@@ -24,7 +24,7 @@ postgres:
   expose:
     - "5432"
   ports:
-    - "15432:5432"
+    - "5432"
 rabbitmq:
   image: rabbitmq
   ports:
