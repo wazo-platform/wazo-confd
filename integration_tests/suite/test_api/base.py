@@ -79,7 +79,7 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def setup_helpers(cls):
-        client = cls._create_confd_client()
+        client = cls.new_client()
         setup_confd_helpers(client)
         setup_new_client_helpers(host='localhost',
                                  port=cls.service_port('9486', 'confd'),
@@ -89,11 +89,11 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def create_confd(cls, headers=None, encoder=None):
-        client = cls._create_confd_client(headers, encoder)
+        client = cls.new_client(headers, encoder)
         return client.url
 
     @classmethod
-    def _create_confd_client(cls, headers=None, encoder=None):
+    def new_client(cls, headers=None, encoder=None):
         client = ConfdClient.from_options(host='localhost',
                                           port=cls.service_port('9486', 'confd'),
                                           username='admin',

@@ -17,9 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from hamcrest import (assert_that,
-                      contains_inanyorder)
-from . import confd
+from hamcrest import assert_that, contains_inanyorder
+from . import confd, BaseIntegrationTest
 
 
 def test_get_destinations():
@@ -36,7 +35,9 @@ def test_get_destinations():
          'parameters': []},
         {'type': 'user',
          'parameters': [{'name': 'user_id',
-                         'collection': 'https://localhost:9486/1.1/users'}]},
+                         'collection': 'https://localhost:{}/1.1/users'.format(
+                             BaseIntegrationTest.service_port(9486, 'confd')
+                         )}]},
         {'type': 'parking',
          'parameters': []},
         {'type': 'conference',

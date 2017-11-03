@@ -23,13 +23,11 @@ from contextlib import contextmanager
 from hamcrest import assert_that, has_entries, is_not, starts_with, equal_to, contains, has_items, none, has_key
 
 from test_api import scenarios as s
-from test_api import provd
-from test_api import db
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
 from test_api import helpers as h
-from . import confd
+from . import confd, db, provd
 
 
 @contextmanager

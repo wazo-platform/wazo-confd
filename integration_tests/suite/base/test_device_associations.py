@@ -23,12 +23,10 @@ from hamcrest import assert_that, has_entries
 
 from test_api import config
 from test_api import errors as e
-from . import confd
-from test_api import db
 from test_api import fixtures
 from test_api import associations as a
 from test_api import helpers as h
-from . import mocks, provd
+from . import mocks, provd, db, confd
 
 
 @fixtures.user()

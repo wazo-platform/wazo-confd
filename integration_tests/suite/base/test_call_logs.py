@@ -26,13 +26,13 @@ from hamcrest import empty
 
 from test_api import errors as e
 from test_api import fixtures
-from xivo_test_helpers.confd import new_client
+from . import BaseIntegrationTest
 
 
 class TestCallLogs(unittest.TestCase):
 
     def setUp(self):
-        self.client = new_client({'Accept': 'text/csv'}).url
+        self.client = BaseIntegrationTest.new_client({'Accept': 'text/csv'}).url
 
     def test_missing_start_date(self):
         response = self.client.call_logs.get(end_date='2013-01-29T00:00:00')

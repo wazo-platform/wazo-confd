@@ -21,7 +21,6 @@ from xivo_test_helpers.confd.helpers.extension import generate_extension, delete
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
-from test_api import db
 from test_api import fixtures
 from test_api import config
 
@@ -31,7 +30,7 @@ from hamcrest import empty
 from hamcrest import has_entries
 from hamcrest import has_item
 from hamcrest import has_items
-from . import confd
+from . import confd, db
 
 
 FAKE_ID = 999999999

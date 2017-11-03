@@ -30,14 +30,13 @@ from hamcrest import (assert_that,
                       none,
                       not_)
 
-from test_api import provd
 from test_api import associations as a
 from test_api import scenarios as s
 from test_api import helpers as h
 from test_api import errors as e
 from test_api import fixtures
 from xivo_test_helpers.confd.config import CONTEXT
-from . import confd
+from . import confd, provd
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 
