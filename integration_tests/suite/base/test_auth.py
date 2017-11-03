@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ from hamcrest import assert_that, equal_to
 from xivo_test_helpers.confd.config import confd_base_url
 
 
+@unittest.skip('Waiting to be deleted')
 class TestAuthentication(unittest.TestCase):
 
     def setUp(self):
