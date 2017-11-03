@@ -86,6 +86,7 @@ class IntegrationTest(BaseIntegrationTest):
     @classmethod
     def setUpClass(cls):
         super(IntegrationTest, cls).setUpClass()
+        cls.setup_helpers()
         cls.confd = SingletonProxy(cls.create_confd)
         cls.provd = SingletonProxy(cls.create_provd)
         cls.db = SingletonProxy(cls.create_database)

@@ -33,11 +33,6 @@ class IntegrationTest(AssetLaunchingTestCase):
     assets_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'assets'))
 
     @classmethod
-    def setUpClass(cls):
-        super(IntegrationTest, cls).setUpClass()
-        cls.setup_helpers()
-
-    @classmethod
     def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
         helper = cls.create_provd()
         helper.reset()

@@ -28,6 +28,7 @@ class BaseIntegrationTest(IntegrationTest):
         super(IntegrationTest, cls).setUpClass()
         cls.setup_provd()
         cls.setup_database()
+        cls.setup_helpers()
 
 
 def setUpModule():
