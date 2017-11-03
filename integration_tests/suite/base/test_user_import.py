@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@ from hamcrest import (assert_that,
                       instance_of,
                       empty)
 
-from test_api import confd
 from test_api import config
 from test_api import helpers as h
 from test_api import associations as a
 from test_api import fixtures
+from . import confd
 
 
 client = h.user_import.csv_client()

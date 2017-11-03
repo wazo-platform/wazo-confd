@@ -19,7 +19,7 @@
 from __future__ import unicode_literals
 from hamcrest import assert_that, has_key, has_entries, equal_to
 
-from test_api import confd
+from . import confd
 from test_api import fixtures
 from test_api import scenarios as s
 

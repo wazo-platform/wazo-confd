@@ -21,7 +21,10 @@ from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers.confd.setup import setup_database
 from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
 from xivo_test_helpers.confd.sysconfd import SysconfdMock
+from xivo_test_helpers.confd.client import ConfdClient
 from xivo_test_helpers.confd.helpers import device
+from xivo_test_helpers.confd.helpers import setup_confd as setup_confd_helpers
+from xivo_test_helpers.confd.helpers import setup_new_client as setup_new_client_helpers
 
 
 class IntegrationTest(AssetLaunchingTestCase):
@@ -33,6 +36,7 @@ class IntegrationTest(AssetLaunchingTestCase):
         super(IntegrationTest, cls).setUpClass()
         cls.setup_provd()
         setup_database()
+        cls.setup_helpers()
 
     @classmethod
     def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
@@ -55,3 +59,27 @@ class IntegrationTest(AssetLaunchingTestCase):
     def create_sysconfd(cls):
         url = 'http://localhost:{port}'.format(port=cls.service_port(8668, 'sysconfd'))
         return SysconfdMock(url)
+
+    @classmethod
+    def setup_helpers(cls):
+        client = cls._create_confd_client()
+        setup_confd_helpers(client)
+        setup_new_client_helpers(host='localhost',
+                                 port=cls.service_port('9486', 'confd'),
+                                 username='admin',
+                                 password='proformatique')
+
+    @classmethod
+    def create_confd(cls, headers=None, encoder=None):
+        client = cls._create_confd_client(headers, encoder)
+        return client.url
+
+    @classmethod
+    def _create_confd_client(cls, headers=None, encoder=None):
+        client = ConfdClient.from_options(host='localhost',
+                                          port=cls.service_port('9486', 'confd'),
+                                          username='admin',
+                                          password='proformatique',
+                                          headers=headers,
+                                          encoder=encoder)
+        return client

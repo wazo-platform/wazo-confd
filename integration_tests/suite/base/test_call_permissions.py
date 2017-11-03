@@ -18,7 +18,7 @@
 from test_api import scenarios as s
 from test_api import errors as e
 from test_api import fixtures
-from test_api import confd
+from . import confd
 
 from hamcrest import (assert_that,
                       has_entries,

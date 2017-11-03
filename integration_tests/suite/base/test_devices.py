@@ -24,7 +24,7 @@ from test_api import scenarios as s
 from test_api import errors as e
 from test_api import associations as a
 from test_api import fixtures
-from test_api import confd
+from . import confd
 from . import mocks, provd
 
 from hamcrest import (assert_that,

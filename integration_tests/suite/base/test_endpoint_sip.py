@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from test_api import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e
@@ -30,6 +28,7 @@ from hamcrest import (assert_that,
                       has_items,
                       has_length,
                       instance_of)
+from . import confd
 
 ALL_OPTIONS = [
     ['buggymwi', 'yes'],

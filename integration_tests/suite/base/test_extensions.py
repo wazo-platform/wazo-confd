@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ from hamcrest import (assert_that,
                       none,
                       not_)
 
-from test_api import confd
 from test_api import provd
 from test_api import associations as a
 from test_api import scenarios as s
@@ -38,6 +37,7 @@ from test_api import helpers as h
 from test_api import errors as e
 from test_api import fixtures
 from xivo_test_helpers.confd.config import CONTEXT
+from . import confd
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 

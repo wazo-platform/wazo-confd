@@ -25,7 +25,7 @@ from hamcrest import (
     has_entries,
 )
 
-from test_api import confd
+from . import confd
 from test_api import fixtures
 from test_api import scenarios as s
 

@@ -16,31 +16,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-from . import mocks
 from xivo_test_helpers.confd import (
-    SingletonProxy,
     associations,
     bus,
-    confd,
     config,
     db,
     errors,
     fixtures,
     helpers,
-    new_confd,
     scenarios,
 )
 
 __all__ = [
     associations,
     bus,
-    confd,
     config,
     db,
     errors,
     fixtures,
     helpers,
     scenarios,
-    mocks,
 ]
-confd_csv = SingletonProxy(new_confd, {'Accept': 'text/csv; charset=utf-8'})

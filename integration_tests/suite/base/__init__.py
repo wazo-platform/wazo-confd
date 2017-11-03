@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from test_api.base import IntegrationTest
-from test_api import SingletonProxy
+from xivo_test_helpers.confd import SingletonProxy
 from xivo_test_helpers.confd.wrappers import IsolatedAction
 
 
@@ -44,4 +44,6 @@ class mocks(object):
         actions = {'generate': BaseIntegrationTest.setup_sysconfd}
 
 
+confd = SingletonProxy(BaseIntegrationTest.create_confd)
+confd_csv = SingletonProxy(BaseIntegrationTest.create_confd, {'Accept': 'text/csv; charset=utf-8'})
 provd = SingletonProxy(BaseIntegrationTest.create_provd)

@@ -26,7 +26,7 @@ from hamcrest import (assert_that,
                       is_not,
                       not_)
 
-from test_api import confd
+from . import confd
 from test_api import helpers
 from test_api import db
 from test_api import provd

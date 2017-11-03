@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from test_api import confd
+from . import confd
 from test_api import fixtures
 from test_api import associations as a
 from test_api import scenarios as s

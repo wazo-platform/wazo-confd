@@ -43,7 +43,7 @@ confd:
   expose:
     - "9486"
   ports:
-    - "9486:9486"
+    - "9486"
   links:
     - postgres
     - rabbitmq
