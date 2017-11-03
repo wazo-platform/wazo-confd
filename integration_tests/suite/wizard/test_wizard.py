@@ -29,7 +29,6 @@ from hamcrest import (assert_that,
                       starts_with)
 
 from xivo_test_helpers import until
-from xivo_test_helpers.confd import SingletonProxy
 from xivo_test_helpers.confd.bus import BusClient
 from xivo_test_helpers.confd.wrappers import IsolatedAction
 
@@ -87,9 +86,9 @@ class IntegrationTest(BaseIntegrationTest):
     def setUpClass(cls):
         super(IntegrationTest, cls).setUpClass()
         cls.setup_helpers()
-        cls.confd = SingletonProxy(cls.create_confd)
-        cls.provd = SingletonProxy(cls.create_provd)
-        cls.db = SingletonProxy(cls.create_database)
+        cls.confd = cls.create_confd()
+        cls.provd = cls.create_provd()
+        cls.db = cls.create_database()
 
 
 class mocks(object):
