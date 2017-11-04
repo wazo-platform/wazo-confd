@@ -18,7 +18,7 @@
 import os
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
-from xivo_test_helpers.confd.database import DbHelper
+from xivo_test_helpers.confd.database import create_helper as db_create_helper
 from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
 from xivo_test_helpers.confd.sysconfd import SysconfdMock
 from xivo_test_helpers.confd.client import ConfdClient
@@ -51,13 +51,7 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def create_database(cls):
-        db_user = 'asterisk'
-        db_password = 'proformatique'
-        host = 'localhost'
-        port = cls.service_port(5432, 'postgres')
-        db = 'asterisk'
-        helper = DbHelper.build(db_user, db_password, host, port, db)
-        return helper
+        return db_create_helper(port=cls.service_port(5432, 'postgres'))
 
     @classmethod
     def setup_sysconfd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
