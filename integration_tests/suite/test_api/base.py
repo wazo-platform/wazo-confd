@@ -22,10 +22,10 @@ from xivo_test_helpers.confd.database import create_helper as db_create_helper
 from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
 from xivo_test_helpers.confd.sysconfd import SysconfdMock
 from xivo_test_helpers.confd.client import ConfdClient
-from xivo_test_helpers.confd.helpers import device
 from xivo_test_helpers.confd.helpers import setup_confd as setup_confd_helpers
-from xivo_test_helpers.confd.helpers import setup_new_client as setup_new_client_helpers
 from xivo_test_helpers.confd.helpers import setup_database as setup_database_helpers
+from xivo_test_helpers.confd.helpers import setup_new_client as setup_new_client_helpers
+from xivo_test_helpers.confd.helpers import setup_provd as setup_provd_helpers
 
 
 class IntegrationTest(AssetLaunchingTestCase):
@@ -36,7 +36,6 @@ class IntegrationTest(AssetLaunchingTestCase):
     def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
         helper = cls.create_provd()
         helper.reset()
-        device.provd = helper
         return helper
 
     @classmethod
@@ -66,10 +65,10 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def setup_helpers(cls):
-        client = cls.new_client()
-        setup_confd_helpers(client)
+        setup_confd_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
         setup_new_client_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
-        setup_database_helpers(cls.create_database())
+        setup_database_helpers(host='localhost', port=cls.service_port(5432, 'postgres'))
+        setup_provd_helpers(host='localhost', port=cls.service_port(8666, 'provd'))
 
     @classmethod
     def create_confd(cls, headers=None, encoder=None):
