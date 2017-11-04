@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from test_api.base import IntegrationTest
-from xivo_test_helpers.confd import SingletonProxy
 from xivo_test_helpers.confd.wrappers import IsolatedAction
 
 
@@ -49,6 +48,25 @@ class mocks(object):
     class sysconfd(IsolatedAction):
 
         actions = {'generate': BaseIntegrationTest.setup_sysconfd}
+
+
+class SingletonProxy(object):
+
+    def __init__(self, func, *args, **kwargs):
+        self.func = func
+        self.func_args = args
+        self.func_kwargs = kwargs
+        self.obj = None
+
+    def __getattr__(self, name):
+        if self.obj is None:
+            self.obj = self.func(*self.func_args, **self.func_kwargs)
+        return getattr(self.obj, name)
+
+    def __call__(self, *args, **kwargs):
+        if self.obj is None:
+            self.obj = self.func(*self.func_args, **self.func_kwargs)
+        return self.obj(*args, **kwargs)
 
 
 confd = SingletonProxy(BaseIntegrationTest.create_confd)
