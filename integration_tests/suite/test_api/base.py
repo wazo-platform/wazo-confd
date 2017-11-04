@@ -30,7 +30,7 @@ from xivo_test_helpers.confd.helpers import setup_provd as setup_provd_helpers
 
 class IntegrationTest(AssetLaunchingTestCase):
     service = 'confd'
-    assets_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'assets'))
+    assets_root = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 
     @classmethod
     def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
