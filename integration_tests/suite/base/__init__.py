@@ -70,6 +70,7 @@ class SingletonProxy(object):
 
 
 confd = SingletonProxy(BaseIntegrationTest.create_confd)
-confd_csv = SingletonProxy(BaseIntegrationTest.create_confd, {'Accept': 'text/csv; charset=utf-8'})
+confd_csv = SingletonProxy(BaseIntegrationTest.create_confd, {'Accept': 'text/csv; charset=utf-8',
+                                                              'X-Auth-Token': 'valid-token'})
 provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)

@@ -293,7 +293,8 @@ def _new_moh_file_client():
             return None
         return data['content']
 
-    return BaseIntegrationTest.new_client(headers={"Content-Type": "application/octet-stream"}, encoder=encoder)
+    return BaseIntegrationTest.new_client(headers={"Content-Type": "application/octet-stream",
+                                                   "X-Auth-Token": "valid-token"}, encoder=encoder)
 
 
 @fixtures.moh()

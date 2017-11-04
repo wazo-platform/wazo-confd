@@ -68,4 +68,9 @@ sysconfd:
     host: sysconfd
     port: 8668
 
+auth:
+    host: auth
+    port: 9497
+    verify_certificate: False
+
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c

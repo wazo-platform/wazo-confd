@@ -10,6 +10,7 @@ test-setup: build-provd build-confd egg-info
 	docker pull rabbitmq
 	docker pull wazopbx/postgres
 	docker pull wazopbx/postgres-test
+	docker pull wazopbx/xivo-auth-mock
 	docker pull p0bailey/docker-flask
 	docker pull swaggerapi/swagger-validator
 

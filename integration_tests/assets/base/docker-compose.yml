@@ -1,14 +1,21 @@
 sync:
   image: n3llyb0y/wait
   links:
+    - auth
     - rabbitmq
     - postgres
     - provd
     - sysconfd
     - confd
   environment:
-    PORTS: "5432 5672 8666 8668 9486"
+    PORTS: "5432 5672 8666 8668 9486 9497"
     TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"
+auth:
+  image: wazopbx/xivo-auth-mock
+  expose:
+    - 9497
+  volumes:
+    - ./ssl:/usr/local/share/ssl
 provd:
   image: wazopbx/xivo-provd
   ports:
@@ -49,6 +56,7 @@ confd:
     - rabbitmq
     - provd
     - sysconfd
+    - auth
   command: "xivo-confd -f -d"
   volumes:
     - "../../..:/usr/src/xivo-confd"

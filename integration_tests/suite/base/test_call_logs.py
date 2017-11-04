@@ -32,7 +32,8 @@ from . import BaseIntegrationTest
 class TestCallLogs(unittest.TestCase):
 
     def setUp(self):
-        self.client = BaseIntegrationTest.new_client({'Accept': 'text/csv'}).url
+        self.client = BaseIntegrationTest.new_client(headers={'Accept': 'text/csv',
+                                                              'X-Auth-Token': 'valid-token'}).url
 
     def test_missing_start_date(self):
         response = self.client.call_logs.get(end_date='2013-01-29T00:00:00')
