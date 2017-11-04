@@ -15,24 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import unittest
-import requests
 
-from hamcrest import assert_that, equal_to
-from xivo_test_helpers.confd.config import confd_base_url
+from . import BaseIntegrationTest
 
 
-@unittest.skip('Waiting to be deleted')
-class TestAuthentication(unittest.TestCase):
-
-    def setUp(self):
-        self.session = requests.Session()
-        self.session.verify = False
-        self.session.headers['Accept'] = 'application/json'
-
-    def test_ignore_x_forwarded_for_header(self):
-        url = confd_base_url() + '/infos'
-
-        r = self.session.get(url, headers={'X-Forwarded-For': '127.0.0.1'})
-
-        assert_that(r.status_code, equal_to(401))
+def test_ignore_x_forwarded_for_header():
+    confd = BaseIntegrationTest.new_client(headers={'X-Forwarded-For': '127.0.0.1'}).url
+    response = confd.users.get()
+    response.assert_status(401)

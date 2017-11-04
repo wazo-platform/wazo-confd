@@ -74,10 +74,7 @@ class IntegrationTest(AssetLaunchingTestCase):
     def setup_helpers(cls):
         client = cls.new_client()
         setup_confd_helpers(client)
-        setup_new_client_helpers(host='localhost',
-                                 port=cls.service_port('9486', 'confd'),
-                                 username='admin',
-                                 password='proformatique')
+        setup_new_client_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
         setup_database_helpers(cls.create_database())
 
     @classmethod
@@ -89,8 +86,6 @@ class IntegrationTest(AssetLaunchingTestCase):
     def new_client(cls, headers=None, encoder=None):
         client = ConfdClient.from_options(host='localhost',
                                           port=cls.service_port('9486', 'confd'),
-                                          username='admin',
-                                          password='proformatique',
                                           headers=headers,
                                           encoder=encoder)
         return client
