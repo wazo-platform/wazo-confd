@@ -1,7 +1,25 @@
+sync:
+  image: n3llyb0y/wait
+  links:
+    - auth
+    - rabbitmq
+    - postgres
+    - provd
+    - sysconfd
+    - confd
+  environment:
+    PORTS: "5432 5672 8666 8668 9486 9497"
+    TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"
+auth:
+  image: wazopbx/xivo-auth-mock
+  expose:
+    - 9497
+  volumes:
+    - ./ssl:/usr/local/share/ssl
 provd:
   image: wazopbx/xivo-provd
   ports:
-    - "8666:8666"
+    - "8666"
   expose:
     - "8666"
   volumes:
@@ -13,7 +31,7 @@ postgres:
   expose:
     - "5432"
   ports:
-    - "15432:5432"
+    - "5432"
 rabbitmq:
   image: rabbitmq
   ports:
@@ -23,7 +41,7 @@ sysconfd:
   expose:
     - "8668"
   ports:
-    - "18668:8668"
+    - "8668"
   volumes:
     - "./mocks/sysconfd.py:/tmp/sysconfd.py"
   command: "python /tmp/sysconfd.py"
@@ -32,12 +50,13 @@ confd:
   expose:
     - "9486"
   ports:
-    - "9486:9486"
+    - "9486"
   links:
     - postgres
     - rabbitmq
     - provd
     - sysconfd
+    - auth
   command: "xivo-confd -f -d"
   volumes:
     - "../../..:/usr/src/xivo-confd"
@@ -46,16 +65,3 @@ confd:
     # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
     # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
     # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
-tests:
-  # This image checks that all the links are up by pinging the ports.
-  # Used to make sure everything is ready before executing tests
-  image: n3llyb0y/wait
-  links:
-    - rabbitmq
-    - postgres
-    - provd
-    - sysconfd
-    - confd
-  environment:
-    PORTS: "5432 5672 8666 8668 9486"
-    TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"

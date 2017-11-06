@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
@@ -27,6 +26,7 @@ from hamcrest import (assert_that,
                       has_item,
                       is_not,
                       not_)
+from . import confd
 
 
 def test_get_errors():

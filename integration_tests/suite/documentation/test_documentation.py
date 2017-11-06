@@ -16,23 +16,18 @@
 
 from __future__ import unicode_literals
 
-import os
 import requests
 import pprint
 
 from hamcrest import assert_that, empty
 
-from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from test_api.base import IntegrationTest
 
 requests.packages.urllib3.disable_warnings()
 
-ASSET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 
+class TestDocumentation(IntegrationTest):
 
-class TestDocumentation(AssetLaunchingTestCase):
-
-    assets_root = ASSET_ROOT
-    service = 'confd'
     asset = 'documentation'
 
     def test_documentation_errors(self):

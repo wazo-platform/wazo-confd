@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import re
 
 from test_api import config
-from test_api import confd
+from . import confd
 from test_api import fixtures
 from test_api import scenarios as s
 from test_api import errors as e

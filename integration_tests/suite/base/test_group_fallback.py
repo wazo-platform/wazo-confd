@@ -20,7 +20,7 @@ from hamcrest import (assert_that,
                       equal_to,
                       has_entries)
 from test_api import scenarios as s
-from test_api import confd
+from . import confd
 from test_api import fixtures
 from xivo_test_helpers.confd.helpers.destination import invalid_destinations, valid_destinations
 

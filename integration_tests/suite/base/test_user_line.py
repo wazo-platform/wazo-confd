@@ -27,7 +27,7 @@ from hamcrest import has_item
 from hamcrest import has_entry
 
 from test_api import scenarios as s
-from test_api import confd
+from . import confd
 from test_api import errors as e
 from test_api import helpers as h
 from test_api import fixtures

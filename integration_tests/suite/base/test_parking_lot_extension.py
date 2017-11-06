@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@ from hamcrest import (assert_that,
                       contains,
                       has_entries)
 from test_api import scenarios as s
-from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
 from xivo_test_helpers.confd.config import INCALL_CONTEXT, CONTEXT
+from . import confd
 
 
 FAKE_ID = 999999999

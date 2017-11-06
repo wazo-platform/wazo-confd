@@ -17,9 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from test_api import confd
+from . import confd
 from test_api import fixtures
-from test_api import mocks
 from test_api import associations as a
 from test_api import scenarios as s
 from test_api import errors as e
@@ -35,6 +34,7 @@ from hamcrest import (assert_that,
                       has_item,
                       has_items,
                       is_not)
+from . import mocks
 
 
 def test_search_errors():

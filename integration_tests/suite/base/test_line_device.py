@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,13 +23,11 @@ from contextlib import contextmanager
 from hamcrest import assert_that, has_entries, is_not, starts_with, equal_to, contains, has_items, none, has_key
 
 from test_api import scenarios as s
-from test_api import confd
-from test_api import provd
-from test_api import db
 from test_api import errors as e
 from test_api import fixtures
 from test_api import associations as a
 from test_api import helpers as h
+from . import confd, db, provd
 
 
 @contextmanager

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 
 from hamcrest import assert_that, has_item, has_entries
 
-from test_api import confd_csv
 from test_api import config
 from test_api import fixtures
 from test_api import associations as a
+from . import confd_csv
 
 
 @fixtures.user(firstname="Ûrsule",

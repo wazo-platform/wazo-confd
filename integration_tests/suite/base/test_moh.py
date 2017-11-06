@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from test_api import confd
 from test_api import errors as e
 from test_api import fixtures
 from test_api import scenarios as s
-from xivo_test_helpers.confd import new_client
+from . import BaseIntegrationTest
+from . import confd
 
 
 from hamcrest import (assert_that,
@@ -293,7 +293,8 @@ def _new_moh_file_client():
             return None
         return data['content']
 
-    return new_client(headers={"Content-Type": "application/octet-stream"}, encoder=encoder)
+    return BaseIntegrationTest.new_client(headers={"Content-Type": "application/octet-stream",
+                                                   "X-Auth-Token": "valid-token"}, encoder=encoder)
 
 
 @fixtures.moh()
