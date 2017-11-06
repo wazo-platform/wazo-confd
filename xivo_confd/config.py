@@ -143,6 +143,7 @@ DEFAULT_CONFIG = {
         'user_plugin',
         'user_voicemail_plugin',
         'voicemail_plugin',
+        'voicemail_zonemessages_plugin',
         'wizard_plugin',
     ],
     'service_discovery': {
