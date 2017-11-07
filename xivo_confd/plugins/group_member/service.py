@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-
-# Copyright (C) 2016 Proformatique Inc.
-#
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from .notifier import build_notifier
@@ -17,9 +15,10 @@ class GroupMemberUserService(object):
         self.validator = validator
         self.notifier = notifier
 
-    def associate_all_users(self, group, users):
+    def associate_all_users(self, group, members):
+        users = [member['user'] for member in members]
         self.validator.validate_association(group, users)
-        self.group_dao.associate_all_member_users(group, users)
+        self.group_dao.associate_all_member_users(group, members)
         self.notifier.associated(group, users)
 
 

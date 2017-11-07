@@ -46,8 +46,8 @@ class GroupSchema(BaseSchema):
                                   'links'],
                             many=True,
                             dump_only=True)
-    users_member = fields.Nested('UserSchema',
-                                 only=['uuid', 'firstname', 'lastname', 'links'],
+    users_member = fields.Nested('GroupUsersMemberSchema',
+                                 attribute='group_members',
                                  many=True,
                                  dump_only=True)
 
@@ -87,3 +87,25 @@ class GroupSchema(BaseSchema):
         elif ring_strategy == 'weight_random':
             data['ring_strategy'] = 'wrandom'
         return data
+
+
+class GroupUsersMemberSchema(BaseSchema):
+    priority = fields.Integer(attribute='position')
+    user = fields.Nested('UserSchema',
+                         only=['uuid', 'firstname', 'lastname', 'links'],
+                         dump_only=True)
+
+    @post_dump(pass_many=True)
+    def merge_user_group_member(self, data, many):
+        if not many:
+            return self.merge_user(data)
+
+        return [self._merge_user(row) for row in data if row.get('user')]
+
+    def _merge_user(self, row):
+        user = row.pop('user')
+        row['uuid'] = user.get('uuid', None)
+        row['firstname'] = user.get('firstname', None)
+        row['lastname'] = user.get('lastname', None)
+        row['links'] = user.get('links', [])
+        return row

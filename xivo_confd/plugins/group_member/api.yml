@@ -5,9 +5,9 @@ paths:
       summary: Update group and users
       description: '**Required ACL:** `confd.groups.{group_id}.members.users.update`
 
+
       **WARNING**
-      This endpoint remove all members which are not defined.
-      The member order is important for linear ring_strategy'
+      This endpoint remove all members which are not defined.'
       tags:
       - groups
       - users
@@ -18,7 +18,7 @@ paths:
         description: Users to associated
         required: true
         schema:
-          $ref: '#/definitions/UsersUuid'
+          $ref: '#/definitions/GroupUsersUuid'
       responses:
         '204':
           description: Group and Users associated
@@ -26,3 +26,22 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+
+definitions:
+  GroupUsersUuid:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/GroupUserUuid'
+        type: array
+    required:
+      - users
+  GroupUserUuid:
+    properties:
+      uuid:
+        type: string
+      priority:
+        type: integer
+        description: priority of user in the group. Only used for linear ring strategy
+    required:
+      - uuid

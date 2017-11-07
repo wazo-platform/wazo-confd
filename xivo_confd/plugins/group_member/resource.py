@@ -1,17 +1,25 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
+from marshmallow import fields
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.mallow import UsersUUIDSchema
+from xivo_confd.helpers.mallow import BaseSchema
 from xivo_confd.helpers.restful import ConfdResource
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
+
+
+class UserSchemaUUIDLoad(BaseSchema):
+    uuid = fields.String(required=True)
+    priority = fields.Integer()
+
+
+class UsersUUIDSchema(BaseSchema):
+    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
 
 
 class GroupMemberUserItem(ConfdResource):
@@ -29,10 +37,11 @@ class GroupMemberUserItem(ConfdResource):
         group = self.group_dao.get(group_id)
         form = self.schema().load(request.get_json()).data
         try:
-            users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+            members = [{'user': self.user_dao.get_by(uuid=user['uuid']),
+                        'priority': user.get('priority', priority)}
+                       for priority, user in enumerate(form['users'])]
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 
-        self.service.associate_all_users(group, users)
-
+        self.service.associate_all_users(group, members)
         return '', 204
