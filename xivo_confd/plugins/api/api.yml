@@ -495,7 +495,7 @@ definitions:
         description: Play the specified greeting
     required:
     - type
-    - user_id
+    - voicemail_id
   EndpointRelationTrunk:
     properties:
       trunk:

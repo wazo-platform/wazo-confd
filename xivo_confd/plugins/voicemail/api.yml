@@ -135,7 +135,6 @@ definitions:
           - fr_CA
           - it_IT
           - nl_NL
-          default: The system default language
           description: Language used for the voicemail menu prompt
         timezone:
           type: string

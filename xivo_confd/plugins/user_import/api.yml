@@ -46,7 +46,7 @@ paths:
           schema:
             $ref: '#/definitions/UserImportError'
     put:
-      operationId: import_users_csv
+      operationId: update_users_csv
       summary: Mass import users and associated resources
       description: '**Required ACL:** `confd.users.import.update`
 

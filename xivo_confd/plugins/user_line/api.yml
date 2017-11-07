@@ -95,7 +95,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
     post:
-      operationId: associate_user_line
+      operationId: associate_user_line_legacy
       summary: Associate user and line
       deprecated: true
       description: '**Required ACL:** `confd.users.{user_id}.lines.create`'

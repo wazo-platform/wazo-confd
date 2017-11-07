@@ -168,7 +168,6 @@ definitions:
         description: Provisioning plugin to be used by device
       options:
         $ref: '#/definitions/DeviceOptions'
-        description: List of standard keys
       sn:
         type: string
         description: Serial number
@@ -195,6 +194,7 @@ definitions:
         description: Firmware version
   DeviceOptions:
     title: DeviceOptions
+    description: List of standard keys
     properties:
       switchboard:
         type: boolean
