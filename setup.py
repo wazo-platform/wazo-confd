@@ -95,6 +95,7 @@ setup(
             'user_plugin = xivo_confd.plugins.user.plugin:Plugin',
             'user_voicemail_plugin = xivo_confd.plugins.user_voicemail.plugin:Plugin',
             'voicemail_plugin = xivo_confd.plugins.voicemail.plugin:Plugin',
+            'voicemail_zonemessages_plugin = xivo_confd.plugins.voicemail_zonemessages.plugin:Plugin',
             'wizard_plugin = xivo_confd.plugins.wizard.plugin:Plugin',
         ]
     }

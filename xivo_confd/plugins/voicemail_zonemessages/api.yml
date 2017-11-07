@@ -1,0 +1,66 @@
+paths:
+  /asterisk/voicemail/zonemessages:
+    get:
+      operationId: list_asterisk_voicemail_zonemessages
+      summary: List Voicemail zonemessages options
+      description: '**Required ACL:** `confd.asterisk.voicemail.zonemessages.read`'
+      tags:
+      - asterisk
+      - voicemails
+      responses:
+        '200':
+          description: Voicemail zonemessages
+          schema:
+            $ref: '#/definitions/VoicemailZoneMessages'
+    put:
+      operationId: update_asterisk_voicemail_zonemessages
+      summary: Update Voicemail zonemessages option
+      description: '**Required ACL:** `confd.asterisk.voicemail.zonemessages.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      - voicemails
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/VoicemailZoneMessages'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  VoicemailZoneMessages:
+    title: VoicemailZoneMessages
+    properties:
+      items:
+        description: 'Voicemail zonemessages configuration. This configuration will be in the file
+          ''voicemail.conf'' used by asterisk.
+
+          Please consult the asterisk documentation for further details on available parameters.'
+        type: array
+        items:
+          $ref: '#/definitions/VoicemailZoneMessage'
+
+  VoicemailZoneMessage:
+    title: VoicemailZoneMessage
+    properties:
+      name:
+        type: string
+        description: label on which each voicemail is mapped
+      timezone:
+        type: string
+        description: Timezone as define in '/usr/share/zoneinfo/'
+      message:
+        type: string
+        description: Message that each user hears.
+    required:
+      - name
+      - timezone
