@@ -34,7 +34,7 @@ start:
 	docker-compose run --service-ports --rm tests
 
 test:
-	nosetests suite
+	nosetests
 
 distclean:
 	docker rmi xivo/xivo-provd
