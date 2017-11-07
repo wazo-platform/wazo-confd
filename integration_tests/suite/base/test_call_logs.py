@@ -24,8 +24,8 @@ from hamcrest import assert_that
 from hamcrest import contains
 from hamcrest import empty
 
-from test_api import errors as e
-from test_api import fixtures
+from ..test_api import errors as e
+from ..test_api import fixtures
 from . import BaseIntegrationTest
 
 

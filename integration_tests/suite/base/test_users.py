@@ -18,11 +18,11 @@
 
 from __future__ import unicode_literals
 
-from test_api import scenarios as s
-from test_api import associations as a
+from ..test_api import scenarios as s
+from ..test_api import associations as a
 from . import confd
-from test_api import fixtures
-from test_api import config
+from ..test_api import fixtures
+from ..test_api import config
 
 from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not, contains, none, empty
 

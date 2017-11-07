@@ -32,10 +32,10 @@ from hamcrest import (assert_that,
                       instance_of,
                       empty)
 
-from test_api import config
-from test_api import helpers as h
-from test_api import associations as a
-from test_api import fixtures
+from ..test_api import config
+from ..test_api import helpers as h
+from ..test_api import associations as a
+from ..test_api import fixtures
 from . import confd
 
 

@@ -17,8 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from test_api import fixtures
-from test_api import scenarios as s
+from ..test_api import fixtures
+from ..test_api import scenarios as s
 
 from hamcrest import assert_that, has_entries, has_items, \
     instance_of, contains, has_entry

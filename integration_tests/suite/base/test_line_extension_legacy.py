@@ -16,9 +16,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import errors as e
-from test_api import fixtures as f
-from test_api import associations as a
+from ..test_api import errors as e
+from ..test_api import fixtures as f
+from ..test_api import associations as a
 
 from hamcrest import assert_that, has_entries
 from . import confd

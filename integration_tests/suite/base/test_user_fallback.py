@@ -17,9 +17,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from hamcrest import assert_that, has_entries
-from test_api import scenarios as s
+from ..test_api import scenarios as s
 from . import confd
-from test_api import fixtures
+from ..test_api import fixtures
 from xivo_test_helpers.confd.helpers.destination import invalid_destinations, valid_destinations
 
 

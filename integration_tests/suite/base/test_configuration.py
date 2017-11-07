@@ -17,7 +17,7 @@
 
 from hamcrest import assert_that
 
-from test_api import scenarios as s
+from ..test_api import scenarios as s
 from . import confd
 
 

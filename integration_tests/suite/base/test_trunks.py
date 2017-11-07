@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from test_api import scenarios as s
-from test_api import fixtures
+from ..test_api import scenarios as s
+from ..test_api import fixtures
 
 from hamcrest import (assert_that,
                       empty,

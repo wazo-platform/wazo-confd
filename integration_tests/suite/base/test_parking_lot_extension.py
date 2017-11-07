@@ -19,10 +19,10 @@
 from hamcrest import (assert_that,
                       contains,
                       has_entries)
-from test_api import scenarios as s
-from test_api import errors as e
-from test_api import fixtures
-from test_api import associations as a
+from ..test_api import scenarios as s
+from ..test_api import errors as e
+from ..test_api import fixtures
+from ..test_api import associations as a
 from xivo_test_helpers.confd.config import INCALL_CONTEXT, CONTEXT
 from . import confd
 

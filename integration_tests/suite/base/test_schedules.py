@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from . import confd
-from test_api import errors as e
-from test_api import fixtures
-from test_api import scenarios as s
+from ..test_api import errors as e
+from ..test_api import fixtures
+from ..test_api import scenarios as s
 from xivo_test_helpers.confd.helpers.destination import invalid_destinations, valid_destinations
 
 from hamcrest import (assert_that,

@@ -18,11 +18,11 @@
 
 from xivo_test_helpers.confd.helpers.line_sip import generate_line, delete_line
 from xivo_test_helpers.confd.helpers.extension import generate_extension, delete_extension
-from test_api import scenarios as s
-from test_api import errors as e
-from test_api import associations as a
-from test_api import fixtures
-from test_api import config
+from ..test_api import scenarios as s
+from ..test_api import errors as e
+from ..test_api import associations as a
+from ..test_api import fixtures
+from ..test_api import config
 
 from hamcrest import assert_that
 from hamcrest import contains

@@ -21,9 +21,9 @@ import re
 from hamcrest import assert_that, has_entries
 
 from . import confd
-from test_api import fixtures
-from test_api import errors as e
-from test_api import associations as a
+from ..test_api import fixtures
+from ..test_api import errors as e
+from ..test_api import associations as a
 
 
 FAKE_ID = 999999999

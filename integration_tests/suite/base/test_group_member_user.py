@@ -24,11 +24,11 @@ from hamcrest import (assert_that,
                       empty,
                       has_entries)
 
-from test_api import errors as e
-from test_api import scenarios as s
+from ..test_api import errors as e
+from ..test_api import scenarios as s
 from . import confd
-from test_api import fixtures
-from test_api import associations as a
+from ..test_api import fixtures
+from ..test_api import associations as a
 
 
 FAKE_ID = 999999999

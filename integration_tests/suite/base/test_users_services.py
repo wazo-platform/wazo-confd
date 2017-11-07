@@ -26,8 +26,8 @@ from hamcrest import (
 )
 
 from . import confd
-from test_api import fixtures
-from test_api import scenarios as s
+from ..test_api import fixtures
+from ..test_api import scenarios as s
 
 VALID_SERVICES = ['dnd',
                   'incallfilter']
