@@ -6,6 +6,7 @@ paths:
       description: '**Required ACL:** `confd.asterisk.voicemail.zonemessages.read`'
       tags:
       - asterisk
+      - voicemails
       responses:
         '200':
           description: Voicemail zonemessages
@@ -21,6 +22,7 @@ paths:
         are not defined.'
       tags:
       - asterisk
+      - voicemails
       parameters:
       - name: body
         in: body
