@@ -273,7 +273,8 @@ def test_create_voicemails_same_number_different_contexts():
     response.assert_ok()
 
 
-def test_create_voicemail_with_all_parameters():
+@fixtures.voicemail_zonemessages(name='eu-fr')
+def test_create_voicemail_with_all_parameters(_):
     number, context = vm_helper.generate_number_and_context()
 
     parameters = {'name': 'full',
@@ -315,7 +316,8 @@ def test_create_voicemail_with_all_parameters():
 
 
 @fixtures.voicemail()
-def test_edit_voicemail(voicemail):
+@fixtures.voicemail_zonemessages(name='eu-fr')
+def test_edit_voicemail(voicemail, _):
     number, context = vm_helper.new_number_and_context('vmctxedit')
 
     parameters = {'name': 'edited',
@@ -394,7 +396,8 @@ def test_delete_voicemail_deletes_on_disk(voicemail, sysconfd):
 
 
 @fixtures.voicemail()
-def test_update_fields_with_null_value(voicemail):
+@fixtures.voicemail_zonemessages(name='eu-fr')
+def test_update_fields_with_null_value(voicemail, _):
     number, context = vm_helper.generate_number_and_context()
 
     response = confd.voicemails.post(name='nullfields',
