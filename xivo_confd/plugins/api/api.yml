@@ -486,9 +486,7 @@ definitions:
         type: boolean
         description: Skip the playback of instructions for leaving a message
       greeting:
-        type:
-        - string
-        - 'null'
+        type: string
         enum:
         - busy
         - unavailable
