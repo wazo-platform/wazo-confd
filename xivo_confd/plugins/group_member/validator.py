@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2016 Proformatique Inc.
-#
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -35,7 +33,23 @@ class GroupMemberUserAssociationValidator(ValidatorAssociation):
                                            line_id=line.id)
 
 
-def build_validator():
+class GroupMemberExtensionAssociationValidator(ValidatorAssociation):
+
+    def validate(self, group, extensions):
+        self.validate_no_duplicate_extension(extensions)
+
+    def validate_no_duplicate_extension(self, extensions):
+        if any(extensions.count(extension) > 1 for extension in extensions):
+            raise errors.not_permitted('Cannot associate same extensions more than once')
+
+
+def build_validator_member_user():
     return ValidationAssociation(
         association=[GroupMemberUserAssociationValidator()],
+    )
+
+
+def build_validator_member_extension():
+    return ValidationAssociation(
+        association=[GroupMemberExtensionAssociationValidator()],
     )

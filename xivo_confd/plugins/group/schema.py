@@ -50,6 +50,9 @@ class GroupSchema(BaseSchema):
                                  attribute='group_members',
                                  many=True,
                                  dump_only=True)
+    extensions_member = fields.Nested('GroupExtensionsMemberSchema',
+                                      many=True,
+                                      dump_only=True)
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):
@@ -69,8 +72,10 @@ class GroupSchema(BaseSchema):
     @post_dump
     def wrap_users_member(self, data):
         users_member = data.pop('users_member', [])
+        extensions_member = data.pop('extensions_member', [])
         if not self.only or 'members' in self.only:
-            data['members'] = {'users': users_member}
+            data['members'] = {'users': users_member,
+                               'extensions': extensions_member}
         return data
 
     @post_load
@@ -109,3 +114,9 @@ class GroupUsersMemberSchema(BaseSchema):
         row['lastname'] = user.get('lastname', None)
         row['links'] = user.get('links', [])
         return row
+
+
+class GroupExtensionsMemberSchema(BaseSchema):
+    priority = fields.Integer(attribute='position')
+    exten = fields.String(dump_only=True)
+    context = fields.String(dump_only=True)

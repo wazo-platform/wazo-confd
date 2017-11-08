@@ -18,7 +18,7 @@ paths:
         description: Users to associated
         required: true
         schema:
-          $ref: '#/definitions/GroupUsersUuid'
+          $ref: '#/definitions/GroupMemberUsers'
       responses:
         '204':
           description: Group and Users associated
@@ -26,22 +26,67 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /groups/{group_id}/members/extensions:
+    put:
+      operationId: update_group_member_extensions
+      summary: Update group and extensions
+      description: '**Required ACL:** `confd.groups.{group_id}.members.extensions.update`
+
+
+      **WARNING**
+      This endpoint remove all members which are not defined.'
+      tags:
+      - groups
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - name: body
+        in: body
+        description: Extensions to associated
+        required: true
+        schema:
+          $ref: '#/definitions/GroupMemberExtensions'
+      responses:
+        '204':
+          description: Group and Extensions associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
 
 definitions:
-  GroupUsersUuid:
+  GroupMemberUsers:
     properties:
       users:
         items:
-          $ref: '#/definitions/GroupUserUuid'
+          $ref: '#/definitions/GroupMemberUser'
         type: array
     required:
       - users
-  GroupUserUuid:
+  GroupMemberUser:
     properties:
       uuid:
         type: string
       priority:
         type: integer
         description: priority of user in the group. Only used for linear ring strategy
+    required:
+      - uuid
+  GroupMemberExtensions:
+    properties:
+      extensions:
+        items:
+          $ref: '#/definitions/GroupMemberExtension'
+        type: array
+    required:
+      - extensions
+  GroupMemberExtension:
+    properties:
+      exten:
+        type: string
+      context:
+        type: string
+      priority:
+        type: integer
+        description: priority of extension in the group. Only used for linear ring strategy
     required:
       - uuid

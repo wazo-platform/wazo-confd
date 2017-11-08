@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (C) 2016 Proformatique Inc.
-#
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from xivo_confd import api
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd import api
-from .resource import GroupMemberUserItem
+from .resource import GroupMemberUserItem, GroupMemberExtensionItem
 from .service import build_service
 
 
@@ -19,6 +17,12 @@ class Plugin(object):
 
         api.add_resource(GroupMemberUserItem,
                          '/groups/<int:group_id>/members/users',
-                         endpoint='group_users',
+                         endpoint='group_member_users',
                          resource_class_args=(service, group_dao, user_dao)
+                         )
+
+        api.add_resource(GroupMemberExtensionItem,
+                         '/groups/<int:group_id>/members/extensions',
+                         endpoint='group_member_extensions',
+                         resource_class_args=(service, group_dao)
                          )

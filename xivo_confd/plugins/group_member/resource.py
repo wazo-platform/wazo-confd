@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
-from marshmallow import fields
+from marshmallow import fields, post_load
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema
@@ -13,23 +13,50 @@ from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
 
-class UserSchemaUUIDLoad(BaseSchema):
+class GroupUserSchema(BaseSchema):
     uuid = fields.String(required=True)
     priority = fields.Integer()
 
 
-class UsersUUIDSchema(BaseSchema):
-    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
+class GroupUsersSchema(BaseSchema):
+    users = fields.Nested(GroupUserSchema, many=True, required=True)
 
 
-class GroupMemberUserItem(ConfdResource):
+class GroupExtensionSchema(BaseSchema):
+    exten = fields.String(required=True)
+    context = fields.String(required=True)
+    priority = fields.Integer()
 
-    schema = UsersUUIDSchema
+    @post_load
+    def add_envelope(self, data):
+        data['extension'] = {'exten': data.pop('exten'),
+                             'context': data.pop('context')}
+        return data
+
+
+class GroupExtensionsSchema(BaseSchema):
+    extensions = fields.Nested(GroupExtensionSchema, many=True, required=True)
+
+    @post_load
+    def set_default_priority(self, data):
+        for priority, extension in enumerate(data['extensions']):
+            extension['priority'] = extension.get('priority', priority)
+        return data
+
+
+class GroupMemberItem(ConfdResource):
+    def __init__(self, service, group_dao):
+        super(GroupMemberItem, self).__init__()
+        self.service = service
+        self.group_dao = group_dao
+
+
+class GroupMemberUserItem(GroupMemberItem):
+
+    schema = GroupUsersSchema
 
     def __init__(self, service, group_dao, user_dao):
         super(GroupMemberUserItem, self).__init__()
-        self.service = service
-        self.group_dao = group_dao
         self.user_dao = user_dao
 
     @required_acl('confd.groups.{group_id}.members.users.update')
@@ -44,4 +71,16 @@ class GroupMemberUserItem(ConfdResource):
             raise errors.param_not_found('users', 'User', **e.metadata)
 
         self.service.associate_all_users(group, members)
+        return '', 204
+
+
+class GroupMemberExtensionItem(GroupMemberItem):
+
+    schema = GroupExtensionsSchema
+
+    @required_acl('confd.groups.{group_id}.members.extensions.update')
+    def put(self, group_id):
+        group = self.group_dao.get(group_id)
+        form = self.schema().load(request.get_json()).data
+        self.service.associate_all_extensions(group, form['extensions'])
         return '', 204
