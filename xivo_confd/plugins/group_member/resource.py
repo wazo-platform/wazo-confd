@@ -17,9 +17,20 @@ class GroupUserSchema(BaseSchema):
     uuid = fields.String(required=True)
     priority = fields.Integer()
 
+    @post_load
+    def add_envelope(self, data):
+        data['user'] = {'uuid': data.pop('uuid')}
+        return data
+
 
 class GroupUsersSchema(BaseSchema):
     users = fields.Nested(GroupUserSchema, many=True, required=True)
+
+    @post_load
+    def set_default_priority(self, data):
+        for priority, user in enumerate(data['users']):
+            user['priority'] = user.get('priority', priority)
+        return data
 
 
 class GroupExtensionSchema(BaseSchema):
@@ -56,7 +67,7 @@ class GroupMemberUserItem(GroupMemberItem):
     schema = GroupUsersSchema
 
     def __init__(self, service, group_dao, user_dao):
-        super(GroupMemberUserItem, self).__init__()
+        super(GroupMemberUserItem, self).__init__(service, group_dao)
         self.user_dao = user_dao
 
     @required_acl('confd.groups.{group_id}.members.users.update')
@@ -64,13 +75,12 @@ class GroupMemberUserItem(GroupMemberItem):
         group = self.group_dao.get(group_id)
         form = self.schema().load(request.get_json()).data
         try:
-            members = [{'user': self.user_dao.get_by(uuid=user['uuid']),
-                        'priority': user.get('priority', priority)}
-                       for priority, user in enumerate(form['users'])]
+            for user in form['users']:
+                user['user'] = self.user_dao.get_by(uuid=user['user']['uuid'])
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 
-        self.service.associate_all_users(group, members)
+        self.service.associate_all_users(group, form['users'])
         return '', 204
 
 
