@@ -48,6 +48,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
     yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
 
+    regex = r'users.*priority'
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': None}], regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': 'string'}], regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': []}], regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': {}}], regex
+
 
 @fixtures.group()
 @fixtures.user()
@@ -65,16 +71,20 @@ def test_associate(group, user, line):
 @fixtures.line_sip()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multiple(group, user1, user2, user3, line1, line2, line3):
+def test_associate_multiple_with_priority(group, user1, user2, user3, line1, line2, line3):
     with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(user3, line3):
-        response = confd.groups(group['id']).members.users.put(users=[user2, user3, user1])
+        user1['priority'], user2['priority'], user3['priority'] = 4, 1, 2
+        response = confd.groups(group['id']).members.users.put(users=[user1, user2, user3])
         response.assert_updated()
 
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
-            members=has_entries(users=contains(has_entries(uuid=user2['uuid']),
-                                               has_entries(uuid=user3['uuid']),
-                                               has_entries(uuid=user1['uuid'])))
+            members=has_entries(users=contains(has_entries(uuid=user2['uuid'],
+                                                           priority=1),
+                                               has_entries(uuid=user3['uuid'],
+                                                           priority=2),
+                                               has_entries(uuid=user1['uuid'],
+                                                           priority=4)))
         ))
 
 
@@ -115,12 +125,12 @@ def test_get_users_associated_to_group(group, user1, user2, line1, line2):
             a.group_member_user(group, user2, user1):
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
-            members=has_entries(users=contains(has_entries(uuid=user2['uuid'],
-                                                           firstname=user2['firstname'],
-                                                           lastname=user2['lastname']),
-                                               has_entries(uuid=user1['uuid'],
-                                                           firstname=user1['firstname'],
-                                                           lastname=user1['lastname'])))
+            members=has_entries(users=contains_inanyorder(has_entries(uuid=user2['uuid'],
+                                                                      firstname=user2['firstname'],
+                                                                      lastname=user2['lastname']),
+                                                          has_entries(uuid=user1['uuid'],
+                                                                      firstname=user1['firstname'],
+                                                                      lastname=user1['lastname'])))
         ))
 
 
