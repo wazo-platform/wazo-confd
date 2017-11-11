@@ -94,6 +94,7 @@ DEFAULT_CONFIG = {
         'group_fallback_plugin',
         'group_member_user_plugin',
         'group_plugin',
+        'group_schedule_plugin',
         'incall_extension_plugin',
         'incall_plugin',
         'incall_schedule_plugin',

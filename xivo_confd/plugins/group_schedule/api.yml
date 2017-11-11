@@ -1,0 +1,36 @@
+paths:
+  /groups/{group_id}/schedules/{schedule_id}:
+    put:
+      operationId: associate_group_schedule
+      summary: Associate group and schedule
+      description: '**Required ACL:** `confd.groups.{group_id}.schedules.{schedule_id}.update`'
+      tags:
+      - groups
+      - schedules
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Group and Schedule associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_group_schedule
+      summary: Dissociate group and schedule
+      description: '**Required ACL:** `confd.groups.{group_id}.schedules.{schedule_id}.delete`'
+      tags:
+      - groups
+      - schedules
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Group and Schedule dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
