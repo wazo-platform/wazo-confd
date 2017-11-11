@@ -84,6 +84,10 @@ class UserSchema(BaseSchema):
                           many=True,
                           dump_only=True)
     forwards = fields.Nested('ForwardsSchema', dump_only=True)
+    schedules = fields.Nested('ScheduleSchema',
+                              only=['id', 'name', 'links'],
+                              many=True,
+                              dump_only=True)
     services = fields.Nested('ServicesSchema', dump_only=True)
     switchboards = fields.Nested('SwitchboardSchema',
                                  only=['uuid',

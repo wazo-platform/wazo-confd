@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields, post_load, validates, validates_schema
@@ -96,8 +94,13 @@ class ScheduleSchema(BaseSchema):
                             many=True,
                             dump_only=True)
 
+    users = fields.Nested('UserSchema',
+                          only=['uuid', 'firstname', 'lastname', 'links'],
+                          many=True,
+                          dump_only=True)
+
     @post_load
-    def unwrap_cosed_destination(self, data):
+    def unwrap_closed_destination(self, data):
         if 'closed_destination' in data:
             data['type'] = data['closed_destination'].get('type')
             data['subtype'] = data['closed_destination'].get('subtype')
