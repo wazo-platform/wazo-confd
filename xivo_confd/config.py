@@ -129,6 +129,7 @@ DEFAULT_CONFIG = {
         'user_line_associated_plugin',
         'user_line_plugin',
         'user_plugin',
+        'user_schedule_plugin',
         'user_voicemail_plugin',
         'voicemail_plugin',
         'voicemail_zonemessages_plugin',
