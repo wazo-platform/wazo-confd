@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
-#
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -29,6 +26,10 @@ class OutcallSchema(BaseSchema):
                                attribute='dialpatterns',
                                many=True,
                                dump_only=True)
+    schedules = fields.Nested('ScheduleSchema',
+                              only=['id', 'name', 'links'],
+                              many=True,
+                              dump_only=True)
 
 
 class DialPatternSchema(BaseSchema):

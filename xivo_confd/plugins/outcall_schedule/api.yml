@@ -1,0 +1,36 @@
+paths:
+  /outcalls/{outcall_id}/schedules/{schedule_id}:
+    put:
+      operationId: associate_outcall_schedule
+      summary: Associate outcall and schedule
+      description: '**Required ACL:** `confd.outcalls.{outcall_id}.schedules.{schedule_id}.update`'
+      tags:
+      - outcalls
+      - schedules
+      parameters:
+      - $ref: '#/parameters/outcallid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Outcall and Schedule associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_outcall_schedule
+      summary: Dissociate outcall and schedule
+      description: '**Required ACL:** `confd.outcalls.{outcall_id}.schedules.{schedule_id}.delete`'
+      tags:
+      - outcalls
+      - schedules
+      parameters:
+      - $ref: '#/parameters/outcallid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Outcall and Schedule dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

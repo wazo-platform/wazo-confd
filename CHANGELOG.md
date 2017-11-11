@@ -27,6 +27,11 @@ Changelog
   * DELETE `/1.1/groups/<group_id>/schedules/<schedule_id>`
   * PUT `/1.1/groups/<group_id>/schedules/<schedule_id>`
 
+* A new API for associating an outcall with a schedule has been added:
+
+  * DELETE `/1.1/outcalls/<outcall_id>/schedules/<schedule_id>`
+  * PUT `/1.1/outcalls/<outcall_id>/schedules/<schedule_id>`
+
 
 17.13
 -----

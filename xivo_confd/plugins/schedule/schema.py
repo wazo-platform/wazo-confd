@@ -101,6 +101,10 @@ class ScheduleSchema(BaseSchema):
                            only=['id', 'name', 'links'],
                            many=True,
                            dump_only=True)
+    outcalls = fields.Nested('OutcallSchema',
+                             only=['id', 'name', 'links'],
+                             many=True,
+                             dump_only=True)
 
     @post_load
     def unwrap_closed_destination(self, data):

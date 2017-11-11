@@ -108,6 +108,7 @@ DEFAULT_CONFIG = {
         'moh_plugin',
         'outcall_extension_plugin',
         'outcall_plugin',
+        'outcall_schedule_plugin',
         'outcall_trunk_plugin',
         'paging_plugin',
         'paging_user_plugin',
