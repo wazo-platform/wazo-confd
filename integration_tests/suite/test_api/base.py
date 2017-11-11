@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
-
 # SPDX-License-Identifier: GPL-3.0+
 
 import os
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from xivo_test_helpers.bus import BusClient
+from xivo_test_helpers.confd.bus import setup_bus as setup_bus_helpers
 from xivo_test_helpers.confd.database import create_helper as db_create_helper
 from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
 from xivo_test_helpers.confd.sysconfd import SysconfdMock
@@ -58,6 +58,7 @@ class IntegrationTest(AssetLaunchingTestCase):
         setup_new_client_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
         setup_database_helpers(host='localhost', port=cls.service_port(5432, 'postgres'))
         setup_provd_helpers(host='localhost', port=cls.service_port(8666, 'provd'))
+        setup_bus_helpers(host='localhost', port=cls.service_port(5672, 'rabbitmq'))
 
     @classmethod
     def create_confd(cls, headers=None, encoder=None):
@@ -70,4 +71,10 @@ class IntegrationTest(AssetLaunchingTestCase):
                                           port=cls.service_port('9486', 'confd'),
                                           headers=headers,
                                           encoder=encoder)
+        return client
+
+    @classmethod
+    def create_bus(cls):
+        port = cls.service_port(5672, 'rabbitmq')
+        client = BusClient.from_connection_fields(host='localhost', port=port)
         return client
