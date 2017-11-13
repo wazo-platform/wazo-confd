@@ -5,12 +5,13 @@ MANAGE_DB_DIR ?= ../../manage-db/
 POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/postgres-test/Dockerfile
 
 
-test-setup: build-provd build-confd egg-info
+test-setup: egg-info build-confd
 	docker pull n3llyb0y/wait
 	docker pull rabbitmq
 	docker pull wazopbx/postgres
 	docker pull wazopbx/postgres-test
 	docker pull wazopbx/xivo-auth-mock
+	docker pull wazopbx/xivo-provd
 	docker pull p0bailey/docker-flask
 	docker pull swaggerapi/swagger-validator
 
