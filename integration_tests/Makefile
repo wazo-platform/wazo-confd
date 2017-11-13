@@ -1,4 +1,4 @@
-.PHONY: test-setup distclean
+.PHONY: test-setup test egg-info update-db build-provd build-confd
 
 PROVD_DIR ?= ../../provisioning
 MANAGE_DB_DIR ?= ../../manage-db/
@@ -24,23 +24,8 @@ update-db:
 build-provd:
 	docker build -t wazopbx/xivo-provd $(PROVD_DIR)
 
-stop:
-	cd assets/base && \
-	docker-compose kill && \
-	docker-compose rm -f
-
-start:
-	cd assets/base && \
-	docker-compose run --service-ports --rm tests
-
 test:
 	nosetests
-
-distclean:
-	docker rmi xivo/xivo-provd
-	docker rmi xivo/postgres-test
-	docker rmi xivo/xivo-confd
-	docker rmi xivo-confd-test
 
 egg-info:
 	cd .. && python setup.py egg_info
