@@ -9,11 +9,11 @@ from hamcrest import contains_inanyorder
 from hamcrest import empty
 from hamcrest import has_entries
 
-from ..test_api import associations as a
+from ..helpers import associations as a
 from . import confd
-from ..test_api import helpers as h
-from ..test_api import fixtures
-from ..test_api import scenarios as s
+from ..helpers import helpers as h
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 
 
 FAKE_UUID = 'uuid-not-found'

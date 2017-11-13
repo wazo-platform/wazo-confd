@@ -8,8 +8,8 @@ from hamcrest import (assert_that,
                       has_entries,
                       has_item)
 
-from ..test_api import fixtures
-from ..test_api import scenarios as s
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from . import confd
 
 FAKE_ID = 999999999

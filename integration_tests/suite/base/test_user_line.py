@@ -14,12 +14,12 @@ from hamcrest import has_entries
 from hamcrest import has_item
 from hamcrest import has_entry
 
-from ..test_api import scenarios as s
+from ..helpers import scenarios as s
 from . import confd
-from ..test_api import errors as e
-from ..test_api import helpers as h
-from ..test_api import fixtures
-from ..test_api import associations as a
+from ..helpers import errors as e
+from ..helpers import helpers as h
+from ..helpers import fixtures
+from ..helpers import associations as a
 
 
 secondary_user_regex = re.compile(r"There are secondary users associated to the line")

@@ -10,8 +10,8 @@ from hamcrest import (assert_that,
                       has_length,
                       instance_of,)
 
-from ..test_api import fixtures
-from ..test_api import associations as a
+from ..helpers import fixtures
+from ..helpers import associations as a
 from . import confd
 
 

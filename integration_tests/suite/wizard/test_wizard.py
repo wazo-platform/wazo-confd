@@ -20,7 +20,7 @@ from hamcrest import (assert_that,
 from xivo_test_helpers import until
 from xivo_test_helpers.confd.wrappers import IsolatedAction
 
-from ..test_api.base import IntegrationTest as BaseIntegrationTest
+from ..helpers.base import IntegrationTest as BaseIntegrationTest
 
 
 RESOLVCONF_NAMESERVERS = ['8.8.8.8', '8.8.8.4']

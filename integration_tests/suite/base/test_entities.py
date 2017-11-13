@@ -4,10 +4,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..test_api import associations as a
-from ..test_api import scenarios as s
-from ..test_api import errors as e
-from ..test_api import fixtures
+from ..helpers import associations as a
+from ..helpers import scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
 
 from hamcrest import (assert_that,
                       contains,

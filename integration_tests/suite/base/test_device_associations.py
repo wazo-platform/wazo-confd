@@ -9,11 +9,11 @@ from __future__ import unicode_literals
 from hamcrest import assert_that, has_entries
 
 
-from ..test_api import config
-from ..test_api import errors as e
-from ..test_api import fixtures
-from ..test_api import associations as a
-from ..test_api import helpers as h
+from ..helpers import config
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import associations as a
+from ..helpers import helpers as h
 from . import mocks, provd, db, confd
 
 

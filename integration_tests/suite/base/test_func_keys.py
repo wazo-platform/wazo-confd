@@ -14,10 +14,10 @@ from hamcrest import (assert_that,
                       is_not,
                       not_)
 
-from ..test_api import helpers
-from ..test_api import associations as a
-from ..test_api import scenarios as s
-from ..test_api import fixtures
+from ..helpers import helpers
+from ..helpers import associations as a
+from ..helpers import scenarios as s
+from ..helpers import fixtures
 from . import confd, db, provd
 
 FAKE_ID = 999999999

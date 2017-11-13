@@ -6,10 +6,10 @@
 
 
 from . import confd
-from ..test_api import fixtures
-from ..test_api import associations as a
-from ..test_api import scenarios as s
-from ..test_api import errors as e
+from ..helpers import fixtures
+from ..helpers import associations as a
+from ..helpers import scenarios as s
+from ..helpers import errors as e
 
 from xivo_test_helpers.confd.helpers import voicemail as vm_helper
 from xivo_test_helpers.confd.helpers import context as context_helper
