@@ -369,12 +369,10 @@ class TestWizard(IntegrationTest):
         self.validate_sysconfd(sysconfd, data)
         self.validate_provd(data['network']['ip_address'])
 
-        def validate_bus_event():
-            def assert_function():
-                assert_that(bus_events.accumulate(), has_length(1))
+        def assert_bus_event_received():
+            assert_that(bus_events.accumulate(), has_length(1))
 
-            until.assert_(assert_function, tries=5)
-        validate_bus_event()
+        until.assert_(assert_bus_event_received, tries=5)
 
     def validate_db(self, data):
         with self.db.queries() as queries:
