@@ -18,7 +18,6 @@ from hamcrest import (assert_that,
                       starts_with)
 
 from xivo_test_helpers import until
-from xivo_test_helpers.confd.bus import BusClient
 from xivo_test_helpers.confd.wrappers import IsolatedAction
 
 from ..test_api.base import IntegrationTest as BaseIntegrationTest
@@ -78,6 +77,7 @@ class IntegrationTest(BaseIntegrationTest):
         cls.confd = cls.create_confd()
         cls.provd = cls.create_provd()
         cls.db = cls.create_database()
+        cls.bus = cls.create_bus()
 
 
 class mocks(object):
@@ -354,7 +354,7 @@ class TestWizard(IntegrationTest):
     @mocks.sysconfd()
     def test_post(self, sysconfd):
         data = copy.deepcopy(COMPLETE_POST_BODY)
-        BusClient.listen_events('config.wizard.created')
+        bus_events = self.bus.accumulator('config.wizard.created')
 
         response = self.confd.wizard.get()
         assert_that(response.item, equal_to({'configured': False}))
@@ -368,13 +368,11 @@ class TestWizard(IntegrationTest):
         self.validate_db(data)
         self.validate_sysconfd(sysconfd, data)
         self.validate_provd(data['network']['ip_address'])
-        self.validate_bus_event()
 
-    def validate_bus_event(self):
-        def assert_function():
-            assert_that(BusClient.events(), has_length(1))
+        def assert_bus_event_received():
+            assert_that(bus_events.accumulate(), has_length(1))
 
-        until.assert_(assert_function, tries=5)
+        until.assert_(assert_bus_event_received, tries=5)
 
     def validate_db(self, data):
         with self.db.queries() as queries:
