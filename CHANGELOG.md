@@ -17,6 +17,11 @@ Changelog
 
   * PUT `/1.1/groups/<group_id>/members/extensions`
 
+* A new API for associating an user with a schedule has been added:
+
+  * DELETE `/1.1/users/<user_id>/schedules/<schedule_id>`
+  * PUT `/1.1/users/<user_id>/schedules/<schedule_id>`
+
 
 17.13
 -----

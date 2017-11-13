@@ -81,6 +81,7 @@ setup(
             'user_line_associated_plugin = xivo_confd.plugins.user_line_associated.plugin:Plugin',
             'user_line_plugin = xivo_confd.plugins.user_line.plugin:Plugin',
             'user_plugin = xivo_confd.plugins.user.plugin:Plugin',
+            'user_schedule_plugin = xivo_confd.plugins.user_schedule.plugin:Plugin',
             'user_voicemail_plugin = xivo_confd.plugins.user_voicemail.plugin:Plugin',
             'voicemail_plugin = xivo_confd.plugins.voicemail.plugin:Plugin',
             'voicemail_zonemessages_plugin = xivo_confd.plugins.voicemail_zonemessages.plugin:Plugin',

@@ -1,0 +1,36 @@
+paths:
+  /users/{user_id}/schedules/{schedule_id}:
+    put:
+      operationId: associate_user_schedule
+      summary: Associate user and schedule
+      description: '**Required ACL:** `confd.users.{user_id}.schedules.{schedule_id}.update`'
+      tags:
+      - users
+      - schedules
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: User and Schedule associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_user_schedule
+      summary: Dissociate user and schedule
+      description: '**Required ACL:** `confd.users.{user_id}.schedules.{schedule_id}.delete`'
+      tags:
+      - users
+      - schedules
+      parameters:
+      - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: User and Schedule dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
