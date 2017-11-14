@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 # Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from setuptools import setup
@@ -46,6 +44,7 @@ setup(
             'group_extension_plugin = xivo_confd.plugins.group_extension.plugin:Plugin',
             'group_fallback_plugin = xivo_confd.plugins.group_fallback.plugin:Plugin',
             'group_member_user_plugin = xivo_confd.plugins.group_member.plugin:Plugin',
+            'group_schedule_plugin = xivo_confd.plugins.group_schedule.plugin:Plugin',
             'incall_extension_plugin = xivo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_plugin = xivo_confd.plugins.incall.plugin:Plugin',
             'incall_schedule_plugin = xivo_confd.plugins.incall_schedule.plugin:Plugin',

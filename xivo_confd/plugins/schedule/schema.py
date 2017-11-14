@@ -93,11 +93,14 @@ class ScheduleSchema(BaseSchema):
                             only=['id', 'links'],
                             many=True,
                             dump_only=True)
-
     users = fields.Nested('UserSchema',
                           only=['uuid', 'firstname', 'lastname', 'links'],
                           many=True,
                           dump_only=True)
+    groups = fields.Nested('GroupSchema',
+                           only=['id', 'name', 'links'],
+                           many=True,
+                           dump_only=True)
 
     @post_load
     def unwrap_closed_destination(self, data):

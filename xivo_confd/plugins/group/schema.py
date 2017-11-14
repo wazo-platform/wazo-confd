@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -53,6 +51,10 @@ class GroupSchema(BaseSchema):
     extensions_member = fields.Nested('GroupExtensionsMemberSchema',
                                       many=True,
                                       dump_only=True)
+    schedules = fields.Nested('ScheduleSchema',
+                              only=['id', 'name', 'links'],
+                              many=True,
+                              dump_only=True)
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):
