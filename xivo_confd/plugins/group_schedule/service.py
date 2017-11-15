@@ -25,4 +25,4 @@ class GroupScheduleService(object):
 
 def build_service():
     return GroupScheduleService(build_notifier(),
-                                 build_validator())
+                                build_validator())

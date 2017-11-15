@@ -25,4 +25,4 @@ class OutcallScheduleService(object):
 
 def build_service():
     return OutcallScheduleService(build_notifier(),
-                                 build_validator())
+                                  build_validator())

@@ -4,21 +4,21 @@
 
 from xivo_confd import bus
 from xivo_bus.resources.user_schedule.event import (UserScheduleAssociatedEvent,
-                                                      UserScheduleDissociatedEvent)
+                                                    UserScheduleDissociatedEvent)
 
 
 class UserScheduleNotifier(object):
 
     def __init__(self, bus):
-        self.bus = bus
+        self._bus = bus
 
     def associated(self, user, schedule):
         event = UserScheduleAssociatedEvent(user.id, schedule.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event, event.routing_key)
 
     def dissociated(self, user, schedule):
         event = UserScheduleDissociatedEvent(user.id, schedule.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event, event.routing_key)
 
 
 def build_notifier():

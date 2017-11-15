@@ -7,11 +7,11 @@ import unittest
 from mock import Mock
 
 from xivo_bus.resources.outcall_schedule.event import (OutcallScheduleAssociatedEvent,
-                                                      OutcallScheduleDissociatedEvent)
-from ..notifier import OutcallScheduleNotifier
-
+                                                       OutcallScheduleDissociatedEvent)
 from xivo_dao.alchemy.outcall import Outcall
 from xivo_dao.alchemy.schedule import Schedule
+
+from ..notifier import OutcallScheduleNotifier
 
 
 class TestOutcallScheduleNotifier(unittest.TestCase):

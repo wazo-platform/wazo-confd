@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -10,10 +8,10 @@ from mock import Mock
 
 from xivo_bus.resources.incall_schedule.event import (IncallScheduleAssociatedEvent,
                                                       IncallScheduleDissociatedEvent)
-from ..notifier import IncallScheduleNotifier
-
 from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.schedule import Schedule
+
+from ..notifier import IncallScheduleNotifier
 
 
 class TestIncallScheduleNotifier(unittest.TestCase):
