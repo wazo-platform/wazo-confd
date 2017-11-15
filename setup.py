@@ -58,6 +58,7 @@ setup(
             'moh_plugin = xivo_confd.plugins.moh.plugin:Plugin',
             'outcall_extension_plugin = xivo_confd.plugins.outcall_extension.plugin:Plugin',
             'outcall_plugin = xivo_confd.plugins.outcall.plugin:Plugin',
+            'outcall_schedule_plugin = xivo_confd.plugins.outcall_schedule.plugin:Plugin',
             'outcall_trunk_plugin = xivo_confd.plugins.outcall_trunk.plugin:Plugin',
             'paging_plugin = xivo_confd.plugins.paging.plugin:Plugin',
             'paging_user_plugin = xivo_confd.plugins.paging_user.plugin:Plugin',
