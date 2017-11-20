@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 20162017 The Wazo Authors  (see the AUTHORS file)
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..helpers import errors as e

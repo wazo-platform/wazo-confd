@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright (C) 2015 Avencall
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.endpoint_sccp import dao

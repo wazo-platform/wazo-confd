@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright (C) 2015-2016 Avencall
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.plugins.line.service import build_service as build_line_service

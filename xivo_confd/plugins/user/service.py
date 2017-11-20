@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (C) 2013-2016 Avencall
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.plugins.user.validator import build_validator, build_validator_forward

@@ -1,10 +1,7 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright (C) 2016 Avencall
 # Copyright (C) 2016 Proformatique Inc.
-#
 # SPDX-License-Identifier: GPL-3.0+
-
 
 from marshmallow import fields
 

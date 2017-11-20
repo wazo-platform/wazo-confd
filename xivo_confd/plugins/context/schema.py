@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (C) 2016 Proformatique Inc.
-#
 # SPDX-License-Identifier: GPL-3.0+
-
 
 from marshmallow import fields, post_load
 from marshmallow.validate import Length, Range, Predicate, OneOf

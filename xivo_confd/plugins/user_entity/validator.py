@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (C) 2016 Avencall
 # Copyright (C) 2016 Proformatique Inc.
-#
 # SPDX-License-Identifier: GPL-3.0+
-
 
 from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 from xivo_dao.resources.user_line import dao as user_line_dao

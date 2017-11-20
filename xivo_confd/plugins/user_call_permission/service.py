@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright (C) 2016 Avencall
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao

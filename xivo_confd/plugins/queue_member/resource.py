@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright (C) 2016 Avencall
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request, url_for

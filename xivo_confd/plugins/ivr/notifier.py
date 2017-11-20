@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright (C) 2016 Proformatique Inc.
-#
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_bus.resources.ivr.event import (CreateIvrEvent,

@@ -1,8 +1,6 @@
 # -*- coding: UTF-8 -*-
 # Copyright (C) 2016 Avencall
-#
 # SPDX-License-Identifier: GPL-3.0+
-
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers import errors
