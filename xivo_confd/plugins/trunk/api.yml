@@ -2,7 +2,7 @@ paths:
   /trunks:
     get:
       operationId: list_trunks
-      summary: List tunks
+      summary: List trunks
       description: '**Required ACL:** `confd.trunks.read`'
       tags:
       - trunks
