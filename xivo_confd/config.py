@@ -113,6 +113,7 @@ DEFAULT_CONFIG = {
         'parking_lot_extension_plugin',
         'parking_lot_plugin',
         'queue_member_plugin',
+        'register_sip_plugin',
         'schedule_plugin',
         'sip_general_plugin',
         'switchboard_plugin',

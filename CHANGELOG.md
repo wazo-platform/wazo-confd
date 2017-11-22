@@ -1,6 +1,18 @@
 Changelog
 =========
 
+17.17
+-----
+
+* Added register sip endpoints:
+
+  * GET `/1.1/registers/sip`
+  * POST `/1.1/registers/sip`
+  * DELETE `/1.1/registers/sip/<register_sip_id>`
+  * GET `/1.1/registers/sip/<register_sip_id>`
+  * PUT `/1.1/registers/sip/<register_sip_id>`
+
+
 17.16
 -----
 
