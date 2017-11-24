@@ -1,6 +1,7 @@
 Changelog
 =========
 
+<<<<<<< HEAD
 17.17
 -----
 
@@ -11,6 +12,10 @@ Changelog
   * DELETE `/1.1/registers/sip/<register_sip_id>`
   * GET `/1.1/registers/sip/<register_sip_id>`
   * PUT `/1.1/registers/sip/<register_sip_id>`
+
+* Added Timezones endpoints:
+
+  * GET `/1.1/timezones`
 
 
 17.16

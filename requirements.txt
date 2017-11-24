@@ -20,3 +20,4 @@ pyyaml==3.11
 requests==2.4.3
 sqlalchemy==0.9.8  # from xivo-dao
 stevedore==1.17.1
+pytz==2012c

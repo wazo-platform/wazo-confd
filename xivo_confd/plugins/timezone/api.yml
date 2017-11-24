@@ -1,0 +1,28 @@
+paths:
+  /timezones:
+    get:
+      operationId: list_timezones
+      summary: List all available timezones
+      description: '**Required ACL:** `confd.timezones.read`'
+      tags:
+      - timezones
+      responses:
+        '200':
+          description: List timezones
+          schema:
+            $ref: '#/definitions/TimezoneItems'
+definitions:
+  Timezone:
+    title: Timezone
+    properties:
+      zone_name:
+        type: string
+  TimezoneItems:
+    title: TimezoneItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Timezone'
+      total:
+        type: integer

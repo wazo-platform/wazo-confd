@@ -118,6 +118,7 @@ DEFAULT_CONFIG = {
         'sip_general_plugin',
         'switchboard_plugin',
         'switchboard_member_plugin',
+        'timezone_plugin',
         'trunk_endpoint_plugin',
         'trunk_plugin',
         'user_agent_plugin',
