@@ -29,7 +29,8 @@ Depends: ${python:Depends},
          python-cheroot,
          python-requests (>= 2.4.3),
          python-netifaces,
-         python-marshmallow
+         python-marshmallow,
+         python-tz
 Description: Wazo confd server
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.

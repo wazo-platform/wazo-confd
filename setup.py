@@ -69,6 +69,7 @@ setup(
             'sip_general_plugin = xivo_confd.plugins.sip_general.plugin:Plugin',
             'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
             'switchboard_member_plugin = xivo_confd.plugins.switchboard_member.plugin:Plugin',
+            'timezone_plugin = xivo_confd.plugins.timezone.plugin:Plugin',
             'trunk_endpoint_plugin = xivo_confd.plugins.trunk_endpoint.plugin:Plugin',
             'trunk_plugin = xivo_confd.plugins.trunk.plugin:Plugin',
             'user_agent_plugin = xivo_confd.plugins.user_agent.plugin:Plugin',

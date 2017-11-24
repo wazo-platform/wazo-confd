@@ -1,6 +1,14 @@
 Changelog
 =========
 
+17.17
+-----
+
+* Added Timezones endpoints:
+
+  * GET `/1.1/timezones`
+
+
 17.16
 -----
 
