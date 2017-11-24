@@ -9,7 +9,7 @@ from ..helpers import scenarios as s
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import associations as a
-from xivo_test_helpers.confd.config import INCALL_CONTEXT, CONTEXT
+from ..helpers.config import INCALL_CONTEXT, CONTEXT
 from . import confd
 
 

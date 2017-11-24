@@ -16,7 +16,7 @@ from hamcrest import (assert_that,
                       starts_with)
 
 from xivo_test_helpers import until
-from xivo_test_helpers.confd.wrappers import IsolatedAction
+from ...wrappers import IsolatedAction
 
 from ..helpers.base import IntegrationTest as BaseIntegrationTest
 

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..helpers.base import IntegrationTest
-from xivo_test_helpers.confd.wrappers import IsolatedAction
+from ..helpers.wrappers import IsolatedAction
 
 
 class BaseIntegrationTest(IntegrationTest):

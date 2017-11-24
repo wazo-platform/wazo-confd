@@ -8,7 +8,7 @@ from hamcrest import (assert_that,
 from ..helpers import scenarios as s
 from . import confd
 from ..helpers import fixtures
-from xivo_test_helpers.confd.helpers.destination import invalid_destinations, valid_destinations
+from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 
 FAKE_ID = 999999999

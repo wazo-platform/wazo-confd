@@ -6,15 +6,15 @@ import os
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers.bus import BusClient
-from xivo_test_helpers.confd.bus import setup_bus as setup_bus_helpers
-from xivo_test_helpers.confd.database import create_helper as db_create_helper
-from xivo_test_helpers.confd.provd import create_helper as provd_create_helper
-from xivo_test_helpers.confd.sysconfd import SysconfdMock
-from xivo_test_helpers.confd.client import ConfdClient
-from xivo_test_helpers.confd.helpers import setup_confd as setup_confd_helpers
-from xivo_test_helpers.confd.helpers import setup_database as setup_database_helpers
-from xivo_test_helpers.confd.helpers import setup_new_client as setup_new_client_helpers
-from xivo_test_helpers.confd.helpers import setup_provd as setup_provd_helpers
+from .bus import setup_bus as setup_bus_helpers
+from .client import ConfdClient
+from .database import create_helper as db_create_helper
+from .helpers import setup_confd as setup_confd_helpers
+from .helpers import setup_database as setup_database_helpers
+from .helpers import setup_new_client as setup_new_client_helpers
+from .helpers import setup_provd as setup_provd_helpers
+from .provd import create_helper as provd_create_helper
+from .sysconfd import SysconfdMock
 
 
 class IntegrationTest(AssetLaunchingTestCase):

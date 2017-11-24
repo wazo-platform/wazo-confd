@@ -6,7 +6,7 @@ from . import confd
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from xivo_test_helpers.confd.helpers.destination import invalid_destinations, valid_destinations
+from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 from hamcrest import (assert_that,
                       empty,

@@ -9,8 +9,8 @@ from ..helpers import associations as a
 from ..helpers import scenarios as s
 from ..helpers import errors as e
 
-from xivo_test_helpers.confd.helpers import voicemail as vm_helper
-from xivo_test_helpers.confd.helpers import context as context_helper
+from ..helpers.helpers import voicemail as vm_helper
+from ..helpers.helpers import context as context_helper
 
 from hamcrest import (assert_that,
                       contains,

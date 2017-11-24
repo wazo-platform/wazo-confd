@@ -2,8 +2,8 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_test_helpers.confd.helpers.line_sip import generate_line, delete_line
-from xivo_test_helpers.confd.helpers.extension import generate_extension, delete_extension
+from ..helpers.helpers.line_sip import generate_line, delete_line
+from ..helpers.helpers.extension import generate_extension, delete_extension
 from ..helpers import scenarios as s
 from ..helpers import errors as e
 from ..helpers import associations as a
