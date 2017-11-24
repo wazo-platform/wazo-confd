@@ -32,7 +32,7 @@ INVALID_CALLBACK_EXTENSION = r'^[^~ ]*$'
 
 class RegisterSIPSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    transport = fields.String(validate=OneOf(['udp', 'tcp', 'tls', 'ws', 'wss']))
+    transport = fields.String(validate=OneOf(['udp', 'tcp', 'tls', 'ws', 'wss']), allow_none=True)
     sip_username = fields.String(validate=Regexp(INVALID_CHAR), required=True)
     auth_username = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     auth_password = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
