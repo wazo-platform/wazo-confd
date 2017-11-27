@@ -4,6 +4,8 @@
 
 from hamcrest import (
     assert_that,
+    contains,
+    has_entries,
     empty,
 )
 
@@ -80,6 +82,28 @@ def test_dissociate(outcall, call_permission):
     with a.outcall_call_permission(outcall, call_permission, check=False):
         response = confd.outcalls(outcall['id']).callpermissions(call_permission['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.outcall()
+@fixtures.call_permission()
+def test_get_call_permissions_relation(outcall, call_permission):
+    with a.outcall_call_permission(outcall, call_permission):
+        response = confd.outcalls(outcall['id']).get()
+        assert_that(response.item['call_permissions'], contains(
+            has_entries(id=call_permission['id'],
+                        name=call_permission['name'])
+        ))
+
+
+@fixtures.outcall()
+@fixtures.call_permission()
+def test_get_outcalls_relation(outcall, call_permission):
+    with a.outcall_call_permission(outcall, call_permission):
+        response = confd.callpermissions(call_permission['id']).get()
+        assert_that(response.item['outcalls'], contains(
+            has_entries(id=outcall['id'],
+                        name=outcall['name'])
+        ))
 
 
 @fixtures.outcall()
