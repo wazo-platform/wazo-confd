@@ -56,6 +56,7 @@ setup(
             'line_plugin = xivo_confd.plugins.line.plugin:Plugin',
             'line_sip_plugin = xivo_confd.plugins.line_sip.plugin:Plugin',
             'moh_plugin = xivo_confd.plugins.moh.plugin:Plugin',
+            'outcall_call_permission_plugin = xivo_confd.plugins.outcall_call_permission.plugin:Plugin',
             'outcall_extension_plugin = xivo_confd.plugins.outcall_extension.plugin:Plugin',
             'outcall_plugin = xivo_confd.plugins.outcall.plugin:Plugin',
             'outcall_schedule_plugin = xivo_confd.plugins.outcall_schedule.plugin:Plugin',

@@ -1,0 +1,34 @@
+paths:
+  /outcalls/{outcall_id}/callpermissions/{callpermission_id}:
+    put:
+      operationId: associate_outcall_callpermission
+      summary: Associate outcall and call permission
+      description: '**Required ACL:** `confd.outcalls.{outcall_id}.callpermissions.{call_permission_id}.update`'
+      tags:
+      - outcalls
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/outcallid'
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_outcall_callpermission
+      summary: Dissociate outcall and call permission
+      description: '**Required ACL:** `confd.outcalls.{outcall_id}.callpermissions.{call_permission_id}.delete`'
+      tags:
+      - outcalls
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/outcallid'
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '204':
+          description: Outcall and Call Permission dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

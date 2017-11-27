@@ -104,6 +104,7 @@ DEFAULT_CONFIG = {
         'line_plugin',
         'line_sip_plugin',
         'moh_plugin',
+        'outcall_call_permission_plugin',
         'outcall_extension_plugin',
         'outcall_plugin',
         'outcall_schedule_plugin',

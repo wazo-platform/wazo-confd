@@ -262,3 +262,10 @@ def outcall_schedule(outcall, schedule, check=True):
     h.outcall_schedule.associate(outcall['id'], schedule['id'], check)
     yield
     h.outcall_schedule.dissociate(outcall['id'], schedule['id'], check)
+
+
+@contextmanager
+def outcall_call_permission(outcall, call_permission, check=True):
+    h.outcall_call_permission.associate(outcall['id'], call_permission['id'], check)
+    yield
+    h.outcall_call_permission.dissociate(outcall['id'], call_permission['id'], check)

@@ -131,6 +131,7 @@ import paging_member_user
 import parking_lot
 import parking_lot_extension
 import outcall
+import outcall_call_permission
 import outcall_extension
 import outcall_schedule
 import outcall_trunk

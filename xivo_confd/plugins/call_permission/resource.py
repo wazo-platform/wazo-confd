@@ -28,6 +28,11 @@ class CallPermissionSchema(BaseSchema):
     description = fields.String(allow_none=True)
     links = ListLink(Link('callpermissions'))
 
+    outcalls = fields.Nested('OutcallSchema',
+                             only=['id', 'name', 'links'],
+                             many=True,
+                             dump_only=True)
+
 
 class CallPermissionList(ListResource):
 
