@@ -3,13 +3,14 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import api
-from .resource import TimezoneList
+
+from .resource import SoundLanguageList
 
 
 class Plugin(object):
 
     def load(self, core):
         api.add_resource(
-            TimezoneList,
-            '/timezones'
+            SoundLanguageList,
+            '/sounds/languages'
         )

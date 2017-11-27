@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.group import dao as group_dao
@@ -14,7 +14,8 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(GroupFallbackList,
-                         '/groups/<int:group_id>/fallbacks',
-                         resource_class_args=(service, group_dao)
-                         )
+        api.add_resource(
+            GroupFallbackList,
+            '/groups/<int:group_id>/fallbacks',
+            resource_class_args=(service, group_dao)
+        )

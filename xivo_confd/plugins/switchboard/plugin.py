@@ -4,8 +4,8 @@
 
 from xivo_confd import api
 
-from .service import build_service
 from .resource import SwitchboardItem, SwitchboardList
+from .service import build_service
 
 
 class Plugin(object):
@@ -13,13 +13,15 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(SwitchboardList,
-                         '/switchboards',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            SwitchboardList,
+            '/switchboards',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(SwitchboardItem,
-                         '/switchboards/<uuid>',
-                         endpoint='switchboards',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            SwitchboardItem,
+            '/switchboards/<uuid>',
+            endpoint='switchboards',
+            resource_class_args=(service,)
+        )

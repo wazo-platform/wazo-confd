@@ -1,22 +1,24 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import api
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociationSip
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointGetSip
-from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetSip
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociationSccp
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointGetSccp
-from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetSccp
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointAssociationCustom
-from xivo_confd.plugins.line_endpoint.resource import LineEndpointGetCustom
-from xivo_confd.plugins.line_endpoint.resource import EndpointLineGetCustom
-
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 from xivo_confd.plugins.endpoint_custom.service import build_service as build_custom_service
-from xivo_confd.plugins.line_endpoint.service import build_service
+
+from .resource import (
+    LineEndpointAssociationSip,
+    LineEndpointGetSip,
+    EndpointLineGetSip,
+    LineEndpointAssociationSccp,
+    LineEndpointGetSccp,
+    EndpointLineGetSccp,
+    LineEndpointAssociationCustom,
+    LineEndpointGetCustom,
+    EndpointLineGetCustom,
+)
+from .service import build_service
 
 
 class Plugin(object):
@@ -31,50 +33,68 @@ class Plugin(object):
     def load_sip(self, provd_client):
         service = self.build_sip_service(provd_client)
 
-        api.add_resource(LineEndpointAssociationSip,
-                         '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',
-                         endpoint='line_endpoint_sip',
-                         resource_class_args=(service,))
+        api.add_resource(
+            LineEndpointAssociationSip,
+            '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',
+            endpoint='line_endpoint_sip',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(LineEndpointGetSip,
-                         '/lines/<int:line_id>/endpoints/sip',
-                         resource_class_args=(service,))
+        api.add_resource(
+            LineEndpointGetSip,
+            '/lines/<int:line_id>/endpoints/sip',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(EndpointLineGetSip,
-                         '/endpoints/sip/<int:endpoint_id>/lines',
-                         resource_class_args=(service,))
+        api.add_resource(
+            EndpointLineGetSip,
+            '/endpoints/sip/<int:endpoint_id>/lines',
+            resource_class_args=(service,)
+        )
 
     def load_sccp(self, provd_client):
         service = self.build_sccp_service(provd_client)
 
-        api.add_resource(LineEndpointAssociationSccp,
-                         '/lines/<int:line_id>/endpoints/sccp/<int:endpoint_id>',
-                         endpoint='line_endpoint_sccp',
-                         resource_class_args=(service,))
+        api.add_resource(
+            LineEndpointAssociationSccp,
+            '/lines/<int:line_id>/endpoints/sccp/<int:endpoint_id>',
+            endpoint='line_endpoint_sccp',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(LineEndpointGetSccp,
-                         '/lines/<int:line_id>/endpoints/sccp',
-                         resource_class_args=(service,))
+        api.add_resource(
+            LineEndpointGetSccp,
+            '/lines/<int:line_id>/endpoints/sccp',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(EndpointLineGetSccp,
-                         '/endpoints/sccp/<int:endpoint_id>/lines',
-                         resource_class_args=(service,))
+        api.add_resource(
+            EndpointLineGetSccp,
+            '/endpoints/sccp/<int:endpoint_id>/lines',
+            resource_class_args=(service,)
+        )
 
     def load_custom(self, provd_client):
         service = self.build_custom_service(provd_client)
 
-        api.add_resource(LineEndpointAssociationCustom,
-                         '/lines/<int:line_id>/endpoints/custom/<int:endpoint_id>',
-                         endpoint='line_endpoint_custom',
-                         resource_class_args=(service,))
+        api.add_resource(
+            LineEndpointAssociationCustom,
+            '/lines/<int:line_id>/endpoints/custom/<int:endpoint_id>',
+            endpoint='line_endpoint_custom',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(LineEndpointGetCustom,
-                         '/lines/<int:line_id>/endpoints/custom',
-                         resource_class_args=(service,))
+        api.add_resource(
+            LineEndpointGetCustom,
+            '/lines/<int:line_id>/endpoints/custom',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(EndpointLineGetCustom,
-                         '/endpoints/custom/<int:endpoint_id>/lines',
-                         resource_class_args=(service,))
+        api.add_resource(
+            EndpointLineGetCustom,
+            '/endpoints/custom/<int:endpoint_id>/lines',
+            resource_class_args=(service,)
+        )
 
     def build_sip_service(self, provd_client):
         sip_service = build_sip_service(provd_client)

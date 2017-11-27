@@ -15,14 +15,16 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(GroupMemberUserItem,
-                         '/groups/<int:group_id>/members/users',
-                         endpoint='group_member_users',
-                         resource_class_args=(service, group_dao, user_dao)
-                         )
+        api.add_resource(
+            GroupMemberUserItem,
+            '/groups/<int:group_id>/members/users',
+            endpoint='group_member_users',
+            resource_class_args=(service, group_dao, user_dao)
+        )
 
-        api.add_resource(GroupMemberExtensionItem,
-                         '/groups/<int:group_id>/members/extensions',
-                         endpoint='group_member_extensions',
-                         resource_class_args=(service, group_dao)
-                         )
+        api.add_resource(
+            GroupMemberExtensionItem,
+            '/groups/<int:group_id>/members/extensions',
+            endpoint='group_member_extensions',
+            resource_class_args=(service, group_dao)
+        )

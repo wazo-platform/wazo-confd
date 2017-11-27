@@ -12,7 +12,8 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(VoicemailZoneMessagesList,
-                         '/asterisk/voicemail/zonemessages',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            VoicemailZoneMessagesList,
+            '/asterisk/voicemail/zonemessages',
+            resource_class_args=(service,)
+        )

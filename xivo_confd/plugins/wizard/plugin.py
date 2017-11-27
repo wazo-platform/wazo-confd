@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -9,9 +8,10 @@ from xivo_auth_client import Client as AuthClient
 from xivo_dird_client import Client as DirdClient
 
 from xivo_confd import api
-from xivo_confd.plugins.wizard.service import build_service
-from xivo_confd.plugins.wizard.resource import WizardResource, WizardDiscoverResource
 from xivo_dao.resources.infos import dao as infos_dao
+
+from .resource import WizardResource, WizardDiscoverResource
+from .service import build_service
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +33,15 @@ class Plugin(object):
 
         service = build_service(provd_client, auth_client, dird_client, infos_dao)
 
-        api.add_resource(WizardResource,
-                         '/wizard',
-                         endpoint='wizard',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            WizardResource,
+            '/wizard',
+            endpoint='wizard',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(WizardDiscoverResource,
-                         '/wizard/discover',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            WizardDiscoverResource,
+            '/wizard/discover',
+            resource_class_args=(service,)
+        )

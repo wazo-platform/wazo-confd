@@ -24,31 +24,6 @@ from xivo_confd.plugins.user_line.service import build_service as build_ul_servi
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
 from xivo_confd.plugins.voicemail.service import build_service as build_voicemail_service
 
-from xivo_confd.plugins.user_import.entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
-from xivo_confd.plugins.user_import.resource import UserImportResource, UserExportResource
-from xivo_confd.plugins.user_import.service import ImportService
-
-from xivo_confd.plugins.user_import.creators import (CallPermissionCreator,
-                                                     CtiProfileCreator,
-                                                     EntityCreator,
-                                                     ExtensionCreator,
-                                                     IncallCreator,
-                                                     LineCreator,
-                                                     SccpCreator,
-                                                     SipCreator,
-                                                     UserCreator,
-                                                     VoicemailCreator)
-
-from xivo_confd.plugins.user_import.associators import (CallPermissionAssociator,
-                                                        CtiProfileAssociator,
-                                                        EntityAssociator,
-                                                        ExtensionAssociator,
-                                                        IncallAssociator,
-                                                        LineAssociator,
-                                                        SccpAssociator,
-                                                        SipAssociator,
-                                                        VoicemailAssociator)
-
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
@@ -63,6 +38,33 @@ from xivo_dao.resources.user_call_permission import dao as user_call_permission_
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
+
+from .associators import (
+    CallPermissionAssociator,
+    CtiProfileAssociator,
+    EntityAssociator,
+    ExtensionAssociator,
+    IncallAssociator,
+    LineAssociator,
+    SccpAssociator,
+    SipAssociator,
+    VoicemailAssociator
+)
+from .creators import (
+    CallPermissionCreator,
+    CtiProfileCreator,
+    EntityCreator,
+    ExtensionCreator,
+    IncallCreator,
+    LineCreator,
+    SccpCreator,
+    SipCreator,
+    UserCreator,
+    VoicemailCreator
+)
+from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
+from .resource import UserImportResource, UserExportResource
+from .service import ImportService
 
 
 class Plugin(object):
@@ -137,10 +139,13 @@ class Plugin(object):
 
         service = ImportService(entry_creator, entry_associator, entry_updater)
 
-        api.add_resource(UserImportResource,
-                         '/users/import',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            UserImportResource,
+            '/users/import',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(UserExportResource,
-                         '/users/export')
+        api.add_resource(
+            UserExportResource,
+            '/users/export'
+        )

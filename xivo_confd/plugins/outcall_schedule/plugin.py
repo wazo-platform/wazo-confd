@@ -15,8 +15,9 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(OutcallScheduleItem,
-                         '/outcalls/<int:outcall_id>/schedules/<int:schedule_id>',
-                         endpoint='outcall_schedules',
-                         resource_class_args=(service, outcall_dao, schedule_dao)
-                         )
+        api.add_resource(
+            OutcallScheduleItem,
+            '/outcalls/<int:outcall_id>/schedules/<int:schedule_id>',
+            endpoint='outcall_schedules',
+            resource_class_args=(service, outcall_dao, schedule_dao)
+        )

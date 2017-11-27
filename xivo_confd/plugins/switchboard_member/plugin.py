@@ -15,8 +15,9 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(SwitchboardMemberUserItem,
-                         '/switchboards/<uuid:switchboard_uuid>/members/users',
-                         endpoint='switchboard_member_users',
-                         resource_class_args=(service, switchboard_dao, user_dao)
-                         )
+        api.add_resource(
+            SwitchboardMemberUserItem,
+            '/switchboards/<uuid:switchboard_uuid>/members/users',
+            endpoint='switchboard_member_users',
+            resource_class_args=(service, switchboard_dao, user_dao)
+        )

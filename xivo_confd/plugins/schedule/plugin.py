@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import api
-from .service import build_service
+
 from .resource import ScheduleItem, ScheduleList
+from .service import build_service
 
 
 class Plugin(object):
@@ -12,13 +13,15 @@ class Plugin(object):
     def load(self, core):
         service = build_service()
 
-        api.add_resource(ScheduleList,
-                         '/schedules',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            ScheduleList,
+            '/schedules',
+            resource_class_args=(service,)
+        )
 
-        api.add_resource(ScheduleItem,
-                         '/schedules/<int:id>',
-                         endpoint='schedules',
-                         resource_class_args=(service,)
-                         )
+        api.add_resource(
+            ScheduleItem,
+            '/schedules/<int:id>',
+            endpoint='schedules',
+            resource_class_args=(service,)
+        )
