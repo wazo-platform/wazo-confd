@@ -18,6 +18,8 @@ class RegisterSIPService(CRUDService):
                              category='general',
                              var_name='register',
                              var_val=register_sip['var_val'])
+        if register_sip.get('enabled'):
+            resource.enabled = register_sip.get('enabled')
         return super(RegisterSIPService, self).create(resource)
 
 
