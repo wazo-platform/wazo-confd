@@ -24,7 +24,6 @@ setup(
             'xivo-confd=xivo_confd.bin.daemon:main',
         ],
         'xivo_confd.plugins': [
-            'plugin_list = xivo_confd.plugins.plugin_list:Plugin',
             'api_plugin = xivo_confd.plugins.api.plugin:Plugin',
             'call_log_plugin = xivo_confd.plugins.call_log.plugin:Plugin',
             'call_permission_plugin = xivo_confd.plugins.call_permission.plugin:Plugin',
