@@ -2,8 +2,11 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import re
 import requests
 from requests import RequestException
+
+LANGUAGE_REGEX = r'^[a-zA-Z]{2,3}_[a-zA-Z]{2,3}$'
 
 
 class AsteriskUnreachable(Exception):
@@ -42,7 +45,12 @@ class Client(object):
         response.raise_for_status()
 
         languages = self._extract_sounds_languages(response.json())
-        return [{'tag': language} for language in languages]
+        sound_languages = [{'tag': language} for language in languages]
+        sound_languages = self._remove_non_standard_tag(sound_languages)
+        return sound_languages
 
     def _extract_sounds_languages(self, sounds):
         return set(format_['language'] for sound in sounds for format_ in sound['formats'])
+
+    def _remove_non_standard_tag(self, languages):
+        return [language for language in languages if re.match(LANGUAGE_REGEX, language['tag'])]

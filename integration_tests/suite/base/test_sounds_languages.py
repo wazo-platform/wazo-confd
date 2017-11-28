@@ -21,9 +21,9 @@ def test_get():
                       'format': 'slin'},
                      {'language': 'en_US',
                       'format': 'slin'},
-                     {'language': 'en',
-                      'format': 'gsm'},
                      {'language': 'fr_FR',
+                      'format': 'gsm'},
+                     {'language': 'priv-callerintros',
                       'format': 'slin'}],
          'text': 'minutes'}
     ]
@@ -34,8 +34,7 @@ def test_get():
 
     assert_that(response.items, contains_inanyorder(
         {'tag': 'en_US'},
-        {'tag': 'en'},
         {'tag': 'fr_CA'},
         {'tag': 'fr_FR'},
     ))
-    assert_that(response.total, equal_to(4))
+    assert_that(response.total, equal_to(3))
