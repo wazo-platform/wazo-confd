@@ -7,7 +7,6 @@ import logging
 from xivo_auth_client import Client as AuthClient
 from xivo_dird_client import Client as DirdClient
 
-from xivo_confd import api
 from xivo_dao.resources.infos import dao as infos_dao
 
 from .resource import WizardResource, WizardDiscoverResource
@@ -19,6 +18,7 @@ logger = logging.getLogger(__name__)
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service_id = core.config['wizard']['service_id']
         service_key = core.config['wizard']['service_key']
         if not service_id or not service_key:

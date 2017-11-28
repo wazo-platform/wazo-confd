@@ -6,8 +6,6 @@ from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 
-from xivo_confd import api
-
 from .legacy import LineExtensionLegacy, ExtensionLineLegacy
 from .resource import LineExtensionItem, LineExtensionList, ExtensionLineList
 from .service import build_service
@@ -16,6 +14,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
         class_args = (service, line_dao, extension_dao)
         legacy_class_args = (service, line_dao, extension_dao, line_extension_dao)

@@ -2,7 +2,6 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import api
 from xivo_confd.plugins.device.builder import build_dao as build_device_dao
 
 from xivo_dao.resources.line import dao as line_dao
@@ -18,6 +17,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         provd_client = core.provd_client()
         device_dao = build_device_dao(provd_client)
         service = build_service(provd_client)

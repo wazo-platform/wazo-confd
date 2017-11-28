@@ -5,8 +5,6 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 
-from xivo_confd import api
-
 from . import service
 from .resource import UserCtiProfileRoot
 
@@ -14,6 +12,8 @@ from .resource import UserCtiProfileRoot
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
+
         api.add_resource(
             UserCtiProfileRoot,
             '/users/<int:user_id>/cti',

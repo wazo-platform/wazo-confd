@@ -5,8 +5,6 @@
 from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
 
-from xivo_confd import api
-
 from .resource import (
     TrunkEndpointAssociationSip,
     TrunkEndpointGetSip,
@@ -21,10 +19,11 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
-        self.load_sip()
-        self.load_custom()
+        api = core.api
+        self.load_sip(api)
+        self.load_custom(api)
 
-    def load_sip(self):
+    def load_sip(self, api):
         service = self.build_sip_service()
 
         api.add_resource(
@@ -46,7 +45,7 @@ class Plugin(object):
             resource_class_args=(service,)
         )
 
-    def load_custom(self):
+    def load_custom(self, api):
         service = self.build_custom_service()
 
         api.add_resource(

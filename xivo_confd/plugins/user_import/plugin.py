@@ -4,8 +4,6 @@
 
 from collections import OrderedDict
 
-from xivo_confd import api
-
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
@@ -70,6 +68,7 @@ from .service import ImportService
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         provd_client = core.provd_client()
 
         user_service = build_user_service(provd_client)

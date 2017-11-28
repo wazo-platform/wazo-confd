@@ -10,7 +10,6 @@ class Plugin(object):
 
     def load(self, core):
         api = core.api
-
         service = build_service()
 
         api.add_resource(

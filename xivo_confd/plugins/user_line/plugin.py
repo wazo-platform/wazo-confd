@@ -5,8 +5,6 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 
-from xivo_confd import api
-
 from .resource import UserLineList, UserLineItem, LineUserList
 from .service import build_service
 
@@ -14,6 +12,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
 
         api.add_resource(

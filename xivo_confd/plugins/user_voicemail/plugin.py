@@ -5,8 +5,6 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
-from xivo_confd import api
-
 from .resource import (
     UserVoicemailItem,
     UserVoicemailLegacy,
@@ -19,6 +17,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
 
         api.add_resource(

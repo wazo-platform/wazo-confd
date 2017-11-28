@@ -2,7 +2,6 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import api
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.user import dao as user_dao
 
@@ -13,6 +12,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
 
         api.add_resource(

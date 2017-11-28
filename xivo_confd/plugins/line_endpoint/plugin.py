@@ -2,7 +2,6 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import api
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 from xivo_confd.plugins.endpoint_custom.service import build_service as build_custom_service
@@ -24,13 +23,14 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         provd_client = core.provd_client()
 
-        self.load_sip(provd_client)
-        self.load_sccp(provd_client)
-        self.load_custom(provd_client)
+        self.load_sip(api, provd_client)
+        self.load_sccp(api, provd_client)
+        self.load_custom(api, provd_client)
 
-    def load_sip(self, provd_client):
+    def load_sip(self, api, provd_client):
         service = self.build_sip_service(provd_client)
 
         api.add_resource(
@@ -52,7 +52,7 @@ class Plugin(object):
             resource_class_args=(service,)
         )
 
-    def load_sccp(self, provd_client):
+    def load_sccp(self, api, provd_client):
         service = self.build_sccp_service(provd_client)
 
         api.add_resource(
@@ -74,7 +74,7 @@ class Plugin(object):
             resource_class_args=(service,)
         )
 
-    def load_custom(self, provd_client):
+    def load_custom(self, api, provd_client):
         service = self.build_custom_service(provd_client)
 
         api.add_resource(

@@ -5,7 +5,6 @@
 from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.schedule import dao as schedule_dao
 
-from xivo_confd import api
 from .resource import OutcallScheduleItem
 from .service import build_service
 
@@ -13,6 +12,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
 
         api.add_resource(

@@ -2,7 +2,6 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import api
 from xivo_confd.application import add_endpoint_to_do_not_log_data_list
 
 from .resource import MohItem, MohList, MohFileItem
@@ -12,6 +11,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
 
         api.add_resource(

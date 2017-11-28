@@ -5,8 +5,6 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 
-from xivo_confd import api
-
 from .resource import (
     CallPermissionUserGet,
     UserCallPermissionAssociation,
@@ -18,6 +16,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
+        api = core.api
         service = build_service()
 
         api.add_resource(
