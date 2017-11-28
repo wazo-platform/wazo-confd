@@ -68,6 +68,10 @@ sysconfd:
     host: sysconfd
     port: 8668
 
+ari:
+    host: ari
+    port: 5039
+
 auth:
     host: auth
     port: 9497
