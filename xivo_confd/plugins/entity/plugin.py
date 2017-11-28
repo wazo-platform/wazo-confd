@@ -16,7 +16,7 @@ class Plugin(object):
             EntityList,
             '/entities',
             resource_class_args=(service,)
-                         )
+        )
 
         api.add_resource(
             EntityItem,
