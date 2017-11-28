@@ -68,6 +68,7 @@ setup(
             'register_sip_plugin = xivo_confd.plugins.register_sip.plugin:Plugin',
             'schedule_plugin = xivo_confd.plugins.schedule.plugin:Plugin',
             'sip_general_plugin = xivo_confd.plugins.sip_general.plugin:Plugin',
+            'sound_language_plugin = xivo_confd.plugins.sound_language.plugin:Plugin',
             'switchboard_plugin = xivo_confd.plugins.switchboard.plugin:Plugin',
             'switchboard_member_plugin = xivo_confd.plugins.switchboard_member.plugin:Plugin',
             'timezone_plugin = xivo_confd.plugins.timezone.plugin:Plugin',

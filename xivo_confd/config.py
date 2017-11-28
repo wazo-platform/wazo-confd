@@ -46,6 +46,13 @@ DEFAULT_CONFIG = {
         'port': 9497,
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
     },
+    'ari': {
+        'host': 'localhost',
+        'port': 5039,
+        'https': False,
+        'username': 'xivo',
+        'password': 'Nasheow8Eag',
+    },
     'bus': {
         'username': 'guest',
         'password': 'guest',
@@ -117,6 +124,7 @@ DEFAULT_CONFIG = {
         'register_sip_plugin',
         'schedule_plugin',
         'sip_general_plugin',
+        'sound_language_plugin',
         'switchboard_plugin',
         'switchboard_member_plugin',
         'timezone_plugin',

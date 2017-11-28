@@ -50,6 +50,13 @@ auth:
     port: 9497
     verify_certificate: /usr/share/xivo-certs/server.crt
 
+# Asterisk ARI connection informations
+ari:
+  host: localhost
+  port: 5039
+  username: xivo
+  password: Nasheow8Eag
+
 # Event bus (AMQP) connection information
 bus:
     username: guest
