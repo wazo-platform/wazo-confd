@@ -28,8 +28,13 @@ class ARIClientProxy(object):
 
     def get_sounds_languages(self):
         if not self._sounds_languages:
-            self._sounds_languages = self._ari_client.get_sounds_languages()
+            sounds = self._ari_client.get_sounds_languages()
+            languages = self._extract_sounds_languages(sounds)
+            self._sounds_languages = [{'tag': language} for language in languages]
         return self._sounds_languages
+
+    def _extract_sounds_languages(self, sounds):
+        return set(format_['language'] for sound in sounds for format_ in sound['formats'])
 
 
 def build_ari_client_proxy(ari_client, bus):

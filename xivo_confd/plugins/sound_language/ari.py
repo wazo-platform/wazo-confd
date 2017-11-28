@@ -2,6 +2,17 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import requests
+from requests import RequestException
+
+
+class AsteriskUnreachable(Exception):
+    pass
+
+
+class AsteriskUnauthorized(Exception):
+    pass
+
 
 class Client(object):
 
@@ -16,8 +27,17 @@ class Client(object):
             host=self._host,
             port=':{}'.format(self._port) if self._port else ''
         )
+        self._params = {'api_key': '{}:{}'.format(username, password)}
 
     def get_sounds_languages(self):
-        # TODO fetch value from asterisk
-        return [{'tag': 'en_US'},
-                {'tag': 'fr_FR'}]
+        url = '{base_url}/sounds'.format(base_url=self._base_url)
+        try:
+            response = requests.get(url, params=self._params)
+        except RequestException as e:
+            raise AsteriskUnreachable(e)
+
+        if response.status_code == 401:
+            raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
+
+        response.raise_for_status()
+        return response.json()
