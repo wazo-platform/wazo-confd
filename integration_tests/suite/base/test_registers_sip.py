@@ -85,6 +85,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'expiration', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'expiration', []
     yield s.check_bogus_field_returns_error, url, 'expiration', {}
+    yield s.check_bogus_field_returns_error, url, 'enabled', 'string'
+    yield s.check_bogus_field_returns_error, url, 'enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'enabled', []
 
 
 @fixtures.register_sip()
@@ -100,6 +104,7 @@ def test_get(register_sip):
         remote_port=none(),
         callback_extension=none(),
         expiration=none(),
+        enabled=True,
     ))
 
 
@@ -124,6 +129,7 @@ def test_create_all_parameters():
         remote_port=1234,
         callback_extension='callback-extension',
         expiration=1000,
+        enabled=True
     )
     response = confd.registers.sip.post(**parameters)
 
@@ -150,6 +156,7 @@ def test_edit_all_parameters(register_sip):
         remote_port=1234,
         callback_extension='callback-extension',
         expiration=1000,
+        enabled=False
     )
 
     response = confd.registers.sip(register_sip['id']).put(**parameters)

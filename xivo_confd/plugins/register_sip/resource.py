@@ -10,7 +10,7 @@ from marshmallow.exceptions import ValidationError
 from marshmallow.validate import OneOf, Range, Regexp
 
 from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
 REGISTER_REGEX = re.compile(r'''^
@@ -40,6 +40,7 @@ class RegisterSIPSchema(BaseSchema):
     remote_port = fields.Integer(validate=Range(min=0, max=65535), allow_none=True)
     callback_extension = fields.String(validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True)
     expiration = fields.Integer(validate=Range(min=0), allow_none=True)
+    enabled = StrictBoolean()
     links = ListLink(Link('register_sip'))
 
     @validates_schema
@@ -74,6 +75,7 @@ class RegisterSIPSchema(BaseSchema):
         register = REGISTER_REGEX.match(data.var_val)
         result = register.groupdict()
         result['id'] = data.id
+        result['enabled'] = data.enabled
         return result
 
 
@@ -106,12 +108,15 @@ class RegisterSIPItem(ItemResource):
     @required_acl('confd.registers.{id}.update')
     def put(self, id):
         model = self.service.get(id)
-        model_json = self.schema().dump(model).data
         form = self.schema().load(request.get_json(), partial=True).data
+
+        model_json = self.schema().dump(model).data
         for name, value in form.iteritems():
             model_json[name] = value
         model_json = self.schema().load(model_json).data  # update var_val
+
         model.var_val = model_json['var_val']
+        model.enabled = model_json['enabled']
         self.service.edit(model)
         return '', 204
 
