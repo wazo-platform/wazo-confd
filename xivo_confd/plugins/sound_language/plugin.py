@@ -4,17 +4,15 @@
 
 from .ari import Client as ARIClient
 from .resource import SoundLanguageList
-from .service import build_service, build_ari_client_proxy
+from .service import build_service
 
 
 class Plugin(object):
 
     def load(self, core):
         api = core.api
-        bus = None  # TODO build_bus_consumer
         ari_client = ARIClient(**core.config['ari'])
-        ari_client_proxy = build_ari_client_proxy(ari_client, bus)
-        service = build_service(ari_client_proxy)
+        service = build_service(ari_client)
 
         api.add_resource(
             SoundLanguageList,

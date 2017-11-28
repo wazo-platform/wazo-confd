@@ -40,4 +40,9 @@ class Client(object):
             raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
 
         response.raise_for_status()
-        return response.json()
+
+        languages = self._extract_sounds_languages(response.json())
+        return [{'tag': language} for language in languages]
+
+    def _extract_sounds_languages(self, sounds):
+        return set(format_['language'] for sound in sounds for format_ in sound['formats'])
