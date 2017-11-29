@@ -1,0 +1,34 @@
+paths:
+  /groups/{group_id}/callpermissions/{callpermission_id}:
+    put:
+      operationId: associate_group_callpermission
+      summary: Associate group and call permission
+      description: '**Required ACL:** `confd.groups.{group_id}.callpermissions.{call_permission_id}.update`'
+      tags:
+      - groups
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_group_callpermission
+      summary: Dissociate group and call permission
+      description: '**Required ACL:** `confd.groups.{group_id}.callpermissions.{call_permission_id}.delete`'
+      tags:
+      - groups
+      - callpermissions
+      parameters:
+      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/callpermissionid'
+      responses:
+        '204':
+          description: Group and Call Permission dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

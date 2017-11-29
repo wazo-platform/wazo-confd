@@ -40,6 +40,7 @@ setup(
             'extension_plugin = xivo_confd.plugins.extension.plugin:Plugin',
             'func_key_plugin = xivo_confd.plugins.func_key.plugin:Plugin',
             'group_plugin = xivo_confd.plugins.group.plugin:Plugin',
+            'group_call_permission_plugin = xivo_confd.plugins.group_call_permission.plugin:Plugin',
             'group_extension_plugin = xivo_confd.plugins.group_extension.plugin:Plugin',
             'group_fallback_plugin = xivo_confd.plugins.group_fallback.plugin:Plugin',
             'group_member_user_plugin = xivo_confd.plugins.group_member.plugin:Plugin',

@@ -95,6 +95,7 @@ DEFAULT_CONFIG = {
         'entity_plugin',
         'extension_plugin',
         'func_key_plugin',
+        'group_call_permission_plugin',
         'group_extension_plugin',
         'group_fallback_plugin',
         'group_member_user_plugin',

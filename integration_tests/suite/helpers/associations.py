@@ -269,3 +269,10 @@ def outcall_call_permission(outcall, call_permission, check=True):
     h.outcall_call_permission.associate(outcall['id'], call_permission['id'], check)
     yield
     h.outcall_call_permission.dissociate(outcall['id'], call_permission['id'], check)
+
+
+@contextmanager
+def group_call_permission(group, call_permission, check=True):
+    h.group_call_permission.associate(group['id'], call_permission['id'], check)
+    yield
+    h.group_call_permission.dissociate(group['id'], call_permission['id'], check)
