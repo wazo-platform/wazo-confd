@@ -16,7 +16,7 @@ from xivo_confd.plugins.line_endpoint.service import build_service as build_le_s
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 from xivo_confd.plugins.user.service import build_service as build_user_service
 from xivo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
-from xivo_confd.plugins.user_cti_profile import service as user_cti_profile_service
+from xivo_confd.plugins.user_cti_profile.service import build_service as build_user_cti_profile_service
 from xivo_confd.plugins.user_entity.service import build_service as build_user_entity_service
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
@@ -74,6 +74,7 @@ class Plugin(object):
         user_service = build_user_service(provd_client)
         entity_service = build_entity_service()
         user_voicemail_service = build_uv_service()
+        user_cti_profile_service = build_user_cti_profile_service()
         voicemail_service = build_voicemail_service()
         line_service = build_line_service(provd_client)
         sip_service = build_sip_service(provd_client)
