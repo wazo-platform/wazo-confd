@@ -5,14 +5,15 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.cti_profile import dao as cti_profile_dao
 
-from . import service
 from .resource import UserCtiProfileRoot
+from .service import build_service
 
 
 class Plugin(object):
 
     def load(self, core):
         api = core.api
+        service = build_service()
 
         api.add_resource(
             UserCtiProfileRoot,

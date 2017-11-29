@@ -4,19 +4,33 @@
 
 from xivo_dao.helpers.db_manager import Session
 
-from xivo_confd.plugins.user_cti_profile import validator, notifier
+from . import (
+    validator as validator_module,
+    notifier as notifier_module
+)
 
 
-def edit(user, form):
-    cti_profile_id = form.get('cti_profile_id')
-    cti_enabled = form.get('cti_enabled')
-    if cti_enabled is not None:
-        user.cti_enabled = cti_enabled
+class UserCTIProfileService(object):
 
-    with Session.no_autoflush:
-        validator.validate_edit(user, cti_profile_id)
+    def __init__(self, validator, notifier):
+        self.validator = validator
+        self.notifier = notifier
 
-    if 'cti_profile_id' in form:
-        user.cti_profile_id = cti_profile_id
+    def edit(self, user, form):
+        cti_profile_id = form.get('cti_profile_id')
+        cti_enabled = form.get('cti_enabled')
+        if cti_enabled is not None:
+            user.cti_enabled = cti_enabled
 
-    notifier.edited(user)
+        with Session.no_autoflush:
+            self.validator.validate_edit(user, cti_profile_id)
+
+        if 'cti_profile_id' in form:
+            user.cti_profile_id = cti_profile_id
+
+        self.notifier.edited(user)
+
+
+def build_service():
+    return UserCTIProfileService(validator_module,
+                                 notifier_module)
