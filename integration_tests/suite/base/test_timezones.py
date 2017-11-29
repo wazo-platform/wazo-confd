@@ -6,7 +6,7 @@ from hamcrest import assert_that, has_items, not_
 from . import confd
 
 
-def test_get_destinations():
+def test_get():
     response = confd.timezones.get()
     response.assert_ok()
 

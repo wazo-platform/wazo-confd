@@ -6,6 +6,7 @@ import os
 
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers.bus import BusClient
+from .ari import ARIClient
 from .bus import setup_bus as setup_bus_helpers
 from .client import ConfdClient
 from .database import create_helper as db_create_helper
@@ -78,3 +79,7 @@ class IntegrationTest(AssetLaunchingTestCase):
         port = cls.service_port(5672, 'rabbitmq')
         client = BusClient.from_connection_fields(host='localhost', port=port)
         return client
+
+    @classmethod
+    def create_ari(cls):
+        return ARIClient(host='localhost', port=cls.service_port(5039, 'ari'))

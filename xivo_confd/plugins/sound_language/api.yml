@@ -1,0 +1,28 @@
+paths:
+  /sounds/languages:
+    get:
+      operationId: list_sounds_languages
+      summary: List all languages for sounds
+      description: '**Required ACL:** `confd.sounds.languages.read`'
+      tags:
+      - sounds
+      responses:
+        '200':
+          description: List sounds languages
+          schema:
+            $ref: '#/definitions/SoundLanguageItems'
+definitions:
+  SoundLanguage:
+    title: SoundLanguage
+    properties:
+      tag:
+        type: string
+  SoundLanguageItems:
+    title: SoundLanguageItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/SoundLanguage'
+      total:
+        type: integer

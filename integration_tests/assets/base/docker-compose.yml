@@ -1,6 +1,7 @@
 sync:
   image: n3llyb0y/wait
   links:
+    - ari
     - auth
     - rabbitmq
     - postgres
@@ -8,8 +9,15 @@ sync:
     - sysconfd
     - confd
   environment:
-    PORTS: "5432 5672 8666 8668 9486 9497"
+    PORTS: "5039 5432 5672 8666 8668 9486 9497"
     TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"
+ari:
+  image: p0bailey/docker-flask
+  ports:
+    - "5039"
+  volumes:
+    - "./mocks/ari.py:/tmp/ari.py"
+  command: "python /tmp/ari.py 5039"
 auth:
   image: wazopbx/xivo-auth-mock
   expose:
@@ -52,6 +60,7 @@ confd:
   ports:
     - "9486"
   links:
+    - ari
     - postgres
     - rabbitmq
     - provd
