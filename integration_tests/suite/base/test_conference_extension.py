@@ -29,13 +29,11 @@ def test_associate_errors(conference, extension):
 @fixtures.conference()
 @fixtures.extension()
 def test_dissociate_errors(conference, extension):
-    fake_conference_extension = confd.conferences(conference['id']).extensions(extension['id']).delete
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_conference, 'Conference'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_conference_extension, 'ConferenceExtension'
 
 
 @fixtures.conference()
@@ -50,7 +48,7 @@ def test_associate(conference, extension):
 def test_associate_already_associated(conference, extension):
     with a.conference_extension(conference, extension):
         response = confd.conferences(conference['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Conference', 'Extension'))
+        response.assert_updated()
 
 
 @fixtures.conference()
@@ -94,6 +92,13 @@ def test_dissociate(conference, extension):
     with a.conference_extension(conference, extension, check=False):
         response = confd.conferences(conference['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.conference()
+@fixtures.extension()
+def test_dissociate_not_associated(conference, extension):
+    response = confd.conferences(conference['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.conference()

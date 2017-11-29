@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -11,6 +11,8 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class ConferenceExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, conference, extension):
+        if extension in conference.extensions:
+            return
         self.validate_conference_not_already_associated(conference)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
@@ -44,20 +46,7 @@ class ConferenceExtensionAssociationValidator(ValidatorAssociation):
                                                 context=extension.context)
 
 
-class ConferenceExtensionDissociationValidator(ValidatorAssociation):
-
-    def validate(self, conference, extension):
-        self.validate_conference_extension_exists(conference, extension)
-
-    def validate_conference_extension_exists(self, conference, extension):
-        if extension.conference != conference:
-            raise errors.not_found('ConferenceExtension',
-                                   conference_id=conference.id,
-                                   extension_id=extension.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[ConferenceExtensionAssociationValidator()],
-        dissociation=[ConferenceExtensionDissociationValidator()]
     )
