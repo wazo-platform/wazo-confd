@@ -29,13 +29,11 @@ def test_associate_errors(group, extension):
 @fixtures.group()
 @fixtures.extension()
 def test_dissociate_errors(group, extension):
-    fake_group_extension = confd.groups(group['id']).extensions(extension['id']).delete
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_group, 'Group'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_group_extension, 'GroupExtension'
 
 
 @fixtures.group()
@@ -50,7 +48,7 @@ def test_associate(group, extension):
 def test_associate_already_associated(group, extension):
     with a.group_extension(group, extension):
         response = confd.groups(group['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Group', 'Extension'))
+        response.assert_updated()
 
 
 @fixtures.group()
@@ -94,6 +92,13 @@ def test_dissociate(group, extension):
     with a.group_extension(group, extension, check=False):
         response = confd.groups(group['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.group()
+@fixtures.extension()
+def test_dissociate_not_associated(group, extension):
+    response = confd.groups(group['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.group()
