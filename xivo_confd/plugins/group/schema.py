@@ -55,6 +55,10 @@ class GroupSchema(BaseSchema):
                               only=['id', 'name', 'links'],
                               many=True,
                               dump_only=True)
+    call_permissions = fields.Nested('CallPermissionSchema',
+                                     only=['id', 'name', 'links'],
+                                     many=True,
+                                     dump_only=True)
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):

@@ -32,6 +32,10 @@ class CallPermissionSchema(BaseSchema):
                              only=['id', 'name', 'links'],
                              many=True,
                              dump_only=True)
+    groups = fields.Nested('GroupSchema',
+                           only=['id', 'name', 'links'],
+                           many=True,
+                           dump_only=True)
 
 
 class CallPermissionList(ListResource):

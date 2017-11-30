@@ -16,6 +16,20 @@ Changelog
 
   * GET `/1.1/timezones`
 
+* Added Sounds Languages endpoints:
+
+  * GET `/1.1/sounds/languages`
+
+* A new API for associating a outcall with a call permission has been added:
+
+  * PUT `/1.1/outcalls/<outcall_id>/callpermissions/<call_permission_id>`
+  * DELETE `/1.1/outcalls/<outcall_id>/callpermissions/<call_permission_id>`
+
+* A new API for associating group with a call permission has been added:
+
+  * PUT `/1.1/groups/<group_id>/callpermissions/<call_permission_id>`
+  * DELETE `/1.1/groups/<group_id>/callpermissions/<call_permission_id>`
+
 
 17.16
 -----
