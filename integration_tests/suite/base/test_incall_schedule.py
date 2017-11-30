@@ -28,13 +28,11 @@ def test_associate_errors(incall, schedule):
 @fixtures.incall()
 @fixtures.schedule()
 def test_dissociate_errors(incall, schedule):
-    fake_incall_schedule = confd.incalls(incall['id']).schedules(schedule['id']).delete
     fake_incall = confd.incalls(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.incalls(incall['id']).schedules(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_incall, 'Incall'
     yield s.check_resource_not_found, fake_schedule, 'Schedule'
-    yield s.check_resource_not_found, fake_incall_schedule, 'IncallSchedule'
 
 
 @fixtures.incall()
@@ -49,7 +47,7 @@ def test_associate(incall, schedule):
 def test_associate_already_associated(incall, schedule):
     with a.incall_schedule(incall, schedule):
         response = confd.incalls(incall['id']).schedules(schedule['id']).put()
-        response.assert_match(400, e.resource_associated('Incall', 'Schedule'))
+        response.assert_updated()
 
 
 @fixtures.incall()
@@ -76,6 +74,13 @@ def test_dissociate(incall, schedule):
     with a.incall_schedule(incall, schedule, check=False):
         response = confd.incalls(incall['id']).schedules(schedule['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.incall()
+@fixtures.schedule()
+def test_dissociate_not_associated(incall, schedule):
+    response = confd.incalls(incall['id']).schedules(schedule['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.incall()
