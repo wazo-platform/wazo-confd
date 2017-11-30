@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -13,6 +12,8 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class IncallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, incall, extension):
+        if extension in incall.extensions:
+            return
         self.validate_incall_not_already_associated(incall)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
@@ -47,20 +48,7 @@ class IncallExtensionAssociationValidator(ValidatorAssociation):
                                                 context=extension.context)
 
 
-class IncallExtensionDissociationValidator(ValidatorAssociation):
-
-    def validate(self, incall, extension):
-        self.validate_incall_extension_exists(incall, extension)
-
-    def validate_incall_extension_exists(self, incall, extension):
-        if not (extension.type == 'incall' and extension.typeval == str(incall.id)):
-            raise errors.not_found('IncallExtension',
-                                   incall_id=incall.id,
-                                   extension_id=extension.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[IncallExtensionAssociationValidator()],
-        dissociation=[IncallExtensionDissociationValidator()]
     )
