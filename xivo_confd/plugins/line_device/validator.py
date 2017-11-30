@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.helpers.validator import ValidationAssociation
@@ -23,15 +22,9 @@ class ValidateLineHasNoDevice(Validator):
 class ValidateLineDeviceAssociation(ValidatorAssociation):
 
     def validate(self, line, device):
+        if line.device_id == device.id:
+            return
         ValidateLineHasNoDevice().validate(line)
-
-
-class ValidateLineDeviceDissociation(ValidatorAssociation):
-
-    def validate(self, line, device):
-        if line.device_id != device.id:
-            raise errors.resource_not_associated('Line', 'Device',
-                                                 line_id=line.id, device_id=device.id)
 
 
 class ValidateLinePosition(ValidatorAssociation):
@@ -40,6 +33,8 @@ class ValidateLinePosition(ValidatorAssociation):
         self.line_dao = line_dao
 
     def validate(self, line, device):
+        if line.device_id == device.id:
+            return
         existing = self.line_dao.find_by(device_id=device.id, position=line.position)
         if existing:
             msg = "Cannot associate 2 lines with same position (position: {})".format(line.position)
@@ -78,6 +73,8 @@ class ValidateMultipleLines(ValidatorAssociation):
         self.line_dao = line_dao
 
     def validate(self, line, device):
+        if line.device_id == device.id:
+            return
         lines = self.line_dao.find_all_by(device_id=device.id)
         if lines:
             existing = lines[0]
@@ -95,8 +92,5 @@ def build_validator():
             ValidateLinePosition(line_dao_module),
             ValidateRequiredResources(user_line_dao_module, line_extension_dao_module),
             ValidateMultipleLines(line_dao_module),
-        ],
-        dissociation=[
-            ValidateLineDeviceDissociation(),
         ]
     )
