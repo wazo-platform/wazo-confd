@@ -85,77 +85,77 @@ def setup_provd(host, port):
     provd.port = port
 
 
-import destination
+from . import destination
 
-import agent
-import agent_login_status
-import call_filter
-import call_filter_entity
-import call_log
-import call_permission
-import call_pickup
-import call_pickup_entity
-import conference
-import conference_extension
-import context_entity
-import cti_profile
-import device
-import endpoint_custom
-import endpoint_sccp
-import endpoint_sip
-import entity
-import extension
-import funckey_template
-import group
-import group_call_permission
-import group_extension
-import group_member_extension
-import group_member_user
-import group_schedule
-import incall
-import incall_extension
-import incall_schedule
-import incall_user
-import ivr
-import line
-import line_device
-import line_endpoint_custom
-import line_endpoint_sccp
-import line_endpoint_sip
-import line_extension
-import line_sip
-import meetme
-import moh
-import paging
-import paging_caller_user
-import paging_member_user
-import parking_lot
-import parking_lot_extension
-import outcall
-import outcall_call_permission
-import outcall_extension
-import outcall_schedule
-import outcall_trunk
-import queue
-import queue_extension
-import queue_member_agent
-import register_sip
-import schedule
-import schedule_entity
-import switchboard
-import switchboard_member_user
-import trunk
-import trunk_endpoint_custom
-import trunk_endpoint_sip
-import user
-import user_agent
-import user_call_permission
-import user_cti_profile
-import user_entity
-import user_funckey_template
-import user_import
-import user_line
-import user_schedule
-import user_voicemail
-import voicemail
-import voicemail_zonemessages
+from . import agent
+from . import agent_login_status
+from . import call_filter
+from . import call_filter_entity
+from . import call_log
+from . import call_permission
+from . import call_pickup
+from . import call_pickup_entity
+from . import conference
+from . import conference_extension
+from . import context_entity
+from . import cti_profile
+from . import device
+from . import endpoint_custom
+from . import endpoint_sccp
+from . import endpoint_sip
+from . import entity
+from . import extension
+from . import funckey_template
+from . import group
+from . import group_call_permission
+from . import group_extension
+from . import group_member_extension
+from . import group_member_user
+from . import group_schedule
+from . import incall
+from . import incall_extension
+from . import incall_schedule
+from . import incall_user
+from . import ivr
+from . import line
+from . import line_device
+from . import line_endpoint_custom
+from . import line_endpoint_sccp
+from . import line_endpoint_sip
+from . import line_extension
+from . import line_sip
+from . import meetme
+from . import moh
+from . import paging
+from . import paging_caller_user
+from . import paging_member_user
+from . import parking_lot
+from . import parking_lot_extension
+from . import outcall
+from . import outcall_call_permission
+from . import outcall_extension
+from . import outcall_schedule
+from . import outcall_trunk
+from . import queue
+from . import queue_extension
+from . import queue_member_agent
+from . import register_sip
+from . import schedule
+from . import schedule_entity
+from . import switchboard
+from . import switchboard_member_user
+from . import trunk
+from . import trunk_endpoint_custom
+from . import trunk_endpoint_sip
+from . import user
+from . import user_agent
+from . import user_call_permission
+from . import user_cti_profile
+from . import user_entity
+from . import user_funckey_template
+from . import user_import
+from . import user_line
+from . import user_schedule
+from . import user_voicemail
+from . import voicemail
+from . import voicemail_zonemessages
