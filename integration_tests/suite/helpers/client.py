@@ -2,6 +2,8 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from __future__ import unicode_literals
+
 import csv
 import json
 import logging
@@ -61,7 +63,7 @@ class ConfdClient(object):
     def log_request(self, method, url, parameters, data):
         if data is not None:
             data = unicode(data, encoding='utf8')
-        logger.info(u'%s %s params: %s body: %s', method, url, parameters, data)
+        logger.info('%s %s params: %s body: %s', method, url, parameters, data)
 
     def head(self, url, **parameters):
         return self.request('HEAD', url, parameters=parameters)

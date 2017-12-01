@@ -2,6 +2,8 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from __future__ import unicode_literals
+
 import docker
 
 from datetime import datetime
@@ -14,40 +16,40 @@ class ProvdHelper(object):
 
     DOCKER_PROVD_IMAGE = "wazopbx/xivo-provd"
 
-    DEFAULT_CONFIGS = [{u'X_type': u'registrar',
-                        u'deletable': False,
-                        u'displayname': u'local',
-                        u'id': u'default',
-                        u'parent_ids': [],
-                        u'proxy_main': u'127.0.0.1',
-                        u'raw_config': {u'X_key': u'xivo'},
-                        u'registrar_main': u'127.0.0.1',
+    DEFAULT_CONFIGS = [{'X_type': 'registrar',
+                        'deletable': False,
+                        'displayname': 'local',
+                        'id': 'default',
+                        'parent_ids': [],
+                        'proxy_main': '127.0.0.1',
+                        'raw_config': {'X_key': 'xivo'},
+                        'registrar_main': '127.0.0.1',
                         },
-                       {u'X_type': u'internal',
-                        u'deletable': False,
-                        u'id': u'autoprov',
-                        u'parent_ids': [u'base', u'defaultconfigdevice'],
-                        u'raw_config': {u'sccp_call_managers': {u'1': {u'ip': u'127.0.0.1'}},
-                                        u'sip_lines': {u'1': {u'display_name': u'Autoprov',
-                                                              u'number': u'autoprov',
-                                                              u'password': u'autoprov',
-                                                              u'proxy_ip': u'127.0.0.1',
-                                                              u'registrar_ip': u'127.0.0.1',
-                                                              u'username': u'apmy3dCQDw'}}},
-                        u'role': u'autocreate'},
-                       {u'X_type': u'internal',
-                        u'deletable': False,
-                        u'id': u'base',
-                        u'parent_ids': [],
-                        u'raw_config': {u'X_xivo_phonebook_ip': u'127.0.0.1',
-                                        u'ntp_enabled': True,
-                                        u'ntp_ip': u'127.0.0.1'}},
-                       {u'X_type': u'device',
-                        u'deletable': False,
-                        u'id': u'defaultconfigdevice',
-                        u'label': u'Default config device',
-                        u'parent_ids': [],
-                        u'raw_config': {u'ntp_enabled': True, u'ntp_ip': u'127.0.0.1'}},
+                       {'X_type': 'internal',
+                        'deletable': False,
+                        'id': 'autoprov',
+                        'parent_ids': ['base', 'defaultconfigdevice'],
+                        'raw_config': {'sccp_call_managers': {'1': {'ip': '127.0.0.1'}},
+                                       'sip_lines': {'1': {'display_name': 'Autoprov',
+                                                           'number': 'autoprov',
+                                                           'password': 'autoprov',
+                                                           'proxy_ip': '127.0.0.1',
+                                                           'registrar_ip': '127.0.0.1',
+                                                           'username': 'apmy3dCQDw'}}},
+                        'role': 'autocreate'},
+                       {'X_type': 'internal',
+                        'deletable': False,
+                        'id': 'base',
+                        'parent_ids': [],
+                        'raw_config': {'X_xivo_phonebook_ip': '127.0.0.1',
+                                       'ntp_enabled': True,
+                                       'ntp_ip': '127.0.0.1'}},
+                       {'X_type': 'device',
+                        'deletable': False,
+                        'id': 'defaultconfigdevice',
+                        'label': 'Default config device',
+                        'parent_ids': [],
+                        'raw_config': {'ntp_enabled': True, 'ntp_ip': '127.0.0.1'}},
                        {'X_type': 'device',
                         'deletable': True,
                         'id': 'mockdevicetemplate',
@@ -85,11 +87,11 @@ class ProvdHelper(object):
 
     def add_device_template(self):
         config = {
-            u'X_type': u'device',
-            u'deletable': True,
-            u'label': u'black-label',
-            u'parent_ids': [],
-            u'raw_config': {},
+            'X_type': 'device',
+            'deletable': True,
+            'label': 'black-label',
+            'parent_ids': [],
+            'raw_config': {},
         }
 
         return self.configs.add(config)
@@ -98,14 +100,14 @@ class ProvdHelper(object):
         # line <-> device association is an operation that is currently performed
         # "completely" only by the web-interface -- fake a minimum amount of work here
         config = {
-            u'id': device_id,
-            u'parent_ids': [],
-            u'raw_config': {},
+            'id': device_id,
+            'parent_ids': [],
+            'raw_config': {},
         }
         self.configs.add(config)
 
         device = self.devices.get(device_id)
-        device[u'config'] = device_id
+        device['config'] = device_id
         self.devices.update(device)
 
     def assert_config_does_not_exist(self, config_id):
@@ -117,11 +119,11 @@ class ProvdHelper(object):
             raise AssertionError('config "{}" exists in xivo-provd'.format(config_id))
 
     def assert_device_has_autoprov_config(self, device):
-        assert_that(device[u'config'], starts_with(u'autoprov'))
+        assert_that(device['config'], starts_with('autoprov'))
 
     def assert_config_use_device_template(self, config, template_id):
-        assert_that(config[u'configdevice'], equal_to(template_id))
-        assert_that(config[u'parent_ids'], has_item(template_id))
+        assert_that(config['configdevice'], equal_to(template_id))
+        assert_that(config['parent_ids'], has_item(template_id))
 
     def has_synchronized(self, device_id, timestamp=None):
         timestamp = timestamp or datetime.utcnow()

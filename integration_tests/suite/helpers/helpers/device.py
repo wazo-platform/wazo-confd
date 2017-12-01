@@ -2,6 +2,8 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from __future__ import unicode_literals
+
 import string
 import hashlib
 
@@ -50,17 +52,17 @@ def generate_autoprov():
     sip_username = "".join(choice(string.ascii_letters) for _ in range(20))
     random_id = hashlib.md5(str(random())).hexdigest()
 
-    device = {'added': u'auto',
+    device = {'added': 'auto',
               'config': autoprov_id,
               'configured': True,
               'id': random_id,
               'ip': ip,
               'mac': mac,
-              'model': u'6731i',
-              'plugin': u'xivo-aastra-3.3.1-SP4',
+              'model': '6731i',
+              'plugin': 'xivo-aastra-3.3.1-SP4',
               'remote_state_sip_username': sip_username,
-              'vendor': u'Aastra',
-              'version': u'3.3.1.4322'
+              'vendor': 'Aastra',
+              'version': '3.3.1.4322'
               }
 
     config = {'id': autoprov_id,
