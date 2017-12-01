@@ -11,7 +11,7 @@ import pprint
 import requests
 import sys
 
-from io import StringIO
+from io import BytesIO
 from hamcrest import (
     assert_that,
     contains_string,
@@ -196,7 +196,7 @@ class Response(object):
     def csv(self):
         self.assert_ok()
         lines = []
-        content = StringIO(self.response.content)
+        content = BytesIO(self.response.content)
         reader = csv.DictReader(content)
         for row in reader:
             lines.append({key.decode('utf8'): value.decode('utf8')
