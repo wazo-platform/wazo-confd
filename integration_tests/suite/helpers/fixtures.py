@@ -2,8 +2,7 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from wrappers import IsolatedAction
-
+from .wrappers import IsolatedAction
 from . import helpers as h
 
 

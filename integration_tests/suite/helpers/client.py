@@ -6,11 +6,21 @@ import csv
 import json
 import logging
 import pprint
-from cStringIO import StringIO
-
-from hamcrest import assert_that, is_in, has_key, has_entry, contains_string, has_item, instance_of, only_contains
 import requests
-from urls import UrlFragment
+
+from cStringIO import StringIO
+from hamcrest import (
+    assert_that,
+    contains_string,
+    has_entry,
+    has_item,
+    has_key,
+    instance_of,
+    is_in,
+    only_contains,
+)
+
+from .urls import UrlFragment
 
 requests.packages.urllib3.disable_warnings()
 
