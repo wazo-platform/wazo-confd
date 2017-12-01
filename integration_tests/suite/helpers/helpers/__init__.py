@@ -4,7 +4,6 @@
 
 from ..client import ConfdClient
 from ..database import create_helper as db_create_helper
-from ..provd import create_helper as provd_create_helper
 
 
 class NewClientWrapper(object):
@@ -55,6 +54,7 @@ class ProvdWrapper(object):
 
     def __getattr__(self, attr):
         if self._provd is None:
+            from ..provd import create_helper as provd_create_helper
             self._provd = provd_create_helper(host=self.host, port=self.port)
         return getattr(self._provd, attr)
 
