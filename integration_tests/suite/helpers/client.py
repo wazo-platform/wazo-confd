@@ -9,8 +9,9 @@ import json
 import logging
 import pprint
 import requests
+import sys
 
-from cStringIO import StringIO
+from io import StringIO
 from hamcrest import (
     assert_that,
     contains_string,
@@ -23,6 +24,7 @@ from hamcrest import (
 )
 
 from .urls import UrlFragment
+
 
 requests.packages.urllib3.disable_warnings()
 
@@ -61,8 +63,8 @@ class ConfdClient(object):
         return Response(response)
 
     def log_request(self, method, url, parameters, data):
-        if data is not None:
-            data = unicode(data, encoding='utf8')
+        if sys.version_info[0] == 2:
+            data = unicode(data, encoding='utf8') if data is not None else data
         logger.info('%s %s params: %s body: %s', method, url, parameters, data)
 
     def head(self, url, **parameters):
@@ -198,7 +200,7 @@ class Response(object):
         reader = csv.DictReader(content)
         for row in reader:
             lines.append({key.decode('utf8'): value.decode('utf8')
-                          for key, value in row.iteritems()})
+                          for key, value in row.items()})
         return lines
 
     def assert_status(self, *statuses):
@@ -215,7 +217,7 @@ class Response(object):
             self.assert_link(resource)
 
     def assert_location(self, resource):
-        headers = {key.lower(): value for key, value in self.response.headers.iteritems()}
+        headers = {key.lower(): value for key, value in self.response.headers.items()}
         expected = has_entry('location', contains_string(resource))
         assert_that(headers, expected, 'Location header not found')
 

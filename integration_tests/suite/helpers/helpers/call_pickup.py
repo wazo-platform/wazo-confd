@@ -22,4 +22,4 @@ def delete_call_pickup(call_pickup, check=False):
 
 
 def _random_name():
-    return ''.join(random.choice(string.lowercase) for i in range(10))
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(10))

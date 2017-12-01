@@ -22,4 +22,4 @@ def delete_call_filter(call_filter, check=False):
 
 
 def _random_name():
-    return ''.join(random.choice(string.lowercase) for i in range(10))
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(10))

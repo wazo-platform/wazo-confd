@@ -20,6 +20,6 @@ def delete_custom(custom_id, check=False):
 
 
 def generate_custom(**params):
-    name = "".join(random.choice(string.lowercase) for _ in range(8))
+    name = "".join(random.choice(string.ascii_lowercase) for _ in range(8))
     params.setdefault('interface', 'custom/{}'.format(name))
     return add_custom(**params)

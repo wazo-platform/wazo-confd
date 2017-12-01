@@ -5,5 +5,5 @@
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
 OUTCALL_CONTEXT = 'to-extern'
-EXTENSION_RANGE = range(1000, 5001)
+EXTENSION_RANGE = list(range(1000, 5001))
 ENTITY_NAME = 'xivotest'

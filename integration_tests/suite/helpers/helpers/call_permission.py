@@ -32,7 +32,7 @@ def generate_name():
 
 
 def _random_name(names):
-    name = ''.join(random.choice(string.lowercase) for i in range(10))
+    name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
     while name in names:
-        name = ''.join(random.choice(string.lowercase) for i in range(10))
+        name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
     return name

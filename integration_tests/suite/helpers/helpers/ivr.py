@@ -26,4 +26,4 @@ def delete_ivr(ivr_id, check=False):
 
 
 def _random_name():
-    return ''.join(random.choice(string.lowercase) for _ in range(10))
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
