@@ -74,11 +74,6 @@ dird:
   host: dird
   https: false
 
-# Activate confd plugins
-# This is the recommended way to add plugins.
-enabled_plugins:
-   - wizard_plugin
-
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c
 
 wizard:

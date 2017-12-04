@@ -123,7 +123,7 @@ def setup_app(config):
     core = CoreRestApi(app, api, auth)
     plugin_helpers.load(
         namespace='xivo_confd.plugins',
-        names=plugin_helpers.from_list(core.config['enabled_plugins']),
+        names=core.config['enabled_plugins'],
         dependencies=core,
     )
 
