@@ -45,6 +45,7 @@ setup(
             'group_fallback = xivo_confd.plugins.group_fallback.plugin:Plugin',
             'group_member_user = xivo_confd.plugins.group_member.plugin:Plugin',
             'group_schedule = xivo_confd.plugins.group_schedule.plugin:Plugin',
+            'iax_general = xivo_confd.plugins.iax_general.plugin:Plugin',
             'incall = xivo_confd.plugins.incall.plugin:Plugin',
             'incall_extension = xivo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_schedule = xivo_confd.plugins.incall_schedule.plugin:Plugin',
