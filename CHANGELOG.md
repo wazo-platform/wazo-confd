@@ -30,6 +30,11 @@ Changelog
   * PUT `/1.1/groups/<group_id>/callpermissions/<call_permission_id>`
   * DELETE `/1.1/groups/<group_id>/callpermissions/<call_permission_id>`
 
+* Added IAX general endpoints:
+
+  * GET `/1.1/asterisk/iax/general`
+  * PUT `/1.1/asterisk/iax/general`
+
 
 17.16
 -----
