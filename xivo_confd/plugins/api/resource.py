@@ -17,9 +17,6 @@ class SwaggerResource(Resource):
 
     api_filename = "api.yml"
 
-    def __init__(self, config):
-        self._enabled_plugins = config['enabled_plugins']
-
     def get(self):
         api_spec = ChainMap(*load_all_api_specs('xivo_confd.plugins', self.api_filename))
 

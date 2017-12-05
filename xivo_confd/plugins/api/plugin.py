@@ -13,5 +13,4 @@ class Plugin(object):
         api.add_resource(
             SwaggerResource,
             '/api/api.yml',
-            resource_class_args=(core.config,)
         )
