@@ -1,0 +1,66 @@
+paths:
+  /asterisk/iax/general:
+    get:
+      operationId: list_asterisk_iax_general
+      summary: List IAX general options
+      description: '**Required ACL:** `confd.asterisk.iax.general.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: IAX general
+          schema:
+            $ref: '#/definitions/IAXGeneral'
+    put:
+      operationId: update_asterisk_iax_general
+      summary: Update IAX general option
+      description: '**Required ACL:** `confd.asterisk.iax.general.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/IAXGeneral'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  IAXGeneral:
+    title: IAXGeneral
+    description: 'IAX general configuration. This configuration will be in the file
+      ''iax.conf'' used by asterisk.
+
+      Please consult the asterisk documentation for further details on available parameters.'
+    properties:
+      options:
+        description: "General IAX options. These options must be unique and unordered.\
+          \ Otherwise, use `ordered_options`. Option must have the following form:\n\
+          \n```\n{\n  \"options\": {\n    \"name1\": \"value1\",\n    ...\n  }\n}\n\
+          ```\n\n"
+        type: object
+      ordered_options:
+        description: "Any options may be repeated as many times and ordered as needed.\
+          \ Ordered options must have the following form:\n\n```\n{\n  \"ordered_options\"\
+          : [\n    [\"name1\", \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n\
+          ```\n\nThe resulting configuration in iax.conf will have the following form:\n\
+          \n```\n[general]\nname1=value1\nname2=value2\n```\n"
+        type: array
+        items:
+          $ref: '#/definitions/KeyValueOption'
+  KeyValueOption:
+    title: Info
+    type: array
+    items:
+      type: string
+    maxItems: 2
+    minItems: 2
