@@ -1,0 +1,50 @@
+paths:
+  /asterisk/voicemail/general:
+    get:
+      operationId: list_asterisk_voicemail_general
+      summary: List Voicemail general options
+      description: '**Required ACL:** `confd.asterisk.voicemail.general.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: Voicemail general
+          schema:
+            $ref: '#/definitions/VoicemailGeneral'
+    put:
+      operationId: update_asterisk_voicemail_general
+      summary: Update Voicemail general option
+      description: '**Required ACL:** `confd.asterisk.voicemail.general.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/VoicemailGeneral'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  VoicemailGeneral:
+    title: VoicemailGeneral
+    description: 'Voicemail general configuration. This configuration will be in the file
+      ''voicemail.conf'' used by asterisk.
+
+      Please consult the asterisk documentation for further details on available parameters.'
+    properties:
+      options:
+        description: "General Voicemail options. These options must be unique and unordered.\
+          \ Option must have the following form:\n\
+          \n```\n{\n  \"options\": {\n    \"name1\": \"value1\",\n    ...\n  }\n}\n\
+          ```\n\n"
+        type: object

@@ -145,6 +145,7 @@ DEFAULT_CONFIG = {
         'user_schedule': True,
         'user_voicemail': True,
         'voicemail': True,
+        'voicemail_general': True,
         'voicemail_zonemessages': True,
         'wizard': True,
     },

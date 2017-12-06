@@ -89,6 +89,7 @@ setup(
             'user_schedule = xivo_confd.plugins.user_schedule.plugin:Plugin',
             'user_voicemail = xivo_confd.plugins.user_voicemail.plugin:Plugin',
             'voicemail = xivo_confd.plugins.voicemail.plugin:Plugin',
+            'voicemail_general = xivo_confd.plugins.voicemail_general.plugin:Plugin',
             'voicemail_zonemessages = xivo_confd.plugins.voicemail_zonemessages.plugin:Plugin',
             'wizard = xivo_confd.plugins.wizard.plugin:Plugin',
         ]

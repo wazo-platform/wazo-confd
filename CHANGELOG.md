@@ -35,6 +35,11 @@ Changelog
   * GET `/1.1/asterisk/iax/general`
   * PUT `/1.1/asterisk/iax/general`
 
+* Added Voicemail general endpoints:
+
+  * GET `/1.1/asterisk/voicemail/general`
+  * PUT `/1.1/asterisk/voicemail/general`
+
 
 17.16
 -----
