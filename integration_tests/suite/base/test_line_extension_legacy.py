@@ -8,34 +8,47 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import scenarios as s
 from ..helpers import fixtures as f
-from ..helpers.helpers.extension import generate_extension, delete_extension
-from ..helpers.helpers.line_sip import generate_line, delete_line
 
 from . import confd
 
+FAKE_ID = 999999999
 
-class TestLineExtensionAssociation(s.AssociationScenarios, s.DissociationScenarios, s.AssociationGetScenarios):
 
-    left_resource = "Line"
-    right_resource = "Extension"
+@f.line()
+@f.extension()
+def test_associate_errors(line, extension):
+    response = confd.lines(FAKE_ID).extension.post(extension_id=extension['id'])
+    response.assert_match(404, e.not_found(resource='Line'))
 
-    def create_resources(self):
-        line = generate_line()
-        extension = generate_extension()
-        return line['id'], extension['id']
+    response = confd.lines(line['id']).extension.post(extension_id=FAKE_ID)
+    response.assert_match(400, e.not_found(resource='Extension'))
 
-    def delete_resources(self, line_id, extension_id):
-        delete_line(line_id)
-        delete_extension(extension_id)
 
-    def associate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extension.post(extension_id=extension_id)
+@f.line()
+@f.extension()
+def test_dissociate_errors(line, extension):
+    fake_line = confd.lines(FAKE_ID).extension.delete
+    yield s.check_resource_not_found, fake_line, 'Line'
 
-    def dissociate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extension.delete()
 
-    def get_association(self, line_id, extension_id):
-        return confd.lines(line_id).extension.get()
+def test_get_errors():
+    fake_line = confd.lines(FAKE_ID).extension.get
+    yield s.check_resource_not_found, fake_line, 'Line'
+
+
+@f.extension()
+@f.line_sip()
+def test_associate_line_to_extension_already_associated(extension, line):
+    with a.line_extension(line, extension):
+        response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
+        response.assert_match(400, e.resource_associated('Extension', 'Line'))
+
+
+@f.line_sip()
+@f.extension()
+def test_dissociate_not_associated(line, extension):
+    response = confd.lines(line['id']).extension.delete()
+    response.assert_match(404, e.not_found(resource='LineExtension'))
 
 
 @f.line_sip()
