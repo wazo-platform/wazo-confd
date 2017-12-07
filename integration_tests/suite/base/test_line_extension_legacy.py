@@ -41,7 +41,7 @@ def test_get_errors():
 def test_associate_line_to_extension_already_associated(extension, line):
     with a.line_extension(line, extension):
         response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
-        response.assert_match(400, e.resource_associated('Extension', 'Line'))
+        response.assert_ok()
 
 
 @f.line_sip()

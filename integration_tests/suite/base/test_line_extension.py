@@ -35,11 +35,9 @@ def test_associate_errors(line, extension):
 def test_dissociate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.lines(line['id']).extensions(FAKE_ID).delete
-    fake_line_extension = confd.lines(line['id']).extensions(extension['id']).delete
 
     yield s.check_resource_not_found, fake_line, 'Line'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_line_extension, 'LineExtension'
 
 
 def test_get_errors():
@@ -176,7 +174,7 @@ def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extensio
 def test_associate_line_to_extension_already_associated(extension, line):
     with a.line_extension(line, extension):
         response = confd.lines(line['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Extension', 'Line'))
+        response.assert_updated()
 
 
 @fixtures.line_sip()
@@ -215,6 +213,13 @@ def test_dissociate_line_and_extension(line, extension):
     with a.line_extension(line, extension, check=False):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_dissociate_not_associated(line, extension):
+    response = confd.lines(line['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.line_sip()
