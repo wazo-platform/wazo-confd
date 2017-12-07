@@ -2,8 +2,6 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers.helpers.line_sip import generate_line, delete_line
-from ..helpers.helpers.extension import generate_extension, delete_extension
 from ..helpers import scenarios as s
 from ..helpers import errors as e
 from ..helpers import associations as a
@@ -20,30 +18,6 @@ from . import confd, db
 
 
 FAKE_ID = 999999999
-
-
-class TestLineExtensionAssociation(s.AssociationScenarios, s.DissociationScenarios, s.AssociationGetScenarios):
-
-    left_resource = "Line"
-    right_resource = "Extension"
-
-    def create_resources(self):
-        line = generate_line()
-        extension = generate_extension()
-        return line['id'], extension['id']
-
-    def delete_resources(self, line_id, extension_id):
-        delete_line(line_id)
-        delete_extension(extension_id)
-
-    def associate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extension.post(extension_id=extension_id)
-
-    def dissociate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extension.delete()
-
-    def get_association(self, line_id, extension_id):
-        return confd.lines(line_id).extension.get()
 
 
 @fixtures.line()
