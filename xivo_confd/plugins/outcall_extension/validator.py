@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -30,20 +30,7 @@ class OutcallExtensionAssociationValidator(ValidatorAssociation):
                                                 context=extension.context)
 
 
-class OutcallExtensionDissociationValidator(ValidatorAssociation):
-
-    def validate(self, outcall, extension):
-        self.validate_outcall_extension_exists(outcall, extension)
-
-    def validate_outcall_extension_exists(self, outcall, extension):
-        if extension not in outcall.extensions:
-            raise errors.not_found('OutcallExtension',
-                                   outcall_id=outcall.id,
-                                   extension_id=extension.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[OutcallExtensionAssociationValidator()],
-        dissociation=[OutcallExtensionDissociationValidator()]
     )
