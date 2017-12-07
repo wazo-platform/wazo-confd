@@ -11,7 +11,6 @@ from hamcrest import (
 
 from ..helpers import (
     associations as a,
-    errors as e,
     fixtures,
     scenarios as s,
 )
@@ -73,7 +72,7 @@ def test_associate_multiple_outcalls_to_call_permission(outcall1, outcall2, outc
 def test_associate_when_outcall_already_associated_to_same_call_permission(outcall, call_permission):
     with a.outcall_call_permission(outcall, call_permission):
         response = confd.outcalls(outcall['id']).callpermissions(call_permission['id']).put()
-        response.assert_match(400, e.resource_associated('Outcall', 'CallPermission'))
+        response.assert_updated()
 
 
 @fixtures.outcall()
@@ -82,6 +81,13 @@ def test_dissociate(outcall, call_permission):
     with a.outcall_call_permission(outcall, call_permission, check=False):
         response = confd.outcalls(outcall['id']).callpermissions(call_permission['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.outcall()
+@fixtures.call_permission()
+def test_dissociate_not_associated(outcall, call_permission):
+    response = confd.outcalls(outcall['id']).callpermissions(call_permission['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.outcall()
