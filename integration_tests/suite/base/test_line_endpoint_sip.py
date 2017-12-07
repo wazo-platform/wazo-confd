@@ -88,7 +88,7 @@ def test_associate(line, sip):
 def test_associate_when_endpoint_already_associated(line, sip):
     with a.line_endpoint_sip(line, sip):
         response = confd.lines(line['id']).endpoints.sip(sip['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+        response.assert_updated()
 
 
 @fixtures.line()
@@ -130,7 +130,7 @@ def test_dissociate(line, sip):
 @fixtures.sip()
 def test_dissociate_when_not_associated(line, sip):
     response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
-    response.assert_status(400)
+    response.assert_deleted()
 
 
 @fixtures.line()

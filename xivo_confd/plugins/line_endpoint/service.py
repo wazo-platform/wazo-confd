@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.plugins.line.service import build_service as build_line_service
-from xivo_confd.plugins.line_endpoint.validator import build_validator
-
 from xivo_dao.helpers import errors
+
+from .validator import build_validator
 
 
 class LineEndpointService(object):
@@ -42,14 +42,16 @@ class LineEndpointService(object):
                 'endpoint_id': line.endpoint_id}
 
     def associate(self, line, endpoint):
-        self.validator.validate_association(line, endpoint)
-        line.associate_endpoint(endpoint)
-        self.line_service.edit(line)
+        if not line.is_associated_with(endpoint):
+            self.validator.validate_association(line, endpoint)
+            line.associate_endpoint(endpoint)
+            self.line_service.edit(line)
 
     def dissociate(self, line, endpoint):
-        self.validator.validate_dissociation(line, endpoint)
-        line.remove_endpoint()
-        self.line_service.edit(line)
+        if line.is_associated_with(endpoint):
+            self.validator.validate_dissociation(line, endpoint)
+            line.remove_endpoint()
+            self.line_service.edit(line)
 
 
 def build_service(provd_client, endpoint, endpoint_service):
