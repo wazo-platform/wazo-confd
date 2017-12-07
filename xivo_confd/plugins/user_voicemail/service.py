@@ -31,9 +31,10 @@ class UserVoicemailService(object):
         return self.dao.get_by(user_id=user.id)
 
     def dissociate(self, user, voicemail):
-        self.validator.validate_dissociation(user, voicemail)
-        self.dao.dissociate(user, voicemail)
-        self.notifier.dissociated(user, voicemail)
+        if voicemail:
+            self.validator.validate_dissociation(user, voicemail)
+            self.dao.dissociate(user, voicemail)
+            self.notifier.dissociated(user, voicemail)
 
 
 def build_service():

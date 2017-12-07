@@ -57,7 +57,7 @@ def test_associate_using_uuid(user, voicemail):
 def test_associate_when_already_associated(user, voicemail):
     with a.user_voicemail(user, voicemail):
         response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
-        response.assert_match(400, e.resource_associated('User', 'Voicemail'))
+        response.assert_ok()
 
 
 @fixtures.user()

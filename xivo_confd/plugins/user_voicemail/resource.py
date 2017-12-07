@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers.exception import NotFoundError
@@ -60,9 +59,7 @@ class UserVoicemailList(UserVoicemailResource):
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
         user = self.get_user(user_id)
-        user_voicemail = self.service.get_by(user_id=user.id)
-        voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
-        self.service.dissociate(user, voicemail)
+        self.service.dissociate(user, user.voicemail)
         return '', 204
 
 
