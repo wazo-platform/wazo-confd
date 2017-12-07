@@ -28,13 +28,11 @@ def test_associate_errors(trunk, sip):
 @fixtures.trunk()
 @fixtures.sip()
 def test_dissociate_errors(trunk, sip):
-    fake_trunk_sip = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['id']).delete
     fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_trunk, 'Trunk'
     yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
-    yield fake_trunk_sip().assert_status, 400
 
 
 def test_get_errors():
@@ -57,7 +55,7 @@ def test_associate(trunk, sip):
 def test_associate_already_associated(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+        response.assert_updated()
 
 
 @fixtures.trunk()
@@ -123,6 +121,13 @@ def test_dissociate(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
         response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.trunk()
+@fixtures.sip()
+def test_dissociate_not_associated(trunk, sip):
+    response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.trunk()

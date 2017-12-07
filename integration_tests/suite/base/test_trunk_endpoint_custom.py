@@ -28,13 +28,11 @@ def test_associate_errors(trunk, custom):
 @fixtures.trunk()
 @fixtures.custom()
 def test_dissociate_errors(trunk, custom):
-    fake_trunk_custom = confd.trunks(trunk['id']).endpoints.custom(custom['id']).delete
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom(custom['id']).delete
     fake_custom = confd.trunks(trunk['id']).endpoints.custom(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_trunk, 'Trunk'
     yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
-    yield fake_trunk_custom().assert_status, 400
 
 
 def test_get_errors():
@@ -57,7 +55,7 @@ def test_associate(trunk, custom):
 def test_associate_already_associated(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+        response.assert_updated()
 
 
 @fixtures.trunk()
@@ -123,6 +121,13 @@ def test_dissociate(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom, check=False):
         response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.trunk()
+@fixtures.custom()
+def test_dissociate_not_associated(trunk, custom):
+    response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.trunk()
