@@ -491,6 +491,13 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
 @fixtures.user()
 @fixtures.funckey_template()
+def test_dissociate_not_associated(user, funckey_template):
+        response = confd.users(user['id']).funckeys.templates(funckey_template['id']).delete()
+        response.assert_deleted()
+
+
+@fixtures.user()
+@fixtures.funckey_template()
 def test_delete_funckey_template_when_user_and_funckey_template_associated(user, funckey_template):
     with a.user_funckey_template(user, funckey_template, check=False):
         response = confd.users(user['id']).funckeys.templates.get()

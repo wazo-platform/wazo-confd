@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.plugins.func_key.validator import build_validator, build_validator_bsfilter
@@ -147,8 +147,7 @@ class UserFuncKeyTemplateService(object):
 
     def dissociate(self, user, template):
         if user.func_key_template_id != template.id:
-            raise errors.not_found("FuncKeyTemplate",
-                                   template_id=template.id)
+            return
 
         user.func_key_template_id = None
         self.user_dao.edit(user)
