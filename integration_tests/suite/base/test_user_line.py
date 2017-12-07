@@ -165,7 +165,7 @@ def test_get_secondary_user_associated_to_line(main_user, other_user, line):
 def test_associate_when_user_already_associated_to_same_line(user, line):
     with a.user_line(user, line):
         response = confd.users(user['id']).lines(line['id']).put()
-        response.assert_match(400, e.resource_associated('User', 'Line'))
+        response.assert_updated()
 
 
 @fixtures.user()
@@ -369,6 +369,13 @@ def test_dissociate_second_user_before_first(first_user, second_user, line):
     with a.user_line(first_user, line), a.user_line(second_user, line):
         response = confd.users(first_user['id']).lines(line['id']).delete()
         response.assert_match(400, secondary_user_regex)
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_dissociate_not_associated(user, line):
+    response = confd.users(user['uuid']).lines(line['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.user()

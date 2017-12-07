@@ -32,10 +32,11 @@ class UserLineService(object):
         return user_line
 
     def dissociate(self, user, line):
-        self.validator.validate_dissociation(user, line)
-        user_line = self.dao.get_by(user_id=user.id, line_id=line.id)
-        self.notifier.dissociated(user_line)
-        self.dao.dissociate(user, line)
+        user_line = self.dao.find_by(user_id=user.id, line_id=line.id)
+        if user_line:
+            self.validator.validate_dissociation(user, line)
+            self.notifier.dissociated(user_line)
+            self.dao.dissociate(user, line)
 
     def associate_all_lines(self, user, lines):
         if len(lines) != len(set(lines)):
