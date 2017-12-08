@@ -4,10 +4,8 @@
 
 from xivo_dao.helpers.db_manager import Session
 
-from . import (
-    validator as validator_module,
-    notifier as notifier_module
-)
+from . import validator as validator_module
+from .notifier import build_notifier
 
 
 class UserCTIProfileService(object):
@@ -33,4 +31,4 @@ class UserCTIProfileService(object):
 
 def build_service():
     return UserCTIProfileService(validator_module,
-                                 notifier_module)
+                                 build_notifier())
