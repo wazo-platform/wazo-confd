@@ -26,12 +26,11 @@ class BusPublisher(object):
         self._publisher = publisher
         self.messages = []
 
-    def send_bus_event(self, message, routing_key, headers=None):
-        # XXX remove routing_key from all send_bus_event call
-        self.messages.append((message, routing_key, headers))
+    def send_bus_event(self, event, headers=None):
+        self.messages.append((event, headers))
 
     def flush(self):
-        for event, routing_key, headers in self.messages:
+        for event, headers in self.messages:
             self._publisher.publish(event, headers)
 
     def rollback(self):
