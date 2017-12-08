@@ -16,11 +16,11 @@ class GroupCallPermissionNotifier(object):
 
     def associated(self, group, call_permission):
         event = GroupCallPermissionAssociatedEvent(group.id, call_permission.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, group, call_permission):
         event = GroupCallPermissionDissociatedEvent(group.id, call_permission.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

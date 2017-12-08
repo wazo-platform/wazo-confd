@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock, patch
 
-from xivo_bus.resources.line_extension.event import (LineExtensionAssociatedEvent,
-                                                     LineExtensionDissociatedEvent)
+from xivo_bus.resources.line_extension.event import (
+    LineExtensionAssociatedEvent,
+    LineExtensionDissociatedEvent,
+)
+
 from ..notifier import LineExtensionNotifier
 
 USER_ID = 1
@@ -34,8 +37,7 @@ class TestLineExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.line_extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.line_extension)
@@ -48,8 +50,7 @@ class TestLineExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.line_extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.line_extension)

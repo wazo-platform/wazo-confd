@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
 from xivo_bus.resources.sip_general.event import EditSIPGeneralEvent
-
-from xivo_confd.plugins.sip_general.notifier import SIPGeneralNotifier
-
 from xivo_dao.alchemy.staticsip import StaticSIP
+
+from ..notifier import SIPGeneralNotifier
+
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['sip reload'],
@@ -30,8 +30,7 @@ class TestSIPGeneralNotifier(unittest.TestCase):
 
         self.notifier.edited(self.sip_general)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_sip_general_edited_then_sip_reloaded(self):
         self.notifier.edited(self.sip_general)

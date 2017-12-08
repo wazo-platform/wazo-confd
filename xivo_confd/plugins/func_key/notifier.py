@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
 from xivo_confd.database import device as device_db
 
-from xivo_bus.resources.func_key.event import (CreateFuncKeyTemplateEvent,
-                                               EditFuncKeyTemplateEvent,
-                                               DeleteFuncKeyTemplateEvent)
+from xivo_bus.resources.func_key.event import (
+    CreateFuncKeyTemplateEvent,
+    DeleteFuncKeyTemplateEvent,
+    EditFuncKeyTemplateEvent,
+)
 
 
 class FuncKeyTemplateNotifier(object):
@@ -25,18 +27,18 @@ class FuncKeyTemplateNotifier(object):
 
     def created(self, template):
         event = CreateFuncKeyTemplateEvent(template.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, template, updated_fields):
         event = EditFuncKeyTemplateEvent(template.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
             self._reload_sccp(template)
 
     def deleted(self, template):
         event = DeleteFuncKeyTemplateEvent(template.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(['dialplan reload'])
         self._reload_sccp(template)
 

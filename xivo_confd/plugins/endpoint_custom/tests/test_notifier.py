@@ -1,16 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.endpoint_custom.event import CreateCustomEndpointEvent, \
-    EditCustomEndpointEvent, DeleteCustomEndpointEvent
-
-from xivo_confd.plugins.endpoint_custom.notifier import CustomEndpointNotifier
-
+from xivo_bus.resources.endpoint_custom.event import (
+    CreateCustomEndpointEvent,
+    DeleteCustomEndpointEvent,
+    EditCustomEndpointEvent,
+)
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
+
+from ..notifier import CustomEndpointNotifier
 
 
 class TestCustomEndpointNotifier(unittest.TestCase):
@@ -26,8 +28,7 @@ class TestCustomEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.custom_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_custom_endpoint_edited_then_event_sent_on_bus(self):
         expected_event = EditCustomEndpointEvent(self.custom_endpoint.id,
@@ -35,8 +36,7 @@ class TestCustomEndpointNotifier(unittest.TestCase):
 
         self.notifier.edited(self.custom_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_custom_endpoint_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteCustomEndpointEvent(self.custom_endpoint.id,
@@ -44,5 +44,4 @@ class TestCustomEndpointNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.custom_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

@@ -1,17 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.trunk.event import (CreateTrunkEvent,
-                                            EditTrunkEvent,
-                                            DeleteTrunkEvent)
-
-from xivo_confd.plugins.trunk.notifier import TrunkNotifier
-
+from xivo_bus.resources.trunk.event import (
+    CreateTrunkEvent,
+    DeleteTrunkEvent,
+    EditTrunkEvent,
+)
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
+
+from ..notifier import TrunkNotifier
 
 
 class TestTrunkNotifier(unittest.TestCase):
@@ -28,24 +29,21 @@ class TestTrunkNotifier(unittest.TestCase):
 
         self.notifier.created(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_edited_then_event_sent_on_bus(self):
         expected_event = EditTrunkEvent(self.trunk.id)
 
         self.notifier.edited(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteTrunkEvent(self.trunk.id)
 
         self.notifier.deleted(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_sip_edited_then_sip_reloaded(self):
         self.trunk.endpoint = 'sip'

@@ -26,7 +26,7 @@ class UserLineNotifier(object):
                                         user_line.line_id,
                                         user_line.main_user,
                                         user_line.main_line)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
     def dissociated(self, user_line):
         self._send_sysconfd_handlers()
@@ -34,7 +34,7 @@ class UserLineNotifier(object):
                                          user_line.line_id,
                                          user_line.main_user,
                                          user_line.main_line)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -6,8 +6,11 @@ import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.user_schedule.event import (UserScheduleAssociatedEvent,
-                                                    UserScheduleDissociatedEvent)
+from xivo_bus.resources.user_schedule.event import (
+    UserScheduleAssociatedEvent,
+    UserScheduleDissociatedEvent,
+)
+
 from ..notifier import UserScheduleNotifier
 
 
@@ -25,13 +28,11 @@ class TestUserScheduleNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):
         expected_event = UserScheduleDissociatedEvent(self.user.id, self.schedule.id)
 
         self.notifier.dissociated(self.user, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

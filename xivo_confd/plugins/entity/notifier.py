@@ -1,12 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
 
-from xivo_bus.resources.entity.event import (CreateEntityEvent,
-                                             DeleteEntityEvent,
-                                             EditEntityEvent)
+from xivo_bus.resources.entity.event import (
+    CreateEntityEvent,
+    DeleteEntityEvent,
+    EditEntityEvent
+)
 
 
 class EntityNotifier(object):
@@ -16,15 +18,15 @@ class EntityNotifier(object):
 
     def created(self, entity):
         event = CreateEntityEvent(entity.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, entity):
         event = DeleteEntityEvent(entity.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, entity):
         event = EditEntityEvent(entity.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

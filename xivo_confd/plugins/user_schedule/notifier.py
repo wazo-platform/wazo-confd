@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
-from xivo_bus.resources.user_schedule.event import (UserScheduleAssociatedEvent,
-                                                    UserScheduleDissociatedEvent)
+from xivo_bus.resources.user_schedule.event import (
+    UserScheduleAssociatedEvent,
+    UserScheduleDissociatedEvent,
+)
 
 
 class UserScheduleNotifier(object):
@@ -14,11 +16,11 @@ class UserScheduleNotifier(object):
 
     def associated(self, user, schedule):
         event = UserScheduleAssociatedEvent(user.id, schedule.id)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
     def dissociated(self, user, schedule):
         event = UserScheduleDissociatedEvent(user.id, schedule.id)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():

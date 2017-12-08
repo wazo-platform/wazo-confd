@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.extension.event import CreateExtensionEvent, \
-    EditExtensionEvent, DeleteExtensionEvent
+from xivo_bus.resources.extension.event import (
+    CreateExtensionEvent,
+    DeleteExtensionEvent,
+    EditExtensionEvent,
+)
 
 
 class ExtensionNotifier(object):
@@ -25,7 +28,7 @@ class ExtensionNotifier(object):
         event = CreateExtensionEvent(extension.id,
                                      extension.exten,
                                      extension.context)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, extension, updated_fields):
         if updated_fields is None or updated_fields:
@@ -36,14 +39,14 @@ class ExtensionNotifier(object):
         event = EditExtensionEvent(extension.id,
                                    extension.exten,
                                    extension.context)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, extension):
         self.send_sysconfd_handlers(['dialplan reload'])
         event = DeleteExtensionEvent(extension.id,
                                      extension.exten,
                                      extension.context)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.line.event import CreateLineEvent, \
-    EditLineEvent, DeleteLineEvent
+from xivo_bus.resources.line.event import (
+    CreateLineEvent,
+    DeleteLineEvent,
+    EditLineEvent,
+)
 
 
 class LineNotifier(object):
@@ -23,18 +26,18 @@ class LineNotifier(object):
     def created(self, line):
         self.send_sysconfd_handlers()
         event = CreateLineEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, line, updated_fields):
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers()
         event = EditLineEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, line):
         self.send_sysconfd_handlers()
         event = DeleteLineEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

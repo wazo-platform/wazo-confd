@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
-from xivo_bus.resources.paging_user.event import (PagingMemberUsersAssociatedEvent,
-                                                  PagingCallerUsersAssociatedEvent)
+from xivo_bus.resources.paging_user.event import (
+    PagingMemberUsersAssociatedEvent,
+    PagingCallerUsersAssociatedEvent,
+)
 
 
 class PagingUserNotifier(object):
@@ -15,12 +17,12 @@ class PagingUserNotifier(object):
     def callers_associated(self, paging, users):
         user_uuids = [user.uuid for user in users]
         event = PagingCallerUsersAssociatedEvent(paging.id, user_uuids)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def members_associated(self, paging, users):
         user_uuids = [user.uuid for user in users]
         event = PagingMemberUsersAssociatedEvent(paging.id, user_uuids)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

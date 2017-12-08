@@ -28,7 +28,7 @@ class UserCtiProfileNotifier(object):
         self._send_sysconfd_handlers(cti_command)
 
         event = UserCtiProfileEditedEvent(user.id, user.cti_profile_id, user.cti_enabled)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():

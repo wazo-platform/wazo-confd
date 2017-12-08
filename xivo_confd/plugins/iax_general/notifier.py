@@ -21,7 +21,7 @@ class IAXGeneralNotifier(object):
 
     def edited(self, iax_general):
         event = EditIAXGeneralEvent()
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(['iax2 reload'])
 
 

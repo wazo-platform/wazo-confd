@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
-from xivo_bus.resources.queue_members.event import (AgentQueueAssociationEditedEvent,
-                                                    AgentQueueAssociatedEvent,
-                                                    AgentRemovedFromQueueEvent)
+from xivo_bus.resources.queue_members.event import (
+    AgentQueueAssociatedEvent,
+    AgentQueueAssociationEditedEvent,
+    AgentRemovedFromQueueEvent,
+)
 
 
 class QueueMemberNotifier(object):
@@ -24,7 +26,7 @@ class QueueMemberNotifier(object):
         event = AgentQueueAssociatedEvent(queue_member.queue_id,
                                           queue_member.agent_id,
                                           queue_member.penalty)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(cti_command=['xivo[queuemember,update]'],
                                     agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
 
@@ -32,12 +34,12 @@ class QueueMemberNotifier(object):
         event = AgentQueueAssociationEditedEvent(queue_member.queue_id,
                                                  queue_member.agent_id,
                                                  queue_member.penalty)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
 
     def dissociated(self, queue_member):
         event = AgentRemovedFromQueueEvent(queue_member.queue_id, queue_member.agent_id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(cti_command=['xivo[queuemember,update]'],
                                     agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
 

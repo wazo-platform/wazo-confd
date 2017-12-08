@@ -1,12 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
 
-from xivo_bus.resources.paging.event import (CreatePagingEvent,
-                                             EditPagingEvent,
-                                             DeletePagingEvent)
+from xivo_bus.resources.paging.event import (
+    CreatePagingEvent,
+    DeletePagingEvent,
+    EditPagingEvent,
+)
 
 
 class PagingNotifier(object):
@@ -16,15 +18,15 @@ class PagingNotifier(object):
 
     def created(self, paging):
         event = CreatePagingEvent(paging.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, paging):
         event = EditPagingEvent(paging.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, paging):
         event = DeletePagingEvent(paging.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

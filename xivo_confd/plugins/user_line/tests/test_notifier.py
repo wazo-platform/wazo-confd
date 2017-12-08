@@ -33,8 +33,7 @@ class TestUserLineNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user_line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associated_then_sip_reload(self):
         self.notifier.associated(self.user_line)
@@ -49,8 +48,7 @@ class TestUserLineNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.user_line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociated_then_sip_reload(self):
         self.notifier.dissociated(self.user_line)

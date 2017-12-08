@@ -1,15 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.device.event import CreateDeviceEvent, \
-    EditDeviceEvent, DeleteDeviceEvent
+from xivo_bus.resources.device.event import (
+    CreateDeviceEvent,
+    DeleteDeviceEvent,
+    EditDeviceEvent,
+)
 
-from xivo_confd.plugins.device.notifier import DeviceNotifier
-from xivo_confd.plugins.device.model import Device
+from ..notifier import DeviceNotifier
+from ..model import Device
 
 
 class TestDeviceNotifier(unittest.TestCase):
@@ -24,21 +27,18 @@ class TestDeviceNotifier(unittest.TestCase):
 
         self.notifier.created(self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_device_edited_then_event_sent_on_bus(self):
         expected_event = EditDeviceEvent(self.device.id)
 
         self.notifier.edited(self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_device_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteDeviceEvent(self.device.id)
 
         self.notifier.deleted(self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

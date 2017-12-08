@@ -30,13 +30,11 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.group, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_dissociate_to_group_then_event_sent_on_bus(self):
         expected_event = GroupCallPermissionDissociatedEvent(self.group.id, self.call_permission.id)
 
         self.notifier.dissociated(self.group, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

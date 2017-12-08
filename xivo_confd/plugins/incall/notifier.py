@@ -1,12 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
 
-from xivo_bus.resources.incall.event import (CreateIncallEvent,
-                                             EditIncallEvent,
-                                             DeleteIncallEvent)
+from xivo_bus.resources.incall.event import (
+    CreateIncallEvent,
+    DeleteIncallEvent,
+    EditIncallEvent,
+)
 
 
 class IncallNotifier(object):
@@ -16,15 +18,15 @@ class IncallNotifier(object):
 
     def created(self, incall):
         event = CreateIncallEvent(incall.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, incall):
         event = EditIncallEvent(incall.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, incall):
         event = DeleteIncallEvent(incall.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

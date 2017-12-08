@@ -1,13 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.paging.event import (CreatePagingEvent,
-                                             EditPagingEvent,
-                                             DeletePagingEvent)
+from xivo_bus.resources.paging.event import (
+    CreatePagingEvent,
+    DeletePagingEvent,
+    EditPagingEvent,
+)
 
 from ..notifier import PagingNotifier
 
@@ -25,21 +27,18 @@ class TestPagingNotifier(unittest.TestCase):
 
         self.notifier.created(self.paging)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_paging_edited_then_event_sent_on_bus(self):
         expected_event = EditPagingEvent(self.paging.id)
 
         self.notifier.edited(self.paging)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_paging_deleted_then_event_sent_on_bus(self):
         expected_event = DeletePagingEvent(self.paging.id)
 
         self.notifier.deleted(self.paging)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

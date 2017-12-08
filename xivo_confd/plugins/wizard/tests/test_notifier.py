@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -7,7 +7,7 @@ from mock import Mock
 
 from xivo_bus.resources.wizard.event import CreateWizardEvent
 
-from xivo_confd.plugins.wizard.notifier import WizardNotifier
+from ..notifier import WizardNotifier
 
 
 class TestWizardNotifier(unittest.TestCase):
@@ -22,5 +22,4 @@ class TestWizardNotifier(unittest.TestCase):
 
         self.notifier.created()
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

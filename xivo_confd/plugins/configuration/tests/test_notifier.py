@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_confd.plugins.configuration.notifier import LiveReloadNotifier
 from xivo_bus.resources.configuration.event import LiveReloadEditedEvent
+
+from ..notifier import LiveReloadNotifier
 
 
 class TestLiveReloadNotifier(unittest.TestCase):
@@ -23,8 +24,7 @@ class TestLiveReloadNotifier(unittest.TestCase):
 
         self.notifier.edited(self.live_reload)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_live_reload_enabled_then_sysconfd_called(self):
         expected_handlers = {'ctibus': ['xivo[cticonfig,update]'],

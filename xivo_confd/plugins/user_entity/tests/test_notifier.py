@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
 from xivo_bus.resources.user_entity.event import UserEntityAssociatedEvent
-from xivo_confd.plugins.user_entity.notifier import UserEntityNotifier
-
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+
+from ..notifier import UserEntityNotifier
 
 
 class TestEntityNotifier(unittest.TestCase):
@@ -25,5 +25,4 @@ class TestEntityNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user, self.entity)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

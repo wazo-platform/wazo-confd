@@ -1,12 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.trunk.event import (CreateTrunkEvent,
-                                            EditTrunkEvent,
-                                            DeleteTrunkEvent)
+from xivo_bus.resources.trunk.event import (
+    CreateTrunkEvent,
+    DeleteTrunkEvent,
+    EditTrunkEvent,
+)
 
 
 class TrunkNotifier(object):
@@ -28,19 +30,19 @@ class TrunkNotifier(object):
 
     def created(self, trunk):
         event = CreateTrunkEvent(trunk.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, trunk):
         if trunk.endpoint in self._IPBX_COMMANDS:
             self.send_sysconfd_handlers(self._IPBX_COMMANDS[trunk.endpoint])
         event = EditTrunkEvent(trunk.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, trunk):
         if trunk.endpoint in self._IPBX_COMMANDS:
             self.send_sysconfd_handlers(self._IPBX_COMMANDS[trunk.endpoint])
         event = DeleteTrunkEvent(trunk.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -7,10 +7,10 @@ import unittest
 from mock import Mock
 
 from xivo_bus.resources.outcall_trunk.event import OutcallTrunksAssociatedEvent
-from ..notifier import OutcallTrunkNotifier
-
 from xivo_dao.alchemy.outcall import Outcall
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
+
+from ..notifier import OutcallTrunkNotifier
 
 
 class TestOutcallTrunkNotifier(unittest.TestCase):
@@ -28,5 +28,4 @@ class TestOutcallTrunkNotifier(unittest.TestCase):
 
         self.notifier.associated_all_trunks(self.outcall, [self.trunk])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

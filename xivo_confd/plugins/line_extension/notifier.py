@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
-from xivo_bus.resources.line_extension.event import (LineExtensionAssociatedEvent,
-                                                     LineExtensionDissociatedEvent)
+from xivo_bus.resources.line_extension.event import (
+    LineExtensionAssociatedEvent,
+    LineExtensionDissociatedEvent,
+)
 from xivo_dao.resources.user_line import dao as user_line_dao
 
 
@@ -24,13 +26,13 @@ class LineExtensionNotifier(object):
         self.send_sysconfd_handlers(line_extension)
         event = LineExtensionAssociatedEvent(line_extension.line_id,
                                              line_extension.extension_id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, line_extension):
         self.send_sysconfd_handlers(line_extension)
         event = LineExtensionDissociatedEvent(line_extension.line_id,
                                               line_extension.extension_id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def _generate_ctibus_commands(self, line_extension):
         commands = ['xivo[phone,edit,%d]' % line_extension.line_id]

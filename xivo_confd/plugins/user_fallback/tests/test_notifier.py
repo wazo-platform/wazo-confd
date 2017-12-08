@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -7,9 +7,9 @@ import unittest
 from mock import Mock
 
 from xivo_bus.resources.user.event import EditUserFallbackEvent
-from ..notifier import UserFallbackNotifier
-
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+
+from ..notifier import UserFallbackNotifier
 
 
 class TestUserFallbackNotifier(unittest.TestCase):
@@ -25,5 +25,4 @@ class TestUserFallbackNotifier(unittest.TestCase):
 
         self.notifier.edited(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

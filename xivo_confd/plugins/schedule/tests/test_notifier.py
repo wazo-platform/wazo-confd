@@ -5,9 +5,11 @@
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.schedule.event import (CreateScheduleEvent,
-                                               EditScheduleEvent,
-                                               DeleteScheduleEvent)
+from xivo_bus.resources.schedule.event import (
+    CreateScheduleEvent,
+    DeleteScheduleEvent,
+    EditScheduleEvent,
+)
 
 from ..notifier import ScheduleNotifier
 
@@ -25,21 +27,18 @@ class TestScheduleNotifier(unittest.TestCase):
 
         self.notifier.created(self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_schedule_edited_then_event_sent_on_bus(self):
         expected_event = EditScheduleEvent(self.schedule.id)
 
         self.notifier.edited(self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_schedule_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteScheduleEvent(self.schedule.id)
 
         self.notifier.deleted(self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
@@ -14,7 +14,7 @@ class OutcallTrunkNotifier(object):
     def associated_all_trunks(self, outcall, trunks):
         trunk_ids = [trunk.id for trunk in trunks]
         event = OutcallTrunksAssociatedEvent(outcall.id, trunk_ids)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

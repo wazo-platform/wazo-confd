@@ -34,8 +34,7 @@ class TestUserCtiProfileNotifier(unittest.TestCase):
 
         self.notifier.edited(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_edited_then_ctibus_command_sent(self):
         self.notifier.edited(self.user)

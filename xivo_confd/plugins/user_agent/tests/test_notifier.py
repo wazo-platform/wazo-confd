@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from ..notifier import UserAgentNotifier
-
-from xivo_bus.resources.user_agent.event import (UserAgentAssociatedEvent,
-                                                 UserAgentDissociatedEvent)
+from xivo_bus.resources.user_agent.event import (
+    UserAgentAssociatedEvent,
+    UserAgentDissociatedEvent,
+)
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+
+from ..notifier import UserAgentNotifier
 
 
 class TestAgentNotifier(unittest.TestCase):
@@ -26,13 +28,11 @@ class TestAgentNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user, self.agent)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_agent_dissociate_to_user_then_event_sent_on_bus(self):
         expected_event = UserAgentDissociatedEvent(self.user.uuid, self.agent.id)
 
         self.notifier.dissociated(self.user, self.agent)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

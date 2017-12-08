@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
-
 from mock import Mock
 
 from xivo_bus.resources.group.event import EditGroupFallbackEvent
-from ..notifier import GroupFallbackNotifier
-
 from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
+
+from ..notifier import GroupFallbackNotifier
 
 
 class TestGroupFallbackNotifier(unittest.TestCase):
@@ -25,5 +24,4 @@ class TestGroupFallbackNotifier(unittest.TestCase):
 
         self.notifier.edited(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

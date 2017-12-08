@@ -25,7 +25,7 @@ class SwitchboardMemberUserNotifier(object):
         event = ArbitraryEvent(name, body, acl)
         event.routing_key = routing_key.format(switchboard=switchboard)
 
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

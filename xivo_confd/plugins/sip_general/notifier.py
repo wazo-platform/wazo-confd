@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
@@ -21,7 +21,7 @@ class SIPGeneralNotifier(object):
 
     def edited(self, sip_general):
         event = EditSIPGeneralEvent()
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(['sip reload'])
 
 

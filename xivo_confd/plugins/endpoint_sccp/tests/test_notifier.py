@@ -1,17 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.endpoint_sccp.event import CreateSccpEndpointEvent, \
-    EditSccpEndpointEvent, DeleteSccpEndpointEvent
-
-from xivo_confd.plugins.endpoint_sccp.notifier import SccpEndpointNotifier
-
+from xivo_bus.resources.endpoint_sccp.event import (
+    CreateSccpEndpointEvent,
+    DeleteSccpEndpointEvent,
+    EditSccpEndpointEvent,
+)
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
+from ..notifier import SccpEndpointNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['module reload chan_sccp.so', 'dialplan reload'],
@@ -32,8 +33,7 @@ class TestSccpEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.sccp_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_sccp_endpoint_edited_then_sccp_reloaded(self):
         self.notifier.edited(self.sccp_endpoint)
@@ -45,8 +45,7 @@ class TestSccpEndpointNotifier(unittest.TestCase):
 
         self.notifier.edited(self.sccp_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_sccp_endpoint_deleted_then_sccp_reloaded(self):
         self.notifier.deleted(self.sccp_endpoint)
@@ -58,5 +57,4 @@ class TestSccpEndpointNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.sccp_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

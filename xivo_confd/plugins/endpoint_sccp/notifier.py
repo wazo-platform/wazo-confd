@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.endpoint_sccp.event import CreateSccpEndpointEvent, \
-    EditSccpEndpointEvent, DeleteSccpEndpointEvent
+from xivo_bus.resources.endpoint_sccp.event import (
+    CreateSccpEndpointEvent,
+    DeleteSccpEndpointEvent,
+    EditSccpEndpointEvent,
+)
 
 
 class SccpEndpointNotifier(object):
@@ -22,17 +25,17 @@ class SccpEndpointNotifier(object):
 
     def created(self, line):
         event = CreateSccpEndpointEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, line):
         self.send_sysconfd_handlers()
         event = EditSccpEndpointEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, line):
         self.send_sysconfd_handlers()
         event = DeleteSccpEndpointEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

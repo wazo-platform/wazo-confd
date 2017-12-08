@@ -9,6 +9,7 @@ from mock import Mock
 from xivo_bus.resources.group_member.event import GroupMemberUsersAssociatedEvent
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
+
 from ..notifier import GroupMemberNotifier
 
 
@@ -35,8 +36,7 @@ class TestGroupMemberUserNotifier(unittest.TestCase):
 
         self.notifier.users_associated(self.group, [self.user1, self.user2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.users_associated(self.group, [self.user1, self.user2])

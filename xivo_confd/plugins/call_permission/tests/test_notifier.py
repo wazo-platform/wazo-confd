@@ -1,17 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.call_permission.event import (CreateCallPermissionEvent,
-                                                      EditCallPermissionEvent,
-                                                      DeleteCallPermissionEvent)
-
-from xivo_confd.plugins.call_permission.notifier import CallPermissionNotifier
-
+from xivo_bus.resources.call_permission.event import (
+    CreateCallPermissionEvent,
+    DeleteCallPermissionEvent,
+    EditCallPermissionEvent,
+)
 from xivo_dao.alchemy.rightcall import RightCall as CallPermission
+
+from ..notifier import CallPermissionNotifier
 
 
 class TestCallPermissionNotifier(unittest.TestCase):
@@ -27,21 +28,18 @@ class TestCallPermissionNotifier(unittest.TestCase):
 
         self.notifier.created(self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_edited_then_event_sent_on_bus(self):
         expected_event = EditCallPermissionEvent(self.call_permission.id)
 
         self.notifier.edited(self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteCallPermissionEvent(self.call_permission.id)
 
         self.notifier.deleted(self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

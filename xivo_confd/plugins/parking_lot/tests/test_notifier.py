@@ -1,13 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.parking_lot.event import (CreateParkingLotEvent,
-                                                  EditParkingLotEvent,
-                                                  DeleteParkingLotEvent)
+from xivo_bus.resources.parking_lot.event import (
+    CreateParkingLotEvent,
+    DeleteParkingLotEvent,
+    EditParkingLotEvent,
+)
 
 from ..notifier import ParkingLotNotifier
 
@@ -35,8 +37,7 @@ class TestParkingLotNotifier(unittest.TestCase):
 
         self.notifier.created(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_parking_lot_edited_then_res_parking_reloaded(self):
         self.notifier.edited(self.parking_lot)
@@ -48,8 +49,7 @@ class TestParkingLotNotifier(unittest.TestCase):
 
         self.notifier.edited(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_parking_lot_deleted_then_res_parking_reloaded(self):
         self.notifier.deleted(self.parking_lot)
@@ -61,5 +61,4 @@ class TestParkingLotNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.parking_lot_extension.event import (ParkingLotExtensionAssociatedEvent,
-                                                            ParkingLotExtensionDissociatedEvent)
-from ..notifier import ParkingLotExtensionNotifier
-
+from xivo_bus.resources.parking_lot_extension.event import (
+    ParkingLotExtensionAssociatedEvent,
+    ParkingLotExtensionDissociatedEvent,
+)
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.parking_lot import ParkingLot
 
+from ..notifier import ParkingLotExtensionNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['module reload res_parking.so'],
@@ -34,8 +35,7 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.parking_lot, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.parking_lot, self.extension)
@@ -47,8 +47,7 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.parking_lot, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.parking_lot, self.extension)

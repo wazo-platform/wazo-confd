@@ -29,8 +29,7 @@ class TestIAXGeneralNotifier(unittest.TestCase):
 
         self.notifier.edited(self.iax_general)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_iax_general_edited_then_iax_reloaded(self):
         self.notifier.edited(self.iax_general)

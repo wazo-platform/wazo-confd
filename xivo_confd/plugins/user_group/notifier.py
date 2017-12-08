@@ -24,7 +24,7 @@ class UserGroupNotifier(object):
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
         event = UserGroupsAssociatedEvent(user.uuid, group_ids)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -6,8 +6,10 @@ import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.outcall_schedule.event import (OutcallScheduleAssociatedEvent,
-                                                       OutcallScheduleDissociatedEvent)
+from xivo_bus.resources.outcall_schedule.event import (
+    OutcallScheduleAssociatedEvent,
+    OutcallScheduleDissociatedEvent,
+)
 from xivo_dao.alchemy.outcall import Outcall
 from xivo_dao.alchemy.schedule import Schedule
 
@@ -28,13 +30,11 @@ class TestOutcallScheduleNotifier(unittest.TestCase):
 
         self.notifier.associated(self.outcall, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):
         expected_event = OutcallScheduleDissociatedEvent(self.outcall.id, self.schedule.id)
 
         self.notifier.dissociated(self.outcall, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

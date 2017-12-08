@@ -35,13 +35,13 @@ class UserVoicemailNotifier(object):
         cti_commands = self._generate_cti_commands(user)
         self._send_sysconfd_handlers(cti_commands)
         event = UserVoicemailAssociatedEvent(user.uuid, voicemail.id)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
     def dissociated(self, user, voicemail):
         cti_commands = self._generate_cti_commands(user)
         self._send_sysconfd_handlers(cti_commands)
         event = UserVoicemailDissociatedEvent(user.uuid, voicemail.id)
-        self._bus.send_bus_event(event, event.routing_key)
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():
