@@ -23,8 +23,9 @@ class SwitchboardMemberUserNotifier(object):
         body = {'switchboard_uuid': switchboard.uuid,
                 'users': [{'uuid': user.uuid} for user in users]}
         event = ArbitraryEvent(name, body, acl)
+        event.routing_key = routing_key.format(switchboard=switchboard)
 
-        self.bus.send_bus_event(event, routing_key.format(switchboard=switchboard))
+        self.bus.send_bus_event(event, event.routing_key)
 
 
 def build_notifier():
