@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 
-from xivo_confd.plugins.user_voicemail.validator import build_validator
-from xivo_confd.plugins.user_voicemail import notifier
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class UserVoicemailService(object):
@@ -37,7 +37,6 @@ class UserVoicemailService(object):
 
 
 def build_service():
-    validator = build_validator()
     return UserVoicemailService(user_voicemail_dao,
-                                validator,
-                                notifier)
+                                build_validator(),
+                                build_notifier())
