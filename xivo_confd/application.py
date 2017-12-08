@@ -23,7 +23,7 @@ from xivo_confd.core_rest_api import CoreRestApi
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.converter import FilenameConverter
 from xivo_confd.helpers.restful import ConfdApi
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
+from xivo_confd.sysconfd import SysconfdPublisher
 
 logger = logging.getLogger(__name__)
 

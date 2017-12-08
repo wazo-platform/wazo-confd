@@ -4,10 +4,11 @@
 
 import json
 
-from hamcrest import assert_that, equal_to, has_items, has_entries
 from mock import patch, Mock
 from unittest import TestCase
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
+from hamcrest import assert_that, equal_to, has_items, has_entries
+
+from ..sysconfd import SysconfdPublisher
 
 
 class TestSysconfdClient(TestCase):
