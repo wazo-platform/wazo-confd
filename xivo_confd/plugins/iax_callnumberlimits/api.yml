@@ -1,0 +1,67 @@
+paths:
+  /asterisk/iax/callnumberlimits:
+    get:
+      operationId: list_asterisk_iax_callnumberlimits
+      summary: List IAX callnumberlimits options
+      description: '**Required ACL:** `confd.asterisk.iax.callnumberlimits.read`'
+      tags:
+      - asterisk
+      - iax
+      responses:
+        '200':
+          description: IAX callnumberlimits
+          schema:
+            $ref: '#/definitions/IAXCallNumberLimitss'
+    put:
+      operationId: update_asterisk_iax_callnumberlimits
+      summary: Update IAX callnumberlimits option
+      description: '**Required ACL:** `confd.asterisk.iax.callnumberlimits.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      - iax
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/IAXCallNumberLimitss'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  IAXCallNumberLimitss:
+    title: IAXCallNumberLimitss
+    properties:
+      items:
+        description: 'IAX callnumberlimits configuration. This configuration will be in the file
+          ''iax.conf'' used by asterisk.
+
+          Please consult the asterisk documentation for further details on available parameters.'
+        type: array
+        items:
+          $ref: '#/definitions/IAXCallNumberLimits'
+
+  IAXCallNumberLimits:
+    title: IAXCallNumberLimits
+    properties:
+      ip_address:
+        type: string
+        description: IPv4 address of the destination
+      netmask:
+        type: string
+        description: Netmask of the IP address (e.g. 255.255.255.255)
+      limit:
+        type: string
+        description: Maximum call for the ip_address destination
+    required:
+      - ip_address
+      - netmask
+      - limit

@@ -67,6 +67,11 @@ Changelog
   * GET `/1.1/asterisk/sccp/general`
   * PUT `/1.1/asterisk/sccp/general`
 
+* Added IAX CallNumberLimits endpoints:
+
+  * GET `/1.1/asterisk/iax/callnumberlimits`
+  * PUT `/1.1/asterisk/iax/callnumberlimits`
+
 
 17.17
 -----
