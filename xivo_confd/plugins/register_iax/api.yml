@@ -1,0 +1,143 @@
+paths:
+  /registers/iax:
+    get:
+      operationId: list_registers_iax
+      summary: List registers iax
+      description: '**Required ACL:** `confd.registers.iax.read`'
+      tags:
+      - registers
+      - iax
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Registers IAX list
+          schema:
+            $ref: '#/definitions/RegisterIAXItems'
+    post:
+      operationId: create_register_iax
+      summary: Create register_iax
+      description: '**Required ACL:** `confd.registers.iax.create`'
+      tags:
+      - registers
+      - iax
+      parameters:
+      - name: body
+        in: body
+        description: Register iax to create
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterIAX'
+      responses:
+        '201':
+          description: Register IAX created
+          schema:
+            $ref: '#/definitions/RegisterIAX '
+        '400':
+          $ref: '#/responses/CreateError'
+  /registers/iax/{register_iax_id}:
+    get:
+      operationId: get_register_iax
+      summary: Get register IAX
+      description: '**Required ACL:** `confd.registers.iax.{register_iax_id}.read`'
+      tags:
+      - registers
+      - iax
+      parameters:
+      - $ref: '#/parameters/registeriaxid'
+      responses:
+        '200':
+          description: Register IAX
+          schema:
+            $ref: '#/definitions/RegisterIAX'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_register_iax
+      summary: Update register IAX
+      description: '**Required ACL:** `confd.registers.iax.{register_iax_id}.update`'
+      tags:
+      - registers
+      - iax
+      parameters:
+      - $ref: '#/parameters/registeriaxid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterIAX'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_register_iax
+      summary: Delete register IAX
+      description: '**Required ACL:** `confd.registers.iax.{register_iax_id}.delete`'
+      tags:
+      - registers
+      - iax
+      parameters:
+      - $ref: '#/parameters/registeriaxid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  registeriaxid:
+    description: Register IAX's ID
+    name: register_iax_id
+    in: path
+    type: integer
+    required: true
+definitions:
+  RegisterIAX:
+    title: Register IAX
+    allOf:
+    - $ref: '#/definitions/RegisterIAXRelationBase'
+    - properties:
+        auth_username:
+          type: string
+          description: The username used by the remote_host for the authentication
+        auth_password:
+          type: string
+          description: The password to authenticate to the remote_host
+        remote_host:
+          type: string
+          description: The register domain
+        remote_port:
+          type: integer
+          description: The port of the remote_host
+        callback_extension:
+          type: string
+          description: The callback extension to use for the register
+        callback_context:
+          type: string
+          description: The callback context to use for the register
+    required:
+      - remote_host
+  RegisterIAXRelationBase:
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the register IAX
+  RegisterIAXItems:
+    title: RegisterItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/RegisterIAX'
+      total:
+        type: integer

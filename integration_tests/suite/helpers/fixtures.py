@@ -226,3 +226,9 @@ class register_sip(IsolatedAction):
 
     actions = {'generate': h.register_sip.generate_register_sip,
                'delete': h.register_sip.delete_register_sip}
+
+
+class register_iax(IsolatedAction):
+
+    actions = {'generate': h.register_iax.generate_register_iax,
+               'delete': h.register_iax.delete_register_iax}

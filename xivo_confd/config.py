@@ -123,6 +123,7 @@ DEFAULT_CONFIG = {
         'parking_lot': True,
         'parking_lot_extension': True,
         'queue_member': True,
+        'register_iax': True,
         'register_sip': True,
         'schedule': True,
         'sip_general': True,
