@@ -8,6 +8,7 @@ import urllib
 
 from flask import Flask, g, request
 from flask_cors import CORS
+from flask_restful import Api
 from sqlalchemy.exc import SQLAlchemyError
 
 from xivo import http_helpers
@@ -21,15 +22,13 @@ from xivo_confd._bus import BusPublisher
 from xivo_confd._sysconfd import SysconfdPublisher
 from xivo_confd.authentication.confd_auth import auth
 from xivo_confd.core_rest_api import CoreRestApi
-from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.converter import FilenameConverter
-from xivo_confd.helpers.restful import ConfdApi
 
 logger = logging.getLogger(__name__)
 
 app = Flask('xivo_confd')
 
-api = ConfdApi(app, prefix="/1.1")
+api = Api(app, prefix="/1.1")
 
 _do_not_log_data_endpoints = []
 
@@ -102,11 +101,6 @@ def flush_bus():
     publisher = g.get('bus_publisher')
     if publisher:
         publisher.flush()
-
-
-@app.errorhandler(Exception)
-def error_handler(error):
-    return handle_error(error)
 
 
 def setup_app(config):

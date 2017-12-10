@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -8,12 +7,12 @@ from __future__ import unicode_literals
 import string
 
 from flask import request
-from flask_restful import Resource
 from marshmallow import fields, validates_schema, validates
 from marshmallow.validate import Equal, Regexp, Length, OneOf, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from xivo_confd.helpers.restful import ErrorCatchingResource
 from .access_restriction import xivo_unconfigured
 
 ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
@@ -96,7 +95,7 @@ class ConfiguredSchema(BaseSchema):
     configured = fields.Boolean()
 
 
-class WizardResource(Resource):
+class WizardResource(ErrorCatchingResource):
 
     wizard_schema = WizardSchema
     configured_schema = ConfiguredSchema
@@ -135,7 +134,7 @@ class WizardDiscoverSchema(BaseSchema):
     gateways = fields.List(fields.Nested(WizardDiscoverGatewaySchema))
 
 
-class WizardDiscoverResource(Resource):
+class WizardDiscoverResource(ErrorCatchingResource):
 
     schema = WizardDiscoverSchema
 

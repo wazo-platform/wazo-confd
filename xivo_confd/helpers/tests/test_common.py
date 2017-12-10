@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -8,7 +8,7 @@ import json
 from flask import Flask
 from werkzeug.exceptions import HTTPException, BadRequest
 
-from xivo_confd.helpers.common import handle_error
+from xivo_confd.helpers.common import handle_api_exception
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers.exception import ServiceError
 
@@ -30,12 +30,15 @@ class TestCommon(unittest.TestCase):
 
 class TestHandleError(TestCommon):
 
+    def raise_(self, ex):
+        raise ex
+
     def test_when_not_found_error_is_raised(self):
         expected_status_code = 404
         expected_message = ["not found error"]
         exception = NotFoundError("not found error")
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -44,7 +47,7 @@ class TestHandleError(TestCommon):
         expected_message = ["service error"]
         exception = ServiceError("service error")
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -53,7 +56,7 @@ class TestHandleError(TestCommon):
         expected_message = ["bad request"]
         exception = BadRequest("bad request")
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -65,7 +68,7 @@ class TestHandleError(TestCommon):
         exception.data = {'message': {'field': 'missing'}}
         exception.code = 400
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -76,7 +79,7 @@ class TestHandleError(TestCommon):
         exception = HTTPException("generic http error")
         exception.code = 400
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -85,7 +88,7 @@ class TestHandleError(TestCommon):
         expected_message = [u"Unexpected error: error message. not ascii: é, not utf-8: \ufffd"]
         exception = Exception("error message. not ascii: é, not utf-8: \xc9")
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
 
@@ -94,6 +97,6 @@ class TestHandleError(TestCommon):
         expected_message = [u"Unexpected error: error message. not ascii: é"]
         exception = Exception(u"error message. not ascii: é")
 
-        response = handle_error(exception)
+        response = handle_api_exception(lambda: self.raise_(exception))()
 
         self.assertResponse(response, expected_status_code, expected_message)
