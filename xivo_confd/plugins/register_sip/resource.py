@@ -9,6 +9,7 @@ from marshmallow import fields, post_load, pre_dump, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import OneOf, Range, Regexp
 
+from xivo_dao.alchemy.staticsip import StaticSIP
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
@@ -40,7 +41,7 @@ class RegisterSIPSchema(BaseSchema):
     remote_port = fields.Integer(validate=Range(min=0, max=65535), allow_none=True)
     callback_extension = fields.String(validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True)
     expiration = fields.Integer(validate=Range(min=0), allow_none=True)
-    enabled = StrictBoolean()
+    enabled = StrictBoolean(missing=True)
     links = ListLink(Link('register_sip'))
 
     @validates_schema
@@ -81,6 +82,7 @@ class RegisterSIPSchema(BaseSchema):
 
 class RegisterSIPList(ListResource):
 
+    model = StaticSIP
     schema = RegisterSIPSchema
 
     def build_headers(self, register):
@@ -89,7 +91,12 @@ class RegisterSIPList(ListResource):
     @required_acl('confd.registers.create')
     def post(self):
         form = self.schema().load(request.get_json()).data
-        model = self.service.create(form)
+        model = self.model(filename='sip.conf',
+                           category='general',
+                           var_name='register',
+                           var_val=form['var_val'],
+                           enabled=form['enabled'])
+        model = self.service.create(model)
         return self.schema().dump(model).data, 201, self.build_headers(model)
 
     @required_acl('confd.registers.read')
