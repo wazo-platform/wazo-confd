@@ -12,9 +12,9 @@ class GroupScheduleAssociationValidator(ValidatorAssociation):
     def validate(self, group, schedule):
         if schedule in group.schedules:
             return
-        self.validate_group_not_already_associated(group, schedule)
+        self.validate_group_not_already_associated(group)
 
-    def validate_group_not_already_associated(self, group, schedule):
+    def validate_group_not_already_associated(self, group):
         if group.schedules:
             raise errors.resource_associated('Group', 'Schedule',
                                              group_id=group.id,
