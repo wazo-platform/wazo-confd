@@ -6,7 +6,7 @@ import logging
 import yaml
 
 from flask import make_response
-from flask.ext.restful import Resource
+from flask_restful import Resource
 from xivo.chain_map import ChainMap
 from xivo.rest_api_helpers import load_all_api_specs
 

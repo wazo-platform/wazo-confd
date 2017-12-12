@@ -30,26 +30,10 @@ Running integration tests
 
 You need Docker installed.
 
-You need the repos xivo-manage-db and xivo-provisioning.
-
-To clone them:
-
-```
-git clone https://github.com/wazo-pbx/xivo-manage-db
-git clone https://github.com/wazo-pbx/xivo-provisioning
-```
-
-If you already have them:
-
-1. ensure they are up-to-date
-2. change the values for ``PROVD_DIR`` and ``MANAGE_DB_DIR``
-
-Run the tests:
-
 ```
 cd integration_tests
 pip install -U -r test-requirements.txt
-make test-setup PROVD_DIR=../../xivo-provisioning MANAGE_DB_DIR=../../xivo-manage-db
+make test-setup
 make test
 ```
 
@@ -57,31 +41,28 @@ make test
 Development
 -----------
 
-### xivo-dao
-
-In case you need to mount xivo_dao inside the xivo-confd container:
-
-* uncomment the confd volumes in ```integration_tests/assets/base/docker-compose.yml```
-* set the environment variable:
-
-```
-export LOCAL_GIT_REPOS=/parent/directory/to/all/git/repos
-```
-
 ### Modified database
 
-If you need to run tests against a modified database schema, run:
+You need the repos xivo-manage-db up-to-date.
 
-```
-make update-db MANAGE_DB_DIR=../../xivo-manage-db
-```
+1. ```git clone https://github.com/wazo-pbx/xivo-manage-db```
+2. ```MANAGE_DB_DIR=../../xivo-manage-db make update-db```
+3. Execute the steps above to run integration tests
 
-### Quick multiple runs
 
-If you need to run tests more than once (e.g. when developing):
+### Modified xivo-provisioning
 
-```
-make stop
-make start
-DOCKER=0 nosetests suite
-```
+You need the repos xivo-provisioning up-to-date.
+
+1. ```git clone https://github.com/wazo-pbx/xivo-provisioning```
+2. ```PROVD_DIR=../../xivo-provisioning make build-provd```
+3. Execute the steps above to run integration tests
+
+
+### Mounting libraries
+
+In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the xivo-confd container:
+
+1. Uncomment the confd volumes in ```integration_tests/assets/base/docker-compose.yml```
+2. Set the environment variable: ```export LOCAL_GIT_REPOS=/parent/directory/to/all/git/repos```
+3. Execute the steps above to run integration tests
