@@ -1,16 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.endpoint_sip.event import CreateSipEndpointEvent, \
-    EditSipEndpointEvent, DeleteSipEndpointEvent
-
-from xivo_confd.plugins.endpoint_sip.notifier import SipEndpointNotifier
-
+from xivo_bus.resources.endpoint_sip.event import (
+    CreateSipEndpointEvent,
+    DeleteSipEndpointEvent,
+    EditSipEndpointEvent,
+)
 from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
+
+from ..notifier import SipEndpointNotifier
 
 
 SYSCONFD_HANDLERS = {'ctibus': [],
@@ -32,8 +34,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.sip_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_sip_endpoint_edited_then_sip_reloaded(self):
         self.notifier.edited(self.sip_endpoint)
@@ -45,8 +46,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
         self.notifier.edited(self.sip_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_sip_endpoint_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.sip_endpoint)
@@ -58,5 +58,4 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.sip_endpoint)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

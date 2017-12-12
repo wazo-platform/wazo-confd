@@ -1,17 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.line.event import CreateLineEvent, \
-    EditLineEvent, DeleteLineEvent
-
-from xivo_confd.plugins.line.notifier import LineNotifier
-
+from xivo_bus.resources.line.event import (
+    CreateLineEvent,
+    DeleteLineEvent,
+    EditLineEvent,
+)
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
+from ..notifier import LineNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['sip reload', 'dialplan reload', 'module reload chan_sccp.so'],
@@ -37,8 +38,7 @@ class TestLineNotifier(unittest.TestCase):
 
         self.notifier.created(self.line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_line_edited_then_sip_reloaded(self):
         updated_fields = ['name']
@@ -62,8 +62,7 @@ class TestLineNotifier(unittest.TestCase):
 
         self.notifier.edited(self.line, None)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_line_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.line)
@@ -75,5 +74,4 @@ class TestLineNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

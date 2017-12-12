@@ -6,10 +6,9 @@ import unittest
 from mock import Mock
 
 from xivo_bus.resources.voicemail_zonemessages.event import EditVoicemailZoneMessagesEvent
-
-from xivo_confd.plugins.voicemail_zonemessages.notifier import VoicemailZoneMessagesNotifier
-
 from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
+
+from ..notifier import VoicemailZoneMessagesNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['voicemail reload'],
@@ -30,8 +29,7 @@ class TestVoicemailZoneMessagesNotifier(unittest.TestCase):
 
         self.notifier.edited(self.voicemail_zonemessages)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_voicemail_zonemessages_edited_then_voicemail_reloaded(self):
         self.notifier.edited(self.voicemail_zonemessages)

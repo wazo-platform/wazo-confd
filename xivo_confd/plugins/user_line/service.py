@@ -4,8 +4,9 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_confd.plugins.user_line import notifier
-from xivo_confd.plugins.user_line.validator import build_validator
+
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class UserLineService(object):
@@ -60,7 +61,6 @@ class UserLineService(object):
 
 
 def build_service():
-    validator = build_validator()
     return UserLineService(user_line_dao,
-                           validator,
-                           notifier)
+                           build_validator(),
+                           build_notifier())

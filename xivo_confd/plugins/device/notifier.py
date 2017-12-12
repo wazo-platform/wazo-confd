@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
 
-from xivo_bus.resources.device.event import CreateDeviceEvent
-from xivo_bus.resources.device.event import EditDeviceEvent
-from xivo_bus.resources.device.event import DeleteDeviceEvent
+from xivo_bus.resources.device.event import (
+    CreateDeviceEvent,
+    DeleteDeviceEvent,
+    EditDeviceEvent,
+)
 
 
 class DeviceNotifier(object):
@@ -16,15 +18,15 @@ class DeviceNotifier(object):
 
     def created(self, device):
         event = CreateDeviceEvent(device.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, device):
         event = EditDeviceEvent(device.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, device):
         event = DeleteDeviceEvent(device.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

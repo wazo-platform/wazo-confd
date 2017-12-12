@@ -3,32 +3,40 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
-from mock import patch, Mock
 
-from xivo_confd.plugins.user_cti_profile import notifier
+from mock import Mock
+from xivo_bus.resources.user_cti_profile.event import UserCtiProfileEditedEvent
+
+from ..notifier import UserCtiProfileNotifier
+
+USER_ID = 5
+
+EXPECTED_SYSCONFD_HANDLERS = {
+    'ctibus': ['xivo[user,edit,{}]'.format(USER_ID)],
+    'ipbx': [],
+    'agentbus': []
+}
 
 
 class TestUserCtiProfileNotifier(unittest.TestCase):
 
     def setUp(self):
-        self.sysconfd_command = {
-            'ctibus': [],
-            'ipbx': [],
-            'agentbus': [],
-        }
+        self.bus = Mock()
+        self.sysconfd = Mock()
+        self.user = Mock(id=USER_ID)
 
-    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
-    @patch('xivo_bus.resources.user_cti_profile.event.UserCtiProfileEditedEvent')
-    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
-    def test_edited(self, send_bus_event, UserCtiProfileEditedEvent, exec_request_handler):
-        new_event = UserCtiProfileEditedEvent.return_value = Mock()
-        user = Mock(id=1, cti_profile_id=2, cti_enabled=True)
-        self.sysconfd_command['ctibus'] = ['xivo[user,edit,1]']
+        self.notifier = UserCtiProfileNotifier(self.bus, self.sysconfd)
 
-        notifier.edited(user)
+    def test_edited_then_bus_event(self):
+        expected_event = UserCtiProfileEditedEvent(self.user.id,
+                                                   self.user.cti_profile_id,
+                                                   self.user.cti_enabled)
 
-        UserCtiProfileEditedEvent.assert_called_once_with(user.id,
-                                                          user.cti_profile_id,
-                                                          user.cti_enabled)
-        send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
-        exec_request_handler.assert_called_once_with(self.sysconfd_command)
+        self.notifier.edited(self.user)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_edited_then_ctibus_command_sent(self):
+        self.notifier.edited(self.user)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)

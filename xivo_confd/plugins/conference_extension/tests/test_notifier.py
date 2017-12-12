@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.conference_extension.event import (ConferenceExtensionAssociatedEvent,
-                                                           ConferenceExtensionDissociatedEvent)
-from ..notifier import ConferenceExtensionNotifier
-
+from xivo_bus.resources.conference_extension.event import (
+    ConferenceExtensionAssociatedEvent,
+    ConferenceExtensionDissociatedEvent,
+)
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.conference import Conference
 
+from ..notifier import ConferenceExtensionNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['dialplan reload'],
@@ -34,8 +35,7 @@ class TestConferenceExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.conference, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.conference, self.extension)
@@ -47,8 +47,7 @@ class TestConferenceExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.conference, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.conference, self.extension)

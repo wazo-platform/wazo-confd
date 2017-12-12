@@ -25,17 +25,17 @@ class RegisterSIPNotifier(object):
 
     def created(self, register):
         event = CreateRegisterSIPEvent(register.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, register):
         self.send_sysconfd_handlers()
         event = EditRegisterSIPEvent(register.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, register):
         self.send_sysconfd_handlers()
         event = DeleteRegisterSIPEvent(register.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
-from xivo_bus.resources.conference_extension.event import (ConferenceExtensionAssociatedEvent,
-                                                           ConferenceExtensionDissociatedEvent)
+from xivo_bus.resources.conference_extension.event import (
+    ConferenceExtensionAssociatedEvent,
+    ConferenceExtensionDissociatedEvent,
+)
 
 
 class ConferenceExtensionNotifier(object):
@@ -22,12 +24,12 @@ class ConferenceExtensionNotifier(object):
     def associated(self, conference, extension):
         self.send_sysconfd_handlers()
         event = ConferenceExtensionAssociatedEvent(conference.id, extension.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, conference, extension):
         self.send_sysconfd_handlers()
         event = ConferenceExtensionDissociatedEvent(conference.id, extension.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.queue_members.event import (AgentQueueAssociatedEvent,
-                                                    AgentQueueAssociationEditedEvent,
-                                                    AgentRemovedFromQueueEvent)
-from xivo_confd.plugins.queue_member.notifier import QueueMemberNotifier
+from xivo_bus.resources.queue_members.event import (
+    AgentQueueAssociatedEvent,
+    AgentQueueAssociationEditedEvent,
+    AgentRemovedFromQueueEvent
+)
 from xivo_dao.resources.queue_members.model import QueueMemberAgent
+
+from ..notifier import QueueMemberNotifier
 
 
 class TestQueueMemberNotifier(unittest.TestCase):
@@ -28,8 +31,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.associated(self.queue_member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_queue_member_associated_then_sysconfd_called(self):
         expected_handlers = {'ipbx': [],
@@ -46,8 +48,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.edited(self.queue_member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_queue_member_edited_then_sysconfd_called(self):
         expected_handlers = {'ipbx': [],
@@ -63,8 +64,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.queue_member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_queue_member_dissociated_then_sysconfd_called(self):
         expected_handlers = {'ipbx': [],

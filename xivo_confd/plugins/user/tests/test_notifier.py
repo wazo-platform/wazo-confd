@@ -5,20 +5,24 @@
 import unittest
 from mock import Mock, call
 
-from xivo_bus.resources.user.event import (CreateUserEvent,
-                                           EditUserEvent,
-                                           DeleteUserEvent,
-                                           EditUserServiceEvent,
-                                           EditUserForwardEvent)
-from xivo_confd.plugins.user.notifier import UserNotifier, UserServiceNotifier, UserForwardNotifier
-from xivo_confd.plugins.user.resource_sub import (ServiceDNDSchema,
-                                                  ServiceIncallFilterSchema,
-                                                  ForwardBusySchema,
-                                                  ForwardNoAnswerSchema,
-                                                  ForwardUnconditionalSchema,
-                                                  ForwardsSchema)
-
+from xivo_bus.resources.user.event import (
+    CreateUserEvent,
+    DeleteUserEvent,
+    EditUserEvent,
+    EditUserForwardEvent,
+    EditUserServiceEvent,
+)
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+
+from ..notifier import UserNotifier, UserServiceNotifier, UserForwardNotifier
+from ..resource_sub import (
+    ServiceDNDSchema,
+    ServiceIncallFilterSchema,
+    ForwardBusySchema,
+    ForwardNoAnswerSchema,
+    ForwardUnconditionalSchema,
+    ForwardsSchema
+)
 
 
 def sysconfd_handler(action, user_id):
@@ -51,8 +55,7 @@ class TestUserNotifier(unittest.TestCase):
 
         self.notifier.created(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_user_edited_then_sip_reloaded(self):
         self.notifier.edited(self.user)
@@ -65,8 +68,7 @@ class TestUserNotifier(unittest.TestCase):
 
         self.notifier.edited(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_user_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.user)
@@ -79,8 +81,7 @@ class TestUserNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
 
 class TestUserServiceNotifier(unittest.TestCase):
@@ -100,7 +101,6 @@ class TestUserServiceNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key,
                                                         headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
 
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
@@ -112,7 +112,6 @@ class TestUserServiceNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key,
                                                         headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
 
 
@@ -137,7 +136,6 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key,
                                                         headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
 
     def test_when_user_forward_noanswer_edited_then_event_sent_on_bus(self):
@@ -150,7 +148,6 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key,
                                                         headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
 
     def test_when_user_forward_unconditional_edited_then_event_sent_on_bus(self):
@@ -163,7 +160,6 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key,
                                                         headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
 
     def test_when_user_forwards_edited_then_event_sent_on_bus(self):
@@ -184,12 +180,9 @@ class TestUserForwardNotifier(unittest.TestCase):
                                                             self.user.unconditional_enabled,
                                                             self.user.unconditional_destination)
         expected_calls = [call(expected_busy_event,
-                               expected_busy_event.routing_key,
                                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}),
                           call(expected_noanswer_event,
-                               expected_noanswer_event.routing_key,
                                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}),
                           call(expected_unconditional_event,
-                               expected_unconditional_event.routing_key,
                                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})]
         self.bus.send_bus_event.assert_has_calls(expected_calls)

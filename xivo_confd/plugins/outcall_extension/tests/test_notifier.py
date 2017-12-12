@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock
 
-from ..notifier import OutcallExtensionNotifier
-from xivo_bus.resources.outcall_extension.event import (OutcallExtensionAssociatedEvent,
-                                                        OutcallExtensionDissociatedEvent)
+from xivo_bus.resources.outcall_extension.event import (
+    OutcallExtensionAssociatedEvent,
+    OutcallExtensionDissociatedEvent,
+)
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.outcall import Outcall
 
+from ..notifier import OutcallExtensionNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['dialplan reload'],
@@ -33,8 +35,7 @@ class TestOutcallExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.outcall, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.outcall, self.extension)
@@ -46,8 +47,7 @@ class TestOutcallExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.outcall, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.outcall, self.extension)

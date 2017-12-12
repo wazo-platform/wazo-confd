@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock
-from xivo_bus.resources.ivr.event import (CreateIvrEvent,
-                                          EditIvrEvent,
-                                          DeleteIvrEvent)
+from xivo_bus.resources.ivr.event import (
+    CreateIvrEvent,
+    DeleteIvrEvent,
+    EditIvrEvent,
+)
 from xivo_dao.alchemy.ivr import IVR
 
 from ..notifier import IvrNotifier
@@ -32,8 +34,7 @@ class TestIvrNotifier(unittest.TestCase):
 
         self.notifier.created(self.ivr)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_ivr_edited_then_event_sent_on_bus(self):
@@ -41,8 +42,7 @@ class TestIvrNotifier(unittest.TestCase):
 
         self.notifier.edited(self.ivr)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_ivr_deleted_then_event_sent_on_bus(self):
@@ -50,6 +50,5 @@ class TestIvrNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.ivr)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)

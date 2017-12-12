@@ -4,11 +4,13 @@
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.user.event import (CreateUserEvent,
-                                           EditUserEvent,
-                                           DeleteUserEvent,
-                                           EditUserServiceEvent,
-                                           EditUserForwardEvent)
+from xivo_bus.resources.user.event import (
+    CreateUserEvent,
+    DeleteUserEvent,
+    EditUserEvent,
+    EditUserForwardEvent,
+    EditUserServiceEvent,
+)
 
 
 class UserNotifier(object):
@@ -30,17 +32,17 @@ class UserNotifier(object):
     def created(self, user):
         self.send_sysconfd_handlers('add', user.id)
         event = CreateUserEvent(user.id, user.uuid)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, user):
         self.send_sysconfd_handlers('edit', user.id)
         event = EditUserEvent(user.id, user.uuid)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, user):
         self.send_sysconfd_handlers('delete', user.id)
         event = DeleteUserEvent(user.id, user.uuid)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():
@@ -57,7 +59,7 @@ class UserServiceNotifier(object):
         for type_ in schema.types:
             service = services.get(type_, services)
             event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
-            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
+            self.bus.send_bus_event(event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
 
 
 def build_notifier_service():
@@ -74,7 +76,7 @@ class UserForwardNotifier(object):
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
             event = EditUserForwardEvent(user.uuid, type_, forward['enabled'], forward['destination'])
-            self.bus.send_bus_event(event, event.routing_key, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
+            self.bus.send_bus_event(event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
 
 
 def build_notifier_forward():

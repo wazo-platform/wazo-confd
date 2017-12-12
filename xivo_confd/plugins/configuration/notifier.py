@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
@@ -21,7 +21,7 @@ class LiveReloadNotifier(object):
 
     def edited(self, live_reload):
         event = LiveReloadEditedEvent(live_reload['enabled'])
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         if live_reload['enabled']:
             self.send_sysconfd_handlers(['xivo[cticonfig,update]'])
 

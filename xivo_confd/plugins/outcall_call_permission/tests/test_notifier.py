@@ -30,13 +30,11 @@ class TestOutcallCallPermissionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.outcall, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_dissociate_to_outcall_then_event_sent_on_bus(self):
         expected_event = OutcallCallPermissionDissociatedEvent(self.outcall.id, self.call_permission.id)
 
         self.notifier.dissociated(self.outcall, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

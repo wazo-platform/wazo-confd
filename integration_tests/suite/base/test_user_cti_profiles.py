@@ -10,6 +10,7 @@ from . import confd
 from ..helpers import fixtures
 from ..helpers import errors as e
 from ..helpers import associations as a
+from ..helpers import scenarios as s
 
 
 FAKE_ID = 999999999
@@ -117,3 +118,11 @@ def test_get_cti_profile_associated_to_user(cti_profile, user):
                 name=cti_profile['name']
             )
         ))
+
+
+@fixtures.cti_profile()
+@fixtures.user()
+def test_bus_events(cti_profile, user):
+    yield (s.check_bus_event,
+           'config.user_cti_profile_association.edited',
+           confd.users(user['uuid']).cti.put, {'cti_profile_id': cti_profile['id']})

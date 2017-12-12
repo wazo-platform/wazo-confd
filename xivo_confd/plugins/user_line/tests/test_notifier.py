@@ -1,76 +1,56 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
-from mock import patch, Mock
 
-from xivo_dao.alchemy.user_line import UserLine
-from xivo_confd.plugins.user_line import notifier
+from mock import Mock
+from xivo_bus.resources.user_line.event import UserLineAssociatedEvent, UserLineDissociatedEvent
+
+from ..notifier import UserLineNotifier
+
+EXPECTED_SYSCONFD_HANDLERS = {
+    'ctibus': [],
+    'ipbx': ['dialplan reload', 'sip reload'],
+    'agentbus': []
+}
 
 
 class TestUserLineNotifier(unittest.TestCase):
 
-    @patch('xivo_confd.plugins.user_line.notifier.sysconf_command_association_updated')
-    @patch('xivo_confd.plugins.user_line.notifier.bus_event_associated')
-    def test_associated(self, bus_event_associated, sysconf_command_association_updated):
-        user_line = UserLine(user_id=1, line_id=2, main_user=True, main_line=True)
+    def setUp(self):
+        self.bus = Mock()
+        self.sysconfd = Mock()
+        self.user_line = Mock(user_id=1, line_id=2, main_user=True, main_line=True)
 
-        notifier.associated(user_line)
+        self.notifier = UserLineNotifier(self.bus, self.sysconfd)
 
-        sysconf_command_association_updated.assert_called_once_with(user_line)
-        bus_event_associated.assert_called_once_with(user_line)
+    def test_associated_then_bus_event(self):
+        expected_event = UserLineAssociatedEvent(self.user_line.user_id,
+                                                 self.user_line.line_id,
+                                                 self.user_line.main_user,
+                                                 self.user_line.main_line)
 
-    @patch('xivo_confd.helpers.sysconfd_connector.exec_request_handlers')
-    def test_send_sysconf_command_association_updated(self, exec_request_handlers):
-        user_line = UserLine(user_id=1, line_id=2, main_user=True, main_line=True)
+        self.notifier.associated(self.user_line)
 
-        expected_sysconf_command = {
-            'ctibus': [],
-            'ipbx': ['dialplan reload', 'sip reload'],
-            'agentbus': []
-        }
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-        notifier.sysconf_command_association_updated(user_line)
+    def test_associated_then_sip_reload(self):
+        self.notifier.associated(self.user_line)
 
-        exec_request_handlers.assert_called_once_with(expected_sysconf_command)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
 
-    @patch('xivo_bus.resources.user_line.event.UserLineAssociatedEvent')
-    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
-    def test_bus_event_associated(self, send_bus_event, UserLineAssociatedEvent):
-        new_event = UserLineAssociatedEvent.return_value = Mock()
+    def test_dissociated_then_bus_event(self):
+        expected_event = UserLineDissociatedEvent(self.user_line.user_id,
+                                                  self.user_line.line_id,
+                                                  self.user_line.main_user,
+                                                  self.user_line.main_line)
 
-        user_line = UserLine(user_id=1, line_id=2, main_user=True, main_line=True)
+        self.notifier.dissociated(self.user_line)
 
-        notifier.bus_event_associated(user_line)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-        UserLineAssociatedEvent.assert_called_once_with(user_line.user_id,
-                                                        user_line.line_id,
-                                                        True,
-                                                        True)
-        send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
+    def test_dissociated_then_sip_reload(self):
+        self.notifier.dissociated(self.user_line)
 
-    @patch('xivo_confd.plugins.user_line.notifier.sysconf_command_association_updated')
-    @patch('xivo_confd.plugins.user_line.notifier.bus_event_dissociated')
-    def test_dissociated(self, bus_event_dissociated, sysconf_command_association_updated):
-        user_line = UserLine(user_id=1, line_id=2, main_user=True, main_line=True)
-
-        notifier.dissociated(user_line)
-
-        sysconf_command_association_updated.assert_called_once_with(user_line)
-        bus_event_dissociated.assert_called_once_with(user_line)
-
-    @patch('xivo_bus.resources.user_line.event.UserLineDissociatedEvent')
-    @patch('xivo_confd.helpers.bus_manager.send_bus_event')
-    def test_bus_event_dissociated(self, send_bus_event, UserLineDissociatedEvent):
-        new_event = UserLineDissociatedEvent.return_value = Mock()
-
-        user_line = UserLine(user_id=1, line_id=2, main_user=True, main_line=True)
-
-        notifier.bus_event_dissociated(user_line)
-
-        UserLineDissociatedEvent.assert_called_once_with(user_line.user_id,
-                                                         user_line.line_id,
-                                                         True,
-                                                         True)
-        send_bus_event.assert_called_once_with(new_event, new_event.routing_key)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)

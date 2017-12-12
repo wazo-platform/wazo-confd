@@ -1,10 +1,12 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_bus.resources.ivr.event import (CreateIvrEvent,
-                                          EditIvrEvent,
-                                          DeleteIvrEvent)
+from xivo_bus.resources.ivr.event import (
+    CreateIvrEvent,
+    DeleteIvrEvent,
+    EditIvrEvent,
+)
 
 from xivo_confd import bus, sysconfd
 
@@ -24,17 +26,17 @@ class IvrNotifier(object):
     def created(self, ivr):
         self.send_sysconfd_handlers()
         event = CreateIvrEvent(ivr.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, ivr):
         self.send_sysconfd_handlers()
         event = EditIvrEvent(ivr.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, ivr):
         self.send_sysconfd_handlers()
         event = DeleteIvrEvent(ivr.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

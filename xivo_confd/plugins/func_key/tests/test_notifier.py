@@ -1,19 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
-
 
 import unittest
 from mock import Mock, call
 
+from xivo_bus.resources.func_key.event import (
+    CreateFuncKeyTemplateEvent,
+    DeleteFuncKeyTemplateEvent,
+    EditFuncKeyTemplateEvent,
+)
 from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 
-from xivo_bus.resources.func_key.event import (CreateFuncKeyTemplateEvent,
-                                               DeleteFuncKeyTemplateEvent,
-                                               EditFuncKeyTemplateEvent)
-
-from xivo_confd.plugins.func_key.notifier import FuncKeyTemplateNotifier
-
+from ..notifier import FuncKeyTemplateNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['dialplan reload'],
@@ -37,16 +36,14 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.notifier.created(self.func_key_template)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_func_key_template_edited_then_event_sent_on_bus(self):
         expected_event = EditFuncKeyTemplateEvent(self.func_key_template.id)
 
         self.notifier.edited(self.func_key_template, None)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(self):
         self.device_db.template_has_sccp_device.return_value = True
@@ -91,8 +88,7 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.func_key_template)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(self):
         self.device_db.template_has_sccp_device.return_value = True

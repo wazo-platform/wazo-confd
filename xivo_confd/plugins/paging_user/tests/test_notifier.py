@@ -6,12 +6,14 @@ import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.paging_user.event import (PagingMemberUsersAssociatedEvent,
-                                                  PagingCallerUsersAssociatedEvent)
-from ..notifier import PagingUserNotifier
-
+from xivo_bus.resources.paging_user.event import (
+    PagingMemberUsersAssociatedEvent,
+    PagingCallerUsersAssociatedEvent,
+)
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.paging import Paging
+
+from ..notifier import PagingUserNotifier
 
 
 class TestPagingUserNotifier(unittest.TestCase):
@@ -29,13 +31,11 @@ class TestPagingUserNotifier(unittest.TestCase):
 
         self.notifier.callers_associated(self.paging, [self.user1, self.user2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_member_then_bus_event(self):
         expected_event = PagingMemberUsersAssociatedEvent(self.paging.id, [self.user1.uuid, self.user2.uuid])
 
         self.notifier.members_associated(self.paging, [self.user1, self.user2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

@@ -1,13 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.conference.event import (CreateConferenceEvent,
-                                                 EditConferenceEvent,
-                                                 DeleteConferenceEvent)
+from xivo_bus.resources.conference.event import (
+    CreateConferenceEvent,
+    DeleteConferenceEvent,
+    EditConferenceEvent,
+)
 
 from ..notifier import ConferenceNotifier
 
@@ -35,8 +37,7 @@ class TestConferenceNotifier(unittest.TestCase):
 
         self.notifier.created(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_conference_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.conference)
@@ -48,8 +49,7 @@ class TestConferenceNotifier(unittest.TestCase):
 
         self.notifier.edited(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_conference_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.conference)
@@ -61,5 +61,4 @@ class TestConferenceNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

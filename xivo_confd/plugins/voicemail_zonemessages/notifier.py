@@ -21,7 +21,7 @@ class VoicemailZoneMessagesNotifier(object):
 
     def edited(self, voicemail_zonemessages):
         event = EditVoicemailZoneMessagesEvent()
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(['voicemail reload'])
 
 

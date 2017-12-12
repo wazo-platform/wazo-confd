@@ -13,7 +13,6 @@ from xivo_bus.resources.register.event import (
 
 from ..notifier import RegisterSIPNotifier
 
-
 EXPECTED_SYSCONFD_HANDLERS = {
     'ctibus': [],
     'ipbx': ['sip reload'],
@@ -35,24 +34,21 @@ class TestRegisterSIPNotifier(unittest.TestCase):
 
         self.notifier.created(self.register_sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_register_sip_edited_then_event_sent_on_bus(self):
         expected_event = EditRegisterSIPEvent(self.register_sip.id)
 
         self.notifier.edited(self.register_sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_register_sip_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteRegisterSIPEvent(self.register_sip.id)
 
         self.notifier.deleted(self.register_sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_register_sip_edited_then_sip_reloaded(self):
         self.notifier.edited(self.register_sip)

@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
 
-from xivo_bus.resources.endpoint_sip.event import CreateSipEndpointEvent, \
-    EditSipEndpointEvent, DeleteSipEndpointEvent
+from xivo_bus.resources.endpoint_sip.event import (
+    CreateSipEndpointEvent,
+    DeleteSipEndpointEvent,
+    EditSipEndpointEvent,
+)
 
 
 class SipEndpointNotifier(object):
@@ -22,17 +25,17 @@ class SipEndpointNotifier(object):
 
     def created(self, line):
         event = CreateSipEndpointEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, line):
         self.send_sysconfd_handlers()
         event = EditSipEndpointEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, line):
         self.send_sysconfd_handlers()
         event = DeleteSipEndpointEvent(line.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

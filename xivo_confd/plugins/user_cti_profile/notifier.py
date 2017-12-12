@@ -2,26 +2,34 @@
 # Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_bus.resources.user_cti_profile import event
-from xivo_confd.helpers import bus_manager, sysconfd_connector
+from xivo_bus.resources.user_cti_profile.event import UserCtiProfileEditedEvent
+from xivo_confd import bus, sysconfd
 
 
-def edited(user):
-    bus_event = event.UserCtiProfileEditedEvent(user.id,
-                                                user.cti_profile_id,
-                                                user.cti_enabled)
-    bus_manager.send_bus_event(bus_event, bus_event.routing_key)
-    _send_sysconfd_command(user)
+class UserCtiProfileNotifier(object):
+
+    def __init__(self, bus, sysconfd):
+        self._bus = bus
+        self._sysconfd = sysconfd
+
+    def _send_sysconfd_handlers(self, cti_command):
+        handlers = {
+            'ctibus': cti_command,
+            'ipbx': [],
+            'agentbus': [],
+        }
+        self._sysconfd.exec_request_handlers(handlers)
+
+    def _generate_cti_commands(self, user_id):
+        return ['xivo[user,edit,%d]' % user_id]
+
+    def edited(self, user):
+        cti_command = self._generate_cti_commands(user.id)
+        self._send_sysconfd_handlers(cti_command)
+
+        event = UserCtiProfileEditedEvent(user.id, user.cti_profile_id, user.cti_enabled)
+        self._bus.send_bus_event(event)
 
 
-def _send_sysconfd_command(user):
-    command_dict = {
-        'ctibus': _generate_cti_commands(user),
-        'ipbx': [],
-        'agentbus': [],
-    }
-    sysconfd_connector.exec_request_handlers(command_dict)
-
-
-def _generate_cti_commands(user):
-    return ['xivo[user,edit,%d]' % user.id]
+def build_notifier():
+    return UserCtiProfileNotifier(bus, sysconfd)

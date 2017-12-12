@@ -18,12 +18,12 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
 
 from xivo_confd.authentication.confd_auth import auth
+from xivo_confd.bus import BusPublisher
 from xivo_confd.core_rest_api import CoreRestApi
 from xivo_confd.helpers.common import handle_error
 from xivo_confd.helpers.converter import FilenameConverter
 from xivo_confd.helpers.restful import ConfdApi
-from xivo_confd.helpers.bus_publisher import BusPublisher
-from xivo_confd.helpers.sysconfd_publisher import SysconfdPublisher
+from xivo_confd.sysconfd import SysconfdPublisher
 
 logger = logging.getLogger(__name__)
 

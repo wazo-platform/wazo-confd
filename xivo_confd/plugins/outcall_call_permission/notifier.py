@@ -16,11 +16,11 @@ class OutcallCallPermissionNotifier(object):
 
     def associated(self, outcall, call_permission):
         event = OutcallCallPermissionAssociatedEvent(outcall.id, call_permission.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, outcall, call_permission):
         event = OutcallCallPermissionDissociatedEvent(outcall.id, call_permission.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

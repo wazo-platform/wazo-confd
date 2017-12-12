@@ -7,11 +7,10 @@ import unittest
 from mock import Mock
 
 from xivo_bus.resources.user_group.event import UserGroupsAssociatedEvent
-from ..notifier import UserGroupNotifier
-
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 
+from ..notifier import UserGroupNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['sip reload',
@@ -36,8 +35,7 @@ class TestUserGroupNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user, [self.group1, self.group2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.user, [self.group1, self.group2])

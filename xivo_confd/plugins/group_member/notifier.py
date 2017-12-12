@@ -27,12 +27,12 @@ class GroupMemberNotifier(object):
         self.send_sysconfd_handlers()
         user_uuids = [user.uuid for user in users]
         event = GroupMemberUsersAssociatedEvent(group.id, user_uuids)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def extensions_associated(self, group, extensions):
         self.send_sysconfd_handlers()
         event = GroupMemberExtensionsAssociatedEvent(group.id, extensions)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

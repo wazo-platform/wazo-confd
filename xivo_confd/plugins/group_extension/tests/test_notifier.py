@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock
 
-from xivo_bus.resources.group_extension.event import (GroupExtensionAssociatedEvent,
-                                                      GroupExtensionDissociatedEvent)
-from ..notifier import GroupExtensionNotifier
-
+from xivo_bus.resources.group_extension.event import (
+    GroupExtensionAssociatedEvent,
+    GroupExtensionDissociatedEvent,
+)
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 
+from ..notifier import GroupExtensionNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['dialplan reload'],
@@ -34,8 +35,7 @@ class TestGroupExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.group, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.group, self.extension)
@@ -47,8 +47,7 @@ class TestGroupExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.group, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.group, self.extension)

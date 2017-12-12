@@ -408,3 +408,14 @@ def test_delete_user_when_user_and_line_associated(user, line):
     with a.user_line(user, line):
         response = confd.users(user['id']).delete()
         response.assert_match(400, e.resource_associated('User', 'Line'))
+
+
+@fixtures.user()
+@fixtures.line_sip()
+def test_bus_events(user, line):
+    yield (s.check_bus_event,
+           'config.user_line_association.created',
+           confd.users(user['uuid']).lines(line['id']).put)
+    yield (s.check_bus_event,
+           'config.user_line_association.deleted',
+           confd.users(user['uuid']).lines(line['id']).delete)

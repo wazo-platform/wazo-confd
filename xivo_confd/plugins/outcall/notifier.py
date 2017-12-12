@@ -1,12 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus
 
-from xivo_bus.resources.outcall.event import (CreateOutcallEvent,
-                                              EditOutcallEvent,
-                                              DeleteOutcallEvent)
+from xivo_bus.resources.outcall.event import (
+    CreateOutcallEvent,
+    DeleteOutcallEvent,
+    EditOutcallEvent,
+)
 
 
 class OutcallNotifier(object):
@@ -16,15 +18,15 @@ class OutcallNotifier(object):
 
     def created(self, outcall):
         event = CreateOutcallEvent(outcall.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, outcall):
         event = EditOutcallEvent(outcall.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, outcall):
         event = DeleteOutcallEvent(outcall.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

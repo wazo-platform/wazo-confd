@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
-from xivo_bus.resources.parking_lot_extension.event import (ParkingLotExtensionAssociatedEvent,
-                                                            ParkingLotExtensionDissociatedEvent)
+from xivo_bus.resources.parking_lot_extension.event import (
+    ParkingLotExtensionAssociatedEvent,
+    ParkingLotExtensionDissociatedEvent,
+)
 
 
 class ParkingLotExtensionNotifier(object):
@@ -22,12 +24,12 @@ class ParkingLotExtensionNotifier(object):
     def associated(self, parking_lot, extension):
         self.send_sysconfd_handlers()
         event = ParkingLotExtensionAssociatedEvent(parking_lot.id, extension.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, parking_lot, extension):
         self.send_sysconfd_handlers()
         event = ParkingLotExtensionDissociatedEvent(parking_lot.id, extension.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

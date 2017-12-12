@@ -4,9 +4,11 @@
 
 from xivo_confd import bus
 
-from xivo_bus.resources.schedule.event import (CreateScheduleEvent,
-                                               EditScheduleEvent,
-                                               DeleteScheduleEvent)
+from xivo_bus.resources.schedule.event import (
+    CreateScheduleEvent,
+    DeleteScheduleEvent,
+    EditScheduleEvent,
+)
 
 
 class ScheduleNotifier(object):
@@ -16,15 +18,15 @@ class ScheduleNotifier(object):
 
     def created(self, schedule):
         event = CreateScheduleEvent(schedule.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def edited(self, schedule):
         event = EditScheduleEvent(schedule.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
     def deleted(self, schedule):
         event = DeleteScheduleEvent(schedule.id)
-        self.bus.send_bus_event(event, event.routing_key)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,17 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.extension.event import (CreateExtensionEvent,
-                                                EditExtensionEvent,
-                                                DeleteExtensionEvent)
-
-from xivo_confd.plugins.extension.notifier import ExtensionNotifier
-
+from xivo_bus.resources.extension.event import (
+    CreateExtensionEvent,
+    DeleteExtensionEvent,
+    EditExtensionEvent,
+)
 from xivo_dao.alchemy.extension import Extension
+
+from ..notifier import ExtensionNotifier
 
 
 class TestExtensionNotifier(unittest.TestCase):
@@ -30,8 +31,7 @@ class TestExtensionNotifier(unittest.TestCase):
 
         self.notifier.created(self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_extension_created_then_dialplan_reloaded(self):
         expected_handlers = {'ctibus': [],
@@ -77,8 +77,7 @@ class TestExtensionNotifier(unittest.TestCase):
 
         self.notifier.edited(self.extension, None)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_extension_deleted_then_dialplan_reloaded(self):
         expected_handlers = {'ctibus': [],
@@ -95,5 +94,4 @@ class TestExtensionNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)

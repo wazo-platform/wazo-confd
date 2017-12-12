@@ -1,13 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.group.event import (CreateGroupEvent,
-                                            EditGroupEvent,
-                                            DeleteGroupEvent)
+from xivo_bus.resources.group.event import (
+    CreateGroupEvent,
+    DeleteGroupEvent,
+    EditGroupEvent,
+)
 
 from ..notifier import GroupNotifier
 
@@ -35,8 +37,7 @@ class TestGroupNotifier(unittest.TestCase):
 
         self.notifier.created(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_group_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.group)
@@ -48,8 +49,7 @@ class TestGroupNotifier(unittest.TestCase):
 
         self.notifier.edited(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_group_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.group)
@@ -61,5 +61,4 @@ class TestGroupNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        expected_event.routing_key)
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
