@@ -59,7 +59,7 @@ class UserVoicemailList(UserVoicemailResource):
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
         user = self.get_user(user_id)
-        self.service.dissociate(user, user.voicemail)
+        self.service.dissociate_all_by_user(user)
         return '', 204
 
 
