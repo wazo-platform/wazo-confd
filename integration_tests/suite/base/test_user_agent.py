@@ -97,6 +97,13 @@ def test_dissociate(agent, user):
 
 @fixtures.agent()
 @fixtures.user()
+def test_dissociate_not_associated(agent, user):
+    response = confd.users(user['uuid']).agents().delete()
+    response.assert_deleted()
+
+
+@fixtures.agent()
+@fixtures.user()
 def test_get_agent_relation(agent, user):
     with a.user_agent(user, agent):
         response = confd.users(user['id']).get()
