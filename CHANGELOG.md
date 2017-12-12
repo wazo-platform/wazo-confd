@@ -4,7 +4,7 @@ Changelog
 18.01
 -----
 
-* The following endpoints do not return anymore error when they are already associated
+* The following endpoints do not return an error (400) when the resources are already associated. Instead, they return a successful association code (204).
 
   * PUT `/1.1/conferences/<id>/extensions/<id>`
   * PUT `/1.1/groups/<id>/extensions/<id>`
@@ -29,7 +29,7 @@ Changelog
   * PUT `/1.1/users/<id>/schedules/<id>`
   * PUT `/1.1/users/<id>/voicemails/<id>`
 
-* The following endpoints do not return anymore error when they are not associated
+* The following endpoints do not return an error (400) when the resources are already dissociated. Instead, they return a successful dissociation code (204).
 
   * DELETE `/1.1/conferences/<id>/extensions/<id>`
   * DELETE `/1.1/groups/<id>/extensions/<id>`
@@ -47,6 +47,7 @@ Changelog
   * DELETE `/1.1/parkinglots/<id>/extensions/<id>`
   * DELETE `/1.1/trunks/<id>/endpoints/sip/<id>`
   * DELETE `/1.1/trunks/<id>/endpoints/custom/<id>`
+  * DELETE `/1.1/users/<id>/agents`
   * DELETE `/1.1/users/<id>/callpermissions/<id>`
   * DELETE `/1.1/users/<id>/lines/<id>`
   * DELETE `/1.1/users/<id>/funckeys/templates/<id>`
