@@ -67,6 +67,7 @@ setup(
             'parking_lot = xivo_confd.plugins.parking_lot.plugin:Plugin',
             'parking_lot_extension = xivo_confd.plugins.parking_lot_extension.plugin:Plugin',
             'queue_member = xivo_confd.plugins.queue_member.plugin:Plugin',
+            'register_iax = xivo_confd.plugins.register_iax.plugin:Plugin',
             'register_sip = xivo_confd.plugins.register_sip.plugin:Plugin',
             'schedule = xivo_confd.plugins.schedule.plugin:Plugin',
             'sip_general = xivo_confd.plugins.sip_general.plugin:Plugin',

@@ -7,42 +7,39 @@ import re
 from flask import url_for, request
 from marshmallow import fields, post_load, pre_dump, validates_schema
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import OneOf, Range, Regexp
+from marshmallow.validate import Range, Regexp
 
-from xivo_dao.alchemy.staticsip import StaticSIP
+from xivo_dao.alchemy.staticiax import StaticIAX
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
 REGISTER_REGEX = re.compile(r'''^
-                            (?:(?P<transport>.*)://)?
-                            (?P<sip_username>[^:/]*)
-                            (?::(?P<auth_password>[^:/]*))?
+                            (?:
+                            (?P<auth_password>[^:/]*)
                             (?::(?P<auth_username>[^:/]*))?
-                            @
-                            (?P<remote_host>[^:~/]*)
+                            @)?
+                            (?P<remote_host>[^:?/]*)
                             (?::(?P<remote_port>\d*))?
-                            (?:/(?P<callback_extension>[^~]*))?
-                            (?:~(?P<expiration>\d*))?
+                            (?:/(?P<callback_extension>[^?]*))?
+                            (?:\?(?P<callback_context>.*))?
                             $''', re.VERBOSE)
 
 INVALID_CHAR = r'^[^:/ ]*$'
-INVALID_REMOTE_HOST = r'^[^:/~ ]*$'
-INVALID_CALLBACK_EXTENSION = r'^[^~ ]*$'
+INVALID_REMOTE_HOST = r'^[^:/? ]*$'
+INVALID_CALLBACK_EXTENSION = r'^[^? ]*$'
 
 
-class RegisterSIPSchema(BaseSchema):
+class RegisterIAXSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    transport = fields.String(validate=OneOf(['udp', 'tcp', 'tls', 'ws', 'wss']), allow_none=True)
-    sip_username = fields.String(validate=Regexp(INVALID_CHAR), required=True)
     auth_username = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     auth_password = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     remote_host = fields.String(validate=Regexp(INVALID_REMOTE_HOST), required=True)
     remote_port = fields.Integer(validate=Range(min=0, max=65535), allow_none=True)
     callback_extension = fields.String(validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True)
-    expiration = fields.Integer(validate=Range(min=0), allow_none=True)
+    callback_context = fields.String(allow_none=True)
     enabled = StrictBoolean(missing=True)
-    links = ListLink(Link('register_sip'))
+    links = ListLink(Link('register_iax'))
 
     @validates_schema
     def validate_auth_username(self, data):
@@ -51,28 +48,33 @@ class RegisterSIPSchema(BaseSchema):
                                   'auth_username')
 
     @validates_schema
+    def validate_callback_context(self, data):
+        if data.get('callback_context') and not data.get('callback_extension'):
+            raise ValidationError('Cannot set field "callback_context" if the field "callback_extension" is not set',
+                                  'callback_context')
+
+    @validates_schema
     def validate_total_length(self, data):
-        if len(self.convert_to_chansip(data)['var_val']) > 255:
+        if len(self.convert_to_chaniax(data)['var_val']) > 255:
             raise ValidationError('The sum of all fields is longer than maximum length 255')
 
     @post_load
-    def convert_to_chansip(self, data):
-        chansip_fmt = '{transport}{sip_username}{auth_password}{auth_username}'\
-                      '@{remote_host}{remote_port}{callback_extension}{expiration}'
-        data['var_val'] = chansip_fmt.format(
-            transport='{}://'.format(data.get('transport')) if data.get('transport') else '',
-            sip_username=data.get('sip_username'),
-            auth_password=':{}'.format(data.get('auth_password')) if data.get('auth_password') else '',
+    def convert_to_chaniax(self, data):
+        chaniax_fmt = '{auth_password}{auth_username}{separator}'\
+                      '{remote_host}{remote_port}{callback_extension}{callback_context}'
+        data['var_val'] = chaniax_fmt.format(
+            auth_password=data.get('auth_password') if data.get('auth_password') else '',
             auth_username=':{}'.format(data.get('auth_username')) if data.get('auth_username') else '',
+            separator='@' if data.get('auth_password') or data.get('auth_username') else '',
             remote_host=data.get('remote_host'),
             remote_port=':{}'.format(data.get('remote_port')) if data.get('remote_port') else '',
             callback_extension='/{}'.format(data.get('callback_extension')) if data.get('callback_extension') else '',
-            expiration='~{}'.format(data.get('expiration')) if data.get('expiration') else '',
+            callback_context='?{}'.format(data.get('callback_context')) if data.get('callback_context') else '',
         )
         return data
 
     @pre_dump
-    def convert_from_chansip(self, data):
+    def convert_from_chaniax(self, data):
         register = REGISTER_REGEX.match(data.var_val)
         result = register.groupdict()
         result['id'] = data.id
@@ -80,18 +82,18 @@ class RegisterSIPSchema(BaseSchema):
         return result
 
 
-class RegisterSIPList(ListResource):
+class RegisterIAXList(ListResource):
 
-    model = StaticSIP
-    schema = RegisterSIPSchema
+    model = StaticIAX
+    schema = RegisterIAXSchema
 
     def build_headers(self, register):
-        return {'Location': url_for('register_sip', id=register.id, _external=True)}
+        return {'Location': url_for('register_iax', id=register.id, _external=True)}
 
     @required_acl('confd.registers.create')
     def post(self):
         form = self.schema().load(request.get_json()).data
-        model = self.model(filename='sip.conf',
+        model = self.model(filename='iax.conf',
                            category='general',
                            var_name='register',
                            var_val=form['var_val'],
@@ -101,16 +103,16 @@ class RegisterSIPList(ListResource):
 
     @required_acl('confd.registers.read')
     def get(self):
-        return super(RegisterSIPList, self).get()
+        return super(RegisterIAXList, self).get()
 
 
-class RegisterSIPItem(ItemResource):
+class RegisterIAXItem(ItemResource):
 
-    schema = RegisterSIPSchema
+    schema = RegisterIAXSchema
 
     @required_acl('confd.registers.{id}.read')
     def get(self, id):
-        return super(RegisterSIPItem, self).get(id)
+        return super(RegisterIAXItem, self).get(id)
 
     @required_acl('confd.registers.{id}.update')
     def put(self, id):
@@ -129,4 +131,4 @@ class RegisterSIPItem(ItemResource):
 
     @required_acl('confd.registers.{id}.delete')
     def delete(self, id):
-        return super(RegisterSIPItem, self).delete(id)
+        return super(RegisterIAXItem, self).delete(id)

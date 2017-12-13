@@ -139,6 +139,7 @@ from . import outcall_trunk
 from . import queue
 from . import queue_extension
 from . import queue_member_agent
+from . import register_iax
 from . import register_sip
 from . import schedule
 from . import schedule_entity

@@ -1,6 +1,18 @@
 Changelog
 =========
 
+18.01
+-----
+
+* Added register iax endpoints:
+
+  * GET `/1.1/registers/iax`
+  * POST `/1.1/registers/iax`
+  * DELETE `/1.1/registers/iax/<register_iax_id>`
+  * GET `/1.1/registers/iax/<register_iax_id>`
+  * PUT `/1.1/registers/iax/<register_iax_id>`
+
+
 17.17
 -----
 

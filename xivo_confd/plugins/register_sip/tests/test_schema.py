@@ -253,5 +253,5 @@ class TestRegisterSIPSchema(unittest.TestCase):
                     auth_username='auth_username',
                     remote_host='remote_host')
 
-        result = self.schema.load(body).data
+        result = self.schema.load(body).errors
         assert_that(result, has_key('auth_username'))
