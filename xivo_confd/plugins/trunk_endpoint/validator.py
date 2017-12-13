@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique, Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
@@ -47,18 +46,6 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
                                              endpoint_id=line.endpoint_id)
 
 
-class TrunkEndpointDissociationValidator(ValidatorAssociation):
-
-    def validate(self, trunk, endpoint):
-        self.validate_endpoint(trunk, endpoint)
-
-    def validate_endpoint(self, trunk, endpoint):
-        if not trunk.is_associated_with(endpoint):
-            raise errors.resource_not_associated('Trunk', 'Endpoint',
-                                                 trunk_id=trunk.id,
-                                                 endpoint_id=endpoint.id)
-
-
 def build_validator(endpoint):
     return ValidationAssociation(
         association=[
@@ -66,7 +53,4 @@ def build_validator(endpoint):
                                               trunk_dao_module,
                                               line_dao_module)
         ],
-        dissociation=[
-            TrunkEndpointDissociationValidator()
-        ]
     )

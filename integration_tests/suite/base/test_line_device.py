@@ -6,7 +6,18 @@ import re
 
 from contextlib import contextmanager
 
-from hamcrest import assert_that, has_entries, is_not, starts_with, equal_to, contains, has_items, none, has_key
+from hamcrest import (
+    assert_that,
+    contains,
+    equal_to,
+    has_entries,
+    has_items,
+    has_key,
+    is_not,
+    none,
+    not_,
+    starts_with,
+)
 
 from ..helpers import scenarios as s
 from ..helpers import errors as e
@@ -384,7 +395,7 @@ def test_associate_when_device_already_associated():
 def check_associate_when_device_already_associated(line, device):
     with a.line_device(line, device):
         response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
+        response.assert_updated()
 
 
 def test_associate_with_another_device_when_already_associated():
@@ -428,13 +439,26 @@ def check_dissociate_sccp(line, device):
 
 
 def test_dissociate_when_not_associated():
-    with line_and_device('sip') as (line, device):
-        yield check_dissociate_when_not_associated, line, device
+    with line_and_device('sip') as (line1, device1), line_and_device('sip') as (line2, device2):
+        yield check_dissociate_when_not_associated, line1, device1, line2, device2
 
-    with line_and_device('sccp') as (line, device):
-        yield check_dissociate_when_not_associated, line, device
+    with line_and_device('sccp') as (line1, device1), line_and_device('sccp') as (line2, device2):
+        yield check_dissociate_when_not_associated, line1, device1, line2, device2
 
 
-def check_dissociate_when_not_associated(line, device):
-    response = confd.lines(line['id']).devices(device['id']).delete()
-    response.assert_status(400)
+def check_dissociate_when_not_associated(line1, device1, line2, device2):
+    with a.line_device(line1, device1), a.line_device(line2, device2):
+        response = confd.lines(line1['id']).devices(device2['id']).delete()
+        response.assert_deleted()
+
+        provd_device1 = provd.devices.get(device1['id'])
+        assert_that(provd_device1['config'], not_(starts_with('autoprov')))
+
+        provd_device2 = provd.devices.get(device2['id'])
+        assert_that(provd_device2['config'], not_(starts_with('autoprov')))
+
+        response = confd.lines(line1['id']).get()
+        assert_that(response.item, has_entries(device_id=device1['id']))
+
+        response = confd.lines(line2['id']).get()
+        assert_that(response.item, has_entries(device_id=device2['id']))

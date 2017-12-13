@@ -338,6 +338,10 @@ class TestTemplateAssociation(BaseTestFuncKey):
         self.association_url = confd.users(self.user['id']).funckeys.templates(self.template['id'])
         self.uuid_url = confd.users(self.user['uuid']).funckeys.templates(self.template['id'])
 
+    def test_associate_already_associated(self):
+        self.association_url.put().assert_ok()
+        self.association_url.put().assert_ok()
+
     def test_given_template_has_func_key_when_associated_then_func_key_added_to_provd(self):
         self.association_url.put().assert_ok()
 
@@ -487,6 +491,13 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
         response = confd.users(self.user['uuid']).funckeys.templates.get()
         assert_that(response.items, empty())
+
+
+@fixtures.user()
+@fixtures.funckey_template()
+def test_dissociate_not_associated(user, funckey_template):
+    response = confd.users(user['id']).funckeys.templates(funckey_template['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.user()

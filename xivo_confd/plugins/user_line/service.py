@@ -26,14 +26,20 @@ class UserLineService(object):
         return self.dao.get_by(user_id=user.id, line_id=line.id)
 
     def associate(self, user, line):
+        if line in user.lines:
+            return self.dao.get_by(user_id=user.id, line_id=line.id)
+
         self.validator.validate_association(user, line)
         user_line = self.dao.associate(user, line)
         self.notifier.associated(user_line)
         return user_line
 
     def dissociate(self, user, line):
+        user_line = self.dao.find_by(user_id=user.id, line_id=line.id)
+        if not user_line:
+            return
+
         self.validator.validate_dissociation(user, line)
-        user_line = self.dao.get_by(user_id=user.id, line_id=line.id)
         self.notifier.dissociated(user_line)
         self.dao.dissociate(user, line)
 

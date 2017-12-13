@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -62,20 +62,7 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
                                              context=extension.context)
 
 
-class ParkingLotExtensionDissociationValidator(ValidatorAssociation):
-
-    def validate(self, parking_lot, extension):
-        self.validate_parking_lot_extension_exists(parking_lot, extension)
-
-    def validate_parking_lot_extension_exists(self, parking_lot, extension):
-        if extension.parking_lot != parking_lot:
-            raise errors.not_found('ParkingLotExtension',
-                                   parking_lot_id=parking_lot.id,
-                                   extension_id=extension.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[ParkingLotExtensionAssociationValidator()],
-        dissociation=[ParkingLotExtensionDissociationValidator()]
     )

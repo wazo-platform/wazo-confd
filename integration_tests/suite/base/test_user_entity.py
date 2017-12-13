@@ -73,7 +73,7 @@ def test_associate_when_user_already_associated_to_other_entity(entity1, entity2
 def test_associate_when_user_already_associated_to_same_entity(entity, user):
     with a.user_entity(user, entity):
         response = confd.users(user['id']).entities(entity['id']).put()
-        response.assert_match(400, e.resource_associated('User', 'Entity'))
+        response.assert_updated()
 
 
 @fixtures.entity()

@@ -29,13 +29,11 @@ def test_associate_errors(incall, extension):
 @fixtures.incall()
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_dissociate_errors(incall, extension):
-    fake_incall_extension = confd.incalls(incall['id']).extensions(extension['id']).delete
     fake_incall = confd.incalls(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.incalls(incall['id']).extensions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_incall, 'Incall'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_incall_extension, 'IncallExtension'
 
 
 @fixtures.incall()
@@ -50,7 +48,7 @@ def test_associate(incall, extension):
 def test_associate_already_associated(incall, extension):
     with a.incall_extension(incall, extension):
         response = confd.incalls(incall['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Incall', 'Extension'))
+        response.assert_updated()
 
 
 @fixtures.incall()
@@ -94,6 +92,13 @@ def test_dissociate(incall, extension):
     with a.incall_extension(incall, extension, check=False):
         response = confd.incalls(incall['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.incall()
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_dissociate_not_associated(incall, extension):
+    response = confd.incalls(incall['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.incall()

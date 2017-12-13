@@ -56,13 +56,11 @@ def error_checks(url):
 @fixtures.outcall()
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_dissociate_errors(outcall, extension):
-    fake_outcall_extension = confd.outcalls(outcall['id']).extensions(extension['id']).delete
     fake_outcall = confd.outcalls(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.outcalls(outcall['id']).extensions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_outcall, 'Outcall'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_outcall_extension, 'OutcallExtension'
 
 
 @fixtures.outcall()
@@ -132,6 +130,13 @@ def test_dissociate(outcall, extension):
     with a.outcall_extension(outcall, extension, check=False):
         response = confd.outcalls(outcall['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.outcall()
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_dissociate_not_associated(outcall, extension):
+    response = confd.outcalls(outcall['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.outcall()

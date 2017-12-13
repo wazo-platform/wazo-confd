@@ -88,7 +88,7 @@ def test_associate(line, sccp):
 def test_associate_when_endpoint_already_associated(line, sccp):
     with a.line_endpoint_sccp(line, sccp):
         response = confd.lines(line['id']).endpoints.sccp(sccp['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+        response.assert_updated()
 
 
 @fixtures.line()
@@ -121,7 +121,7 @@ def test_dissociate(line, sccp):
 @fixtures.sccp()
 def test_dissociate_when_not_associated(line, sccp):
     response = confd.lines(line['id']).endpoints.sccp(sccp['id']).delete()
-    response.assert_status(400)
+    response.assert_deleted()
 
 
 @fixtures.line()

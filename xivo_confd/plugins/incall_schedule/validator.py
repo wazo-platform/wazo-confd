@@ -19,20 +19,7 @@ class IncallScheduleAssociationValidator(ValidatorAssociation):
                                              schedule_id=incall.schedules[0].id)
 
 
-class IncallScheduleDissociationValidator(ValidatorAssociation):
-
-    def validate(self, incall, schedule):
-        self.validate_incall_schedule_exists(incall, schedule)
-
-    def validate_incall_schedule_exists(self, incall, schedule):
-        if incall not in schedule.incalls:
-            raise errors.not_found('IncallSchedule',
-                                   incall_id=incall.id,
-                                   schedule_id=schedule.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[IncallScheduleAssociationValidator()],
-        dissociation=[IncallScheduleDissociationValidator()]
     )

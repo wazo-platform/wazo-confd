@@ -88,7 +88,7 @@ def test_associate(line, custom):
 def test_associate_when_endpoint_already_associated(line, custom):
     with a.line_endpoint_custom(line, custom):
         response = confd.lines(line['id']).endpoints.custom(custom['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+        response.assert_updated()
 
 
 @fixtures.line()
@@ -130,7 +130,7 @@ def test_dissociate(line, custom):
 @fixtures.custom()
 def test_dissociate_when_not_associated(line, custom):
     response = confd.lines(line['id']).endpoints.custom(custom['id']).delete()
-    response.assert_status(400)
+    response.assert_deleted()
 
 
 @fixtures.line()

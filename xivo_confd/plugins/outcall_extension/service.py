@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from .notifier import build_notifier
@@ -22,6 +22,9 @@ class OutcallExtensionService(object):
         self.notifier.associated(outcall, extension)
 
     def dissociate(self, outcall, extension):
+        if extension not in outcall.extensions:
+            return
+
         self.validator.validate_dissociation(outcall, extension)
         outcall.dissociate_extension(extension)
         self.notifier.dissociated(outcall, extension)

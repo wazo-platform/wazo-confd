@@ -2,12 +2,53 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures as f
-from ..helpers import associations as a
-
 from hamcrest import assert_that, has_entries
+
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import scenarios as s
+from ..helpers import fixtures as f
+
 from . import confd
+
+FAKE_ID = 999999999
+
+
+@f.line()
+@f.extension()
+def test_associate_errors(line, extension):
+    response = confd.lines(FAKE_ID).extension.post(extension_id=extension['id'])
+    response.assert_match(404, e.not_found(resource='Line'))
+
+    response = confd.lines(line['id']).extension.post(extension_id=FAKE_ID)
+    response.assert_match(400, e.not_found(resource='Extension'))
+
+
+@f.line()
+@f.extension()
+def test_dissociate_errors(line, extension):
+    fake_line = confd.lines(FAKE_ID).extension.delete
+    yield s.check_resource_not_found, fake_line, 'Line'
+
+
+def test_get_errors():
+    fake_line = confd.lines(FAKE_ID).extension.get
+    yield s.check_resource_not_found, fake_line, 'Line'
+
+
+@f.extension()
+@f.line_sip()
+def test_associate_line_to_extension_already_associated(extension, line):
+    with a.line_extension(line, extension):
+        response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
+        response.assert_ok()
+
+
+@f.line_sip()
+@f.extension()
+def test_dissociate_not_associated(line, extension):
+    response = confd.lines(line['id']).extension.delete()
+    response.assert_match(404, e.not_found(resource='LineExtension'))
 
 
 @f.line_sip()

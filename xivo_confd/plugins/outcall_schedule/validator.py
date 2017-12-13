@@ -19,20 +19,7 @@ class OutcallScheduleAssociationValidator(ValidatorAssociation):
                                              schedule_id=outcall.schedules[0].id)
 
 
-class OutcallScheduleDissociationValidator(ValidatorAssociation):
-
-    def validate(self, outcall, schedule):
-        self.validate_outcall_schedule_exists(outcall, schedule)
-
-    def validate_outcall_schedule_exists(self, outcall, schedule):
-        if outcall not in schedule.outcalls:
-            raise errors.not_found('OutcallSchedule',
-                                   outcall_id=outcall.id,
-                                   schedule_id=schedule.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[OutcallScheduleAssociationValidator()],
-        dissociation=[OutcallScheduleDissociationValidator()]
     )

@@ -9,7 +9,6 @@ from hamcrest import (assert_that,
                       not_)
 
 from ..helpers import scenarios as s
-from ..helpers import errors as e
 from ..helpers import helpers as h
 from ..helpers import fixtures
 from ..helpers import associations as a
@@ -32,13 +31,11 @@ def test_associate_errors(user, call_permission):
 @fixtures.user()
 @fixtures.call_permission()
 def test_dissociate_errors(user, call_permission):
-    fake_user_call_permission = confd.users(user['id']).callpermissions(call_permission['id']).delete
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
-    yield s.check_resource_not_found, fake_user_call_permission, 'UserCallPermission'
 
 
 def test_get_errors():
@@ -134,7 +131,7 @@ def test_get_users_associated_to_call_permission(user1, user2, call_permission):
 def test_associate_when_user_already_associated_to_same_call_permission(user, call_permission):
     with a.user_call_permission(user, call_permission):
         response = confd.users(user['id']).callpermissions(call_permission['id']).put()
-        response.assert_match(400, e.resource_associated('User', 'CallPermission'))
+        response.assert_updated()
 
 
 @fixtures.user()
@@ -143,6 +140,13 @@ def test_dissociate_using_uuid(user, call_permission):
     with a.user_call_permission(user, call_permission, check=False):
         response = confd.users(user['uuid']).callpermissions(call_permission['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.user()
+@fixtures.call_permission()
+def test_dissociate_not_associated(user, call_permission):
+    response = confd.users(user['uuid']).callpermissions(call_permission['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.user()

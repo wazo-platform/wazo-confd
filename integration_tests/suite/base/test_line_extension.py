@@ -2,8 +2,6 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers.helpers.line_sip import generate_line, delete_line
-from ..helpers.helpers.extension import generate_extension, delete_extension
 from ..helpers import scenarios as s
 from ..helpers import errors as e
 from ..helpers import associations as a
@@ -22,30 +20,6 @@ from . import confd, db
 FAKE_ID = 999999999
 
 
-class TestLineExtensionAssociation(s.AssociationScenarios, s.DissociationScenarios, s.AssociationGetScenarios):
-
-    left_resource = "Line"
-    right_resource = "Extension"
-
-    def create_resources(self):
-        line = generate_line()
-        extension = generate_extension()
-        return line['id'], extension['id']
-
-    def delete_resources(self, line_id, extension_id):
-        delete_line(line_id)
-        delete_extension(extension_id)
-
-    def associate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extension.post(extension_id=extension_id)
-
-    def dissociate_resources(self, line_id, extension_id):
-        return confd.lines(line_id).extension.delete()
-
-    def get_association(self, line_id, extension_id):
-        return confd.lines(line_id).extension.get()
-
-
 @fixtures.line()
 @fixtures.extension()
 def test_associate_errors(line, extension):
@@ -61,11 +35,9 @@ def test_associate_errors(line, extension):
 def test_dissociate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.lines(line['id']).extensions(FAKE_ID).delete
-    fake_line_extension = confd.lines(line['id']).extensions(extension['id']).delete
 
     yield s.check_resource_not_found, fake_line, 'Line'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_line_extension, 'LineExtension'
 
 
 def test_get_errors():
@@ -202,7 +174,7 @@ def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extensio
 def test_associate_line_to_extension_already_associated(extension, line):
     with a.line_extension(line, extension):
         response = confd.lines(line['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('Extension', 'Line'))
+        response.assert_updated()
 
 
 @fixtures.line_sip()
@@ -241,6 +213,13 @@ def test_dissociate_line_and_extension(line, extension):
     with a.line_extension(line, extension, check=False):
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_dissociate_not_associated(line, extension):
+    response = confd.lines(line['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.line_sip()

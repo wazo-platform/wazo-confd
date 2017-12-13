@@ -3,42 +3,39 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 
+from hamcrest import assert_that, has_entries
+
 from ..helpers import scenarios as s
 from ..helpers import helpers as h
 from ..helpers import errors as e
 from ..helpers import associations as a
 from ..helpers import fixtures
-
-from hamcrest import assert_that, has_entries
 from . import confd
+
 FAKE_ID = 999999999
 
 
-class TestUserVoicemailAssociation(s.AssociationScenarios,
-                                   s.DissociationScenarios,
-                                   s.AssociationGetScenarios):
+@fixtures.user()
+@fixtures.voicemail()
+def test_associate_errors(user, voicemail):
+    response = confd.users(FAKE_ID).voicemail.post(voicemail_id=voicemail['id'])
+    response.assert_match(404, e.not_found(resource='User'))
 
-    left_resource = "User"
-    right_resource = "Voicemail"
+    response = confd.users(user['id']).voicemail.post(voicemail_id=FAKE_ID)
+    response.assert_match(400, e.not_found(resource='Voicemail'))
 
-    def create_resources(self):
-        self.user_id = h.user.generate_user()['id']
-        self.voicemail_id = h.voicemail.generate_voicemail()['id']
-        return self.user_id, self.voicemail_id
 
-    def delete_resources(self, user_id, voicemail_id):
-        h.voicemail.delete_voicemail(self.voicemail_id)
-        h.user.delete_user(self.user_id)
-        h.voicemail.delete_voicemail(self.voicemail_id)
+@fixtures.user()
+@fixtures.voicemail()
+def test_dissociate_errors(user, voicemail):
+    fake_user = confd.users(FAKE_ID).voicemail.delete
+    yield s.check_resource_not_found, fake_user, 'User'
 
-    def associate_resources(self, user_id, voicemail_id):
-        return confd.users(user_id).voicemail.post(voicemail_id=voicemail_id)
 
-    def dissociate_resources(self, user_id, voicemail_id):
-        return confd.users(user_id).voicemail.delete()
-
-    def get_association(self, user_id, voicemail_id):
-        return confd.users(user_id).voicemail.get()
+@fixtures.user()
+def test_get_errors(user):
+    fake_user = confd.users(FAKE_ID).voicemail.get
+    yield s.check_resource_not_found, fake_user, 'User'
 
 
 @fixtures.user()
@@ -60,7 +57,7 @@ def test_associate_using_uuid(user, voicemail):
 def test_associate_when_already_associated(user, voicemail):
     with a.user_voicemail(user, voicemail):
         response = confd.users(user['id']).voicemail.post(voicemail_id=voicemail['id'])
-        response.assert_match(400, e.resource_associated('User', 'Voicemail'))
+        response.assert_ok()
 
 
 @fixtures.user()

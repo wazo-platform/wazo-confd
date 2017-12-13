@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.database import agent as agent_db
@@ -28,22 +27,9 @@ class UserAgentAssociationValidator(ValidatorAssociation):
             raise errors.not_found('Agent', id=agent.id)
 
 
-class UserAgentDissociationValidator(ValidatorAssociation):
-
-    def validate(self, user, agent):
-        self.validate_user_agent_exists(user)
-
-    def validate_user_agent_exists(self, user):
-        if not user.agentid:
-            raise errors.not_found('UserAgent', user_id=user.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[
             UserAgentAssociationValidator(agent_db)
         ],
-        dissociation=[
-            UserAgentDissociationValidator()
-        ]
     )

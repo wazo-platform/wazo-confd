@@ -19,20 +19,7 @@ class UserScheduleAssociationValidator(ValidatorAssociation):
                                              schedule_id=user.schedules[0].id)
 
 
-class UserScheduleDissociationValidator(ValidatorAssociation):
-
-    def validate(self, user, schedule):
-        self.validate_user_schedule_exists(user, schedule)
-
-    def validate_user_schedule_exists(self, user, schedule):
-        if user not in schedule.users:
-            raise errors.not_found('UserSchedule',
-                                   user_id=user.id,
-                                   schedule_id=schedule.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[UserScheduleAssociationValidator()],
-        dissociation=[UserScheduleDissociationValidator()]
     )

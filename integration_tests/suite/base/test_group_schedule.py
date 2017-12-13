@@ -27,13 +27,11 @@ def test_associate_errors(group, schedule):
 @fixtures.group()
 @fixtures.schedule()
 def test_dissociate_errors(group, schedule):
-    fake_group_schedule = confd.groups(group['id']).schedules(schedule['id']).delete
     fake_group = confd.groups(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.groups(group['id']).schedules(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_group, 'Group'
     yield s.check_resource_not_found, fake_schedule, 'Schedule'
-    yield s.check_resource_not_found, fake_group_schedule, 'GroupSchedule'
 
 
 @fixtures.group()
@@ -48,7 +46,7 @@ def test_associate(group, schedule):
 def test_associate_already_associated(group, schedule):
     with a.group_schedule(group, schedule):
         response = confd.groups(group['id']).schedules(schedule['id']).put()
-        response.assert_match(400, e.resource_associated('Group', 'Schedule'))
+        response.assert_updated()
 
 
 @fixtures.group()
@@ -75,6 +73,13 @@ def test_dissociate(group, schedule):
     with a.group_schedule(group, schedule, check=False):
         response = confd.groups(group['id']).schedules(schedule['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.group()
+@fixtures.schedule()
+def test_dissociate_not_associated(group, schedule):
+    response = confd.groups(group['id']).schedules(schedule['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.group()

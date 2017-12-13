@@ -13,11 +13,17 @@ class IncallScheduleService(object):
         self.notifier = notifier
 
     def associate(self, incall, schedule):
+        if schedule in incall.schedules:
+            return
+
         self.validator.validate_association(incall, schedule)
         incall.schedules = [schedule]
         self.notifier.associated(incall, schedule)
 
     def dissociate(self, incall, schedule):
+        if schedule not in incall.schedules:
+            return
+
         self.validator.validate_dissociation(incall, schedule)
         incall.schedules = []
         self.notifier.dissociated(incall, schedule)

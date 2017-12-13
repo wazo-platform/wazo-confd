@@ -13,11 +13,17 @@ class OutcallScheduleService(object):
         self.notifier = notifier
 
     def associate(self, outcall, schedule):
+        if schedule in outcall.schedules:
+            return
+
         self.validator.validate_association(outcall, schedule)
         outcall.schedules = [schedule]
         self.notifier.associated(outcall, schedule)
 
     def dissociate(self, outcall, schedule):
+        if schedule not in outcall.schedules:
+            return
+
         self.validator.validate_dissociation(outcall, schedule)
         outcall.schedules = []
         self.notifier.dissociated(outcall, schedule)

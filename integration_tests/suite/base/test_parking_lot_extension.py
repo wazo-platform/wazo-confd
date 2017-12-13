@@ -29,13 +29,11 @@ def test_associate_errors(parking_lot, extension):
 @fixtures.parking_lot()
 @fixtures.extension()
 def test_dissociate_errors(parking_lot, extension):
-    fake_parking_lot_extension = confd.parkinglots(parking_lot['id']).extensions(extension['id']).delete
     fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
     yield s.check_resource_not_found, fake_extension, 'Extension'
-    yield s.check_resource_not_found, fake_parking_lot_extension, 'ParkingLotExtension'
 
 
 @fixtures.parking_lot()
@@ -50,7 +48,7 @@ def test_associate(parking_lot, extension):
 def test_associate_already_associated(parking_lot, extension):
     with a.parking_lot_extension(parking_lot, extension):
         response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
-        response.assert_match(400, e.resource_associated('ParkingLot', 'Extension'))
+        response.assert_updated()
 
 
 @fixtures.parking_lot()
@@ -116,6 +114,13 @@ def test_dissociate(parking_lot, extension):
     with a.parking_lot_extension(parking_lot, extension, check=False):
         response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_dissociate_not_associated(parking_lot, extension):
+    response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.parking_lot()

@@ -34,10 +34,8 @@ def test_associate_errors(agent, user):
 @fixtures.user()
 def test_dissociate_errors(user):
     fake_user = confd.users(FAKE_ID).agents().delete
-    fake_user_agent = confd.users(user['id']).agents.delete
 
     yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_user_agent, 'UserAgent'
 
 
 @fixtures.agent()
@@ -82,7 +80,7 @@ def test_associate_when_user_already_associated_to_other_agent(agent1, agent2, u
 def test_associate_when_user_already_associated_to_same_agent(agent, user):
     with a.user_agent(user, agent):
         response = confd.users(user['id']).agents(agent['id']).put()
-        response.assert_match(400, e.resource_associated('User', 'Agent'))
+        response.assert_updated()
 
 
 @fixtures.agent()
@@ -95,6 +93,13 @@ def test_dissociate(agent, user):
     with a.user_agent(user, agent, check=False):
         response = confd.users(user['uuid']).agents().delete()
         response.assert_deleted()
+
+
+@fixtures.agent()
+@fixtures.user()
+def test_dissociate_not_associated(agent, user):
+    response = confd.users(user['uuid']).agents().delete()
+    response.assert_deleted()
 
 
 @fixtures.agent()

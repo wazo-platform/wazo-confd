@@ -2,14 +2,13 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.helpers import errors
-
 from xivo_confd.database import device as device_db
+from xivo_confd.plugins.device.builder import build_device_updater
+from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao
 
-from xivo_confd.plugins.device.builder import build_device_updater
-from xivo_confd.plugins.line_device.validator import build_validator
-from xivo_confd.plugins.line_device.notifier import build_notifier
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class LineDevice(object):
@@ -32,6 +31,9 @@ class LineDeviceService(object):
         self.device_updater = device_updater
 
     def associate(self, line, device):
+        if line.device_id == device.id:
+            return
+
         self.validator.validate_association(line, device)
         self.associate_line_device(line, device)
         self.notifier.associated(line, device)
@@ -43,6 +45,9 @@ class LineDeviceService(object):
             device_db.associate_sccp_device(line, device)
 
     def dissociate(self, line, device):
+        if line.device_id != device.id:
+            return
+
         self.validator.validate_dissociation(line, device)
         self.dissociate_line_device(line, device)
         self.device_updater.update_device(device)

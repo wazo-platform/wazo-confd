@@ -28,13 +28,11 @@ def test_associate_errors(user, schedule):
 @fixtures.user()
 @fixtures.schedule()
 def test_dissociate_errors(user, schedule):
-    fake_user_schedule = confd.users(user['uuid']).schedules(schedule['id']).delete
     fake_user = confd.users(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.users(user['uuid']).schedules(FAKE_ID).delete
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_schedule, 'Schedule'
-    yield s.check_resource_not_found, fake_user_schedule, 'UserSchedule'
 
 
 @fixtures.user()
@@ -56,7 +54,7 @@ def test_associate_with_user_id(user, schedule):
 def test_associate_already_associated(user, schedule):
     with a.user_schedule(user, schedule):
         response = confd.users(user['uuid']).schedules(schedule['id']).put()
-        response.assert_match(400, e.resource_associated('User', 'Schedule'))
+        response.assert_updated()
 
 
 @fixtures.user()
@@ -83,6 +81,13 @@ def test_dissociate(user, schedule):
     with a.user_schedule(user, schedule, check=False):
         response = confd.users(user['uuid']).schedules(schedule['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.user()
+@fixtures.schedule()
+def test_dissociate_not_associated(user, schedule):
+    response = confd.users(user['uuid']).schedules(schedule['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.user()

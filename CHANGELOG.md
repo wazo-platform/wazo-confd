@@ -12,6 +12,56 @@ Changelog
   * GET `/1.1/registers/iax/<register_iax_id>`
   * PUT `/1.1/registers/iax/<register_iax_id>`
 
+* The following endpoints do not return an error (400) when the resources are already associated. Instead, they return a successful association code (204).
+
+  * PUT `/1.1/conferences/<id>/extensions/<id>`
+  * PUT `/1.1/groups/<id>/extensions/<id>`
+  * PUT `/1.1/groups/<id>/schedules/<id>`
+  * PUT `/1.1/incalls/<id>/extensions/<id>`
+  * PUT `/1.1/incalls/<id>/schedules/<id>`
+  * PUT `/1.1/lines/<id>/devices/<id>`
+  * PUT `/1.1/lines/<id>/endpoints/sip/<id>`
+  * PUT `/1.1/lines/<id>/endpoints/sccp/<id>`
+  * PUT `/1.1/lines/<id>/endpoints/custom/<id>`
+  * PUT `/1.1/lines/<id>/extensions/<id>`
+  * PUT `/1.1/outcalls/<id>/callpermissions/<id>`
+  * PUT `/1.1/outcalls/<id>/extensions/<id>`
+  * PUT `/1.1/outcalls/<id>/schedules/<id>`
+  * PUT `/1.1/parkinglots/<id>/extensions/<id>`
+  * PUT `/1.1/trunks/<id>/endpoints/sip/<id>`
+  * PUT `/1.1/trunks/<id>/endpoints/custom/<id>`
+  * PUT `/1.1/users/<id>/agents/<id>`
+  * PUT `/1.1/users/<id>/callpermissions/<id>`
+  * PUT `/1.1/users/<id>/entities/<id>`
+  * PUT `/1.1/users/<id>/lines/<id>`
+  * PUT `/1.1/users/<id>/schedules/<id>`
+  * PUT `/1.1/users/<id>/voicemails/<id>`
+
+* The following endpoints do not return an error (400) when the resources are already dissociated. Instead, they return a successful dissociation code (204).
+
+  * DELETE `/1.1/conferences/<id>/extensions/<id>`
+  * DELETE `/1.1/groups/<id>/extensions/<id>`
+  * DELETE `/1.1/groups/<id>/schedules/<id>`
+  * DELETE `/1.1/incalls/<id>/extensions/<id>`
+  * DELETE `/1.1/incalls/<id>/schedules/<id>`
+  * DELETE `/1.1/lines/<id>/devices/<id>`
+  * DELETE `/1.1/lines/<id>/endpoints/sip/<id>`
+  * DELETE `/1.1/lines/<id>/endpoints/sccp/<id>`
+  * DELETE `/1.1/lines/<id>/endpoints/custom/<id>`
+  * DELETE `/1.1/lines/<id>/extensions/<id>`
+  * DELETE `/1.1/outcalls/<id>/callpermissions/<id>`
+  * DELETE `/1.1/outcalls/<id>/extensions/<id>`
+  * DELETE `/1.1/outcalls/<id>/schedules/<id>`
+  * DELETE `/1.1/parkinglots/<id>/extensions/<id>`
+  * DELETE `/1.1/trunks/<id>/endpoints/sip/<id>`
+  * DELETE `/1.1/trunks/<id>/endpoints/custom/<id>`
+  * DELETE `/1.1/users/<id>/agents`
+  * DELETE `/1.1/users/<id>/callpermissions/<id>`
+  * DELETE `/1.1/users/<id>/lines/<id>`
+  * DELETE `/1.1/users/<id>/funckeys/templates/<id>`
+  * DELETE `/1.1/users/<id>/schedules/<id>`
+  * DELETE `/1.1/users/<id>/voicemails`
+
 
 17.17
 -----

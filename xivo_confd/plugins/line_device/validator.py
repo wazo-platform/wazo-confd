@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.helpers.validator import ValidationAssociation
@@ -24,14 +23,6 @@ class ValidateLineDeviceAssociation(ValidatorAssociation):
 
     def validate(self, line, device):
         ValidateLineHasNoDevice().validate(line)
-
-
-class ValidateLineDeviceDissociation(ValidatorAssociation):
-
-    def validate(self, line, device):
-        if line.device_id != device.id:
-            raise errors.resource_not_associated('Line', 'Device',
-                                                 line_id=line.id, device_id=device.id)
 
 
 class ValidateLinePosition(ValidatorAssociation):
@@ -95,8 +86,5 @@ def build_validator():
             ValidateLinePosition(line_dao_module),
             ValidateRequiredResources(user_line_dao_module, line_extension_dao_module),
             ValidateMultipleLines(line_dao_module),
-        ],
-        dissociation=[
-            ValidateLineDeviceDissociation(),
         ]
     )

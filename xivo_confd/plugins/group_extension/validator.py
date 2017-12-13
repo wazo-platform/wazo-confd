@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -44,20 +44,7 @@ class GroupExtensionAssociationValidator(ValidatorAssociation):
                                                 context=extension.context)
 
 
-class GroupExtensionDissociationValidator(ValidatorAssociation):
-
-    def validate(self, group, extension):
-        self.validate_group_extension_exists(group, extension)
-
-    def validate_group_extension_exists(self, group, extension):
-        if extension.group != group:
-            raise errors.not_found('GroupExtension',
-                                   group_id=group.id,
-                                   extension_id=extension.id)
-
-
 def build_validator():
     return ValidationAssociation(
         association=[GroupExtensionAssociationValidator()],
-        dissociation=[GroupExtensionDissociationValidator()]
     )

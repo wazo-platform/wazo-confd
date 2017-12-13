@@ -13,11 +13,17 @@ class UserScheduleService(object):
         self.notifier = notifier
 
     def associate(self, user, schedule):
+        if schedule in user.schedules:
+            return
+
         self.validator.validate_association(user, schedule)
         user.schedules = [schedule]
         self.notifier.associated(user, schedule)
 
     def dissociate(self, user, schedule):
+        if schedule not in user.schedules:
+            return
+
         self.validator.validate_dissociation(user, schedule)
         user.schedules = []
         self.notifier.dissociated(user, schedule)
