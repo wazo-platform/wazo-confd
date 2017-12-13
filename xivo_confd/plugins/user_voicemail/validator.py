@@ -9,7 +9,7 @@ from xivo_confd.helpers.validator import Validator, ValidationAssociation
 class UserHasNoVoicemail(Validator):
 
     def validate(self, user, voicemail):
-        if user.voicemail and voicemail is not user.voicemail:
+        if user.voicemail:
             raise errors.resource_associated('User', 'Voicemail',
                                              user_id=user.id,
                                              voicemail_id=voicemail.id)

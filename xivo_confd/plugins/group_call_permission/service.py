@@ -14,10 +14,16 @@ class GroupCallPermissionService(object):
         self.notifier = notifier
 
     def associate(self, group, call_permission):
+        if call_permission in group.call_permissions:
+            return
+
         self.group_dao.associate_call_permission(group, call_permission)
         self.notifier.associated(group, call_permission)
 
     def dissociate(self, group, call_permission):
+        if call_permission not in group.call_permissions:
+            return
+
         self.group_dao.dissociate_call_permission(group, call_permission)
         self.notifier.dissociated(group, call_permission)
 

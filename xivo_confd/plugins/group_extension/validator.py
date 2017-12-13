@@ -11,8 +11,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class GroupExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, group, extension):
-        if extension in group.extensions:
-            return
         self.validate_group_not_already_associated(group)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)

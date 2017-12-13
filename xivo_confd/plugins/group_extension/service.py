@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from .notifier import build_notifier
@@ -16,11 +16,17 @@ class GroupExtensionService(object):
         self.notifier = notifier
 
     def associate(self, group, extension):
+        if extension in group.extensions:
+            return
+
         self.validator.validate_association(group, extension)
         self.extension_dao.associate_group(group, extension)
         self.notifier.associated(group, extension)
 
     def dissociate(self, group, extension):
+        if extension not in group.extensions:
+            return
+
         self.validator.validate_dissociation(group, extension)
         self.extension_dao.dissociate_group(group, extension)
         self.notifier.dissociated(group, extension)

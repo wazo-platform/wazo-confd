@@ -31,6 +31,9 @@ class LineDeviceService(object):
         self.device_updater = device_updater
 
     def associate(self, line, device):
+        if line.device_id == device.id:
+            return
+
         self.validator.validate_association(line, device)
         self.associate_line_device(line, device)
         self.notifier.associated(line, device)
@@ -42,14 +45,15 @@ class LineDeviceService(object):
             device_db.associate_sccp_device(line, device)
 
     def dissociate(self, line, device):
+        if line.device_id != device.id:
+            return
+
         self.validator.validate_dissociation(line, device)
         self.dissociate_line_device(line, device)
         self.device_updater.update_device(device)
         self.notifier.dissociated(line, device)
 
     def dissociate_line_device(self, line, device):
-        if line.device_id != device.id:
-            return
         line.remove_device()
         self.device_updater.update_device(device)
         if line.endpoint == "sccp":

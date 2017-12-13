@@ -12,8 +12,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class IncallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, incall, extension):
-        if extension in incall.extensions:
-            return
         self.validate_incall_not_already_associated(incall)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)

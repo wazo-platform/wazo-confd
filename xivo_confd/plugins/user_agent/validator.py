@@ -13,8 +13,6 @@ class UserAgentAssociationValidator(ValidatorAssociation):
         self.agent_db = agent_db
 
     def validate(self, user, agent):
-        if agent.id == user.agent_id:
-            return
         self.validate_agent_exists(agent)
         self.validate_user_not_already_associated(user, agent)
 

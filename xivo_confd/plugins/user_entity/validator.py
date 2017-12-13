@@ -13,8 +13,6 @@ class UserEntityAssociationValidator(ValidatorAssociation):
         self.user_line_dao = user_line_dao
 
     def validate(self, user, entity):
-        if user.entity_id == entity.id:
-            return
         self.validate_user_no_line_associated(user)
 
     def validate_user_no_line_associated(self, user):

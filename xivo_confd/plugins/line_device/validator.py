@@ -22,8 +22,6 @@ class ValidateLineHasNoDevice(Validator):
 class ValidateLineDeviceAssociation(ValidatorAssociation):
 
     def validate(self, line, device):
-        if line.device_id == device.id:
-            return
         ValidateLineHasNoDevice().validate(line)
 
 
@@ -33,8 +31,6 @@ class ValidateLinePosition(ValidatorAssociation):
         self.line_dao = line_dao
 
     def validate(self, line, device):
-        if line.device_id == device.id:
-            return
         existing = self.line_dao.find_by(device_id=device.id, position=line.position)
         if existing:
             msg = "Cannot associate 2 lines with same position (position: {})".format(line.position)
@@ -73,8 +69,6 @@ class ValidateMultipleLines(ValidatorAssociation):
         self.line_dao = line_dao
 
     def validate(self, line, device):
-        if line.device_id == device.id:
-            return
         lines = self.line_dao.find_all_by(device_id=device.id)
         if lines:
             existing = lines[0]

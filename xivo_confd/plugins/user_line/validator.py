@@ -15,8 +15,6 @@ from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 class UserLineAssociationValidator(ValidatorAssociation):
 
     def validate(self, user, line):
-        if line in user.lines:
-            return
         self.validate_line_has_endpoint(line)
         self.validate_we_are_not_creating_a_group_under_the_same_extension(user, line)
 

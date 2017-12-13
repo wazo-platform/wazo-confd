@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.extension import dao as extension_dao
@@ -16,11 +16,17 @@ class ParkingLotExtensionService(object):
         self.notifier = notifier
 
     def associate(self, parking_lot, extension):
+        if extension in parking_lot.extensions:
+            return
+
         self.validator.validate_association(parking_lot, extension)
         self.extension_dao.associate_parking_lot(parking_lot, extension)
         self.notifier.associated(parking_lot, extension)
 
     def dissociate(self, parking_lot, extension):
+        if extension not in parking_lot.extensions:
+            return
+
         self.validator.validate_dissociation(parking_lot, extension)
         self.extension_dao.dissociate_parking_lot(parking_lot, extension)
         self.notifier.dissociated(parking_lot, extension)

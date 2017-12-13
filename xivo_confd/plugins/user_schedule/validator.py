@@ -10,8 +10,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class UserScheduleAssociationValidator(ValidatorAssociation):
 
     def validate(self, user, schedule):
-        if schedule in user.schedules:
-            return
         self.validate_user_not_already_associated(user)
 
     def validate_user_not_already_associated(self, user):

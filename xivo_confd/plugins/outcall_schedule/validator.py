@@ -10,8 +10,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class OutcallScheduleAssociationValidator(ValidatorAssociation):
 
     def validate(self, outcall, schedule):
-        if schedule in outcall.schedules:
-            return
         self.validate_outcall_not_already_associated(outcall)
 
     def validate_outcall_not_already_associated(self, outcall):

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.user import dao as user_dao
@@ -25,6 +25,9 @@ class UserAgentService(object):
 
     def associate(self, user, agent_id):
         agent = Agent(agent_id)
+        if agent.id == user.agent_id:
+            return
+
         self.validator.validate_association(user, agent)
         user.agent_id = agent_id
         self.dao.edit(user)

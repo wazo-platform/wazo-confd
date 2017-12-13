@@ -12,8 +12,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, parking_lot, extension):
-        if extension in parking_lot.extensions:
-            return
         self.validate_parking_lot_not_already_associated(parking_lot)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)

@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.plugins.user_entity.notifier import build_notifier
-from xivo_confd.plugins.user_entity.validator import build_validator
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class UserEntityService(object):
@@ -25,6 +25,9 @@ class UserEntityService(object):
         return user
 
     def associate(self, user, entity):
+        if user.entity_id == entity.id:
+            return
+
         self.validator.validate_association(user, entity)
         user.entity_id = entity.id
         self.dao.edit(user)

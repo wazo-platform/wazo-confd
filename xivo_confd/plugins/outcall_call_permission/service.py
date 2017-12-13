@@ -14,10 +14,16 @@ class OutcallCallPermissionService(object):
         self.notifier = notifier
 
     def associate(self, outcall, call_permission):
+        if call_permission in outcall.call_permissions:
+            return
+
         self.outcall_dao.associate_call_permission(outcall, call_permission)
         self.notifier.associated(outcall, call_permission)
 
     def dissociate(self, outcall, call_permission):
+        if call_permission not in outcall.call_permissions:
+            return
+
         self.outcall_dao.dissociate_call_permission(outcall, call_permission)
         self.notifier.dissociated(outcall, call_permission)
 

@@ -16,8 +16,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class LineExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, line, extension):
-        if extension in line.extensions:
-            return
         self.validate_line_has_endpoint(line)
         self.validate_line_has_no_extension(line)
         self.validate_extension_not_associated_to_other_resource(extension)

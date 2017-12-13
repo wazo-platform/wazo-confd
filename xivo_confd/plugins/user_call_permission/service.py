@@ -23,10 +23,16 @@ class UserCallPermissionService(object):
         return self.dao.get_by(user_id=user.id, call_permission_id=call_permission.id)
 
     def associate(self, user, call_permission):
+        if self.dao.find_by(user_id=user.id, call_permission_id=call_permission.id):
+            return
+
         self.dao.associate(user, call_permission)
         self.notifier.associated(user, call_permission)
 
     def dissociate(self, user, call_permission):
+        if not self.dao.find_by(user_id=user.id, call_permission_id=call_permission.id):
+            return
+
         self.dao.dissociate(user, call_permission)
         self.notifier.dissociated(user, call_permission)
 

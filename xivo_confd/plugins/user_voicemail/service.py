@@ -25,12 +25,18 @@ class UserVoicemailService(object):
         return self.dao.find_all_by(**criteria)
 
     def associate(self, user, voicemail):
+        if voicemail is user.voicemail:
+            return self.dao.get_by(user_id=user.id)
+
         self.validator.validate_association(user, voicemail)
         self.dao.associate(user, voicemail)
         self.notifier.associated(user, voicemail)
         return self.dao.get_by(user_id=user.id)
 
     def dissociate(self, user, voicemail):
+        if voicemail is not user.voicemail:
+            return
+
         self.validator.validate_dissociation(user, voicemail)
         self.dao.dissociate(user, voicemail)
         self.notifier.dissociated(user, voicemail)

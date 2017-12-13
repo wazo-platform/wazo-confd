@@ -11,8 +11,6 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class ConferenceExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, conference, extension):
-        if extension in conference.extensions:
-            return
         self.validate_conference_not_already_associated(conference)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)

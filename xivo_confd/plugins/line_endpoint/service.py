@@ -42,16 +42,20 @@ class LineEndpointService(object):
                 'endpoint_id': line.endpoint_id}
 
     def associate(self, line, endpoint):
-        if not line.is_associated_with(endpoint):
-            self.validator.validate_association(line, endpoint)
-            line.associate_endpoint(endpoint)
-            self.line_service.edit(line)
+        if line.is_associated_with(endpoint):
+            return
+
+        self.validator.validate_association(line, endpoint)
+        line.associate_endpoint(endpoint)
+        self.line_service.edit(line)
 
     def dissociate(self, line, endpoint):
-        if line.is_associated_with(endpoint):
-            self.validator.validate_dissociation(line, endpoint)
-            line.remove_endpoint()
-            self.line_service.edit(line)
+        if not line.is_associated_with(endpoint):
+            return
+
+        self.validator.validate_dissociation(line, endpoint)
+        line.remove_endpoint()
+        self.line_service.edit(line)
 
 
 def build_service(provd_client, endpoint, endpoint_service):
