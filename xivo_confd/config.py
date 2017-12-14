@@ -83,6 +83,7 @@ DEFAULT_CONFIG = {
         'api': True,
         'call_log': True,
         'call_permission': True,
+        'confbridge': True,
         'conference': True,
         'conference_extension': True,
         'configuration': True,

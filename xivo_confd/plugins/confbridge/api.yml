@@ -1,0 +1,66 @@
+paths:
+  /asterisk/sip/general:
+    get:
+      operationId: list_asterisk_sip_general
+      summary: List SIP general options
+      description: '**Required ACL:** `confd.asterisk.sip.general.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: SIP general
+          schema:
+            $ref: '#/definitions/SIPGeneral'
+    put:
+      operationId: update_asterisk_sip_general
+      summary: Update SIP general option
+      description: '**Required ACL:** `confd.asterisk.sip.general.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/SIPGeneral'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  SIPGeneral:
+    title: SIPGeneral
+    description: 'SIP general configuration. This configuration will be in the file
+      ''sip.conf'' used by asterisk.
+
+      Please consult the asterisk documentation for further details on available parameters.'
+    properties:
+      options:
+        description: "General SIP options. These options must be unique and unordered.\
+          \ Otherwise, use `ordered_options`. Option must have the following form:\n\
+          \n```\n{\n  \"options\": {\n    \"name1\": \"value1\",\n    ...\n  }\n}\n\
+          ```\n\n"
+        type: object
+      ordered_options:
+        description: "Any options may be repeated as many times and ordered as needed.\
+          \ Ordered options must have the following form:\n\n```\n{\n  \"ordered_options\"\
+          : [\n    [\"name1\", \"value1\"],\n    [\"name2\", \"value2\"]\n  ]\n}\n\
+          ```\n\nThe resulting configuration in sip.conf will have the following form:\n\
+          \n```\n[general]\nname1=value1\nname2=value2\n```\n"
+        type: array
+        items:
+          $ref: '#/definitions/KeyValueOption'
+  KeyValueOption:
+    title: Info
+    type: array
+    items:
+      type: string
+    maxItems: 2
+    minItems: 2
