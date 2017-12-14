@@ -1,28 +1,22 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
-from flask_restful import Resource, Api
+from flask_restful import Resource
 
-from xivo_confd.helpers.common import handle_error
+from xivo_confd.helpers.common import handle_api_exception
 from xivo_confd.authentication.confd_auth import auth
 
 from xivo_dao.helpers import errors
 
 
-class ConfdApi(Api):
-
-    def handle_error(self, error):
-        try:
-            return handle_error(error)
-        except:
-            return super(ConfdApi, self).handle_error(error)
+class ErrorCatchingResource(Resource):
+    method_decorators = ([handle_api_exception] + Resource.method_decorators)
 
 
-class ConfdResource(Resource):
-    method_decorators = [auth.login_required]
+class ConfdResource(ErrorCatchingResource):
+    method_decorators = [auth.login_required] + ErrorCatchingResource.method_decorators
 
 
 class ListResource(ConfdResource):

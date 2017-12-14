@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
-import json
 
-from werkzeug.exceptions import HTTPException
-from flask_restful.utils import http_status_message
 from flask import g
+from flask_restful.utils import http_status_message
+from functools import wraps
+from werkzeug.exceptions import HTTPException
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import ServiceError
@@ -20,33 +20,29 @@ GENERIC_ERRORS = (ServiceError,)
 NOT_FOUND_ERRORS = (NotFoundError,)
 
 
-def handle_error(error):
-    rollback()
-
-    exc_info = True
-    code = 500
-
-    try:
-        error_message = unicode(error)
-    except UnicodeDecodeError:
-        error_message = str(error).decode('utf-8', errors='replace')
-
-    if isinstance(error, NOT_FOUND_ERRORS):
-        messages = [error_message]
-        code = 404
-        exc_info = False
-    elif isinstance(error, GENERIC_ERRORS):
-        messages = [error_message]
-        code = 400
-        exc_info = False
-    elif isinstance(error, HTTPException):
-        messages, code = extract_http_messages(error)
-        exc_info = False
-    else:
-        messages = [u'Unexpected error: {}'.format(error_message)]
-
-    logger.error(error_message, exc_info=exc_info)
-    return error_response(messages, code)
+def handle_api_exception(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except NOT_FOUND_ERRORS as error:
+            rollback()
+            message = decode_and_log_error(error)
+            return [message], 404
+        except GENERIC_ERRORS as error:
+            rollback()
+            message = decode_and_log_error(error)
+            return [message], 400
+        except HTTPException as error:
+            rollback()
+            messages, code = extract_http_messages(error)
+            decode_and_log_error(error)
+            return messages, code
+        except Exception as error:
+            rollback()
+            message = decode_and_log_error(error, exc_info=True)
+            return [u'Unexpected error: {}'.format(message)], 500
+    return wrapper
 
 
 def rollback():
@@ -59,6 +55,15 @@ def rollback():
     bus = g.get('bus_publisher')
     if bus:
         bus.rollback()
+
+
+def decode_and_log_error(error, exc_info=False):
+    try:
+        error_message = unicode(error)
+    except UnicodeDecodeError:
+        error_message = str(error).decode('utf-8', errors='replace')
+    logger.error(error_message, exc_info=exc_info)
+    return error_message
 
 
 def extract_http_messages(error):
@@ -81,8 +86,3 @@ def extract_http_messages(error):
         messages = [getattr(error, 'description', http_status_message(code))]
 
     return messages, code
-
-
-def error_response(messages, code):
-    response = json.dumps(messages)
-    return (response, code, {'Content-Type': 'application/json'})
