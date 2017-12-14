@@ -126,6 +126,7 @@ DEFAULT_CONFIG = {
         'register_iax': True,
         'register_sip': True,
         'schedule': True,
+        'sccp_general': True,
         'sip_general': True,
         'sound_language': True,
         'switchboard': True,

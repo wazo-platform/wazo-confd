@@ -62,6 +62,11 @@ Changelog
   * DELETE `/1.1/users/<id>/schedules/<id>`
   * DELETE `/1.1/users/<id>/voicemails`
 
+* Added SCCP general endpoints:
+
+  * GET `/1.1/asterisk/sccp/general`
+  * PUT `/1.1/asterisk/sccp/general`
+
 
 17.17
 -----

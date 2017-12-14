@@ -70,6 +70,7 @@ setup(
             'register_iax = xivo_confd.plugins.register_iax.plugin:Plugin',
             'register_sip = xivo_confd.plugins.register_sip.plugin:Plugin',
             'schedule = xivo_confd.plugins.schedule.plugin:Plugin',
+            'sccp_general = xivo_confd.plugins.sccp_general.plugin:Plugin',
             'sip_general = xivo_confd.plugins.sip_general.plugin:Plugin',
             'sound_language = xivo_confd.plugins.sound_language.plugin:Plugin',
             'switchboard = xivo_confd.plugins.switchboard.plugin:Plugin',
