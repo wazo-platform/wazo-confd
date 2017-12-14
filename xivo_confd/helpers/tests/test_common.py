@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
-import json
 
 from flask import Flask
 from werkzeug.exceptions import HTTPException, BadRequest
@@ -22,10 +21,10 @@ class TestCommon(unittest.TestCase):
         app.test_request_context('').push()
 
     def assertResponse(self, response, expected_code, result):
-        data, status_code, headers = response
+        data, status_code = response
 
         self.assertEquals(status_code, expected_code)
-        self.assertEquals(json.loads(data), result)
+        self.assertEquals(data, result)
 
 
 class TestHandleError(TestCommon):
