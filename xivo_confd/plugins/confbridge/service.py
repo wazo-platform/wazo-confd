@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.asterisk_file import dao as asterisk_file_dao
+from xivo_dao.helpers import errors
 
 from .notifier import build_notifier
 
@@ -28,7 +29,13 @@ class ConfBridgeConfigurationService(object):
 
     def edit(self, section_name, variables):
         confbridge = self.dao.find_by(name=self.file_name)
+        if not confbridge:
+            raise errors.not_found('AsteriskFile', name=self.file_name)
+
         section = confbridge.sections.get(section_name)
+        if not section:
+            raise errors.not_found('AsteriskFileSection', section=section_name)
+
         self.dao.edit_section_variables(section, variables)
         self.notifier.edited(section_name, confbridge)
 
