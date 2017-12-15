@@ -72,6 +72,16 @@ Changelog
   * GET `/1.1/asterisk/iax/callnumberlimits`
   * PUT `/1.1/asterisk/iax/callnumberlimits`
 
+* Added ConfBridge default_bridge endpoints:
+
+  * GET `/1.1/asterisk/confbridge/default_bridge`
+  * PUT `/1.1/asterisk/confbridge/default_bridge`
+
+* Added ConfBridge default_user endpoints:
+
+  * GET `/1.1/asterisk/confbridge/default_user`
+  * PUT `/1.1/asterisk/confbridge/default_user`
+
 
 17.17
 -----

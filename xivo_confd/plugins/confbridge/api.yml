@@ -1,0 +1,88 @@
+paths:
+  /asterisk/confbridge/default_bridge:
+    get:
+      operationId: list_asterisk_confbridge_default_bridge
+      summary: List ConfBridge default_bridge options
+      description: '**Required ACL:** `confd.asterisk.confbridge.default_bridge.read`'
+      tags:
+      - asterisk
+      - conference
+      responses:
+        '200':
+          description: ConfBridge default_bridge
+          schema:
+            $ref: '#/definitions/ConfBridgeConfiguration'
+    put:
+      operationId: update_asterisk_confbridge_default_bridge
+      summary: Update ConfBridge default_bridge option
+      description: '**Required ACL:** `confd.asterisk.confbridge.default_bridge.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      - conference
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ConfBridgeConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /asterisk/confbridge/default_user:
+    get:
+      operationId: list_asterisk_confbridge_default_user
+      summary: List ConfBridge default_user options
+      description: '**Required ACL:** `confd.asterisk.confbridge.default_user.read`'
+      tags:
+      - asterisk
+      - conference
+      responses:
+        '200':
+          description: ConfBridge default_user
+          schema:
+            $ref: '#/definitions/ConfBridgeConfiguration'
+    put:
+      operationId: update_asterisk_confbridge_default_user
+      summary: Update ConfBridge default_user option
+      description: '**Required ACL:** `confd.asterisk.confbridge.default_user.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      - conference
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ConfBridgeConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  ConfBridgeConfiguration:
+    title: ConfBridgeConfiguration
+    description: 'This configuration will be in the file ''confbridge.conf'' used by asterisk.
+
+      Please consult the asterisk documentation for further details on available parameters.'
+    properties:
+      options:
+        description: "These options must be unique and unordered.\
+          \ Otherwise, use `ordered_options`. Option must have the following form:\n\
+          \n```\n{\n  \"options\": {\n    \"name1\": \"value1\",\n    ...\n  }\n}\n\
+          ```\n\n"
+        type: object
