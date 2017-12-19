@@ -97,11 +97,11 @@ class FeaturesConfigurationList(ConfdResource):
 class FeaturesApplicationmapList(FeaturesConfigurationList):
     section_name = 'applicationmap'
 
-    @required_acl('confd.asterisk.confbridge.applicationmap.get')
+    @required_acl('confd.asterisk.features.applicationmap.get')
     def get(self):
         return super(FeaturesApplicationmapList, self).get()
 
-    @required_acl('confd.asterisk.confbridge.applicationmap.update')
+    @required_acl('confd.asterisk.features.applicationmap.update')
     def put(self):
         return super(FeaturesApplicationmapList, self).put()
 
@@ -110,11 +110,11 @@ class FeaturesFeaturemapList(FeaturesConfigurationList):
     section_name = 'featuremap'
     schema = FeaturesFeaturemapSchema
 
-    @required_acl('confd.asterisk.confbridge.featuremap.get')
+    @required_acl('confd.asterisk.features.featuremap.get')
     def get(self):
         return super(FeaturesFeaturemapList, self).get()
 
-    @required_acl('confd.asterisk.confbridge.featuremap.update')
+    @required_acl('confd.asterisk.features.featuremap.update')
     def put(self):
         return super(FeaturesFeaturemapList, self).put()
 
@@ -123,10 +123,10 @@ class FeaturesGeneralList(FeaturesConfigurationList):
     section_name = 'general'
     schema = FeaturesGeneralSchema
 
-    @required_acl('confd.asterisk.confbridge.general.get')
+    @required_acl('confd.asterisk.features.general.get')
     def get(self):
         return super(FeaturesGeneralList, self).get()
 
-    @required_acl('confd.asterisk.confbridge.general.update')
+    @required_acl('confd.asterisk.features.general.update')
     def put(self):
         return super(FeaturesGeneralList, self).put()
