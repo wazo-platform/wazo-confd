@@ -95,6 +95,7 @@ DEFAULT_CONFIG = {
         'endpoint_sip': True,
         'entity': True,
         'extension': True,
+        'features': True,
         'func_key': True,
         'group': True,
         'group_call_permission': True,

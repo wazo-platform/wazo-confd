@@ -1,0 +1,119 @@
+paths:
+  /asterisk/features/applicationmap:
+    get:
+      operationId: list_asterisk_features_applicationmap
+      summary: List Features applicationmap options
+      description: '**Required ACL:** `confd.asterisk.features.applicationmap.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: Features applicationmap
+          schema:
+            $ref: '#/definitions/FeaturesConfiguration'
+    put:
+      operationId: update_asterisk_features_applicationmap
+      summary: Update Features applicationmap option
+      description: '**Required ACL:** `confd.asterisk.features.applicationmap.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/FeaturesConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /asterisk/features/featuremap:
+    get:
+      operationId: list_asterisk_features_featuremap
+      summary: List Features featuremap options
+      description: '**Required ACL:** `confd.asterisk.features.featuremap.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: Features featuremap
+          schema:
+            $ref: '#/definitions/FeaturesConfiguration'
+    put:
+      operationId: update_asterisk_features_featuremap
+      summary: Update Features featuremap option
+      description: '**Required ACL:** `confd.asterisk.features.featuremap.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/FeaturesConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /asterisk/features/general:
+    get:
+      operationId: list_asterisk_features_general
+      summary: List Features general options
+      description: '**Required ACL:** `confd.asterisk.features.general.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: Features general
+          schema:
+            $ref: '#/definitions/FeaturesConfiguration'
+    put:
+      operationId: update_asterisk_features_general
+      summary: Update Features general option
+      description: '**Required ACL:** `confd.asterisk.features.general.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/FeaturesConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  FeaturesConfiguration:
+    title: FeaturesConfiguration
+    description: 'This configuration will be in the file ''features.conf'' used by asterisk.
+
+      Please consult the asterisk documentation for further details on available parameters.'
+    properties:
+      options:
+        description: "These options must be unique and unordered.\
+          \ Otherwise, use `ordered_options`. Option must have the following form:\n\
+          \n```\n{\n  \"options\": {\n    \"name1\": \"value1\",\n    ...\n  }\n}\n\
+          ```\n\n"
+        type: object
