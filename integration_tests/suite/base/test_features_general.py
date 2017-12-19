@@ -22,6 +22,20 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', {'wrong_value': 23}
     yield s.check_bogus_field_returns_error, url, 'options', {'none_value': None}
 
+    yield s.check_bogus_field_returns_error, url, 'options', {'comebacktoorigin': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'courtesytone': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'findslot': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkedcallhangup': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkedcallrecording': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkedcallreparking': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkedcalltransfers': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkeddynamic': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkedmusicclass': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkedplay': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkinghints': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkingtime': 'value'}
+    yield s.check_bogus_field_returns_error, url, 'options', {'parkpos': 'value'}
+
 
 def test_get():
     response = confd.asterisk.features.general.get()
