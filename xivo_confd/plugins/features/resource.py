@@ -4,14 +4,16 @@
 
 from flask import request
 
-from marshmallow import fields, pre_dump, post_load, pre_load, post_dump
 from marshmallow.validate import Length
+from marshmallow import fields, pre_dump, post_load, pre_load, post_dump, validates_schema
+from marshmallow.exceptions import ValidationError
 
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema
 from xivo_confd.helpers.restful import ConfdResource
 
 from xivo_dao.alchemy.features import Features
+from xivo_dao.resources.features.search import FUNC_KEY_FEATUREMAP_FOREIGN_KEY
 
 
 class AsteriskOptionSchema(BaseSchema):
@@ -45,6 +47,18 @@ class FeaturesConfigurationSchema(BaseSchema):
     @post_load
     def remove_envelope(self, data):
         return data['options']
+
+
+class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
+    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+
+    @validates_schema
+    def _validate_required_options(self, data):
+        keys = [option.get('var_name') for option in data.get('options', {})]
+
+        for required in FUNC_KEY_FEATUREMAP_FOREIGN_KEY:
+            if required not in keys:
+                raise ValidationError('The following option are required: {}'.format(required), 'options')
 
 
 class FeaturesConfigurationList(ConfdResource):
@@ -81,6 +95,7 @@ class FeaturesApplicationmapList(FeaturesConfigurationList):
 
 class FeaturesFeaturemapList(FeaturesConfigurationList):
     section_name = 'featuremap'
+    schema = FeaturesFeaturemapSchema
 
     @required_acl('confd.asterisk.confbridge.featuremap.get')
     def get(self):
