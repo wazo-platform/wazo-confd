@@ -82,6 +82,21 @@ Changelog
   * GET `/1.1/asterisk/confbridge/default_user`
   * PUT `/1.1/asterisk/confbridge/default_user`
 
+* Added Features applicationmap endpoints:
+
+  * GET `/1.1/asterisk/features/applicationmap`
+  * PUT `/1.1/asterisk/features/applicationmap`
+
+* Added Features featuremap endpoints:
+
+  * GET `/1.1/asterisk/features/featuremap`
+  * PUT `/1.1/asterisk/features/featuremap`
+
+* Added Features general endpoints:
+
+  * GET `/1.1/asterisk/features/general`
+  * PUT `/1.1/asterisk/features/general`
+
 
 17.17
 -----
