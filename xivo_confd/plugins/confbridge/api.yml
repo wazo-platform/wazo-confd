@@ -6,7 +6,7 @@ paths:
       description: '**Required ACL:** `confd.asterisk.confbridge.default_bridge.read`'
       tags:
       - asterisk
-      - conference
+      - conferences
       responses:
         '200':
           description: ConfBridge default_bridge
@@ -22,7 +22,7 @@ paths:
         are not defined.'
       tags:
       - asterisk
-      - conference
+      - conferences
       parameters:
       - name: body
         in: body
@@ -43,7 +43,7 @@ paths:
       description: '**Required ACL:** `confd.asterisk.confbridge.default_user.read`'
       tags:
       - asterisk
-      - conference
+      - conferences
       responses:
         '200':
           description: ConfBridge default_user
@@ -59,7 +59,7 @@ paths:
         are not defined.'
       tags:
       - asterisk
-      - conference
+      - conferences
       parameters:
       - name: body
         in: body
