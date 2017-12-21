@@ -4,6 +4,21 @@
 
 from collections import OrderedDict
 
+from xivo_dao.resources.call_permission import dao as call_permission_dao
+from xivo_dao.resources.cti_profile import dao as cti_profile_dao
+from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
+from xivo_dao.resources.endpoint_sip import dao as sip_dao
+from xivo_dao.resources.entity import dao as entity_dao
+from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.incall import dao as incall_dao
+from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.line_extension import dao as line_extension_dao
+from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
+from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
+
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
@@ -21,21 +36,6 @@ from xivo_confd.plugins.user_entity.service import build_service as build_user_e
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
 from xivo_confd.plugins.voicemail.service import build_service as build_voicemail_service
-
-from xivo_dao.resources.call_permission import dao as call_permission_dao
-from xivo_dao.resources.cti_profile import dao as cti_profile_dao
-from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
-from xivo_dao.resources.endpoint_sip import dao as sip_dao
-from xivo_dao.resources.entity import dao as entity_dao
-from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.incall import dao as incall_dao
-from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
-from xivo_dao.resources.user_line import dao as user_line_dao
-from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
-from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from .associators import (
     CallPermissionAssociator,
@@ -90,18 +90,19 @@ class Plugin(object):
         incall_service = build_incall_service()
         incall_extension_service = build_incall_extension_service()
 
-        creators = {'user': UserCreator(user_service),
-                    'entity': EntityCreator(entity_service),
-                    'line': LineCreator(line_service),
-                    'voicemail': VoicemailCreator(voicemail_service),
-                    'sip': SipCreator(sip_service),
-                    'sccp': SccpCreator(sccp_service),
-                    'extension': ExtensionCreator(extension_service),
-                    'extension_incall': ExtensionCreator(extension_service),
-                    'incall': IncallCreator(incall_service),
-                    'cti_profile': CtiProfileCreator(cti_profile_dao),
-                    'call_permissions': CallPermissionCreator(call_permission_service),
-                    }
+        creators = {
+            'user': UserCreator(user_service),
+            'entity': EntityCreator(entity_service),
+            'line': LineCreator(line_service),
+            'voicemail': VoicemailCreator(voicemail_service),
+            'sip': SipCreator(sip_service),
+            'sccp': SccpCreator(sccp_service),
+            'extension': ExtensionCreator(extension_service),
+            'extension_incall': ExtensionCreator(extension_service),
+            'incall': IncallCreator(incall_service),
+            'cti_profile': CtiProfileCreator(cti_profile_dao),
+            'call_permissions': CallPermissionCreator(call_permission_service),
+        }
 
         entry_creator = EntryCreator(creators)
 
