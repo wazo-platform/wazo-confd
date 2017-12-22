@@ -14,8 +14,8 @@ from .model import SoundCategory, SoundFormat, SoundFile
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_FOLDERS = ['acd', 'features', 'playback', 'recordings']
-RESERVED_FOLDERS = ['monitor', 'recordings-meetme']
+DEFAULT_DIRECTORIES = ['acd', 'features', 'playback', 'recordings']
+RESERVED_DIRECTORIES = ['monitor', 'recordings-meetme']
 
 
 def build_storage(base_path='/var/lib/xivo/sounds'):
@@ -35,20 +35,20 @@ class _SoundFilesystemStorage(object):
 
     def list_directories(self):
         try:
-            folders = self._list_directories(self._base_path)
+            directories = self._list_directories(self._base_path)
         except OSError as e:
             logger.error('Could not list sound directory %s: %s', self._base_path, e)
             raise e
 
-        folders = [folder for folder in folders if folder not in RESERVED_FOLDERS]
-        return [self.get_directory(folder) for folder in folders]
+        directories = [directory for directory in directories if directory not in RESERVED_DIRECTORIES]
+        return [self.get_directory(directory_name) for directory_name in directories]
 
     def _list_directories(path):
         # Valid with a symlink -> directory
         return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
 
     def get_directory(self, sound_name):
-        if sound_name in RESERVED_FOLDERS:
+        if sound_name in RESERVED_DIRECTORIES:
             raise errors.not_found('Sound', name=sound_name)
         sound = SoundCategory(name=sound_name)
         sound.files = self._list_files(sound)

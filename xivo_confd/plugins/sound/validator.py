@@ -7,15 +7,15 @@ from xivo_dao.helpers import errors
 from xivo_confd.helpers.validator import Validator, ValidationGroup
 
 from .schema import ASTERISK_CATEGORY
-from .storage import DEFAULT_FOLDERS, RESERVED_FOLDERS
+from .storage import DEFAULT_DIRECTORIES, RESERVED_DIRECTORIES
 
 
 class SoundDeleteValidator(Validator):
 
     def validate(self, sound):
-        if sound.name in DEFAULT_FOLDERS + [ASTERISK_CATEGORY]:
+        if sound.name in DEFAULT_DIRECTORIES + [ASTERISK_CATEGORY]:
             raise errors.not_permitted('Cannot delete default sound category')
-        if sound.name in RESERVED_FOLDERS:
+        if sound.name in RESERVED_DIRECTORIES:
             raise errors.not_found('Sound', name=sound.name)
 
 
