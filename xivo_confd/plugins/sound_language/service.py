@@ -13,5 +13,5 @@ class SoundLanguageService(object):
         return len(result), result
 
 
-def build_service(ari_client_proxy):
-    return SoundLanguageService(ari_client_proxy)
+def build_service(ari_client):
+    return SoundLanguageService(ari_client)
