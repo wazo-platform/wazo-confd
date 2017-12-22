@@ -41,7 +41,7 @@ class _SoundFilesystemStorage(object):
             directories = self._list_directories(self._base_path)
         except OSError as e:
             logger.error('Could not list sound directory %s: %s', self._base_path, e)
-            raise e
+            raise
 
         directories.sort()
         return [self.get_directory(directory_name) for directory_name in directories]
@@ -142,4 +142,4 @@ class _SoundFilesystemStorage(object):
         except OSError as e:
             if e.errno == errno.ENOENT:
                 raise errors.not_found('Sound file', name=sound.name, filename=filename)
-            raise e
+            raise
