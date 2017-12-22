@@ -232,3 +232,10 @@ class register_iax(IsolatedAction):
 
     actions = {'generate': h.register_iax.generate_register_iax,
                'delete': h.register_iax.delete_register_iax}
+
+
+class sound(IsolatedAction):
+
+    id_field = 'name'
+    actions = {'generate': h.sound.generate_sound,
+               'delete': h.sound.delete_sound}

@@ -1,0 +1,179 @@
+paths:
+  /sounds:
+    get:
+      operationId: list_sounds
+      summary: List sound categories
+      description: '**Required ACL:** `confd.sounds.read`'
+      tags:
+      - sounds
+      responses:
+        '200':
+          description: sounds list
+          schema:
+            $ref: '#/definitions/SoundItems'
+    post:
+      operationId: create_sounds
+      summary: Create sound category
+      description: '**Required ACL:** `confd.sounds.create`'
+      tags:
+      - sounds
+      parameters:
+      - name: body
+        in: body
+        description: Sound category to create
+        required: true
+        schema:
+          $ref: '#/definitions/Sound'
+      responses:
+        '201':
+          description: Sound category created
+          schema:
+            $ref: '#/definitions/Sound'
+        '400':
+          $ref: '#/responses/CreateError'
+  /sounds/{sound_name}:
+    get:
+      operationId: get_sounds
+      summary: Get sound category
+      description: '**Required ACL:** `confd.sounds.{sound_name}.read`'
+      tags:
+      - sounds
+      parameters:
+      - $ref: '#/parameters/sound_name'
+      responses:
+        '200':
+          description: Sound category
+          schema:
+            $ref: '#/definitions/Sound'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_sounds
+      summary: Delete sound category
+      description: |
+        **Required ACL:** `confd.sounds.{sound_name}.delete`
+
+        Delete the sound category and associated audio files.
+      tags:
+      - sounds
+      parameters:
+      - $ref: '#/parameters/sound_name'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /sounds/{sound_name}/files/{sound_filename}:
+    get:
+      operationId: get_sounds_files
+      summary: Get audio file
+      description: '**Required ACL:** `confd.sounds.{sound_name}.files.{sound_filename}.read`'
+      tags:
+      - sounds
+      parameters:
+      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_filename'
+      - $ref: '#/parameters/sound_language'
+      - $ref: '#/parameters/sound_format'
+      produces:
+      - application/octet-stream
+      responses:
+        '200':
+          description: Audio file
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_sounds_files
+      summary: Add or update audio file
+      description: '**Required ACL:** `confd.sounds.{sound_name}.files.{sound_filename}.update`'
+      tags:
+      - sounds
+      consumes:
+      - application/octet-stream
+      parameters:
+      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_filename'
+      - $ref: '#/parameters/sound_language'
+      - $ref: '#/parameters/sound_format'
+      - name: body
+        in: body
+        required: true
+        schema:
+          format: binary
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_sounds_files
+      summary: Delete audio file
+      description: '**Required ACL:** `confd.sounds.{sound_name}.files.{sound_filename}.delete`'
+      tags:
+      - sounds
+      parameters:
+      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_filename'
+      - $ref: '#/parameters/sound_language'
+      - $ref: '#/parameters/sound_format'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  sound_name:
+    required: true
+    type: string
+    name: sound_name
+    in: path
+  sound_filename:
+    required: true
+    type: string
+    name: sound_filename
+    in: path
+  sound_language:
+    required: false
+    name: language
+    in: query
+    type: string
+    description: Language of the sound
+  sound_format:
+    required: false
+    name: format
+    in: query
+    type: string
+    description: Format of the sound
+
+definitions:
+  Sound:
+    properties:
+      name:
+        type: string
+        description: The name of the category (can only by set on create and must be unique)
+      files:
+        type: array
+        readOnly: true
+        description: The audio files
+        items:
+          $ref: '#/definitions/SoundFile'
+    required:
+    - name
+  SoundFile:
+    properties:
+      name:
+        type: string
+        description: The name of the file
+  SoundItems:
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Sound'
+      total:
+        type: integer
+    required:
+    - total
