@@ -34,15 +34,18 @@ class _SoundFilesystemStorage(object):
         return os.path.join(self._base_path, sound.name.encode('utf-8'), filename.encode('utf-8'))
 
     def list_directories(self):
-        # XXX: try to list only directory
         try:
-            folders = os.listdir(self._base_path)
+            folders = self._list_directories(self._base_path)
         except OSError as e:
             logger.error('Could not list sound directory %s: %s', self._base_path, e)
             raise e
 
         folders = [folder for folder in folders if folder not in RESERVED_FOLDERS]
         return [self.get_directory(folder) for folder in folders]
+
+    def _list_directories(path):
+        # Valid with a symlink -> directory
+        return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
 
     def get_directory(self, sound_name):
         if sound_name in RESERVED_FOLDERS:
