@@ -33,6 +33,9 @@ class _SoundFilesystemStorage(object):
     def _filename_path(self, sound, filename):
         return os.path.join(self._base_path, sound.name.encode('utf-8'), filename.encode('utf-8'))
 
+    def _path(self, base_path, path):
+        return os.path.join(base_path, path.encode('utf-8'))
+
     def list_directories(self):
         try:
             directories = self._list_directories(self._base_path)
@@ -40,18 +43,19 @@ class _SoundFilesystemStorage(object):
             logger.error('Could not list sound directory %s: %s', self._base_path, e)
             raise e
 
-        directories = [directory for directory in directories if directory not in RESERVED_DIRECTORIES]
+        directories.sort()
         return [self.get_directory(directory_name) for directory_name in directories]
 
-    def _list_directories(path):
-        # Valid with a symlink -> directory
-        return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+    def _list_directories(self, path):
+        return [name for name in os.listdir(path)
+                if os.path.isdir(self._path(path, name))
+                and name not in RESERVED_DIRECTORIES]
 
     def get_directory(self, sound_name):
         if sound_name in RESERVED_DIRECTORIES:
             raise errors.not_found('Sound', name=sound_name)
         sound = SoundCategory(name=sound_name)
-        sound.files = self._list_files(sound)
+        sound.files = self._list_sound_files(sound)
         return sound
 
     def create_directory(self, sound):
@@ -74,26 +78,51 @@ class _SoundFilesystemStorage(object):
             else:
                 logger.error('Could not remove sound directory %s: %s', e)
 
-    def _list_files(self, sound):
+    def _list_sound_files(self, sound):
         path = self._directory_path(sound)
         try:
-            filenames = os.listdir(path)
+            directories, files = self._list_directories_files(path)
         except OSError as e:
             if e.errno == errno.ENOENT:
                 raise errors.not_found('Sound', name=sound.name)
             else:
                 logger.error('Could not list sound directory %s: %s', path, e)
-            filenames = []
-        filenames.sort()
-        # we currently returns the whole list of files in the directory, even if they
-        # aren't file (e.g. directory) or they have an invalid filename (e.g. a filename
-        # that confd won't accept) for simplicity
+                return []
 
-        # XXX Extract format
-        # XXX consider all subfolder as language folder
-        # XXX separe folder and file
-        files = [SoundFile(name=filename) for filename in filenames]
-        return files
+        result = {}
+        self._extract_and_merge_formats(result, files)
+
+        for directory in directories:
+            path = self._path(path, directory)
+            try:
+                files = os.listdir(path)
+            except OSError as e:
+                logger.error('Could not list sound language directory %s: %s', path, e)
+                continue
+
+            self._extract_and_merge_formats(result, files, language=directory)
+
+        return result.values()
+
+    def _extract_and_merge_formats(self, result, files, language=None):
+        for file_ in files:
+            # XXX: convert extension to format (i.e. wav to slin)
+            filename, extension = os.path.splitext(file_)
+            extension = extension.strip('.') if extension else extension
+            sound_file = result.setdefault(filename, SoundFile(filename))
+            sound_file.formats.append(SoundFormat(format_=extension, language=language))
+        return result
+
+    def _list_directories_files(self, path):
+        directories = []
+        files = []
+        for name in os.listdir(path):
+            full_name = self._path(path, name)
+            if os.path.isfile(full_name):
+                files.append(name)
+            elif os.path.isdir(full_name):
+                directories.append(name)
+        return directories, files
 
     def load_file(self, sound, filename):
         path = self._filename_path(sound, filename)

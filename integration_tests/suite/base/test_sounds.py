@@ -6,6 +6,7 @@
 from hamcrest import (
     assert_that,
     contains,
+    contains_inanyorder,
     empty,
     equal_to,
     has_entries,
@@ -71,6 +72,29 @@ def test_get(sound):
     response = confd.sounds(sound['name']).get()
     assert_that(response.item, has_entries(name=sound['name'],
                                            files=empty()))
+
+
+@fixtures.sound()
+def test_get_with_files(sound):
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr.wav').put(content='ivrwav').assert_updated()
+    client.url.sounds(sound['name']).files('ivr.ogg').put(content='ivrogg').assert_updated()
+
+    response = confd.sounds(sound['name']).get()
+    assert_that(response.item, has_entries(
+        name=sound['name'],
+        files=contains_inanyorder(has_entries(
+            name='ivr',
+            formats=contains_inanyorder(
+                has_entries(format='wav',
+                            language=None,
+                            text=None),
+                has_entries(format='ogg',
+                            language=None,
+                            text=None),
+            )
+        ))
+    ))
 
 
 def test_get_internal_folder():

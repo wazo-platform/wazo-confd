@@ -52,18 +52,21 @@ class SoundFileItem(ConfdResource):
 
     @required_acl('confd.sounds.{name}.files.{filename}.read')
     def get(self, name, filename):
+        # XXX extract query string
         sounds = self.service.get(name)
         response = self.service.load_file(sounds, filename)
         return response
 
     @required_acl('confd.sounds.{name}.files.{filename}.update')
     def put(self, name, filename):
+        # XXX extract query string
         sounds = self.service.get(name)
         self.service.save_file(sounds, filename, request.data)
         return '', 204
 
     @required_acl('confd.sounds.{name}.files.{filename}.delete')
     def delete(self, name, filename):
+        # XXX extract query string
         sounds = self.service.get(name)
         self.service.delete_file(sounds, filename)
         return '', 204

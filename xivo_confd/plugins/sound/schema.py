@@ -14,8 +14,15 @@ RESERVED_DIRECTORIES_ERROR = "The following name are reserved for internal usage
 DIRECTORY_REGEX = r'^[a-zA-Z0-9]{1}[-_.a-zA-Z0-9]+$'
 
 
+class SoundFormatSchema(BaseSchema):
+    format = fields.String()
+    language = fields.String()
+    text = fields.String()
+
+
 class SoundFileSchema(BaseSchema):
     name = fields.String()
+    formats = fields.Nested(SoundFormatSchema, many=True)
 
 
 class SoundSchema(BaseSchema):
