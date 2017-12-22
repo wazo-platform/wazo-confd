@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
-from flask import Response
 from flask import url_for
 
 from xivo_dao.alchemy.moh import MOH
