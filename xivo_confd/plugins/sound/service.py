@@ -12,9 +12,10 @@ from .converter import convert_ari_sounds_to_model
 
 class SoundService(object):
 
-    def __init__(self, ari_client, storage, validator, validator_file, notifier):
-        self._storage = storage
+    def __init__(self, ari_client, storage, asterisk_storage, validator, validator_file, notifier):
         self._ari_client = ari_client
+        self._storage = storage
+        self._asterisk_storage = asterisk_storage
         self.validator = validator
         self.validator_file = validator_file
         self.notifier = notifier
@@ -51,8 +52,7 @@ class SoundService(object):
 
     def load_file(self, sound, filename):
         if sound.name == ASTERISK_CATEGORY:
-            # XXX return Asterisk sound binary
-            sound = object()
+            sound = self._asterisk_storage.load_file(SoundCategory(name=''), filename)
         else:
             sound = self._storage.load_file(sound, filename)
         return sound
@@ -69,6 +69,7 @@ class SoundService(object):
 def build_service(ari_client):
     return SoundService(ari_client,
                         build_storage(),
+                        build_storage(base_path='/usr/share/asterisk/sounds'),
                         build_validator(),
                         build_validator_file(),
                         build_notifier())
