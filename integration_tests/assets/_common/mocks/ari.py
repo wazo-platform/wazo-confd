@@ -70,7 +70,7 @@ def set_response():
 
 @app.route('/ari/sounds', methods=['GET'])
 def get_sounds():
-    return make_response(json.dumps(_responses['sounds']), 200, {'Content-Type': 'application/json'})
+    return make_response(json.dumps(_responses.get('sounds', [])), 200, {'Content-Type': 'application/json'})
 
 
 _reset()

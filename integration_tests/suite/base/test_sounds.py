@@ -17,7 +17,7 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from . import BaseIntegrationTest
-from . import confd
+from . import confd, ari
 
 
 def test_get_errors():
@@ -64,7 +64,11 @@ def unique_error_checks(url, sound):
 @fixtures.sound()
 def test_list(sound1, sound2):
     response = confd.sounds.get()
-    assert_that(response.items, has_items(sound1, sound2))
+    assert_that(response.items, has_items(
+        sound1,
+        sound2,
+        has_entries(name='system'),
+    ))
 
 
 @fixtures.sound()
@@ -95,6 +99,41 @@ def test_get_with_files(sound):
             )
         ))
     ))
+
+
+def test_get_system_sound():
+    sounds = [
+        {'id': 'conf-now-unmuted',
+         'formats': [{'language': 'fr_CA',
+                      'format': 'slin'},
+                     {'language': 'en_US',
+                      'format': 'slin'},
+                     {'language': 'en',
+                      'format': 'gsm'}],
+         'text': 'The conference is now unmuted.'},
+    ]
+    ari.set_sounds(sounds)
+
+    response = confd.sounds('system').get()
+
+    assert_that(response.item, has_entries(
+        name='system',
+        files=contains_inanyorder(has_entries(
+            name=sounds[0]['id'],
+            formats=contains_inanyorder(
+                has_entries(format=sounds[0]['formats'][0]['format'],
+                            language=sounds[0]['formats'][0]['language'],
+                            text=None),
+                has_entries(format=sounds[0]['formats'][1]['format'],
+                            language=sounds[0]['formats'][1]['language'],
+                            text=sounds[0]['text']),
+                has_entries(format=sounds[0]['formats'][2]['format'],
+                            language=sounds[0]['formats'][2]['language'],
+                            text=sounds[0]['text']),
+            )
+        ))
+    ))
+    ari.reset()
 
 
 def test_get_internal_folder():

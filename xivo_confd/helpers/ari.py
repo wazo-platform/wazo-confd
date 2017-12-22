@@ -32,7 +32,7 @@ class Client(object):
         )
         self._params = {'api_key': '{}:{}'.format(username, password)}
 
-    def get_sounds_languages(self):
+    def get_sounds(self):
         url = '{base_url}/sounds'.format(base_url=self._base_url)
         try:
             response = requests.get(url, params=self._params)
@@ -43,8 +43,11 @@ class Client(object):
             raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
 
         response.raise_for_status()
+        return response.json()
 
-        languages = self._extract_sounds_languages(response.json())
+    def get_sounds_languages(self):
+        sounds = self.get_sounds()
+        languages = self._extract_sounds_languages(sounds)
         sound_languages = [{'tag': language} for language in languages]
         sound_languages = self._remove_non_standard_tag(sound_languages)
         return sound_languages

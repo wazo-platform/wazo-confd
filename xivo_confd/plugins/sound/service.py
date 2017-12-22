@@ -7,29 +7,36 @@ from .notifier import build_notifier
 from .schema import ASTERISK_CATEGORY
 from .storage import build_storage
 from .validator import build_validator, build_validator_file
+from .converter import convert_ari_sounds_to_model
 
 
 class SoundService(object):
 
-    def __init__(self, storage, validator, validator_file, notifier):
+    def __init__(self, ari_client, storage, validator, validator_file, notifier):
         self._storage = storage
+        self._ari_client = ari_client
         self.validator = validator
         self.validator_file = validator_file
         self.notifier = notifier
 
     def search(self, parameters):
-        # XXX get Asterisk sounds
+        sound_system = self._get_asterisk_sound()
         sounds = self._storage.list_directories()
-        # XXX merge Asterisk sounds
+        sounds.append(sound_system)
         total = len(sounds)
         return total, sounds
 
     def get(self, sound_name):
         if sound_name == ASTERISK_CATEGORY:
-            # XXX return Asterisk sounds
-            sound = SoundCategory(name='system')
+            sound = self._get_asterisk_sound()
         else:
             sound = self._storage.get_directory(sound_name)
+        return sound
+
+    def _get_asterisk_sound(self):
+        sound = SoundCategory(name='system')
+        ari_sounds = self._ari_client.get_sounds()
+        sound.files = convert_ari_sounds_to_model(ari_sounds)
         return sound
 
     def create(self, sound):
@@ -59,8 +66,9 @@ class SoundService(object):
         self._storage.remove_file(sound, filename)
 
 
-def build_service():
-    return SoundService(build_storage(),
+def build_service(ari_client):
+    return SoundService(ari_client,
+                        build_storage(),
                         build_validator(),
                         build_validator_file(),
                         build_notifier())
