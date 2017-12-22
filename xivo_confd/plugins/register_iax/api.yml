@@ -36,7 +36,7 @@ paths:
         '201':
           description: Register IAX created
           schema:
-            $ref: '#/definitions/RegisterIAX '
+            $ref: '#/definitions/RegisterIAX'
         '400':
           $ref: '#/responses/CreateError'
   /registers/iax/{register_iax_id}:

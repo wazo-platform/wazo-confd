@@ -36,7 +36,7 @@ paths:
         '201':
           description: Register SIP created
           schema:
-            $ref: '#/definitions/RegisterSIP '
+            $ref: '#/definitions/RegisterSIP'
         '400':
           $ref: '#/responses/CreateError'
   /registers/sip/{register_sip_id}:

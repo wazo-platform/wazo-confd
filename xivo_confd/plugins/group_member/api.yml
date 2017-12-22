@@ -88,5 +88,3 @@ definitions:
       priority:
         type: integer
         description: priority of extension in the group. Only used for linear ring strategy
-    required:
-      - uuid
