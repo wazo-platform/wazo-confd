@@ -1,6 +1,6 @@
 ## Image to build from sources
 
-FROM python:2.7.9
+FROM python:2.7.13
 MAINTAINER Wazo Maintainers <dev@wazo.community>
 
 # Configure environment
