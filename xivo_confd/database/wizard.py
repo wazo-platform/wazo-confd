@@ -182,7 +182,7 @@ def set_phonebook(entity, phonebook_body):
         available_directories.append('wazophonebook')
         profile.directories = ','.join(available_directories)
         Session.add(profile)
-    Session.add(CtiReverseDirectories(directories='[wazophonebook]'))
+    Session.add(CtiReverseDirectories(directories='["wazophonebook"]'))
 
 
 def include_outcall_context_in_internal_context():
