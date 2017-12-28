@@ -766,7 +766,7 @@ class DatabaseQueries(object):
         return self.connection.execute(query).scalar() == 2  # default and __switchboard
 
     def profile_as_phonebook_for_reverse_lookup(self):
-        query = text("""select count(id) from ctireversedirectories where directories like '%wazophonebook%'""")
+        query = text("""select count(id) from ctireversedirectories where directories like '%"wazophonebook"%'""")
         return self.connection.execute(query).scalar() == 1
 
     def phonebook_source_is_configured(self):
