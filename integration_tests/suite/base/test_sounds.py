@@ -5,6 +5,7 @@
 
 from hamcrest import (
     assert_that,
+    any_of,
     contains,
     contains_inanyorder,
     empty,
@@ -81,8 +82,14 @@ def test_get(sound):
 @fixtures.sound()
 def test_get_with_files(sound):
     client = _new_sound_file_client()
-    client.url.sounds(sound['name']).files('ivr').put(content='ivrwav', query_string={'format': 'wav'}).assert_updated()
-    client.url.sounds(sound['name']).files('ivr').put(content='ivrogg', query_string={'format': 'ogg'}).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivrwav',
+        query_string={'format': 'wav', 'language': 'fr_FR'},
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivrogg',
+        query_string={'format': 'ogg', 'language': 'en_US'}
+    ).assert_updated()
 
     response = confd.sounds(sound['name']).get()
     assert_that(response.item, has_entries(
@@ -91,14 +98,61 @@ def test_get_with_files(sound):
             name='ivr',
             formats=contains_inanyorder(
                 has_entries(format='wav',
-                            language=None,
+                            language='fr_FR',
                             text=None),
                 has_entries(format='ogg',
-                            language=None,
+                            language='en_US',
                             text=None),
             )
         ))
     ))
+
+
+@fixtures.sound()
+def test_get_file(sound):
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_wav_fr_FR',
+        query_string={'format': 'wav', 'language': 'fr_FR'},
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_ogg_fr_FR',
+        query_string={'format': 'ogg', 'language': 'fr_FR'}
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_ogg_fr_CA',
+        query_string={'format': 'ogg', 'language': 'fr_CA'}
+    ).assert_updated()
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
+    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_ogg_fr_CA'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
+    assert_that(response.raw, equal_to('ivr_ogg_fr_FR'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
+    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_wav_fr_FR'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'wav', 'language': 'fr_FR'})
+    assert_that(response.raw, equal_to('ivr_wav_fr_FR'))
+
+
+@fixtures.sound()
+def test_get_file_errors(sound):
+    response = confd.sounds(sound['name']).files('ivr').get()
+    response.assert_status(404)
+
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_wav_fr_FR',
+        query_string={'format': 'wav', 'language': 'fr_FR'},
+    ).assert_updated()
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'wav', 'language': 'invalid'})
+    response.assert_status(404)
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
+    response.assert_status(404)
 
 
 def test_get_system_sound():
