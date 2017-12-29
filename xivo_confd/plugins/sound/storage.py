@@ -28,7 +28,7 @@ class _SoundFilesystemStorage(object):
         self._base_path = base_path
 
     def _build_path(self, *fragments):
-        return os.path.join(self._base_path, *[fragment.encode('utf-8') for fragment in fragments])
+        return os.path.join(self._base_path, *[fragment.encode('utf-8') for fragment in fragments if fragment])
 
     def list_directories(self, parameters):
         try:
@@ -91,7 +91,7 @@ class _SoundFilesystemStorage(object):
 
                     try:
                         for lang_file in os.listdir(full_name):
-                            sound_file = self._create_sound_file(lang_file, language=file_)
+                            sound_file = self._create_sound_file(lang_file, language=file_, category=sound.name)
                             sound.add_file(sound_file)
                     except OSError as e:
                         logger.error('Could not list sound language directory %s: %s', full_name, e)
@@ -123,14 +123,12 @@ class _SoundFilesystemStorage(object):
         sound.files = files_filtered
         return sound
 
-    def _create_sound_file(self, filename_ext, language=None):
+    def _create_sound_file(self, filename_ext, language=None, category=None):
         filename, extension = os.path.splitext(filename_ext)
-        formats = [self._create_sound_format(extension, language)]
-        return SoundFile(name=filename, formats=formats)
-
-    def _create_sound_format(self, extension, language):
         format_ = extension.strip('.') if extension else extension
-        return SoundFormat(format_=format_, language=language)
+        path = self._build_path(category, language, filename)
+        sound_format = SoundFormat(format_=format_, language=language, path=path)
+        return SoundFile(name=filename, formats=[sound_format])
 
     def load_file(self, sound):
         path = self._get_first_file_path(sound)

@@ -42,12 +42,14 @@ class SoundFile(object):
 
 class SoundFormat(object):
 
-    def __init__(self, format_=None, language=None, text=None):
+    def __init__(self, format_=None, language=None, text=None, path=None):
         self.format = format_
         self.language = language
         self.text = text
+        self.path = path
 
     def __eq__(self, other):
         return (self.format == other.format
                 and self.language == other.language
-                and self.text == other.text)
+                and self.text == other.text
+                and self.path == other.path)

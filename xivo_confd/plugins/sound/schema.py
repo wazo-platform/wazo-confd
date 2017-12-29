@@ -23,6 +23,7 @@ class SoundFormatSchema(BaseSchema):
     format = fields.String()
     language = fields.String()
     text = fields.String()
+    path = fields.String()
 
 
 class SoundFileSchema(BaseSchema):

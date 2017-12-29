@@ -99,9 +99,11 @@ def test_get_with_files(sound):
             formats=contains_inanyorder(
                 has_entries(format='wav',
                             language='fr_FR',
+                            path='/var/lib/xivo/sounds/{}/fr_FR/ivr'.format(sound['name']),
                             text=None),
                 has_entries(format='ogg',
                             language='en_US',
+                            path='/var/lib/xivo/sounds/{}/en_US/ivr'.format(sound['name']),
                             text=None),
             )
         ))
