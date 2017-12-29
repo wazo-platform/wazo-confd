@@ -65,7 +65,6 @@ def set_response():
     set_response = request_body['response']
     set_response_body = request_body['content']
     _responses[set_response] = set_response_body
-    logger.critical(_responses)
     return '', 204
 
 
