@@ -27,18 +27,19 @@ class SoundService(object):
         total = len(sounds)
         return total, sounds
 
-    def get(self, sound_name, parameters=None):
+    def get(self, sound_name, parameters=None, with_files=True):
         parameters = parameters if parameters is not None else {}
         if sound_name == ASTERISK_CATEGORY:
-            sound = self._get_asterisk_sound(parameters)
+            sound = self._get_asterisk_sound(parameters, with_files)
         else:
-            sound = self._storage.get_directory(sound_name, parameters)
+            sound = self._storage.get_directory(sound_name, parameters, with_files)
         return sound
 
-    def _get_asterisk_sound(self, parameters):
+    def _get_asterisk_sound(self, parameters, with_files=True):
         sound = SoundCategory(name='system')
-        ari_sounds = self._ari_client.get_sounds(parameters)
-        sound.files = convert_ari_sounds_to_model(ari_sounds)
+        if with_files:
+            ari_sounds = self._ari_client.get_sounds(parameters)
+            sound.files = convert_ari_sounds_to_model(ari_sounds)
         return sound
 
     def create(self, sound):

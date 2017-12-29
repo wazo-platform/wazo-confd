@@ -61,8 +61,7 @@ class SoundFileItem(ConfdResource):
     @required_acl('confd.sounds.{name}.files.{filename}.update')
     def put(self, name, filename):
         parameters = SoundQueryParametersSchema().load(request.args).data
-        # XXX call exists instead get to avoid getting all files
-        sound = self.service.get(name)
+        sound = self.service.get(name, with_files=False)
         sound_file = SoundFile(
             name=filename,
             formats=[SoundFormat(format_=parameters.get('format'), language=parameters.get('language'))],

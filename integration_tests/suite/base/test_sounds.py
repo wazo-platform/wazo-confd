@@ -285,6 +285,9 @@ def test_put_filename_errors(sound):
         response = client.url.sounds(invalid_name).files('foo').put()
         response.assert_status(404)
 
+    response = client.url.sounds('invalid').files('foo').put()
+    response.assert_status(404)
+
 
 @fixtures.sound()
 def test_delete_file_multiple(sound):

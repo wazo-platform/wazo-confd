@@ -45,11 +45,15 @@ class _SoundFilesystemStorage(object):
                 if os.path.isdir(self._build_path(name))
                 and name not in RESERVED_DIRECTORIES]
 
-    def get_directory(self, sound_name, parameters):
+    def get_directory(self, sound_name, parameters, with_files=True):
         if sound_name in RESERVED_DIRECTORIES:
             raise errors.not_found('Sound', name=sound_name)
         sound = SoundCategory(name=sound_name)
-        sound = self._populate_files(sound, parameters)
+        if with_files:
+            sound = self._populate_files(sound, parameters)
+        else:
+            if not os.path.exists(self._build_path(sound.name)):
+                raise errors.not_found('Sound', name=sound.name)
         return sound
 
     def create_directory(self, sound):
