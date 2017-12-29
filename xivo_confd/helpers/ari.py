@@ -32,8 +32,12 @@ class Client(object):
         )
         self._params = {'api_key': '{}:{}'.format(username, password)}
 
-    def get_sounds(self):
+    def get_sounds(self, params=None):
         url = '{base_url}/sounds'.format(base_url=self._base_url)
+        if params and 'language' in params:
+            self._params['lang'] = params['language']
+        if params and 'format' in params:
+            self._params['format'] = params['format']
         try:
             response = requests.get(url, params=self._params)
         except RequestException as e:

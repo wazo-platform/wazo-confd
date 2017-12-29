@@ -14,6 +14,11 @@ RESERVED_DIRECTORIES_ERROR = "The following name are reserved for internal usage
 DIRECTORY_REGEX = r'^[a-zA-Z0-9]{1}[-_.a-zA-Z0-9]+$'
 
 
+class SoundQueryParametersSchema(BaseSchema):
+    format = fields.String()
+    language = fields.String(validate=[Regexp(DIRECTORY_REGEX)])
+
+
 class SoundFormatSchema(BaseSchema):
     format = fields.String()
     language = fields.String()

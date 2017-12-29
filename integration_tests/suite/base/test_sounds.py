@@ -81,8 +81,8 @@ def test_get(sound):
 @fixtures.sound()
 def test_get_with_files(sound):
     client = _new_sound_file_client()
-    client.url.sounds(sound['name']).files('ivr.wav').put(content='ivrwav').assert_updated()
-    client.url.sounds(sound['name']).files('ivr.ogg').put(content='ivrogg').assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(content='ivrwav', query_string={'format': 'wav'}).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(content='ivrogg', query_string={'format': 'ogg'}).assert_updated()
 
     response = confd.sounds(sound['name']).get()
     assert_that(response.item, has_entries(
@@ -192,24 +192,24 @@ def test_add_update_delete_filename(sound):
     client = _new_sound_file_client()
 
     # add a new file
-    response = client.url.sounds(sound['name']).files('foo.wav').put(content='content is not checked')
+    response = client.url.sounds(sound['name']).files('foo').put(content='content is not checked')
     response.assert_status(204)
 
-    response = client.url.sounds(sound['name']).files('foo.wav').get()
+    response = client.url.sounds(sound['name']).files('foo').get()
     assert_that(response.raw, equal_to('content is not checked'))
 
     response = confd.sounds(sound['name']).get()
-    assert_that(response.item, has_entries(files=contains({'name': 'foo.wav'})))
+    assert_that(response.item, has_entries(files=contains(has_entries(name='foo'))))
 
     # update/overwrite the file
-    response = client.url.sounds(sound['name']).files('foo.wav').put(content='some new content')
+    response = client.url.sounds(sound['name']).files('foo').put(content='some new content')
     response.assert_status(204)
 
-    response = client.url.sounds(sound['name']).files('foo.wav').get()
+    response = client.url.sounds(sound['name']).files('foo').get()
     assert_that(response.raw, equal_to('some new content'))
 
     # delete the file
-    response = client.url.sounds(sound['name']).files('foo.wav').delete()
+    response = client.url.sounds(sound['name']).files('foo').delete()
     response.assert_deleted()
 
     response = confd.sounds(sound['name']).get()
@@ -220,27 +220,27 @@ def test_add_update_delete_filename(sound):
 def test_put_filename_errors(sound):
     client = _new_sound_file_client()
     filenames = [
-        '.foo.wav',
-        'foo/bar.wav',
-        '../bar.wav',
+        '.foo',
+        'foo/bar',
+        '../bar',
     ]
     for filename in filenames:
         response = client.url.sounds(sound['name']).files(filename).put(content='content is not checked')
         response.assert_status(404)
 
     for invalid_name in ['.foo', 'foo/bar', '../bar']:
-        response = client.url.sounds(invalid_name).files('foo.wav').put(content='content is not checked')
+        response = client.url.sounds(invalid_name).files('foo').put(content='content is not checked')
         response.assert_status(404)
 
 
 def test_update_system_filename():
     client = _new_sound_file_client()
-    response = client.url.sounds('system').files('foo.wav').put(content='content is not checked')
+    response = client.url.sounds('system').files('foo').put(content='content is not checked')
     response.assert_status(400)
 
 
 def test_delete_system_filename():
-    response = confd.sounds('system').files('foo.wav').delete()
+    response = confd.sounds('system').files('foo').delete()
     response.assert_status(400)
 
 

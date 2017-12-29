@@ -21,22 +21,23 @@ class SoundService(object):
         self.notifier = notifier
 
     def search(self, parameters):
-        sound_system = self._get_asterisk_sound()
-        sounds = self._storage.list_directories()
+        sound_system = self._get_asterisk_sound(parameters)
+        sounds = self._storage.list_directories(parameters)
         sounds.append(sound_system)
         total = len(sounds)
         return total, sounds
 
-    def get(self, sound_name):
+    def get(self, sound_name, parameters=None):
+        parameters = parameters if parameters is not None else {}
         if sound_name == ASTERISK_CATEGORY:
-            sound = self._get_asterisk_sound()
+            sound = self._get_asterisk_sound(parameters)
         else:
-            sound = self._storage.get_directory(sound_name)
+            sound = self._storage.get_directory(sound_name, parameters)
         return sound
 
-    def _get_asterisk_sound(self):
+    def _get_asterisk_sound(self, parameters):
         sound = SoundCategory(name='system')
-        ari_sounds = self._ari_client.get_sounds()
+        ari_sounds = self._ari_client.get_sounds(parameters)
         sound.files = convert_ari_sounds_to_model(ari_sounds)
         return sound
 

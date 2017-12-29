@@ -52,18 +52,20 @@ class SoundFileItem(ConfdResource):
 
     @required_acl('confd.sounds.{name}.files.{filename}.read')
     def get(self, name, filename):
-        # XXX extract query string
-        sounds = self.service.get(name)
+        parameters = SoundQueryParametersSchema().load(request.args).data
+        parameters['file_name'] = filename
+        sound = self.service.get(name, parameters)
         response = self.service.load_first_file(sound)
         return response
 
     @required_acl('confd.sounds.{name}.files.{filename}.update')
     def put(self, name, filename):
-        # XXX extract query string
+        parameters = SoundQueryParametersSchema().load(request.args).data
         # XXX call exists instead get to avoid getting all files
         sound = self.service.get(name)
         sound_file = SoundFile(
             name=filename,
+            formats=[SoundFormat(format_=parameters.get('format'), language=parameters.get('language'))],
         )
         sound.files = [sound_file]
         self.service.save_first_file(sound, request.data)
@@ -71,7 +73,8 @@ class SoundFileItem(ConfdResource):
 
     @required_acl('confd.sounds.{name}.files.{filename}.delete')
     def delete(self, name, filename):
-        # XXX extract query string
-        sounds = self.service.get(name)
+        parameters = SoundQueryParametersSchema().load(request.args).data
+        parameters['file_name'] = filename
+        sound = self.service.get(name, parameters)
         self.service.delete_files(sound)
         return '', 204
