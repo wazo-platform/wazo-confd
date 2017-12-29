@@ -54,19 +54,18 @@ class SoundService(object):
     def load_first_file(self, sound):
         if sound.name == ASTERISK_CATEGORY:
             sound.name = ''
-            sound = self._asterisk_storage.load_file(sound)
+            sound = self._asterisk_storage.load_first_file(sound)
         else:
-            sound = self._storage.load_file(sound)
+            sound = self._storage.load_first_file(sound)
         return sound
 
     def save_first_file(self, sound, content):
         self.validator_file.validate_edit(sound)
-        self._storage.save_file(sound, content)
+        self._storage.save_first_file(sound, content)
 
     def delete_files(self, sound):
         self.validator_file.validate_delete(sound)
-        # XXX Remove all sound.files
-        self._storage.remove_file(sound)
+        self._storage.remove_files(sound)
 
 
 def build_service(ari_client):

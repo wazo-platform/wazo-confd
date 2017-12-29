@@ -289,6 +289,28 @@ def test_put_filename_errors(sound):
         response.assert_status(404)
 
 
+@fixtures.sound()
+def test_delete_file_multiple(sound):
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr',
+        query_string={'format': 'wav', 'language': 'fr_FR'},
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr',
+        query_string={'format': 'ogg'},
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr',
+        query_string={'format': 'wav', 'language': 'fr_CA'},
+    ).assert_updated()
+
+    confd.sounds(sound['name']).files('ivr').delete().assert_deleted()
+
+    response = confd.sounds(sound['name']).files('ivr').get()
+    response.assert_status(404)
+
+
 def test_update_system_filename():
     client = _new_sound_file_client()
     response = client.url.sounds('system').files('foo').put(content='content is not checked')

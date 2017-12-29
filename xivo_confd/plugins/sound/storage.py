@@ -130,34 +130,40 @@ class _SoundFilesystemStorage(object):
         sound_format = SoundFormat(format_=format_, language=language, path=path)
         return SoundFile(name=filename, formats=[sound_format])
 
-    def load_file(self, sound):
+    def load_first_file(self, sound):
         path = self._get_first_file_path(sound)
         if not os.path.isfile(path):
             raise errors.not_found('Sound file', name=sound.name, path=path)
         return send_file(path, mimetype='application/octet-stream')
 
-    def save_file(self, sound, content):
+    def save_first_file(self, sound, content):
         path = self._get_first_file_path(sound)
         self._ensure_directory(os.path.dirname(path))
         with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o660), 'wb') as fobj:
             return fobj.write(content)
 
-    def remove_file(self, sound):
-        path = self._get_first_file_path(sound)
+    def remove_files(self, sound):
+        paths = self._get_file_paths(sound)
         try:
-            os.remove(path)
+            for path in paths:
+                os.remove(path)
         except OSError as e:
             if e.errno == errno.ENOENT:
                 raise errors.not_found('Sound file', name=sound.name, path=path)
             raise
 
     def _get_first_file_path(self, sound):
-        if not sound.files or not sound.files[0].formats:
-            raise errors.not_found('Sound file', name=sound.name)
+        for path in self._get_file_paths(sound):
+            return path
+        raise errors.not_found('Sound file', name=sound.name)
 
-        language = sound.files[0].formats[0].language or ''
-        filename = "{}.{}".format(sound.files[0].name, sound.files[0].formats[0].format)
-        return self._build_path(sound.name, language, filename)
+    def _get_file_paths(self, sound):
+        for file_ in sound.files:
+            return ['{}.{}'.format(
+                self._build_path(sound.name, format_.language, file_.name),
+                format_.format,
+            ) for format_ in file_.formats]
+        raise errors.not_found('Sound file', name=sound.name)
 
     def _ensure_directory(self, path):
         if not os.path.exists(path):
