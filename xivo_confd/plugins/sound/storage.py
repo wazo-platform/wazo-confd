@@ -55,7 +55,7 @@ class _SoundFilesystemStorage(object):
         if sound_name in RESERVED_DIRECTORIES:
             raise errors.not_found('Sound', name=sound_name)
         sound = SoundCategory(name=sound_name)
-        sound.files = self._list_sound_files(sound)
+        sound = self._populate_files(sound)
         return sound
 
     def create_directory(self, sound):
@@ -78,10 +78,25 @@ class _SoundFilesystemStorage(object):
             else:
                 logger.error('Could not remove sound directory %s: %s', e)
 
-    def _list_sound_files(self, sound):
+    def _populate_files(self, sound):
         path = self._directory_path(sound)
         try:
-            directories, files = self._list_directories_files(path)
+
+            for file_ in os.listdir(path):
+                full_name = self._path(path, file_)
+                if os.path.isfile(full_name):
+                    sound_file = self._create_sound_file(file_)
+                    sound.add_file(sound_file)
+
+                elif os.path.isdir(full_name):
+                    try:
+                        for lang_file in os.listdir(full_name):
+                            sound_file = self._create_sound_file(lang_file, language=file_)
+                            sound.add_file(sound_file)
+                    except OSError as e:
+                        logger.error('Could not list sound language directory %s: %s', full_name, e)
+                        continue
+
         except OSError as e:
             if e.errno == errno.ENOENT:
                 raise errors.not_found('Sound', name=sound.name)
@@ -89,53 +104,34 @@ class _SoundFilesystemStorage(object):
                 logger.error('Could not list sound directory %s: %s', path, e)
                 return []
 
-        result = {}
-        self._extract_and_merge_formats(result, files)
+        return sound
 
-        for directory in directories:
-            path = self._path(path, directory)
-            try:
-                files = os.listdir(path)
-            except OSError as e:
-                logger.error('Could not list sound language directory %s: %s', path, e)
                 continue
 
-            self._extract_and_merge_formats(result, files, language=directory)
+    def _create_sound_file(self, filename_ext, language=None):
+        filename, extension = os.path.splitext(filename_ext)
+        formats = [self._create_sound_format(extension, language)]
+        return SoundFile(name=filename, formats=formats)
 
-        return result.values()
+    def _create_sound_format(self, extension, language):
+        format_ = extension.strip('.') if extension else extension
+        return SoundFormat(format_=format_, language=language)
 
-    def _extract_and_merge_formats(self, result, files, language=None):
-        for file_ in files:
-            # XXX: convert extension to format (i.e. wav to slin)
-            filename, extension = os.path.splitext(file_)
-            extension = extension.strip('.') if extension else extension
-            sound_file = result.setdefault(filename, SoundFile(filename))
-            sound_file.formats.append(SoundFormat(format_=extension, language=language))
-        return result
-
-    def _list_directories_files(self, path):
-        directories = []
-        files = []
-        for name in os.listdir(path):
-            full_name = self._path(path, name)
-            if os.path.isfile(full_name):
-                files.append(name)
-            elif os.path.isdir(full_name):
-                directories.append(name)
-        return directories, files
-
-    def load_file(self, sound, filename):
+    def load_file(self, sound):
+        filename = self._get_first_filename(sound)
         path = self._filename_path(sound, filename)
         if not os.path.isfile(path):
             raise errors.not_found('Sound file', name=sound.name, filename=filename)
         return send_file(path, mimetype='application/octet-stream')
 
-    def save_file(self, sound, filename, content):
+    def save_file(self, sound, content):
+        filename = self._get_first_filename(sound)
         path = self._filename_path(sound, filename)
         with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o660), 'wb') as fobj:
             return fobj.write(content)
 
-    def remove_file(self, sound, filename):
+    def remove_file(self, sound):
+        filename = self._get_first_filename(sound)
         path = self._filename_path(sound, filename)
         try:
             os.remove(path)
@@ -143,3 +139,11 @@ class _SoundFilesystemStorage(object):
             if e.errno == errno.ENOENT:
                 raise errors.not_found('Sound file', name=sound.name, filename=filename)
             raise
+
+    def _get_first_filename(self, sound):
+        if not sound.files or not sound.files[0].formats:
+            raise errors.not_found('Sound file', name=sound.name)
+
+        # XXX change directory according to the language
+        filename = "{}.{}".format(sound.files[0].name, sound.files[0].formats[0].format)
+        return filename

@@ -8,8 +8,8 @@ from flask import url_for
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
-from .model import SoundCategory
-from .schema import SoundSchema
+from .model import SoundCategory, SoundFile, SoundFormat
+from .schema import SoundSchema, SoundQueryParametersSchema
 
 
 class SoundList(ListResource):
@@ -54,19 +54,24 @@ class SoundFileItem(ConfdResource):
     def get(self, name, filename):
         # XXX extract query string
         sounds = self.service.get(name)
-        response = self.service.load_file(sounds, filename)
+        response = self.service.load_first_file(sound)
         return response
 
     @required_acl('confd.sounds.{name}.files.{filename}.update')
     def put(self, name, filename):
         # XXX extract query string
-        sounds = self.service.get(name)
-        self.service.save_file(sounds, filename, request.data)
+        # XXX call exists instead get to avoid getting all files
+        sound = self.service.get(name)
+        sound_file = SoundFile(
+            name=filename,
+        )
+        sound.files = [sound_file]
+        self.service.save_first_file(sound, request.data)
         return '', 204
 
     @required_acl('confd.sounds.{name}.files.{filename}.delete')
     def delete(self, name, filename):
         # XXX extract query string
         sounds = self.service.get(name)
-        self.service.delete_file(sounds, filename)
+        self.service.delete_files(sound)
         return '', 204

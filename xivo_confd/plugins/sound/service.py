@@ -50,20 +50,22 @@ class SoundService(object):
         self._storage.remove_directory(sound)
         self.notifier.deleted(sound)
 
-    def load_file(self, sound, filename):
+    def load_first_file(self, sound):
         if sound.name == ASTERISK_CATEGORY:
-            sound = self._asterisk_storage.load_file(SoundCategory(name=''), filename)
+            sound.name = ''
+            sound = self._asterisk_storage.load_file(sound)
         else:
-            sound = self._storage.load_file(sound, filename)
+            sound = self._storage.load_file(sound)
         return sound
 
-    def save_file(self, sound, filename, content):
+    def save_first_file(self, sound, content):
         self.validator_file.validate_edit(sound)
-        self._storage.save_file(sound, filename, content)
+        self._storage.save_file(sound, content)
 
-    def delete_file(self, sound, filename):
+    def delete_files(self, sound):
         self.validator_file.validate_delete(sound)
-        self._storage.remove_file(sound, filename)
+        # XXX Remove all sound.files
+        self._storage.remove_file(sound)
 
 
 def build_service(ari_client):
