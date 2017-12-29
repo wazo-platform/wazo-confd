@@ -83,11 +83,9 @@ def test_get(sound):
 def test_get_with_files(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivrwav',
         query_string={'format': 'wav', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivrogg',
         query_string={'format': 'ogg', 'language': 'en_US'}
     ).assert_updated()
 
@@ -146,7 +144,6 @@ def test_get_file_errors(sound):
 
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_wav_fr_FR',
         query_string={'format': 'wav', 'language': 'fr_FR'},
     ).assert_updated()
 
@@ -281,11 +278,11 @@ def test_put_filename_errors(sound):
         '../bar',
     ]
     for filename in filenames:
-        response = client.url.sounds(sound['name']).files(filename).put(content='content is not checked')
+        response = client.url.sounds(sound['name']).files(filename).put()
         response.assert_status(404)
 
     for invalid_name in ['.foo', 'foo/bar', '../bar']:
-        response = client.url.sounds(invalid_name).files('foo').put(content='content is not checked')
+        response = client.url.sounds(invalid_name).files('foo').put()
         response.assert_status(404)
 
 
@@ -293,15 +290,12 @@ def test_put_filename_errors(sound):
 def test_delete_file_multiple(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr',
         query_string={'format': 'wav', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr',
         query_string={'format': 'ogg'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr',
         query_string={'format': 'wav', 'language': 'fr_CA'},
     ).assert_updated()
 
@@ -313,7 +307,7 @@ def test_delete_file_multiple(sound):
 
 def test_update_system_filename():
     client = _new_sound_file_client()
-    response = client.url.sounds('system').files('foo').put(content='content is not checked')
+    response = client.url.sounds('system').files('foo').put()
     response.assert_status(400)
 
 
@@ -325,9 +319,10 @@ def test_delete_system_filename():
 # XXX set this client in BaseIntegrationTest
 def _new_sound_file_client():
     def encoder(data):
+        default_content = 'I do not care of content'
         if data is None:
-            return None
-        return data['content']
+            return default_content
+        return data.get('content', default_content)
 
     return BaseIntegrationTest.new_client(headers={"Content-Type": "application/octet-stream",
                                                    "X-Auth-Token": "valid-token"}, encoder=encoder)
