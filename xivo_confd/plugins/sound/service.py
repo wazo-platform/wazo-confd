@@ -54,7 +54,7 @@ class SoundService(object):
 
     def load_first_file(self, sound):
         if sound.name == ASTERISK_CATEGORY:
-            sound.name = ''
+            sound.name = None
             sound = self._asterisk_storage.load_first_file(sound)
         else:
             sound = self._storage.load_first_file(sound)
