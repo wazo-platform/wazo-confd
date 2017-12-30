@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -45,7 +45,7 @@ class ExtenAvailableOnCreateValidator(ExtenAvailableValidator):
         self._validate_parking_lots(extension)
 
 
-class ExtenAvailabelOnUpdateValidator(ExtenAvailableValidator):
+class ExtenAvailableOnUpdateValidator(ExtenAvailableValidator):
 
     def validate(self, extension):
         existing = self.dao.find_by(exten=extension.exten,
@@ -148,7 +148,7 @@ def build_validator():
             ExtensionRangeValidator(context_dao),
         ],
         edit=[
-            ExtenAvailabelOnUpdateValidator(extension_dao, parking_lot_dao),
+            ExtenAvailableOnUpdateValidator(extension_dao, parking_lot_dao),
             ContextOnUpdateValidator(context_dao),
             ExtensionRangeValidator(context_dao),
         ],
