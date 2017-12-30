@@ -76,7 +76,7 @@ class ConfdClient(object):
     def post(self, url, body):
         return self.request('POST', url, data=body)
 
-    def put(self, url, body, parameters):
+    def put(self, url, body, parameters=None):
         return self.request('PUT', url, data=body, parameters=parameters)
 
     def delete(self, url):
