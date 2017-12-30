@@ -76,8 +76,8 @@ class ConfdClient(object):
     def post(self, url, body):
         return self.request('POST', url, data=body)
 
-    def put(self, url, body):
-        return self.request('PUT', url, data=body)
+    def put(self, url, body, parameters=None):
+        return self.request('PUT', url, data=body, parameters=parameters)
 
     def delete(self, url):
         return self.request('DELETE', url)
@@ -120,10 +120,10 @@ class RestUrlClient(UrlFragment):
         params = self._merge_params(params, body, self.body)
         return self.client.post(url, params)
 
-    def put(self, body=None, **params):
+    def put(self, body=None, query_string=None, **params):
         url = str(self)
         params = self._merge_params(params, body, self.body)
-        return self.client.put(url, params)
+        return self.client.put(url, params, query_string)
 
     def delete(self):
         url = str(self)

@@ -97,6 +97,17 @@ Changelog
   * GET `/1.1/asterisk/features/general`
   * PUT `/1.1/asterisk/features/general`
 
+* A new API for managing :abbr:`Sounds`:
+
+  * GET `/1.1/sounds`
+  * POST `/1.1/sounds`
+  * DELETE `/1.1/sounds/<sound_id>`
+  * GET `/1.1/sounds/<sound_id>`
+  * PUT `/1.1/sounds/<sound_id>`
+  * DELETE `/1.1/sounds/<sound_id>/files/<filename>`
+  * GET `/1.1/sounds/<sound_id>/files/<filename>`
+  * PUT `/1.1/sounds/<sound_id>/files/<filename>`
+
 
 17.17
 -----

@@ -141,6 +141,7 @@ from . import queue_extension
 from . import queue_member_agent
 from . import register_iax
 from . import register_sip
+from . import sound
 from . import schedule
 from . import schedule_entity
 from . import switchboard
@@ -218,6 +219,7 @@ __all__ = [
     'queue_member_agent',
     'register_iax',
     'register_sip',
+    'sound',
     'schedule',
     'schedule_entity',
     'switchboard',
