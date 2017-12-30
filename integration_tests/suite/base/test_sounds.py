@@ -108,81 +108,6 @@ def test_get_with_files(sound):
     ))
 
 
-@fixtures.sound()
-def test_get_file(sound):
-    client = _new_sound_file_client()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_slin_fr_FR',
-        query_string={'format': 'slin', 'language': 'fr_FR'},
-    ).assert_updated()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_ogg_fr_FR',
-        query_string={'format': 'ogg', 'language': 'fr_FR'}
-    ).assert_updated()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_ogg_fr_CA',
-        query_string={'format': 'ogg', 'language': 'fr_CA'}
-    ).assert_updated()
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
-    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_ogg_fr_CA'))
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
-    assert_that(response.raw, equal_to('ivr_ogg_fr_FR'))
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
-    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_slin_fr_FR'))
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'fr_FR'})
-    assert_that(response.raw, equal_to('ivr_slin_fr_FR'))
-
-
-@fixtures.sound()
-def test_get_file_return_without_format_and_language_first(sound):
-    client = _new_sound_file_client()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_ogg_fr_FR',
-        query_string={'format': 'ogg', 'language': 'fr_FR'}
-    ).assert_updated()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_fr_FR',
-        query_string={'language': 'fr_FR'}
-    ).assert_updated()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_ogg',
-        query_string={'format': 'ogg'}
-    ).assert_updated()
-    client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr',
-    ).assert_updated()
-
-    response = confd.sounds(sound['name']).files('ivr').get()
-    assert_that(response.raw, equal_to('ivr'))
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
-    assert_that(response.raw, equal_to('ivr_ogg'))
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
-    assert_that(response.raw, equal_to('ivr_fr_FR'))
-
-
-@fixtures.sound()
-def test_get_file_errors(sound):
-    response = confd.sounds(sound['name']).files('ivr').get()
-    response.assert_status(404)
-
-    client = _new_sound_file_client()
-    client.url.sounds(sound['name']).files('ivr').put(
-        query_string={'format': 'slin', 'language': 'fr_FR'},
-    ).assert_updated()
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'invalid'})
-    response.assert_status(404)
-
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
-    response.assert_status(404)
-
-
 def test_get_system_sound():
     sounds = [
         {'id': 'conf-now-unmuted',
@@ -270,7 +195,102 @@ def test_delete_internal_folder():
 
 
 @fixtures.sound()
-def test_add_update_delete_filename(sound):
+def test_get_file_errors(sound):
+    response = confd.sounds(sound['name']).files('ivr').get()
+    response.assert_status(404)
+
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr').put(
+        query_string={'format': 'slin', 'language': 'fr_FR'},
+    ).assert_updated()
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'invalid'})
+    response.assert_status(404)
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
+    response.assert_status(404)
+
+
+@fixtures.sound()
+def test_put_file_errors(sound):
+    client = _new_sound_file_client()
+    filenames = [
+        '.foo',
+        'foo/bar',
+        '../bar',
+    ]
+    for filename in filenames:
+        response = client.url.sounds(sound['name']).files(filename).put()
+        response.assert_status(404)
+
+    for invalid_name in ['.foo', 'foo/bar', '../bar']:
+        response = client.url.sounds(invalid_name).files('foo').put()
+        response.assert_status(404)
+
+    response = client.url.sounds('invalid').files('foo').put()
+    response.assert_status(404)
+
+
+@fixtures.sound()
+def test_get_file(sound):
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_slin_fr_FR',
+        query_string={'format': 'slin', 'language': 'fr_FR'},
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_ogg_fr_FR',
+        query_string={'format': 'ogg', 'language': 'fr_FR'}
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_ogg_fr_CA',
+        query_string={'format': 'ogg', 'language': 'fr_CA'}
+    ).assert_updated()
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
+    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_ogg_fr_CA'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
+    assert_that(response.raw, equal_to('ivr_ogg_fr_FR'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
+    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_slin_fr_FR'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'fr_FR'})
+    assert_that(response.raw, equal_to('ivr_slin_fr_FR'))
+
+
+@fixtures.sound()
+def test_get_file_return_without_format_and_language_first(sound):
+    client = _new_sound_file_client()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_ogg_fr_FR',
+        query_string={'format': 'ogg', 'language': 'fr_FR'}
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_fr_FR',
+        query_string={'language': 'fr_FR'}
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr_ogg',
+        query_string={'format': 'ogg'}
+    ).assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put(
+        content='ivr',
+    ).assert_updated()
+
+    response = confd.sounds(sound['name']).files('ivr').get()
+    assert_that(response.raw, equal_to('ivr'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
+    assert_that(response.raw, equal_to('ivr_ogg'))
+
+    response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
+    assert_that(response.raw, equal_to('ivr_fr_FR'))
+
+
+@fixtures.sound()
+def test_add_update_delete_file(sound):
     client = _new_sound_file_client()
 
     # add a new file
@@ -299,26 +319,6 @@ def test_add_update_delete_filename(sound):
 
 
 @fixtures.sound()
-def test_put_filename_errors(sound):
-    client = _new_sound_file_client()
-    filenames = [
-        '.foo',
-        'foo/bar',
-        '../bar',
-    ]
-    for filename in filenames:
-        response = client.url.sounds(sound['name']).files(filename).put()
-        response.assert_status(404)
-
-    for invalid_name in ['.foo', 'foo/bar', '../bar']:
-        response = client.url.sounds(invalid_name).files('foo').put()
-        response.assert_status(404)
-
-    response = client.url.sounds('invalid').files('foo').put()
-    response.assert_status(404)
-
-
-@fixtures.sound()
 def test_delete_file_multiple(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
@@ -337,13 +337,13 @@ def test_delete_file_multiple(sound):
     response.assert_status(404)
 
 
-def test_update_system_filename():
+def test_update_system_file():
     client = _new_sound_file_client()
     response = client.url.sounds('system').files('foo').put()
     response.assert_status(400)
 
 
-def test_delete_system_filename():
+def test_delete_system_file():
     response = confd.sounds('system').files('foo').delete()
     response.assert_status(400)
 
