@@ -18,3 +18,23 @@ def convert_ari_sounds_to_model(sounds):
             sound_file.formats.append(sound_format)
         result.append(sound_file)
     return result
+
+
+class ExtensionFormatConverter(object):
+
+    extension_map = {
+        'wav': 'slin',
+    }
+    format_map = {v: k for k, v in extension_map.iteritems()}
+
+    @staticmethod
+    def extension_to_format(extension):
+        if extension is '':
+            return None
+        return ExtensionFormatConverter.extension_map.get(extension, extension)
+
+    @staticmethod
+    def format_to_extension(format_):
+        if format_ is None:
+            return ''
+        return ExtensionFormatConverter.format_map.get(format_, format_)

@@ -11,6 +11,7 @@ from flask import send_file
 from xivo_dao.helpers import errors
 
 from .model import SoundCategory, SoundFormat, SoundFile
+from .converter import ExtensionFormatConverter as EFConverter
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +130,8 @@ class _SoundFilesystemStorage(object):
 
     def _create_sound_file(self, filename_ext, language=None, category=None):
         filename, extension = os.path.splitext(filename_ext)
-        format_ = extension.strip('.') if extension else extension
+        extension = extension.strip('.') if extension else extension
+        format_ = EFConverter.extension_to_format(extension)
         path = self._build_path(category, language, filename)
         sound_format = SoundFormat(format_=format_, language=language, path=path)
         return SoundFile(name=filename, formats=[sound_format])
@@ -165,7 +167,7 @@ class _SoundFilesystemStorage(object):
         for file_ in sound.files:
             result = ['{}.{}'.format(
                 self._build_path(sound.name, format_.language, file_.name),
-                format_.format if format_.format else '',
+                EFConverter.format_to_extension(format_.format),
             ) for format_ in file_.formats]
             # Return path without language first, because we cannot
             # specify language=None in the parameters

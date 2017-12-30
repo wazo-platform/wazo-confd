@@ -83,7 +83,7 @@ def test_get(sound):
 def test_get_with_files(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        query_string={'format': 'wav', 'language': 'fr_FR'},
+        query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
         query_string={'format': 'ogg', 'language': 'en_US'}
@@ -95,7 +95,7 @@ def test_get_with_files(sound):
         files=contains_inanyorder(has_entries(
             name='ivr',
             formats=contains_inanyorder(
-                has_entries(format='wav',
+                has_entries(format='slin',
                             language='fr_FR',
                             path='/var/lib/xivo/sounds/{}/fr_FR/ivr'.format(sound['name']),
                             text=None),
@@ -112,8 +112,8 @@ def test_get_with_files(sound):
 def test_get_file(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        content='ivr_wav_fr_FR',
-        query_string={'format': 'wav', 'language': 'fr_FR'},
+        content='ivr_slin_fr_FR',
+        query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
         content='ivr_ogg_fr_FR',
@@ -131,10 +131,10 @@ def test_get_file(sound):
     assert_that(response.raw, equal_to('ivr_ogg_fr_FR'))
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
-    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_wav_fr_FR'))
+    assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_slin_fr_FR'))
 
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'wav', 'language': 'fr_FR'})
-    assert_that(response.raw, equal_to('ivr_wav_fr_FR'))
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'fr_FR'})
+    assert_that(response.raw, equal_to('ivr_slin_fr_FR'))
 
 
 @fixtures.sound()
@@ -173,10 +173,10 @@ def test_get_file_errors(sound):
 
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        query_string={'format': 'wav', 'language': 'fr_FR'},
+        query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
 
-    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'wav', 'language': 'invalid'})
+    response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'invalid'})
     response.assert_status(404)
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
@@ -322,13 +322,13 @@ def test_put_filename_errors(sound):
 def test_delete_file_multiple(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        query_string={'format': 'wav', 'language': 'fr_FR'},
+        query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
         query_string={'format': 'ogg'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        query_string={'format': 'wav', 'language': 'fr_CA'},
+        query_string={'format': 'slin', 'language': 'fr_CA'},
     ).assert_updated()
 
     confd.sounds(sound['name']).files('ivr').delete().assert_deleted()
