@@ -163,10 +163,14 @@ class _SoundFilesystemStorage(object):
 
     def _get_file_paths(self, sound):
         for file_ in sound.files:
-            return ['{}.{}'.format(
+            result = ['{}.{}'.format(
                 self._build_path(sound.name, format_.language, file_.name),
-                format_.format,
+                format_.format if format_.format else '',
             ) for format_ in file_.formats]
+            # Return path without language first, because we cannot
+            # specify language=None in the parameters
+            result.sort(key=len)
+            return result
         raise errors.not_found('Sound file', name=sound.name)
 
     def _ensure_directory(self, path):
