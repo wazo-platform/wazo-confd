@@ -120,7 +120,7 @@ class RestUrlClient(UrlFragment):
         params = self._merge_params(params, body, self.body)
         return self.client.post(url, params)
 
-    def put(self, query_string=None, body=None, **params):
+    def put(self, body=None, query_string=None, **params):
         url = str(self)
         params = self._merge_params(params, body, self.body)
         return self.client.put(url, params, query_string)
