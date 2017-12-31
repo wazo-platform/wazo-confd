@@ -43,8 +43,8 @@ class _SoundFilesystemStorage(object):
 
     def _list_directories(self):
         return [name for name in os.listdir(self._base_path)
-                if os.path.isdir(self._build_path(name))
-                and name not in RESERVED_DIRECTORIES]
+                if os.path.isdir(self._build_path(name)) and
+                name not in RESERVED_DIRECTORIES]
 
     def get_directory(self, sound_name, parameters, with_files=True):
         if sound_name in RESERVED_DIRECTORIES:
@@ -75,7 +75,7 @@ class _SoundFilesystemStorage(object):
             if e.errno == errno.ENOENT:
                 logger.info('Sound directory %s already removed', path)
             else:
-                logger.error('Could not remove sound directory %s: %s', e)
+                logger.error('Could not remove sound directory %s: %s', path, e)
 
     def _populate_files(self, sound, parameters):
         # XXX Can be improved by doing only the right request when parameters is set

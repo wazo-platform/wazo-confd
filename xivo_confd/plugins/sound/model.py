@@ -49,7 +49,7 @@ class SoundFormat(object):
         self.path = path
 
     def __eq__(self, other):
-        return (self.format == other.format
-                and self.language == other.language
-                and self.text == other.text
-                and self.path == other.path)
+        return (self.format == other.format and
+                self.language == other.language and
+                self.text == other.text and
+                self.path == other.path)

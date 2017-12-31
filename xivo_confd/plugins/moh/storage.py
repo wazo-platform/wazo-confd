@@ -49,7 +49,7 @@ class _MohFilesystemStorage(object):
             if e.errno == errno.ENOENT:
                 logger.info('MOH directory %s already removed', path)
             else:
-                logger.error('Could not remove MOH directory %s: %s', e)
+                logger.error('Could not remove MOH directory %s: %s', path, e)
 
     def list_files(self, moh):
         path = self._directory_path(moh)
