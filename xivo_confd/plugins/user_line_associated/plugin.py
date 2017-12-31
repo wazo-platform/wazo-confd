@@ -10,8 +10,8 @@ from .resource import UserLineAssociatedEndpointSipItem
 
 class Plugin(object):
 
-    def load(self, core):
-        api = core['api']
+    def load(self, dependencies):
+        api = dependencies['api']
 
         api.add_resource(
             UserLineAssociatedEndpointSipItem,

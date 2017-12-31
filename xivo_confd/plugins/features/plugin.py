@@ -12,8 +12,8 @@ from .service import build_service
 
 class Plugin(object):
 
-    def load(self, core):
-        api = core['api']
+    def load(self, dependencies):
+        api = dependencies['api']
         service = build_service()
 
         api.add_resource(

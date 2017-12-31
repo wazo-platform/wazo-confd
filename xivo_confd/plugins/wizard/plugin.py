@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 
 class Plugin(object):
 
-    def load(self, core):
-        api = core['api']
-        config = core['config']
+    def load(self, dependencies):
+        api = dependencies['api']
+        config = dependencies['config']
         service_id = config['wizard']['service_id']
         service_key = config['wizard']['service_key']
         if not service_id or not service_key:
@@ -30,7 +30,7 @@ class Plugin(object):
                                  password=service_key,
                                  **config['auth'])
         dird_client = DirdClient(**config['dird'])
-        provd_client = core['provd_client']()
+        provd_client = dependencies['provd_client']()
 
         service = build_service(provd_client, auth_client, dird_client, infos_dao)
 

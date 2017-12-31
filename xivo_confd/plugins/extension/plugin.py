@@ -8,9 +8,9 @@ from .service import build_service
 
 class Plugin(object):
 
-    def load(self, core):
-        api = core['api']
-        provd_client = core['provd_client']()
+    def load(self, dependencies):
+        api = dependencies['api']
+        provd_client = dependencies['provd_client']()
 
         service = build_service(provd_client)
 

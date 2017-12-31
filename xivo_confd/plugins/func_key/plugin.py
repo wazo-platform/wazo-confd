@@ -21,10 +21,10 @@ from .service import build_service, build_user_funckey_template_service
 
 class Plugin(object):
 
-    def load(self, core):
-        api = core['api']
+    def load(self, dependencies):
+        api = dependencies['api']
 
-        provd_client = core['provd_client']()
+        provd_client = dependencies['provd_client']()
 
         service = build_service(provd_client)
         service_association = build_user_funckey_template_service(provd_client)
