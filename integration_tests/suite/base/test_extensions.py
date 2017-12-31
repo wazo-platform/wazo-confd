@@ -5,17 +5,19 @@
 import re
 import datetime
 
-from hamcrest import (assert_that,
-                      contains,
-                      contains_inanyorder,
-                      equal_to,
-                      empty,
-                      has_entry,
-                      has_entries,
-                      has_item,
-                      is_not,
-                      none,
-                      not_)
+from hamcrest import (
+    assert_that,
+    contains,
+    contains_inanyorder,
+    empty,
+    equal_to,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    none,
+    not_,
+)
 
 from ..helpers import associations as a
 from ..helpers import scenarios as s
@@ -269,9 +271,9 @@ def test_edit_extension_with_no_change_device_not_updated(user1, user2,
 
 
 @fixtures.extension_feature()
-def test_search_do_not_find_extension_feature(_):
+def test_search_do_not_find_extension_feature(extension):
     response = confd.extensions().get()
-    assert_that(response.items, empty())
+    assert_that(response.items, is_not(has_item(has_entries(context=extension['context']))))
 
 
 @fixtures.extension(exten='4999', context='default')
