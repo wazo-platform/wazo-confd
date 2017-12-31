@@ -114,6 +114,14 @@ Changelog
   * GET `/1.1/extensions/features/<extension_id>`
   * PUT `/1.1/extensions/features/<extension_id>`
 
+* New parameters have been added to the extension resource:
+
+  * `enabled`
+
+* Parameters have been deprecated for the extension resource:
+
+  * `commented`
+
 
 17.17
 -----
