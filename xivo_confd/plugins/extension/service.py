@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers.db_manager import Session
@@ -15,6 +15,13 @@ class ExtensionService(CRUDService):
     def __init__(self, dao, validator, notifier, device_updater):
         super(ExtensionService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
+
+    def search(self, parameters):
+        parameters['is_feature'] = False
+        return self.dao.search(**parameters)
+
+    def get(self, resource_id):
+        return self.dao.get_by(id=resource_id, is_feature=False)
 
     def edit(self, extension, updated_fields=None):
         with Session.no_autoflush:

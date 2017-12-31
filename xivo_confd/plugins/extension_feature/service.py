@@ -13,11 +13,11 @@ from .validator import build_validator
 class ExtensionService(CRUDService):
 
     def search(self, parameters):
-        parameters['context'] = 'xivo-features'
+        parameters['is_feature'] = True
         return self.dao.search(**parameters)
 
     def get(self, resource_id):
-        return self.dao.get_by(id=resource_id, context='xivo-features')
+        return self.dao.get_by(id=resource_id, is_feature=True)
 
 
 def build_service():
