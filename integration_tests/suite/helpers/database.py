@@ -129,7 +129,7 @@ class DatabaseQueries(object):
         query = text("UPDATE extensions SET type = 'user', typeval = 0 WHERE id = :extension_id")
         self.connection.execute(query, extension_id=extension_id)
 
-    def insert_extension_feature(self, exten='1000', feature='default', commented=False):
+    def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
         query = text("""
         INSERT INTO extensions
         (exten, context, type, typeval, commented)
@@ -147,7 +147,7 @@ class DatabaseQueries(object):
                     .execute(query,
                              exten=exten,
                              feature=feature,
-                             commented=1 if commented else 0)
+                             commented=1 if not enabled else 0)
                     .scalar())
 
         return agent_id

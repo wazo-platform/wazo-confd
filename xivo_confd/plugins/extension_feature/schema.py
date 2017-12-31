@@ -14,5 +14,5 @@ class ExtensionFeatureSchema(BaseSchema):
     exten = fields.String(validate=Regexp(EXTEN_REGEX), required=True)
     context = fields.String(dump_only=True)
     feature = fields.String(attribute='typeval', dump_only=True)
-    commented = fields.Boolean(attribute='legacy_commented')
+    enabled = fields.Boolean()
     links = ListLink(Link('extensions_features'))

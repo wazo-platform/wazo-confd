@@ -104,7 +104,7 @@ def test_get(extension):
         exten=extension['exten'],
         context=extension['context'],
         feature=extension['feature'],
-        commented=False,
+        enabled=True,
     ))
 
 
@@ -117,7 +117,7 @@ def test_edit_minimal_parameters(extension):
 @fixtures.extension_feature()
 def test_edit_all_parameters(extension):
     parameters = {'exten': '*911',
-                  'commented': True}
+                  'enabled': False}
 
     response = confd.extensions.features(extension['id']).put(**parameters)
     response.assert_updated()
