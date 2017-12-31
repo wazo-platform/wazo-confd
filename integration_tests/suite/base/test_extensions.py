@@ -196,21 +196,21 @@ def test_edit_pattern(extension):
 @fixtures.context()
 def test_update_required_parameters(extension, context):
     exten = h.extension.find_available_exten(context['name'])
-    url = confd.extensions(extension['id'])
 
-    response = url.put(exten=exten,
-                       context=context['name'])
+    response = confd.extensions(extension['id']).put(exten=exten, context=context['name'])
     response.assert_updated()
 
-    assert_that(url.get().item, has_entries(exten=exten,
-                                            context=context['name']))
+    response = confd.extensions(extension['id']).get()
+    assert_that(response.item, has_entries(exten=exten, context=context['name']))
 
 
 @fixtures.extension(enabled=True)
 def test_update_additional_parameters(extension1):
-    url = confd.extensions(extension1['id'])
-    url.put(enabled=False).assert_updated()
-    assert_that(url.get().item, has_entries(enabled=False))
+    response = confd.extensions(extension1['id']).put(enabled=False)
+    response.assert_updated()
+
+    response = confd.extensions(extension1['id']).get()
+    assert_that(response.item, has_entries(enabled=False))
 
 
 @fixtures.user()
@@ -309,29 +309,27 @@ def test_sorting_offset_limit(extension1, extension2):
 
 
 def test_search_extensions_in_context():
-    exten = h.extension.find_available_exten('default')
+    exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
 
-    with fixtures.extension(exten=exten, context='default'), \
-            fixtures.extension(exten=exten, context='from-extern') as extension2, \
+    with fixtures.extension(exten=exten1, context='default'), \
+            fixtures.extension(exten=exten1, context='from-extern') as extension2, \
             fixtures.extension(exten=exten2, context='from-extern'):
 
-        expected = contains(extension2)
-        response = confd.extensions.get(search=exten, context='from-extern')
-        assert_that(response.items, expected)
+        response = confd.extensions.get(search=exten1, context='from-extern')
+        assert_that(response.items, contains(extension2))
 
 
 def test_search_list_extensions_in_context():
-    exten = h.extension.find_available_exten('default')
+    exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
 
-    with fixtures.extension(exten=exten, context='default'), \
-            fixtures.extension(exten=exten, context='from-extern') as extension2, \
+    with fixtures.extension(exten=exten1, context='default'), \
+            fixtures.extension(exten=exten1, context='from-extern') as extension2, \
             fixtures.extension(exten=exten2, context='from-extern') as extension3:
 
-        expected = contains_inanyorder(extension2, extension3)
         response = confd.extensions.get(context='from-extern')
-        assert_that(response.items, expected)
+        assert_that(response.items, contains_inanyorder(extension2, extension3))
 
 
 @fixtures.extension(context='default')
