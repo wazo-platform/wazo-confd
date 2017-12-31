@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
@@ -94,6 +94,6 @@ class SIPGeneralList(ConfdResource):
     @required_acl('confd.asterisk.sip.general.update')
     def put(self):
         form = self.schema().load(request.get_json()).data
-        sip_general = [StaticSIP(**option) for option in form]
+        sip_general = [self.model(**option) for option in form]
         self.service.edit(sip_general)
         return '', 204
