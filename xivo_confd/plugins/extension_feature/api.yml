@@ -1,0 +1,89 @@
+paths:
+  /extensions/features:
+    get:
+      operationId: list_extensions_features
+      summary: List extensions features
+      description: '**Required ACL:** `confd.extensions.features.read`'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Extension feature list
+          schema:
+            $ref: '#/definitions/ExtensionFeatureItems'
+  /extensions/features/{extension_id}:
+    get:
+      operationId: get_extension_feature
+      summary: Get extension feature
+      description: '**Required ACL:** `confd.extensions.features.{extension_id}.read`'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '200':
+          description: Extension feature
+          schema:
+            $ref: '#/definitions/ExtensionFeature'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_extension_feature
+      summary: Update extension
+      description: '**Required ACL:** `confd.extensions.features.{extension_id}.update`'
+      tags:
+      - extensions
+      parameters:
+      - $ref: '#/parameters/extensionid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ExtensionFeature'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  ExtensionFeatureItems:
+    title: ExtensionFeatureItems
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/ExtensionFeature'
+        type: array
+      total:
+        type: integer
+    required:
+    - total
+  ExtensionFeature:
+    title: ExtensionFeature
+    properties:
+      id:
+        type: integer
+        description: Extension ID
+        readOnly: true
+      context:
+        type: string
+        readOnly: true
+      exten:
+        type: string
+      feature:
+        type: string
+        readOnly: true
+        description: The feature of the extension
+      enabled:
+        type: boolean
+        description: If False the extension feature is disabled
+    required:
+    - exten

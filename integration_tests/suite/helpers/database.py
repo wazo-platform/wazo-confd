@@ -129,6 +129,33 @@ class DatabaseQueries(object):
         query = text("UPDATE extensions SET type = 'user', typeval = 0 WHERE id = :extension_id")
         self.connection.execute(query, extension_id=extension_id)
 
+    def insert_extension_feature(self, exten='1000', feature='default', commented=False):
+        query = text("""
+        INSERT INTO extensions
+        (exten, context, type, typeval, commented)
+        VALUES (
+            :exten,
+            'xivo-features',
+            'extenfeatures',
+            :feature,
+            :commented
+        )
+        RETURNING id
+        """)
+
+        agent_id = (self.connection
+                    .execute(query,
+                             exten=exten,
+                             feature=feature,
+                             commented=1 if commented else 0)
+                    .scalar())
+
+        return agent_id
+
+    def delete_extension_feature(self, extension_id):
+        query = text("DELETE FROM extensions WHERE id = :extension_id AND context = 'xivo-features'")
+        self.connection.execute(query, extension_id=extension_id)
+
     def insert_func_key(self, func_key_type, destination_type):
         func_key_query = text("""
         INSERT INTO func_key (type_id, destination_type_id)
