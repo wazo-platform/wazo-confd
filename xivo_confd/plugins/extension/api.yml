@@ -144,7 +144,10 @@ definitions:
     - properties:
         commented:
           type: boolean
-          description: If True the extension is disabled
+          description: If True the extension is disabled. Deprecated, use enabled instead
+        enabled:
+          type: boolean
+          description: If False the extension is disabled.
     - $ref: '#/definitions/ExtensionRelationConference'
     - $ref: '#/definitions/ExtensionRelationGroup'
     - $ref: '#/definitions/ExtensionRelationIncall'
