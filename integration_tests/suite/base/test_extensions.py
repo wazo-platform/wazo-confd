@@ -78,7 +78,7 @@ def test_get(extension):
     response = confd.extensions(extension['id']).get()
     assert_that(response.item, has_entries(exten=extension['exten'],
                                            context=extension['context'],
-                                           commented=False,
+                                           enabled=True,
                                            incall=none(),
                                            outcall=none(),
                                            lines=empty(),
@@ -95,20 +95,20 @@ def test_create_minimal_parameters():
 
     assert_that(response.item, has_entries(exten=exten,
                                            context=CONTEXT,
-                                           commented=False))
+                                           enabled=True))
 
 
-def test_create_with_commented_parameter():
+def test_create_with_enabled_parameter():
     exten = h.extension.find_available_exten(CONTEXT)
 
     response = confd.extensions.post(exten=exten,
                                      context=CONTEXT,
-                                     commented=True)
+                                     enabled=False)
     response.assert_created('extensions')
 
     assert_that(response.item, has_entries(exten=exten,
                                            context=CONTEXT,
-                                           commented=True))
+                                           enabled=False))
 
 
 def test_create_extension_in_different_ranges():
@@ -206,11 +206,11 @@ def test_update_required_parameters(extension, context):
                                             context=context['name']))
 
 
-@fixtures.extension(commented=False)
+@fixtures.extension(enabled=True)
 def test_update_additional_parameters(extension1):
     url = confd.extensions(extension1['id'])
-    url.put(commented=True).assert_updated()
-    assert_that(url.get().item, has_entries(commented=True))
+    url.put(enabled=False).assert_updated()
+    assert_that(url.get().item, has_entries(enabled=False))
 
 
 @fixtures.user()
