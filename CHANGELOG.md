@@ -108,6 +108,12 @@ Changelog
   * GET `/1.1/sounds/<sound_id>/files/<filename>`
   * PUT `/1.1/sounds/<sound_id>/files/<filename>`
 
+* Added extension feature endpoints:
+
+  * GET `/1.1/extensions/features`
+  * GET `/1.1/extensions/features/<extension_id>`
+  * PUT `/1.1/extensions/features/<extension_id>`
+
 
 17.17
 -----
