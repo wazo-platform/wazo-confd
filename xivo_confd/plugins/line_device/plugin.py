@@ -17,8 +17,8 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
-        provd_client = core.provd_client()
+        api = core['api']
+        provd_client = core['provd_client']()
         device_dao = build_device_dao(provd_client)
         service = build_service(provd_client)
 

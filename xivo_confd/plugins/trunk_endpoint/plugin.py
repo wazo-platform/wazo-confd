@@ -19,7 +19,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
+        api = core['api']
         self.load_sip(api)
         self.load_custom(api)
 

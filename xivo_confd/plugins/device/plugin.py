@@ -13,8 +13,8 @@ from .resource import (
 
 class Plugin(object):
     def load(self, core):
-        api = core.api
-        provd_client = core.provd_client()
+        api = core['api']
+        provd_client = core['provd_client']()
 
         dao = build_dao(provd_client)
         service = build_service(dao)

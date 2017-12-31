@@ -9,7 +9,7 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
+        api = core['api']
 
         service = build_service()
 

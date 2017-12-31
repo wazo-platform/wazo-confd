@@ -13,15 +13,14 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from xivo import http_helpers
 from xivo import plugin_helpers
-
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
+from xivo_provd_client import new_provisioning_client_from_config
 
 from xivo_confd._bus import BusPublisher
 from xivo_confd._sysconfd import SysconfdPublisher
 from xivo_confd.authentication.confd_auth import auth
-from xivo_confd.core_rest_api import CoreRestApi
 from xivo_confd.helpers.converter import FilenameConverter
 
 logger = logging.getLogger(__name__)
@@ -114,11 +113,14 @@ def setup_app(config):
     app.debug = config.get('debug', False)
 
     auth.set_config(config)
-    core = CoreRestApi(app, api, auth)
     plugin_helpers.load(
         namespace='xivo_confd.plugins',
-        names=core.config['enabled_plugins'],
-        dependencies=core,
+        names=config['enabled_plugins'],
+        dependencies={
+            'api': api,
+            'config': config,
+            'provd_client': (lambda: new_provisioning_client_from_config(config['provd'])),
+        }
     )
 
     load_cors(app)

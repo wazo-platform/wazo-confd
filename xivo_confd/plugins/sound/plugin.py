@@ -12,8 +12,9 @@ from .service import build_service
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
-        ari_client = ARIClient(**core.config['ari'])
+        api = core['api']
+        config = core['config']
+        ari_client = ARIClient(**config['ari'])
         service = build_service(ari_client)
 
         api.add_resource(

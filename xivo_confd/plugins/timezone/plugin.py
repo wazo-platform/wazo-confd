@@ -8,7 +8,7 @@ from .resource import TimezoneList
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
+        api = core['api']
 
         api.add_resource(
             TimezoneList,

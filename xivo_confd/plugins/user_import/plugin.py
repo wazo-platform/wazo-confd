@@ -68,8 +68,8 @@ from .service import ImportService
 class Plugin(object):
 
     def load(self, core):
-        api = core.api
-        provd_client = core.provd_client()
+        api = core['api']
+        provd_client = core['provd_client']()
 
         user_service = build_user_service(provd_client)
         entity_service = build_entity_service()
