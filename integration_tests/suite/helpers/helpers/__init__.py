@@ -105,6 +105,7 @@ from . import endpoint_sccp
 from . import endpoint_sip
 from . import entity
 from . import extension
+from . import extension_feature
 from . import funckey_template
 from . import group
 from . import group_call_permission
@@ -183,6 +184,7 @@ __all__ = [
     'endpoint_sip',
     'entity',
     'extension',
+    'extension_feature',
     'funckey_template',
     'group',
     'group_call_permission',

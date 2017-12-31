@@ -39,6 +39,7 @@ setup(
             'endpoint_sip = xivo_confd.plugins.endpoint_sip.plugin:Plugin',
             'entity = xivo_confd.plugins.entity.plugin:Plugin',
             'extension = xivo_confd.plugins.extension.plugin:Plugin',
+            'extension_feature = xivo_confd.plugins.extension_feature.plugin:Plugin',
             'features = xivo_confd.plugins.features.plugin:Plugin',
             'func_key = xivo_confd.plugins.func_key.plugin:Plugin',
             'group = xivo_confd.plugins.group.plugin:Plugin',

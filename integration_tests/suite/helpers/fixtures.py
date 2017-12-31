@@ -239,3 +239,9 @@ class sound(IsolatedAction):
     id_field = 'name'
     actions = {'generate': h.sound.generate_sound,
                'delete': h.sound.delete_sound}
+
+
+class extension_feature(IsolatedAction):
+
+    actions = {'generate': h.extension_feature.generate_extension_feature,
+               'delete': h.extension_feature.delete_extension_feature}
