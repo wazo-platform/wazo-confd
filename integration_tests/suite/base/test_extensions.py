@@ -268,6 +268,12 @@ def test_edit_extension_with_no_change_device_not_updated(user1, user2,
         assert_that(provd.updated_count(device['id'], timestamp), equal_to(device_updated_count))
 
 
+@fixtures.extension_feature()
+def test_search_do_not_find_extension_feature(_):
+    response = confd.extensions().get()
+    assert_that(response.items, empty())
+
+
 @fixtures.extension(exten='4999', context='default')
 @fixtures.extension(exten='9999', context='from-extern')
 def test_search(extension, hidden):
