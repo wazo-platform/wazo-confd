@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from setuptools import setup
@@ -76,7 +76,7 @@ setup(
             'schedule = xivo_confd.plugins.schedule.plugin:Plugin',
             'sccp_general = xivo_confd.plugins.sccp_general.plugin:Plugin',
             'sip_general = xivo_confd.plugins.sip_general.plugin:Plugin',
-            'sound= xivo_confd.plugins.sound.plugin:Plugin',
+            'sound = xivo_confd.plugins.sound.plugin:Plugin',
             'sound_language = xivo_confd.plugins.sound_language.plugin:Plugin',
             'switchboard = xivo_confd.plugins.switchboard.plugin:Plugin',
             'switchboard_member = xivo_confd.plugins.switchboard_member.plugin:Plugin',
