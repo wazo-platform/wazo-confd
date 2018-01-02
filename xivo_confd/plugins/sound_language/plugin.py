@@ -10,9 +10,10 @@ from .service import build_service
 
 class Plugin(object):
 
-    def load(self, core):
-        api = core.api
-        ari_client = ARIClient(**core.config['ari'])
+    def load(self, dependencies):
+        api = dependencies['api']
+        config = dependencies['config']
+        ari_client = ARIClient(**config['ari'])
         service = build_service(ari_client)
 
         api.add_resource(
