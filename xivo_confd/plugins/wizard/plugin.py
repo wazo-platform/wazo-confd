@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
 
 from xivo_auth_client import Client as AuthClient
 from xivo_dird_client import Client as DirdClient
+from xivo_provd_client import new_provisioning_client_from_config
 
 from xivo_dao.resources.infos import dao as infos_dao
 
@@ -30,7 +31,7 @@ class Plugin(object):
                                  password=service_key,
                                  **config['auth'])
         dird_client = DirdClient(**config['dird'])
-        provd_client = dependencies['provd_client']()
+        provd_client = new_provisioning_client_from_config(config['provd'])
 
         service = build_service(provd_client, auth_client, dird_client, infos_dao)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import os
@@ -16,7 +16,6 @@ from xivo import plugin_helpers
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
-from xivo_provd_client import new_provisioning_client_from_config
 
 from xivo_confd._bus import BusPublisher
 from xivo_confd._sysconfd import SysconfdPublisher
@@ -119,7 +118,6 @@ def setup_app(config):
         dependencies={
             'api': api,
             'config': config,
-            'provd_client': (lambda: new_provisioning_client_from_config(config['provd'])),
         }
     )
 

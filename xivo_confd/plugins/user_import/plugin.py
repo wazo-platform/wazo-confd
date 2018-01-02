@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from collections import OrderedDict
@@ -18,6 +18,7 @@ from xivo_dao.resources.user_call_permission import dao as user_call_permission_
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
+from xivo_provd_client import new_provisioning_client_from_config
 
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
@@ -69,7 +70,8 @@ class Plugin(object):
 
     def load(self, dependencies):
         api = dependencies['api']
-        provd_client = dependencies['provd_client']()
+        config = dependencies['config']
+        provd_client = new_provisioning_client_from_config(config['provd'])
 
         user_service = build_user_service(provd_client)
         entity_service = build_entity_service()
