@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..helpers import errors as e
@@ -41,6 +41,7 @@ def test_put_errors(outcall):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', None
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
