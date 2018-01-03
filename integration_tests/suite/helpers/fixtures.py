@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from .wrappers import IsolatedAction
@@ -245,3 +245,9 @@ class extension_feature(IsolatedAction):
 
     actions = {'generate': h.extension_feature.generate_extension_feature,
                'delete': h.extension_feature.delete_extension_feature}
+
+
+class iax(IsolatedAction):
+
+    actions = {'generate': h.endpoint_iax.generate_iax,
+               'delete': h.endpoint_iax.delete_iax}

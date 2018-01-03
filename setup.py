@@ -35,6 +35,7 @@ setup(
             'cti_profile = xivo_confd.plugins.cti_profile.plugin:Plugin',
             'device = xivo_confd.plugins.device.plugin:Plugin',
             'endpoint_custom = xivo_confd.plugins.endpoint_custom.plugin:Plugin',
+            'endpoint_iax = xivo_confd.plugins.endpoint_iax.plugin:Plugin',
             'endpoint_sccp = xivo_confd.plugins.endpoint_sccp.plugin:Plugin',
             'endpoint_sip = xivo_confd.plugins.endpoint_sip.plugin:Plugin',
             'entity = xivo_confd.plugins.entity.plugin:Plugin',

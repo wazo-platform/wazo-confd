@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import argparse
@@ -91,6 +91,7 @@ DEFAULT_CONFIG = {
         'cti_profile': True,
         'device': True,
         'endpoint_custom': True,
+        'endpoint_iax': True,
         'endpoint_sccp': True,
         'endpoint_sip': True,
         'entity': True,
