@@ -89,6 +89,27 @@ def test_dissociate_not_associated(trunk, iax):
 
 @fixtures.trunk()
 @fixtures.iax()
+def test_get_endpoint_iax_relation(trunk, iax):
+    with a.trunk_endpoint_iax(trunk, iax):
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(
+            endpoint_iax=has_entries(id=iax['id'],
+                                     name=iax['name'])
+        ))
+
+
+@fixtures.trunk()
+@fixtures.iax()
+def test_get_trunk_relation(trunk, iax):
+    with a.trunk_endpoint_iax(trunk, iax):
+        response = confd.endpoints.iax(iax['id']).get()
+        assert_that(response.item, has_entries(
+            trunk=has_entries(id=trunk['id'])
+        ))
+
+
+@fixtures.trunk()
+@fixtures.iax()
 def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, iax):
     with a.trunk_endpoint_iax(trunk, iax, check=False):
         confd.trunks(trunk['id']).delete().assert_deleted()
@@ -105,11 +126,10 @@ def test_delete_iax_when_trunk_and_iax_associated(trunk, iax):
     with a.trunk_endpoint_iax(trunk, iax, check=False):
         confd.endpoints.iax(iax['id']).delete().assert_deleted()
 
-        # Implementation of relation needed
-        # response = confd.trunks(iax['id']).get()
-        # assert_that(response.item, has_entries(
-        #     endpoint_iax=none()
-        # ))
+        response = confd.trunks(iax['id']).get()
+        assert_that(response.item, has_entries(
+            endpoint_iax=none()
+        ))
 
 
 @fixtures.trunk()

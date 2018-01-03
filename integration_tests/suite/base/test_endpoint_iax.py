@@ -144,6 +144,7 @@ def test_get(iax):
         'type': 'friend',
         'host': 'dynamic',
         'options': instance_of(list),
+        'trunk': None,
     }))
 
 

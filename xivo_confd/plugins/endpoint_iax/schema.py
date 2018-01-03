@@ -18,4 +18,4 @@ class IAXSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('endpoint_iax'))
 
-    # trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True, attribute='trunk_rel')

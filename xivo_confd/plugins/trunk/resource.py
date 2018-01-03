@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import url_for
 from marshmallow import fields
 
+from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
+
 from xivo_confd.authentication.confd_auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 
 
 class TrunkSchema(BaseSchema):
@@ -19,6 +19,7 @@ class TrunkSchema(BaseSchema):
     links = ListLink(Link('trunks'))
     endpoint_sip = fields.Nested('SipSchema', only=['id', 'username', 'links'], dump_only=True)
     endpoint_custom = fields.Nested('CustomSchema', only=['id', 'interface', 'links'], dump_only=True)
+    endpoint_iax = fields.Nested('IAXSchema', only=['id', 'name', 'links'], dump_only=True)
     outcalls = fields.Nested('OutcallSchema', only=['id', 'name', 'links'], many=True, dump_only=True)
 
 
