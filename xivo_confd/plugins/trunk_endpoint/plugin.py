@@ -1,17 +1,19 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
+from xivo_dao.resources.endpoint_iax import dao as endpoint_iax_dao
+from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
 
 from .resource import (
-    TrunkEndpointAssociationSip,
-    TrunkEndpointGetSip,
+    EndpointTrunkGetCustom,
     EndpointTrunkGetSip,
     TrunkEndpointAssociationCustom,
+    TrunkEndpointAssociationSip,
+    TrunkEndpointAssociationIAX,
     TrunkEndpointGetCustom,
-    EndpointTrunkGetCustom
+    TrunkEndpointGetSip,
 )
 from .service import build_service
 
@@ -22,6 +24,7 @@ class Plugin(object):
         api = dependencies['api']
         self.load_sip(api)
         self.load_custom(api)
+        self.load_iax(api)
 
     def load_sip(self, api):
         service = self.build_sip_service()
@@ -67,8 +70,21 @@ class Plugin(object):
             resource_class_args=(service,)
         )
 
+    def load_iax(self, api):
+        service = self.build_iax_service()
+
+        api.add_resource(
+            TrunkEndpointAssociationIAX,
+            '/trunks/<int:trunk_id>/endpoints/iax/<int:endpoint_id>',
+            endpoint='trunk_endpoint_iax',
+            resource_class_args=(service,)
+        )
+
     def build_sip_service(self):
         return build_service('sip', endpoint_sip_dao)
 
     def build_custom_service(self):
         return build_service('custom', endpoint_custom_dao)
+
+    def build_iax_service(self):
+        return build_service('iax', endpoint_iax_dao)

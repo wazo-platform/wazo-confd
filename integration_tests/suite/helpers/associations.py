@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from contextlib import contextmanager
@@ -133,6 +133,13 @@ def trunk_endpoint_custom(trunk, custom, check=True):
     h.trunk_endpoint_custom.associate(trunk['id'], custom['id'], check)
     yield
     h.trunk_endpoint_custom.dissociate(trunk['id'], custom['id'], check)
+
+
+@contextmanager
+def trunk_endpoint_iax(trunk, iax, check=True):
+    h.trunk_endpoint_iax.associate(trunk['id'], iax['id'], check)
+    yield
+    h.trunk_endpoint_iax.dissociate(trunk['id'], iax['id'], check)
 
 
 @contextmanager

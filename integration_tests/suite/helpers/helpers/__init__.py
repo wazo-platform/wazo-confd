@@ -150,6 +150,7 @@ from . import switchboard
 from . import switchboard_member_user
 from . import trunk
 from . import trunk_endpoint_custom
+from . import trunk_endpoint_iax
 from . import trunk_endpoint_sip
 from . import user
 from . import user_agent
@@ -230,6 +231,7 @@ __all__ = [
     'switchboard_member_user',
     'trunk',
     'trunk_endpoint_custom',
+    'trunk_endpoint_iax',
     'trunk_endpoint_sip',
     'user',
     'user_agent',
