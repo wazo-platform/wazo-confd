@@ -1,0 +1,218 @@
+paths:
+  /endpoints/iax:
+    get:
+      operationId: list_endpoints_iax
+      summary: List IAX endpoints
+      description: '**Required ACL:** `confd.endpoints.iax.read`'
+      tags:
+      - endpoints
+      - iax
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: IAX endpoint list
+          schema:
+            $ref: '#/definitions/EndpointIAXItems'
+    post:
+      operationId: create_endpoint_iax
+      summary: Create IAX endpoint
+      description: '**Required ACL:** `confd.endpoints.iax.create`'
+      tags:
+      - endpoints
+      - iax
+      parameters:
+      - name: body
+        in: body
+        description: IAX Endpoint to create
+        required: false
+        schema:
+          $ref: '#/definitions/EndpointIAX'
+      responses:
+        '201':
+          description: IAX endpoint created
+          schema:
+            $ref: '#/definitions/EndpointIAX'
+        '400':
+          $ref: '#/responses/CreateError'
+  /endpoints/iax/{iax_id}:
+    get:
+      operationId: get_endpoint_iax
+      summary: Get IAX Endpoint
+      description: '**Required ACL:** `confd.endpoints.iax.{iax_id}.read`'
+      tags:
+      - endpoints
+      - iax
+      parameters:
+      - $ref: '#/parameters/iaxid'
+      responses:
+        '200':
+          description: IAX Endpoint
+          schema:
+            $ref: '#/definitions/EndpointIAX'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_endpoint_iax
+      summary: Update IAX Endpoint
+      description: '**Required ACL:** `confd.endpoints.iax.{iax_id}.update`'
+      tags:
+      - endpoints
+      - iax
+      parameters:
+      - $ref: '#/parameters/iaxid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/EndpointIAX'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_endpoint_iax
+      summary: Delete IAX Endpoint
+      description: '**Required ACL:** `confd.endpoints.iax.{iax_id}.delete`'
+      tags:
+      - endpoints
+      - iax
+      parameters:
+      - $ref: '#/parameters/iaxid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  iaxid:
+    required: true
+    type: integer
+    name: iax_id
+    in: path
+
+definitions:
+  EndpointIAX:
+    title: IAX Endpoint
+    allOf:
+    - $ref: '#/definitions/EndpointIAXRelationBase'
+    - properties:
+        type:
+          type: string
+          enum:
+          - friend
+          - peer
+          - user
+          default: friend
+          description: Type of IAX account
+        host:
+          type: string
+          description: Hosts that are allowed to use this IAX account
+          default: dynamic
+        options:
+          description: |
+            Advanced configuration: options. Options are appended at the end of a IAX account in the file 'iax.conf' used by asterisk. Please consult the asterisk documentation for further details on available parameters. Because of database limitations, the following options can only be configured once:
+
+            * accountcode
+            * adsi
+            * allow
+            * amaflags
+            * auth
+            * callerid
+            * category
+            * cid_number
+            * codecpriority
+            * commented
+            * context
+            * dbsecret
+            * defaultip
+            * deny
+            * disallow
+            * encryption
+            * forceencryption
+            * forcejitterbuffer
+            * fullname
+            * immediate
+            * inkeys
+            * jitterbuffer
+            * keyrotate
+            * language
+            * mailbox
+            * mask
+            * maxauthreq
+            * mohinterpret
+            * mohsuggest
+            * outkey
+            * parkinglot
+            * peercontext
+            * permit
+            * port
+            * protocol
+            * qualify
+            * qualifyfreqnoto
+            * qualifyfreqok
+            * qualifysmoothing
+            * regexten
+            * requirecalltoken
+            * secret
+            * sendani
+            * setvar
+            * sourceaddress
+            * timezone
+            * transfer
+            * trunk
+            * username
+
+            Any other options may be repeated as many times as needed. Options must have the following form:
+            ```
+            {
+              "options": [
+                 ["name1", "value1"],
+                 ["name2", "value2"]
+              ]
+            }
+            ```
+
+            The resulting configuration in iax.conf will have the following form:
+            ```
+            [iaxusername]
+            context=default
+            secret=iaxsecret
+            name1=value1
+            name2=value2
+            ```
+          type: array
+          items:
+            $ref: '#/definitions/KeyValueOption'
+          default: []
+    - $ref: '#/definitions/EndpointRelationTrunk'
+    - $ref: '#/definitions/EndpointRelationLine'
+  EndpointIAXRelationBase:
+    properties:
+      id:
+        type: integer
+        description: IAX Endpoint ID
+        readOnly: true
+      name:
+        type: string
+        description: IAX name
+        default: autogenerated
+  EndpointIAXItems:
+    title: IAX Endpoints
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/EndpointIAX'
+        type: array
+      total:
+        type: integer

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..client import ConfdClient
@@ -101,6 +101,7 @@ from . import context_entity
 from . import cti_profile
 from . import device
 from . import endpoint_custom
+from . import endpoint_iax
 from . import endpoint_sccp
 from . import endpoint_sip
 from . import entity
@@ -180,6 +181,7 @@ __all__ = [
     'cti_profile',
     'device',
     'endpoint_custom',
+    'endpoint_iax',
     'endpoint_sccp',
     'endpoint_sip',
     'entity',

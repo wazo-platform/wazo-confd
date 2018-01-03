@@ -122,6 +122,14 @@ Changelog
 
   * `commented`
 
+* Added iax endpoints:
+
+  * GET `/1.1/endpoints/iax`
+  * POST `/1.1/registers/iax`
+  * DELETE `/1.1/endpoints/iax/<endpoint_iax_id>`
+  * GET `/1.1/endpoints/iax/<endpoint_iax_id>`
+  * PUT `/1.1/endpoints/iax/<endpoint_iax_id>`
+
 
 17.17
 -----
