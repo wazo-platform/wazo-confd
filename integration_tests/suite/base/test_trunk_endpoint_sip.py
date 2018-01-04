@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (assert_that,
@@ -161,7 +161,7 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
         confd.trunks(trunk['id']).delete().assert_deleted()
 
-        deleted_trunk = confd.trunks(sip['id']).endpoints.sip.get
+        deleted_trunk = confd.trunks(trunk['id']).endpoints.sip.get
         deleted_sip = confd.endpoints.sip(sip['id']).trunks.get
         yield s.check_resource_not_found, deleted_trunk, 'Trunk'
         yield s.check_resource_not_found, deleted_sip, 'SIPEndpoint'

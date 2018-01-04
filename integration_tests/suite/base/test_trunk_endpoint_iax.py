@@ -114,7 +114,7 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, iax):
     with a.trunk_endpoint_iax(trunk, iax, check=False):
         confd.trunks(trunk['id']).delete().assert_deleted()
 
-        deleted_trunk = confd.trunks(iax['id']).get
+        deleted_trunk = confd.trunks(trunk['id']).get
         deleted_iax = confd.endpoints.iax(iax['id']).get
         yield s.check_resource_not_found, deleted_trunk, 'Trunk'
         yield s.check_resource_not_found, deleted_iax, 'IAXEndpoint'
@@ -126,7 +126,7 @@ def test_delete_iax_when_trunk_and_iax_associated(trunk, iax):
     with a.trunk_endpoint_iax(trunk, iax, check=False):
         confd.endpoints.iax(iax['id']).delete().assert_deleted()
 
-        response = confd.trunks(iax['id']).get()
+        response = confd.trunks(trunk['id']).get()
         assert_that(response.item, has_entries(
             endpoint_iax=none()
         ))
