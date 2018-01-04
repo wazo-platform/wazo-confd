@@ -105,6 +105,7 @@ def test_get(register_sip):
         callback_extension=none(),
         expiration=none(),
         enabled=True,
+        trunk=none(),
     ))
 
 

@@ -89,6 +89,26 @@ def test_dissociate_not_associated(trunk, register):
 
 @fixtures.trunk()
 @fixtures.register_iax()
+def test_get_register_iax_relation(trunk, register):
+    with a.trunk_register_iax(trunk, register):
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(
+            register_iax=has_entries(id=register['id'])
+        ))
+
+
+@fixtures.trunk()
+@fixtures.register_iax()
+def test_get_trunk_relation(trunk, register):
+    with a.trunk_register_iax(trunk, register):
+        response = confd.registers.iax(register['id']).get()
+        assert_that(response.item, has_entries(
+            trunk=has_entries(id=trunk['id'])
+        ))
+
+
+@fixtures.trunk()
+@fixtures.register_iax()
 def test_delete_trunk_when_trunk_and_register_associated(trunk, register):
     with a.trunk_register_iax(trunk, register, check=False):
         confd.trunks(trunk['id']).delete().assert_deleted()
@@ -105,11 +125,10 @@ def test_delete_iax_when_trunk_and_iax_associated(trunk, register):
     with a.trunk_register_iax(trunk, register, check=False):
         confd.registers.iax(register['id']).delete().assert_deleted()
 
-        # Relation needed
-        # response = confd.trunks(trunk['id']).get()
-        # assert_that(response.item, has_entries(
-        #     register_iax=none()
-        # ))
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(
+            register_iax=none()
+        ))
 
 
 @fixtures.trunk()
