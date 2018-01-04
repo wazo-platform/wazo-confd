@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
@@ -121,3 +121,14 @@ class EndpointTrunkGetCustom(EndpointTrunkGet):
     @required_acl('confd.endpoints.custom.{endpoint_id}.trunks.read')
     def get(self, endpoint_id):
         return super(EndpointTrunkGetCustom, self).get(endpoint_id)
+
+
+class TrunkEndpointAssociationIAX(TrunkEndpointAssociation):
+
+    @required_acl('confd.trunks.{trunk_id}.endpoints.iax.{endpoint_id}.update')
+    def put(self, trunk_id, endpoint_id):
+        return super(TrunkEndpointAssociationIAX, self).put(trunk_id, endpoint_id)
+
+    @required_acl('confd.trunks.{trunk_id}.endpoints.iax.{endpoint_id}.delete')
+    def delete(self, trunk_id, endpoint_id):
+        return super(TrunkEndpointAssociationIAX, self).delete(trunk_id, endpoint_id)

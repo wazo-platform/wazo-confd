@@ -102,6 +102,43 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /trunks/{trunk_id}/endpoints/iax/{iax_id}:
+    put:
+      operationId: associate_trunk_endpoint_iax
+      summary: Associate trunk and IAX endpoint
+      description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.iax.{iax_id}.update`'
+      tags:
+      - trunks
+      - endpoints
+      - iax
+      parameters:
+      - $ref: '#/parameters/trunkid'
+      - $ref: '#/parameters/iaxid'
+      responses:
+        '204':
+          description: Trunk and IAX endpoint associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_trunk_endpoint_iax
+      summary: Dissociate trunk and IAX endpoint
+      description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.iax.{iax_id}.delete`'
+      tags:
+      - trunks
+      - endpoints
+      - iax
+      parameters:
+      - $ref: '#/parameters/trunkid'
+      - $ref: '#/parameters/iaxid'
+      responses:
+        '204':
+          description: Trunk and IAX endpoint dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
   /trunks/{trunk_id}/endpoints/sip:
     get:
       operationId: get_trunk_endpoint_sip

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..helpers import scenarios as s
@@ -99,6 +99,7 @@ def test_get(trunk):
                                            twilio_incoming=trunk['twilio_incoming'],
                                            endpoint_sip=none(),
                                            endpoint_custom=none(),
+                                           endpoint_iax=none(),
                                            outcalls=empty()))
 
 

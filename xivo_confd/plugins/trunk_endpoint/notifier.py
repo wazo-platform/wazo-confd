@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd import bus, sysconfd
@@ -16,21 +16,25 @@ class TrunkEndpointNotifier(object):
         self.bus = bus
         self.sysconfd = sysconfd
 
-    def send_sysconfd_handlers(self):
+    def send_sysconfd_handlers(self, ipbx):
         handlers = {'ctibus': [],
-                    'ipbx': ['sip reload'],
+                    'ipbx': ipbx,
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            self.send_sysconfd_handlers()
+            self.send_sysconfd_handlers(['sip reload'])
+        elif self.endpoint == 'iax':
+            self.send_sysconfd_handlers(['iax2 reload'])
         event = TrunkEndpointAssociatedEvent(trunk.id, endpoint.id)
         self.bus.send_bus_event(event)
 
     def dissociated(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            self.send_sysconfd_handlers()
+            self.send_sysconfd_handlers(['sip reload'])
+        elif self.endpoint == 'iax':
+            self.send_sysconfd_handlers(['iax2 reload'])
         event = TrunkEndpointDissociatedEvent(trunk.id, endpoint.id)
         self.bus.send_bus_event(event)
 
