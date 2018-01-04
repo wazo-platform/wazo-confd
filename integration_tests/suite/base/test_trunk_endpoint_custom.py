@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      has_entries)
+from hamcrest import (
+    assert_that,
+    has_entries,
+)
 
-from ..helpers import scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from . import confd
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
-
 
 FAKE_ID = 999999999
 
@@ -83,6 +86,24 @@ def test_associate_when_line_already_associated(trunk, line, custom):
     with a.line_endpoint_custom(line, custom):
         response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
+
+
+@fixtures.trunk()
+@fixtures.custom()
+@fixtures.register_iax()
+def test_associate_when_register_iax(trunk, custom, register):
+    with a.trunk_register_iax(trunk, register):
+        response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'IAXRegister'))
+
+
+@fixtures.trunk()
+@fixtures.custom()
+@fixtures.register_sip()
+def test_associate_when_register_sip(trunk, custom, register):
+    with a.trunk_register_sip(trunk, register):
+        response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
 
 
 @fixtures.trunk()

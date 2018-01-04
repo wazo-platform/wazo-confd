@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
@@ -21,6 +21,7 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
         self.validate_not_already_associated(trunk, endpoint)
         self.validate_not_associated_to_trunk(trunk, endpoint)
         self.validate_not_associated_to_line(trunk, endpoint)
+        self.validate_associate_to_register(trunk, endpoint)
 
     def validate_not_already_associated(self, trunk, endpoint):
         if trunk.is_associated():
@@ -44,6 +45,25 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
                                              trunk_id=line.id,
                                              endpoint=line.endpoint,
                                              endpoint_id=line.endpoint_id)
+
+    def validate_associate_to_register(self, trunk, endpoint):
+        if self.endpoint == 'iax' and trunk.register_sip:
+            raise errors.resource_associated('Trunk', 'SIPRegister',
+                                             trunk_id=trunk.id,
+                                             register_iax_id=trunk.register_sip.id)
+        if self.endpoint == 'sip' and trunk.register_iax:
+            raise errors.resource_associated('Trunk', 'IAXRegister',
+                                             trunk_id=trunk.id,
+                                             register_sip_id=trunk.register_iax.id)
+        if self.endpoint == 'custom':
+            if trunk.register_iax:
+                raise errors.resource_associated('Trunk', 'IAXRegister',
+                                                 trunk_id=trunk.id,
+                                                 register_iax_id=trunk.register_iax.id)
+            if trunk.register_sip:
+                raise errors.resource_associated('Trunk', 'SIPRegister',
+                                                 trunk_id=trunk.id,
+                                                 register_sip_id=trunk.register_sip.id)
 
 
 def build_validator(endpoint):

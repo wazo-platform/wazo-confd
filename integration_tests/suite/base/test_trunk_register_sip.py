@@ -74,6 +74,24 @@ def test_associate_multiple_trunks_to_register_sip(trunk1, trunk2, register):
 
 @fixtures.trunk()
 @fixtures.register_sip()
+@fixtures.custom()
+def test_associate_when_endpoint_custom(trunk, register, custom):
+    with a.trunk_endpoint_custom(trunk, custom):
+        response = confd.trunks(trunk['id']).registers.sip(register['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+
+
+@fixtures.trunk()
+@fixtures.register_sip()
+@fixtures.iax()
+def test_associate_when_endpoint_iax(trunk, register, iax):
+    with a.trunk_endpoint_iax(trunk, iax):
+        response = confd.trunks(trunk['id']).registers.sip(register['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+
+
+@fixtures.trunk()
+@fixtures.register_sip()
 def test_dissociate(trunk, register):
     with a.trunk_register_sip(trunk, register, check=False):
         response = confd.trunks(trunk['id']).registers.sip(register['id']).delete()
