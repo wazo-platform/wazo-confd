@@ -139,6 +139,13 @@ Changelog
 
   * `interface_suffix`
 
+* A new API for associating registers with a trunk has been added:
+
+  * DELETE `/1.1/trunks/<trunk_id>/registers/iax/<register_id>`
+  * PUT `/1.1/trunks/<trunk_id>/registers/iax/<register_id>`
+  * DELETE `/1.1/trunks/<trunk_id>/registers/sip/<register_id>`
+  * PUT `/1.1/trunks/<trunk_id>/registers/sip/<register_id>`
+
 
 17.17
 -----
