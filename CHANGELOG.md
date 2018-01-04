@@ -135,6 +135,10 @@ Changelog
   * DELETE `/1.1/trunks/<trunk_id>/endpoints/iax/<endpoint_id>`
   * PUT `/1.1/trunks/<trunk_id>/endpoints/iax/<endpoint_id>`
 
+* New parameters have been added to the endpoint custom resource:
+
+  * `interface_suffix`
+
 
 17.17
 -----
