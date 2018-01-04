@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
@@ -17,12 +17,12 @@ from . import confd
 
 def test_get_errors():
     fake_register_iax = confd.registers.iax(999999).get
-    yield s.check_resource_not_found, fake_register_iax, 'RegisterIAX'
+    yield s.check_resource_not_found, fake_register_iax, 'IAXRegister'
 
 
 def test_delete_errors():
     fake_register_iax = confd.registers.iax(999999).delete
-    yield s.check_resource_not_found, fake_register_iax, 'RegisterIAX'
+    yield s.check_resource_not_found, fake_register_iax, 'IAXRegister'
 
 
 def test_post_errors():
