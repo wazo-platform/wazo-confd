@@ -283,3 +283,17 @@ def group_call_permission(group, call_permission, check=True):
     h.group_call_permission.associate(group['id'], call_permission['id'], check)
     yield
     h.group_call_permission.dissociate(group['id'], call_permission['id'], check)
+
+
+@contextmanager
+def trunk_register_iax(trunk, iax, check=True):
+    h.trunk_register_iax.associate(trunk['id'], iax['id'], check)
+    yield
+    h.trunk_register_iax.dissociate(trunk['id'], iax['id'], check)
+
+
+@contextmanager
+def trunk_register_sip(trunk, sip, check=True):
+    h.trunk_register_sip.associate(trunk['id'], sip['id'], check)
+    yield
+    h.trunk_register_sip.dissociate(trunk['id'], sip['id'], check)
