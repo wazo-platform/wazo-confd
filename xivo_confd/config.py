@@ -16,7 +16,6 @@ KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
 DEFAULT_CONFIG = {
     'foreground': False,
     'debug': False,
-    'profile': None,
     'user': 'www-data',
     'log_level': 'info',
     'config_file': '/etc/xivo-confd/config.yml',
@@ -24,6 +23,7 @@ DEFAULT_CONFIG = {
     'log_filename': '/var/log/xivo-confd.log',
     'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
     'rest_api': {
+        'profile': None,
         'http': {
             'enabled': True,
             'listen': '127.0.0.1',
