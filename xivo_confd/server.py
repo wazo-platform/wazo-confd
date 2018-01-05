@@ -141,7 +141,7 @@ class HTTPServer(object):
 
         if not (http_config['enabled'] or https_config['enabled']):
             logger.critical('No HTTP/HTTPS server enabled')
-            exit()
+            return
 
         if https_config['enabled']:
             try:
