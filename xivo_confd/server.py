@@ -24,7 +24,6 @@ from xivo_dao.resources.infos import dao as info_dao
 
 from ._bus import BusPublisher
 from ._sysconfd import SysconfdPublisher
-from .authentication.confd_auth import auth
 from .helpers.converter import FilenameConverter
 
 logger = logging.getLogger(__name__)
@@ -113,7 +112,6 @@ class HTTPServer(object):
 
         app.config.update(global_config)
         app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
-        auth.set_config(global_config)
 
         app.url_map.converters['filename'] = FilenameConverter
 

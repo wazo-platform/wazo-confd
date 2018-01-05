@@ -10,6 +10,7 @@ from functools import partial
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 
+from .authentication.confd_auth import auth
 from .server import api, HTTPServer
 from .service_discovery import self_check
 
@@ -29,6 +30,7 @@ class Controller(object):
             partial(self_check, config),
         ]
 
+        auth.set_config(config)
         self.http_server = HTTPServer(config)
         plugin_helpers.load(
             namespace='xivo_confd.plugins',
