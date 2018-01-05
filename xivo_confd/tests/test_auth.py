@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014-2016 Avencall
+# Copyright 2014-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import os
 import requests
 import unittest
 
-
-from mock import Mock
 from flask import Flask
 from hamcrest import assert_that, equal_to
-from mock import patch
-from xivo_confd.auth import ConfdAuth
+from mock import Mock, patch
+
 from xivo.auth_verifier import AuthVerifier
 
+from ..auth import Authentication
 
-class TestConfdAuthBase(unittest.TestCase):
+
+class TestAuthenticationBase(unittest.TestCase):
 
     def setUp(self):
         self.app = Flask(__name__)
@@ -24,7 +24,7 @@ class TestConfdAuthBase(unittest.TestCase):
         config = {'auth': {'host': 'localhost',
                            'port': 9497},
                   'rest_api': {'http': {'port': 9487}}}
-        self.auth = ConfdAuth()
+        self.auth = Authentication()
         self.auth.set_config(config)
 
         @self.app.route('/')
@@ -36,7 +36,7 @@ class TestConfdAuthBase(unittest.TestCase):
 
 
 @patch('xivo_dao.accesswebservice_dao.get_allowed_hosts')
-class TestConfdAuthAllowedHosts(TestConfdAuthBase):
+class TestAuthenticationAllowedHosts(TestAuthenticationBase):
 
     def test_when_request_from_local_host_and_local_port_then_calls_action(self, get_allowed_hosts):
         get_allowed_hosts.return_value = []
@@ -62,12 +62,12 @@ class TestConfdAuthAllowedHosts(TestConfdAuthBase):
         assert_that(response.status_code, equal_to(401))
 
 
-class TestConfdAuthCredentials(TestConfdAuthBase):
+class TestAuthenticationCredentials(TestAuthenticationBase):
 
     def setUp(self):
         patch('xivo_dao.accesswebservice_dao.get_allowed_hosts', return_value=[]).start()
         patch('xivo_dao.accesswebservice_dao.get_password').start()
-        super(TestConfdAuthCredentials, self).setUp()
+        super(TestAuthenticationCredentials, self).setUp()
 
     def tearDown(self):
         patch.stopall()
@@ -93,12 +93,12 @@ class TestConfdAuthCredentials(TestConfdAuthBase):
             assert_that(response.data, equal_to('called'))
 
 
-class TestConfdAuthToken(TestConfdAuthBase):
+class TestAuthenticationToken(TestAuthenticationBase):
 
     def setUp(self):
         patch('xivo_dao.accesswebservice_dao.get_allowed_hosts', return_value=[]).start()
         patch('xivo_dao.accesswebservice_dao.get_password').start()
-        super(TestConfdAuthToken, self).setUp()
+        super(TestAuthenticationToken, self).setUp()
         self.auth_verifier = Mock(AuthVerifier)
         self.auth.auth_verifier = self.auth_verifier
         self.token = self.auth_verifier.client.return_value.token

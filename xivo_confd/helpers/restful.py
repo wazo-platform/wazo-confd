@@ -7,7 +7,7 @@ from flask_restful import Resource
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.auth import auth
+from xivo_confd.auth import authentication
 from xivo_confd.helpers.common import handle_api_exception
 
 
@@ -16,7 +16,7 @@ class ErrorCatchingResource(Resource):
 
 
 class ConfdResource(ErrorCatchingResource):
-    method_decorators = [auth.login_required] + ErrorCatchingResource.method_decorators
+    method_decorators = [authentication.login_required] + ErrorCatchingResource.method_decorators
 
 
 class ListResource(ConfdResource):

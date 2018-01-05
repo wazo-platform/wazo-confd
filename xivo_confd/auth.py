@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2014-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2014-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -19,12 +19,12 @@ logger = logging.getLogger(__name__)
 required_acl = required_acl
 
 
-class ConfdAuth(HTTPDigestAuth):
+class Authentication(HTTPDigestAuth):
 
     ALLOWED_HOST = '127.0.0.1'
 
     def __init__(self):
-        super(ConfdAuth, self).__init__()
+        super(Authentication, self).__init__()
         self.get_password(accesswebservice_dao.get_password)
         self.auth_verifier = AuthVerifier()
         self._auth_host = None
@@ -41,7 +41,7 @@ class ConfdAuth(HTTPDigestAuth):
         self.auth_verifier.set_config(config['auth'])
 
     def login_required(self, func):
-        auth_func = super(ConfdAuth, self).login_required(func)
+        auth_func = super(Authentication, self).login_required(func)
 
         @wraps(func)
         def decorated(*args, **kwargs):
@@ -80,4 +80,4 @@ class ConfdAuth(HTTPDigestAuth):
         return current_required_acl
 
 
-auth = ConfdAuth()
+authentication = Authentication()
