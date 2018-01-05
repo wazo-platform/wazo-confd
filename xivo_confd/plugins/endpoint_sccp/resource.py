@@ -1,16 +1,16 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import url_for
 from marshmallow import fields
 from marshmallow.validate import Length
 
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
+
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
 
 class SccpSchema(BaseSchema):

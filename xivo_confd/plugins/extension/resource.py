@@ -1,11 +1,13 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import url_for
-from xivo_confd.authentication.confd_auth import required_acl
-from xivo_confd.helpers.restful import ListResource, ItemResource
+
 from xivo_dao.alchemy.extension import Extension
+
+from xivo_confd.auth import required_acl
+from xivo_confd.helpers.restful import ListResource, ItemResource
 
 from .schema import ExtensionSchema
 

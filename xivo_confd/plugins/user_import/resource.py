@@ -1,15 +1,16 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers.db_manager import Session
 
 from xivo_confd import sysconfd, bus
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.auth import required_acl
 from xivo_confd.database import user_export as user_export_db
 from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.plugins.user_import import csvparse
 from xivo_confd.representations.csv_ import output_csv
+
+from . import csvparse
 
 
 class UserImportResource(ConfdResource):

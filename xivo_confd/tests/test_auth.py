@@ -11,7 +11,7 @@ from mock import Mock
 from flask import Flask
 from hamcrest import assert_that, equal_to
 from mock import patch
-from xivo_confd.authentication.confd_auth import ConfdAuth
+from xivo_confd.auth import ConfdAuth
 from xivo.auth_verifier import AuthVerifier
 
 

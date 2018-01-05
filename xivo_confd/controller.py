@@ -10,7 +10,7 @@ from functools import partial
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 
-from .authentication.confd_auth import auth
+from .auth import auth
 from .http_server import api, HTTPServer
 from .service_discovery import self_check
 
