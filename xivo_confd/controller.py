@@ -11,7 +11,7 @@ from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 
 from .authentication.confd_auth import auth
-from .server import api, HTTPServer
+from .http_server import api, HTTPServer
 from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)

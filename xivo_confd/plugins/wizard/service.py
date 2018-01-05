@@ -8,8 +8,8 @@ import re
 import socket
 
 from xivo_confd import sysconfd
-from xivo_confd.server import commit_database
 from xivo_confd.database import wizard as wizard_db
+from xivo_confd.http_server import commit_database
 
 from .notifier import build_notifier
 from .validator import build_validator

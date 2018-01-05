@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from werkzeug.local import LocalProxy
-from .server import get_bus_publisher
-from .server import get_sysconfd_publisher
+from .http_server import get_bus_publisher
+from .http_server import get_sysconfd_publisher
 
 bus = LocalProxy(get_bus_publisher)
 sysconfd = LocalProxy(get_sysconfd_publisher)

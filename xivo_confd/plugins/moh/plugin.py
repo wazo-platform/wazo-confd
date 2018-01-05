@@ -2,7 +2,7 @@
 # Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.server import add_endpoint_to_do_not_log_data_list
+from xivo_confd.http_server import add_endpoint_to_do_not_log_data_list
 
 from .resource import MohItem, MohList, MohFileItem
 from .service import build_service
