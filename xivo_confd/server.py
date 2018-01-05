@@ -105,15 +105,16 @@ class HTTPServer(object):
     def __init__(self, global_config):
         self.config = global_config['rest_api']
         http_helpers.add_logger(app, logger)
-        app.after_request(after_request)
+
         app.before_first_request(load_uuid)
         app.before_request(log_requests)
+        app.after_request(after_request)
+
         app.secret_key = os.urandom(24)
+        app.url_map.converters['filename'] = FilenameConverter
 
         app.config.update(global_config)
         app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
-
-        app.url_map.converters['filename'] = FilenameConverter
 
         self._load_cors()
 
