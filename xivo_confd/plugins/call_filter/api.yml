@@ -1,0 +1,165 @@
+paths:
+  /callfilters:
+    get:
+      operationId: list_call_filters
+      summary: List call filters
+      description: '**Required ACL:** `confd.callfilters.read`'
+      tags:
+      - callfilters
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Call Filters list
+          schema:
+            $ref: '#/definitions/CallFilterItems'
+    post:
+      operationId: create_callfilter
+      summary: Create call filter
+      description: '**Required ACL:** `confd.callfilters.create`'
+      tags:
+      - callfilters
+      parameters:
+      - name: body
+        in: body
+        description: Call Filter to create
+        required: true
+        schema:
+          $ref: '#/definitions/CallFilter'
+      responses:
+        '201':
+          description: Call Filter created
+          schema:
+            $ref: '#/definitions/CallFilter'
+        '400':
+          $ref: '#/responses/CreateError'
+  /callfilters/{callfilter_id}:
+    get:
+      operationId: get_callfilter
+      summary: Get call filter
+      description: '**Required ACL:** `confd.callfilters.{callfilter_id}.read`'
+      tags:
+      - callfilters
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      responses:
+        '200':
+          description: Call Filter
+          schema:
+            $ref: '#/definitions/CallFilter'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_callfilter
+      summary: Update call filter
+      description: '**Required ACL:** `confd.callfilters.{callfilter_id}.update`'
+      tags:
+      - callfilters
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CallFilter'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_callfilter
+      summary: Delete call filter
+      description: '**Required ACL:** `confd.callfilters.{callfilter_id}.delete`
+
+
+        . The call filter will also be removed from all users, groups, incoming
+        calls and outgoing calls.'
+      tags:
+      - callfilters
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  callfilterid:
+    required: true
+    type: integer
+    name: callfilter_id
+    in: path
+    description: Call Filter's ID
+
+definitions:
+  CallFilter:
+    title: CallFilter
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the call filter
+      name:
+        type: string
+        description: The name of the call filter
+      from_:
+        type: string
+        enum:
+        - internal
+        - external
+        - all
+        description: Call type to apply call filter
+      mode:
+        type: string
+        enum:
+        - bossfirst-serial
+        - bossfirst-simult
+        - secretary-serial
+        - secretary-simult
+        - all
+        description: Determine which will ring.
+      timeout:
+        type: integer
+        description: Number of seconds the filter's members will ring before fallbacking
+      caller_id_mode:
+        type: string
+        enum:
+        - prepend
+        - overwrite
+        - append
+        description: How the caller_id_name will be treated
+      caller_id_name:
+        type: string
+        description: Name to display
+      description:
+        type: string
+        description: Additional information about the call filter
+      enabled:
+        type: boolean
+        default: true
+        description: Disable or enable the call filter
+    required:
+    - name
+    - from_
+    - mode
+  CallFilterItems:
+    title: CallFilterItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/CallFilter'
+      total:
+        type: integer
+    required:
+    - total

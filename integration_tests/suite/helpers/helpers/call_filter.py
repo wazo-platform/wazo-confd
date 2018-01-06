@@ -1,25 +1,40 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import random
 import string
+import random
 
-from . import db
-
-
-def generate_call_filter(**parameters):
-    parameters.setdefault('name', _random_name())
-
-    with db.queries() as queries:
-        id = queries.insert_call_filter(**parameters)
-    return {'id': id}
+from . import confd
 
 
-def delete_call_filter(call_filter, check=False):
-    with db.queries() as queries:
-        queries.delete_call_filter(call_filter)
+def generate_call_filter(**params):
+    name = generate_name()
+    params.setdefault('name', name)
+    params.setdefault('mode', 'all')
+    params.setdefault('from_', 'all')
+    return add_call_filter(**params)
 
 
-def _random_name():
-    return ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+def add_call_filter(**params):
+    response = confd.callfilters.post(params)
+    return response.item
+
+
+def delete_call_filter(call_filter_id, check=False):
+    response = confd.callfilters(call_filter_id).delete()
+    if check:
+        response.assert_ok()
+
+
+def generate_name():
+    response = confd.callfilters.get()
+    names = set(d['name'] for d in response.items)
+    return _random_name(names)
+
+
+def _random_name(names):
+    name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    while name in names:
+        name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    return name

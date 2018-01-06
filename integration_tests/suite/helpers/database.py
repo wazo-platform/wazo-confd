@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import sqlalchemy as sa
@@ -461,26 +461,6 @@ class DatabaseQueries(object):
     def associate_call_pickup_entity(self, call_pickup_id, entity_id):
         query = text("UPDATE pickup SET entity_id = :entity_id WHERE id = :call_pickup_id")
         self.connection.execute(query, entity_id=entity_id, call_pickup_id=call_pickup_id)
-
-    def insert_call_filter(self, name):
-        query = text("""
-        INSERT INTO callfilter (name, type, description)
-        VALUES (
-                     :name, 'bosssecretary', ''
-               )
-        RETURNING id
-        """)
-
-        call_filter_id = (self.connection
-                          .execute(query,
-                                   name=name)
-                          .scalar())
-
-        return call_filter_id
-
-    def delete_call_filter(self, call_filter_id):
-        query = text("DELETE FROM callfilter WHERE id = :id")
-        self.connection.execute(query, id=call_filter_id)
 
     def associate_call_filter_entity(self, call_filter_id, entity_id):
         query = text("UPDATE callfilter SET entity_id = :entity_id WHERE id = :call_filter_id")
