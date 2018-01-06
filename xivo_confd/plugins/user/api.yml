@@ -188,7 +188,6 @@ paths:
       summary: Get status of all user's services
       description: '**Required ACL:** `confd.users.{user_id}.services.read`'
       tags:
-      - services
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
@@ -204,7 +203,6 @@ paths:
       summary: Update all services for a user
       description: '**Required ACL:** `confd.users.{user_id}.services.update`'
       tags:
-      - services
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
@@ -224,7 +222,6 @@ paths:
       summary: Get status of service
       description: '**Required ACL:** `confd.users.{user_id}.services.{service}.read`'
       tags:
-      - services
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
@@ -241,7 +238,6 @@ paths:
       summary: Enable/Disable service for a user
       description: '**Required ACL:** `confd.users.{user_id}.services.{service}.update`'
       tags:
-      - services
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
