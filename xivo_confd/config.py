@@ -223,7 +223,7 @@ def _parse_cli_args(argv):
     if parsed_args.debug:
         result['debug'] = parsed_args.debug
     if parsed_args.profile:
-        result['profile'] = parsed_args.profile
+        result['rest_api']['profile'] = parsed_args.profile
     if parsed_args.foreground:
         result['foreground'] = parsed_args.foreground
     if parsed_args.log_level:
