@@ -7,9 +7,10 @@ import random
 import re
 import socket
 
+from xivo_dao.helpers.db_utils import session_scope
+
 from xivo_confd import sysconfd
 from xivo_confd.database import wizard as wizard_db
-from xivo_confd.http_server import commit_database
 
 from .notifier import build_notifier
 from .validator import build_validator
@@ -36,8 +37,10 @@ class WizardService(object):
     def create(self, wizard):
         self.validator.validate_create(wizard)
         autoprov_username = self._generate_autoprov_username()
-        wizard_db.create(wizard, autoprov_username)
-        commit_database()
+
+        with session_scope():
+            wizard_db.create(wizard, autoprov_username)
+
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],
                                 wizard['network']['nameservers'])
