@@ -21,7 +21,7 @@ confd:
     # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
   environment:
     XIVO_UUID: "abcd-1234"
-  command: "xivo-confd -f -d"
+  command: "xivo-confd -d"
 
 postgres:
   image: wazopbx/postgres-test

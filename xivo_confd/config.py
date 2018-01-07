@@ -14,7 +14,6 @@ API_VERSION = '1.1'
 KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
 
 DEFAULT_CONFIG = {
-    'foreground': False,
     'debug': False,
     'user': 'www-data',
     'log_level': 'info',
@@ -197,10 +196,6 @@ def _parse_cli_args(argv):
                         '--debug',
                         action='store_true',
                         help="Log debug messages. Overrides log_level. Default: %(default)s")
-    parser.add_argument('-f',
-                        '--foreground',
-                        action='store_true',
-                        help="Foreground, don't daemonize. Default: %(default)s")
     parser.add_argument('-l',
                         '--log-level',
                         action='store',
@@ -224,8 +219,6 @@ def _parse_cli_args(argv):
         result['debug'] = parsed_args.debug
     if parsed_args.profile:
         result['rest_api']['profile'] = parsed_args.profile
-    if parsed_args.foreground:
-        result['foreground'] = parsed_args.foreground
     if parsed_args.log_level:
         result['log_level'] = parsed_args.log_level
     if parsed_args.user:
