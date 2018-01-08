@@ -65,7 +65,7 @@ confd:
     - provd
     - sysconfd
     - dird
-  command: "xivo-confd -f -d"
+  command: "xivo-confd -d"
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -13,16 +13,16 @@ from xivo.user_rights import change_user
 from xivo_confd.config import load as load_config
 from xivo_confd.controller import Controller
 
-
 logger = logging.getLogger(__name__)
+
+FOREGROUND = True  # Always in foreground systemd takes care of daemonizing
 
 
 def main(argv=None):
     argv = argv or sys.argv[1:]
     config = load_config(argv)
 
-    xivo_logging.setup_logging(config['log_filename'], config['foreground'],
-                               config['debug'], config['log_level'])
+    xivo_logging.setup_logging(config['log_filename'], FOREGROUND, config['debug'], config['log_level'])
     xivo_logging.silence_loggers(['Flask-Cors'], logging.WARNING)
 
     if config['user']:
@@ -36,5 +36,5 @@ def main(argv=None):
 
     controller = Controller(config)
 
-    with pidfile_context(config['pid_filename'], config['foreground']):
+    with pidfile_context(config['pid_filename'], FOREGROUND):
         controller.run()

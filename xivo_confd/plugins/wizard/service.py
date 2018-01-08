@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import netifaces
@@ -7,11 +7,13 @@ import random
 import re
 import socket
 
+from xivo_dao.helpers.db_utils import session_scope
+
 from xivo_confd import sysconfd
-from xivo_confd.application import commit_database
-from xivo_confd.plugins.wizard.notifier import build_notifier
-from xivo_confd.plugins.wizard.validator import build_validator
 from xivo_confd.database import wizard as wizard_db
+
+from .notifier import build_notifier
+from .validator import build_validator
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = '^nameserver (.*)'
@@ -35,8 +37,10 @@ class WizardService(object):
     def create(self, wizard):
         self.validator.validate_create(wizard)
         autoprov_username = self._generate_autoprov_username()
-        wizard_db.create(wizard, autoprov_username)
-        commit_database()
+
+        with session_scope():
+            wizard_db.create(wizard, autoprov_username)
+
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],
                                 wizard['network']['nameservers'])

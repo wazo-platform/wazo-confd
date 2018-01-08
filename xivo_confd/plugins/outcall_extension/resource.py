@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
@@ -7,7 +7,7 @@ from flask import request
 from marshmallow import fields
 from marshmallow.validate import Length, Range, Regexp
 
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.helpers.mallow import BaseSchema
 

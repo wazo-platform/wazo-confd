@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
@@ -10,7 +10,8 @@ from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Range, Regexp
 
 from xivo_dao.alchemy.staticiax import StaticIAX
-from xivo_confd.authentication.confd_auth import required_acl
+
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
 

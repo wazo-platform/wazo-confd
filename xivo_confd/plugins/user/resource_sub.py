@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
 from marshmallow import fields, pre_dump, post_load
 from marshmallow.validate import Length
 
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 from xivo_confd.helpers.restful import ConfdResource
 

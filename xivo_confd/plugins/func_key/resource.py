@@ -1,35 +1,38 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import url_for, request
 
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.resources.func_key.model import (
+    AgentDestination,
+    BSFilterDestination,
+    ConferenceDestination,
+    CustomDestination,
+    ForwardDestination,
+    FuncKey,
+    GroupDestination,
+    OnlineRecordingDestination,
+    PagingDestination,
+    ParkPositionDestination,
+    ParkingDestination,
+    QueueDestination,
+    ServiceDestination,
+    TransferDestination,
+    UserDestination,
+)
+
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
 
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
-
-from xivo_dao.resources.func_key.model import FuncKey
-from xivo_dao.resources.func_key.model import (AgentDestination,
-                                               BSFilterDestination,
-                                               ConferenceDestination,
-                                               CustomDestination,
-                                               ForwardDestination,
-                                               GroupDestination,
-                                               OnlineRecordingDestination,
-                                               PagingDestination,
-                                               ParkPositionDestination,
-                                               ParkingDestination,
-                                               QueueDestination,
-                                               ServiceDestination,
-                                               TransferDestination,
-                                               UserDestination)
-from .schema import (FuncKeyDestinationField,
-                     FuncKeySchema,
-                     FuncKeyUnifiedTemplateSchema,
-                     FuncKeyTemplateSchema,
-                     FuncKeyTemplateUserSchema)
-
+from .schema import (
+    FuncKeyDestinationField,
+    FuncKeySchema,
+    FuncKeyTemplateSchema,
+    FuncKeyTemplateUserSchema,
+    FuncKeyUnifiedTemplateSchema,
+)
 
 models_destination = {'user': UserDestination,
                       'group': GroupDestination,

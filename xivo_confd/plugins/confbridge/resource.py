@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
-
 from marshmallow import fields, pre_dump, post_load, pre_load, post_dump
 from marshmallow.validate import Length
 
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_dao.alchemy.asterisk_file_variable import AsteriskFileVariable
+
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema
 from xivo_confd.helpers.restful import ConfdResource
-
-from xivo_dao.alchemy.asterisk_file_variable import AsteriskFileVariable
 
 
 class AsteriskOptionSchema(BaseSchema):

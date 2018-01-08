@@ -66,7 +66,7 @@ confd:
     - provd
     - sysconfd
     - auth
-  command: "xivo-confd -f -d"
+  command: "xivo-confd -d"
   volumes:
     - "../../..:/usr/src/xivo-confd"
     - "./etc/xivo-confd:/etc/xivo-confd"

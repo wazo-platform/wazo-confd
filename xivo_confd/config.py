@@ -14,9 +14,7 @@ API_VERSION = '1.1'
 KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
 
 DEFAULT_CONFIG = {
-    'foreground': False,
     'debug': False,
-    'profile': None,
     'user': 'www-data',
     'log_level': 'info',
     'config_file': '/etc/xivo-confd/config.yml',
@@ -24,6 +22,7 @@ DEFAULT_CONFIG = {
     'log_filename': '/var/log/xivo-confd.log',
     'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
     'rest_api': {
+        'profile': None,
         'http': {
             'enabled': True,
             'listen': '127.0.0.1',
@@ -197,10 +196,6 @@ def _parse_cli_args(argv):
                         '--debug',
                         action='store_true',
                         help="Log debug messages. Overrides log_level. Default: %(default)s")
-    parser.add_argument('-f',
-                        '--foreground',
-                        action='store_true',
-                        help="Foreground, don't daemonize. Default: %(default)s")
     parser.add_argument('-l',
                         '--log-level',
                         action='store',
@@ -223,9 +218,7 @@ def _parse_cli_args(argv):
     if parsed_args.debug:
         result['debug'] = parsed_args.debug
     if parsed_args.profile:
-        result['profile'] = parsed_args.profile
-    if parsed_args.foreground:
-        result['foreground'] = parsed_args.foreground
+        result['rest_api']['profile'] = parsed_args.profile
     if parsed_args.log_level:
         result['log_level'] = parsed_args.log_level
     if parsed_args.user:

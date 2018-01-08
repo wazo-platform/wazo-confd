@@ -1,14 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import request
 from flask_restful import Resource
 
-from xivo_confd.helpers.common import handle_api_exception
-from xivo_confd.authentication.confd_auth import auth
-
 from xivo_dao.helpers import errors
+
+from xivo_confd.auth import authentication
+from xivo_confd.helpers.common import handle_api_exception
 
 
 class ErrorCatchingResource(Resource):
@@ -16,7 +16,7 @@ class ErrorCatchingResource(Resource):
 
 
 class ConfdResource(ErrorCatchingResource):
-    method_decorators = [auth.login_required] + ErrorCatchingResource.method_decorators
+    method_decorators = [authentication.login_required] + ErrorCatchingResource.method_decorators
 
 
 class ListResource(ConfdResource):
