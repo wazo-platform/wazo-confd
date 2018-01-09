@@ -2,17 +2,19 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    none,
+    not_,
+)
+
 from ..helpers import scenarios as s
 from ..helpers import fixtures
-
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      none,
-                      not_)
 from . import confd
 
 
@@ -94,13 +96,17 @@ def test_sorting_offset_limit(_, __, trunk1, trunk2):
 @fixtures.trunk()
 def test_get(trunk):
     response = confd.trunks(trunk['id']).get()
-    assert_that(response.item, has_entries(id=trunk['id'],
-                                           context=trunk['context'],
-                                           twilio_incoming=trunk['twilio_incoming'],
-                                           endpoint_sip=none(),
-                                           endpoint_custom=none(),
-                                           endpoint_iax=none(),
-                                           outcalls=empty()))
+    assert_that(response.item, has_entries(
+        id=trunk['id'],
+        context=trunk['context'],
+        twilio_incoming=trunk['twilio_incoming'],
+        endpoint_sip=none(),
+        endpoint_custom=none(),
+        endpoint_iax=none(),
+        outcalls=empty(),
+        register_iax=none(),
+        register_sip=none(),
+    ))
 
 
 def test_create_minimal_parameters():

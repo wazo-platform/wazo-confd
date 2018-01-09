@@ -139,6 +139,7 @@ DEFAULT_CONFIG = {
         'timezone': True,
         'trunk': True,
         'trunk_endpoint': True,
+        'trunk_register': True,
         'user': True,
         'user_agent': True,
         'user_call_permission': True,

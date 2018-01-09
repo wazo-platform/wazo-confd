@@ -92,6 +92,7 @@ def test_get(register_iax):
         callback_extension=none(),
         callback_context=none(),
         enabled=True,
+        trunk=none(),
     ))
 
 

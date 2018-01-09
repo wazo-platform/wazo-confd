@@ -45,6 +45,8 @@ class RegisterSIPSchema(BaseSchema):
     enabled = StrictBoolean(missing=True)
     links = ListLink(Link('register_sip'))
 
+    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+
     @validates_schema
     def validate_auth_username(self, data):
         if data.get('auth_username') and not data.get('auth_password'):
@@ -78,6 +80,7 @@ class RegisterSIPSchema(BaseSchema):
         result = register.groupdict()
         result['id'] = data.id
         result['enabled'] = data.enabled
+        result['trunk'] = data.trunk
         return result
 
 

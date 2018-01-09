@@ -84,6 +84,7 @@ setup(
             'timezone = xivo_confd.plugins.timezone.plugin:Plugin',
             'trunk = xivo_confd.plugins.trunk.plugin:Plugin',
             'trunk_endpoint = xivo_confd.plugins.trunk_endpoint.plugin:Plugin',
+            'trunk_register = xivo_confd.plugins.trunk_register.plugin:Plugin',
             'user = xivo_confd.plugins.user.plugin:Plugin',
             'user_agent = xivo_confd.plugins.user_agent.plugin:Plugin',
             'user_call_permission = xivo_confd.plugins.user_call_permission.plugin:Plugin',

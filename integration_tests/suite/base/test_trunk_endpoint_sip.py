@@ -87,6 +87,15 @@ def test_associate_when_line_already_associated(trunk, line, sip):
 
 @fixtures.trunk()
 @fixtures.sip()
+@fixtures.register_iax()
+def test_associate_when_register_iax(trunk, sip, register):
+    with a.trunk_register_iax(trunk, register):
+        response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
+        response.assert_match(400, e.resource_associated('Trunk', 'IAXRegister'))
+
+
+@fixtures.trunk()
+@fixtures.sip()
 def test_get_endpoint_associated_to_trunk(trunk, sip):
     expected = has_entries({'trunk_id': trunk['id'],
                             'endpoint': 'sip',
