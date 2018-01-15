@@ -19,15 +19,18 @@ from hamcrest import (
     not_,
 )
 
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import helpers as h
-from ..helpers import errors as e
-from ..helpers import fixtures
+from ..helpers import (
+    associations as a,
+    scenarios as s,
+    helpers as h,
+    errors as e,
+    fixtures,
+)
 from ..helpers.config import (
     CONTEXT,
     EXTEN_OUTSIDE_RANGE,
-    gen_conference_exten
+    gen_conference_exten,
+    gen_group_exten,
 )
 from . import confd, provd
 
@@ -175,6 +178,14 @@ def test_create_2_extensions_same_exten_different_context(context):
 @fixtures.conference()
 def test_edit_extension_conference_with_exten_outside_range(extension, conference):
     with a.conference_extension(conference, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
+
+
+@fixtures.extension(exten=gen_group_exten(), context=CONTEXT)
+@fixtures.group()
+def test_edit_extension_group_with_exten_outside_range(extension, group):
+    with a.group_extension(group, extension):
         response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
         response.assert_match(400, outside_range_regex)
 

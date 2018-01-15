@@ -12,5 +12,9 @@ ENTITY_NAME = 'xivotest'
 EXTEN_OUTSIDE_RANGE = str('99999')
 
 
+def gen_group_exten():
+    return str(random.randint(2000, 3000))
+
+
 def gen_conference_exten():
     return str(random.randint(4000, 5000))
