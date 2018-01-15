@@ -8,8 +8,7 @@ from ..config import CONTEXT, USER_EXTENSION_RANGE
 
 def generate_extension(**parameters):
     parameters.setdefault('context', CONTEXT)
-    if 'exten' not in parameters:
-        parameters['exten'] = find_available_exten(parameters['context'])
+    parameters.setdefault('exten', find_available_exten(parameters['context']))
     return add_extension(**parameters)
 
 

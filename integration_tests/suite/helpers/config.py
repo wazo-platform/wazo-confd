@@ -7,7 +7,6 @@ import random
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
 OUTCALL_CONTEXT = 'to-extern'
-EXTENSION_RANGE = list(range(1000, 5001))
 ENTITY_NAME = 'xivotest'
 EXTEN_OUTSIDE_RANGE = str('99999')
 USER_EXTENSION_RANGE = list(range(1000, 2000))
