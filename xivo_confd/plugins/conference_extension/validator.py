@@ -1,20 +1,28 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.context import dao as context_dao_module
 
-from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
+from xivo_confd.helpers.validator import (
+    BaseExtensionRangeMixin,
+    ValidatorAssociation,
+    ValidationAssociation,
+)
 
 
-class ConferenceExtensionAssociationValidator(ValidatorAssociation):
+class ConferenceExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRangeMixin):
+
+    def __init__(self, context_dao):
+        self._context_dao = context_dao
 
     def validate(self, conference, extension):
         self.validate_conference_not_already_associated(conference)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
+        self.validate_exten_is_in_context_conference_range(extension)
 
     def validate_conference_not_already_associated(self, conference):
         if conference.extensions:
@@ -36,15 +44,23 @@ class ConferenceExtensionAssociationValidator(ValidatorAssociation):
                                              associated_id=extension.typeval)
 
     def validate_extension_is_in_internal_context(self, extension):
-        context = context_dao.get_by_name(extension.context)
+        context = self._context_dao.get_by_name(extension.context)
         if context.type != 'internal':
             raise errors.unhandled_context_type(context.type,
                                                 extension.context,
                                                 id=extension.id,
                                                 context=extension.context)
 
+    def validate_exten_is_in_context_conference_range(self, extension):
+        if self._is_pattern(extension.exten):
+            return
+
+        context = self._context_dao.get_by_name(extension.context)
+        if not self._exten_in_range(extension.exten, context.conference_room_ranges):
+            raise errors.outside_context_range(extension.exten, extension.context)
+
 
 def build_validator():
     return ValidationAssociation(
-        association=[ConferenceExtensionAssociationValidator()],
+        association=[ConferenceExtensionAssociationValidator(context_dao_module)],
     )

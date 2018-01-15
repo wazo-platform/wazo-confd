@@ -24,7 +24,11 @@ from ..helpers import scenarios as s
 from ..helpers import helpers as h
 from ..helpers import errors as e
 from ..helpers import fixtures
-from ..helpers.config import CONTEXT
+from ..helpers.config import (
+    CONTEXT,
+    EXTEN_OUTSIDE_RANGE,
+    gen_conference_exten
+)
 from . import confd, provd
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
@@ -167,6 +171,12 @@ def test_create_2_extensions_same_exten_different_context(context):
     response.assert_created('extensions')
 
 
+@fixtures.extension(exten=gen_conference_exten(), context=CONTEXT)
+@fixtures.conference()
+def test_edit_extension_conference_with_exten_outside_range(extension, conference):
+    with a.conference_extension(conference, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
 
 
 @fixtures.extension()
