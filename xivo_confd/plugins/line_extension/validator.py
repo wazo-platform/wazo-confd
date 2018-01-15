@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
-
 from xivo_dao.helpers import errors
-from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.context import dao as context_dao_module
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
-from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
+from xivo_confd.helpers.validator import (
+    BaseExtensionRangeMixin,
+    ValidatorAssociation,
+    ValidationAssociation,
+)
+from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 
-class LineExtensionAssociationValidator(ValidatorAssociation):
+class LineExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRangeMixin):
+
+    def __init__(self, context_dao):
+        self._context_dao = context_dao
 
     def validate(self, line, extension):
         self.validate_line_has_endpoint(line)
@@ -21,6 +27,7 @@ class LineExtensionAssociationValidator(ValidatorAssociation):
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
         self.validate_line_has_no_different_user(line, extension)
+        self.validate_exten_is_in_context_user_range(extension)
 
     def validate_line_has_endpoint(self, line):
         if not line.is_associated():
@@ -43,7 +50,7 @@ class LineExtensionAssociationValidator(ValidatorAssociation):
                                              associated_id=extension.typeval)
 
     def validate_extension_is_in_internal_context(self, extension):
-        context = context_dao.get_by_name(extension.context)
+        context = self._context_dao.get_by_name(extension.context)
         if context.type != 'internal':
             raise errors.unhandled_context_type(context.type,
                                                 extension.context,
@@ -66,6 +73,14 @@ class LineExtensionAssociationValidator(ValidatorAssociation):
                                                  user_id=other_user_line.user_id,
                                                  line_id=other_user_line.line_id)
 
+    def validate_exten_is_in_context_user_range(self, extension):
+        if self._is_pattern(extension.exten):
+            return
+
+        context = self._context_dao.get_by_name(extension.context)
+        if not self._exten_in_range(extension.exten, context.user_ranges):
+            raise errors.outside_context_range(extension.exten, extension.context)
+
 
 class LineExtensionDissociationValidator(ValidatorAssociation):
 
@@ -75,6 +90,6 @@ class LineExtensionDissociationValidator(ValidatorAssociation):
 
 def build_validator():
     return ValidationAssociation(
-        association=[LineExtensionAssociationValidator()],
+        association=[LineExtensionAssociationValidator(context_dao_module)],
         dissociation=[LineExtensionDissociationValidator()]
     )

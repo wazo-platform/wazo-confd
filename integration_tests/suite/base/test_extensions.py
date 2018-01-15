@@ -31,6 +31,7 @@ from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     gen_conference_exten,
     gen_group_exten,
+    gen_line_exten,
 )
 from . import confd, provd
 
@@ -186,6 +187,14 @@ def test_edit_extension_conference_with_exten_outside_range(extension, conferenc
 @fixtures.group()
 def test_edit_extension_group_with_exten_outside_range(extension, group):
     with a.group_extension(group, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
+
+
+@fixtures.extension(exten=gen_line_exten(), context=CONTEXT)
+@fixtures.line_sip()
+def test_edit_extension_line_with_exten_outside_range(extension, line):
+    with a.line_extension(line, extension):
         response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
         response.assert_match(400, outside_range_regex)
 
