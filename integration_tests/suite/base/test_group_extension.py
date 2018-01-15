@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
-from ..helpers.config import INCALL_CONTEXT
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
+from ..helpers import (
+    scenarios as s,
+    errors as e,
+    fixtures,
+    associations as a,
+)
+from ..helpers.config import (
+    EXTEN_OUTSIDE_RANGE,
+    INCALL_CONTEXT,
+    gen_group_exten,
+)
 from . import confd
 
 
@@ -17,7 +26,7 @@ FAKE_ID = 999999999
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_associate_errors(group, extension):
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).put
@@ -27,7 +36,7 @@ def test_associate_errors(group, extension):
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_dissociate_errors(group, extension):
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).delete
@@ -37,14 +46,14 @@ def test_dissociate_errors(group, extension):
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_associate(group, extension):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_updated()
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_associate_already_associated(group, extension):
     with a.group_extension(group, extension):
         response = confd.groups(group['id']).extensions(extension['id']).put()
@@ -52,8 +61,8 @@ def test_associate_already_associated(group, extension):
 
 
 @fixtures.group()
-@fixtures.extension()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.extension(exten=gen_group_exten())
 def test_associate_multiple_extensions_to_group(group, extension1, extension2):
     with a.group_extension(group, extension1):
         response = confd.groups(group['id']).extensions(extension2['id']).put()
@@ -62,7 +71,7 @@ def test_associate_multiple_extensions_to_group(group, extension1, extension2):
 
 @fixtures.group()
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_associate_multiple_groups_to_extension(group1, group2, extension):
     with a.group_extension(group1, extension):
         response = confd.groups(group2['id']).extensions(extension['id']).put()
@@ -80,14 +89,28 @@ def test_associate_when_user_already_associated(group, user, line_sip, extension
 
 
 @fixtures.group()
-@fixtures.extension(context=INCALL_CONTEXT)
+@fixtures.extension(exten=gen_group_exten(), context=INCALL_CONTEXT)
 def test_associate_when_not_internal_context(group, extension):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_status(400)
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=EXTEN_OUTSIDE_RANGE)
+def test_associate_when_exten_outside_range(group, extension):
+    response = confd.groups(group['id']).extensions(extension['id']).put()
+    response.assert_status(400)
+
+
+@fixtures.group()
+@fixtures.extension(exten='_5678')
+def test_associate_when_exten_pattern(group, extension):
+    response = confd.groups(group['id']).extensions(extension['id']).put()
+    response.assert_updated()
+
+
+@fixtures.group()
+@fixtures.extension(exten=gen_group_exten())
 def test_dissociate(group, extension):
     with a.group_extension(group, extension, check=False):
         response = confd.groups(group['id']).extensions(extension['id']).delete()
@@ -95,14 +118,14 @@ def test_dissociate(group, extension):
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_dissociate_not_associated(group, extension):
     response = confd.groups(group['id']).extensions(extension['id']).delete()
     response.assert_deleted()
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_get_group_relation(group, extension):
     with a.group_extension(group, extension):
         response = confd.groups(group['id']).get()
@@ -113,7 +136,7 @@ def test_get_group_relation(group, extension):
         ))
 
 
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 def test_get_extension_relation(extension, group):
     with a.group_extension(group, extension):
@@ -125,7 +148,7 @@ def test_get_extension_relation(extension, group):
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_edit_context_to_incall_when_associated(group, extension):
     with a.group_extension(group, extension):
         response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
@@ -133,7 +156,7 @@ def test_edit_context_to_incall_when_associated(group, extension):
 
 
 @fixtures.group()
-@fixtures.extension()
+@fixtures.extension(exten=gen_group_exten())
 def test_delete_group_when_group_and_extension_associated(group, extension):
     with a.group_extension(group, extension, check=False):
         response = confd.groups(group['id']).delete()

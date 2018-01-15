@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
@@ -31,7 +31,7 @@ def find_available_number(context=config.CONTEXT, exclude=None):
                for v in response.items
                if v['context'] == context and v['number'].isdigit()]
 
-    available_numbers = set(config.EXTENSION_RANGE) - set(numbers) - exclude
+    available_numbers = set(config.USER_EXTENSION_RANGE) - set(numbers) - exclude
     return str(available_numbers.pop())
 
 

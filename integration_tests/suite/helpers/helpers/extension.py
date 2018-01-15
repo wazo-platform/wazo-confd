@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
-from .. import config
+from ..config import CONTEXT, USER_EXTENSION_RANGE
 
 
 def generate_extension(**parameters):
-    parameters.setdefault('context', config.CONTEXT)
-    if 'exten' not in parameters:
-        parameters['exten'] = find_available_exten(parameters['context'])
+    parameters.setdefault('context', CONTEXT)
+    parameters.setdefault('exten', find_available_exten(parameters['context']))
     return add_extension(**parameters)
 
 
@@ -20,7 +19,7 @@ def find_available_exten(context, exclude=None):
                for e in response.items
                if e['context'] == context and e['exten'].isdigit()]
 
-    available = set(config.EXTENSION_RANGE) - set(numbers) - exclude
+    available = set(USER_EXTENSION_RANGE) - set(numbers) - exclude
     return str(available.pop())
 
 

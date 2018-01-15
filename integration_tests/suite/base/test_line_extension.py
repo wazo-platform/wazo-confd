@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import associations as a
-from ..helpers import fixtures
-from ..helpers import config
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    has_entries,
+    has_item,
+    has_items,
+)
 
-from hamcrest import assert_that
-from hamcrest import contains
-from hamcrest import empty
-from hamcrest import has_entries
-from hamcrest import has_item
-from hamcrest import has_items
+from ..helpers import (
+    scenarios as s,
+    errors as e,
+    associations as a,
+    fixtures,
+)
+from ..helpers.config import EXTEN_OUTSIDE_RANGE, INCALL_CONTEXT
 from . import confd, db
-
 
 FAKE_ID = 999999999
 
@@ -85,7 +88,7 @@ def test_associate_line_and_internal_extension(line, extension):
                                                       'extension_id': extension['id']})))
 
 
-@fixtures.extension(context=config.INCALL_CONTEXT)
+@fixtures.extension(context=INCALL_CONTEXT)
 @fixtures.line_sip()
 def test_associate_extension_not_in_internal_context(extension, line):
     response = confd.lines(line['id']).extensions(extension['id']).put()
@@ -208,6 +211,20 @@ def test_associate_line_with_endpoint(line, sip, extension):
 
 
 @fixtures.line_sip()
+@fixtures.extension(exten=EXTEN_OUTSIDE_RANGE)
+def test_associate_when_exten_outside_range(line, extension):
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_status(400)
+
+
+@fixtures.line_sip()
+@fixtures.extension(exten='_9123')
+def test_associate_when_exten_pattern(line, extension):
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_updated()
+
+
+@fixtures.line_sip()
 @fixtures.extension()
 def test_dissociate_line_and_extension(line, extension):
     with a.line_extension(line, extension, check=False):
@@ -271,7 +288,7 @@ def test_dissociation(line, extension):
 @fixtures.extension()
 def test_edit_context_to_incall_when_associated(line, extension):
     with a.line_extension(line, extension, check=True):
-        response = confd.extensions(extension['id']).put(context=config.INCALL_CONTEXT)
+        response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
         response.assert_status(400)
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
@@ -19,12 +19,20 @@ from hamcrest import (
     not_,
 )
 
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import helpers as h
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers.config import CONTEXT
+from ..helpers import (
+    associations as a,
+    scenarios as s,
+    helpers as h,
+    errors as e,
+    fixtures,
+)
+from ..helpers.config import (
+    CONTEXT,
+    EXTEN_OUTSIDE_RANGE,
+    gen_conference_exten,
+    gen_group_exten,
+    gen_line_exten,
+)
 from . import confd, provd
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
@@ -150,12 +158,6 @@ def test_create_extension_with_fake_context():
     response.assert_match(400, e.not_found('Context'))
 
 
-def test_create_extension_outside_context_range():
-    response = confd.extensions.post(exten='999999999',
-                                     context='default')
-    response.assert_match(400, outside_range_regex)
-
-
 def test_create_pattern():
     response = confd.extensions.post(exten='_XXXX',
                                      context='default')
@@ -173,11 +175,28 @@ def test_create_2_extensions_same_exten_different_context(context):
     response.assert_created('extensions')
 
 
-@fixtures.extension()
-def test_edit_extension_outside_context_range(extension):
-    response = confd.extensions(extension['id']).put(exten='999999999',
-                                                     context='default')
-    response.assert_match(400, outside_range_regex)
+@fixtures.extension(exten=gen_conference_exten(), context=CONTEXT)
+@fixtures.conference()
+def test_edit_extension_conference_with_exten_outside_range(extension, conference):
+    with a.conference_extension(conference, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
+
+
+@fixtures.extension(exten=gen_group_exten(), context=CONTEXT)
+@fixtures.group()
+def test_edit_extension_group_with_exten_outside_range(extension, group):
+    with a.group_extension(group, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
+
+
+@fixtures.extension(exten=gen_line_exten(), context=CONTEXT)
+@fixtures.line_sip()
+def test_edit_extension_line_with_exten_outside_range(extension, line):
+    with a.line_extension(line, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
 
 
 @fixtures.extension()
