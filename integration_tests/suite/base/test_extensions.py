@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
@@ -150,12 +150,6 @@ def test_create_extension_with_fake_context():
     response.assert_match(400, e.not_found('Context'))
 
 
-def test_create_extension_outside_context_range():
-    response = confd.extensions.post(exten='999999999',
-                                     context='default')
-    response.assert_match(400, outside_range_regex)
-
-
 def test_create_pattern():
     response = confd.extensions.post(exten='_XXXX',
                                      context='default')
@@ -173,11 +167,6 @@ def test_create_2_extensions_same_exten_different_context(context):
     response.assert_created('extensions')
 
 
-@fixtures.extension()
-def test_edit_extension_outside_context_range(extension):
-    response = confd.extensions(extension['id']).put(exten='999999999',
-                                                     context='default')
-    response.assert_match(400, outside_range_regex)
 
 
 @fixtures.extension()

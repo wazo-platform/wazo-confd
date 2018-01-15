@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -9,7 +9,12 @@ from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 
 
-from xivo_confd.helpers.validator import Validator, ValidationGroup, GetResource
+from xivo_confd.helpers.validator import (
+    BaseExtensionRangeMixin,
+    GetResource,
+    ValidationGroup,
+    Validator,
+)
 
 
 class ExtenAvailableValidator(Validator):
@@ -85,7 +90,7 @@ class ContextOnUpdateValidator(Validator):
             raise errors.unhandled_context_type(context.type)
 
 
-class ExtensionRangeValidator(Validator):
+class ExtensionRangeValidator(Validator, BaseExtensionRangeMixin):
 
     def __init__(self, dao):
         self.dao = dao
@@ -95,23 +100,18 @@ class ExtensionRangeValidator(Validator):
             return
 
         context = self.dao.get_by_name(extension.context)
-        if context.type == 'outcall':
-            return
 
-        context_ranges = (context.user_ranges +
-                          context.group_ranges +
-                          context.queue_ranges +
-                          context.conference_room_ranges +
-                          context.incall_ranges)
-        if not self.extension_in_range(extension.exten, context_ranges):
+        if extension.conference and not self._exten_in_range(extension.exten, context.conference_room_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
 
-    def extension_in_range(self, exten, context_ranges):
-        return any(context_range.in_range(exten)
-                   for context_range in context_ranges)
+        if extension.group and not self._exten_in_range(extension.exten, context.group_ranges):
+            raise errors.outside_context_range(extension.exten, extension.context)
 
-    def _is_pattern(self, exten):
-        return exten.startswith('_')
+        if extension.incall and not self._exten_in_range(extension.exten, context.incall_ranges):
+            raise errors.outside_context_range(extension.exten, extension.context)
+
+        if extension.lines and not self._exten_in_range(extension.exten, context.user_ranges):
+            raise errors.outside_context_range(extension.exten, extension.context)
 
 
 class ExtensionAssociationValidator(Validator):
@@ -145,7 +145,6 @@ def build_validator():
         ],
         create=[
             ExtenAvailableOnCreateValidator(extension_dao, parking_lot_dao),
-            ExtensionRangeValidator(context_dao),
         ],
         edit=[
             ExtenAvailableOnUpdateValidator(extension_dao, parking_lot_dao),

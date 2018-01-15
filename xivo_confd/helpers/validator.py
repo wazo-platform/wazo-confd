@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import abc
@@ -154,3 +154,13 @@ class ValidationAssociation(object):
     def validate_dissociation(self, *models):
         for validator in self.common + self.dissociation:
             validator.validate(*models)
+
+
+class BaseExtensionRangeMixin(object):
+
+    def _exten_in_range(self, exten, context_ranges):
+        return any(context_range.in_range(exten)
+                   for context_range in context_ranges)
+
+    def _is_pattern(self, exten):
+        return exten.startswith('_')
