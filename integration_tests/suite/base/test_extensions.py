@@ -73,10 +73,13 @@ def test_delete_errors():
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'exten', None
     yield s.check_bogus_field_returns_error, url, 'exten', True
-    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123'
-    yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX'
     yield s.check_bogus_field_returns_error, url, 'exten', {}
     yield s.check_bogus_field_returns_error, url, 'exten', []
+    yield s.check_bogus_field_returns_error, url, 'exten', '01234567890123456789012345678901234567890'
+    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123', {'context': CONTEXT}
+    yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX', {'context': CONTEXT}
+    yield s.check_bogus_field_returns_error, url, 'exten', '_+111', {'context': CONTEXT}
+    yield s.check_bogus_field_returns_error, url, 'exten', '_1+111', {'context': 'to-extern'}
     yield s.check_bogus_field_returns_error, url, 'context', None
     yield s.check_bogus_field_returns_error, url, 'context', True
     yield s.check_bogus_field_returns_error, url, 'context', {}
@@ -164,6 +167,13 @@ def test_create_pattern():
     response.assert_created('extensions')
 
 
+def test_create_outcall_pattern():
+    response = confd.extensions.post(exten='_+XXXX', context='to-extern')
+    response.assert_created('extensions')
+
+    confd.extensions(response.item['id']).delete()
+
+
 @fixtures.context()
 def test_create_2_extensions_same_exten_different_context(context):
     exten = h.extension.find_available_exten(CONTEXT)
@@ -210,6 +220,12 @@ def test_edit_extension_with_fake_context(extension):
 def test_edit_pattern(extension):
     response = confd.extensions(extension['id']).put(exten='_X21',
                                                      context='default')
+    response.assert_updated()
+
+
+@fixtures.extension(context='to-extern')
+def test_edit_outcall_pattern(extension):
+    response = confd.extensions(extension['id']).put(exten='_+X21')
     response.assert_updated()
 
 

@@ -1,17 +1,16 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
-from marshmallow.validate import Regexp
+from marshmallow.validate import Length
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-from xivo_confd.helpers.validator import EXTEN_REGEX
 
 
 class ExtensionSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    exten = fields.String(validate=Regexp(EXTEN_REGEX), required=True)
+    exten = fields.String(validate=Length(max=40), required=True)
     context = fields.String(required=True)
     commented = fields.Boolean(attribute='legacy_commented')
     enabled = fields.Boolean()
