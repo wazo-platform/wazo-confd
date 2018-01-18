@@ -62,25 +62,25 @@ class ConfBridgeConfigurationList(ConfdResource):
         return '', 204
 
 
-class ConfBridgeDefaultBridgeList(ConfBridgeConfigurationList):
-    section_name = 'default_bridge'
+class ConfBridgeWazoDefaultBridgeList(ConfBridgeConfigurationList):
+    section_name = 'wazo_default_bridge'
 
-    @required_acl('confd.asterisk.confbridge.default_bridge.get')
+    @required_acl('confd.asterisk.confbridge.wazo_default_bridge.get')
     def get(self):
-        return super(ConfBridgeDefaultBridgeList, self).get()
+        return super(ConfBridgeWazoDefaultBridgeList, self).get()
 
-    @required_acl('confd.asterisk.confbridge.default_bridge.update')
+    @required_acl('confd.asterisk.confbridge.wazo_default_bridge.update')
     def put(self):
-        return super(ConfBridgeDefaultBridgeList, self).put()
+        return super(ConfBridgeWazoDefaultBridgeList, self).put()
 
 
-class ConfBridgeDefaultUserList(ConfBridgeConfigurationList):
-    section_name = 'default_user'
+class ConfBridgeWazoDefaultUserList(ConfBridgeConfigurationList):
+    section_name = 'wazo_default_user'
 
-    @required_acl('confd.asterisk.confbridge.default_user.get')
+    @required_acl('confd.asterisk.confbridge.wazo_default_user.get')
     def get(self):
-        return super(ConfBridgeDefaultUserList, self).get()
+        return super(ConfBridgeWazoDefaultUserList, self).get()
 
-    @required_acl('confd.asterisk.confbridge.default_user.update')
+    @required_acl('confd.asterisk.confbridge.wazo_default_user.update')
     def put(self):
-        return super(ConfBridgeDefaultUserList, self).put()
+        return super(ConfBridgeWazoDefaultUserList, self).put()

@@ -1,13 +1,13 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 from mock import Mock
 
 from xivo_bus.resources.confbridge.event import (
-    EditConfBridgeDefaultBridgeEvent,
-    EditConfBridgeDefaultUserEvent,
+    EditConfBridgeWazoDefaultBridgeEvent,
+    EditConfBridgeWazoDefaultUserEvent,
 )
 
 from ..notifier import ConfBridgeConfigurationNotifier
@@ -27,26 +27,26 @@ class TestConfBridgeConfigurationNotifier(unittest.TestCase):
 
         self.notifier = ConfBridgeConfigurationNotifier(self.bus, self.sysconfd)
 
-    def test_when_confbridge_default_bridge_edited_then_event_sent_on_bus(self):
-        expected_event = EditConfBridgeDefaultBridgeEvent()
+    def test_when_confbridge_wazo_default_bridge_edited_then_event_sent_on_bus(self):
+        expected_event = EditConfBridgeWazoDefaultBridgeEvent()
 
-        self.notifier.edited('default_bridge', self.confbridge)
+        self.notifier.edited('wazo_default_bridge', self.confbridge)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_when_confbridge_default_bridge_edited_then_sip_reloaded(self):
-        self.notifier.edited('default_bridge', self.confbridge)
+    def test_when_confbridge_wazo_default_bridge_edited_then_sip_reloaded(self):
+        self.notifier.edited('wazo_default_bridge', self.confbridge)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
-    def test_when_confuser_default_user_edited_then_event_sent_on_bus(self):
-        expected_event = EditConfBridgeDefaultUserEvent()
+    def test_when_confuser_wazo_default_user_edited_then_event_sent_on_bus(self):
+        expected_event = EditConfBridgeWazoDefaultUserEvent()
 
-        self.notifier.edited('default_user', self.confbridge)
+        self.notifier.edited('wazo_default_user', self.confbridge)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_when_confuser_default_user_edited_then_sip_reloaded(self):
-        self.notifier.edited('default_user', self.confbridge)
+    def test_when_confuser_wazo_default_user_edited_then_sip_reloaded(self):
+        self.notifier.edited('wazo_default_user', self.confbridge)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
