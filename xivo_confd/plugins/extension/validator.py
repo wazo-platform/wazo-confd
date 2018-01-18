@@ -70,6 +70,9 @@ class ExtenAvailableOnUpdateValidator(ExtenAvailableValidator):
 
 class ExtenRegexValidator(Validator):
 
+    exten_regex = re.compile(EXTEN_REGEX)
+    exten_outcall_regex = re.compile(EXTEN_OUTCALL_REGEX)
+
     def __init__(self, context_dao):
         self._context_dao = context_dao
 
@@ -77,12 +80,12 @@ class ExtenRegexValidator(Validator):
         context = self._context_dao.get_by_name(extension.context)
 
         if context.type == 'outcall':
-            self._validate_regexp(EXTEN_OUTCALL_REGEX, extension.exten)
+            self._validate_regexp(self.exten_outcall_regex, extension.exten)
         else:
-            self._validate_regexp(EXTEN_REGEX, extension.exten)
+            self._validate_regexp(self.exten_regex, extension.exten)
 
     def _validate_regexp(self, regexp, value):
-        if re.compile(regexp).match(value) is None:
+        if regexp.match(value) is None:
             raise InputError("exten: ['String does not match expected pattern.']")
 
 
