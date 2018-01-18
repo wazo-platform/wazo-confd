@@ -8,6 +8,7 @@ from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
 EXTEN_REGEX = r'^_[*#0-9_XxZzNn\[\].!-]{1,39}$|[*#0-9]{1,40}$'
+EXTEN_OUTCALL_REGEX = r'^_?\+?[*#0-9_XxZzNn\[\].!-]*$'
 LANGUAGE_REGEX = r"^[a-z]{2}_[A-Z]{2}$"
 
 

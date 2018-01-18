@@ -2,7 +2,10 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import re
+
 from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
@@ -10,6 +13,8 @@ from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 
 
 from xivo_confd.helpers.validator import (
+    EXTEN_REGEX,
+    EXTEN_OUTCALL_REGEX,
     BaseExtensionRangeMixin,
     GetResource,
     ValidationGroup,
@@ -61,6 +66,27 @@ class ExtenAvailableOnUpdateValidator(ExtenAvailableValidator):
                                          context=extension.context)
 
         self._validate_parking_lots(extension)
+
+
+class ExtenRegexValidator(Validator):
+
+    exten_regex = re.compile(EXTEN_REGEX)
+    exten_outcall_regex = re.compile(EXTEN_OUTCALL_REGEX)
+
+    def __init__(self, context_dao):
+        self._context_dao = context_dao
+
+    def validate(self, extension):
+        context = self._context_dao.get_by_name(extension.context)
+
+        if context.type == 'outcall':
+            self._validate_regexp(self.exten_outcall_regex, extension.exten)
+        else:
+            self._validate_regexp(self.exten_regex, extension.exten)
+
+    def _validate_regexp(self, regexp, value):
+        if regexp.match(value) is None:
+            raise InputError("exten: ['String does not match expected pattern.']")
 
 
 class ContextOnUpdateValidator(Validator):
@@ -145,11 +171,13 @@ def build_validator():
         ],
         create=[
             ExtenAvailableOnCreateValidator(extension_dao, parking_lot_dao),
+            ExtenRegexValidator(context_dao),
         ],
         edit=[
             ExtenAvailableOnUpdateValidator(extension_dao, parking_lot_dao),
             ContextOnUpdateValidator(context_dao),
             ExtensionRangeValidator(context_dao),
+            ExtenRegexValidator(context_dao),
         ],
         delete=[
             ExtensionAssociationValidator(extension_dao, line_extension_dao)
