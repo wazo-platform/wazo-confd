@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from .resource import ConfBridgeDefaultBridgeList, ConfBridgeDefaultUserList
+from .resource import ConfBridgeWazoDefaultBridgeList, ConfBridgeWazoDefaultUserList
 from .service import build_service
 
 
@@ -13,13 +13,13 @@ class Plugin(object):
         service = build_service()
 
         api.add_resource(
-            ConfBridgeDefaultBridgeList,
-            '/asterisk/confbridge/default_bridge',
+            ConfBridgeWazoDefaultBridgeList,
+            '/asterisk/confbridge/wazo_default_bridge',
             resource_class_args=(service,)
         )
 
         api.add_resource(
-            ConfBridgeDefaultUserList,
-            '/asterisk/confbridge/default_user',
+            ConfBridgeWazoDefaultUserList,
+            '/asterisk/confbridge/wazo_default_user',
             resource_class_args=(service,)
         )

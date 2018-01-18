@@ -1,21 +1,21 @@
 paths:
-  /asterisk/confbridge/default_bridge:
+  /asterisk/confbridge/wazo_default_bridge:
     get:
-      operationId: list_asterisk_confbridge_default_bridge
-      summary: List ConfBridge default_bridge options
-      description: '**Required ACL:** `confd.asterisk.confbridge.default_bridge.read`'
+      operationId: list_asterisk_confbridge_wazo_default_bridge
+      summary: List ConfBridge wazo_default_bridge options
+      description: '**Required ACL:** `confd.asterisk.confbridge.wazo_default_bridge.read`'
       tags:
       - asterisk
       - conferences
       responses:
         '200':
-          description: ConfBridge default_bridge
+          description: ConfBridge wazo_default_bridge
           schema:
             $ref: '#/definitions/ConfBridgeConfiguration'
     put:
-      operationId: update_asterisk_confbridge_default_bridge
-      summary: Update ConfBridge default_bridge option
-      description: '**Required ACL:** `confd.asterisk.confbridge.default_bridge.update`
+      operationId: update_asterisk_confbridge_wazo_default_bridge
+      summary: Update ConfBridge wazo_default_bridge option
+      description: '**Required ACL:** `confd.asterisk.confbridge.wazo_default_bridge.update`
 
 
         **WARNING** This endpoint restore to default value or delete all fields that
@@ -36,23 +36,23 @@ paths:
           $ref: '#/responses/UpdateError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /asterisk/confbridge/default_user:
+  /asterisk/confbridge/wazo_default_user:
     get:
-      operationId: list_asterisk_confbridge_default_user
-      summary: List ConfBridge default_user options
-      description: '**Required ACL:** `confd.asterisk.confbridge.default_user.read`'
+      operationId: list_asterisk_confbridge_wazo_default_user
+      summary: List ConfBridge wazo_default_user options
+      description: '**Required ACL:** `confd.asterisk.confbridge.wazo_default_user.read`'
       tags:
       - asterisk
       - conferences
       responses:
         '200':
-          description: ConfBridge default_user
+          description: ConfBridge wazo_default_user
           schema:
             $ref: '#/definitions/ConfBridgeConfiguration'
     put:
-      operationId: update_asterisk_confbridge_default_user
-      summary: Update ConfBridge default_user option
-      description: '**Required ACL:** `confd.asterisk.confbridge.default_user.update`
+      operationId: update_asterisk_confbridge_wazo_default_user
+      summary: Update ConfBridge wazo_default_user option
+      description: '**Required ACL:** `confd.asterisk.confbridge.wazo_default_user.update`
 
 
         **WARNING** This endpoint restore to default value or delete all fields that
