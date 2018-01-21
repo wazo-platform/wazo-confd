@@ -27,12 +27,12 @@ class SoundService(object):
         total = len(sounds)
         return total, sounds
 
-    def get(self, sound_name, parameters=None, with_files=True):
+    def get(self, category, parameters=None, with_files=True):
         parameters = parameters if parameters is not None else {}
-        if sound_name == ASTERISK_CATEGORY:
+        if category == ASTERISK_CATEGORY:
             sound = self._get_asterisk_sound(parameters, with_files)
         else:
-            sound = self._storage.get_directory(sound_name, parameters, with_files)
+            sound = self._storage.get_directory(category, parameters, with_files)
         return sound
 
     def _get_asterisk_sound(self, parameters, with_files=True):

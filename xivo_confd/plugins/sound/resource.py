@@ -17,7 +17,7 @@ class SoundList(ListResource):
     schema = SoundSchema
 
     def build_headers(self, sound):
-        return {'Location': url_for('sounds', name=sound.name, _external=True)}
+        return {'Location': url_for('sounds', category=sound.name, _external=True)}
 
     @required_acl('confd.sounds.create')
     def post(self):
@@ -32,15 +32,15 @@ class SoundItem(ItemResource):
 
     schema = SoundSchema
 
-    @required_acl('confd.sounds.{name}.read')
-    def get(self, name):
-        return super(SoundItem, self).get(name)
+    @required_acl('confd.sounds.{category}.read')
+    def get(self, category):
+        return super(SoundItem, self).get(category)
 
-    @required_acl('confd.sounds.{name}.delete')
-    def delete(self, name):
-        return super(SoundItem, self).delete(name)
+    @required_acl('confd.sounds.{category}.delete')
+    def delete(self, category):
+        return super(SoundItem, self).delete(category)
 
-    def put(self, name):
+    def put(self, category):
         return '', 405
 
 
@@ -49,18 +49,18 @@ class SoundFileItem(ConfdResource):
     def __init__(self, service):
         self.service = service
 
-    @required_acl('confd.sounds.{name}.files.{filename}.read')
-    def get(self, name, filename):
+    @required_acl('confd.sounds.{category}.files.{filename}.read')
+    def get(self, category, filename):
         parameters = SoundQueryParametersSchema().load(request.args).data
         parameters['file_name'] = filename
-        sound = self.service.get(name, parameters)
+        sound = self.service.get(category, parameters)
         response = self.service.load_first_file(sound)
         return response
 
-    @required_acl('confd.sounds.{name}.files.{filename}.update')
-    def put(self, name, filename):
+    @required_acl('confd.sounds.{category}.files.{filename}.update')
+    def put(self, category, filename):
         parameters = SoundQueryParametersSchema().load(request.args).data
-        sound = self.service.get(name, with_files=False)
+        sound = self.service.get(category, with_files=False)
         sound_file = SoundFile(
             name=filename,
             formats=[SoundFormat(format_=parameters.get('format'), language=parameters.get('language'))],
@@ -69,10 +69,10 @@ class SoundFileItem(ConfdResource):
         self.service.save_first_file(sound, request.data)
         return '', 204
 
-    @required_acl('confd.sounds.{name}.files.{filename}.delete')
-    def delete(self, name, filename):
+    @required_acl('confd.sounds.{category}.files.{filename}.delete')
+    def delete(self, category, filename):
         parameters = SoundQueryParametersSchema().load(request.args).data
         parameters['file_name'] = filename
-        sound = self.service.get(name, parameters)
+        sound = self.service.get(category, parameters)
         self.service.delete_files(sound)
         return '', 204

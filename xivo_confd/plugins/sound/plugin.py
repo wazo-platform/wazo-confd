@@ -25,14 +25,14 @@ class Plugin(object):
 
         api.add_resource(
             SoundItem,
-            '/sounds/<filename:name>',
+            '/sounds/<filename:category>',
             endpoint='sounds',
             resource_class_args=(service,)
         )
 
         api.add_resource(
             SoundFileItem,
-            '/sounds/<filename:name>/files/<filename:filename>',
+            '/sounds/<filename:category>/files/<filename:filename>',
             endpoint='soundsfileitem',
             resource_class_args=(service,)
         )
