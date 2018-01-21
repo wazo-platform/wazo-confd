@@ -10,6 +10,13 @@ RUN true && \
     chmod -R 777 /var/lib/xivo/sounds
 
 RUN true && \
+    mkdir -p /var/lib/xivo/sounds/hard-coded/fr_FR && \
+    touch /var/lib/xivo/sounds/hard-coded/fr_FR/ivr.mp3 && \
+    chmod 777 /var/lib/xivo/sounds/hard-coded && \
+    chmod 555 /var/lib/xivo/sounds/hard-coded/fr_FR && \
+    chmod 444 /var/lib/xivo/sounds/hard-coded/fr_FR/ivr.mp3
+
+RUN true && \
     mkdir -p /usr/share/asterisk/sounds/fr_FR && \
     mkdir -p /usr/share/asterisk/sounds/fr_CA && \
     echo -n "asterisk_sound_ogg_fr_FR" > /usr/share/asterisk/sounds/fr_FR/conf-now-unmuted.ogg && \

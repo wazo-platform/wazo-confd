@@ -365,6 +365,17 @@ def test_delete_file_multiple(sound):
     response.assert_status(404)
 
 
+def test_delete_files_with_partial_errors():
+    client = _new_sound_file_client()
+    client.url.sounds('hard-coded').files('ivr').put().assert_updated()
+
+    response = confd.sounds('hard-coded').files('ivr').delete()
+    response.assert_deleted()
+
+    response = confd.sounds('hard-coded').files('ivr').delete()
+    response.assert_status(500)
+
+
 def test_update_system_file():
     sound = {
         'id': 'foo',

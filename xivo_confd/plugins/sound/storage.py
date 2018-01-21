@@ -147,13 +147,19 @@ class _SoundFilesystemStorage(object):
 
     def remove_files(self, sound):
         paths = self._get_file_paths(sound)
-        try:
-            for path in paths:
+        errors = []
+        for path in paths:
+            try:
                 os.remove(path)
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                raise errors.not_found('Sound file', name=sound.name, path=path)
-            raise
+            except OSError as e:
+                if e.errno == errno.ENOENT:
+                    errors.append(errors.not_found('Sound file', name=sound.name, path=path))
+                else:
+                    errors.append(e)
+
+        if len(errors) == len(paths):
+            for error in errors:
+                raise error
 
     def _get_first_file_path(self, sound):
         paths = self._get_file_paths(sound)
