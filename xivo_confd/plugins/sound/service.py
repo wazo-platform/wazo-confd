@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from .model import SoundCategory
@@ -38,7 +38,10 @@ class SoundService(object):
     def _get_asterisk_sound(self, parameters, with_files=True):
         sound = SoundCategory(name='system')
         if with_files:
-            ari_sounds = self._ari_client.get_sounds(parameters)
+            if 'file_name' in parameters:
+                ari_sounds = [self._ari_client.get_sound(parameters['file_name'], parameters)]
+            else:
+                ari_sounds = self._ari_client.get_sounds()
             sound.files = convert_ari_sounds_to_model(ari_sounds)
         return sound
 

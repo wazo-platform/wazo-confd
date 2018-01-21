@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -260,6 +260,34 @@ def test_get_file(sound):
     assert_that(response.raw, equal_to('ivr_slin_fr_FR'))
 
 
+def test_get_file_system():
+    sound = {
+        'id': 'conf-now-unmuted',
+        'formats': [{'language': 'fr_FR',
+                     'format': 'slin'},
+                    {'language': 'fr_FR',
+                     'format': 'ogg'},
+                    {'language': 'fr_CA',
+                     'format': 'ogg'}],
+        'text': 'The conference is now unmuted.'
+    }
+    ari.set_sound(sound)
+
+    response = confd.sounds('system').files(sound['id']).get(**{'format': 'ogg'})
+    assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR', 'asterisk_sound_ogg_fr_CA'))
+
+    response = confd.sounds('system').files(sound['id']).get(**{'format': 'ogg', 'language': 'fr_FR'})
+    assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR'))
+
+    response = confd.sounds('system').files(sound['id']).get(**{'language': 'fr_FR'})
+    assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR', 'asterisk_sound_slin_fr_FR'))
+
+    response = confd.sounds('system').files(sound['id']).get(**{'format': 'slin', 'language': 'fr_FR'})
+    assert_that(response.raw, any_of('asterisk_sound_slin_fr_FR'))
+
+    ari.reset()
+
+
 @fixtures.sound()
 def test_get_file_return_without_format_and_language_first(sound):
     client = _new_sound_file_client()
@@ -338,12 +366,22 @@ def test_delete_file_multiple(sound):
 
 
 def test_update_system_file():
+    sound = {
+        'id': 'foo',
+        'formats': [],
+    }
+    ari.set_sound(sound)
     client = _new_sound_file_client()
     response = client.url.sounds('system').files('foo').put()
     response.assert_status(400)
 
 
 def test_delete_system_file():
+    sound = {
+        'id': 'foo',
+        'formats': [],
+    }
+    ari.set_sound(sound)
     response = confd.sounds('system').files('foo').delete()
     response.assert_status(400)
 
