@@ -158,20 +158,30 @@ class _SoundFilesystemStorage(object):
             raise
 
     def _get_first_file_path(self, sound):
-        for path in self._get_file_paths(sound):
+        paths = self._get_file_paths(sound)
+        paths = self._sort_without_language_first(paths)
+        for path in paths:
             return path
         raise errors.not_found('Sound file', name=sound.name)
 
+    def _sort_without_language_first(self, paths):
+        # We cannot set format/language to None in the query
+        # string when getting file.
+        # example:
+        #   * /path/category/toto.wav
+        #   * /path/category/fr_FR/toto.wav
+        #
+        # to get the first toto.wav, we need to sort list before
+        # returning the first_file_path
+        paths.sort(key=len)
+        return paths
+
     def _get_file_paths(self, sound):
         for file_ in sound.files:
-            result = ['{}.{}'.format(
+            return ['{}.{}'.format(
                 self._build_path(sound.name, format_.language, file_.name),
                 EFConverter.format_to_extension(format_.format),
             ) for format_ in file_.formats]
-            # Return path without language first, because we cannot
-            # specify language=None in the parameters
-            result.sort(key=len)
-            return result
         raise errors.not_found('Sound file', name=sound.name)
 
     def _ensure_directory(self, path):
