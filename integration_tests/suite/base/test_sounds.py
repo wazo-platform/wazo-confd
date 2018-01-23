@@ -376,6 +376,11 @@ def test_delete_files_with_partial_errors():
     response.assert_status(500)
 
 
+def test_get_system_file_errors():
+    response = confd.sounds('system').files('invalid').get()
+    response.assert_status(404)
+
+
 def test_update_system_file():
     sound = {
         'id': 'foo',

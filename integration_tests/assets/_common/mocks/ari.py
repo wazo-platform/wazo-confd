@@ -75,7 +75,9 @@ def get_sounds():
 
 @app.route('/ari/sounds/<sound_id>', methods=['GET'])
 def get_sound(sound_id):
-    sound = _responses.get('sounds/{}'.format(sound_id), {})
+    sound = _responses.get('sounds/{}'.format(sound_id))
+    if not sound:
+        return '', 404
     return make_response(json.dumps(sound), 200, {'Content-Type': 'application/json'})
 
 

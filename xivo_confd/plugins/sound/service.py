@@ -2,6 +2,10 @@
 # Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from requests import HTTPError
+
+from xivo_dao.helpers import errors
+
 from .model import SoundCategory
 from .notifier import build_notifier
 from .schema import ASTERISK_CATEGORY
@@ -39,9 +43,15 @@ class SoundService(object):
         sound = SoundCategory(name='system')
         if with_files:
             if 'file_name' in parameters:
-                ari_sounds = [self._ari_client.get_sound(parameters['file_name'], parameters)]
+                try:
+                    ari_sounds = [self._ari_client.get_sound(parameters['file_name'], parameters)]
+                except HTTPError as e:
+                    if e.response.status_code == 404:
+                        raise errors.not_found('Sound', name='system', file_name=parameters['file_name'])
+                    raise
             else:
                 ari_sounds = self._ari_client.get_sounds()
+
             sound.files = convert_ari_sounds_to_model(ari_sounds)
         return sound
 

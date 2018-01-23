@@ -4,16 +4,16 @@
 
 import re
 import requests
-from requests import RequestException
+from requests import RequestException, HTTPError
 
 LANGUAGE_REGEX = r'^[a-zA-Z]{2,3}_[a-zA-Z]{2,3}$'
 
 
-class AsteriskUnreachable(Exception):
+class AsteriskUnreachable(RequestException):
     pass
 
 
-class AsteriskUnauthorized(Exception):
+class AsteriskUnauthorized(HTTPError):
     pass
 
 
