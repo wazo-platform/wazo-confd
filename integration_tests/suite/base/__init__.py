@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..helpers.base import IntegrationTest
@@ -62,3 +62,6 @@ confd_csv = SingletonProxy(BaseIntegrationTest.create_confd, {'Accept': 'text/cs
 ari = SingletonProxy(BaseIntegrationTest.create_ari)
 provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)
+
+wazo_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/var/lib/xivo/sounds')
+asterisk_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds')

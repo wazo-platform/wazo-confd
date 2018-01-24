@@ -18,7 +18,10 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from . import BaseIntegrationTest
-from . import confd, ari
+from . import confd, ari, wazo_sound, asterisk_sound
+
+DEFAULT_INTERNAL_DIRECTORY = ('monitor', 'recordings-meetme')
+DEFAULT_CATEGORY = ('acd', 'features', 'playback', 'recordings')
 
 
 def test_get_errors():
@@ -143,8 +146,8 @@ def test_get_system_sound():
     ari.reset()
 
 
-def test_get_internal_folder():
-    for name in ['monitor', 'recordings-meetme']:
+def test_get_internal_directory():
+    for name in DEFAULT_INTERNAL_DIRECTORY:
         response = confd.sounds(name).get()
         response.assert_status(404)
 
@@ -183,13 +186,13 @@ def test_delete_system_sound():
 
 
 def test_delete_default_sound():
-    for name in ['acd', 'features', 'playback', 'recordings']:
+    for name in DEFAULT_CATEGORY:
         response = confd.sounds(name).delete()
         response.assert_status(400)
 
 
-def test_delete_internal_folder():
-    for name in ['monitor', 'recordings-meetme']:
+def test_delete_internal_directory():
+    for name in DEFAULT_INTERNAL_DIRECTORY:
         response = confd.sounds(name).delete()
         response.assert_status(404)
 
@@ -261,15 +264,20 @@ def test_get_file(sound):
 
 
 def test_get_file_system():
+    asterisk_sound.create_directory('fr_FR')
+    asterisk_sound.create_directory('fr_CA')
+    asterisk_sound.create_file('fr_FR/asterisk-sound.ogg', content='asterisk_sound_ogg_fr_FR')
+    asterisk_sound.create_file('fr_FR/asterisk-sound.wav', content='asterisk_sound_slin_fr_FR')
+    asterisk_sound.create_file('fr_CA/asterisk-sound.ogg', content='asterisk_sound_ogg_fr_CA')
     sound = {
-        'id': 'conf-now-unmuted',
+        'id': 'asterisk-sound',
         'formats': [{'language': 'fr_FR',
                      'format': 'slin'},
                     {'language': 'fr_FR',
                      'format': 'ogg'},
                     {'language': 'fr_CA',
                      'format': 'ogg'}],
-        'text': 'The conference is now unmuted.'
+        'text': 'Asterisk Sound test'
     }
     ari.set_sound(sound)
 
@@ -365,14 +373,17 @@ def test_delete_file_multiple(sound):
     response.assert_status(404)
 
 
-def test_delete_files_with_partial_errors():
+@fixtures.sound()
+def test_delete_files_with_partial_errors(sound):
+    wazo_sound.create_directory('{}/fr_FR'.format(sound['name']), mode=555)
+    wazo_sound.create_file('{}/fr_FR/ivr.mp3'.format(sound['name']), mode=444)
     client = _new_sound_file_client()
-    client.url.sounds('hard-coded').files('ivr').put().assert_updated()
+    client.url.sounds(sound['name']).files('ivr').put().assert_updated()
 
-    response = confd.sounds('hard-coded').files('ivr').delete()
+    response = confd.sounds(sound['name']).files('ivr').delete()
     response.assert_deleted()
 
-    response = confd.sounds('hard-coded').files('ivr').delete()
+    response = confd.sounds(sound['name']).files('ivr').delete()
     response.assert_status(500)
 
 
