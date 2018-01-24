@@ -293,6 +293,21 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         for pos, expected_funckey in self.confd_funckeys.items():
             self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
+    def test_when_update_template_funckeys(self):
+        for position in self.exclude_for_template:
+            del self.confd_funckeys[position]
+        template = confd.funckeys.templates.post(name='template', keys={}).item
+
+        response = confd.funckeys.templates(template['id']).put(name='edited', keys=self.confd_funckeys)
+        response.assert_updated()
+
+        response = confd.funckeys.templates(template['id']).get()
+        funckeys = response.item['keys']
+
+        for pos, expected_funckey in self.confd_funckeys.items():
+            expected_funckey['inherited'] = True
+            self.assert_template_has_funckey(funckeys, pos, expected_funckey)
+
     def test_when_update_user_funckeys(self):
         response = confd.users(self.user['id']).funckeys.put(name='user1', keys=self.confd_funckeys)
         response.assert_updated()

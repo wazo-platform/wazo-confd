@@ -61,6 +61,28 @@ paths:
             $ref: '#/definitions/FuncKeyTemplate'
         '404':
           $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_func_key_template
+      summary: Update a func key template
+      description: '**Required ACL:** `confd.funckeys.templates.{template_id}.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - funckeys
+      parameters:
+      - $ref: '#/parameters/templateid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/FuncKeyTemplate'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
     delete:
       operationId: delete_func_key_template
       summary: Delete func key template
