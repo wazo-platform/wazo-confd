@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
-from hamcrest import (assert_that,
-                      contains,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_key,
-                      is_not,
-                      not_)
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    has_entries,
+    has_entry,
+    has_key,
+    is_not,
+    not_,
+)
 
-from ..helpers import helpers
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import fixtures
 from . import confd, db, provd
+from ..helpers import (
+    associations as a,
+    fixtures,
+    helpers,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 

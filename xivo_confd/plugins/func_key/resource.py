@@ -34,20 +34,22 @@ from .schema import (
     FuncKeyUnifiedTemplateSchema,
 )
 
-models_destination = {'user': UserDestination,
-                      'group': GroupDestination,
-                      'queue': QueueDestination,
-                      'conference': ConferenceDestination,
-                      'paging': PagingDestination,
-                      'service': ServiceDestination,
-                      'custom': CustomDestination,
-                      'forward': ForwardDestination,
-                      'transfer': TransferDestination,
-                      'park_position': ParkPositionDestination,
-                      'parking': ParkingDestination,
-                      'bsfilter': BSFilterDestination,
-                      'agent': AgentDestination,
-                      'onlinerec': OnlineRecordingDestination}
+models_destination = {
+    'user': UserDestination,
+    'group': GroupDestination,
+    'queue': QueueDestination,
+    'conference': ConferenceDestination,
+    'paging': PagingDestination,
+    'service': ServiceDestination,
+    'custom': CustomDestination,
+    'forward': ForwardDestination,
+    'transfer': TransferDestination,
+    'park_position': ParkPositionDestination,
+    'parking': ParkingDestination,
+    'bsfilter': BSFilterDestination,
+    'agent': AgentDestination,
+    'onlinerec': OnlineRecordingDestination
+}
 
 
 def _create_funckey_model(funckey):

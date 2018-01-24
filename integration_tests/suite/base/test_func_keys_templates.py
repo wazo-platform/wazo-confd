@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import scenarios as s
-from ..helpers import fixtures
-
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not)
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+)
 
 from . import confd
+from ..helpers import (
+    fixtures,
+    scenarios as s,
+)
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
+
 
 invalid_template_destinations = [
     {'type': 'agent'},
