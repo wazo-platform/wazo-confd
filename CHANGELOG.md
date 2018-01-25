@@ -1,6 +1,14 @@
 Changelog
 =========
 
+18.02
+-----
+
+* A new API for updating all template's funckeys
+
+  * PUT `/1.1/funckeys/templates/<template_id>`
+
+
 18.01
 -----
 

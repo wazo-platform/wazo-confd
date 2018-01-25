@@ -34,26 +34,53 @@ from .schema import (
     FuncKeyUnifiedTemplateSchema,
 )
 
-models_destination = {'user': UserDestination,
-                      'group': GroupDestination,
-                      'queue': QueueDestination,
-                      'conference': ConferenceDestination,
-                      'paging': PagingDestination,
-                      'service': ServiceDestination,
-                      'custom': CustomDestination,
-                      'forward': ForwardDestination,
-                      'transfer': TransferDestination,
-                      'park_position': ParkPositionDestination,
-                      'parking': ParkingDestination,
-                      'bsfilter': BSFilterDestination,
-                      'agent': AgentDestination,
-                      'onlinerec': OnlineRecordingDestination}
+models_destination = {
+    'user': UserDestination,
+    'group': GroupDestination,
+    'queue': QueueDestination,
+    'conference': ConferenceDestination,
+    'paging': PagingDestination,
+    'service': ServiceDestination,
+    'custom': CustomDestination,
+    'forward': ForwardDestination,
+    'transfer': TransferDestination,
+    'park_position': ParkPositionDestination,
+    'parking': ParkingDestination,
+    'bsfilter': BSFilterDestination,
+    'agent': AgentDestination,
+    'onlinerec': OnlineRecordingDestination
+}
 
 
 def _create_funckey_model(funckey):
     type_ = funckey['destination'].pop('type')
     funckey['destination'] = models_destination[type_](**funckey['destination'])
     return FuncKey(**funckey)
+
+
+class FindUpdateFieldsMixin(object):
+
+    def find_updated_fields_position(self, model, form):
+        updated_fields = []
+        for position, funckey in form.iteritems():
+            funckey_model = model.get(position, FuncKey())
+            if self.find_updated_fields_funkey(funckey_model, funckey):
+                updated_fields.append(position)
+        return updated_fields
+
+    def find_updated_fields_funkey(self, model, form):
+        updated_fields = []
+        for name, value in form.iteritems():
+            try:
+                if isinstance(value, dict):
+                    if self.find_updated_fields_funkey(getattr(model, name), value):
+                        updated_fields.append(name)
+
+                elif getattr(model, name) != value:
+                    updated_fields.append(name)
+            except AttributeError:
+                pass
+        return updated_fields
 
 
 class FuncKeyDestination(ConfdResource):
@@ -95,7 +122,7 @@ class FuncKeyTemplateList(ListResource):
         return self.model(**template)
 
 
-class FuncKeyTemplateItem(ConfdResource):
+class FuncKeyTemplateItem(ConfdResource, FindUpdateFieldsMixin):
 
     context = {'exclude_destination': ['agent', 'bsfilter']}
     schema = FuncKeyTemplateSchema
@@ -108,6 +135,21 @@ class FuncKeyTemplateItem(ConfdResource):
     def get(self, id):
         template = self.service.get(id)
         return self.schema(context=self.context).dump(template).data
+
+    @required_acl('confd.funckeys.templates.{id}.update')
+    def put(self, id):
+        template = self.service.get(id)
+        template_form = self.schema().load(request.get_json()).data
+        updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
+
+        for position, funckey in template_form.get('keys', {}).iteritems():
+            template_form['keys'][position] = _create_funckey_model(funckey)
+
+        template.keys = template_form.get('keys', {})
+        template.name = template_form.get('name')
+
+        self.service.edit(template, updated_fields)
+        return '', 204
 
     @required_acl('confd.funckeys.templates.{id}.delete')
     def delete(self, id):
@@ -152,30 +194,8 @@ class UserFuncKey(ConfdResource):
     def get_user(self, user_id):
         return self.user_dao.get_by_id_uuid(user_id)
 
-    def find_updated_fields_position(self, model, form):
-        updated_fields = []
-        for position, funckey in form.iteritems():
-            funckey_model = model.get(position, FuncKey())
-            if self.find_updated_fields_funkey(funckey_model, funckey):
-                updated_fields.append(position)
-        return updated_fields
 
-    def find_updated_fields_funkey(self, model, form):
-        updated_fields = []
-        for name, value in form.iteritems():
-            try:
-                if isinstance(value, dict):
-                    if self.find_updated_fields_funkey(getattr(model, name), value):
-                        updated_fields.append(name)
-
-                elif getattr(model, name) != value:
-                    updated_fields.append(name)
-            except AttributeError:
-                pass
-        return updated_fields
-
-
-class UserFuncKeyList(UserFuncKey):
+class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
 
     schema = FuncKeyUnifiedTemplateSchema
 

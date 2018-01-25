@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
-from hamcrest import (assert_that,
-                      contains,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_key,
-                      is_not,
-                      not_)
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    has_entries,
+    has_entry,
+    has_key,
+    is_not,
+    not_,
+)
 
-from ..helpers import helpers
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import fixtures
 from . import confd, db, provd
+from ..helpers import (
+    associations as a,
+    fixtures,
+    helpers,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 
@@ -287,6 +291,21 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         funckeys = response.item['keys']
 
         for pos, expected_funckey in self.confd_funckeys.items():
+            self.assert_template_has_funckey(funckeys, pos, expected_funckey)
+
+    def test_when_update_template_funckeys(self):
+        for position in self.exclude_for_template:
+            del self.confd_funckeys[position]
+        template = confd.funckeys.templates.post(name='template', keys={}).item
+
+        response = confd.funckeys.templates(template['id']).put(name='edited', keys=self.confd_funckeys)
+        response.assert_updated()
+
+        response = confd.funckeys.templates(template['id']).get()
+        funckeys = response.item['keys']
+
+        for pos, expected_funckey in self.confd_funckeys.items():
+            expected_funckey['inherited'] = True
             self.assert_template_has_funckey(funckeys, pos, expected_funckey)
 
     def test_when_update_user_funckeys(self):
