@@ -28,4 +28,4 @@ RUN true && \
 
 EXPOSE 9486
 
-CMD ["xivo-confd", "-fd"]
+CMD ["xivo-confd", "-d"]
