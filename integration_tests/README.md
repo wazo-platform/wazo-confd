@@ -82,6 +82,9 @@ response.assert_ok()
 #i.e. Responses for users should have a header "Location: http://confd:9486/1.1/users"
 response.assert_location('users')
 
+#Assert that the response contains a "Content-Disposition:" header with a filename for a given resource.
+response.assert_location('ivr.wav')
+
 #Assert that the JSON body contains a 'link' property that has a URL for a given resource.
 #e.g.: {"id": 12, "links": [{"rel": "users", "href": "http://confd:9486/1.1/users/12"}]}
 response.assert_link('users')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -15,6 +15,7 @@ from io import BytesIO
 from hamcrest import (
     assert_that,
     contains_string,
+    ends_with,
     has_entry,
     has_item,
     has_key,
@@ -220,6 +221,11 @@ class Response(object):
         headers = {key.lower(): value for key, value in self.response.headers.items()}
         expected = has_entry('location', contains_string(resource))
         assert_that(headers, expected, 'Location header not found')
+
+    def assert_content_disposition(self, filename):
+        headers = {key.lower(): value for key, value in self.response.headers.items()}
+        expected = has_entry('content-disposition', ends_with('filename={}'.format(filename)))
+        assert_that(headers, expected, 'Content-Disposition header not found')
 
     def assert_link(self, resource):
         expected = has_entry('links', has_item(has_entry('rel', contains_string(resource))))
