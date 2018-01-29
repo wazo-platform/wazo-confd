@@ -195,7 +195,7 @@ class _SoundFilesystemStorage(object):
         path = self._get_first_file_path(sound)
         if not os.path.isfile(path):
             raise errors.not_found('Sound file', name=sound.name, path=path)
-        return send_file(path, mimetype='application/octet-stream')
+        return send_file(path, mimetype='application/octet-stream', as_attachment=True)
 
     def save_first_file(self, sound, content):
         path = self._get_first_file_path(sound)

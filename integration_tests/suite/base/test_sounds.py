@@ -252,15 +252,18 @@ def test_get_file(sound):
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
     assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_ogg_fr_CA'))
+    response.assert_content_disposition('ivr.ogg')
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg', 'language': 'fr_FR'})
     assert_that(response.raw, equal_to('ivr_ogg_fr_FR'))
+    response.assert_content_disposition('ivr.ogg')
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
     assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_slin_fr_FR'))
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'fr_FR'})
     assert_that(response.raw, equal_to('ivr_slin_fr_FR'))
+    response.assert_content_disposition('ivr.wav')
 
 
 def test_get_file_system():
@@ -283,15 +286,18 @@ def test_get_file_system():
 
     response = confd.sounds('system').files(sound['id']).get(**{'format': 'ogg'})
     assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR', 'asterisk_sound_ogg_fr_CA'))
+    response.assert_content_disposition('asterisk-sound.ogg')
 
     response = confd.sounds('system').files(sound['id']).get(**{'format': 'ogg', 'language': 'fr_FR'})
     assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR'))
+    response.assert_content_disposition('asterisk-sound.ogg')
 
     response = confd.sounds('system').files(sound['id']).get(**{'language': 'fr_FR'})
     assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR', 'asterisk_sound_slin_fr_FR'))
 
     response = confd.sounds('system').files(sound['id']).get(**{'format': 'slin', 'language': 'fr_FR'})
     assert_that(response.raw, any_of('asterisk_sound_slin_fr_FR'))
+    response.assert_content_disposition('asterisk-sound.wav')
 
     ari.reset()
 
