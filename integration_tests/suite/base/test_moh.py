@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from ..helpers import errors as e
@@ -241,6 +241,7 @@ def test_add_update_delete_filename(moh):
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get()
     assert_that(response.raw, equal_to('content is not checked'))
+    response.assert_content_disposition('foo.wav')
 
     response = confd.moh(moh['uuid']).get()
     assert_that(response.item, has_entries(files=contains({'name': 'foo.wav'})))

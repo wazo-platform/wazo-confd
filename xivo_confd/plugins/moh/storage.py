@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import errno
@@ -71,7 +71,7 @@ class _MohFilesystemStorage(object):
         path = self._filename_path(moh, filename)
         if not os.path.isfile(path):
             raise _moh_file_not_found(path, moh, filename)
-        return send_file(path, mimetype='application/octet-stream')
+        return send_file(path, mimetype='application/octet-stream', as_attachment=True)
 
     def save_file(self, moh, filename, content):
         path = self._filename_path(moh, filename)
