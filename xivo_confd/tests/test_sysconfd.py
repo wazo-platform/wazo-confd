@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import json
 
-from mock import patch, Mock
 from unittest import TestCase
-from hamcrest import assert_that, equal_to, has_items, has_entries
+
+from mock import patch, Mock
+from hamcrest import (
+    assert_that,
+    equal_to,
+    has_entries,
+    has_items,
+)
 
 from .._sysconfd import SysconfdPublisher
 

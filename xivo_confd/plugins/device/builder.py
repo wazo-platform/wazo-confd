@@ -1,38 +1,41 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus
-
-from xivo_confd.database import device as device_db
-from xivo_confd.database import func_key_template as func_key_template_db
-
-from xivo_confd.plugins.device.service import (DeviceService,
-                                               SearchEngine)
-
-from xivo_confd.plugins.device.update import (DeviceUpdater,
-                                              ProvdUpdater)
-
-from xivo_confd.plugins.device.generators import (ConfigGenerator,
-                                                  UserGenerator,
-                                                  ExtensionGenerator,
-                                                  RawConfigGenerator,
-                                                  FuncKeyGenerator,
-                                                  SipGenerator,
-                                                  SccpGenerator)
-
-from xivo_confd.plugins.device.dao import DeviceDao
-from xivo_confd.plugins.device.notifier import DeviceNotifier
-from xivo_confd.plugins.device.validator import build_validator
-
-from xivo_confd.plugins.device.funckey import build_converters
-
+from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.func_key_template import dao as template_dao
 from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.func_key_template import dao as template_dao
-from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.user_line import dao as user_line_dao
+
+from xivo_confd import bus
+from xivo_confd.database import (
+    device as device_db,
+    func_key_template as func_key_template_db,
+)
+from xivo_confd.plugins.device.funckey import build_converters
+from xivo_confd.plugins.device.generators import (
+    ConfigGenerator,
+    ExtensionGenerator,
+    FuncKeyGenerator,
+    RawConfigGenerator,
+    SccpGenerator,
+    SipGenerator,
+    UserGenerator,
+)
+from xivo_confd.plugins.device.service import (
+    DeviceService,
+    SearchEngine,
+)
+from xivo_confd.plugins.device.update import (
+    DeviceUpdater,
+    ProvdUpdater,
+)
+
+from .dao import DeviceDao
+from .notifier import DeviceNotifier
+from .validator import build_validator
 
 
 def build_dao(provd_client):

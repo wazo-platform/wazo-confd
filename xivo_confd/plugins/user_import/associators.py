@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import abc
 
-from xivo_dao.helpers.exception import NotFoundError
-
 from xivo_dao.alchemy.dialaction import Dialaction
+from xivo_dao.helpers.exception import NotFoundError
 
 
 class Associator(object):
@@ -77,7 +76,7 @@ class SipAssociator(Associator):
         line = entry.get_resource('line')
         sip = entry.get_resource('sip')
         if line and sip and not line.is_associated_with(sip):
-                self.service.associate(line, sip)
+            self.service.associate(line, sip)
 
 
 class SccpAssociator(Associator):
@@ -92,7 +91,7 @@ class SccpAssociator(Associator):
         line = entry.get_resource('line')
         sccp = entry.get_resource('sccp')
         if line and sccp and not line.is_associated_with(sccp):
-                self.service.associate(line, sccp)
+            self.service.associate(line, sccp)
 
 
 class VoicemailAssociator(Associator):
@@ -134,7 +133,7 @@ class EntityAssociator(Associator):
 class CtiProfileAssociator(Associator):
 
     def __init__(self, service, dao):
-        self.service = service
+        super(CtiProfileAssociator, self).__init__(service)
         self.dao = dao
 
     def associate(self, entry):
@@ -190,7 +189,7 @@ class IncallAssociator(Associator):
 class CallPermissionAssociator(Associator):
 
     def __init__(self, service, call_permission_service):
-        self.service = service
+        super(CallPermissionAssociator, self).__init__(service)
         self.call_permission_service = call_permission_service
 
     def associate(self, entry):

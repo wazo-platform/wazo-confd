@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.helpers.validator import (UniqueField,
-                                          Validator,
-                                          ValidationGroup)
 from xivo_dao.helpers import errors
 from xivo_dao.resources.entity import dao as entity_dao
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.database import call_pickup as call_pickup_dao
-from xivo_confd.database import call_filter as call_filter_dao
-from xivo_confd.database import context as context_dao
-from xivo_confd.database import schedule as schedule_dao
+from xivo_confd.database import (
+    call_filter as call_filter_dao,
+    call_pickup as call_pickup_dao,
+    context as context_dao,
+    schedule as schedule_dao,
+)
+from xivo_confd.helpers.validator import (
+    UniqueField,
+    ValidationGroup,
+    Validator,
+)
 
 
 class DBValidator(Validator):

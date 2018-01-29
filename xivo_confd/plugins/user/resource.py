@@ -4,9 +4,10 @@
 
 from flask import url_for, request
 
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
+
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from .schema import (
     UserDirectorySchema,

@@ -1,12 +1,18 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.helpers.validator import ValidationGroup, GetResource, Validator, Optional, MemberOfSequence
+from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.line import dao as line_dao
-from xivo_dao.helpers import errors
+
+from xivo_confd.helpers.validator import (
+    GetResource,
+    MemberOfSequence,
+    Optional,
+    ValidationGroup,
+    Validator,
+)
 
 
 class ProvCodeAvailable(Validator):
@@ -31,12 +37,14 @@ class ProvCodeChanged(ProvCodeAvailable):
 def build_validator(device_dao):
     return ValidationGroup(
         create=[
-            Optional('provisioning_code',
-                     ProvCodeAvailable(line_dao)
-                     ),
-            Optional('registrar',
-                     MemberOfSequence('registrar', device_dao.registrars, 'Registrar')
-                     ),
+            Optional(
+                'provisioning_code',
+                ProvCodeAvailable(line_dao)
+            ),
+            Optional(
+                'registrar',
+                MemberOfSequence('registrar', device_dao.registrars, 'Registrar')
+            ),
             GetResource('context', context_dao.get_by_name, 'Context'),
         ],
         edit=[

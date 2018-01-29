@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -10,12 +10,13 @@ class ConfigGenerator(object):
 
     def generate(self, device):
         configdevice = device.template_id or 'defaultconfigdevice'
-        config = {'id': device.id,
-                  'configdevice': configdevice,
-                  'parent_ids': ['base', configdevice],
-                  'deletable': True,
-                  'raw_config': self.raw_generator.generate(device),
-                  }
+        config = {
+            'id': device.id,
+            'configdevice': configdevice,
+            'parent_ids': ['base', configdevice],
+            'deletable': True,
+            'raw_config': self.raw_generator.generate(device),
+        }
 
         return config
 

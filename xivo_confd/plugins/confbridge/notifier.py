@@ -2,12 +2,12 @@
 # Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus, sysconfd
-
 from xivo_bus.resources.confbridge.event import (
     EditConfBridgeWazoDefaultBridgeEvent,
     EditConfBridgeWazoDefaultUserEvent,
 )
+
+from xivo_confd import bus, sysconfd
 
 
 class ConfBridgeConfigurationNotifier(object):

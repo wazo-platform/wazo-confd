@@ -2,10 +2,10 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import netifaces
 import random
 import re
 import socket
+import netifaces
 
 from xivo_dao.helpers.db_utils import session_scope
 

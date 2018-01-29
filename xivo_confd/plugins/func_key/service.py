@@ -1,18 +1,16 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.plugins.func_key.validator import build_validator, build_validator_bsfilter
-from xivo_confd.plugins.func_key.notifier import build_notifier
-from xivo_confd.plugins.device import builder as device_builder
-
-from xivo_dao.resources.func_key_template.model import UserTemplate
-
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.func_key_template.model import UserTemplate
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_dao.helpers.db_manager import Session
-from xivo_dao.helpers import errors
+from xivo_confd.plugins.device import builder as device_builder
+from .notifier import build_notifier
+from .validator import build_validator, build_validator_bsfilter
 
 
 class TemplateService(object):

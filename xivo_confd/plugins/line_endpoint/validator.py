@@ -1,18 +1,16 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
+
+from xivo_dao.helpers import errors
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
+from xivo_dao.resources.trunk import dao as trunk_dao_module
+from xivo_dao.resources.user_line import dao as user_line_dao_module
 
 from xivo_confd.helpers.validator import ValidationAssociation
 from xivo_confd.helpers.validator import ValidatorAssociation
-
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
-
-from xivo_dao.resources.user_line import dao as user_line_dao_module
-from xivo_dao.resources.line_extension import dao as line_extension_dao_module
-from xivo_dao.resources.line import dao as line_dao_module
-from xivo_dao.resources.trunk import dao as trunk_dao_module
-
-from xivo_dao.helpers import errors
 
 
 class ValidateLineAssociation(ValidatorAssociation):

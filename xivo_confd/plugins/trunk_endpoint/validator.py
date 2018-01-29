@@ -2,11 +2,11 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
-
 from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
+
+from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
 class TrunkEndpointAssociationValidator(ValidatorAssociation):

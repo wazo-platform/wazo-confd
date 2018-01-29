@@ -4,9 +4,10 @@
 
 from flask import url_for
 
+from xivo_dao.alchemy.useriax import UserIAX as IAXEndpoint
+
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_dao.alchemy.useriax import UserIAX as IAXEndpoint
 
 from .schema import IAXSchema
 
