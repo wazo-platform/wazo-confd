@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import json
@@ -71,6 +71,14 @@ def set_response():
 @app.route('/ari/sounds', methods=['GET'])
 def get_sounds():
     return make_response(json.dumps(_responses.get('sounds', [])), 200, {'Content-Type': 'application/json'})
+
+
+@app.route('/ari/sounds/<sound_id>', methods=['GET'])
+def get_sound(sound_id):
+    sound = _responses.get('sounds/{}'.format(sound_id))
+    if not sound:
+        return '', 404
+    return make_response(json.dumps(sound), 200, {'Content-Type': 'application/json'})
 
 
 _reset()

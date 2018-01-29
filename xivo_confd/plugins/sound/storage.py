@@ -3,15 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import errno
+import glob
 import logging
-import os.path
+import os
 import shutil
 
 from flask import send_file
 from xivo_dao.helpers import errors
 
 from .model import SoundCategory, SoundFormat, SoundFile
-from .converter import ExtensionFormatConverter as EFConverter
 
 logger = logging.getLogger(__name__)
 
@@ -46,15 +46,17 @@ class _SoundFilesystemStorage(object):
                 if os.path.isdir(self._build_path(name)) and
                 name not in RESERVED_DIRECTORIES]
 
-    def get_directory(self, sound_name, parameters, with_files=True):
-        if sound_name in RESERVED_DIRECTORIES:
-            raise errors.not_found('Sound', name=sound_name)
-        sound = SoundCategory(name=sound_name)
+    def get_directory(self, directory, parameters, with_files=True):
+        if directory in RESERVED_DIRECTORIES:
+            raise errors.not_found('Sound', name=directory)
+
+        if not os.path.exists(self._build_path(directory)):
+            raise errors.not_found('Sound', name=directory, **parameters)
+
+        sound = SoundCategory(name=directory)
+
         if with_files:
             sound = self._populate_files(sound, parameters)
-        else:
-            if not os.path.exists(self._build_path(sound.name)):
-                raise errors.not_found('Sound', name=sound.name)
         return sound
 
     def create_directory(self, sound):
@@ -78,61 +80,115 @@ class _SoundFilesystemStorage(object):
                 logger.error('Could not remove sound directory %s: %s', path, e)
 
     def _populate_files(self, sound, parameters):
-        # XXX Can be improved by doing only the right request when parameters is set
-        #     And probably with other module (e.i. glob) for pattern matching
-        path = self._build_path(sound.name)
-        try:
+        language_filter = parameters.get('language')
+        format_filter = parameters.get('format')
+        filename_filter = parameters.get('file_name')
 
-            for file_ in os.listdir(path):
-                full_name = self._build_path(sound.name, file_)
-                if os.path.isfile(full_name):
-                    sound_file = self._create_sound_file(file_)
-                    sound.add_file(sound_file)
+        if filename_filter and language_filter and format_filter:
+            return self._filter_filename_language_format(sound, filename_filter, language_filter, format_filter)
 
-                elif os.path.isdir(full_name):
-                    if file_ != parameters.get('language', file_):
-                        continue
+        elif filename_filter and language_filter:
+            return self._filter_filename_language(sound, filename_filter, language_filter)
 
-                    try:
-                        for lang_file in os.listdir(full_name):
-                            sound_file = self._create_sound_file(lang_file, language=file_, category=sound.name)
-                            sound.add_file(sound_file)
-                    except OSError as e:
-                        logger.error('Could not list sound language directory %s: %s', full_name, e)
-                        continue
+        elif filename_filter and format_filter:
+            return self._filter_filename_format(sound, filename_filter, format_filter)
 
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                raise errors.not_found('Sound', name=sound.name, **parameters)
-            else:
-                logger.error('Could not list sound directory %s: %s', path, e)
-                return []
+        elif filename_filter:
+            return self._filter_filename(sound, filename_filter)
 
-        return self._filter(sound, parameters)
+        elif language_filter and format_filter:
+            return self._filter_language_format(sound, language_filter, format_filter)
 
-    def _filter(self, sound, parameters):
-        files_filtered = []
-        for file_ in sound.files:
-            if file_.name != parameters.get('file_name', file_.name):
-                continue
-            formats_filtered = []
-            for format_ in file_.formats:
-                if format_.format != parameters.get('format', format_.format):
-                    continue
-                if format_.language != parameters.get('language', format_.language):
-                    continue
-                formats_filtered.append(format_)
-            file_.formats = formats_filtered
-            files_filtered.append(file_)
-        sound.files = files_filtered
+        elif language_filter:
+            return self._filter_language(sound, language_filter)
+
+        elif format_filter:
+            return self._filter_format(sound, format_filter)
+
+        else:
+            return self._filter_none(sound)
+
+    def _filter_filename_language_format(self, sound, filename_filter, language_filter, format_filter):
+        filename_extension = '{}.{}'.format(filename_filter, SoundFormat(format_filter).extension)
+        path = self._build_path(sound.name, language_filter, filename_extension)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
         return sound
 
-    def _create_sound_file(self, filename_ext, language=None, category=None):
-        filename, extension = os.path.splitext(filename_ext)
+    def _filter_filename_language(self, sound, filename_filter, language_filter):
+        filename_extension = '{}.*'.format(filename_filter)
+        path = self._build_path(sound.name, language_filter, filename_extension)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+        return sound
+
+    def _filter_filename_format(self, sound, filename_filter, format_filter):
+        filename_extension = '{}.{}'.format(filename_filter, SoundFormat(format_filter).extension)
+
+        path = self._build_path(sound.name, filename_extension)
+        sound = self._find_and_populate_sound(sound, path)
+
+        path = self._build_path(sound.name, '*', filename_extension)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
+        return sound
+
+    def _filter_filename(self, sound, filename_filter):
+        filename_extension = '{}.*'.format(filename_filter)
+        path = self._build_path(sound.name, filename_extension)
+        sound = self._find_and_populate_sound(sound, path)
+
+        path = self._build_path(sound.name, '*', filename_extension)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
+        return sound
+
+    def _filter_language_format(self, sound, language_filter, format_filter):
+        filename_extension = '*.{}'.format(SoundFormat(format_=format_filter).extension)
+        path = self._build_path(sound.name, language_filter, filename_extension)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+        return sound
+
+    def _filter_language(self, sound, language_filter):
+        path = self._build_path(sound.name, language_filter, '*')
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+        return sound
+
+    def _filter_format(self, sound, format_filter):
+        filename_extension = '*.{}'.format(SoundFormat(format_=format_filter).extension)
+
+        path = self._build_path(sound.name, filename_extension)
+        sound = self._find_and_populate_sound(sound, path)
+
+        path = self._build_path(sound.name, '*', filename_extension)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
+        return sound
+
+    def _filter_none(self, sound):
+        path = self._build_path(sound.name, '*')
+        sound = self._find_and_populate_sound(sound, path)
+
+        path = self._build_path(sound.name, '*', '*')
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
+        return sound
+
+    def _find_and_populate_sound(self, sound, path, extract_language=False):
+        for file_ in glob.glob(path):
+            if not os.path.isfile(file_):
+                continue
+            sound_file = self._create_sound_file(file_, extract_language=extract_language)
+            sound.add_file(sound_file)
+        return sound
+
+    def _create_sound_file(self, path, extract_language=False):
+        language = None
+        if extract_language:
+            language = os.path.basename(os.path.dirname(path))
+        basename = os.path.basename(path)
+        filename, extension = os.path.splitext(basename)
         extension = extension.strip('.') if extension else extension
-        format_ = EFConverter.extension_to_format(extension)
-        path = self._build_path(category, language, filename)
-        sound_format = SoundFormat(format_=format_, language=language, path=path)
+        path_without_extension = os.path.join(os.path.dirname(path), filename)
+        sound_format = SoundFormat(language=language, path=path_without_extension, extension=extension)
         return SoundFile(name=filename, formats=[sound_format])
 
     def load_first_file(self, sound):
@@ -149,29 +205,45 @@ class _SoundFilesystemStorage(object):
 
     def remove_files(self, sound):
         paths = self._get_file_paths(sound)
-        try:
-            for path in paths:
+        errors = []
+        for path in paths:
+            try:
                 os.remove(path)
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                raise errors.not_found('Sound file', name=sound.name, path=path)
-            raise
+            except OSError as e:
+                if e.errno == errno.ENOENT:
+                    errors.append(errors.not_found('Sound file', name=sound.name, path=path))
+                else:
+                    errors.append(e)
+
+        if len(errors) == len(paths):
+            for error in errors:
+                raise error
 
     def _get_first_file_path(self, sound):
-        for path in self._get_file_paths(sound):
+        paths = self._get_file_paths(sound)
+        paths = self._sort_without_language_first(paths)
+        for path in paths:
             return path
         raise errors.not_found('Sound file', name=sound.name)
 
+    def _sort_without_language_first(self, paths):
+        # We cannot set format/language to None in the query
+        # string when getting file.
+        # example:
+        #   * /path/category/toto.wav
+        #   * /path/category/fr_FR/toto.wav
+        #
+        # to get the first toto.wav, we need to sort list before
+        # returning the first_file_path
+        paths.sort(key=len)
+        return paths
+
     def _get_file_paths(self, sound):
         for file_ in sound.files:
-            result = ['{}.{}'.format(
+            return ['{}.{}'.format(
                 self._build_path(sound.name, format_.language, file_.name),
-                EFConverter.format_to_extension(format_.format),
+                format_.extension,
             ) for format_ in file_.formats]
-            # Return path without language first, because we cannot
-            # specify language=None in the parameters
-            result.sort(key=len)
-            return result
         raise errors.not_found('Sound file', name=sound.name)
 
     def _ensure_directory(self, path):

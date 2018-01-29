@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
@@ -39,4 +39,4 @@ class SoundSchema(BaseSchema):
                          required=True)
     files = fields.Nested(SoundFileSchema, many=True, dump_only=True)
 
-    links = ListLink(Link('sounds', field='name'))
+    links = ListLink(Link('sounds', field='name', target='category'))

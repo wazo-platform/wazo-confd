@@ -31,15 +31,15 @@ paths:
             $ref: '#/definitions/Sound'
         '400':
           $ref: '#/responses/CreateError'
-  /sounds/{sound_name}:
+  /sounds/{sound_category}:
     get:
       operationId: get_sounds
       summary: Get sound category
-      description: '**Required ACL:** `confd.sounds.{sound_name}.read`'
+      description: '**Required ACL:** `confd.sounds.{sound_category}.read`'
       tags:
       - sounds
       parameters:
-      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_category'
       responses:
         '200':
           description: Sound category
@@ -51,13 +51,13 @@ paths:
       operationId: delete_sounds
       summary: Delete sound category
       description: |
-        **Required ACL:** `confd.sounds.{sound_name}.delete`
+        **Required ACL:** `confd.sounds.{sound_category}.delete`
 
         Delete the sound category and associated audio files.
       tags:
       - sounds
       parameters:
-      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_category'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
@@ -65,15 +65,15 @@ paths:
           $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /sounds/{sound_name}/files/{sound_filename}:
+  /sounds/{sound_category}/files/{sound_filename}:
     get:
       operationId: get_sounds_files
       summary: Get audio file
-      description: '**Required ACL:** `confd.sounds.{sound_name}.files.{sound_filename}.read`'
+      description: '**Required ACL:** `confd.sounds.{sound_category}.files.{sound_filename}.read`'
       tags:
       - sounds
       parameters:
-      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_category'
       - $ref: '#/parameters/sound_filename'
       - $ref: '#/parameters/sound_language'
       - $ref: '#/parameters/sound_format'
@@ -87,13 +87,13 @@ paths:
     put:
       operationId: update_sounds_files
       summary: Add or update audio file
-      description: '**Required ACL:** `confd.sounds.{sound_name}.files.{sound_filename}.update`'
+      description: '**Required ACL:** `confd.sounds.{sound_category}.files.{sound_filename}.update`'
       tags:
       - sounds
       consumes:
       - application/octet-stream
       parameters:
-      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_category'
       - $ref: '#/parameters/sound_filename'
       - $ref: '#/parameters/sound_language'
       - $ref: '#/parameters/sound_format'
@@ -110,11 +110,11 @@ paths:
     delete:
       operationId: delete_sounds_files
       summary: Delete audio file
-      description: '**Required ACL:** `confd.sounds.{sound_name}.files.{sound_filename}.delete`'
+      description: '**Required ACL:** `confd.sounds.{sound_category}.files.{sound_filename}.delete`'
       tags:
       - sounds
       parameters:
-      - $ref: '#/parameters/sound_name'
+      - $ref: '#/parameters/sound_category'
       - $ref: '#/parameters/sound_filename'
       - $ref: '#/parameters/sound_language'
       - $ref: '#/parameters/sound_format'
@@ -125,10 +125,10 @@ paths:
           $ref: '#/responses/NotFoundError'
 
 parameters:
-  sound_name:
+  sound_category:
     required: true
     type: string
-    name: sound_name
+    name: sound_category
     in: path
   sound_filename:
     required: true

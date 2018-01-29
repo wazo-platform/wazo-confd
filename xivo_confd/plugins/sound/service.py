@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
+
+from requests import HTTPError
+
+from xivo_dao.helpers import errors
 
 from .model import SoundCategory
 from .notifier import build_notifier
@@ -27,18 +31,27 @@ class SoundService(object):
         total = len(sounds)
         return total, sounds
 
-    def get(self, sound_name, parameters=None, with_files=True):
+    def get(self, category, parameters=None, with_files=True):
         parameters = parameters if parameters is not None else {}
-        if sound_name == ASTERISK_CATEGORY:
+        if category == ASTERISK_CATEGORY:
             sound = self._get_asterisk_sound(parameters, with_files)
         else:
-            sound = self._storage.get_directory(sound_name, parameters, with_files)
+            sound = self._storage.get_directory(category, parameters, with_files)
         return sound
 
     def _get_asterisk_sound(self, parameters, with_files=True):
         sound = SoundCategory(name='system')
         if with_files:
-            ari_sounds = self._ari_client.get_sounds(parameters)
+            if 'file_name' in parameters:
+                try:
+                    ari_sounds = [self._ari_client.get_sound(parameters['file_name'], parameters)]
+                except HTTPError as e:
+                    if e.response.status_code == 404:
+                        raise errors.not_found('Sound', name='system', file_name=parameters['file_name'])
+                    raise
+            else:
+                ari_sounds = self._ari_client.get_sounds()
+
             sound.files = convert_ari_sounds_to_model(ari_sounds)
         return sound
 

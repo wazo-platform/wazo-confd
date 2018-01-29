@@ -106,4 +106,4 @@ service_discovery:
 # Activate confd plugins
 # This is the recommended way to add plugins.
 # enabled_plugins:
-#     - plugin_list
+#     user: true

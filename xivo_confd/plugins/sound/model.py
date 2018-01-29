@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -42,8 +42,16 @@ class SoundFile(object):
 
 class SoundFormat(object):
 
-    def __init__(self, format_=None, language=None, text=None, path=None):
-        self.format = format_
+    extension_map = {
+        'wav': 'slin',
+    }
+    format_map = {v: k for k, v in extension_map.iteritems()}
+
+    def __init__(self, format_=None, language=None, text=None, path=None, extension=None):
+        if format_ is not None:
+            self.format = format_
+        else:
+            self.extension = extension
         self.language = language
         self.text = text
         self.path = path
@@ -53,3 +61,16 @@ class SoundFormat(object):
                 self.language == other.language and
                 self.text == other.text and
                 self.path == other.path)
+
+    @property
+    def extension(self):
+        if self.format is None:
+            return ''
+        return self.format_map.get(self.format, self.format)
+
+    @extension.setter
+    def extension(self, value):
+        if value == '':
+            self.format = None
+        else:
+            self.format = self.extension_map.get(value, value)

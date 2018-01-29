@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
 import requests
-from requests import RequestException
+from requests import RequestException, HTTPError
 
 LANGUAGE_REGEX = r'^[a-zA-Z]{2,3}_[a-zA-Z]{2,3}$'
 
 
-class AsteriskUnreachable(Exception):
+class AsteriskUnreachable(RequestException):
     pass
 
 
-class AsteriskUnauthorized(Exception):
+class AsteriskUnauthorized(HTTPError):
     pass
 
 
@@ -32,12 +32,8 @@ class Client(object):
         )
         self._params = {'api_key': '{}:{}'.format(username, password)}
 
-    def get_sounds(self, params=None):
+    def get_sounds(self):
         url = '{base_url}/sounds'.format(base_url=self._base_url)
-        if params and 'language' in params:
-            self._params['lang'] = params['language']
-        if params and 'format' in params:
-            self._params['format'] = params['format']
         try:
             response = requests.get(url, params=self._params)
         except RequestException as e:
@@ -48,6 +44,34 @@ class Client(object):
 
         response.raise_for_status()
         return response.json()
+
+    def get_sound(self, sound_id, params=None):
+        params = params or {}
+        url = '{base_url}/sounds/{sound_id}'.format(base_url=self._base_url, sound_id=sound_id)
+        try:
+            response = requests.get(url, params=self._params)
+        except RequestException as e:
+            raise AsteriskUnreachable(e)
+
+        if response.status_code == 401:
+            raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
+
+        response.raise_for_status()
+        result = self._filter_sound(response.json(), params)
+        return result
+
+    def _filter_sound(self, sound, parameters):
+        format_filter = parameters.get('format')
+        language_filter = parameters.get('language')
+        formats_filtered = []
+        for format_ in sound.get('formats'):
+            if format_filter and format_filter != format_.get('format'):
+                continue
+            if language_filter and language_filter != format_.get('language'):
+                continue
+            formats_filtered.append(format_)
+        sound['formats'] = formats_filtered
+        return sound
 
     def get_sounds_languages(self):
         sounds = self.get_sounds()

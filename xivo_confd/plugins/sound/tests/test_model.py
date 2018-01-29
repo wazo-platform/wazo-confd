@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -8,7 +8,8 @@ from hamcrest import (
     assert_that,
     contains_inanyorder,
     empty,
-    has_properties
+    equal_to,
+    has_properties,
 )
 
 from ..model import SoundCategory, SoundFile, SoundFormat
@@ -93,3 +94,35 @@ class TestSoundFile(unittest.TestCase):
             has_properties(language='en_US'),
             has_properties(language='fr_FR'),
         ))
+
+
+class TestSoundFormat(unittest.TestCase):
+
+    def test_format_chosen_when_extension_format(self):
+        result = SoundFormat(format_='foo', extension='bar')
+        assert_that(result.format, equal_to('foo'))
+        assert_that(result.extension, equal_to('foo'))
+
+    def test_extension_with_None(self):
+        result = SoundFormat(extension='')
+        assert_that(result.format, equal_to(None))
+
+    def test_extension_with_wav(self):
+        result = SoundFormat(extension='wav')
+        assert_that(result.format, equal_to('slin'))
+
+    def test_extension_with_other(self):
+        result = SoundFormat(extension='other_extension')
+        assert_that(result.format, equal_to('other_extension'))
+
+    def test_format_with_None(self):
+        result = SoundFormat(format_=None)
+        assert_that(result.extension, equal_to(''))
+
+    def test_format_with_wav(self):
+        result = SoundFormat(format_='slin')
+        assert_that(result.extension, equal_to('wav'))
+
+    def test_format_with_other(self):
+        result = SoundFormat(format_='other_extension')
+        assert_that(result.extension, equal_to('other_extension'))

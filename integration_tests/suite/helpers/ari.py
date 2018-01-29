@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import requests
@@ -20,6 +20,12 @@ class ARIClient(object):
         url = self.url('_set_response')
         body = {'response': 'sounds',
                 'content': sounds}
+        requests.post(url, json=body)
+
+    def set_sound(self, sound):
+        url = self.url('_set_response')
+        body = {'response': 'sounds/{}'.format(sound['id']),
+                'content': sound}
         requests.post(url, json=body)
 
     def reset(self):
