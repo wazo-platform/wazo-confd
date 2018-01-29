@@ -115,9 +115,13 @@ class _SoundFilesystemStorage(object):
         return sound
 
     def _filter_filename_language(self, sound, filename_filter, language_filter):
+        path = self._build_path(sound.name, language_filter, filename_filter)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
         filename_extension = '{}.*'.format(filename_filter)
         path = self._build_path(sound.name, language_filter, filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
         return sound
 
     def _filter_filename_format(self, sound, filename_filter, format_filter):
@@ -132,6 +136,12 @@ class _SoundFilesystemStorage(object):
         return sound
 
     def _filter_filename(self, sound, filename_filter):
+        path = self._build_path(sound.name, filename_filter)
+        sound = self._find_and_populate_sound(sound, path)
+
+        path = self._build_path(sound.name, '*', filename_filter)
+        sound = self._find_and_populate_sound(sound, path, extract_language=True)
+
         filename_extension = '{}.*'.format(filename_filter)
         path = self._build_path(sound.name, filename_extension)
         sound = self._find_and_populate_sound(sound, path)
@@ -240,9 +250,9 @@ class _SoundFilesystemStorage(object):
 
     def _get_file_paths(self, sound):
         for file_ in sound.files:
-            return ['{}.{}'.format(
+            return ['{}{}'.format(
                 self._build_path(sound.name, format_.language, file_.name),
-                format_.extension,
+                '.{}'.format(format_.extension) if format_.extension else '',
             ) for format_ in file_.formats]
         raise errors.not_found('Sound file', name=sound.name)
 

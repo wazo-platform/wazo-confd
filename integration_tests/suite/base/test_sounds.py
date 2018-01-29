@@ -323,12 +323,15 @@ def test_get_file_return_without_format_and_language_first(sound):
 
     response = confd.sounds(sound['name']).files('ivr').get()
     assert_that(response.raw, equal_to('ivr'))
+    response.assert_content_disposition('ivr')
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'ogg'})
     assert_that(response.raw, equal_to('ivr_ogg'))
+    response.assert_content_disposition('ivr.ogg')
 
     response = confd.sounds(sound['name']).files('ivr').get(**{'language': 'fr_FR'})
     assert_that(response.raw, equal_to('ivr_fr_FR'))
+    response.assert_content_disposition('ivr')
 
 
 @fixtures.sound()
