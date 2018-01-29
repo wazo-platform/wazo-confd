@@ -11,7 +11,7 @@ from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 class CallFilterSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
-    mode = fields.String(validate=OneOf([
+    strategy = fields.String(validate=OneOf([
         'bossfirst-serial',
         'bossfirst-simult',
         'secretary-serial',

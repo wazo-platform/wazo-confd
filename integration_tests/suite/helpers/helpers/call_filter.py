@@ -11,8 +11,8 @@ from . import confd
 def generate_call_filter(**params):
     name = generate_name()
     params.setdefault('name', name)
-    params.setdefault('mode', 'all')
     params.setdefault('from_', 'all')
+    params.setdefault('strategy', 'all')
     return add_call_filter(**params)
 
 

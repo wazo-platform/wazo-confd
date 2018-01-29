@@ -49,12 +49,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'from_', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'from_', {}
     yield s.check_bogus_field_returns_error, url, 'from_', []
-    yield s.check_bogus_field_returns_error, url, 'mode', 123
-    yield s.check_bogus_field_returns_error, url, 'mode', None
-    yield s.check_bogus_field_returns_error, url, 'mode', False
-    yield s.check_bogus_field_returns_error, url, 'mode', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'mode', {}
-    yield s.check_bogus_field_returns_error, url, 'mode', []
+    yield s.check_bogus_field_returns_error, url, 'strategy', 123
+    yield s.check_bogus_field_returns_error, url, 'strategy', None
+    yield s.check_bogus_field_returns_error, url, 'strategy', False
+    yield s.check_bogus_field_returns_error, url, 'strategy', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'strategy', {}
+    yield s.check_bogus_field_returns_error, url, 'strategy', []
     yield s.check_bogus_field_returns_error, url, 'timeout', 'ten'
     yield s.check_bogus_field_returns_error, url, 'timeout', -1
     yield s.check_bogus_field_returns_error, url, 'timeout', {}
@@ -85,15 +85,15 @@ def error_checks(url):
 
 @fixtures.call_filter(name='unique')
 def unique_error_checks(url, call_filter):
-    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'mode': 'all', 'from_': 'all'}
+    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'strategy': 'all', 'from_': 'all'}
 
 
-@fixtures.call_filter(name="search", description="SearchDesc", mode='all')
-@fixtures.call_filter(name="hidden", description="HiddenDesc", mode='bossfirst-serial')
+@fixtures.call_filter(name="search", description="SearchDesc", strategy='all')
+@fixtures.call_filter(name="hidden", description="HiddenDesc", strategy='bossfirst-serial')
 def test_search(call_filter, hidden):
     url = confd.callfilters
     searches = {'name': 'search',
-                'mode': 'all',
+                'strategy': 'all',
                 'description': 'Search'}
 
     for field, term in searches.items():
@@ -137,7 +137,7 @@ def test_get(call_filter):
         from_=call_filter['from_'],
         caller_id_mode=none(),
         caller_id_name=none(),
-        mode=call_filter['mode'],
+        strategy=call_filter['strategy'],
         timeout=none(),
         description=none(),
         enabled=True,
@@ -148,7 +148,7 @@ def test_create_minimal_parameters():
     response = confd.callfilters.post(
         name='minimal',
         from_='all',
-        mode='all',
+        strategy='all',
     )
     response.assert_created('callfilters')
 
@@ -161,7 +161,7 @@ def test_create_all_parameters():
     parameters = {
         'name': 'allparameter',
         'from_': 'all',
-        'mode': 'all',
+        'strategy': 'all',
         'timeout': 10,
         'caller_id_mode': 'prepend',
         'caller_id_name': 'callidname',
@@ -191,7 +191,7 @@ def test_edit_all_parameters(call_filter):
     parameters = {
         'name': 'editallparameter',
         'from_': 'all',
-        'mode': 'all',
+        'strategy': 'all',
         'timeout': 10,
         'caller_id_mode': 'prepend',
         'caller_id_name': 'callidname',
