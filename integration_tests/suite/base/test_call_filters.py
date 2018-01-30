@@ -44,11 +44,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', True
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'from_', 123
-    yield s.check_bogus_field_returns_error, url, 'from_', True
-    yield s.check_bogus_field_returns_error, url, 'from_', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'from_', {}
-    yield s.check_bogus_field_returns_error, url, 'from_', []
+    yield s.check_bogus_field_returns_error, url, 'source', 123
+    yield s.check_bogus_field_returns_error, url, 'source', True
+    yield s.check_bogus_field_returns_error, url, 'source', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'source', {}
+    yield s.check_bogus_field_returns_error, url, 'source', []
     yield s.check_bogus_field_returns_error, url, 'strategy', 123
     yield s.check_bogus_field_returns_error, url, 'strategy', None
     yield s.check_bogus_field_returns_error, url, 'strategy', False
@@ -85,7 +85,7 @@ def error_checks(url):
 
 @fixtures.call_filter(name='unique')
 def unique_error_checks(url, call_filter):
-    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'strategy': 'all', 'from_': 'all'}
+    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'}
 
 
 @fixtures.call_filter(name="search", description="SearchDesc", strategy='all')
@@ -134,7 +134,7 @@ def test_get(call_filter):
     response = confd.callfilters(call_filter['id']).get()
     assert_that(response.item, has_entries(
         name=call_filter['name'],
-        from_=call_filter['from_'],
+        source=call_filter['source'],
         caller_id_mode=none(),
         caller_id_name=none(),
         strategy=call_filter['strategy'],
@@ -147,7 +147,7 @@ def test_get(call_filter):
 def test_create_minimal_parameters():
     response = confd.callfilters.post(
         name='minimal',
-        from_='all',
+        source='all',
         strategy='all',
     )
     response.assert_created('callfilters')
@@ -160,7 +160,7 @@ def test_create_minimal_parameters():
 def test_create_all_parameters():
     parameters = {
         'name': 'allparameter',
-        'from_': 'all',
+        'source': 'all',
         'strategy': 'all',
         'timeout': 10,
         'caller_id_mode': 'prepend',
@@ -190,7 +190,7 @@ def test_edit_minimal_parameters(call_filter):
 def test_edit_all_parameters(call_filter):
     parameters = {
         'name': 'editallparameter',
-        'from_': 'all',
+        'source': 'all',
         'strategy': 'all',
         'timeout': 10,
         'caller_id_mode': 'prepend',

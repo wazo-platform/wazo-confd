@@ -112,7 +112,7 @@ definitions:
       name:
         type: string
         description: The name of the call filter
-      from_:
+      source:
         type: string
         enum:
         - internal
@@ -150,7 +150,7 @@ definitions:
         description: Disable or enable the call filter
     required:
     - name
-    - from_
+    - source
     - strategy
   CallFilterItems:
     title: CallFilterItems

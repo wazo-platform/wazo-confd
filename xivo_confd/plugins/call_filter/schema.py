@@ -18,7 +18,7 @@ class CallFilterSchema(BaseSchema):
         'secretary-simult',
         'all',
     ]), required=True)
-    from_ = fields.String(validate=OneOf([
+    source = fields.String(validate=OneOf([
         'internal',
         'external',
         'all',
