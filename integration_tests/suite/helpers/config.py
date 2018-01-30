@@ -13,12 +13,12 @@ USER_EXTENSION_RANGE = list(range(1000, 2000))
 
 
 def gen_line_exten():
-    return str(random.randint(1000, 2000))
+    return str(random.randint(1000, 1999))
 
 
 def gen_group_exten():
-    return str(random.randint(2000, 3000))
+    return str(random.randint(2000, 2999))
 
 
 def gen_conference_exten():
-    return str(random.randint(4000, 5000))
+    return str(random.randint(4000, 4999))
