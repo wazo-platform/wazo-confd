@@ -29,7 +29,7 @@ class CallFilterSchema(BaseSchema):
         'append',
     ]), allow_none=True)
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
-    timeout = fields.Integer(validate=Range(min=0), allow_none=True)
+    surrogates_timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     description = fields.String(allow_none=True)
     enabled = StrictBoolean()
     links = ListLink(Link('callfilters'))

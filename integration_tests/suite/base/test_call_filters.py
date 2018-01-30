@@ -55,10 +55,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'strategy', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'strategy', {}
     yield s.check_bogus_field_returns_error, url, 'strategy', []
-    yield s.check_bogus_field_returns_error, url, 'timeout', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', []
+    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', 'ten'
+    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', -1
+    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', {}
+    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', []
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 1234
@@ -138,7 +138,7 @@ def test_get(call_filter):
         caller_id_mode=none(),
         caller_id_name=none(),
         strategy=call_filter['strategy'],
-        timeout=none(),
+        surrogates_timeout=none(),
         description=none(),
         enabled=True,
     ))
@@ -162,7 +162,7 @@ def test_create_all_parameters():
         'name': 'allparameter',
         'source': 'all',
         'strategy': 'all',
-        'timeout': 10,
+        'surrogates_timeout': 10,
         'caller_id_mode': 'prepend',
         'caller_id_name': 'callidname',
         'description': 'Create description',
@@ -192,7 +192,7 @@ def test_edit_all_parameters(call_filter):
         'name': 'editallparameter',
         'source': 'all',
         'strategy': 'all',
-        'timeout': 10,
+        'surrogates_timeout': 10,
         'caller_id_mode': 'prepend',
         'caller_id_name': 'callidname',
         'description': 'Create description',

@@ -128,9 +128,9 @@ definitions:
         - secretary-simult
         - all
         description: Determine which will ring.
-      timeout:
+      surrogates_timeout:
         type: integer
-        description: Number of seconds the filter's members will ring before fallbacking
+        description: Number of seconds the filter's surrogates will ring before fallbacking
       caller_id_mode:
         type: string
         enum:
