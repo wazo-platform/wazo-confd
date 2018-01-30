@@ -122,10 +122,10 @@ definitions:
       strategy:
         type: string
         enum:
-        - bossfirst-serial
-        - bossfirst-simult
-        - secretary-serial
-        - secretary-simult
+        - all-recipients-then-linear-surrogates
+        - all-recipients-then-all-surrogates
+        - all-surrogates-then-all-recipients
+        - linear-surrogates-then-all-recipients
         - all
         description: Determine which will ring.
       surrogates_timeout:

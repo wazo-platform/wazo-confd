@@ -88,12 +88,11 @@ def unique_error_checks(url, call_filter):
     yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'}
 
 
-@fixtures.call_filter(name="search", description="SearchDesc", strategy='all')
-@fixtures.call_filter(name="hidden", description="HiddenDesc", strategy='bossfirst-serial')
+@fixtures.call_filter(name="search", description="SearchDesc")
+@fixtures.call_filter(name="hidden", description="HiddenDesc")
 def test_search(call_filter, hidden):
     url = confd.callfilters
     searches = {'name': 'search',
-                'strategy': 'all',
                 'description': 'Search'}
 
     for field, term in searches.items():
@@ -173,6 +172,21 @@ def test_create_all_parameters():
     response.assert_created('callfilters')
     assert_that(response.item, has_entries(parameters))
     confd.callfilters(response.item['id']).delete().assert_deleted()
+
+
+@fixtures.call_filter(strategy='all-recipients-then-linear-surrogates')
+@fixtures.call_filter(strategy='all-recipients-then-all-surrogates')
+@fixtures.call_filter(strategy='all-surrogates-then-all-recipients')
+@fixtures.call_filter(strategy='linear-surrogates-then-all-recipients')
+@fixtures.call_filter(strategy='all')
+@fixtures.call_filter(source='external')
+@fixtures.call_filter(source='internal')
+@fixtures.call_filter(source='all')
+@fixtures.call_filter(caller_id_mode='prepend')
+@fixtures.call_filter(caller_id_mode='append')
+@fixtures.call_filter(caller_id_mode='overwrite')
+def test_create_with_every_enum(self, *call_filters):
+    pass
 
 
 def test_create_without_name():

@@ -12,10 +12,10 @@ class CallFilterSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     strategy = fields.String(validate=OneOf([
-        'bossfirst-serial',
-        'bossfirst-simult',
-        'secretary-serial',
-        'secretary-simult',
+        'all-recipients-then-linear-surrogates',
+        'all-recipients-then-all-surrogates',
+        'all-surrogates-then-all-recipients',
+        'linear-surrogates-then-all-recipients',
         'all',
     ]), required=True)
     source = fields.String(validate=OneOf([
