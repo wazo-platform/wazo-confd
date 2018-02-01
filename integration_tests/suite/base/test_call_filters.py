@@ -140,6 +140,12 @@ def test_get(call_filter):
         surrogates_timeout=none(),
         description=none(),
         enabled=True,
+        recipients=has_entries(
+            users=empty()
+        ),
+        surrogates=has_entries(
+            users=empty()
+        ),
     ))
 
 

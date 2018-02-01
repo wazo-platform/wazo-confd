@@ -2,8 +2,6 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from unittest import skip
-
 from hamcrest import (
     assert_that,
     contains,
@@ -69,7 +67,6 @@ def test_associate_more_than_one_recipient(call_filter, user1, user2):
     response.assert_status(400)
 
 
-@skip('GET callfilters/<id> associations not implemented')
 @fixtures.call_filter()
 @fixtures.user()
 def test_get_users_associated_to_call_filter(call_filter, user):
@@ -108,7 +105,6 @@ def test_delete_call_filter_when_call_filter_and_user_associated(call_filter, us
         # we should check if users have the key.callfilters to empty
 
 
-@skip('GET callfilters/<id> associations not implemented')
 @fixtures.call_filter()
 @fixtures.call_filter()
 @fixtures.user()
