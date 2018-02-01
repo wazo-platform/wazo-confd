@@ -80,6 +80,14 @@ def test_associate_same_user(call_filter, user):
 
 @fixtures.call_filter()
 @fixtures.user()
+def test_associate_recipient_to_surrogate(call_filter, user):
+    with a.call_filter_recipient_user(call_filter, user):
+        response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user])
+        response.assert_status(400)
+
+
+@fixtures.call_filter()
+@fixtures.user()
 @fixtures.user()
 def test_get_users_associated_to_call_filter(call_filter, user1, user2):
     with a.call_filter_surrogate_user(call_filter, user2, user1):

@@ -69,6 +69,14 @@ def test_associate_more_than_one_recipient(call_filter, user1, user2):
 
 @fixtures.call_filter()
 @fixtures.user()
+def test_associate_surrogate_to_recipient(call_filter, user):
+    with a.call_filter_surrogate_user(call_filter, user):
+        response = confd.callfilters(call_filter['id']).recipients.users.put(users=[user])
+        response.assert_status(400)
+
+
+@fixtures.call_filter()
+@fixtures.user()
 def test_get_users_associated_to_call_filter(call_filter, user):
     with a.call_filter_recipient_user(call_filter, user):
         response = confd.callfilters(call_filter['id']).get()
