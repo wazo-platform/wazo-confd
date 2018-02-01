@@ -53,7 +53,7 @@ class TrunkRegisterSIPAssociationValidator(ValidatorAssociation):
                                              register_sip_id=register.id)
 
     def validate_associate_to_endpoint_sip(self, trunk, register):
-        if trunk.endpoint_sip or trunk.endpoint_custom:
+        if trunk.endpoint_iax or trunk.endpoint_custom:
             raise errors.resource_associated('Trunk', 'Endpoint',
                                              trunk_id=trunk.id,
                                              protocol=trunk.protocol)
