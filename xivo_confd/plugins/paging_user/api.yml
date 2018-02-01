@@ -21,7 +21,7 @@ paths:
           $ref: '#/definitions/UsersUuid'
       responses:
         '204':
-          description: Group and Users associated
+          description: Paging and Users associated
         '400':
           $ref: '#/responses/GenericError'
         '404':
@@ -48,7 +48,7 @@ paths:
           $ref: '#/definitions/UsersUuid'
       responses:
         '204':
-          description: Group and Users associated
+          description: Paging and Users associated
         '400':
           $ref: '#/responses/GenericError'
         '404':
