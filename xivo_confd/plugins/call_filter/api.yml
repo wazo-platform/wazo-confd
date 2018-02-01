@@ -130,7 +130,7 @@ definitions:
         description: Determine which will ring.
       surrogates_timeout:
         type: integer
-        description: Number of seconds the filter's surrogates will ring before fallbacking
+        description: Number of seconds the filter's surrogates will ring before falling back
       caller_id_mode:
         type: string
         enum:
