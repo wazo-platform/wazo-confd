@@ -1,0 +1,55 @@
+paths:
+  /callfilters/{callfilter_id}/recipients/users:
+    put:
+      operationId: update_call_filter_caller_users
+      summary: Update call filter and recipients
+      description: |
+        **Required ACL:** `confd.callfilters.{callfilter_id}.recipients.users.update`
+
+        **WARNING**
+        This endpoint remove all recipients which are not defined.
+      tags:
+      - callfilters
+      - users
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Call Filter and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /callfilters/{callfilter_id}/surrogates/users:
+    put:
+      operationId: update_call_filter_member_users
+      summary: Update call filter and surrogates
+      description: |
+        **Required ACL:** `confd.callfilters.{callfilter_id}.surrogates.users.update`
+
+        **WARNING**
+        This endpoint remove all surrogates which are not defined.
+      tags:
+      - callfilters
+      - users
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Call Filter and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

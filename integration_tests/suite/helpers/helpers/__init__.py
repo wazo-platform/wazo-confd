@@ -91,6 +91,8 @@ from . import agent
 from . import agent_login_status
 from . import call_filter
 from . import call_filter_entity
+from . import call_filter_recipient_user
+from . import call_filter_surrogate_user
 from . import call_log
 from . import call_permission
 from . import call_pickup
@@ -174,6 +176,8 @@ __all__ = [
     'agent_login_status',
     'call_filter',
     'call_filter_entity',
+    'call_filter_recipient_user',
+    'call_filter_surrogate_user',
     'call_log',
     'call_permission',
     'call_pickup',
