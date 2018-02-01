@@ -66,3 +66,14 @@ In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the 
 1. Uncomment the confd volumes in ```integration_tests/assets/base/docker-compose.yml```
 2. Set the environment variable: ```export LOCAL_GIT_REPOS=/parent/directory/to/all/git/repos```
 3. Execute the steps above to run integration tests
+
+
+Profiling
+=========
+
+* ```pip install gprof2dot```
+* ```apt-get install graphviz```
+* set the `profile` directory configuration
+* process file in directory with the following command:
+
+```gprof2dot -f pstats <directory>/<file> | dot -Tpng -o output.png```
