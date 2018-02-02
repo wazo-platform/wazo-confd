@@ -6,7 +6,7 @@ from collections import Counter
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
-from xivo_dao.resources.bsfilter import dao as bsfilter_dao
+from xivo_dao.resources.call_filter import dao as call_filter_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.features import dao as feature_dao
 from xivo_dao.resources.group import dao as group_dao
@@ -15,10 +15,10 @@ from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
 from xivo_confd.helpers.validator import (
+    Validator,
     GetResource,
     ResourceExists,
     ValidationGroup,
-    Validator,
 )
 
 
@@ -108,16 +108,11 @@ class CustomValidator(FuncKeyValidator):
 
 class BSFilterValidator(FuncKeyValidator):
 
-    def __init__(self, dao):
-        self.dao = dao
-
     def validate(self, user, funckey):
         if funckey.destination.type != 'bsfilter':
             return
 
-        member_ids = [filter_member.member_id
-                      for filter_member in self.dao.find_all_by_member_id(user.id)]
-        if not member_ids:
+        if not (user.call_filter_recipients or user.call_filter_surrogates):
             raise errors.missing_association('User', 'BSFilter', user_id=user.id)
 
 
@@ -136,7 +131,7 @@ def build_validator():
         'parking': [],
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
-        'bsfilter': [ResourceExists('filter_member_id', bsfilter_dao.filter_member_exists, 'FilterMember')],
+        'bsfilter': [ResourceExists('filter_member_id', call_filter_dao.member_exists, 'FilterMember')],
     }
 
     funckey_validator = FuncKeyModelValidator(destination_validators)
@@ -150,4 +145,4 @@ def build_validator():
 
 
 def build_validator_bsfilter():
-    return BSFilterValidator(bsfilter_dao)
+    return BSFilterValidator()
