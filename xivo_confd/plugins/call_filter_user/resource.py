@@ -8,7 +8,7 @@ from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMemb
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
-from xivo_confd.authentication.confd_auth import required_acl
+from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 
 from .schema import (
