@@ -353,7 +353,7 @@ definitions:
         ring_seconds:
           type: integer
           default: 30
-          description: Number of seconds a user's phone will ring before fallbacking
+          description: Number of seconds a user's phone will ring before falling back
         simultaneous_calls:
           type: integer
           default: 5

@@ -9,7 +9,6 @@ from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 from xivo.xivo_logging import get_log_level_by_name
 
-
 API_VERSION = '1.1'
 KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
 
@@ -81,6 +80,7 @@ DEFAULT_CONFIG = {
     'enabled_plugins': {
         'api': True,
         'call_log': True,
+        'call_filter': True,
         'call_permission': True,
         'confbridge': True,
         'conference': True,

@@ -26,6 +26,7 @@ setup(
         'xivo_confd.plugins': [
             'api = xivo_confd.plugins.api.plugin:Plugin',
             'call_log = xivo_confd.plugins.call_log.plugin:Plugin',
+            'call_filter = xivo_confd.plugins.call_filter.plugin:Plugin',
             'call_permission = xivo_confd.plugins.call_permission.plugin:Plugin',
             'confbridge = xivo_confd.plugins.confbridge.plugin:Plugin',
             'conference = xivo_confd.plugins.conference.plugin:Plugin',

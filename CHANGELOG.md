@@ -4,6 +4,14 @@ Changelog
 18.02
 -----
 
+* Added call filter endpoints:
+
+  * GET `/1.1/callfilters`
+  * POST `/1.1/callfilters`
+  * DELETE `/1.1/callfilters/<call_filter_id>`
+  * GET `/1.1/callfilters/<call_filter_id>`
+  * PUT `/1.1/callfilters/<call_filter_id>`
+
 * A new API for updating all template's funckeys
 
   * PUT `/1.1/funckeys/templates/<template_id>`
