@@ -2,11 +2,12 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus, sysconfd
 from xivo_bus.resources.trunk_endpoint.event import (
     TrunkEndpointAssociatedEvent,
     TrunkEndpointDissociatedEvent,
 )
+
+from xivo_confd import bus, sysconfd
 
 
 class TrunkEndpointNotifier(object):

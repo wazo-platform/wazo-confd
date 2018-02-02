@@ -1,14 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
-from mock import Mock, patch, mock_open
-from hamcrest import assert_that, equal_to, empty, none
 from textwrap import dedent
 
-from xivo_confd.plugins.wizard.service import WizardService
+from mock import Mock, patch, mock_open
+from hamcrest import assert_that, equal_to, empty, none
+
+from ..service import WizardService
 
 
 class TestWizardService(unittest.TestCase):

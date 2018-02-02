@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus, sysconfd
 from xivo_bus.resources.parking_lot_extension.event import (
     ParkingLotExtensionAssociatedEvent,
     ParkingLotExtensionDissociatedEvent,
 )
+
+from xivo_confd import bus, sysconfd
 
 
 class ParkingLotExtensionNotifier(object):

@@ -1,16 +1,16 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.line import dao
 
 from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.line.validator import build_validator
-from xivo_confd.plugins.line.notifier import build_notifier
 from xivo_confd.plugins.device import builder as device_builder
+from xivo_confd.plugins.line.notifier import build_notifier
+from xivo_confd.plugins.line.validator import build_validator
 from xivo_confd.plugins.line_device.service import build_service as line_device_build_service
 from xivo_confd.plugins.user_line.service import build_service as user_line_build_service
-from xivo_dao.helpers.db_manager import Session
 
 
 class LineService(CRUDService):

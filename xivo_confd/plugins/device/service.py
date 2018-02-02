@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
-
-from xivo_confd.helpers.resource import CRUDService
 
 from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.helpers import errors
+
+from xivo_confd.helpers.resource import CRUDService
 
 
 class DeviceService(CRUDService):

@@ -3,16 +3,16 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
-import requests
 
 from functools import wraps
+
+import requests
 
 from flask import request
 from flask_httpauth import HTTPDigestAuth
 
-from xivo_dao import accesswebservice_dao
 from xivo.auth_verifier import AuthVerifier, required_acl
-
+from xivo_dao import accesswebservice_dao
 
 logger = logging.getLogger(__name__)
 

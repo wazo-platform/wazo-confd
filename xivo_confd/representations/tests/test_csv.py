@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import assert_that
-from hamcrest import equal_to
-from hamcrest import has_entry
 from unittest import TestCase
+
+from hamcrest import (
+    assert_that,
+    equal_to,
+    has_entry,
+)
 
 from ..csv_ import output_csv
 

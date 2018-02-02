@@ -1,15 +1,17 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.validator import (Validator,
-                                          ValidationGroup,
-                                          Optional,
-                                          UniqueField,
-                                          UniqueFieldChanged,
-                                          MemberOfSequence)
+from xivo_confd.helpers.validator import (
+    MemberOfSequence,
+    Optional,
+    UniqueField,
+    UniqueFieldChanged,
+    ValidationGroup,
+    Validator,
+)
 
 
 class DeviceNotAssociated(Validator):
@@ -29,18 +31,15 @@ def build_validator(device_dao, line_dao):
     return ValidationGroup(
         common=[
             Optional('plugin',
-                     MemberOfSequence('plugin', device_dao.plugins, 'Plugin')
-                     ),
+                     MemberOfSequence('plugin', device_dao.plugins, 'Plugin')),
             Optional('template_id',
-                     MemberOfSequence('template_id', device_dao.device_templates, 'DeviceTemplate')
-                     ),
+                     MemberOfSequence('template_id', device_dao.device_templates, 'DeviceTemplate')),
         ],
         create=[
             Optional('mac',
                      UniqueField('mac',
                                  lambda mac: device_dao.find_by(mac=mac),
-                                 'Device')
-                     ),
+                                 'Device')),
         ],
         edit=[
             Optional('mac',

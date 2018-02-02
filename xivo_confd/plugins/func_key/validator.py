@@ -1,13 +1,8 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from collections import Counter
-
-from xivo_confd.helpers.validator import (Validator,
-                                          GetResource,
-                                          ResourceExists,
-                                          ValidationGroup)
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
@@ -18,6 +13,13 @@ from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.paging import dao as paging_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
+
+from xivo_confd.helpers.validator import (
+    GetResource,
+    ResourceExists,
+    ValidationGroup,
+    Validator,
+)
 
 
 class PrivateTemplateValidator(Validator):

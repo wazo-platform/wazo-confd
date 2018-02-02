@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -7,10 +7,12 @@ import unittest
 from mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to
 
-from xivo_confd.plugins.func_key.service import TemplateService
-from xivo_confd.plugins.device.update import DeviceUpdater
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+
+from xivo_confd.plugins.device.update import DeviceUpdater
+
+from ..service import TemplateService
 
 
 class TestTemplateService(unittest.TestCase):

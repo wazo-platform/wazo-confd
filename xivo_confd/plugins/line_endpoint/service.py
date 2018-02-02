@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.plugins.line.service import build_service as build_line_service
 from xivo_dao.helpers import errors
+
+from xivo_confd.plugins.line.service import build_service as build_line_service
 
 from .validator import build_validator
 

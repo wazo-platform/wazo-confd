@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
+
+from xivo_dao.resources.extension import dao as extension_dao
 
 from .notifier import build_notifier
 from .validator import build_validator
-
-from xivo_dao.resources.extension import dao as extension_dao
 
 
 class GroupExtensionService(object):

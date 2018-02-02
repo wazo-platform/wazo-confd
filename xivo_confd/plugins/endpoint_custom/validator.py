@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.helpers.validator import ValidationGroup, UniqueField, UniqueFieldChanged
-
 from xivo_dao.resources.endpoint_custom import dao as custom_dao
+
+from xivo_confd.helpers.validator import ValidationGroup, UniqueField, UniqueFieldChanged
 
 
 def find_by_interface(interface):

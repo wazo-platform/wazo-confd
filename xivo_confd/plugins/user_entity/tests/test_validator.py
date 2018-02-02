@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock, sentinel
 
-from xivo_confd.plugins.user_entity.validator import UserEntityAssociationValidator
-
 from xivo_dao.helpers.exception import ResourceError
+
+from ..validator import UserEntityAssociationValidator
 
 
 class TestValidateNoLineAssociated(unittest.TestCase):

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from sqlalchemy.orm import Load
@@ -22,8 +22,7 @@ def profile_for_device(device_id):
              .join(LineFeatures.user_lines)
              .join(UserLine.main_user_rel)
              .filter(LineFeatures.device_id == device_id)
-             .filter(LineFeatures.num == 1)
-             )
+             .filter(LineFeatures.num == 1))
 
     return query.first()
 
@@ -39,8 +38,7 @@ def sip_lines_for_device(device_id):
              .options(
                  Load(LineFeatures).load_only("id", "configregistrar"),
                  Load(UserSIP).load_only("id", "callerid", "name", "secret"),
-                 Load(Extension).load_only("id", "exten"))
-             )
+                 Load(Extension).load_only("id", "exten")))
 
     return query.all()
 

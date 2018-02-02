@@ -1,12 +1,13 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus
 from xivo_bus.resources.group_call_permission.event import (
     GroupCallPermissionAssociatedEvent,
     GroupCallPermissionDissociatedEvent,
 )
+
+from xivo_confd import bus
 
 
 class GroupCallPermissionNotifier(object):

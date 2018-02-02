@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from mock import Mock, sentinel
 
-from xivo_confd.plugins.user.validator import (NoEmptyFieldWhenEnabled,
-                                               NoLineAssociated,
-                                               NoVoicemailAssociated)
-from xivo_dao.helpers.exception import ResourceError
-from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
+from xivo_dao.helpers.exception import ResourceError
+
+from ..validator import (
+    NoEmptyFieldWhenEnabled,
+    NoLineAssociated,
+    NoVoicemailAssociated,
+)
 
 
 class TestValidateNoVoicemailAssociated(unittest.TestCase):

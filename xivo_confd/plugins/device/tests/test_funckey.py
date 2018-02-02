@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -7,10 +7,10 @@ import unittest
 from mock import Mock
 from hamcrest import assert_that, has_entries
 
-from xivo_confd.plugins.device.funckey import FuncKeyConverter
-
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.resources.func_key.model import FuncKey
+
+from ..funckey import FuncKeyConverter
 
 
 class FuncKeyTestConverter(FuncKeyConverter):

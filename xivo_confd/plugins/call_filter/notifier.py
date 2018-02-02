@@ -2,13 +2,13 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus
-
 from xivo_bus.resources.call_filter.event import (
     CreateCallFilterEvent,
     DeleteCallFilterEvent,
     EditCallFilterEvent,
 )
+
+from xivo_confd import bus
 
 
 class CallFilterNotifier(object):

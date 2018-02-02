@@ -1,16 +1,8 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import abc
-
-from xivo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
-from xivo_confd.plugins.extension.schema import ExtensionSchema
-from xivo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
-from xivo_confd.plugins.voicemail.schema import VoicemailSchema
-
-from xivo_dao.helpers.exception import NotFoundError
 
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.extension import Extension
@@ -21,7 +13,13 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.voicemail import Voicemail
 
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.extension import dao as extension_dao
+
+from xivo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
+from xivo_confd.plugins.extension.schema import ExtensionSchema
+from xivo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
+from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
 
 class Creator(object):

@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
-import xivo_dao
 
 from functools import partial
+
+import xivo_dao
 
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration

@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import os
-import requests
 import unittest
+
+import requests
 
 from flask import Flask
 from hamcrest import assert_that, equal_to

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.plugins.user.validator import build_validator, build_validator_forward
-from xivo_confd.plugins.user.notifier import build_notifier, build_notifier_service, build_notifier_forward
-from xivo_confd.plugins.device.builder import build_device_updater
+from xivo_dao.resources.user import dao as user_dao
 
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.helpers.validator import ValidationGroup
+from xivo_confd.plugins.device.builder import build_device_updater
 
-from xivo_dao.resources.user import dao as user_dao
+from .validator import build_validator, build_validator_forward
+from .notifier import build_notifier, build_notifier_service, build_notifier_forward
 
 
 class UserBaseService(CRUDService):

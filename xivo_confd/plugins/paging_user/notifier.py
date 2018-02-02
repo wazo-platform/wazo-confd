@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd import bus
 from xivo_bus.resources.paging_user.event import (
     PagingMemberUsersAssociatedEvent,
     PagingCallerUsersAssociatedEvent,
 )
+
+from xivo_confd import bus
 
 
 class PagingUserNotifier(object):

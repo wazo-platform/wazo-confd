@@ -1,13 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
+
 from mock import Mock
 
 from xivo_bus.resources.sccp_general.event import EditSCCPGeneralEvent
-from xivo_confd.plugins.sccp_general.notifier import SCCPGeneralNotifier
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
+
+from ..notifier import SCCPGeneralNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
                      'ipbx': ['module reload chan_sccp.so'],

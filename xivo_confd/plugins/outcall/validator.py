@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.helpers.validator import (UniqueField,
-                                          UniqueFieldChanged,
-                                          ValidationGroup)
-
 from xivo_dao.resources.outcall import dao as outcall_dao
+
+from xivo_confd.helpers.validator import (
+    UniqueField,
+    UniqueFieldChanged,
+    ValidationGroup,
+)
 
 
 def build_validator():

@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
-
-from xivo_confd.helpers.validator import (Optional,
-                                          UniqueField,
-                                          UniqueFieldChanged,
-                                          ValidationGroup,
-                                          Validator)
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
+
+from xivo_confd.helpers.validator import (
+    Optional,
+    UniqueField,
+    UniqueFieldChanged,
+    ValidationGroup,
+    Validator,
+)
 
 
 class NoVoicemailAssociated(Validator):

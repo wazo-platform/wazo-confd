@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
+
+from xivo_dao.helpers import errors
 
 from xivo_confd.database import agent as agent_db
 from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
-from xivo_dao.helpers import errors
 
 
 class UserAgentAssociationValidator(ValidatorAssociation):

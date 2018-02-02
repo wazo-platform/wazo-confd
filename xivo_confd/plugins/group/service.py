@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from .validator import build_validator
-from .notifier import build_notifier
+from xivo_dao.resources.group import dao as group_dao
 
 from xivo_confd.helpers.resource import CRUDService
 
-from xivo_dao.resources.group import dao as group_dao
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 def build_service():

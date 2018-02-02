@@ -1,14 +1,14 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
-
-from xivo_confd import bus, sysconfd
 
 from xivo_bus.resources.endpoint_sccp.event import (
     CreateSccpEndpointEvent,
     DeleteSccpEndpointEvent,
     EditSccpEndpointEvent,
 )
+
+from xivo_confd import bus, sysconfd
 
 
 class SccpEndpointNotifier(object):

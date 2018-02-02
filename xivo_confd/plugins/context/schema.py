@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields, post_load
 from marshmallow.validate import Length, Range, Predicate, OneOf
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
+
+from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
 
 class RangeSchema(BaseSchema):

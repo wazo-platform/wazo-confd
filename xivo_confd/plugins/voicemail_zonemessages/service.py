@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.plugins.voicemail_zonemessages.notifier import build_notifier
-
 from xivo_dao.resources.voicemail_zonemessages import dao as voicemail_zonemessages_dao
+
+from .notifier import build_notifier
 
 
 class VoicemailZoneMessagesService(object):

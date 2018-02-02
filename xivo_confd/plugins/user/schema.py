@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_confd.helpers.validator import LANGUAGE_REGEX
 from marshmallow import fields
 from marshmallow.validate import Length, Range, Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
-
+from xivo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
