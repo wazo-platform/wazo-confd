@@ -1,36 +1,39 @@
-sync:
-  image: n3llyb0y/wait
-  links:
-    - confd
-    - swagger-validator
-    - postgres
-  environment:
-    PORTS: "9486 8080 5432"
+version: '3'
+services:
+  sync:
+    image: waisbrot/wait
+    depends_on:
+      - swagger-validator
+      - postgres
+      - confd
+    environment:
+      TARGETS: "swagger-validator:8080,postgres:5432,confd:9486"
+      TIMEOUT: ${INTEGRATION_TEST_TIMEOUT}
 
-confd:
-  image: xivo-confd-test
-  ports:
-    - "9486"
-  links:
-    - postgres
-  volumes:
-    - "../../..:/usr/src/xivo-confd"
-    - "./etc/ssl:/usr/share/xivo-certs"
-    - "./etc/xivo-confd:/etc/xivo-confd"
-    # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
-    # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
-  environment:
-    XIVO_UUID: "abcd-1234"
-  command: "xivo-confd -d"
+  confd:
+    image: xivo-confd-test
+    ports:
+      - "9486"
+    links:
+      - postgres
+    volumes:
+      - "../../..:/usr/src/xivo-confd"
+      - "./etc/ssl:/usr/share/xivo-certs"
+      - "./etc/xivo-confd:/etc/xivo-confd"
+      # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
+      # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
+    environment:
+      XIVO_UUID: "abcd-1234"
+    command: "xivo-confd -d"
 
-postgres:
-  image: wazopbx/postgres-test
-  expose:
-    - "5432"
+  postgres:
+    image: wazopbx/postgres-test
+    expose:
+      - "5432"
 
-swagger-validator:
-  image: swaggerapi/swagger-validator
-  ports:
-    - "8080"
-  links:
-    - confd
+  swagger-validator:
+    image: swaggerapi/swagger-validator
+    ports:
+      - "8080"
+    links:
+      - confd

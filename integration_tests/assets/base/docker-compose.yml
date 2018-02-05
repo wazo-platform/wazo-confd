@@ -1,76 +1,70 @@
-sync:
-  image: n3llyb0y/wait
-  links:
-    - ari
-    - auth
-    - rabbitmq
-    - postgres
-    - provd
-    - sysconfd
-    - confd
-  environment:
-    PORTS: "5039 5432 5672 8666 8668 9486 9497"
-    TIMEOUT: "${INTEGRATION_TEST_TIMEOUT}"
-ari:
-  image: p0bailey/docker-flask
-  ports:
-    - "5039"
-  volumes:
-    - "./mocks/ari.py:/tmp/ari.py"
-  command: "python /tmp/ari.py 5039"
-auth:
-  image: wazopbx/xivo-auth-mock
-  expose:
-    - 9497
-  volumes:
-    - ./ssl:/usr/local/share/ssl
-provd:
-  image: wazopbx/xivo-provd
-  ports:
-    - "8666"
-  expose:
-    - "8666"
-  volumes:
-    - "./etc/xivo-provd/provd.conf:/etc/xivo/provd/provd.conf"
-    - "./provd/null:/var/lib/xivo-provd/plugins/null"
-    - "./provd/zero:/var/lib/xivo-provd/plugins/zero"
-postgres:
-  image: wazopbx/postgres-test
-  expose:
-    - "5432"
-  ports:
-    - "5432"
-rabbitmq:
-  image: rabbitmq
-  ports:
-    - "5672"
-sysconfd:
-  image: p0bailey/docker-flask
-  expose:
-    - "8668"
-  ports:
-    - "8668"
-  volumes:
-    - "./mocks/sysconfd.py:/tmp/sysconfd.py"
-  command: "python /tmp/sysconfd.py"
-confd:
-  image: xivo-confd-test
-  expose:
-    - "9486"
-  ports:
-    - "9486"
-  links:
-    - ari
-    - postgres
-    - rabbitmq
-    - provd
-    - sysconfd
-    - auth
-  command: "xivo-confd -d"
-  volumes:
-    - "../../..:/usr/src/xivo-confd"
-    - "./etc/xivo-confd:/etc/xivo-confd"
-    - "./etc/ssl:/usr/share/xivo-certs"
-    # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
-    # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
-    # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
+version: '3'
+services:
+  sync:
+    image: waisbrot/wait
+    depends_on:
+      - ari
+      - auth
+      - postgres
+      - provd
+      - rabbitmq
+      - sysconfd
+      - confd
+    environment:
+      TARGETS: "ari:5039,postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
+      TIMEOUT: ${INTEGRATION_TEST_TIMEOUT}
+
+  ari:
+    image: p0bailey/docker-flask
+    ports:
+      - "5039"
+    volumes:
+      - "./mocks/ari.py:/tmp/ari.py"
+    command: "python /tmp/ari.py 5039"
+
+  auth:
+    image: wazopbx/xivo-auth-mock
+    expose:
+      - 9497
+    volumes:
+      - ./ssl:/usr/local/share/ssl
+
+  provd:
+    image: wazopbx/xivo-provd
+    ports:
+      - "8666"
+    volumes:
+      - "./etc/xivo-provd/provd.conf:/etc/xivo/provd/provd.conf"
+      - "./provd/null:/var/lib/xivo-provd/plugins/null"
+      - "./provd/zero:/var/lib/xivo-provd/plugins/zero"
+
+  postgres:
+    image: wazopbx/postgres-test
+    ports:
+      - "5432"
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672"
+
+  sysconfd:
+    image: p0bailey/docker-flask
+    ports:
+      - "8668"
+    volumes:
+      - "./mocks/sysconfd.py:/tmp/sysconfd.py"
+    command: "python /tmp/sysconfd.py"
+
+  confd:
+    image: xivo-confd-test
+    ports:
+      - "9486"
+    command: "xivo-confd -d"
+    volumes:
+      - "../../..:/usr/src/xivo-confd"
+      - "./etc/xivo-confd:/etc/xivo-confd"
+      - "./etc/ssl:/usr/share/xivo-certs"
+      # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
+      # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
+      # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
