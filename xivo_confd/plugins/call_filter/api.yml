@@ -104,54 +104,57 @@ parameters:
 definitions:
   CallFilter:
     title: CallFilter
-    properties:
-      id:
-        type: integer
-        readOnly: true
-        description: The id of the call filter
-      name:
-        type: string
-        description: The name of the call filter
-      source:
-        type: string
-        enum:
-        - internal
-        - external
-        - all
-        description: Call type to apply call filter
-      strategy:
-        type: string
-        enum:
-        - all-recipients-then-linear-surrogates
-        - all-recipients-then-all-surrogates
-        - all-surrogates-then-all-recipients
-        - linear-surrogates-then-all-recipients
-        - all
-        description: Determine which will ring.
-      surrogates_timeout:
-        type: integer
-        description: Number of seconds the filter's surrogates will ring before falling back
-      caller_id_mode:
-        type: string
-        enum:
-        - prepend
-        - overwrite
-        - append
-        description: How the caller_id_name will be treated
-      caller_id_name:
-        type: string
-        description: Name to display
-      description:
-        type: string
-        description: Additional information about the call filter
-      enabled:
-        type: boolean
-        default: true
-        description: Disable or enable the call filter
-    required:
-    - name
-    - source
-    - strategy
+    allOf:
+    - properties:
+        id:
+          type: integer
+          readOnly: true
+          description: The id of the call filter
+        name:
+          type: string
+          description: The name of the call filter
+        source:
+          type: string
+          enum:
+          - internal
+          - external
+          - all
+          description: Call type to apply call filter
+        strategy:
+          type: string
+          enum:
+          - all-recipients-then-linear-surrogates
+          - all-recipients-then-all-surrogates
+          - all-surrogates-then-all-recipients
+          - linear-surrogates-then-all-recipients
+          - all
+          description: Determine which will ring.
+        surrogates_timeout:
+          type: integer
+          description: Number of seconds the filter's surrogates will ring before falling back
+        caller_id_mode:
+          type: string
+          enum:
+          - prepend
+          - overwrite
+          - append
+          description: How the caller_id_name will be treated
+        caller_id_name:
+          type: string
+          description: Name to display
+        description:
+          type: string
+          description: Additional information about the call filter
+        enabled:
+          type: boolean
+          default: true
+          description: Disable or enable the call filter
+      required:
+      - name
+      - source
+      - strategy
+    - $ref: '#/definitions/CallFilterRecipients'
+    - $ref: '#/definitions/CallFilterSurrogates'
   CallFilterItems:
     title: CallFilterItems
     properties:
@@ -163,3 +166,33 @@ definitions:
         type: integer
     required:
     - total
+  CallFilterRecipients:
+    properties:
+      recipients:
+        readOnly: true
+        $ref: '#/definitions/CallFilterRecipientUsers'
+  CallFilterSurrogates:
+    properties:
+      surrogates:
+        readOnly: true
+        $ref: '#/definitions/CallFilterSurrogateUsers'
+  CallFilterRecipientUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/CallFilterRecipientUser'
+  CallFilterSurrogateUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
+  CallFilterRecipientUser:
+    allOf:
+    - properties:
+        timeout:
+          type: integer
+    - $ref: '#/definitions/UserRelationBase'

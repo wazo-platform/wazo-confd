@@ -4,6 +4,11 @@ Changelog
 18.02
 -----
 
+* A new API for associating users with a call filter has been added:
+
+  * PUT `/1.1/callfilters/<call_filter_id>/recipients/users`
+  * PUT `/1.1/callfilters/<call_filter_id>/surrogates/users`
+
 * Added call filter endpoints:
 
   * GET `/1.1/callfilters`

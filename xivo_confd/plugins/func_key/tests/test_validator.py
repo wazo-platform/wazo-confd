@@ -1,33 +1,37 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
+
 from mock import Mock, sentinel
+
 from hamcrest import assert_that, calling, raises
 
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
-from xivo_dao.resources.func_key.model import (BSFilterDestination,
-                                               CustomDestination,
-                                               ForwardDestination,
-                                               FuncKey,
-                                               ParkPositionDestination,
-                                               ServiceDestination)
-
-from xivo_dao.resources.bsfilter.model import FilterMember
-
+from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMember
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.exception import InputError, ResourceError
+from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.resources.func_key.model import (
+    BSFilterDestination,
+    CustomDestination,
+    ForwardDestination,
+    FuncKey,
+    ParkPositionDestination,
+    ServiceDestination,
+)
 
 from xivo_confd.helpers.validator import Validator
 from xivo_confd.plugins.func_key.validator import FuncKeyMappingValidator
-from xivo_confd.plugins.func_key.validator import (BSFilterValidator,
-                                                   CustomValidator,
-                                                   ForwardValidator,
-                                                   FuncKeyModelValidator,
-                                                   ParkPositionValidator,
-                                                   PrivateTemplateValidator,
-                                                   SimilarFuncKeyValidator)
+from xivo_confd.plugins.func_key.validator import (
+    BSFilterValidator,
+    CustomValidator,
+    ForwardValidator,
+    FuncKeyModelValidator,
+    ParkPositionValidator,
+    PrivateTemplateValidator,
+    SimilarFuncKeyValidator,
+)
 
 
 class TestSimilarFuncKeyValidator(unittest.TestCase):
@@ -220,12 +224,10 @@ class TestCustomValidator(unittest.TestCase):
 class TestBSFilterValidator(unittest.TestCase):
 
     def setUp(self):
-        self.bsfilter_dao = Mock()
-
         self.user = User(id=sentinel.user_id)
         self.funckey = FuncKey(destination=BSFilterDestination(filter_member_id=sentinel.filter_member_id))
 
-        self.validator = BSFilterValidator(self.bsfilter_dao)
+        self.validator = BSFilterValidator()
 
     def test_when_func_key_does_not_have_bsfilter_destination_then_validation_passes(self):
         funckey = FuncKey(destination=CustomDestination(exten='1234'))
@@ -233,13 +235,21 @@ class TestBSFilterValidator(unittest.TestCase):
         self.validator.validate(self.user, funckey)
 
     def test_when_user_is_not_member_of_a_filter_then_raises_error(self):
-        self.bsfilter_dao.find_all_by_member_id.return_value = []
+        user = self.user
+        user.call_filter_recipients = []
+        user.call_filter_surrogates = []
 
         assert_that(calling(self.validator.validate).with_args(self.user, self.funckey),
                     raises(ResourceError))
 
-    def test_when_user_is_member_of_a_filter_then_validation_passes(self):
-        filter_member = FilterMember(id=None, member_id=sentinel.user_id, role='boss')
-        self.bsfilter_dao.find_all_by_member_id.return_value = [filter_member]
+    def test_when_user_is_recipient_of_a_filter_then_validation_passes(self):
+        user = self.user
+        user.call_filter_recipients = [CallFilterMember()]
+
+        self.validator.validate(self.user, self.funckey)
+
+    def test_when_user_is_surrogate_of_a_filter_then_validation_passes(self):
+        user = self.user
+        user.call_filter_surrogates = [CallFilterMember()]
 
         self.validator.validate(self.user, self.funckey)

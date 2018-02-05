@@ -297,3 +297,21 @@ def trunk_register_sip(trunk, sip, check=True):
     h.trunk_register_sip.associate(trunk['id'], sip['id'], check)
     yield
     h.trunk_register_sip.dissociate(trunk['id'], sip['id'], check)
+
+
+@contextmanager
+def call_filter_recipient_user(call_filter, *users, **kwargs):
+    user_uuids = [user['uuid'] for user in users]
+    check = kwargs.get('check', True)
+    h.call_filter_recipient_user.associate(call_filter['id'], user_uuids, check=check)
+    yield
+    h.call_filter_recipient_user.dissociate(call_filter['id'], check=check)
+
+
+@contextmanager
+def call_filter_surrogate_user(call_filter, *users, **kwargs):
+    user_uuids = [user['uuid'] for user in users]
+    check = kwargs.get('check', True)
+    h.call_filter_surrogate_user.associate(call_filter['id'], user_uuids, check=check)
+    yield
+    h.call_filter_surrogate_user.dissociate(call_filter['id'], check=check)
