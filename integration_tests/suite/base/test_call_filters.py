@@ -146,6 +146,9 @@ def test_get(call_filter):
         surrogates=has_entries(
             users=empty()
         ),
+        fallbacks=has_entries(
+            noanswer_destination=none()
+        ),
     ))
 
 

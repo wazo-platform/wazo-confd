@@ -60,6 +60,7 @@ class CallFilterSchema(BaseSchema):
 
     recipients = fields.Nested('CallFilterRecipientsSchema', many=True, dump_only=True)
     surrogates = fields.Nested('CallFilterSurrogatesSchema', many=True, dump_only=True)
+    fallbacks = fields.Nested('CallFilterFallbackSchema', dump_only=True)
 
     @post_dump
     def wrap_users(self, data):

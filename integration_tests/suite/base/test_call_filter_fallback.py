@@ -125,3 +125,12 @@ def _update_user_fallbacks_with_nonexistent_destination(call_filter_id, destinat
 def test_bus_events(call_filter):
     url = confd.callfilters(call_filter['id']).fallbacks.put
     yield s.check_bus_event, 'config.callfilters.fallbacks.edited', url
+
+
+@fixtures.call_filter()
+def test_get_fallbacks_relation(call_filter):
+    confd.callfilters(call_filter['id']).fallbacks.put(noanswer_destination={'type': 'none'}).assert_updated
+    response = confd.callfilters(call_filter['id']).get()
+    assert_that(response.item, has_entries(
+        fallbacks=has_entries(noanswer_destination=has_entries(type='none'))
+    ))
