@@ -81,6 +81,7 @@ DEFAULT_CONFIG = {
         'api': True,
         'call_log': True,
         'call_filter': True,
+        'call_filter_fallback': True,
         'call_filter_user': True,
         'call_permission': True,
         'confbridge': True,
