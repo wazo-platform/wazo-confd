@@ -43,7 +43,23 @@ class Client(object):
             raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
 
         response.raise_for_status()
-        return response.json()
+        results = []
+        for sound in response.json():
+            result = self._remove_non_standard_language(sound)
+            if result['formats']:
+                results.append(result)
+        return results
+
+    def _remove_non_standard_language(self, sound):
+        result = dict(sound)
+        result['formats'] = []
+
+        for format_ in sound['formats']:
+            if format_['language'] and not re.match(LANGUAGE_REGEX, format_['language']):
+                continue
+            result['formats'].append(format_)
+
+        return result
 
     def get_sound(self, sound_id, params=None):
         params = params or {}
@@ -58,6 +74,7 @@ class Client(object):
 
         response.raise_for_status()
         result = self._filter_sound(response.json(), params)
+        result = self._remove_non_standard_language(result)
         return result
 
     def _filter_sound(self, sound, parameters):

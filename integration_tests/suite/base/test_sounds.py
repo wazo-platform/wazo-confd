@@ -118,7 +118,7 @@ def test_get_system_sound():
                       'format': 'slin'},
                      {'language': 'en_US',
                       'format': 'slin'},
-                     {'language': 'en',
+                     {'language': 'en_AU',
                       'format': 'gsm'}],
          'text': 'The conference is now unmuted.'},
     ]
@@ -139,9 +139,29 @@ def test_get_system_sound():
                             text=sounds[0]['text']),
                 has_entries(format=sounds[0]['formats'][2]['format'],
                             language=sounds[0]['formats'][2]['language'],
-                            text=sounds[0]['text']),
+                            text=None),
             )
         ))
+    ))
+    ari.reset()
+
+
+def test_get_system_sound_remove_non_standard_language():
+    sounds = [
+        {'id': 'conf-now-unmuted',
+         'formats': [{'language': 'recordings',
+                      'format': 'slin'},
+                     {'language': 'en',
+                      'format': 'slin'}],
+         'text': 'text'},
+    ]
+    ari.set_sounds(sounds)
+
+    response = confd.sounds('system').get()
+
+    assert_that(response.item, has_entries(
+        name='system',
+        files=empty(),
     ))
     ari.reset()
 
@@ -264,6 +284,22 @@ def test_get_file(sound):
     response = confd.sounds(sound['name']).files('ivr').get(**{'format': 'slin', 'language': 'fr_FR'})
     assert_that(response.raw, equal_to('ivr_slin_fr_FR'))
     response.assert_content_disposition('ivr.wav')
+
+
+def test_get_file_system_errors():
+    asterisk_sound.create_directory('recordings')
+    asterisk_sound.create_file('recordings/invalid-language.mp3')
+    sound = {
+        'id': 'invalid-language',
+        'formats': [{'language': 'recordings',
+                     'format': 'mp3'}],
+        'text': 'asterisk sound test'
+    }
+    ari.set_sound(sound)
+
+    response = confd.sounds('system').files(sound['id']).get()
+    response.assert_status(404)
+    ari.reset()
 
 
 def test_get_file_system():
