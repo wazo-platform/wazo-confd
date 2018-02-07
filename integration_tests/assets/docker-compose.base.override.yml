@@ -1,0 +1,20 @@
+version: '3'
+services:
+  sync:
+    depends_on:
+      - ari
+    environment:
+      TARGETS: "ari:5039,postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
+
+  confd:
+    volumes:
+      - "./etc/xivo-confd/conf.d/ari.yml:/etc/xivo-confd/conf.d/ari.yml"
+
+  ari:
+    image: p0bailey/docker-flask
+    ports:
+      - "5039"
+    volumes:
+      - "./mocks/ari.py:/tmp/ari.py"
+    command: "python /tmp/ari.py 5039"
+

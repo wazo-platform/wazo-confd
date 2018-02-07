@@ -3,7 +3,6 @@ services:
   sync:
     image: waisbrot/wait
     depends_on:
-      - ari
       - auth
       - postgres
       - provd
@@ -11,16 +10,8 @@ services:
       - sysconfd
       - confd
     environment:
-      TARGETS: "ari:5039,postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
+      TARGETS: "postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
       TIMEOUT: ${INTEGRATION_TEST_TIMEOUT}
-
-  ari:
-    image: p0bailey/docker-flask
-    ports:
-      - "5039"
-    volumes:
-      - "./mocks/ari.py:/tmp/ari.py"
-    command: "python /tmp/ari.py 5039"
 
   auth:
     image: wazopbx/xivo-auth-mock
@@ -63,7 +54,15 @@ services:
     command: "xivo-confd -d"
     volumes:
       - "../../..:/usr/src/xivo-confd"
-      - "./etc/xivo-confd:/etc/xivo-confd"
+      - "./etc/xivo-confd/conf.d/uuid.yml:/etc/xivo-confd/conf.d/uuid.yml"
+      - "./etc/xivo-confd/conf.d/debug.yml:/etc/xivo-confd/conf.d/debug.yml"
+      - "./etc/xivo-confd/conf.d/postgres.yml:/etc/xivo-confd/conf.d/postgres.yml"
+      - "./etc/xivo-confd/conf.d/auth.yml:/etc/xivo-confd/conf.d/auth.yml"
+      - "./etc/xivo-confd/conf.d/rabbitmq.yml:/etc/xivo-confd/conf.d/rabbitmq.yml"
+      - "./etc/xivo-confd/conf.d/provd.yml:/etc/xivo-confd/conf.d/provd.yml"
+      - "./etc/xivo-confd/conf.d/sysconfd.yml:/etc/xivo-confd/conf.d/sysconfd.yml"
+      - "./etc/xivo-confd/conf.d/disable_service_discovery.yml:/etc/xivo-confd/conf.d/disable_service_discovery.yml"
+
       - "./etc/ssl:/usr/share/xivo-certs"
       # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
       # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
