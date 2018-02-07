@@ -290,7 +290,7 @@ class TestWizardDiscover(IntegrationTest):
         docker_status = self.service_status()
         hostname = docker_status['Config']['Hostname']
 
-        network_settings = docker_status['NetworkSettings']['Networks']['confd0wizard_default']
+        network_settings = docker_status['NetworkSettings']['Networks']['confd_default']
         ip_address = network_settings['IPAddress']
         gateway = network_settings['Gateway']
 
