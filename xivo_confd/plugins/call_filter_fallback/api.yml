@@ -1,0 +1,48 @@
+paths:
+  /callfilters/{callfilter_id}/fallbacks:
+    get:
+      operationId: get_call_filter_fallback
+      summary: List all fallbacks for call filter
+      description: '**Required ACL:** `confd.callfilters.{callfilter_id}.fallbacks.read`'
+      tags:
+      - call_filters
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      responses:
+        '200':
+          description: Fallbacks for call filter
+          schema:
+            $ref: '#/definitions/CallFilterFallbacks'
+    put:
+      operationId: update_call_filter_fallback
+      summary: Update call filter's fallbacks
+      description: '**Required ACL:** `confd.callfilters.{callfilter_id}.fallbacks.update`
+
+
+        **WARNING** This endpoint delete all fields that are not defined.'
+      tags:
+      - callfilters
+      parameters:
+      - $ref: '#/parameters/callfilterid'
+      - name: body
+        in: body
+        description: Fallbacks for call filter
+        schema:
+          $ref: '#/definitions/CallFilterFallbacks'
+      responses:
+        '204':
+          description: CallFilter's fallbacks updated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  CallFilterFallbacks:
+    properties:
+      noanswer_destination:
+        description: The destination to redirect the caller to when there are no answer
+        $ref: '#/definitions/DestinationType'
+    example:
+      noanswer_destination:
+        type: user
+        user_id: 1

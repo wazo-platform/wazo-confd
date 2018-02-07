@@ -4,6 +4,11 @@ Changelog
 18.02
 -----
 
+* A new API for editing fallbacks for a call filter has been added:
+
+  * GET `/1.1/callfilters/<call_filter_id>/fallbacks`
+  * PUT `/1.1/callfilters/<call_filter_id>/fallbacks`
+
 * A new API for associating users with a call filter has been added:
 
   * PUT `/1.1/callfilters/<call_filter_id>/recipients/users`
