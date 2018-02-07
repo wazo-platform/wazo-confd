@@ -5,7 +5,7 @@ paths:
       summary: List all fallbacks for call filter
       description: '**Required ACL:** `confd.callfilters.{callfilter_id}.fallbacks.read`'
       tags:
-      - call_filters
+      - callfilters
       parameters:
       - $ref: '#/parameters/callfilterid'
       responses:
