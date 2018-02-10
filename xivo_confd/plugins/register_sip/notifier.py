@@ -24,6 +24,7 @@ class RegisterSIPNotifier(object):
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, register):
+        self.send_sysconfd_handlers()
         event = CreateRegisterSIPEvent(register.id)
         self.bus.send_bus_event(event)
 
