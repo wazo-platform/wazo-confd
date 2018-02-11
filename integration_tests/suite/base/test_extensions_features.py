@@ -4,15 +4,19 @@
 
 from hamcrest import (
     assert_that,
+    empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
 )
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s
+)
 from . import confd
 
 FAKE_ID = 999999999
@@ -50,6 +54,25 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'enabled', None
     yield s.check_bogus_field_returns_error, url, 'enabled', []
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
+
+
+def test_put_bulk_errors():
+    url = confd.extensions.features.put
+
+    regex = r'features.*exten'
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': None}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': True}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': 'ABC123'}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': 'XXXX'}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': {}}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': []}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'exten': []}, regex
+
+    regex = r'features.*enabled'
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'enabled', 'invalid'}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'enabled', None}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'enabled', []}, regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'features', {'enabled', {}}, regex
 
 
 def test_create_unimplemented():
@@ -134,6 +157,65 @@ def test_edit_all_parameters(extension):
 @fixtures.extension_feature()
 def test_edit_with_same_extension(extension1, extension2):
     response = confd.extensions.features(extension2['id']).put(exten=extension1['exten'])
+    response.assert_match(400, e.resource_exists('Extension'))
+
+
+@fixtures.extension_feature()
+def test_edit_bulk_do_nothing(_):
+    parameters = {'features': []}
+
+    response = confd.extensions.features.put(**parameters)
+    response.assert_updated()
+
+    response = confd.extensions.features.get()
+    assert_that(response.item, is_not(empty()))
+
+
+@fixtures.extension_feature()
+@fixtures.extension_feature()
+def test_edit_bulk_swap(extension1, extension2):
+    parameters = {'features': [
+        {'id': extension1['id'],
+         'exten': extension2['exten'],
+         'enabled': False},
+        {'id': extension2['id'],
+         'exten': extension1['exten'],
+         'enabled': True},
+    ]}
+
+    response = confd.extensions.features.put(**parameters)
+    response.assert_updated()
+
+    response = confd.extensions.features.get()
+    assert_that(response.item, has_items(
+        has_entry(
+            id=extension1['id'],
+            extension=extension2['exten'],
+            enabled=False
+        ),
+        has_entry(
+            id=extension2['id'],
+            extension=extension1['exten'],
+            enabled=False
+        ),
+    ))
+
+
+@fixtures.extension_feature()
+def test_edit_bulk_with_same_extension(extension):
+    # TODO
+    pass
+
+
+@fixtures.extension_feature()
+@fixtures.extension_feature()
+def test_edit_bulk_with_existing_extension(extension1, extension2):
+    parameters = {'features': [
+        {'id': extension2['id'],
+         'exten': extension1['exten']}
+    ]}
+
+    response = confd.extensions.features.put(**parameters)
     response.assert_match(400, e.resource_exists('Extension'))
 
 

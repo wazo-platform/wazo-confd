@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
@@ -16,3 +16,7 @@ class ExtensionFeatureSchema(BaseSchema):
     feature = fields.String(attribute='typeval', dump_only=True)
     enabled = fields.Boolean()
     links = ListLink(Link('extensions_features'))
+
+
+class ExtensionFeaturesSchema(BaseSchema):
+    features = fields.Nested(ExtensionFeatureSchema, many=True, required=True)

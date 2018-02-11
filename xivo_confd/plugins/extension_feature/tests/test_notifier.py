@@ -40,8 +40,7 @@ class TestExtensionFeatureNotifier(unittest.TestCase):
 
     def test_when_extension_edited_then_event_sent_on_bus(self):
         expected_event = EditExtensionFeatureEvent(self.extension.id)
-        updated_fields = []
 
-        self.notifier.edited(self.extension, updated_fields)
+        self.notifier.edited(self.extension)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)

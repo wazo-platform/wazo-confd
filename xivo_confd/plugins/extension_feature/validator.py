@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -22,9 +22,27 @@ class ExtenAvailableOnUpdateValidator(Validator):
                                          context=extension.context)
 
 
+class ExtensAvailableOnUpdateValidator(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, extensions):
+        # TODO
+        pass
+
+
 def build_validator():
     return ValidationGroup(
         edit=[
             ExtenAvailableOnUpdateValidator(extension_dao),
+        ],
+    )
+
+
+def build_validator_bulk():
+    return ValidationGroup(
+        edit=[
+            ExtensAvailableOnUpdateValidator(extension_dao),
         ],
     )

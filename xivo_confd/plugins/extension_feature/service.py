@@ -8,10 +8,14 @@ from xivo_dao.resources.extension import dao as extension_dao
 from xivo_confd.helpers.resource import CRUDService
 
 from .notifier import build_notifier
-from .validator import build_validator
+from .validator import build_validator, build_validator_bulk
 
 
 class ExtensionService(CRUDService):
+
+    def __init__(self, dao, validator, validator_bulk, notifier):
+        super(ExtensionService, self).__init__(dao, validator, notifier)
+        self.validator_bulk = validator_bulk
 
     def search(self, parameters):
         parameters['is_feature'] = True
@@ -26,8 +30,15 @@ class ExtensionService(CRUDService):
         self.dao.edit(resource)
         self.notifier.edited(resource, updated_fields)
 
+    def edit_all(self, resources):
+        self.validator_bulk.validate_edit(resources)
+        for resource in resources:
+            self.dao.edit(resource)
+            self.notifier.edited(resource)
+
 
 def build_service():
     return ExtensionService(extension_dao,
                             build_validator(),
+                            build_validator_bulk(),
                             build_notifier())
