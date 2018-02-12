@@ -4,9 +4,9 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.func_key_template import dao as template_dao_module
 from xivo_dao.resources.func_key_template.model import UserTemplate
-from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.user import dao as user_dao_module
 
 from xivo_confd.plugins.device import builder as device_builder
 from .notifier import build_notifier
@@ -107,8 +107,8 @@ class TemplateService(object):
 def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
-    return TemplateService(template_dao,
-                           user_dao,
+    return TemplateService(template_dao_module,
+                           user_dao_module,
                            build_validator(),
                            build_validator_bsfilter(),
                            build_notifier(),
@@ -155,7 +155,7 @@ class UserFuncKeyTemplateService(object):
 def build_user_funckey_template_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
-    return UserFuncKeyTemplateService(user_dao,
+    return UserFuncKeyTemplateService(user_dao_module,
                                       build_validator(),
                                       build_notifier(),
                                       device_updater)

@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.extension import dao as extension_dao_module
 
 from .notifier import build_notifier
 from .validator import build_validator
@@ -33,6 +33,6 @@ class ParkingLotExtensionService(object):
 
 
 def build_service():
-    return ParkingLotExtensionService(extension_dao,
+    return ParkingLotExtensionService(extension_dao_module,
                                       build_notifier(),
                                       build_validator())

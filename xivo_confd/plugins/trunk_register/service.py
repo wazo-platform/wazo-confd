@@ -2,7 +2,7 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.trunk import dao as trunk_dao
+from xivo_dao.resources.trunk import dao as trunk_dao_module
 
 from .notifier import build_notifier_iax, build_notifier_sip
 from .validator import build_validator_iax, build_validator_sip
@@ -56,7 +56,7 @@ class TrunkRegisterSIPService(TrunkRegisterService):
 
 def build_service_iax():
     return TrunkRegisterIAXService(
-        trunk_dao,
+        trunk_dao_module,
         build_validator_iax(),
         build_notifier_iax(),
     )
@@ -64,7 +64,7 @@ def build_service_iax():
 
 def build_service_sip():
     return TrunkRegisterSIPService(
-        trunk_dao,
+        trunk_dao_module,
         build_validator_sip(),
         build_notifier_sip(),
     )

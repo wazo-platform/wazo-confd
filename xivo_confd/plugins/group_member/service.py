@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.group import dao as group_dao
+from xivo_dao.resources.group import dao as group_dao_module
 
 from .notifier import build_notifier
 from .validator import build_validator_member_user, build_validator_member_extension
@@ -30,7 +30,7 @@ class GroupMemberUserService(object):
 
 
 def build_service():
-    return GroupMemberUserService(group_dao,
+    return GroupMemberUserService(group_dao_module,
                                   build_notifier(),
                                   build_validator_member_user(),
                                   build_validator_member_extension())

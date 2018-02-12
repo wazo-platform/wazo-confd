@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.line import dao as line_dao_module
 
 from xivo_confd.database import device as device_db
 from xivo_confd.plugins.device.builder import build_device_updater
@@ -74,4 +74,4 @@ def build_service(provd_client):
     validator = build_validator()
     updater = build_device_updater(provd_client)
     notifier = build_notifier()
-    return LineDeviceService(validator, line_dao, notifier, updater)
+    return LineDeviceService(validator, line_dao_module, notifier, updater)

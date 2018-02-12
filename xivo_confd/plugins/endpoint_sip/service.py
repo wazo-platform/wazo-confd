@@ -2,7 +2,7 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.endpoint_sip import dao
+from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao_module
 
 from xivo_confd.plugins.device import builder as device_builder
 from xivo_confd.helpers.resource import CRUDService
@@ -25,7 +25,7 @@ class SipEndpointService(CRUDService):
 def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
-    return SipEndpointService(dao,
+    return SipEndpointService(endpoint_sip_dao_module,
                               build_validator(),
                               build_notifier(),
                               device_updater)

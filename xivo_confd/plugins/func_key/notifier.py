@@ -9,7 +9,7 @@ from xivo_bus.resources.func_key.event import (
 )
 
 from xivo_confd import bus, sysconfd
-from xivo_confd.database import device as device_db
+from xivo_confd.database import device as device_db_module
 
 
 class FuncKeyTemplateNotifier(object):
@@ -48,4 +48,4 @@ class FuncKeyTemplateNotifier(object):
 
 
 def build_notifier():
-    return FuncKeyTemplateNotifier(bus, sysconfd, device_db)
+    return FuncKeyTemplateNotifier(bus, sysconfd, device_db_module)

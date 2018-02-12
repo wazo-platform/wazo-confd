@@ -6,10 +6,10 @@ import re
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import InputError
-from xivo_dao.resources.context import dao as context_dao
-from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.resources.line_extension import dao as line_extension_dao
-from xivo_dao.resources.parking_lot import dao as parking_lot_dao
+from xivo_dao.resources.context import dao as context_dao_module
+from xivo_dao.resources.extension import dao as extension_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
+from xivo_dao.resources.parking_lot import dao as parking_lot_dao_module
 
 
 from xivo_confd.helpers.validator import (
@@ -167,19 +167,19 @@ class ExtensionAssociationValidator(Validator):
 def build_validator():
     return ValidationGroup(
         common=[
-            GetResource('context', context_dao.get_by_name, 'Context'),
+            GetResource('context', context_dao_module.get_by_name, 'Context'),
         ],
         create=[
-            ExtenAvailableOnCreateValidator(extension_dao, parking_lot_dao),
-            ExtenRegexValidator(context_dao),
+            ExtenAvailableOnCreateValidator(extension_dao_module, parking_lot_dao_module),
+            ExtenRegexValidator(context_dao_module),
         ],
         edit=[
-            ExtenAvailableOnUpdateValidator(extension_dao, parking_lot_dao),
-            ContextOnUpdateValidator(context_dao),
-            ExtensionRangeValidator(context_dao),
-            ExtenRegexValidator(context_dao),
+            ExtenAvailableOnUpdateValidator(extension_dao_module, parking_lot_dao_module),
+            ContextOnUpdateValidator(context_dao_module),
+            ExtensionRangeValidator(context_dao_module),
+            ExtenRegexValidator(context_dao_module),
         ],
         delete=[
-            ExtensionAssociationValidator(extension_dao, line_extension_dao)
+            ExtensionAssociationValidator(extension_dao_module, line_extension_dao_module)
         ]
     )

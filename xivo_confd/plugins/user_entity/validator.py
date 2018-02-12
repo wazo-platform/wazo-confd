@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.user_line import dao as user_line_dao
+from xivo_dao.resources.user_line import dao as user_line_dao_module
 
 from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 
@@ -28,6 +28,6 @@ class UserEntityAssociationValidator(ValidatorAssociation):
 def build_validator():
     return ValidationAssociation(
         association=[
-            UserEntityAssociationValidator(user_line_dao)
+            UserEntityAssociationValidator(user_line_dao_module)
         ]
     )

@@ -1,13 +1,15 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.resources.extension import dao
+from xivo_dao.resources.extension import dao as extension_dao_module
 
 from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.extension import validator, notifier
 from xivo_confd.plugins.device import builder as device_builder
+
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class ExtensionService(CRUDService):
@@ -35,7 +37,7 @@ class ExtensionService(CRUDService):
 
 def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
-    return ExtensionService(dao,
-                            validator.build_validator(),
-                            notifier.build_notifier(),
+    return ExtensionService(extension_dao_module,
+                            build_validator(),
+                            build_notifier(),
                             device_updater)

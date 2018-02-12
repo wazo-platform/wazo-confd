@@ -2,7 +2,7 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.trunk import dao as trunk_dao
+from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.helpers import errors
 
 from .notifier import build_notifier
@@ -64,7 +64,7 @@ class TrunkEndpointService(object):
 
 def build_service(endpoint, endpoint_dao):
     return TrunkEndpointService(endpoint,
-                                trunk_dao,
+                                trunk_dao_module,
                                 endpoint_dao,
                                 build_validator(endpoint),
                                 build_notifier(endpoint))

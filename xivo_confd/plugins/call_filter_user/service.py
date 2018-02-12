@@ -2,7 +2,7 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_dao.resources.call_filter import dao as call_filter_dao
+from xivo_dao.resources.call_filter import dao as call_filter_dao_module
 
 from .notifier import build_notifier
 from .validator import (
@@ -32,19 +32,19 @@ class CallFilterUserService(object):
     def associate_recipients(self, call_filter, recipients):
         users = [recipient.user for recipient in recipients]
         self.validator_recipient_user.validate_association(call_filter, users)
-        call_filter_dao.associate_recipients(call_filter, recipients)
+        self.call_filter_dao.associate_recipients(call_filter, recipients)
         self.notifier.recipient_users_associated(call_filter, users)
 
     def associate_surrogates(self, call_filter, surrogates):
         users = [surrogate.user for surrogate in surrogates]
         self.validator_surrogate_user.validate_association(call_filter, users)
-        call_filter_dao.associate_surrogates(call_filter, surrogates)
+        self.call_filter_dao.associate_surrogates(call_filter, surrogates)
         self.notifier.surrogate_users_associated(call_filter, users)
 
 
 def build_service():
     return CallFilterUserService(
-        call_filter_dao,
+        call_filter_dao_module,
         build_notifier(),
         build_validator_recipient_user(),
         build_validator_surrogate_user(),
