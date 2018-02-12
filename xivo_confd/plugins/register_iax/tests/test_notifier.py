@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -50,6 +50,11 @@ class TestRegisterIAXNotifier(unittest.TestCase):
         self.notifier.deleted(self.register_iax)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_when_register_iax_created_then_iax_reloaded(self):
+        self.notifier.created(self.register_iax)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
 
     def test_when_register_iax_edited_then_iax_reloaded(self):
         self.notifier.edited(self.register_iax)

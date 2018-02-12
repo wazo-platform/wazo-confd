@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -49,6 +49,11 @@ class TestRegisterSIPNotifier(unittest.TestCase):
         self.notifier.deleted(self.register_sip)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_when_register_sip_created_then_sip_reloaded(self):
+        self.notifier.created(self.register_sip)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
 
     def test_when_register_sip_edited_then_sip_reloaded(self):
         self.notifier.edited(self.register_sip)
