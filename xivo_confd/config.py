@@ -10,7 +10,7 @@ from xivo.config_helper import parse_config_file, read_config_file_hierarchy
 from xivo.xivo_logging import get_log_level_by_name
 
 API_VERSION = '1.1'
-KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
+WIZARD_KEY_FILE = '/var/lib/xivo-auth-keys/xivo-wizard-key.yml'
 
 DEFAULT_CONFIG = {
     'debug': False,
@@ -179,7 +179,7 @@ DEFAULT_CONFIG = {
 
 def load(argv):
     try:
-        with open(KEY_FILE, 'r') as f:
+        with open(WIZARD_KEY_FILE, 'r') as f:
             key_config = {'wizard': yaml.load(f)}
     except IOError:
         key_config = {}
