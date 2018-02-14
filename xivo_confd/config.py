@@ -6,7 +6,7 @@ import argparse
 import yaml
 
 from xivo.chain_map import ChainMap
-from xivo.config_helper import read_config_file_hierarchy
+from xivo.config_helper import parse_config_file, read_config_file_hierarchy
 from xivo.xivo_logging import get_log_level_by_name
 
 API_VERSION = '1.1'
@@ -43,6 +43,7 @@ DEFAULT_CONFIG = {
         'host': 'localhost',
         'port': 9497,
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
+        'key_file': '/var/lib/xivo-auth-keys/xivo-confd-key.yml',
     },
     'ari': {
         'host': 'localhost',
@@ -186,7 +187,14 @@ def load(argv):
     cli_config = _parse_cli_args(argv)
     file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
     reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
-    return ChainMap(reinterpreted_config, key_config, cli_config, file_config, DEFAULT_CONFIG)
+    service_key = _load_key_file(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
+    return ChainMap(reinterpreted_config, key_config, cli_config, service_key, file_config, DEFAULT_CONFIG)
+
+
+def _load_key_file(config):
+    key_file = parse_config_file(config['auth']['key_file'])
+    return {'auth': {'username': key_file['service_id'],
+                     'password': key_file['service_key']}}
 
 
 def _parse_cli_args(argv):

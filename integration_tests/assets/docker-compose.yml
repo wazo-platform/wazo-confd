@@ -62,6 +62,7 @@ services:
       - "./etc/xivo-confd/conf.d/provd.yml:/etc/xivo-confd/conf.d/provd.yml"
       - "./etc/xivo-confd/conf.d/sysconfd.yml:/etc/xivo-confd/conf.d/sysconfd.yml"
       - "./etc/xivo-confd/conf.d/disable_service_discovery.yml:/etc/xivo-confd/conf.d/disable_service_discovery.yml"
+      - "./keys/xivo-confd-key.yml:/var/lib/xivo-auth-keys/xivo-confd-key.yml"
 
       - "./etc/ssl:/usr/share/xivo-certs"
       # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
