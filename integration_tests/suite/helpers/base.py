@@ -24,6 +24,14 @@ class IntegrationTest(AssetLaunchingTestCase):
     assets_root = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
 
     @classmethod
+    def _docker_compose_options(cls):
+        return [
+            '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
+            '--file', os.path.join(cls.assets_root, 'docker-compose.{}.override.yml'.format(cls.asset)),
+            '--project-name', cls.service,
+        ]
+
+    @classmethod
     def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
         helper = cls.create_provd()
         helper.reset()

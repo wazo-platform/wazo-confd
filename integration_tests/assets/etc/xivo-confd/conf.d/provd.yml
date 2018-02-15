@@ -1,0 +1,3 @@
+provd:
+    host: provd
+    port: 8666
