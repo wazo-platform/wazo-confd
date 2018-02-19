@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import time
@@ -163,7 +163,6 @@ class CsvRow(object):
             'voicemail': self.parse_rules(self.VOICEMAIL_RULES),
             'line': self.parse_rules(self.LINE_RULES),
             'sip': self.parse_rules(self.SIP_RULES),
-            'extension': self.parse_rules(self.EXTENSION_RULES),
             'extension_incall': self.parse_rules(self.INCALL_RULES),
             'incall': self.parse_rules(self.INCALL_RULES),
             'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
