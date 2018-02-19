@@ -123,20 +123,22 @@ class Plugin(object):
 
         entry_associator = EntryAssociator(associators)
 
-        entry_finder = EntryFinder(user_dao,
-                                   entity_dao,
-                                   voicemail_dao,
-                                   user_voicemail_dao,
-                                   cti_profile_dao,
-                                   line_dao,
-                                   user_line_dao,
-                                   line_extension_dao,
-                                   sip_dao,
-                                   sccp_dao,
-                                   extension_dao,
-                                   incall_dao,
-                                   call_permission_dao,
-                                   user_call_permission_dao)
+        entry_finder = EntryFinder(
+            user_dao,
+            entity_dao,
+            voicemail_dao,
+            user_voicemail_dao,
+            cti_profile_dao,
+            line_dao,
+            user_line_dao,
+            line_extension_dao,
+            sip_dao,
+            sccp_dao,
+            extension_dao,
+            incall_dao,
+            call_permission_dao,
+            user_call_permission_dao
+        )
 
         entry_updater = EntryUpdater(creators, associators, entry_finder)
 
