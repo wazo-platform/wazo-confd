@@ -21,10 +21,11 @@ class ExtensionFeatureNotifier(object):
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
-    def edited(self, extension):
-        self.send_sysconfd_handlers(['dialplan reload'])
+    def edited(self, extension, updated_fields):
         event = EditExtensionFeatureEvent(extension.id)
         self.bus.send_bus_event(event)
+        if updated_fields:
+            self.send_sysconfd_handlers(['dialplan reload'])
 
 
 def build_notifier():

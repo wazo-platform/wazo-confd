@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
@@ -46,6 +46,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX'
     yield s.check_bogus_field_returns_error, url, 'exten', {}
     yield s.check_bogus_field_returns_error, url, 'exten', []
+    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
+    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    yield s.check_bogus_field_returns_error, url, 'enabled', {}
 
 
 def test_create_unimplemented():
