@@ -25,6 +25,10 @@ class AuthClientProxy(AuthClient):
         self.users_created.append(user)
         return user
 
+    def edit_user(self, *args, **kwargs):
+        # rollback system can be added here
+        self.users.edit(*args, **kwargs)
+
     def rollback(self):
         for user in self.users_created:
             self.users.delete(user['uuid'])

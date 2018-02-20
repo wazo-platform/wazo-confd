@@ -79,7 +79,14 @@ class WazoUserCreator(Creator):
         return fields
 
     def update(self, fields, model):
-        pass
+        fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
+        self.update_model(fields, model)
+        self.service.update(model)
+
+    def update_model(self, fields, model):
+        model.update(fields)
+        if 'email_address' in fields:
+            model['emails'] = [{'address': fields['email_address']}]
 
 
 class EntityCreator(Creator):

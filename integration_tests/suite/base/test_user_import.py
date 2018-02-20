@@ -469,6 +469,67 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
     ))
 
 
+@fixtures.csv_entry(cti_profile=True)
+def test_update_wazo_user_fields_then_wazo_user_updated(entry):
+    user_uuid = entry["user_uuid"]
+    csv = [{"uuid": user_uuid,
+            "firstname": "another_firstname",
+            "lastname": "another_lastname",
+            "username": "another_username",
+            "email": "another_email",
+            "cti_profile_enabled": "0"}]
+
+    client.put("/users/import", csv)
+
+    wazo_user = auth.users.get(user_uuid)
+    assert_that(wazo_user, has_entries(
+        uuid=user_uuid,
+        firstname="another_firstname",
+        lastname="another_lastname",
+        username="another_username",
+        enabled=False,
+    ))
+
+
+@fixtures.csv_entry()
+@fixtures.csv_entry()
+def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2):
+    user_uuid = entry1["user_uuid"]
+    csv = [{"uuid": user_uuid,
+            "firstname": "another_firstname"},
+           {"uuid": entry2['user_uuid'],
+            "firstname": ""}]
+
+    response = client.put("/users/import", csv)
+    assert_error(response, has_error_field('firstname', row_number=2))
+
+    wazo_user = auth.users.get(user_uuid)
+    assert_that(wazo_user, has_entries(
+        uuid=user_uuid,
+        firstname="another_firstname",
+    ))
+
+    response = confd.users(user_uuid).get()
+    assert_that(response.item, has_entries(firstname=entry1['firstname']))
+
+    csv = [{"uuid": user_uuid,
+            "firstname": "another_firstname"},
+           {"uuid": entry2['user_uuid'],
+            "firstname": "valid"}]
+
+    response = client.put("/users/import", csv)
+    response.assert_ok()
+
+    wazo_user = auth.users.get(user_uuid)
+    assert_that(wazo_user, has_entries(
+        uuid=user_uuid,
+        firstname="another_firstname",
+    ))
+
+    response = confd.users(user_uuid).get()
+    assert_that(response.item, has_entries(firstname="another_firstname"))
+
+
 def test_given_csv_has_error_then_wazo_user_deleted():
     csv = [{"firstname": "Géorge"},
            {"firstname": ""}]

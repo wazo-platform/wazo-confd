@@ -21,7 +21,12 @@ class WazoUserService(object):
         )
 
     def update(self, user):
-        pass
+        self._auth_client.edit_user(user['uuid'], **user)
+        if user.get('password'):
+            self._auth_client.users.set_password(user['uuid'], user['password'])
+        if user.get('emails'):
+            # TODO
+            pass
 
 
 def build_service():

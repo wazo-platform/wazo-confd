@@ -141,6 +141,16 @@ class EntryFinder(object):
         uuid = entry.extract_field('user', 'uuid')
         user = entry.user = self.user_dao.get_by(uuid=uuid)
 
+        # Avoid to GET /users/uuid on wazo-auth
+        email = {'address': user.email, 'confirmed': True} if user.email else None
+        entry.wazo_user = {
+            'uuid': user.uuid,
+            'firstname': user.firstname,
+            'lastname': user.lastname,
+            'username': user.username,
+            'emails': [email] if email else []
+        }
+
         if user.cti_profile_id:
             entry.cti_profile = self.cti_profile_dao.get(user.cti_profile_id)
 
