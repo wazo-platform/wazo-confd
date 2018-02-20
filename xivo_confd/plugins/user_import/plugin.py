@@ -47,7 +47,8 @@ from .associators import (
     LineAssociator,
     SccpAssociator,
     SipAssociator,
-    VoicemailAssociator
+    VoicemailAssociator,
+    WazoUserAssociator,
 )
 from .creators import (
     CallPermissionCreator,
@@ -114,6 +115,7 @@ class Plugin(object):
 
         associators = OrderedDict([
             ('entity', EntityAssociator(user_entity_service)),
+            ('wazo_user', WazoUserAssociator(wazo_user_service)),
             ('voicemail', VoicemailAssociator(user_voicemail_service)),
             ('cti_profile', CtiProfileAssociator(user_cti_profile_service, cti_profile_dao)),
             ('sip', SipAssociator(line_sip_service)),
