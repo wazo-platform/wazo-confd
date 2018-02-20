@@ -193,8 +193,8 @@ def load(argv):
 
 def _load_key_file(config):
     key_file = parse_config_file(config['auth']['key_file'])
-    return {'auth': {'username': key_file['service_id'],
-                     'password': key_file['service_key']}}
+    return {'auth': {'username': key_file.get('service_id'),
+                     'password': key_file.get('service_key')}}
 
 
 def _parse_cli_args(argv):
