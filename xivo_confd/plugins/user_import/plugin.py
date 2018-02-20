@@ -67,6 +67,7 @@ from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from .resource import UserImportResource, UserExportResource
 from .service import ImportService
 from .wazo_user_service import build_service as build_wazo_user_service
+from .auth_client import set_auth_client_config
 
 
 class Plugin(object):
@@ -75,6 +76,7 @@ class Plugin(object):
         api = dependencies['api']
         config = dependencies['config']
         provd_client = new_provisioning_client_from_config(config['provd'])
+        set_auth_client_config(config['auth'])
 
         user_service = build_user_service(provd_client)
         wazo_user_service = build_wazo_user_service()
