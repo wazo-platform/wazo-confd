@@ -14,6 +14,6 @@ class WazoUserSchema(BaseSchema):
     firstname = fields.String(validate=Length(max=128), required=True)
     lastname = fields.String(validate=Length(max=128), allow_none=True)
     email_address = fields.String(validate=Length(max=254), allow_none=True)
-    username = fields.String(validate=Regexp(USERNAME_REGEX))
+    username = fields.String(validate=Regexp(USERNAME_REGEX), allow_none=True)
     password = fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
-    enabled = fields.Boolean()
+    enabled = fields.Boolean(allow_none=True)

@@ -18,14 +18,14 @@ class WazoUserService(object):
             email_address=user.get('email_address'),
             username=user.get('username') or user.get('email_address') or user.get('uuid'),
             password=user.get('password'),
+            enabled=user.get('enabled') if user.get('enabled') is not None else True,
         )
 
     def update(self, user):
         self._auth_client.edit_user(user['uuid'], **user)
+        self._auth_client.admin.update_user_emails(user['uuid'], user['emails'])
         if user.get('password'):
             self._auth_client.users.set_password(user['uuid'], user['password'])
-        if user.get('emails'):
-            self._auth_client.admin.update_user_emails(user['uuid'], user['emails'])
 
 
 def build_service():
