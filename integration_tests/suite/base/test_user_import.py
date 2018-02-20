@@ -151,51 +151,56 @@ def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
 
 
 def test_given_csv_has_all_fields_for_a_user_then_user_imported():
-    csv = [{"firstname": "Rîchard",
-            "lastname": "Lâpointe",
-            "email": "richard@lapointe.org",
-            "entity_id": "1",
-            "language": "fr_FR",
-            "username": "richardlapointe",
-            "password": "secret",
-            "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
-            "mobile_phone_number": "4181234567",
-            "supervision_enabled": "1",
-            "call_transfer_enabled": "0",
-            "dtmf_hangup_enabled": "1",
-            "call_record_enabled": "1",
-            "online_call_record_enabled": "0",
-            "simultaneous_calls": "5",
-            "ring_seconds": "10",
-            "userfield": "userfield",
-            "call_permission_password": "1234",
-            "enabled": "1"
-            }]
+    csv = [{
+        "firstname": "Rîchard",
+        "lastname": "Lâpointe",
+        "email": "richard@lapointe.org",
+        "entity_id": "1",
+        "language": "fr_FR",
+        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
+        "mobile_phone_number": "4181234567",
+        "supervision_enabled": "1",
+        "call_transfer_enabled": "0",
+        "dtmf_hangup_enabled": "1",
+        "call_record_enabled": "1",
+        "online_call_record_enabled": "0",
+        "simultaneous_calls": "5",
+        "ring_seconds": "10",
+        "userfield": "userfield",
+        "call_permission_password": "1234",
+        "enabled": "1",
+
+        "username": "richardlapointe",
+        "password": "secret",
+    }]
 
     response = client.post("/users/import", csv)
     user_id = get_import_field(response, 'user_id')
     user_uuid = get_import_field(response, 'user_uuid')
 
     user = confd.users(user_id).get().item
-    assert_that(user, has_entries(firstname="Rîchard",
-                                  lastname="Lâpointe",
-                                  email="richard@lapointe.org",
-                                  language="fr_FR",
-                                  username="richardlapointe",
-                                  password="secret",
-                                  outgoing_caller_id='"Rîchy Cool" <4185551234>',
-                                  mobile_phone_number="4181234567",
-                                  supervision_enabled=True,
-                                  call_transfer_enabled=False,
-                                  dtmf_hangup_enabled=True,
-                                  call_record_enabled=True,
-                                  online_call_record_enabled=False,
-                                  simultaneous_calls=5,
-                                  ring_seconds=10,
-                                  userfield="userfield",
-                                  call_permission_password='1234',
-                                  enabled=True,
-                                  uuid=user_uuid))
+    assert_that(user, has_entries(
+        firstname="Rîchard",
+        lastname="Lâpointe",
+        email="richard@lapointe.org",
+        language="fr_FR",
+        outgoing_caller_id='"Rîchy Cool" <4185551234>',
+        mobile_phone_number="4181234567",
+        supervision_enabled=True,
+        call_transfer_enabled=False,
+        dtmf_hangup_enabled=True,
+        call_record_enabled=True,
+        online_call_record_enabled=False,
+        simultaneous_calls=5,
+        ring_seconds=10,
+        userfield="userfield",
+        call_permission_password='1234',
+        enabled=True,
+        uuid=user_uuid,
+
+        username="richardlapointe",
+        password="secret",
+    ))
 
 
 def test_given_csv_column_has_wrong_type_then_error_returned():
@@ -559,13 +564,13 @@ def test_given_csv_has_call_permission_then_call_permission_associated(call_perm
     csv = [{"firstname": "Gërtrüde",
             "call_permissions": call_permission['name']}]
 
-    expected = contains(
+    response = client.post("/users/import", csv)
+    assert_that(response.item['created'], contains(
         has_entries(
             row_number=1,
-            call_permission_ids=contains(call_permission['id'])))
-
-    response = client.post("/users/import", csv)
-    assert_that(response.item['created'], expected)
+            call_permission_ids=contains(call_permission['id'])
+        )
+    ))
 
     user_id = response.item['created'][0]['user_id']
     user_call_permissions = confd.users(user_id).callpermissions.get().items
@@ -580,13 +585,13 @@ def test_given_csv_has_multiple_call_permissions_then_all_call_permission_associ
     csv = [{"firstname": "Rônald",
             "call_permissions": permissions}]
 
-    expected = contains(
+    response = client.post("/users/import", csv)
+    assert_that(response.item['created'], contains(
         has_entries(
             row_number=1,
-            call_permission_ids=has_items(perm1['id'], perm2['id'])))
-
-    response = client.post("/users/import", csv)
-    assert_that(response.item['created'], expected)
+            call_permission_ids=has_items(perm1['id'], perm2['id'])
+        )
+    ))
 
     user_id = response.item['created'][0]['user_id']
     user_call_permissions = confd.users(user_id).callpermissions.get().items
@@ -609,17 +614,18 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     vm_number = h.voicemail.find_available_number(config.CONTEXT)
 
-    csv = [{"firstname": "Frânçois",
-            "exten": exten,
-            "context": config.CONTEXT,
-            "line_protocol": "sip",
-            "incall_exten": incall_exten,
-            "incall_context": config.INCALL_CONTEXT,
-            "voicemail_name": "francois",
-            "voicemail_number": vm_number,
-            "voicemail_context": config.CONTEXT,
-            "cti_profile_name": "Client",
-            }]
+    csv = [{
+        "firstname": "Frânçois",
+        "exten": exten,
+        "context": config.CONTEXT,
+        "line_protocol": "sip",
+        "incall_exten": incall_exten,
+        "incall_context": config.INCALL_CONTEXT,
+        "voicemail_name": "francois",
+        "voicemail_number": vm_number,
+        "voicemail_context": config.CONTEXT,
+        "cti_profile_name": "Client",
+    }]
 
     response = client.post("/users/import", csv)
 
@@ -657,25 +663,23 @@ def test_given_csv_has_all_resources_then_all_relations_created():
 @fixtures.voicemail()
 @fixtures.call_permission()
 @fixtures.cti_profile()
-def test_given_resources_already_exist_when_importing_then_resources_associated(sip,
-                                                                                extension,
-                                                                                extension_incall,
-                                                                                voicemail,
-                                                                                call_permission,
-                                                                                cti_profile):
-    csv = [{"firstname": "importassociate",
-            "exten": extension['exten'],
-            "context": extension['context'],
-            "line_protocol": "sip",
-            "sip_username": sip['username'],
-            "incall_exten": extension_incall['exten'],
-            "incall_context": extension_incall['context'],
-            "voicemail_number": voicemail['number'],
-            "voicemail_context": voicemail['context'],
-            "cti_profile_name": cti_profile['name'],
-            "call_permissions": call_permission['name'],
-            "entity_id": "1",
-            }]
+def test_given_resources_already_exist_when_importing_then_resources_associated(
+    sip, extension, extension_incall, voicemail, call_permission, cti_profile
+):
+    csv = [{
+        "firstname": "importassociate",
+        "exten": extension['exten'],
+        "context": extension['context'],
+        "line_protocol": "sip",
+        "sip_username": sip['username'],
+        "incall_exten": extension_incall['exten'],
+        "incall_context": extension_incall['context'],
+        "voicemail_number": voicemail['number'],
+        "voicemail_context": voicemail['context'],
+        "cti_profile_name": cti_profile['name'],
+        "call_permissions": call_permission['name'],
+        "entity_id": "1",
+    }]
 
     response = client.post("/users/import", csv)
 
@@ -723,80 +727,84 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
     vm_number2 = h.voicemail.find_available_number(config.CONTEXT, exclude=[vm_number1])
 
     csv = [
-        {"entity_id": "1",
-         "firstname": "Jèan",
-         "lastname": "Bâptiste",
-         "email": "jean@baptiste.st",
-         "mobile_phone_number": "5551234567",
-         "ring_seconds": "15",
-         "simultaneous_calls": "10",
-         "language": "fr_FR",
-         "outgoing_caller_id": '"Jean Le Grand" <5557654321>',
-         "userfield": "userfield",
-         "supervision_enabled": "1",
-         "call_transfer_enabled": "1",
-         "dtmf_hangup_enabled": "0",
-         "call_record_enabled": "0",
-         "online_call_record_enabled": "0",
-         "call_permission_password": "1234",
-         "enabled": "1",
-         "exten": exten1,
-         "context": config.CONTEXT,
-         "line_protocol": "sip",
-         "sip_username": "jeansipusername",
-         "sip_password": "jeansippassword",
-         "incall_exten": incall_exten1,
-         "incall_context": 'from-extern',
-         "incall_ring_seconds": "10",
-         "voicemail_name": "jean",
-         "voicemail_number": vm_number1,
-         "voicemail_context": config.CONTEXT,
-         "voicemail_password": "1234",
-         "voicemail_email": "test@example.com",
-         "voicemail_attach_audio": "1",
-         "voicemail_delete_messages": "1",
-         "voicemail_ask_password": "1",
-         "cti_profile_name": "Client",
-         "cti_profile_enabled": "1",
-         "username": "jean",
-         "password": "secret",
-         "call_permissions": perm1['name']},
-        {"entity_id": "1",
-         "firstname": "Moùssa",
-         "lastname": "Nôbamgo",
-         "email": "moussa@nobamgo.ta",
-         "mobile_phone_number": "5553456789",
-         "ring_seconds": "20",
-         "simultaneous_calls": "8",
-         "language": "fr_FR",
-         "outgoing_caller_id": '"Mousssssssaaaa" <5557654321>',
-         "userfield": "userfield",
-         "supervision_enabled": "1",
-         "call_transfer_enabled": "1",
-         "dtmf_hangup_enabled": "0",
-         "call_record_enabled": "1",
-         "online_call_record_enabled": "1",
-         "call_permission_password": "5678",
-         "enabled": "0",
-         "exten": exten2,
-         "context": config.CONTEXT,
-         "line_protocol": "sccp",
-         "incall_exten": incall_exten2,
-         "incall_context": 'from-extern',
-         "incall_ring_seconds": "12",
-         "voicemail_name": "moussa",
-         "voicemail_number": vm_number2,
-         "voicemail_context": config.CONTEXT,
-         "voicemail_password": "2345",
-         "voicemail_email": "test2@example.com",
-         "voicemail_attach_audio": "1",
-         "voicemail_delete_messages": "1",
-         "voicemail_ask_password": "1",
-         "cti_profile_name": "Client",
-         "cti_profile_enabled": "1",
-         "username": "moussa2",
-         "password": "secret",
-         "call_permissions": perm2['name']},
+        {
+            "entity_id": "1",
+            "firstname": "Jèan",
+            "lastname": "Bâptiste",
+            "email": "jean@baptiste.st",
+            "mobile_phone_number": "5551234567",
+            "ring_seconds": "15",
+            "simultaneous_calls": "10",
+            "language": "fr_FR",
+            "outgoing_caller_id": '"Jean Le Grand" <5557654321>',
+            "userfield": "userfield",
+            "supervision_enabled": "1",
+            "call_transfer_enabled": "1",
+            "dtmf_hangup_enabled": "0",
+            "call_record_enabled": "0",
+            "online_call_record_enabled": "0",
+            "call_permission_password": "1234",
+            "enabled": "1",
+            "exten": exten1,
+            "context": config.CONTEXT,
+            "line_protocol": "sip",
+            "sip_username": "jeansipusername",
+            "sip_password": "jeansippassword",
+            "incall_exten": incall_exten1,
+            "incall_context": 'from-extern',
+            "incall_ring_seconds": "10",
+            "voicemail_name": "jean",
+            "voicemail_number": vm_number1,
+            "voicemail_context": config.CONTEXT,
+            "voicemail_password": "1234",
+            "voicemail_email": "test@example.com",
+            "voicemail_attach_audio": "1",
+            "voicemail_delete_messages": "1",
+            "voicemail_ask_password": "1",
+            "cti_profile_name": "Client",
+            "cti_profile_enabled": "1",
+            "username": "jean",
+            "password": "secret",
+            "call_permissions": perm1['name']
+        },
+        {
+            "entity_id": "1",
+            "firstname": "Moùssa",
+            "lastname": "Nôbamgo",
+            "email": "moussa@nobamgo.ta",
+            "mobile_phone_number": "5553456789",
+            "ring_seconds": "20",
+            "simultaneous_calls": "8",
+            "language": "fr_FR",
+            "outgoing_caller_id": '"Mousssssssaaaa" <5557654321>',
+            "userfield": "userfield",
+            "supervision_enabled": "1",
+            "call_transfer_enabled": "1",
+            "dtmf_hangup_enabled": "0",
+            "call_record_enabled": "1",
+            "online_call_record_enabled": "1",
+            "call_permission_password": "5678",
+            "enabled": "0",
+            "exten": exten2,
+            "context": config.CONTEXT,
+            "line_protocol": "sccp",
+            "incall_exten": incall_exten2,
+            "incall_context": 'from-extern',
+            "incall_ring_seconds": "12",
+            "voicemail_name": "moussa",
+            "voicemail_number": vm_number2,
+            "voicemail_context": config.CONTEXT,
+            "voicemail_password": "2345",
+            "voicemail_email": "test2@example.com",
+            "voicemail_attach_audio": "1",
+            "voicemail_delete_messages": "1",
+            "voicemail_ask_password": "1",
+            "cti_profile_name": "Client",
+            "cti_profile_enabled": "1",
+            "username": "moussa2",
+            "password": "secret",
+            "call_permissions": perm2['name']
+        },
     ]
 
     response = client.post("/users/import", csv)
@@ -850,117 +858,127 @@ def import_empty_group(fields, parameter, expected=None):
 
 @fixtures.csv_entry()
 def test_when_updating_user_fields_then_user_resource_updated(entry):
-    csv = [{"uuid": entry['user_uuid'],
-            "firstname": "Joël",
-            "lastname": "Làchance",
-            "language": "fr_FR",
-            "email": "joel@lachance.fr",
-            "username": "joellachance",
-            "password": "secret",
-            "outgoing_caller_id": '"Joël Spîffy" <4185551234>',
-            "mobile_phone_number": "4181234567",
-            "supervision_enabled": "1",
-            "call_transfer_enabled": "0",
-            "dtmf_hangup_enabled": "1",
-            "call_record_enabled": "1",
-            "online_call_record_enabled": "0",
-            "simultaneous_calls": "5",
-            "ring_seconds": "10",
-            "userfield": "userfield",
-            "call_permission_password": "123",
-            "enabled": "0",
-            }]
+    csv = [{
+        "uuid": entry['user_uuid'],
+        "firstname": "Joël",
+        "lastname": "Làchance",
+        "language": "fr_FR",
+        "email": "joel@lachance.fr",
+        "username": "joellachance",
+        "password": "secret",
+        "outgoing_caller_id": '"Joël Spîffy" <4185551234>',
+        "mobile_phone_number": "4181234567",
+        "supervision_enabled": "1",
+        "call_transfer_enabled": "0",
+        "dtmf_hangup_enabled": "1",
+        "call_record_enabled": "1",
+        "online_call_record_enabled": "0",
+        "simultaneous_calls": "5",
+        "ring_seconds": "10",
+        "userfield": "userfield",
+        "call_permission_password": "123",
+        "enabled": "0",
+    }]
 
     response = client.put("/users/import", csv)
     user_id = get_update_field(response, 'user_id')
     user_uuid = get_update_field(response, 'user_uuid')
 
     user = confd.users(user_id).get().item
-    assert_that(user, has_entries(firstname="Joël",
-                                  lastname="Làchance",
-                                  email="joel@lachance.fr",
-                                  language="fr_FR",
-                                  username="joellachance",
-                                  password="secret",
-                                  outgoing_caller_id='"Joël Spîffy" <4185551234>',
-                                  mobile_phone_number="4181234567",
-                                  supervision_enabled=True,
-                                  call_transfer_enabled=False,
-                                  dtmf_hangup_enabled=True,
-                                  call_record_enabled=True,
-                                  online_call_record_enabled=False,
-                                  simultaneous_calls=5,
-                                  ring_seconds=10,
-                                  userfield="userfield",
-                                  call_permission_password='123',
-                                  enabled=False,
-                                  uuid=user_uuid))
+    assert_that(user, has_entries(
+        firstname="Joël",
+        lastname="Làchance",
+        email="joel@lachance.fr",
+        language="fr_FR",
+        username="joellachance",
+        password="secret",
+        outgoing_caller_id='"Joël Spîffy" <4185551234>',
+        mobile_phone_number="4181234567",
+        supervision_enabled=True,
+        call_transfer_enabled=False,
+        dtmf_hangup_enabled=True,
+        call_record_enabled=True,
+        online_call_record_enabled=False,
+        simultaneous_calls=5,
+        ring_seconds=10,
+        userfield="userfield",
+        call_permission_password='123',
+        enabled=False,
+        uuid=user_uuid
+    ))
 
 
 @fixtures.csv_entry(voicemail=True)
 def test_when_updating_voicemail_fields_then_voicemail_updated(entry):
     number = h.voicemail.find_available_number(config.CONTEXT)
 
-    csv = [{"uuid": entry["user_uuid"],
-            "voicemail_name": "Jôey VM",
-            "voicemail_number": number,
-            "voicemail_context": config.CONTEXT,
-            "voicemail_password": "1234",
-            "voicemail_email": "email@example.com",
-            "voicemail_attach_audio": "0",
-            "voicemail_delete_messages": "1",
-            "voicemail_ask_password": "0",
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "voicemail_name": "Jôey VM",
+        "voicemail_number": number,
+        "voicemail_context": config.CONTEXT,
+        "voicemail_password": "1234",
+        "voicemail_email": "email@example.com",
+        "voicemail_attach_audio": "0",
+        "voicemail_delete_messages": "1",
+        "voicemail_ask_password": "0",
+    }]
 
     response = client.put("/users/import", csv)
     voicemail_id = get_update_field(response, 'voicemail_id')
 
     voicemail = confd.voicemails(voicemail_id).get().item
-    assert_that(voicemail, has_entries(name="Jôey VM",
-                                       number=number,
-                                       context=config.CONTEXT,
-                                       password="1234",
-                                       email='email@example.com',
-                                       attach_audio=False,
-                                       delete_messages=True,
-                                       ask_password=False))
+    assert_that(voicemail, has_entries(
+        name="Jôey VM",
+        number=number,
+        context=config.CONTEXT,
+        password="1234",
+        email='email@example.com',
+        attach_audio=False,
+        delete_messages=True,
+        ask_password=False
+    ))
 
 
 @fixtures.csv_entry()
 def test_when_adding_voicemail_fields_then_voicemail_created(entry):
     number = h.voicemail.find_available_number(config.CONTEXT)
 
-    csv = [{"uuid": entry['user_uuid'],
-            "voicemail_name": "Jôey VM",
-            "voicemail_number": number,
-            "voicemail_context": config.CONTEXT,
-            "voicemail_password": "1234",
-            "voicemail_email": "email@example.com",
-            "voicemail_attach_audio": "0",
-            "voicemail_delete_messages": "1",
-            "voicemail_ask_password": "0",
-            }]
+    csv = [{
+        "uuid": entry['user_uuid'],
+        "voicemail_name": "Jôey VM",
+        "voicemail_number": number,
+        "voicemail_context": config.CONTEXT,
+        "voicemail_password": "1234",
+        "voicemail_email": "email@example.com",
+        "voicemail_attach_audio": "0",
+        "voicemail_delete_messages": "1",
+        "voicemail_ask_password": "0",
+    }]
 
     response = client.put("/users/import", csv)
     voicemail_id = get_update_field(response, 'voicemail_id')
 
     voicemail = confd.voicemails(voicemail_id).get().item
-    assert_that(voicemail, has_entries(name="Jôey VM",
-                                       number=number,
-                                       context=config.CONTEXT,
-                                       password="1234",
-                                       email='email@example.com',
-                                       attach_audio=False,
-                                       delete_messages=True,
-                                       ask_password=False))
+    assert_that(voicemail, has_entries(
+        name="Jôey VM",
+        number=number,
+        context=config.CONTEXT,
+        password="1234",
+        email='email@example.com',
+        attach_audio=False,
+        delete_messages=True,
+        ask_password=False
+    ))
 
 
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_updating_sip_line_fields_then_sip_updated(entry):
-    csv = [{"uuid": entry["user_uuid"],
-            "sip_username": "mynewsipusername",
-            "sip_secret": "mynewsippassword",
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "sip_username": "mynewsipusername",
+        "sip_secret": "mynewsippassword",
+    }]
 
     response = client.put("/users/import", csv)
     sip_id = get_update_field(response, 'sip_id')
@@ -972,10 +990,11 @@ def test_when_updating_sip_line_fields_then_sip_updated(entry):
 
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_updating_sip_line_fields_to_none_then_error_raised(entry):
-    csv = [{"uuid": entry["user_uuid"],
-            "sip_username": "",
-            "sip_secret": "",
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "sip_username": "",
+        "sip_secret": "",
+    }]
 
     response = client.put("/users/import", csv)
     assert_error(response, has_error_field('username'))
@@ -984,11 +1003,12 @@ def test_when_updating_sip_line_fields_to_none_then_error_raised(entry):
 
 @fixtures.csv_entry()
 def test_when_adding_sip_line_then_sip_created(entry):
-    csv = [{"uuid": entry["user_uuid"],
-            "line_protocol": "sip",
-            "sip_username": "createdsipusername",
-            "sip_secret": "createdsippassword",
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "line_protocol": "sip",
+        "sip_username": "createdsipusername",
+        "sip_secret": "createdsippassword",
+    }]
 
     response = client.put("/users/import", csv)
     sip_id = get_update_field(response, 'sip_id')
@@ -1000,9 +1020,10 @@ def test_when_adding_sip_line_then_sip_created(entry):
 
 @fixtures.csv_entry()
 def test_when_adding_sccp_line_then_sccp_created(entry):
-    csv = [{"uuid": entry["user_uuid"],
-            "line_protocol": "sccp",
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "line_protocol": "sccp",
+    }]
 
     response = client.put("/users/import", csv)
     sccp_id = get_update_field(response, 'sccp_id')
@@ -1013,9 +1034,10 @@ def test_when_adding_sccp_line_then_sccp_created(entry):
 
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_changing_line_protocol_then_error_raised(entry):
-    csv = [{"uuid": entry["user_uuid"],
-            "line_protocol": "sccp",
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "line_protocol": "sccp",
+    }]
 
     response = client.put("/users/import", csv)
 
@@ -1026,10 +1048,11 @@ def test_when_changing_line_protocol_then_error_raised(entry):
 def test_when_updating_extension_then_extension_updated(entry):
     exten = h.extension.find_available_exten(config.CONTEXT)
 
-    csv = [{"uuid": entry["user_uuid"],
-            "exten": exten,
-            "context": config.CONTEXT,
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "exten": exten,
+        "context": config.CONTEXT,
+    }]
 
     response = client.put("/users/import", csv)
     extension_id = get_update_field(response, 'extension_id')
@@ -1047,10 +1070,11 @@ def test_when_updating_extension_then_only_main_extension_updated(entry, line2, 
 
     user = {'id': entry['user_uuid']}
     with a.user_line(user, line2), a.line_extension(line2, extension2):
-        csv = [{"uuid": entry["user_uuid"],
-                "exten": exten,
-                "context": config.CONTEXT,
-                }]
+        csv = [{
+            "uuid": entry["user_uuid"],
+            "exten": exten,
+            "context": config.CONTEXT,
+        }]
 
         response = client.put("/users/import", csv)
         extension_id = get_update_field(response, 'extension_id')
@@ -1067,10 +1091,11 @@ def test_when_updating_extension_then_only_main_extension_updated(entry, line2, 
 def test_when_adding_extension_then_extension_created(entry):
     exten = h.extension.find_available_exten(config.CONTEXT)
 
-    csv = [{"uuid": entry["user_uuid"],
-            "exten": exten,
-            "context": config.CONTEXT,
-            }]
+    csv = [{
+        "uuid": entry["user_uuid"],
+        "exten": exten,
+        "context": config.CONTEXT,
+    }]
 
     response = client.put("/users/import", csv)
     extension_id = get_update_field(response, 'extension_id')
@@ -1154,12 +1179,12 @@ def test_when_updating_call_permission_field_then_call_permissions_updated(entry
 
     response = client.put("/users/import", csv)
 
-    expected = contains(
+    assert_that(response.item['updated'], contains(
         has_entries(
             row_number=1,
-            call_permission_ids=has_items(perm1['id'], perm2['id'])))
-
-    assert_that(response.item['updated'], expected)
+            call_permission_ids=has_items(perm1['id'], perm2['id'])
+        )
+    ))
 
     old_perm_id1, old_perm_id2 = entry['call_permission_ids']
     user_id = response.item['updated'][0]['user_id']
@@ -1178,12 +1203,12 @@ def test_when_call_permission_column_is_empty_then_call_permission_is_removed(en
 
     response = client.put("/users/import", csv)
 
-    expected = contains(
+    assert_that(response.item['updated'], contains(
         has_entries(
             row_number=1,
-            call_permission_ids=empty()))
-
-    assert_that(response.item['updated'], expected)
+            call_permission_ids=empty()
+        )
+    ))
 
     user_id = response.item['updated'][0]['user_id']
 
@@ -1199,12 +1224,12 @@ def test_when_call_permission_column_is_not_in_csv_then_call_permission_remains_
 
     response = client.put("/users/import", csv)
 
-    expected = contains(
+    assert_that(response.item['updated'], contains(
         has_entries(
             row_number=1,
-            call_permission_ids=contains(perm_id)))
-
-    assert_that(response.item['updated'], expected)
+            call_permission_ids=contains(perm_id)
+        )
+    ))
 
 
 def check_error_on_update(entry, fields, error):
@@ -1236,97 +1261,107 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
     vm_number2 = h.voicemail.find_available_number(config.CONTEXT, exclude=[vm_number1])
 
     csv = [
-        {"uuid": entry1["user_uuid"],
-         "entity_id": "1",
-         "exten": exten1,
-         "context": config.CONTEXT,
-         "firstname": "Géorge",
-         "lastname": "Bâptiste",
-         "email": "george@baptiste.st",
-         "mobile_phone_number": "5551234567",
-         "ring_seconds": "15",
-         "simultaneous_calls": "10",
-         "language": "fr_FR",
-         "outgoing_caller_id": '"Géorge Le Grand" <5557654321>',
-         "userfield": "userfield",
-         "supervision_enabled": "1",
-         "call_transfer_enabled": "1",
-         "dtmf_hangup_enabled": "0",
-         "call_record_enabled": "0",
-         "online_call_record_enabled": "0",
-         "call_permission_password": "321",
-         "enabled": "1",
-         "sip_username": "georgesipusername",
-         "sip_password": "georgesippassword",
-         "incall_exten": incall_exten1,
-         "incall_context": config.INCALL_CONTEXT,
-         "incall_ring_seconds": "10",
-         "voicemail_name": "george",
-         "voicemail_number": vm_number1,
-         "voicemail_context": config.CONTEXT,
-         "voicemail_password": "1234",
-         "voicemail_email": "test@example.com",
-         "voicemail_attach_audio": "1",
-         "voicemail_delete_messages": "1",
-         "voicemail_ask_password": "1",
-         "cti_profile_name": "Agent",
-         "cti_profile_enabled": "1",
-         "username": "george",
-         "password": "secret"},
-        {"uuid": entry2['user_uuid'],
-         "entity_id": "1",
-         "firstname": "Moùssa",
-         "lastname": "Nôbamgo",
-         "email": "moussa@nobamgo.sd",
-         "mobile_phone_number": "5553456789",
-         "ring_seconds": "20",
-         "simultaneous_calls": "8",
-         "language": "fr_FR",
-         "outgoing_caller_id": '"Mousssssssaaaa" <5557654321>',
-         "userfield": "userfield",
-         "supervision_enabled": "1",
-         "call_transfer_enabled": "1",
-         "dtmf_hangup_enabled": "0",
-         "call_record_enabled": "1",
-         "online_call_record_enabled": "1",
-         "call_permission_password": "654",
-         "enabled": "0",
-         "exten": exten2,
-         "context": config.CONTEXT,
-         "incall_exten": incall_exten2,
-         "incall_context": 'from-extern',
-         "incall_ring_seconds": "12",
-         "voicemail_name": "moussa",
-         "voicemail_number": vm_number2,
-         "voicemail_context": config.CONTEXT,
-         "voicemail_password": "2345",
-         "voicemail_email": "test2@example.com",
-         "voicemail_attach_audio": "1",
-         "voicemail_delete_messages": "1",
-         "voicemail_ask_password": "1",
-         "cti_profile_name": "Agent",
-         "cti_profile_enabled": "1",
-         "username": "moussa1",
-         "password": "secret"},
+        {
+            "uuid": entry1["user_uuid"],
+            "entity_id": "1",
+            "exten": exten1,
+            "context": config.CONTEXT,
+            "firstname": "Géorge",
+            "lastname": "Bâptiste",
+            "email": "george@baptiste.st",
+            "mobile_phone_number": "5551234567",
+            "ring_seconds": "15",
+            "simultaneous_calls": "10",
+            "language": "fr_FR",
+            "outgoing_caller_id": '"Géorge Le Grand" <5557654321>',
+            "userfield": "userfield",
+            "supervision_enabled": "1",
+            "call_transfer_enabled": "1",
+            "dtmf_hangup_enabled": "0",
+            "call_record_enabled": "0",
+            "online_call_record_enabled": "0",
+            "call_permission_password": "321",
+            "enabled": "1",
+            "sip_username": "georgesipusername",
+            "sip_password": "georgesippassword",
+            "incall_exten": incall_exten1,
+            "incall_context": config.INCALL_CONTEXT,
+            "incall_ring_seconds": "10",
+            "voicemail_name": "george",
+            "voicemail_number": vm_number1,
+            "voicemail_context": config.CONTEXT,
+            "voicemail_password": "1234",
+            "voicemail_email": "test@example.com",
+            "voicemail_attach_audio": "1",
+            "voicemail_delete_messages": "1",
+            "voicemail_ask_password": "1",
+            "cti_profile_name": "Agent",
+            "cti_profile_enabled": "1",
+            "username": "george",
+            "password": "secret"
+        },
+        {
+            "uuid": entry2['user_uuid'],
+            "entity_id": "1",
+            "firstname": "Moùssa",
+            "lastname": "Nôbamgo",
+            "email": "moussa@nobamgo.sd",
+            "mobile_phone_number": "5553456789",
+            "ring_seconds": "20",
+            "simultaneous_calls": "8",
+            "language": "fr_FR",
+            "outgoing_caller_id": '"Mousssssssaaaa" <5557654321>',
+            "userfield": "userfield",
+            "supervision_enabled": "1",
+            "call_transfer_enabled": "1",
+            "dtmf_hangup_enabled": "0",
+            "call_record_enabled": "1",
+            "online_call_record_enabled": "1",
+            "call_permission_password": "654",
+            "enabled": "0",
+            "exten": exten2,
+            "context": config.CONTEXT,
+            "incall_exten": incall_exten2,
+            "incall_context": 'from-extern',
+            "incall_ring_seconds": "12",
+            "voicemail_name": "moussa",
+            "voicemail_number": vm_number2,
+            "voicemail_context": config.CONTEXT,
+            "voicemail_password": "2345",
+            "voicemail_email": "test2@example.com",
+            "voicemail_attach_audio": "1",
+            "voicemail_delete_messages": "1",
+            "voicemail_ask_password": "1",
+            "cti_profile_name": "Agent",
+            "cti_profile_enabled": "1",
+            "username": "moussa1",
+            "password": "secret"
+        },
     ]
 
     response = client.put("/users/import", csv)
     entry = response.item['updated']
 
-    assert_that(entry, has_items(has_entries(user_id=entry1['user_id'],
-                                             line_id=entry1['line_id'],
-                                             extension_id=entry1['extension_id'],
-                                             voicemail_id=entry1['voicemail_id'],
-                                             cti_profile_id=entry1['cti_profile_id'],
-                                             sip_id=entry1['sip_id'],
-                                             incall_extension_id=entry1['incall_extension_id']),
-                                 has_entries(user_id=entry2['user_id'],
-                                             line_id=entry2['line_id'],
-                                             extension_id=entry2['extension_id'],
-                                             voicemail_id=entry2['voicemail_id'],
-                                             cti_profile_id=entry2['cti_profile_id'],
-                                             sccp_id=entry2['sccp_id'],
-                                             incall_extension_id=entry2['incall_extension_id'])))
+    assert_that(entry, has_items(
+        has_entries(
+            user_id=entry1['user_id'],
+            line_id=entry1['line_id'],
+            extension_id=entry1['extension_id'],
+            voicemail_id=entry1['voicemail_id'],
+            cti_profile_id=entry1['cti_profile_id'],
+            sip_id=entry1['sip_id'],
+            incall_extension_id=entry1['incall_extension_id']
+        ),
+        has_entries(
+            user_id=entry2['user_id'],
+            line_id=entry2['line_id'],
+            extension_id=entry2['extension_id'],
+            voicemail_id=entry2['voicemail_id'],
+            cti_profile_id=entry2['cti_profile_id'],
+            sccp_id=entry2['sccp_id'],
+            incall_extension_id=entry2['incall_extension_id']
+        ),
+    ))
 
 
 @fixtures.user()
@@ -1341,18 +1376,19 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
                                                                                 extension_incall,
                                                                                 voicemail,
                                                                                 call_permission):
-    csv = [{"uuid": user['uuid'],
-            "exten": extension['exten'],
-            "context": extension['context'],
-            "line_protocol": "sip",
-            "sip_username": sip['username'],
-            "incall_exten": extension_incall['exten'],
-            "incall_context": extension_incall['context'],
-            "voicemail_number": voicemail['number'],
-            "voicemail_context": voicemail['context'],
-            "cti_profile_name": "Client",
-            "call_permissions": call_permission['name'],
-            }]
+    csv = [{
+        "uuid": user['uuid'],
+        "exten": extension['exten'],
+        "context": extension['context'],
+        "line_protocol": "sip",
+        "sip_username": sip['username'],
+        "incall_exten": extension_incall['exten'],
+        "incall_context": extension_incall['context'],
+        "voicemail_number": voicemail['number'],
+        "voicemail_context": voicemail['context'],
+        "cti_profile_name": "Client",
+        "call_permissions": call_permission['name'],
+    }]
 
     response = client.put("/users/import", csv)
 
@@ -1394,43 +1430,45 @@ def test_given_each_field_updated_individually_then_entry_updated(entry, call_pe
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     vm_number = h.voicemail.find_available_number(config.CONTEXT)
 
-    fields = {"entity_id": "1",
-              "exten": exten,
-              "context": config.CONTEXT,
-              "firstname": "Fàbien",
-              "lastname": "Bâptiste",
-              "email": "fabien@baptiste.st",
-              "mobile_phone_number": "5551234567",
-              "ring_seconds": "15",
-              "simultaneous_calls": "10",
-              "language": "fr_FR",
-              "outgoing_caller_id": '"Fàbien Le Grand" <5557654321>',
-              "userfield": "userfield",
-              "supervision_enabled": "1",
-              "call_transfer_enabled": "1",
-              "dtmf_hangup_enabled": "0",
-              "call_record_enabled": "1",
-              "online_call_record_enabled": "1",
-              "call_permission_password": "542",
-              "enabled": "0",
-              "sip_username": "fabiensipusername",
-              "sip_password": "fabiensippassword",
-              "incall_exten": incall_exten,
-              "incall_context": config.INCALL_CONTEXT,
-              "incall_ring_seconds": "10",
-              "voicemail_name": "fabien",
-              "voicemail_number": vm_number,
-              "voicemail_context": config.CONTEXT,
-              "voicemail_password": "1234",
-              "voicemail_email": "test@example.com",
-              "voicemail_attach_audio": "1",
-              "voicemail_delete_messages": "1",
-              "voicemail_ask_password": "1",
-              "cti_profile_name": "Agent",
-              "cti_profile_enabled": "1",
-              "username": "fabien",
-              "call_permissions": call_permission['name'],
-              "password": "secret"}
+    fields = {
+        "entity_id": "1",
+        "exten": exten,
+        "context": config.CONTEXT,
+        "firstname": "Fàbien",
+        "lastname": "Bâptiste",
+        "email": "fabien@baptiste.st",
+        "mobile_phone_number": "5551234567",
+        "ring_seconds": "15",
+        "simultaneous_calls": "10",
+        "language": "fr_FR",
+        "outgoing_caller_id": '"Fàbien Le Grand" <5557654321>',
+        "userfield": "userfield",
+        "supervision_enabled": "1",
+        "call_transfer_enabled": "1",
+        "dtmf_hangup_enabled": "0",
+        "call_record_enabled": "1",
+        "online_call_record_enabled": "1",
+        "call_permission_password": "542",
+        "enabled": "0",
+        "sip_username": "fabiensipusername",
+        "sip_password": "fabiensippassword",
+        "incall_exten": incall_exten,
+        "incall_context": config.INCALL_CONTEXT,
+        "incall_ring_seconds": "10",
+        "voicemail_name": "fabien",
+        "voicemail_number": vm_number,
+        "voicemail_context": config.CONTEXT,
+        "voicemail_password": "1234",
+        "voicemail_email": "test@example.com",
+        "voicemail_attach_audio": "1",
+        "voicemail_delete_messages": "1",
+        "voicemail_ask_password": "1",
+        "cti_profile_name": "Agent",
+        "cti_profile_enabled": "1",
+        "username": "fabien",
+        "call_permissions": call_permission['name'],
+        "password": "secret"
+    }
 
     for name, value in fields.iteritems():
         yield update_csv_field, entry['user_uuid'], name, value
