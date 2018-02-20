@@ -86,7 +86,8 @@ class WazoUserCreator(Creator):
     def update_model(self, fields, model):
         model.update(fields)
         if 'email_address' in fields:
-            model['emails'] = [{'address': fields['email_address']}]
+            email = {'address': fields['email_address'], 'confirmed': True} if fields['email_address'] else None
+            model['emails'] = [email] if email else []
 
 
 class EntityCreator(Creator):

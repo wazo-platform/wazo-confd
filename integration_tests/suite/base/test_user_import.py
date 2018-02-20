@@ -488,6 +488,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
         firstname="another_firstname",
         lastname="another_lastname",
         username="another_username",
+        emails=contains(has_entries(address="another_email")),
         enabled=False,
     ))
 
