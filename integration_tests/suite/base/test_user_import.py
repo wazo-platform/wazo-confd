@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+import uuid
+
 from hamcrest import (
     assert_that,
     contains,
@@ -198,8 +200,8 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
         enabled=True,
         uuid=user_uuid,
 
-        username="richardlapointe",
-        password="secret",
+        username=None,
+        password=None,
     ))
 
 
@@ -447,9 +449,8 @@ def test_given_csv_has_cti_fields_then_cti_profile_associated():
     cti_profile_id = get_import_field(response, 'cti_profile_id')
     user_id = get_import_field(response, 'user_id')
 
-    user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
-                                              enabled=True))
+    response = confd.users(user_id).cti.get()
+    assert_that(response.item, has_entries(cti_profile_id=cti_profile_id))
 
 
 def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
@@ -458,7 +459,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
             "username": "thomas1",
             "password": "secret",
             "email": "thom.dak@example.com",
-            "cti_profile_enabled": "1"}]
+            "cti_profile_enabled": "0"}]
 
     response = client.post("/users/import", csv)
     user_uuid = get_import_field(response, 'user_uuid')
@@ -470,7 +471,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
         lastname="dakin",
         username="thomas1",
         emails=contains(has_entries(address="thom.dak@example.com")),
-        enabled=True,
+        enabled=False,
     ))
 
 
@@ -538,14 +539,15 @@ def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2
 
 
 def test_given_csv_has_error_then_wazo_user_deleted():
-    csv = [{"firstname": "Géorge"},
+    unique_firstname = uuid.uuid4()
+    csv = [{"firstname": unique_firstname},
            {"firstname": ""}]
 
     response = client.post("/users/import", csv)
     assert_error(response, has_error_field('firstname', row_number=2))
 
     wazo_user = auth.users.list()
-    assert_that(wazo_user['items'], empty())
+    assert_that(wazo_user['items'], is_not(has_items(has_entries(firstname=unique_firstname))))
 
 
 def test_given_csv_cti_profile_has_errors_then_errors_returned():
@@ -864,8 +866,6 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
         "lastname": "Làchance",
         "language": "fr_FR",
         "email": "joel@lachance.fr",
-        "username": "joellachance",
-        "password": "secret",
         "outgoing_caller_id": '"Joël Spîffy" <4185551234>',
         "mobile_phone_number": "4181234567",
         "supervision_enabled": "1",
@@ -878,6 +878,9 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
         "userfield": "userfield",
         "call_permission_password": "123",
         "enabled": "0",
+
+        "username": "joellachance",
+        "password": "secret",
     }]
 
     response = client.put("/users/import", csv)
@@ -890,8 +893,6 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
         lastname="Làchance",
         email="joel@lachance.fr",
         language="fr_FR",
-        username="joellachance",
-        password="secret",
         outgoing_caller_id='"Joël Spîffy" <4185551234>',
         mobile_phone_number="4181234567",
         supervision_enabled=True,
@@ -904,7 +905,10 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
         userfield="userfield",
         call_permission_password='123',
         enabled=False,
-        uuid=user_uuid
+        uuid=user_uuid,
+
+        username=None,
+        password=None,
     ))
 
 
@@ -1150,8 +1154,7 @@ def test_when_updating_cti_profile_fields_then_cti_profile_updated(entry, cti_pr
     user_id = get_update_field(response, 'user_id')
 
     user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id'],
-                                              enabled=True))
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id']))
 
 
 @fixtures.csv_entry()
@@ -1165,8 +1168,7 @@ def test_when_adding_cti_profile_fields_then_cti_profile_added(entry, cti_profil
     user_id = get_update_field(response, 'user_id')
 
     user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id'],
-                                              enabled=True))
+    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id']))
 
 
 @fixtures.csv_entry(call_permissions=2)
@@ -1376,6 +1378,8 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
                                                                                 extension_incall,
                                                                                 voicemail,
                                                                                 call_permission):
+    auth.users.new(uuid=user['uuid'], username=user['uuid'])
+
     csv = [{
         "uuid": user['uuid'],
         "exten": extension['exten'],
