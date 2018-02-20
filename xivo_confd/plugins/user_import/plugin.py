@@ -59,11 +59,13 @@ from .creators import (
     SccpCreator,
     SipCreator,
     UserCreator,
-    VoicemailCreator
+    VoicemailCreator,
+    WazoUserCreator,
 )
 from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from .resource import UserImportResource, UserExportResource
 from .service import ImportService
+from .wazo_user_service import build_service as build_wazo_user_service
 
 
 class Plugin(object):
@@ -74,6 +76,7 @@ class Plugin(object):
         provd_client = new_provisioning_client_from_config(config['provd'])
 
         user_service = build_user_service(provd_client)
+        wazo_user_service = build_wazo_user_service()
         entity_service = build_entity_service()
         user_voicemail_service = build_uv_service()
         user_cti_profile_service = build_user_cti_profile_service()
@@ -94,6 +97,7 @@ class Plugin(object):
 
         creators = {
             'user': UserCreator(user_service),
+            'wazo_user': WazoUserCreator(wazo_user_service),
             'entity': EntityCreator(entity_service),
             'line': LineCreator(line_service),
             'voicemail': VoicemailCreator(voicemail_service),

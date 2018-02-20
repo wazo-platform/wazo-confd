@@ -90,8 +90,6 @@ class CsvRow(object):
         UnicodeRule('firstname', 'firstname'),
         UnicodeRule('lastname', 'lastname'),
         UnicodeRule('email', 'email'),
-        UnicodeRule('username', 'username'),
-        UnicodeRule('password', 'password'),
         UnicodeRule('language', 'language'),
         UnicodeRule('outgoing_caller_id', 'outgoing_caller_id'),
         UnicodeRule('mobile_phone_number', 'mobile_phone_number'),
@@ -139,7 +137,6 @@ class CsvRow(object):
 
     CTI_PROFILE_RULES = (
         UnicodeRule('cti_profile_name', 'name'),
-        BooleanRule('cti_profile_enabled', 'enabled'),
     )
 
     INCALL_RULES = (
@@ -152,6 +149,17 @@ class CsvRow(object):
         ColonListRule('call_permissions', 'names'),
     )
 
+    WAZO_USER_RULES = (
+        UnicodeRule('uuid', 'uuid'),
+        UnicodeRule('firstname', 'firstname'),
+        UnicodeRule('lastname', 'lastname'),
+        UnicodeRule('email', 'email_address'),
+        UnicodeRule('username', 'username'),
+        UnicodeRule('password', 'password'),
+        BooleanRule('cti_profile_enabled', 'enabled'),
+
+    )
+
     def __init__(self, fields, position):
         self.fields = fields
         self.position = position
@@ -159,6 +167,7 @@ class CsvRow(object):
     def parse(self):
         return {
             'user': self.parse_rules(self.USER_RULES),
+            'wazo_user': self.parse_rules(self.WAZO_USER_RULES),
             'entity': self.parse_rules(self.ENTITY_RULES),
             'voicemail': self.parse_rules(self.VOICEMAIL_RULES),
             'line': self.parse_rules(self.LINE_RULES),
