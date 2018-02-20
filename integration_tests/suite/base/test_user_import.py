@@ -477,6 +477,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
             "lastname": "another_lastname",
             "username": "another_username",
             "email": "another_email",
+            "password": "another_password",
             "cti_profile_enabled": "0"}]
 
     client.put("/users/import", csv)
