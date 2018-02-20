@@ -1,28 +1,32 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
 
-from hamcrest import (assert_that,
-                      contains,
-                      contains_inanyorder,
-                      contains_string,
-                      equal_to,
-                      has_entries,
-                      has_items,
-                      has_key,
-                      has_length,
-                      is_not,
-                      not_none,
-                      instance_of,
-                      empty)
+from hamcrest import (
+    assert_that,
+    contains,
+    contains_inanyorder,
+    contains_string,
+    empty,
+    equal_to,
+    has_entries,
+    has_items,
+    has_key,
+    has_length,
+    instance_of,
+    is_not,
+    not_none,
+)
 
-from ..helpers import config
-from ..helpers import helpers as h
-from ..helpers import associations as a
-from ..helpers import fixtures
-from . import confd
+from ..helpers import (
+    associations as a,
+    config,
+    fixtures,
+    helpers as h,
+)
+from . import confd, auth
 
 
 client = h.user_import.csv_client()
@@ -441,6 +445,39 @@ def test_given_csv_has_cti_fields_then_cti_profile_associated():
     user_cti_profile = confd.users(user_id).cti.get().item
     assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile_id,
                                               enabled=True))
+
+
+def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
+    csv = [{"firstname": "Thômas",
+            "lastname": "dakin",
+            "username": "thomas1",
+            "password": "secret",
+            "email": "thom.dak@example.com",
+            "cti_profile_enabled": "1"}]
+
+    response = client.post("/users/import", csv)
+    user_uuid = get_import_field(response, 'user_uuid')
+
+    wazo_user = auth.users.get(user_uuid)
+    assert_that(wazo_user, has_entries(
+        uuid=user_uuid,
+        firstname="Thômas",
+        lastname="dakin",
+        username="thomas1",
+        emails=contains(has_entries(address="thom.dak@example.com")),
+        enabled=True,
+    ))
+
+
+def test_given_csv_has_error_then_wazo_user_deleted():
+    csv = [{"firstname": "Géorge"},
+           {"firstname": ""}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('firstname', row_number=2))
+
+    wazo_user = auth.users.list()
+    assert_that(wazo_user['items'], empty())
 
 
 def test_given_csv_cti_profile_has_errors_then_errors_returned():
