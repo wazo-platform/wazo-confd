@@ -28,8 +28,7 @@ from . import confd_csv
                online_call_record_enabled=False,
                call_permission_password="1234",
                enabled=True,
-               username="ursule",
-               password="ursulepassword")
+               username="ursule")
 def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fields(user):
     expected = has_entries(uuid=user['uuid'],
                            firstname="Ûrsule",
@@ -49,7 +48,6 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
                            call_permission_password="1234",
                            enabled="1",
                            username="ursule",
-                           password="ursulepassword",
                            entity_id="1")
 
     response = confd_csv.users.export.get()
