@@ -1,12 +1,14 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import netifaces
 import random
 import re
 import socket
-import netifaces
+import string
 
+from os import urandom
 from xivo_dao.helpers.db_utils import session_scope
 
 from xivo_confd import sysconfd
@@ -94,7 +96,11 @@ class WizardService(object):
                          u'parent_ids': [],
                          u'raw_config': {u'ntp_enabled': True,
                                          u'ntp_ip': address,
-                                         u'sip_dtmf_mode': u'RTP-out-of-band'}}
+                                         u'sip_dtmf_mode': u'RTP-out-of-band',
+                                         u'admin_username': 'admin',
+                                         u'admin_password': self._generate_phone_password(length=16),
+                                         u'user_username': 'user',
+                                         u'user_password': self._generate_phone_password(length=16)}}
         autoprov_config = {u'X_type': u'internal',
                            u'deletable': False,
                            u'id': u'autoprov',
@@ -116,6 +122,10 @@ class WizardService(object):
     def _generate_autoprov_username(self):
         suffix = ''.join(random.choice(USERNAME_VALUES) for _ in range(8))
         return 'ap{}'.format(suffix)
+
+    def _generate_phone_password(self, length):
+        chars = string.ascii_letters + string.digits
+        return "".join(chars[ord(c) % len(chars)] for c in urandom(length))
 
     def get_interfaces(self):
         result = []
