@@ -22,10 +22,10 @@ def user_voicemail(user, voicemail, check=True):
 
 
 @contextmanager
-def user_cti_profile(user, cti_profile, check=True):
-    h.user_cti_profile.associate(user['id'], cti_profile['id'])
+def user_cti_profile(user, cti_profile, **kwargs):
+    h.user_cti_profile.associate(user['id'], cti_profile['id'], **kwargs)
     yield
-    h.user_cti_profile.dissociate(user['id'], cti_profile['id'])
+    h.user_cti_profile.dissociate(user['id'], cti_profile['id'], **kwargs)
 
 
 @contextmanager
