@@ -6,7 +6,6 @@ from xivo_dao.helpers.db_manager import Session
 
 from xivo_confd import sysconfd, bus
 from xivo_confd.auth import required_acl
-from xivo_confd.database import user_export as user_export_db
 from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.representations.csv_ import output_csv
 
@@ -60,16 +59,13 @@ class UserExportResource(ConfdResource):
 
     representations = {'text/csv; charset=utf-8': output_csv}
 
+    def __init__(self, service):
+        self.service = service
+
     @required_acl('confd.users.export.read')
     def get(self):
-        csv_header, users = user_export_db.export_query()
+        csv_header, users = self.service.export()
         return {
             'headers': csv_header,
-            'content': list(self._format_users(csv_header, users))
+            'content': users,
         }
-
-    def _format_users(self, header, users):
-        for user in users:
-            user_row = tuple((field or "") for field in user)
-            user_dict = dict(zip(header, user_row))
-            yield user_dict

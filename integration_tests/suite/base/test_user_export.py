@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -15,7 +15,7 @@ from ..helpers import (
     config,
     fixtures,
 )
-from . import confd_csv
+from . import confd_csv, auth
 
 
 @fixtures.user(firstname="Ûrsule",
@@ -33,9 +33,10 @@ from . import confd_csv
                call_record_enabled=False,
                online_call_record_enabled=False,
                call_permission_password="1234",
-               enabled=True,
-               username="ursule")
+               enabled=True)
 def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fields(user):
+    auth.users.new(uuid=user['uuid'], username='ursule', enabled=False)
+
     response = confd_csv.users.export.get()
     assert_that(response.csv(), has_item(has_entries(
         uuid=user['uuid'],
@@ -55,8 +56,10 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
         online_call_record_enabled="0",
         call_permission_password="1234",
         enabled="1",
-        username="ursule",
         entity_id="1",
+
+        username="ursule",
+        cti_profile_enabled="0",
     )))
 
 
@@ -68,6 +71,7 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
                     delete_messages=True,
                     ask_password=True)
 def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(user, voicemail):
+    auth.users.new(uuid=user['uuid'])
     with a.user_voicemail(user, voicemail):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(has_entries(
@@ -84,13 +88,14 @@ def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(u
 
 
 @fixtures.cti_profile()
-@fixtures.user(username="floogle",
-               password="secret")
+@fixtures.user()
 def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fields(cti_profile, user):
-    with a.user_cti_profile(user, cti_profile):
+    auth.users.new(uuid=user['uuid'], username='floogle', enabled=True)
+    with a.user_cti_profile(user, cti_profile, enabled=False):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(has_entries(
             uuid=user['uuid'],
+            username='floogle',
             cti_profile_name=cti_profile['name'],
             cti_profile_enabled="1"
         )))
@@ -100,6 +105,7 @@ def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fiel
 @fixtures.line()
 @fixtures.sip()
 def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(user, line, sip):
+    auth.users.new(uuid=user['uuid'])
     with a.line_endpoint_sip(line, sip), a.user_line(user, line):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(has_entries(
@@ -116,6 +122,7 @@ def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(user, l
 @fixtures.line()
 @fixtures.sccp()
 def test_given_user_has_sccp_line_when_exporting_then_csv_has_line_fields(user, line, sccp):
+    auth.users.new(uuid=user['uuid'])
     with a.line_endpoint_sccp(line, sccp), a.user_line(user, line):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(has_entries(
@@ -130,6 +137,7 @@ def test_given_user_has_sccp_line_when_exporting_then_csv_has_line_fields(user, 
 @fixtures.sip()
 @fixtures.extension()
 def test_given_user_has_extension_when_exporting_then_csv_has_extension_fields(user, line, sip, extension):
+    auth.users.new(uuid=user['uuid'])
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(has_entries(
@@ -145,6 +153,7 @@ def test_given_user_has_extension_when_exporting_then_csv_has_extension_fields(u
 @fixtures.incall()
 @fixtures.extension(context=config.INCALL_CONTEXT)
 def test_given_user_has_incall_when_exporting_then_csv_has_incall_fields(user, line, sip, incall, extension):
+    auth.users.new(uuid=user['uuid'])
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
             a.incall_extension(incall, extension), a.incall_user(incall, user):
         response = confd_csv.users.export.get()
@@ -169,6 +178,7 @@ def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fiel
                                                                                    incall2,
                                                                                    extension1,
                                                                                    extension2):
+    auth.users.new(uuid=user['uuid'])
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), \
             a.incall_extension(incall1, extension1), a.incall_extension(incall2, extension2), \
             a.incall_user(incall1, user), a.incall_user(incall2, user):
@@ -184,6 +194,7 @@ def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fiel
 @fixtures.call_permission()
 @fixtures.call_permission()
 def test_given_user_has_multiple_call_permissions_when_exporting_then_csv_has_call_permission_field(user, perm1, perm2):
+    auth.users.new(uuid=user['uuid'])
     with a.user_call_permission(user, perm1), a.user_call_permission(user, perm2):
         response = confd_csv.users.export.get()
         assert_that(response.csv(), has_item(has_entries(
