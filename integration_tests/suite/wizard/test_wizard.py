@@ -6,14 +6,17 @@ import copy
 import json
 import re
 
-from hamcrest import (assert_that,
-                      equal_to,
-                      has_entry,
-                      has_entries,
-                      has_item,
-                      has_length,
-                      is_not,
-                      starts_with)
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    equal_to,
+    has_entry,
+    has_entries,
+    has_item,
+    has_length,
+    is_not,
+    starts_with
+)
 
 from xivo_test_helpers import until
 
@@ -455,14 +458,20 @@ class TestWizard(IntegrationTest):
              u'raw_config': {u'X_xivo_phonebook_ip': ip_address,
                              u'ntp_enabled': True,
                              u'ntp_ip': ip_address}},
-            {u'X_type': u'device',
-             u'deletable': False,
-             u'id': u'defaultconfigdevice',
-             u'label': u'Default config device',
-             u'parent_ids': [],
-             u'raw_config': {u'ntp_enabled': True,
+            has_entries({u'X_type': u'device',
+                         u'deletable': False,
+                         u'id': u'defaultconfigdevice',
+                         u'label': u'Default config device',
+                         u'parent_ids': [],
+                         u'raw_config': has_entries({
+                             u'ntp_enabled': True,
                              u'ntp_ip': ip_address,
-                             u'sip_dtmf_mode': u'RTP-out-of-band'}}
+                             u'sip_dtmf_mode': u'RTP-out-of-band',
+                             u'admin_username': 'admin',
+                             u'admin_password': has_length(16),
+                             u'user_username': 'user',
+                             u'user_password': has_length(16)
+                         })})
         ]
 
-        assert_that(configs, equal_to(expected_config))
+        assert_that(configs, contains_inanyorder(*expected_config))
