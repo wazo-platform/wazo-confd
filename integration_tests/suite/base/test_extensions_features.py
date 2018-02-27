@@ -63,11 +63,12 @@ def test_delete_unimplemented(extension):
     response.assert_status(405)
 
 
-@fixtures.extension_feature(exten='4999')
-@fixtures.extension_feature(exten='9999')
+@fixtures.extension_feature(exten='4999', feature='search')
+@fixtures.extension_feature(exten='9999', feature='hidden')
 def test_search(extension, hidden):
     url = confd.extensions.features
-    searches = {'exten': '499'}
+    searches = {'exten': '499',
+                'feature': 'sea'}
 
     for field, term in searches.items():
         yield check_search, url, extension, hidden, field, term
