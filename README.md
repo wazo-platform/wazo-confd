@@ -71,9 +71,27 @@ In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the 
 Profiling
 =========
 
+Terminal
+--------
+
+* add custom configuration:
+```
+rest_api:
+  profile: True
+```
+* Check the log
+
+
+Graphical
+---------
+
 * ```pip install gprof2dot```
 * ```apt-get install graphviz```
-* set the `profile` directory configuration
+* add custom configuration:
+```
+rest_api:
+  profile: '/tmp/confd-profiling'
+```
 * process file in directory with the following command:
 
 ```gprof2dot -f pstats <directory>/<file> | dot -Tpng -o output.png```
