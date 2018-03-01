@@ -20,6 +20,7 @@ from xivo_dao.resources.infos import dao as info_dao
 
 from ._bus import BusPublisher
 from ._sysconfd import SysconfdPublisher
+from .debug import EngineDebuggingSignalEvents, get_debug_queries
 from .helpers.converter import FilenameConverter
 from .helpers.restful import auth_verifier
 
@@ -62,6 +63,13 @@ def commit_database():
         raise
     finally:
         Session.remove()
+
+
+def log_database_queries(response):
+    for query in get_debug_queries():
+        logger.debug("\nQUERY: %s\nParameters: %s\nDuration: %fs\n"
+                     % (query.statement, query.parameters, query.duration))
+    return response
 
 
 def flush_sysconfd():
@@ -107,6 +115,10 @@ class HTTPServer:
             CORS(app, **cors_config)
 
     def run(self):
+        if self.config['debug_db']:
+            EngineDebuggingSignalEvents(Session.get_bind(), app.import_name).register()
+            app.after_request(log_database_queries)
+
         if self.config['profile']:
             from xivo.xivo_logging import _StreamToLogger
             stream = _StreamToLogger(logger, logging.DEBUG)

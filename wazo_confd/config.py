@@ -21,6 +21,7 @@ DEFAULT_CONFIG = {
     'pid_filename': '/run/wazo-confd/wazo-confd.pid',
     'rest_api': {
         'profile': False,
+        'debug_db': False,
         'listen': '0.0.0.0',
         'port': 9486,
         'certificate': '/usr/share/xivo-certs/server.crt',
