@@ -1,0 +1,163 @@
+paths:
+  /callpickups:
+    get:
+      operationId: list_call_pickups
+      summary: List call pickups
+      description: '**Required ACL:** `confd.callpickups.read`'
+      tags:
+      - callpickups
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Call Pickups list
+          schema:
+            $ref: '#/definitions/CallPickupItems'
+    post:
+      operationId: create_callpickup
+      summary: Create call pickup
+      description: '**Required ACL:** `confd.callpickups.create`'
+      tags:
+      - callpickups
+      parameters:
+      - name: body
+        in: body
+        description: Call Pickup to create
+        required: true
+        schema:
+          $ref: '#/definitions/CallPickup'
+      responses:
+        '201':
+          description: Call Pickup created
+          schema:
+            $ref: '#/definitions/CallPickup'
+        '400':
+          $ref: '#/responses/CreateError'
+  /callpickups/{callpickup_id}:
+    get:
+      operationId: get_callpickup
+      summary: Get call pickup
+      description: '**Required ACL:** `confd.callpickups.{callpickup_id}.read`'
+      tags:
+      - callpickups
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      responses:
+        '200':
+          description: Call Pickup
+          schema:
+            $ref: '#/definitions/CallPickup'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_callpickup
+      summary: Update call pickup
+      description: '**Required ACL:** `confd.callpickups.{callpickup_id}.update`'
+      tags:
+      - callpickups
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CallPickup'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_callpickup
+      summary: Delete call pickup
+      description: '**Required ACL:** `confd.callpickups.{callpickup_id}.delete`'
+      tags:
+      - callpickups
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  callpickupid:
+    required: true
+    type: integer
+    name: callpickup_id
+    in: path
+    description: Call Pickup's ID
+
+definitions:
+  CallPickup:
+    title: CallPickup
+    allOf:
+    - properties:
+        id:
+          type: integer
+          readOnly: true
+          description: The id of the call pickup
+        name:
+          type: string
+          description: The name of the call pickup
+        description:
+          type: string
+          description: Additional information about the call pickup
+        enabled:
+          type: boolean
+          default: true
+          description: Disable or enable the call pickup
+      required:
+      - name
+    - $ref: '#/definitions/CallPickupTargets'
+    - $ref: '#/definitions/CallPickupInterceptors'
+  CallPickupItems:
+    title: CallPickupItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/CallPickup'
+      total:
+        type: integer
+    required:
+    - total
+  CallPickupTargets:
+    properties:
+      recipients:
+        readOnly: true
+        $ref: '#/definitions/CallPickupTargetUsers'
+  CallPickupInterceptors:
+    properties:
+      surrogates:
+        readOnly: true
+        $ref: '#/definitions/CallPickupInterceptorUsers'
+  CallPickupTargetUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/CallPickupTargetUser'
+  CallPickupInterceptorUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
+  CallPickupTargetUser:
+    allOf:
+    - properties:
+        timeout:
+          type: integer
+    - $ref: '#/definitions/UserRelationBase'
