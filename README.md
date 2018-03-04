@@ -68,6 +68,17 @@ In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the 
 3. Execute the steps above to run integration tests
 
 
+Debuging SQL queries
+====================
+
+* Add custom configuration:
+```
+rest_api:
+  debug_db: True
+```
+* Check the log
+
+
 Profiling
 =========
 
