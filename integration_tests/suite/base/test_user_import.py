@@ -482,11 +482,12 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
             "firstname": "another_firstname",
             "lastname": "another_lastname",
             "username": "another_username",
-            "email": "another_email",
+            "email": "another_email@example.com",
             "password": "another_password",
             "cti_profile_enabled": "0"}]
 
-    client.put("/users/import", csv)
+    response = client.put("/users/import", csv)
+    response.assert_ok()
 
     wazo_user = auth.users.get(user_uuid)
     assert_that(wazo_user, has_entries(
@@ -494,7 +495,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
         firstname="another_firstname",
         lastname="another_lastname",
         username="another_username",
-        emails=contains(has_entries(address="another_email")),
+        emails=contains(has_entries(address="another_email@example.com")),
         enabled=False,
     ))
 
