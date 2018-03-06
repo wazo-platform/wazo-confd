@@ -23,13 +23,16 @@ class Plugin(object):
         config = dependencies['config']
         service_id = config['wizard']['service_id']
         service_key = config['wizard']['service_key']
+        auth_config = config['auth']
+        auth_config.pop('username', None)
+        auth_config.pop('password', None)
         if not service_id or not service_key:
             logger.info('failed to load the wizard plugin: missing service_id or service_key')
             return
 
         auth_client = AuthClient(username=service_id,
                                  password=service_key,
-                                 **config['auth'])
+                                 **auth_config)
         dird_client = DirdClient(**config['dird'])
         provd_client = new_provisioning_client_from_config(config['provd'])
 
