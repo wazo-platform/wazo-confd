@@ -25,7 +25,7 @@ class UserSchema(BaseSchema):
     uuid = fields.String(dump_only=True)
     firstname = fields.String(validate=Length(max=128), required=True)
     lastname = fields.String(validate=Length(max=128), allow_none=True)
-    email = fields.String(validate=Length(max=254), allow_none=True)
+    email = fields.Email(validate=Length(max=254), allow_none=True)
     timezone = fields.String(validate=Length(max=128), allow_none=True)
     language = fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
     description = fields.String(allow_none=True)

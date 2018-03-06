@@ -1,16 +1,28 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
 
-from ..helpers import scenarios as s
-from ..helpers import associations as a
-from . import confd
-from ..helpers import fixtures
-from ..helpers import config
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    equal_to,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    none,
+)
 
-from hamcrest import assert_that, equal_to, has_entries, has_entry, has_item, is_not, contains, none, empty
+from . import confd
+from ..helpers import (
+    associations as a,
+    config,
+    fixtures,
+    scenarios as s,
+)
 
 
 FULL_USER = {"firstname": "Jôhn",
@@ -99,6 +111,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'lastname', []
     yield s.check_bogus_field_returns_error, url, 'email', s.random_string(255)
     yield s.check_bogus_field_returns_error, url, 'email', 123
+    yield s.check_bogus_field_returns_error, url, 'email', 'invalid_email'
     yield s.check_bogus_field_returns_error, url, 'email', {}
     yield s.check_bogus_field_returns_error, url, 'email', []
     yield s.check_bogus_field_returns_error, url, 'timezone', 123
@@ -220,7 +233,7 @@ def test_put_errors(user):
         yield check
 
 
-@fixtures.user(firstname='user1', username='unique_username', email='unique@email')
+@fixtures.user(firstname='user1', username='unique_username', email='unique@email.com')
 @fixtures.user()
 def test_unique_errors(user1, user2):
     url = confd.users(user2['id']).put
