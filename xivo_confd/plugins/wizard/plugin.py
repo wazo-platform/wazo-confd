@@ -23,7 +23,7 @@ class Plugin(object):
         config = dependencies['config']
         service_id = config['wizard']['service_id']
         service_key = config['wizard']['service_key']
-        auth_config = config['auth']
+        auth_config = dict(config['auth'])
         auth_config.pop('username', None)
         auth_config.pop('password', None)
         if not service_id or not service_key:
