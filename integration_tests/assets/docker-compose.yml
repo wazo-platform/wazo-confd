@@ -15,7 +15,7 @@ services:
 
   auth:
     image: wazopbx/xivo-auth-mock
-    expose:
+    ports:
       - 9497
     volumes:
       - ./ssl:/usr/local/share/ssl
@@ -53,7 +53,7 @@ services:
       - "9486"
     command: "xivo-confd -d"
     volumes:
-      - "../../..:/usr/src/xivo-confd"
+      - "../..:/usr/src/xivo-confd"
       - "./etc/xivo-confd/conf.d/uuid.yml:/etc/xivo-confd/conf.d/uuid.yml"
       - "./etc/xivo-confd/conf.d/debug.yml:/etc/xivo-confd/conf.d/debug.yml"
       - "./etc/xivo-confd/conf.d/postgres.yml:/etc/xivo-confd/conf.d/postgres.yml"
@@ -62,6 +62,7 @@ services:
       - "./etc/xivo-confd/conf.d/provd.yml:/etc/xivo-confd/conf.d/provd.yml"
       - "./etc/xivo-confd/conf.d/sysconfd.yml:/etc/xivo-confd/conf.d/sysconfd.yml"
       - "./etc/xivo-confd/conf.d/disable_service_discovery.yml:/etc/xivo-confd/conf.d/disable_service_discovery.yml"
+      - "./keys/xivo-confd-key.yml:/var/lib/xivo-auth-keys/xivo-confd-key.yml"
 
       - "./etc/ssl:/usr/share/xivo-certs"
       # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"

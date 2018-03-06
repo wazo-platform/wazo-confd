@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -55,7 +55,8 @@ def make_entry(params):
     entry = {'firstname': params.get('firstname', words.name()),
              'lastname': params.get('lastname', words.name()),
              'username': params.get('username', words.alphanumeric()),
-             'password': params.get('password', words.alphanumeric())}
+             'password': params.get('password', words.alphanumeric()),
+             'email': params.get('email', '{}@example.com'.format(words.alphanumeric()))}
 
     if params.get('voicemail'):
         name = "{e[firstname]} {e[lastname]}".format(e=entry)

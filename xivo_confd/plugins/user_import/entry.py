@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -11,6 +11,7 @@ class Entry(object):
         self.number = number
         self.entry_dict = entry_dict
         self.user = None
+        self.wazo_user = None  # will be a dictionnary instead of sql object
         self.entity = None
         self.voicemail = None
         self.line = None
@@ -83,6 +84,7 @@ class EntryCreator(object):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
         entry.create('user', self.creators['user'])
+        entry.create('wazo_user', self.creators['wazo_user'])
         entry.find('entity', self.creators['entity'])
         entry.find_or_create('voicemail', self.creators['voicemail'])
         entry.find_or_create('call_permissions', self.creators['call_permissions'])
@@ -138,6 +140,16 @@ class EntryFinder(object):
         entry = Entry(row.position, entry_dict)
         uuid = entry.extract_field('user', 'uuid')
         user = entry.user = self.user_dao.get_by(uuid=uuid)
+
+        # Avoid to GET /users/uuid on wazo-auth
+        email = {'address': user.email, 'confirmed': True} if user.email else None
+        entry.wazo_user = {
+            'uuid': user.uuid,
+            'firstname': user.firstname,
+            'lastname': user.lastname,
+            'username': user.username,
+            'emails': [email] if email else []
+        }
 
         if user.cti_profile_id:
             entry.cti_profile = self.cti_profile_dao.get(user.cti_profile_id)

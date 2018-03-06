@@ -11,6 +11,7 @@ from xivo_confd.helpers.restful import ConfdResource
 from xivo_confd.representations.csv_ import output_csv
 
 from . import csvparse
+from .auth_client import auth_client
 
 
 class UserImportResource(ConfdResource):
@@ -52,6 +53,7 @@ class UserImportResource(ConfdResource):
         Session.rollback()
         sysconfd.rollback()
         bus.rollback()
+        auth_client.rollback()
 
 
 class UserExportResource(ConfdResource):

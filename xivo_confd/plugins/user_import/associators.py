@@ -24,6 +24,19 @@ class Associator(object):
         return
 
 
+# WazoUser need to be an associator to have the user uuid
+class WazoUserAssociator(Associator):
+
+    def associate(self, entry):
+        user = entry.get_resource('user')
+        wazo_user = entry.get_resource('wazo_user')
+        wazo_user['uuid'] = user.uuid
+        return self.service.create(wazo_user)
+
+    def update(self, entry):
+        pass
+
+
 class LineAssociator(Associator):
 
     def associate(self, entry):

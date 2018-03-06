@@ -21,6 +21,8 @@ from xivo_confd.plugins.extension.schema import ExtensionSchema
 from xivo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
 from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 
+from .wazo_user_schema import WazoUserSchema
+
 
 class Creator(object):
 
@@ -62,6 +64,30 @@ class UserCreator(Creator):
         if fields:
             form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
             return self.service.create(User(**form))
+
+
+class WazoUserCreator(Creator):
+
+    schema = WazoUserSchema
+
+    def find(self, fields):
+        pass
+
+    def create(self, fields):
+        fields = self.schema(handle_error=False, strict=True).load(fields).data
+        # We need to have user_uuid on create, so the real create is on associate
+        return fields
+
+    def update(self, fields, model):
+        fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
+        self.update_model(fields, model)
+        self.service.update(model)
+
+    def update_model(self, fields, model):
+        model.update(fields)
+        if 'email_address' in fields:
+            email = {'address': fields['email_address'], 'confirmed': True} if fields['email_address'] else None
+            model['emails'] = [email] if email else []
 
 
 class EntityCreator(Creator):

@@ -47,7 +47,8 @@ from .associators import (
     LineAssociator,
     SccpAssociator,
     SipAssociator,
-    VoicemailAssociator
+    VoicemailAssociator,
+    WazoUserAssociator,
 )
 from .creators import (
     CallPermissionCreator,
@@ -59,11 +60,14 @@ from .creators import (
     SccpCreator,
     SipCreator,
     UserCreator,
-    VoicemailCreator
+    VoicemailCreator,
+    WazoUserCreator,
 )
 from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from .resource import UserImportResource, UserExportResource
 from .service import ImportService
+from .wazo_user_service import build_service as build_wazo_user_service
+from .auth_client import set_auth_client_config
 
 
 class Plugin(object):
@@ -72,8 +76,10 @@ class Plugin(object):
         api = dependencies['api']
         config = dependencies['config']
         provd_client = new_provisioning_client_from_config(config['provd'])
+        set_auth_client_config(config['auth'])
 
         user_service = build_user_service(provd_client)
+        wazo_user_service = build_wazo_user_service()
         entity_service = build_entity_service()
         user_voicemail_service = build_uv_service()
         user_cti_profile_service = build_user_cti_profile_service()
@@ -94,6 +100,7 @@ class Plugin(object):
 
         creators = {
             'user': UserCreator(user_service),
+            'wazo_user': WazoUserCreator(wazo_user_service),
             'entity': EntityCreator(entity_service),
             'line': LineCreator(line_service),
             'voicemail': VoicemailCreator(voicemail_service),
@@ -110,6 +117,7 @@ class Plugin(object):
 
         associators = OrderedDict([
             ('entity', EntityAssociator(user_entity_service)),
+            ('wazo_user', WazoUserAssociator(wazo_user_service)),
             ('voicemail', VoicemailAssociator(user_voicemail_service)),
             ('cti_profile', CtiProfileAssociator(user_cti_profile_service, cti_profile_dao)),
             ('sip', SipAssociator(line_sip_service)),
@@ -123,20 +131,22 @@ class Plugin(object):
 
         entry_associator = EntryAssociator(associators)
 
-        entry_finder = EntryFinder(user_dao,
-                                   entity_dao,
-                                   voicemail_dao,
-                                   user_voicemail_dao,
-                                   cti_profile_dao,
-                                   line_dao,
-                                   user_line_dao,
-                                   line_extension_dao,
-                                   sip_dao,
-                                   sccp_dao,
-                                   extension_dao,
-                                   incall_dao,
-                                   call_permission_dao,
-                                   user_call_permission_dao)
+        entry_finder = EntryFinder(
+            user_dao,
+            entity_dao,
+            voicemail_dao,
+            user_voicemail_dao,
+            cti_profile_dao,
+            line_dao,
+            user_line_dao,
+            line_extension_dao,
+            sip_dao,
+            sccp_dao,
+            extension_dao,
+            incall_dao,
+            call_permission_dao,
+            user_call_permission_dao
+        )
 
         entry_updater = EntryUpdater(creators, associators, entry_finder)
 
