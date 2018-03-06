@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -40,10 +40,7 @@ COLUMNS = ('uuid',
            'call_record_enabled',
            'online_call_record_enabled',
            'userfield',
-           'username',
-           'password',
            'cti_profile_name',
-           'cti_profile_enabled',
            'voicemail_name',
            'voicemail_number',
            'voicemail_context',
@@ -132,10 +129,7 @@ def export_query(separator=";"):
         cast(User.callrecord, String),
         cast(User.enableonlinerec, String),
         User.userfield,
-        User.username,
-        User.password,
         CtiProfile.name,
-        cast(User.enableclient, String),
         Voicemail.name,
         Voicemail.number,
         Voicemail.context,

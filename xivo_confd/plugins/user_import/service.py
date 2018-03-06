@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -53,3 +53,31 @@ class ImportService(object):
     def update_row(self, row):
         entry = self.entry_updater.update_row(row)
         return entry
+
+
+class ExportService(object):
+
+    def __init__(self, user_export_dao, auth_client):
+        self._user_export_dao = user_export_dao
+        self._auth_client = auth_client
+
+    def export(self):
+        csv_header, users = self._user_export_dao.export_query()
+        users = list(self._format_users(csv_header, users))
+
+        wazo_users = self._auth_client.users.list()['items']
+        wazo_users = {user['uuid']: user for user in wazo_users}
+        for user in users:
+            wazo_user = wazo_users[user['uuid']]
+            user['username'] = wazo_user['username']
+            user['cti_profile_enabled'] = '1' if wazo_user['enabled'] else '0'
+
+        csv_header = csv_header + ('username', 'cti_profile_enabled')
+
+        return csv_header, users
+
+    def _format_users(self, header, users):
+        for user in users:
+            user_row = tuple((field or "") for field in user)
+            user_dict = dict(zip(header, user_row))
+            yield user_dict

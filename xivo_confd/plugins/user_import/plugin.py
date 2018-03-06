@@ -20,6 +20,7 @@ from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from xivo_provd_client import new_provisioning_client_from_config
 
+from xivo_confd.database import user_export as user_export_dao
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
@@ -65,9 +66,9 @@ from .creators import (
 )
 from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from .resource import UserImportResource, UserExportResource
-from .service import ImportService
+from .service import ImportService, ExportService
 from .wazo_user_service import build_service as build_wazo_user_service
-from .auth_client import set_auth_client_config
+from .auth_client import set_auth_client_config, auth_client
 
 
 class Plugin(object):
@@ -150,15 +151,16 @@ class Plugin(object):
 
         entry_updater = EntryUpdater(creators, associators, entry_finder)
 
-        service = ImportService(entry_creator, entry_associator, entry_updater)
-
+        import_service = ImportService(entry_creator, entry_associator, entry_updater)
         api.add_resource(
             UserImportResource,
             '/users/import',
-            resource_class_args=(service,)
+            resource_class_args=(import_service,)
         )
 
+        export_service = ExportService(user_export_dao, auth_client)
         api.add_resource(
             UserExportResource,
-            '/users/export'
+            '/users/export',
+            resource_class_args=(export_service,)
         )

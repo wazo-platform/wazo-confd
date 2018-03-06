@@ -1,6 +1,12 @@
 Changelog
 =========
 
+18.03
+-----
+
+* The `password` field has been removed from GET `/1.1/users/export`
+
+
 18.02
 -----
 
