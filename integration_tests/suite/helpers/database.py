@@ -2,10 +2,22 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from contextlib import contextmanager
+from functools import wraps
+
 import sqlalchemy as sa
 
-from contextlib import contextmanager
 from sqlalchemy.sql import text
+
+
+def reset(db):
+    def decorated(decorated):
+        @wraps(decorated)
+        def wrapper(*args, **kwargs):
+            db.recreate()
+            return decorated(*args, **kwargs)
+        return wrapper
+    return decorated
 
 
 class DbHelper(object):

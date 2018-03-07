@@ -13,11 +13,13 @@ from hamcrest import (
 from ..helpers import (
     associations as a,
     config,
+    database,
     fixtures,
 )
-from . import confd_csv, auth
+from . import confd_csv, auth, db
 
 
+@database.reset(db)
 @fixtures.user(firstname="Ûrsule",
                lastname="Wèrber",
                email="ursule@werber.com",
@@ -63,6 +65,7 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
     )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.voicemail(name="Jàmie",
                     password="1234",
@@ -87,6 +90,7 @@ def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(u
         )))
 
 
+@database.reset(db)
 @fixtures.cti_profile()
 @fixtures.user()
 def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fields(cti_profile, user):
@@ -101,6 +105,7 @@ def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fiel
         )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
@@ -118,6 +123,7 @@ def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(user, l
         )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.line()
 @fixtures.sccp()
@@ -132,6 +138,7 @@ def test_given_user_has_sccp_line_when_exporting_then_csv_has_line_fields(user, 
         )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
@@ -147,6 +154,7 @@ def test_given_user_has_extension_when_exporting_then_csv_has_extension_fields(u
         )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
@@ -164,6 +172,7 @@ def test_given_user_has_incall_when_exporting_then_csv_has_incall_fields(user, l
         )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip()
@@ -190,6 +199,7 @@ def test_given_user_has_multiple_incalls_when_exporting_then_csv_has_incall_fiel
         )))
 
 
+@database.reset(db)
 @fixtures.user()
 @fixtures.call_permission()
 @fixtures.call_permission()
