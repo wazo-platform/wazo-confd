@@ -458,7 +458,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
             "lastname": "dakin",
             "username": "thomas1",
             "password": "secret",
-            "email": "thom.dak@example.com",
+            "email": "thom.dak@user_import.com",
             "cti_profile_enabled": "0"}]
 
     response = client.post("/users/import", csv)
@@ -470,7 +470,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
         firstname="Thômas",
         lastname="dakin",
         username="thomas1",
-        emails=contains(has_entries(address="thom.dak@example.com")),
+        emails=contains(has_entries(address="thom.dak@user_import.com")),
         enabled=False,
     ))
 
@@ -482,7 +482,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
             "firstname": "another_firstname",
             "lastname": "another_lastname",
             "username": "another_username",
-            "email": "another_email@example.com",
+            "email": "another_email@user_import.com",
             "password": "another_password",
             "cti_profile_enabled": "0"}]
 
@@ -495,7 +495,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
         firstname="another_firstname",
         lastname="another_lastname",
         username="another_username",
-        emails=contains(has_entries(address="another_email@example.com")),
+        emails=contains(has_entries(address="another_email@user_import.com")),
         enabled=False,
     ))
 
