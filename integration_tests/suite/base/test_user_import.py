@@ -458,7 +458,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
             "lastname": "dakin",
             "username": "thomas1",
             "password": "secret",
-            "email": "thom.dak@user_import.com",
+            "email": "thom.dak@user-import.com",
             "cti_profile_enabled": "0"}]
 
     response = client.post("/users/import", csv)
@@ -470,7 +470,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
         firstname="Thômas",
         lastname="dakin",
         username="thomas1",
-        emails=contains(has_entries(address="thom.dak@user_import.com")),
+        emails=contains(has_entries(address="thom.dak@user-import.com")),
         enabled=False,
     ))
 
@@ -479,11 +479,11 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
 def test_update_wazo_user_fields_then_wazo_user_updated(entry):
     user_uuid = entry["user_uuid"]
     csv = [{"uuid": user_uuid,
-            "firstname": "another_firstname",
-            "lastname": "another_lastname",
-            "username": "another_username",
-            "email": "another_email@user_import.com",
-            "password": "another_password",
+            "firstname": "user-import",
+            "lastname": "user-import",
+            "username": "user-import",
+            "email": "user-import@user-import.com",
+            "password": "user-import",
             "cti_profile_enabled": "0"}]
 
     response = client.put("/users/import", csv)
@@ -492,10 +492,10 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
     wazo_user = auth.users.get(user_uuid)
     assert_that(wazo_user, has_entries(
         uuid=user_uuid,
-        firstname="another_firstname",
-        lastname="another_lastname",
-        username="another_username",
-        emails=contains(has_entries(address="another_email@user_import.com")),
+        firstname="user-import",
+        lastname="user-import",
+        username="user-import",
+        emails=contains(has_entries(address="user-import@user-import.com")),
         enabled=False,
     ))
 
@@ -505,7 +505,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
 def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2):
     user_uuid = entry1["user_uuid"]
     csv = [{"uuid": user_uuid,
-            "firstname": "another_firstname"},
+            "firstname": "user-import"},
            {"uuid": entry2['user_uuid'],
             "firstname": ""}]
 
@@ -515,14 +515,14 @@ def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2
     wazo_user = auth.users.get(user_uuid)
     assert_that(wazo_user, has_entries(
         uuid=user_uuid,
-        firstname="another_firstname",
+        firstname="user-import",
     ))
 
     response = confd.users(user_uuid).get()
     assert_that(response.item, has_entries(firstname=entry1['firstname']))
 
     csv = [{"uuid": user_uuid,
-            "firstname": "another_firstname"},
+            "firstname": "user-import"},
            {"uuid": entry2['user_uuid'],
             "firstname": "valid"}]
 
@@ -532,11 +532,11 @@ def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2
     wazo_user = auth.users.get(user_uuid)
     assert_that(wazo_user, has_entries(
         uuid=user_uuid,
-        firstname="another_firstname",
+        firstname="user-import",
     ))
 
     response = confd.users(user_uuid).get()
-    assert_that(response.item, has_entries(firstname="another_firstname"))
+    assert_that(response.item, has_entries(firstname="user-import"))
 
 
 def test_given_csv_has_error_then_wazo_user_deleted():
