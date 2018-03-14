@@ -60,6 +60,7 @@ class ListResource(ConfdResource):
         tenant_uuid = form.get('tenant_uuid')
         if tenant_uuid:
             tenant_dao.get_or_create_tenant(tenant_uuid)
+
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model).data, 201, self.build_headers(model)

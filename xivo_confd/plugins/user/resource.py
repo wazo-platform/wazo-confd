@@ -24,6 +24,10 @@ class UserList(ListResource):
     view_schemas = {'directory': UserDirectorySchema,
                     'summary': UserSummarySchema}
 
+    def __init__(self, service, tokens):
+        self.tokens = tokens
+        super(UserList, self).__init__(service)
+
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
 

@@ -106,6 +106,12 @@ parameters:
     type: string
     format: date-time
     required: false
+  tenantuuid:
+    name: Wazo-Tenant
+    type: string
+    in: header
+    description: "The tenant's UUID, defining the ownershop of a given resource."
+    required: false
   view:
     required: false
     name: view
