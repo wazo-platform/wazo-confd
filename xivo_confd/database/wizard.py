@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.alchemy.context import Context
@@ -17,8 +17,14 @@ from xivo_dao.alchemy.resolvconf import Resolvconf
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 from xivo_dao.alchemy.staticiax import StaticIAX
 from xivo_dao.alchemy.staticsip import StaticSIP
+from xivo_dao.alchemy.tenant import Tenant
 from xivo_dao.alchemy.user import User
 from xivo_dao.helpers.db_manager import Session
+
+
+def create_tenant(tenant_uuid):
+    tenant = Tenant(uuid=tenant_uuid)
+    Session.add(tenant)
 
 
 def set_admin_password(password):
@@ -34,8 +40,8 @@ def set_autoprov_name(autoprov_username):
                           var_val=autoprov_username))
 
 
-def set_default_entity(display_name, name):
-    row = Entity(displayname=display_name, name=name, description='Wizard Entity')
+def set_default_entity(display_name, name, tenant_uuid):
+    row = Entity(displayname=display_name, name=name, description='Wizard Entity', tenant_uuid=tenant_uuid)
     Session.add(row)
 
 
@@ -201,13 +207,14 @@ def get_xivo_configured():
     return Session.query(General).first()
 
 
-def create(wizard, autoprov_username):
+def create(wizard, autoprov_username, tenant_uuid):
     network = wizard['network']
     entity = entity_unique_name(wizard['entity_name'])
 
+    create_tenant(tenant_uuid)
     set_admin_password(wizard['admin_password'])
     set_autoprov_name(autoprov_username)
-    set_default_entity(wizard['entity_name'], entity)
+    set_default_entity(wizard['entity_name'], entity, tenant_uuid)
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])

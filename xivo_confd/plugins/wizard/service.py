@@ -8,6 +8,7 @@ import re
 import socket
 import string
 
+from uuid import uuid4
 from os import urandom
 from xivo_dao.helpers.db_utils import session_scope
 
@@ -39,9 +40,10 @@ class WizardService(object):
     def create(self, wizard):
         self.validator.validate_create(wizard)
         autoprov_username = self._generate_autoprov_username()
+        tenant_uuid = uuid4()
 
         with session_scope():
-            wizard_db.create(wizard, autoprov_username)
+            wizard_db.create(wizard, autoprov_username, tenant_uuid)
 
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],
@@ -50,6 +52,7 @@ class WizardService(object):
         entity_display_name = wizard['entity_name']
         entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
         self._initialize_phonebook(entity_unique_name)
+        self._initialize_tenant(tenant_uuid, entity_unique_name)
 
         wizard_db.set_xivo_configured()
         self.notifier.created()
@@ -72,6 +75,11 @@ class WizardService(object):
         token = self._auth_client.token.new('xivo_service', expiration=60)['token']
         phonebook = self._dird_client.phonebook.create(tenant=entity, phonebook_body=PHONEBOOK_BODY, token=token)
         wizard_db.set_phonebook(entity, phonebook)
+
+    def _initialize_tenant(self, tenant_uuid, tenant_name):
+        token = self._auth_client.token.new('xivo_service', expiration=60)['token']
+        self._auth_client.set_token(token)
+        self._auth_client.tenants.create(uuid=tenant_uuid, name=tenant_name)
 
     def _initialize_provd(self, address, autoprov_username):
         default_config = {'X_type': 'registrar',
