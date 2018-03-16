@@ -79,7 +79,7 @@ class WizardService(object):
     def _initialize_tenant(self, tenant_uuid, tenant_name):
         token = self._auth_client.token.new('xivo_service', expiration=60)['token']
         self._auth_client.set_token(token)
-        self._auth_client.tenants.create(uuid=tenant_uuid, name=tenant_name)
+        self._auth_client.tenants.new(uuid=str(tenant_uuid), name=tenant_name)
 
     def _initialize_provd(self, address, autoprov_username):
         default_config = {'X_type': 'registrar',
