@@ -30,6 +30,10 @@ class EntityList(ListResource):
     schema = EntitySchema
     model = Entity
 
+    def __init__(self, service, tokens):
+        self.tokens = tokens
+        super(EntityList, self).__init__(service)
+
     def build_headers(self, entity):
         return {'Location': url_for('entities', id=entity.id, _external=True)}
 

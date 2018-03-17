@@ -5,6 +5,8 @@
 from flask import request
 from flask_restful import Resource
 
+from xivo.tenant_helpers import Tenant
+from xivo_dao import tenant_dao
 from xivo_dao.helpers import errors
 
 from xivo_confd.auth import authentication
@@ -49,7 +51,15 @@ class ListResource(ConfdResource):
         return int(value)
 
     def post(self):
+        tokens = getattr(self, 'tokens', None)
+        tenant = Tenant.autodetect(tokens) if tokens else None
         form = self.schema().load(request.get_json()).data
+        if tenant:
+            form['tenant_uuid'] = tenant.uuid
+
+        tenant_uuid = form.get('tenant_uuid')
+        if tenant_uuid:
+            tenant_dao.get_or_create_tenant(tenant_uuid)
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model).data, 201, self.build_headers(model)
