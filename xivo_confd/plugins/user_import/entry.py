@@ -54,13 +54,13 @@ class Entry(object):
             return True
         return False
 
-    def create(self, resource, creator):
+    def create(self, resource, creator, *args, **kwargs):
         fields = self.entry_dict[resource]
-        setattr(self, resource, creator.create(fields))
+        setattr(self, resource, creator.create(fields, *args, **kwargs))
 
-    def find_or_create(self, resource, creator):
+    def find_or_create(self, resource, creator, *args, **kwargs):
         if not self.find(resource, creator):
-            self.create(resource, creator)
+            self.create(resource, creator, *args, **kwargs)
 
     def update(self, resource, creator):
         model = self.get_resource(resource)
@@ -80,19 +80,19 @@ class EntryCreator(object):
     def __init__(self, creators):
         self.creators = creators
 
-    def create(self, row):
+    def create(self, row, *args, **kwargs):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
-        entry.create('user', self.creators['user'])
-        entry.create('wazo_user', self.creators['wazo_user'])
+        entry.create('user', self.creators['user'], *args, **kwargs)
+        entry.create('wazo_user', self.creators['wazo_user'], *args, **kwargs)
         entry.find('entity', self.creators['entity'])
-        entry.find_or_create('voicemail', self.creators['voicemail'])
-        entry.find_or_create('call_permissions', self.creators['call_permissions'])
-        entry.find_or_create('line', self.creators['line'])
-        entry.find_or_create('extension', self.creators['extension'])
-        entry.find_or_create('extension_incall', self.creators['extension_incall'])
-        entry.find_or_create('incall', self.creators['incall'])
-        entry.find_or_create('cti_profile', self.creators['cti_profile'])
+        entry.find_or_create('voicemail', self.creators['voicemail'], *args, **kwargs)
+        entry.find_or_create('call_permissions', self.creators['call_permissions'], *args, **kwargs)
+        entry.find_or_create('line', self.creators['line'], *args, **kwargs)
+        entry.find_or_create('extension', self.creators['extension'], *args, **kwargs)
+        entry.find_or_create('extension_incall', self.creators['extension_incall'], *args, **kwargs)
+        entry.find_or_create('incall', self.creators['incall'], *args, **kwargs)
+        entry.find_or_create('cti_profile', self.creators['cti_profile'], *args, **kwargs)
         self.create_endpoint(entry)
         return entry
 
