@@ -38,23 +38,29 @@ class UserList(ListResource):
 
     @required_acl('confd.users.read')
     def get(self):
+        tenant_uuids = self._get_tenant_uuids()
         if 'q' in request.args:
             return self.legacy_search()
         else:
-            return self.user_search()
+            return self.user_search(tenant_uuids=tenant_uuids)
 
     def legacy_search(self):
         result = self.service.legacy_search(request.args['q'])
         return {'total': result.total,
                 'items': self.schema().dump(result.items, many=True).data}
 
-    def user_search(self):
+    def user_search(self, tenant_uuids=None):
         view = request.args.get('view')
         schema = self.view_schemas.get(view, self.schema)
         params = self.search_params()
-        result = self.service.search(params)
+        result = self.service.search(params, tenant_uuids)
         return {'total': result.total,
                 'items': schema().dump(result.items, many=True).data}
+
+    def _get_tenant_uuids(self):
+        token = request.headers['X-Auth-Token']
+        token_data = self.auth_token_cache._auth.token.get(token)
+        return [tenant['uuid'] for tenant in token_data['metadata']['tenants']]
 
 
 class UserItem(ItemResource):
