@@ -51,13 +51,7 @@ class ListResource(ConfdResource):
         return int(value)
 
     def post(self):
-        auth_token_cache = getattr(self, 'auth_token_cache', None)
-        auth_user_cache = getattr(self, 'auth_user_cache', None)
-        if auth_token_cache and auth_user_cache:
-            tenant = Tenant.autodetect(auth_token_cache, auth_user_cache)
-        else:
-            tenant = None
-
+        tenant = self._get_tenant()
         form = self.schema().load(request.get_json()).data
         if tenant:
             form['tenant_uuid'] = tenant.uuid
@@ -72,6 +66,12 @@ class ListResource(ConfdResource):
 
     def build_headers(self, model):
         raise NotImplementedError()
+
+    def _get_tenant(self):
+        auth_token_cache = getattr(self, 'auth_token_cache', None)
+        auth_user_cache = getattr(self, 'auth_user_cache', None)
+        if auth_token_cache and auth_user_cache:
+            return Tenant.autodetect(auth_token_cache, auth_user_cache)
 
 
 class ItemResource(ConfdResource):
