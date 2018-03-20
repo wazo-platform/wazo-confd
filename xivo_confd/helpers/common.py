@@ -36,7 +36,7 @@ def handle_api_exception(func):
             return [message], 400
         except rest_api_helpers.APIException as error:
             rollback()
-            return error.message, error.status_code
+            return [error.message], error.status_code
         except HTTPException as error:
             rollback()
             messages, code = extract_http_messages(error)

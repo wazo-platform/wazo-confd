@@ -34,7 +34,7 @@ class ImportService(object):
         return created, errors
 
     def create_entry(self, row, tenant_uuid):
-        entry = self.entry_creator.create(row, tenant_uuid)
+        entry = self.entry_creator.create(row, tenant_uuid=tenant_uuid)
         self.entry_associator.associate(entry)
         return entry
 
