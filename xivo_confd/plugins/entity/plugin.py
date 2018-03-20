@@ -10,14 +10,14 @@ class Plugin(object):
 
     def load(self, dependencies):
         api = dependencies['api']
-        tokens = dependencies['tokens']
-        users = dependencies['users']
+        auth_token_cache = dependencies['auth_token_cache']
+        auth_user_cache = dependencies['auth_user_cache']
         service = build_service()
 
         api.add_resource(
             EntityList,
             '/entities',
-            resource_class_args=(service, tokens, users)
+            resource_class_args=(service, auth_token_cache, auth_user_cache)
         )
 
         api.add_resource(

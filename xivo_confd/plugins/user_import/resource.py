@@ -16,14 +16,14 @@ from .auth_client import auth_client
 
 class UserImportResource(ConfdResource):
 
-    def __init__(self, service, tokens, users):
+    def __init__(self, service, auth_token_cache, auth_user_cache):
         self.service = service
-        self.tokens = tokens
-        self.users = users
+        self.auth_token_cache = auth_token_cache
+        self.auth_user_cache = auth_user_cache
 
     @required_acl('confd.users.import.create')
     def post(self):
-        tenant = Tenant.autodetect(self.tokens, self.users)
+        tenant = Tenant.autodetect(self.auth_token_cache, self.auth_user_cache)
 
         parser = csvparse.parse()
         entries, errors = self.service.import_rows(parser, tenant.uuid)

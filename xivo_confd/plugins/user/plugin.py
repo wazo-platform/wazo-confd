@@ -26,8 +26,8 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        tokens = dependencies['tokens']
-        users = dependencies['users']
+        auth_token_cache = dependencies['auth_token_cache']
+        auth_user_cache = dependencies['auth_user_cache']
         provd_client = new_provisioning_client_from_config(config['provd'])
 
         service = build_service(provd_client)
@@ -46,7 +46,7 @@ class Plugin(object):
             UserList,
             '/users',
             endpoint='users_list',
-            resource_class_args=(service, tokens, users)
+            resource_class_args=(service, auth_token_cache, auth_user_cache)
         )
 
         api.add_resource(

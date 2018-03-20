@@ -24,8 +24,9 @@ class UserList(ListResource):
     view_schemas = {'directory': UserDirectorySchema,
                     'summary': UserSummarySchema}
 
-    def __init__(self, service, tokens):
-        self.tokens = tokens
+    def __init__(self, service, auth_token_cache, auth_user_cache):
+        self.auth_token_cache = auth_token_cache
+        self.auth_user_cache = auth_user_cache
         super(UserList, self).__init__(service)
 
     def build_headers(self, user):
