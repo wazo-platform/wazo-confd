@@ -52,7 +52,8 @@ class ListResource(ConfdResource):
 
     def post(self):
         tokens = getattr(self, 'tokens', None)
-        tenant = Tenant.autodetect(tokens) if tokens else None
+        users = getattr(self, 'users', None)
+        tenant = Tenant.autodetect(tokens, users) if tokens and users else None
         form = self.schema().load(request.get_json()).data
         if tenant:
             form['tenant_uuid'] = tenant.uuid

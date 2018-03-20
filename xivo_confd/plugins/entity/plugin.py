@@ -11,12 +11,13 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         tokens = dependencies['tokens']
+        users = dependencies['users']
         service = build_service()
 
         api.add_resource(
             EntityList,
             '/entities',
-            resource_class_args=(service, tokens)
+            resource_class_args=(service, tokens, users)
         )
 
         api.add_resource(

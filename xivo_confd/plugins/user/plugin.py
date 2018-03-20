@@ -27,6 +27,7 @@ class Plugin(object):
         api = dependencies['api']
         config = dependencies['config']
         tokens = dependencies['tokens']
+        users = dependencies['users']
         provd_client = new_provisioning_client_from_config(config['provd'])
 
         service = build_service(provd_client)
@@ -45,7 +46,7 @@ class Plugin(object):
             UserList,
             '/users',
             endpoint='users_list',
-            resource_class_args=(service, tokens)
+            resource_class_args=(service, tokens, users)
         )
 
         api.add_resource(
