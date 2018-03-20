@@ -54,9 +54,9 @@ class Entry(object):
             return True
         return False
 
-    def create(self, resource, creator):
+    def create(self, resource, creator, tenant_uuid=None):
         fields = self.entry_dict[resource]
-        setattr(self, resource, creator.create(fields))
+        setattr(self, resource, creator.create(fields, tenant_uuid))
 
     def find_or_create(self, resource, creator):
         if not self.find(resource, creator):
@@ -80,10 +80,10 @@ class EntryCreator(object):
     def __init__(self, creators):
         self.creators = creators
 
-    def create(self, row):
+    def create(self, row, tenant_uuid=None):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
-        entry.create('user', self.creators['user'])
+        entry.create('user', self.creators['user'], tenant_uuid=tenant_uuid)
         entry.create('wazo_user', self.creators['wazo_user'])
         entry.find('entity', self.creators['entity'])
         entry.find_or_create('voicemail', self.creators['voicemail'])

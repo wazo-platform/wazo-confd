@@ -10,6 +10,7 @@ from flask import g
 from flask_restful.utils import http_status_message
 from werkzeug.exceptions import HTTPException
 
+from xivo import rest_api_helpers
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import ServiceError, NotFoundError
 
@@ -33,6 +34,9 @@ def handle_api_exception(func):
             rollback()
             message = decode_and_log_error(error)
             return [message], 400
+        except rest_api_helpers.APIException as error:
+            rollback()
+            return [error.message], error.status_code
         except HTTPException as error:
             rollback()
             messages, code = extract_http_messages(error)

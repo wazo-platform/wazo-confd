@@ -2,6 +2,7 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from xivo.tenant_helpers import Tenant
 from xivo_dao.helpers.db_manager import Session
 
 from xivo_confd import sysconfd, bus
@@ -15,13 +16,16 @@ from .auth_client import auth_client
 
 class UserImportResource(ConfdResource):
 
-    def __init__(self, service):
+    def __init__(self, service, tokens):
         self.service = service
+        self.tokens = tokens
 
     @required_acl('confd.users.import.create')
     def post(self):
+        tenant = Tenant.autodetect(self.tokens)
+
         parser = csvparse.parse()
-        entries, errors = self.service.import_rows(parser)
+        entries, errors = self.service.import_rows(parser, tenant.uuid)
 
         if errors:
             status_code = 400

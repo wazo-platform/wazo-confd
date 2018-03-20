@@ -31,6 +31,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/User'
+      - $ref: '#/parameters/tenantuuid'
       responses:
         '201':
           description: User created
