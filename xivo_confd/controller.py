@@ -35,7 +35,10 @@ class Controller(object):
 
         authentication.set_config(config)
         self.http_server = HTTPServer(config)
-        tokens = Tokens(AuthClient(**config['auth']))
+        auth_client = AuthClient(**config['auth'])
+        tokens = Tokens(auth_client)
+        users = Tokens(auth_client)
+
         plugin_helpers.load(
             namespace='xivo_confd.plugins',
             names=config['enabled_plugins'],
@@ -43,6 +46,7 @@ class Controller(object):
                 'api': api,
                 'config': config,
                 'tokens': tokens,
+                'users': users,
             }
         )
 
