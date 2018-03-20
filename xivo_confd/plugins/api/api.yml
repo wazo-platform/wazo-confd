@@ -110,7 +110,7 @@ parameters:
     name: Wazo-Tenant
     type: string
     in: header
-    description: "The tenant's UUID, defining the ownershop of a given resource."
+    description: "The tenant's UUID, defining the ownership of a given resource."
     required: false
   view:
     required: false
