@@ -28,8 +28,8 @@ class UserService(UserBaseService):
         super(UserService, self).edit(user, updated_fields)
         self.device_updater.update_for_user(user)
 
-    def legacy_search(self, term):
-        return self.dao.legacy_search(term)
+    def legacy_search(self, term, tenant_uuids):
+        return self.dao.legacy_search(term, tenant_uuids)
 
 
 def build_service(provd_client):

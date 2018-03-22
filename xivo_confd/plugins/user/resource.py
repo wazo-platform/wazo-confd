@@ -40,12 +40,12 @@ class UserList(ListResource):
     def get(self):
         tenant_uuids = self._get_tenant_uuids()
         if 'q' in request.args:
-            return self.legacy_search()
+            return self.legacy_search(tenant_uuids=tenant_uuids)
         else:
             return self.user_search(tenant_uuids=tenant_uuids)
 
-    def legacy_search(self):
-        result = self.service.legacy_search(request.args['q'])
+    def legacy_search(self, tenant_uuids=None):
+        result = self.service.legacy_search(request.args['q'], tenant_uuids=tenant_uuids)
         return {'total': result.total,
                 'items': self.schema().dump(result.items, many=True).data}
 
