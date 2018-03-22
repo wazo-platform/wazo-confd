@@ -111,7 +111,9 @@ class ItemResource(ConfdResource):
         return updated_fields
 
     def delete(self, id):
-        model = self.service.get(id)
+        tenant_uuids = self._get_tenant_uuids()
+        kwargs = {'tenant_uuids': tenant_uuids} if tenant_uuids else {}
+        model = self.service.get(id, **kwargs)
         self.service.delete(model)
         return '', 204
 
