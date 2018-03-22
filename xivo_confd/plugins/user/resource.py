@@ -74,7 +74,8 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.read')
     def head(self, id):
-        self.service.get(id)
+        tenant_uuids = self._get_tenant_uuids()
+        self.service.get(id, tenant_uuids=tenant_uuids)
         return '', 200
 
     @required_acl('confd.users.{id}.read')
