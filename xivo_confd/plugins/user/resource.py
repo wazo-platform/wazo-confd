@@ -67,6 +67,11 @@ class UserItem(ItemResource):
 
     schema = UserSchema
 
+    def __init__(self, service, auth_token_cache, auth_user_cache):
+        self.auth_token_cache = auth_token_cache
+        self.auth_user_cache = auth_user_cache
+        super(UserItem, self).__init__(service)
+
     @required_acl('confd.users.{id}.read')
     def head(self, id):
         self.service.get(id)

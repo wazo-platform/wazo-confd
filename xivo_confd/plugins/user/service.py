@@ -14,8 +14,8 @@ from .notifier import build_notifier, build_notifier_service, build_notifier_for
 
 class UserBaseService(CRUDService):
 
-    def get(self, user_id):
-        return self.dao.get_by_id_uuid(user_id)
+    def get(self, user_id, tenant_uuids=None):
+        return self.dao.get_by_id_uuid(user_id, tenant_uuids)
 
 
 class UserService(UserBaseService):

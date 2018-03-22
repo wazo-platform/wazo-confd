@@ -39,7 +39,7 @@ class Plugin(object):
             '/users/<uuid:id>',
             '/users/<int:id>',
             endpoint='users',
-            resource_class_args=(service,)
+            resource_class_args=(service, auth_token_cache, auth_user_cache)
         )
 
         api.add_resource(

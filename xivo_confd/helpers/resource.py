@@ -16,8 +16,8 @@ class CRUDService(object):
     def search(self, parameters, tenant_uuids=None):
         return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
 
-    def get(self, resource_id):
-        return self.dao.get(resource_id)
+    def get(self, resource_id, **kwargs):
+        return self.dao.get(resource_id, **kwargs)
 
     def find_by(self, **criteria):
         return self.dao.find_by(**criteria)

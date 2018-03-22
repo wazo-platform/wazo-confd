@@ -81,7 +81,9 @@ class ItemResource(ConfdResource):
         self.service = service
 
     def get(self, id):
-        model = self.service.get(id)
+        tenant_uuids = self._get_tenant_uuids()
+        kwargs = {'tenant_uuids': tenant_uuids} if tenant_uuids else {}
+        model = self.service.get(id, **kwargs)
         return self.schema().dump(model).data
 
     def put(self, id):
@@ -110,3 +112,11 @@ class ItemResource(ConfdResource):
         model = self.service.get(id)
         self.service.delete(model)
         return '', 204
+
+    def _get_tenant_uuids(self):
+        if not hasattr(self, 'auth_token_cache'):
+            return []
+
+        token = request.headers['X-Auth-Token']
+        token_data = self.auth_token_cache._auth.token.get(token)
+        return [tenant['uuid'] for tenant in token_data['metadata']['tenants']]
