@@ -5,6 +5,12 @@ Changelog
 -----
 
 * The `password` field has been removed from GET `/1.1/users/export`
+* The `Wazo-Tenant` header can now be used when creating users in a given tenant.
+
+    * POST `/1.1/users`
+    * POST `/1.1/users/import`
+
+* The users GET, PUT and DELETE are now filtered by tenant. xivo-confd will behave as if users from other tenants do not exist.
 
 
 18.02
