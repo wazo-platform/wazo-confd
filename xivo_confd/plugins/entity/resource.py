@@ -30,11 +30,6 @@ class EntityList(ListResource):
     schema = EntitySchema
     model = Entity
 
-    def __init__(self, service, auth_token_cache, auth_user_cache):
-        self.auth_token_cache = auth_token_cache
-        self.auth_user_cache = auth_user_cache
-        super(EntityList, self).__init__(service)
-
     def build_headers(self, entity):
         return {'Location': url_for('entities', id=entity.id, _external=True)}
 

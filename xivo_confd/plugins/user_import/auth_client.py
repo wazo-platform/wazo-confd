@@ -35,9 +35,9 @@ class AuthClientProxy(AuthClient):
 
 
 def get_auth_client():
-    client = g.get('auth_client')
+    client = g.get('auth_client_user_import')
     if not client:
-        client = g.auth_client = AuthClientProxy(**auth_config)
+        client = g.auth_client_user_import = AuthClientProxy(**auth_config)
     return client
 
 

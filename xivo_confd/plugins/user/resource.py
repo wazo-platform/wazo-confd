@@ -4,6 +4,7 @@
 
 from flask import url_for, request
 
+from xivo.tenant_flask_helpers import Tenant
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from xivo_confd.auth import required_acl
@@ -24,11 +25,6 @@ class UserList(ListResource):
     view_schemas = {'directory': UserDirectorySchema,
                     'summary': UserSummarySchema}
 
-    def __init__(self, service, auth_token_cache, auth_user_cache):
-        self.auth_token_cache = auth_token_cache
-        self.auth_user_cache = auth_user_cache
-        super(UserList, self).__init__(service)
-
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
 
@@ -38,21 +34,22 @@ class UserList(ListResource):
 
     @required_acl('confd.users.read')
     def get(self):
+        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
         if 'q' in request.args:
-            return self.legacy_search()
+            return self.legacy_search(tenant_uuids=tenant_uuids)
         else:
-            return self.user_search()
+            return self.user_search(tenant_uuids=tenant_uuids)
 
-    def legacy_search(self):
-        result = self.service.legacy_search(request.args['q'])
+    def legacy_search(self, tenant_uuids=None):
+        result = self.service.legacy_search(request.args['q'], tenant_uuids=tenant_uuids)
         return {'total': result.total,
                 'items': self.schema().dump(result.items, many=True).data}
 
-    def user_search(self):
+    def user_search(self, tenant_uuids=None):
         view = request.args.get('view')
         schema = self.view_schemas.get(view, self.schema)
         params = self.search_params()
-        result = self.service.search(params)
+        result = self.service.search(params, tenant_uuids)
         return {'total': result.total,
                 'items': schema().dump(result.items, many=True).data}
 
@@ -60,10 +57,12 @@ class UserList(ListResource):
 class UserItem(ItemResource):
 
     schema = UserSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.users.{id}.read')
     def head(self, id):
-        self.service.get(id)
+        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
+        self.service.get(id, tenant_uuids=tenant_uuids)
         return '', 200
 
     @required_acl('confd.users.{id}.read')

@@ -13,6 +13,7 @@ paths:
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
       - $ref: '#/parameters/view'
+      - $ref: '#/parameters/tenantuuid'
       responses:
         '200':
           description: User list

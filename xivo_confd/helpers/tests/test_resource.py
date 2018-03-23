@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -24,8 +24,15 @@ class TestCRUDService(unittest.TestCase):
 
         result = self.service.search(parameters)
 
-        self.dao.search.assert_called_once_with(**parameters)
+        self.dao.search.assert_called_once_with(tenant_uuids=None, **parameters)
         assert_that(result, equal_to(expected_search_result))
+
+        self.dao.search.reset_mock()
+        tenant_uuids = [sentinel.tenant_uuid1, sentinel.tenant_uuid2]
+
+        result = self.service.search(parameters, tenant_uuids=tenant_uuids)
+
+        self.dao.search.assert_called_once_with(tenant_uuids=tenant_uuids, **parameters)
 
     def test_when_getting_then_resource_is_fetched_from_dao(self):
         expected_resource = self.dao.get.return_value

@@ -14,8 +14,8 @@ from .notifier import build_notifier, build_notifier_service, build_notifier_for
 
 class UserBaseService(CRUDService):
 
-    def get(self, user_id):
-        return self.dao.get_by_id_uuid(user_id)
+    def get(self, user_id, tenant_uuids=None):
+        return self.dao.get_by_id_uuid(user_id, tenant_uuids)
 
 
 class UserService(UserBaseService):
@@ -28,8 +28,8 @@ class UserService(UserBaseService):
         super(UserService, self).edit(user, updated_fields)
         self.device_updater.update_for_user(user)
 
-    def legacy_search(self, term):
-        return self.dao.legacy_search(term)
+    def legacy_search(self, term, tenant_uuids):
+        return self.dao.legacy_search(term, tenant_uuids)
 
 
 def build_service(provd_client):
