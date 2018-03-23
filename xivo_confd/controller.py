@@ -10,8 +10,6 @@ import xivo_dao
 
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
-from xivo.tenant_helpers import Tokens
-from xivo_auth_client import Client as AuthClient
 
 from .auth import authentication
 from .http_server import api, HTTPServer
@@ -35,9 +33,6 @@ class Controller(object):
 
         authentication.set_config(config)
         self.http_server = HTTPServer(config)
-        auth_client = AuthClient(**config['auth'])
-        auth_token_cache = Tokens(auth_client)
-        auth_user_cache = Tokens(auth_client)
 
         plugin_helpers.load(
             namespace='xivo_confd.plugins',
@@ -45,8 +40,6 @@ class Controller(object):
             dependencies={
                 'api': api,
                 'config': config,
-                'auth_token_cache': auth_token_cache,
-                'auth_user_cache': auth_user_cache,
             }
         )
 

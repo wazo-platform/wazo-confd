@@ -5,7 +5,7 @@
 from flask import request
 from flask_restful import Resource
 
-from xivo.tenant_helpers import Tenant
+from xivo.tenant_flask_helpers import Tenant
 from xivo_dao import tenant_dao
 from xivo_dao.helpers import errors
 
@@ -51,14 +51,12 @@ class ListResource(ConfdResource):
         return int(value)
 
     def post(self):
-        tenant = self._get_tenant()
         form = self.schema().load(request.get_json()).data
-        if tenant:
-            form['tenant_uuid'] = tenant.uuid
 
-        tenant_uuid = form.get('tenant_uuid')
-        if tenant_uuid:
-            tenant_dao.get_or_create_tenant(tenant_uuid)
+        if hasattr(self.model, '__mapper__') and hasattr(self.model.__mapper__.c, 'tenant_uuid'):
+            tenant = Tenant.autodetect()
+            tenant_dao.get_or_create_tenant(tenant.uuid)
+            form['tenant_uuid'] = tenant.uuid
 
         model = self.model(**form)
         model = self.service.create(model)
@@ -67,28 +65,22 @@ class ListResource(ConfdResource):
     def build_headers(self, model):
         raise NotImplementedError()
 
-    def _get_tenant(self):
-        auth_token_cache = getattr(self, 'auth_token_cache', None)
-        auth_user_cache = getattr(self, 'auth_user_cache', None)
-        if auth_token_cache and auth_user_cache:
-            return Tenant.autodetect(auth_token_cache, auth_user_cache)
-
 
 class ItemResource(ConfdResource):
+
+    has_tenant_uuid = False
 
     def __init__(self, service):
         super(ItemResource, self).__init__()
         self.service = service
 
     def get(self, id):
-        tenant_uuids = self._get_tenant_uuids()
-        kwargs = {'tenant_uuids': tenant_uuids} if tenant_uuids else {}
+        kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
         return self.schema().dump(model).data
 
     def put(self, id):
-        tenant_uuids = self._get_tenant_uuids()
-        kwargs = {'tenant_uuids': tenant_uuids} if tenant_uuids else {}
+        kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
         self.parse_and_update(model)
         return '', 204
@@ -111,16 +103,14 @@ class ItemResource(ConfdResource):
         return updated_fields
 
     def delete(self, id):
-        tenant_uuids = self._get_tenant_uuids()
-        kwargs = {'tenant_uuids': tenant_uuids} if tenant_uuids else {}
+        kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
         self.service.delete(model)
         return '', 204
 
-    def _get_tenant_uuids(self):
-        if not hasattr(self, 'auth_token_cache'):
-            return []
+    def _add_tenant_uuid(self):
+        if not self.has_tenant_uuid:
+            return {}
 
-        token = request.headers['X-Auth-Token']
-        token_data = self.auth_token_cache._auth.token.get(token)
-        return [tenant['uuid'] for tenant in token_data['metadata']['tenants']]
+        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
+        return {'tenant_uuids': tenant_uuids}

@@ -76,8 +76,6 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        auth_token_cache = dependencies['auth_token_cache']
-        auth_user_cache = dependencies['auth_user_cache']
         provd_client = new_provisioning_client_from_config(config['provd'])
         set_auth_client_config(config['auth'])
 
@@ -157,7 +155,7 @@ class Plugin(object):
         api.add_resource(
             UserImportResource,
             '/users/import',
-            resource_class_args=(import_service, auth_token_cache, auth_user_cache)
+            resource_class_args=(import_service,),
         )
 
         export_service = ExportService(user_export_dao, auth_client)

@@ -4,6 +4,7 @@
 
 from flask import url_for, request
 
+from xivo.tenant_flask_helpers import Tenant
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from xivo_confd.auth import required_acl
@@ -24,11 +25,6 @@ class UserList(ListResource):
     view_schemas = {'directory': UserDirectorySchema,
                     'summary': UserSummarySchema}
 
-    def __init__(self, service, auth_token_cache, auth_user_cache):
-        self.auth_token_cache = auth_token_cache
-        self.auth_user_cache = auth_user_cache
-        super(UserList, self).__init__(service)
-
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
 
@@ -38,7 +34,7 @@ class UserList(ListResource):
 
     @required_acl('confd.users.read')
     def get(self):
-        tenant_uuids = self._get_tenant_uuids()
+        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
         if 'q' in request.args:
             return self.legacy_search(tenant_uuids=tenant_uuids)
         else:
@@ -57,24 +53,15 @@ class UserList(ListResource):
         return {'total': result.total,
                 'items': schema().dump(result.items, many=True).data}
 
-    def _get_tenant_uuids(self):
-        token = request.headers['X-Auth-Token']
-        token_data = self.auth_token_cache._auth.token.get(token)
-        return [tenant['uuid'] for tenant in token_data['metadata']['tenants']]
-
 
 class UserItem(ItemResource):
 
     schema = UserSchema
-
-    def __init__(self, service, auth_token_cache, auth_user_cache):
-        self.auth_token_cache = auth_token_cache
-        self.auth_user_cache = auth_user_cache
-        super(UserItem, self).__init__(service)
+    has_tenant_uuid = True
 
     @required_acl('confd.users.{id}.read')
     def head(self, id):
-        tenant_uuids = self._get_tenant_uuids()
+        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
         self.service.get(id, tenant_uuids=tenant_uuids)
         return '', 200
 
