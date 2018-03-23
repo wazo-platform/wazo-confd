@@ -36,6 +36,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/csvbody'
+      - $ref: '#/parameters/tenantuuid'
       responses:
         '201':
           description: Users imported successfully
