@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+)
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not)
+from xivo_test_helpers.hamcrest.uuid_ import uuid_
+
 from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 def test_get_errors():
@@ -91,8 +97,13 @@ def check_sorting(entity1, entity2, field, search):
 @fixtures.entity(name="search", display_name='display_search')
 def test_get(entity):
     response = confd.entities(entity['id']).get()
-    assert_that(response.item, has_entries(name='search',
-                                           display_name='display_search'))
+    assert_that(response.item, has_entries(
+        name='search',
+        display_name='display_search',
+        tenant=has_entries(
+            uuid=uuid_(),
+        ),
+    ))
 
 
 def test_create_minimal_parameters():

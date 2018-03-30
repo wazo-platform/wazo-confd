@@ -22,7 +22,12 @@ class EntitySchema(BaseSchema):
     name = fields.String(validate=Regexp(NAME_REGEX), required=True)
     display_name = fields.String(validate=Length(min=3, max=128), allow_none=True)
     description = fields.Constant('', load_only=True)  # Avoid mess with webi
+    tenant = fields.Nested('TenantSchema', dump_only=True)
     links = ListLink(Link('entities'))
+
+
+class TenantSchema(BaseSchema):
+    uuid = fields.UUID(dump_only=True)
 
 
 class EntityList(ListResource):
