@@ -46,6 +46,7 @@ class UserSchema(BaseSchema):
     simultaneous_calls = fields.Integer(validate=Range(min=1, max=20))
     call_permission_password = fields.String(validate=Regexp(CALL_PERMISSION_PASSWORD_REGEX), allow_none=True)
     enabled = StrictBoolean()
+    tenant_uuid = fields.String(dump_only=True)
     links = ListLink(Link('users'))
 
     agent = fields.Nested('AgentSchema',
