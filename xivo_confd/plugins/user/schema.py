@@ -45,6 +45,8 @@ class UserSchema(BaseSchema):
     ring_seconds = fields.Integer(validate=Range(min=0, max=60))
     simultaneous_calls = fields.Integer(validate=Range(min=1, max=20))
     call_permission_password = fields.String(validate=Regexp(CALL_PERMISSION_PASSWORD_REGEX), allow_none=True)
+    subscription_type = fields.Integer(validate=Range(min=0, max=10))
+    created_at = fields.DateTime(dump_only=True)
     enabled = StrictBoolean()
     tenant_uuid = fields.String(dump_only=True)
     links = ListLink(Link('users'))
