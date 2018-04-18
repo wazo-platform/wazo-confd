@@ -31,17 +31,32 @@ class UserNotifier(object):
 
     def created(self, user):
         self.send_sysconfd_handlers('add', user.id)
-        event = CreateUserEvent(user.id, user.uuid)
+        event = CreateUserEvent(
+            user.id,
+            user.uuid,
+            subscription_type=user.subscription_type,
+            created_at=user.created_at,
+        )
         self.bus.send_bus_event(event)
 
     def edited(self, user):
         self.send_sysconfd_handlers('edit', user.id)
-        event = EditUserEvent(user.id, user.uuid)
+        event = EditUserEvent(
+            user.id,
+            user.uuid,
+            subscription_type=user.subscription_type,
+            created_at=user.created_at,
+        )
         self.bus.send_bus_event(event)
 
     def deleted(self, user):
         self.send_sysconfd_handlers('delete', user.id)
-        event = DeleteUserEvent(user.id, user.uuid)
+        event = DeleteUserEvent(
+            user.id,
+            user.uuid,
+            subscription_type=user.subscription_type,
+            created_at=user.created_at,
+        )
         self.bus.send_bus_event(event)
 
 

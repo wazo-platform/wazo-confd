@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import datetime
 import unittest
 from mock import Mock, call
 
@@ -40,7 +41,7 @@ class TestUserNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.user = Mock(User, id=1234)
+        self.user = Mock(User, id=1234, subscription_type=1, created_at=datetime.datetime.utcnow())
 
         self.notifier = UserNotifier(self.sysconfd, self.bus)
 
@@ -51,7 +52,12 @@ class TestUserNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
 
     def test_when_user_created_then_event_sent_on_bus(self):
-        expected_event = CreateUserEvent(self.user.id, self.user.uuid)
+        expected_event = CreateUserEvent(
+            self.user.id,
+            self.user.uuid,
+            subscription_type=self.user.subscription_type,
+            created_at=self.user.created_at,
+        )
 
         self.notifier.created(self.user)
 
@@ -64,7 +70,12 @@ class TestUserNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
 
     def test_when_user_edited_then_event_sent_on_bus(self):
-        expected_event = EditUserEvent(self.user.id, self.user.uuid)
+        expected_event = EditUserEvent(
+            self.user.id,
+            self.user.uuid,
+            subscription_type=self.user.subscription_type,
+            created_at=self.user.created_at,
+        )
 
         self.notifier.edited(self.user)
 
@@ -77,7 +88,12 @@ class TestUserNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
 
     def test_when_user_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteUserEvent(self.user.id, self.user.uuid)
+        expected_event = DeleteUserEvent(
+            self.user.id,
+            self.user.uuid,
+            subscription_type=self.user.subscription_type,
+            created_at=self.user.created_at,
+        )
 
         self.notifier.deleted(self.user)
 
