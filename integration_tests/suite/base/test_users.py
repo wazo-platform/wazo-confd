@@ -47,7 +47,8 @@ FULL_USER = {"firstname": "Jôhn",
              "call_permission_password": '1234',
              "enabled": False,
              "ring_seconds": 60,
-             "simultaneous_calls": 10}
+             "simultaneous_calls": 10,
+             "subscription_type": 1}
 
 
 NULL_USER = {"firstname": "Jôhn",
@@ -204,6 +205,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', {}
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', []
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', s.random_string(17)
+    yield s.check_bogus_field_returns_error, url, 'subscription_type', 'one'
+    yield s.check_bogus_field_returns_error, url, 'subscription_type', -1
+    yield s.check_bogus_field_returns_error, url, 'subscription_type', 11
+    yield s.check_bogus_field_returns_error, url, 'subscription_type', {}
+    yield s.check_bogus_field_returns_error, url, 'subscription_type', []
     yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'enabled', 123
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
@@ -558,6 +564,7 @@ def test_create_user_with_all_parameters():
 
     response.assert_created('users')
     assert_that(response.item, has_entries(FULL_USER))
+    assert_that(response.item, has_entries(created_at=is_not(none())))
 
 
 def test_create_user_with_all_parameters_null():
