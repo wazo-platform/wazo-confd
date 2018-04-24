@@ -4,6 +4,7 @@
 
 import datetime
 import unittest
+import uuid
 from mock import Mock, call
 
 from xivo_bus.resources.user.event import (
@@ -41,7 +42,13 @@ class TestUserNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.user = Mock(User, id=1234, subscription_type=1, created_at=datetime.datetime.utcnow())
+        self.user = Mock(
+            User,
+            id=1234,
+            subscription_type=1,
+            created_at=datetime.datetime.utcnow(),
+            tenant_uuid=uuid.uuid4(),
+        )
 
         self.notifier = UserNotifier(self.sysconfd, self.bus)
 
@@ -57,6 +64,7 @@ class TestUserNotifier(unittest.TestCase):
             self.user.uuid,
             subscription_type=self.user.subscription_type,
             created_at=self.user.created_at,
+            tenant_uuid=self.user.tenant_uuid,
         )
 
         self.notifier.created(self.user)
@@ -75,6 +83,7 @@ class TestUserNotifier(unittest.TestCase):
             self.user.uuid,
             subscription_type=self.user.subscription_type,
             created_at=self.user.created_at,
+            tenant_uuid=self.user.tenant_uuid,
         )
 
         self.notifier.edited(self.user)
@@ -93,6 +102,7 @@ class TestUserNotifier(unittest.TestCase):
             self.user.uuid,
             subscription_type=self.user.subscription_type,
             created_at=self.user.created_at,
+            tenant_uuid=self.user.tenant_uuid,
         )
 
         self.notifier.deleted(self.user)

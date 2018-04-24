@@ -36,6 +36,7 @@ class UserNotifier(object):
             user.uuid,
             subscription_type=user.subscription_type,
             created_at=user.created_at,
+            tenant_uuid=user.tenant_uuid,
         )
         self.bus.send_bus_event(event)
 
@@ -46,6 +47,7 @@ class UserNotifier(object):
             user.uuid,
             subscription_type=user.subscription_type,
             created_at=user.created_at,
+            tenant_uuid=user.tenant_uuid,
         )
         self.bus.send_bus_event(event)
 
@@ -56,6 +58,7 @@ class UserNotifier(object):
             user.uuid,
             subscription_type=user.subscription_type,
             created_at=user.created_at,
+            tenant_uuid=user.tenant_uuid,
         )
         self.bus.send_bus_event(event)
 
