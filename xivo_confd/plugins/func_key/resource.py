@@ -4,7 +4,7 @@
 
 from flask import url_for, request
 
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 from xivo_dao.resources.func_key.model import (
     AgentDestination,
     BSFilterDestination,
