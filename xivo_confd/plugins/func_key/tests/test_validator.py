@@ -9,17 +9,15 @@ from mock import Mock, sentinel
 from hamcrest import assert_that, calling, raises
 
 from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMember
+from xivo_dao.alchemy.func_key_dest_bsfilter import FuncKeyDestBSFilter
+from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
+from xivo_dao.alchemy.func_key_dest_forward import FuncKeyDestForward
+from xivo_dao.alchemy.func_key_dest_park_position import FuncKeyDestParkPosition
+from xivo_dao.alchemy.func_key_dest_service import FuncKeyDestService
+from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping as FuncKey
+from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.exception import InputError, ResourceError
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
-from xivo_dao.resources.func_key.model import (
-    BSFilterDestination,
-    CustomDestination,
-    ForwardDestination,
-    FuncKey,
-    ParkPositionDestination,
-    ServiceDestination,
-)
 
 from xivo_confd.helpers.validator import Validator
 from xivo_confd.plugins.func_key.validator import FuncKeyMappingValidator
@@ -45,19 +43,19 @@ class TestSimilarFuncKeyValidator(unittest.TestCase):
         self.validator.validate(template)
 
     def test_when_template_has_a_single_func_key_then_validation_passes(self):
-        funckey = FuncKey(destination=CustomDestination(exten='1234'))
+        funckey = FuncKey(destination=FuncKeyDestCustom(exten='1234'))
         template = FuncKeyTemplate(keys={1: funckey})
 
         self.validator.validate(template)
 
     def test_when_template_has_two_func_keys_with_different_destination_then_validation_passes(self):
-        template = FuncKeyTemplate(keys={1: FuncKey(destination=CustomDestination(exten='1234')),
-                                         2: FuncKey(destination=ServiceDestination(service='enablednd'))})
+        template = FuncKeyTemplate(keys={1: FuncKey(destination=FuncKeyDestCustom(exten='1234')),
+                                         2: FuncKey(destination=FuncKeyDestService(service='enablednd'))})
 
         self.validator.validate(template)
 
     def test_when_template_has_two_func_keys_with_same_destination_then_raises_error(self):
-        destination = CustomDestination(exten='1234')
+        destination = FuncKeyDestCustom(exten='1234')
         template = FuncKeyTemplate(keys={1: FuncKey(destination=destination),
                                          2: FuncKey(destination=destination)})
 
@@ -152,13 +150,13 @@ class TestForwardValidator(unittest.TestCase):
         self.validator = ForwardValidator()
 
     def test_given_exten_contains_invalid_characters_then_validation_raises_error(self):
-        destination = ForwardDestination(forward='noanswer', exten='hello\n')
+        destination = FuncKeyDestForward(forward='noanswer', exten='hello\n')
 
         assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_exten_contains_valid_characters_then_validation_passes(self):
-        destination = ForwardDestination(forward='noanswer', exten='hello')
+        destination = FuncKeyDestForward(forward='noanswer', exten='hello')
 
         self.validator.validate(destination)
 
@@ -171,33 +169,33 @@ class TestParkPositionValidator(unittest.TestCase):
         self.validator = ParkPositionValidator(self.dao)
 
     def test_given_position_under_minimum_then_raises_error(self):
-        destination = ParkPositionDestination(position=600)
+        destination = FuncKeyDestParkPosition(position=600)
 
         assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_position_over_maximum_then_raises_error(self):
-        destination = ParkPositionDestination(position=800)
+        destination = FuncKeyDestParkPosition(position=800)
 
         assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_position_on_minimum_position_then_validation_passes(self):
-        destination = ParkPositionDestination(position=701)
+        destination = FuncKeyDestParkPosition(position=701)
 
         self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
 
     def test_given_position_on_maximum_position_then_validation_passes(self):
-        destination = ParkPositionDestination(position=750)
+        destination = FuncKeyDestParkPosition(position=750)
 
         self.validator.validate(destination)
 
         self.dao.find_park_position_range.assert_called_once_with()
 
     def test_given_position_inside_range_then_validation_passes(self):
-        destination = ParkPositionDestination(position=710)
+        destination = FuncKeyDestParkPosition(position=710)
 
         self.validator.validate(destination)
 
@@ -210,13 +208,13 @@ class TestCustomValidator(unittest.TestCase):
         self.validator = CustomValidator()
 
     def test_given_exten_contains_invalid_characters_then_validation_raises_error(self):
-        destination = CustomDestination(exten='1234\n')
+        destination = FuncKeyDestCustom(exten='1234\n')
 
         assert_that(calling(self.validator.validate).with_args(destination),
                     raises(InputError))
 
     def test_given_exten_contains_valid_characters_then_validation_passes(self):
-        destination = CustomDestination(exten='1234')
+        destination = FuncKeyDestCustom(exten='1234')
 
         self.validator.validate(destination)
 
@@ -225,12 +223,12 @@ class TestBSFilterValidator(unittest.TestCase):
 
     def setUp(self):
         self.user = User(id=sentinel.user_id)
-        self.funckey = FuncKey(destination=BSFilterDestination(filter_member_id=sentinel.filter_member_id))
+        self.funckey = FuncKey(destination=FuncKeyDestBSFilter(filter_member_id=sentinel.filter_member_id))
 
         self.validator = BSFilterValidator()
 
     def test_when_func_key_does_not_have_bsfilter_destination_then_validation_passes(self):
-        funckey = FuncKey(destination=CustomDestination(exten='1234'))
+        funckey = FuncKey(destination=FuncKeyDestCustom(exten='1234'))
 
         self.validator.validate(self.user, funckey)
 

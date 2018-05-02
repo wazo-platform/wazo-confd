@@ -8,7 +8,7 @@ from mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 from xivo_confd.plugins.device.update import DeviceUpdater
 

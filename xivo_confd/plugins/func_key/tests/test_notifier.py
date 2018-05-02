@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -10,7 +10,7 @@ from xivo_bus.resources.func_key.event import (
     DeleteFuncKeyTemplateEvent,
     EditFuncKeyTemplateEvent,
 )
-from xivo_dao.resources.func_key_template.model import FuncKeyTemplate
+from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 from ..notifier import FuncKeyTemplateNotifier
 

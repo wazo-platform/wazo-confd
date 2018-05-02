@@ -4,24 +4,24 @@
 
 from flask import url_for, request
 
-from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
-from xivo_dao.resources.func_key.model import (
-    AgentDestination,
-    BSFilterDestination,
-    ConferenceDestination,
-    CustomDestination,
-    ForwardDestination,
-    FuncKey,
-    GroupDestination,
-    OnlineRecordingDestination,
-    PagingDestination,
-    ParkPositionDestination,
-    ParkingDestination,
-    QueueDestination,
-    ServiceDestination,
-    TransferDestination,
-    UserDestination,
+from xivo_dao.alchemy.func_key_dest_agent import FuncKeyDestAgent
+from xivo_dao.alchemy.func_key_dest_bsfilter import FuncKeyDestBSFilter
+from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
+from xivo_dao.alchemy.func_key_dest_conference import FuncKeyDestConference
+from xivo_dao.alchemy.func_key_dest_features import (
+    FuncKeyDestFeatures,
+    FuncKeyDestOnlineRecording,
+    FuncKeyDestParking,
 )
+from xivo_dao.alchemy.func_key_dest_forward import FuncKeyDestForward
+from xivo_dao.alchemy.func_key_dest_group import FuncKeyDestGroup
+from xivo_dao.alchemy.func_key_dest_paging import FuncKeyDestPaging
+from xivo_dao.alchemy.func_key_dest_park_position import FuncKeyDestParkPosition
+from xivo_dao.alchemy.func_key_dest_queue import FuncKeyDestQueue
+from xivo_dao.alchemy.func_key_dest_service import FuncKeyDestService
+from xivo_dao.alchemy.func_key_dest_user import FuncKeyDestUser
+from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping
+from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
@@ -35,27 +35,27 @@ from .schema import (
 )
 
 models_destination = {
-    'user': UserDestination,
-    'group': GroupDestination,
-    'queue': QueueDestination,
-    'conference': ConferenceDestination,
-    'paging': PagingDestination,
-    'service': ServiceDestination,
-    'custom': CustomDestination,
-    'forward': ForwardDestination,
-    'transfer': TransferDestination,
-    'park_position': ParkPositionDestination,
-    'parking': ParkingDestination,
-    'bsfilter': BSFilterDestination,
-    'agent': AgentDestination,
-    'onlinerec': OnlineRecordingDestination
+    'user': FuncKeyDestUser,
+    'group': FuncKeyDestGroup,
+    'queue': FuncKeyDestQueue,
+    'conference': FuncKeyDestConference,
+    'paging': FuncKeyDestPaging,
+    'service': FuncKeyDestService,
+    'custom': FuncKeyDestCustom,
+    'forward': FuncKeyDestForward,
+    'transfer': FuncKeyDestFeatures,
+    'park_position': FuncKeyDestParkPosition,
+    'parking': FuncKeyDestParking,
+    'bsfilter': FuncKeyDestBSFilter,
+    'agent': FuncKeyDestAgent,
+    'onlinerec': FuncKeyDestOnlineRecording
 }
 
 
 def _create_funckey_model(funckey):
     type_ = funckey['destination'].pop('type')
     funckey['destination'] = models_destination[type_](**funckey['destination'])
-    return FuncKey(**funckey)
+    return FuncKeyMapping(**funckey)
 
 
 class FindUpdateFieldsMixin(object):
@@ -63,7 +63,7 @@ class FindUpdateFieldsMixin(object):
     def find_updated_fields_position(self, model, form):
         updated_fields = []
         for position, funckey in form.iteritems():
-            funckey_model = model.get(position, FuncKey())
+            funckey_model = model.get(position, FuncKeyMapping())
             if self.find_updated_fields_funkey(funckey_model, funckey):
                 updated_fields.append(position)
         return updated_fields
