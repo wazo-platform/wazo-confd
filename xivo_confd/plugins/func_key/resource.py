@@ -9,7 +9,7 @@ from xivo_dao.alchemy.func_key_dest_bsfilter import FuncKeyDestBSFilter
 from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
 from xivo_dao.alchemy.func_key_dest_conference import FuncKeyDestConference
 from xivo_dao.alchemy.func_key_dest_features import (
-    FuncKeyDestFeatures,
+    FuncKeyDestTransfer,
     FuncKeyDestOnlineRecording,
     FuncKeyDestParking,
 )
@@ -43,7 +43,7 @@ models_destination = {
     'service': FuncKeyDestService,
     'custom': FuncKeyDestCustom,
     'forward': FuncKeyDestForward,
-    'transfer': FuncKeyDestFeatures,
+    'transfer': FuncKeyDestTransfer,
     'park_position': FuncKeyDestParkPosition,
     'parking': FuncKeyDestParking,
     'bsfilter': FuncKeyDestBSFilter,
