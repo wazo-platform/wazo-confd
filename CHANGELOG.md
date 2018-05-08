@@ -1,6 +1,18 @@
 Changelog
 =========
 
+18.05
+-----
+
+* Added call pickup endpoints:
+
+  * GET `/1.1/callpickups`
+  * POST `/1.1/callpickups`
+  * DELETE `/1.1/callpickups/<call_pickup_id>`
+  * GET `/1.1/callpickups/<call_pickup_id>`
+  * PUT `/1.1/callpickups/<call_pickup_id>`
+
+
 18.04
 -----
 

@@ -449,27 +449,6 @@ class DatabaseQueries(object):
         query = text("UPDATE userfeatures SET cti_profile_id = NULL WHERE cti_profile_id = :cti_profile_id")
         self.connection.execute(query, cti_profile_id=cti_profile_id)
 
-    def insert_call_pickup(self, name):
-        query = text("""
-        INSERT INTO pickup (id, name, description, entity_id)
-        VALUES (
-                     1, :name, '',
-                     (SELECT id FROM entity LIMIT 1)
-               )
-        RETURNING id
-        """)
-
-        call_pickup_id = (self.connection
-                          .execute(query,
-                                   name=name)
-                          .scalar())
-
-        return call_pickup_id
-
-    def delete_call_pickup(self, call_pickup_id):
-        query = text("DELETE FROM pickup WHERE id = :id")
-        self.connection.execute(query, id=call_pickup_id)
-
     def associate_call_pickup_entity(self, call_pickup_id, entity_id):
         query = text("UPDATE pickup SET entity_id = :entity_id WHERE id = :call_pickup_id")
         self.connection.execute(query, entity_id=entity_id, call_pickup_id=call_pickup_id)
