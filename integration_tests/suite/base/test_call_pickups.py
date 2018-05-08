@@ -82,7 +82,7 @@ def check_search(url, call_pickup, hidden, field, term):
     assert_that(response.items, expected_call_pickup)
     assert_that(response.items, hidden_call_pickup)
 
-    response = url.get(field=call_pickup[field])
+    response = url.get(**{field: call_pickup[field]})
 
     expected_call_pickup = has_item(has_entry('id', call_pickup['id']))
     hidden_call_pickup = is_not(has_item(has_entry('id', hidden['id'])))
