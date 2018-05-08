@@ -7,8 +7,8 @@ import unittest
 from mock import Mock
 from hamcrest import assert_that, has_entries
 
+from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping as FuncKey
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
-from xivo_dao.resources.func_key.model import FuncKey
 
 from ..funckey import FuncKeyConverter
 

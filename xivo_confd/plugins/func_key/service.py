@@ -5,7 +5,6 @@
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.func_key_template import dao as template_dao_module
-from xivo_dao.resources.func_key_template.model import UserTemplate
 from xivo_dao.resources.user import dao as user_dao_module
 
 from xivo_confd.plugins.device import builder as device_builder
@@ -124,15 +123,11 @@ class UserFuncKeyTemplateService(object):
         self.device_updater = device_updater
 
     def find_all_by_template_id(self, template_id):
-        users = self.user_dao.find_all_by(func_key_template_id=template_id)
-        return [UserTemplate(user_id=user.id, template_id=user.func_key_template_id) for user in users]
+        return self.user_dao.find_all_by(func_key_template_id=template_id)
 
     def find_all_by_user_id(self, user_id):
         user = self.user_dao.get(user_id=user_id)
-        if user.func_key_template_id:
-            return [UserTemplate(user_id=user.id,
-                                 template_id=user.func_key_template_id)]
-        return []
+        return [user] if user.func_key_template_id else []
 
     def associate(self, user, template):
         if template.private:

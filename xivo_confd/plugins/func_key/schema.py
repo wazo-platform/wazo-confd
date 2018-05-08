@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
@@ -246,11 +246,10 @@ class FuncKeyUnifiedTemplateSchema(BaseSchema):
 
 
 class FuncKeyTemplateUserSchema(BaseSchema):
-    user_id = fields.Integer()
-    template_id = fields.Integer()
+    user_id = fields.Integer(attribute='id')
+    template_id = fields.Integer(attribute='func_key_template_id')
     links = ListLink(Link('func_keys_templates',
-                          field='template_id',
+                          field='func_key_template_id',
                           target='id'),
                      Link('users',
-                          field='user_id',
-                          target='id'))
+                          field='id'))
