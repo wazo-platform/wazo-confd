@@ -43,8 +43,8 @@ class _SoundFilesystemStorage(object):
 
     def _list_directories(self):
         return [name for name in os.listdir(self._base_path)
-                if os.path.isdir(self._build_path(name)) and
-                name not in RESERVED_DIRECTORIES]
+                if os.path.isdir(self._build_path(name))
+                and name not in RESERVED_DIRECTORIES]
 
     def get_directory(self, directory, parameters, with_files=True):
         if directory in RESERVED_DIRECTORIES:
