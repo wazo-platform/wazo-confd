@@ -1,0 +1,55 @@
+paths:
+  /callpickups/{callpickup_id}/interceptors/users:
+    put:
+      operationId: update_call_pickup_interceptor_users
+      summary: Update call pickup and interceptors
+      description: |
+        **Required ACL:** `confd.callpickups.{callpickup_id}.interceptors.users.update`
+
+        **WARNING**
+        This endpoint remove all interceptors which are not defined.
+      tags:
+      - callpickups
+      - users
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Call Filter and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /callpickups/{callpickup_id}/targets/users:
+    put:
+      operationId: update_call_pickup_target_users
+      summary: Update call pickup and targets
+      description: |
+        **Required ACL:** `confd.callpickups.{callpickup_id}.targets.users.update`
+
+        **WARNING**
+        This endpoint remove all targets which are not defined.
+      tags:
+      - callpickups
+      - users
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      - name: body
+        in: body
+        description: Users to associated
+        required: true
+        schema:
+          $ref: '#/definitions/UsersUuid'
+      responses:
+        '204':
+          description: Call Filter and Users associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
