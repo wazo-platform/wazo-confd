@@ -7,6 +7,22 @@ from marshmallow import fields
 from xivo_confd.helpers.mallow import BaseSchema
 
 
+class CallPickupInterceptorGroupSchema(BaseSchema):
+    id = fields.Integer(required=True)
+
+
+class CallPickupInterceptorGroupsSchema(BaseSchema):
+    groups = fields.Nested(CallPickupInterceptorGroupSchema, many=True, required=True)
+
+
+class CallPickupTargetGroupSchema(BaseSchema):
+    id = fields.Integer(required=True)
+
+
+class CallPickupTargetGroupsSchema(BaseSchema):
+    groups = fields.Nested(CallPickupTargetGroupSchema, many=True, required=True)
+
+
 class CallPickupInterceptorUserSchema(BaseSchema):
     uuid = fields.String(required=True)
 

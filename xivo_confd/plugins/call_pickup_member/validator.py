@@ -7,6 +7,28 @@ from xivo_dao.helpers import errors
 from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
+class CallPickupGroupValidator(ValidatorAssociation):
+
+    def validate(self, call_pickup, groups):
+        self.validate_no_duplicate_group(groups)
+
+    def validate_no_duplicate_group(self, groups):
+        if len(groups) != len(set(groups)):
+            raise errors.not_permitted('Cannot associate same group more than once')
+
+
+def build_validator_target_group():
+    return ValidationAssociation(
+        association=[CallPickupGroupValidator()],
+    )
+
+
+def build_validator_interceptor_group():
+    return ValidationAssociation(
+        association=[CallPickupGroupValidator()],
+    )
+
+
 class CallPickupUserValidator(ValidatorAssociation):
 
     def validate(self, call_pickup, users):

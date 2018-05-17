@@ -1,4 +1,32 @@
 paths:
+  /callpickups/{callpickup_id}/interceptors/groups:
+    put:
+      operationId: update_call_pickup_interceptor_groups
+      summary: Update call pickup and interceptors
+      description: |
+        **Required ACL:** `confd.callpickups.{callpickup_id}.interceptors.groups.update`
+
+        **WARNING**
+        This endpoint remove all interceptors which are not defined.
+      tags:
+      - callpickups
+      - groups
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      - name: body
+        in: body
+        description: Groups to associated
+        required: true
+        schema:
+          $ref: '#/definitions/GroupsId'
+      responses:
+        '204':
+          description: Call Filter and Groups associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
   /callpickups/{callpickup_id}/interceptors/users:
     put:
       operationId: update_call_pickup_interceptor_users
@@ -26,6 +54,35 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+
+  /callpickups/{callpickup_id}/targets/groups:
+    put:
+      operationId: update_call_pickup_target_groups
+      summary: Update call pickup and targets
+      description: |
+        **Required ACL:** `confd.callpickups.{callpickup_id}.targets.groups.update`
+
+        **WARNING**
+        This endpoint remove all targets which are not defined.
+      tags:
+      - callpickups
+      - groups
+      parameters:
+      - $ref: '#/parameters/callpickupid'
+      - name: body
+        in: body
+        description: Groups to associated
+        required: true
+        schema:
+          $ref: '#/definitions/GroupsId'
+      responses:
+        '204':
+          description: Call Filter and Groups associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
   /callpickups/{callpickup_id}/targets/users:
     put:
       operationId: update_call_pickup_target_users
