@@ -110,6 +110,12 @@ def test_get(call_pickup):
         name=call_pickup['name'],
         description=none(),
         enabled=True,
+        interceptors=has_entries(
+            users=empty()
+        ),
+        targets=has_entries(
+            users=empty()
+        ),
     ))
 
 

@@ -4,7 +4,7 @@
 
 from hamcrest import (
     assert_that,
-    contains,
+    contains_inanyorder,
     empty,
     has_entries,
 )
@@ -60,12 +60,43 @@ def test_associate_multiple(call_pickup, user1, user2, user3):
     response = confd.callpickups(call_pickup['id']).interceptors.users.put(users=[user1, user2, user3])
     response.assert_updated()
 
+    response = confd.callpickups(call_pickup['id']).get()
+    assert_that(response.item, has_entries(
+        interceptors=has_entries(users=contains_inanyorder(
+            has_entries(uuid=user1['uuid']),
+            has_entries(uuid=user2['uuid']),
+            has_entries(uuid=user3['uuid'])
+        ))
+    ))
+
 
 @fixtures.call_pickup()
 @fixtures.user()
 def test_associate_same_user(call_pickup, user):
     response = confd.callpickups(call_pickup['id']).interceptors.users.put(users=[user, user])
     response.assert_status(400)
+
+
+@fixtures.call_pickup()
+@fixtures.user()
+@fixtures.user()
+def test_get_users_associated_to_call_pickup(call_pickup, user1, user2):
+    with a.call_pickup_interceptor_user(call_pickup, user1, user2):
+        response = confd.callpickups(call_pickup['id']).get()
+        assert_that(response.item, has_entries(
+            interceptors=has_entries(users=contains_inanyorder(
+                has_entries(
+                    uuid=user1['uuid'],
+                    firstname=user1['firstname'],
+                    lastname=user1['lastname'],
+                ),
+                has_entries(
+                    uuid=user2['uuid'],
+                    firstname=user2['firstname'],
+                    lastname=user2['lastname'],
+                ),
+            ))
+        ))
 
 
 @fixtures.call_pickup()
@@ -88,6 +119,21 @@ def test_delete_call_pickup_when_call_pickup_and_user_associated(call_pickup, us
 
         # When the relation will be added,
         # we should check if users have the key.callpickups to empty
+
+
+@fixtures.call_pickup()
+@fixtures.call_pickup()
+@fixtures.user()
+def test_delete_user_when_call_pickup_and_user_associated(call_pickup1, call_pickup2, user):
+    with a.call_pickup_interceptor_user(call_pickup1, user, check=False), \
+            a.call_pickup_interceptor_user(call_pickup2, user, check=False):
+        confd.users(user['uuid']).delete().assert_deleted()
+
+        response = confd.callpickups(call_pickup1['id']).get()
+        yield assert_that, response.item['interceptors']['users'], empty()
+
+        response = confd.callpickups(call_pickup2['id']).get()
+        yield assert_that, response.item['interceptors']['users'], empty()
 
 
 @fixtures.call_pickup()
