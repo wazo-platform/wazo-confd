@@ -18,7 +18,7 @@ paths:
         description: Groups to associated
         required: true
         schema:
-          $ref: '#/definitions/GroupsId'
+          $ref: '#/definitions/GroupsID'
       responses:
         '204':
           description: Call Filter and Groups associated
@@ -74,7 +74,7 @@ paths:
         description: Groups to associated
         required: true
         schema:
-          $ref: '#/definitions/GroupsId'
+          $ref: '#/definitions/GroupsID'
       responses:
         '204':
           description: Call Filter and Groups associated
