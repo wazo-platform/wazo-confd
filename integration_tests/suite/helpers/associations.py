@@ -324,3 +324,12 @@ def call_pickup_interceptor_user(call_pickup, *users, **kwargs):
     h.call_pickup_interceptor_user.associate(call_pickup['id'], user_uuids, check=check)
     yield
     h.call_pickup_interceptor_user.dissociate(call_pickup['id'], check=check)
+
+
+@contextmanager
+def call_pickup_target_user(call_pickup, *users, **kwargs):
+    user_uuids = [user['uuid'] for user in users]
+    check = kwargs.get('check', True)
+    h.call_pickup_target_user.associate(call_pickup['id'], user_uuids, check=check)
+    yield
+    h.call_pickup_target_user.dissociate(call_pickup['id'], check=check)
