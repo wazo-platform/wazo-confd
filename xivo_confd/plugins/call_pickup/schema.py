@@ -15,6 +15,18 @@ class CallPickupSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('callpickups'))
 
+    group_interceptors = fields.Nested(
+        'GroupSchema',
+        only=['id', 'name'],
+        many=True,
+        dump_only=True
+    )
+    group_targets = fields.Nested(
+        'GroupSchema',
+        only=['id', 'name'],
+        many=True,
+        dump_only=True
+    )
     user_interceptors = fields.Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname'],
@@ -30,12 +42,20 @@ class CallPickupSchema(BaseSchema):
 
     @post_dump
     def wrap_users(self, data):
+        interceptor_groups = data.pop('group_interceptors', [])
         interceptor_users = data.pop('user_interceptors', [])
+        target_groups = data.pop('group_targets', [])
         target_users = data.pop('user_targets', [])
 
-        if not self.only or 'user_interceptors' in self.only:
-            data['interceptors'] = {'users': interceptor_users}
-        if not self.only or 'user_target' in self.only:
-            data['targets'] = {'users': target_users}
+        if not self.only or 'interceptors' in self.only:
+            data['interceptors'] = {
+                'groups': interceptor_groups,
+                'users': interceptor_users,
+            }
+        if not self.only or 'targets' in self.only:
+            data['targets'] = {
+                'groups': target_groups,
+                'users': target_users,
+            }
 
         return data

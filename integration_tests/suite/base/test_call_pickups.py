@@ -111,10 +111,12 @@ def test_get(call_pickup):
         description=none(),
         enabled=True,
         interceptors=has_entries(
-            users=empty()
+            groups=empty(),
+            users=empty(),
         ),
         targets=has_entries(
-            users=empty()
+            groups=empty(),
+            users=empty(),
         ),
     ))
 
