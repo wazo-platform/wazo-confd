@@ -1,6 +1,17 @@
 Changelog
 =========
 
+18.06
+-----
+
+* A new API for associating users and groups with a call pickup has been added:
+
+  * PUT `/1.1/callpickups/<call_pickup_id>/interceptors/groups`
+  * PUT `/1.1/callpickups/<call_pickup_id>/interceptors/users`
+  * PUT `/1.1/callpickups/<call_pickup_id>/targets/groups`
+  * PUT `/1.1/callpickups/<call_pickup_id>/targets/users`
+
+
 18.05
 -----
 
