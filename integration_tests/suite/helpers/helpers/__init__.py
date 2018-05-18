@@ -97,6 +97,10 @@ from . import call_log
 from . import call_permission
 from . import call_pickup
 from . import call_pickup_entity
+from . import call_pickup_interceptor_group
+from . import call_pickup_interceptor_user
+from . import call_pickup_target_group
+from . import call_pickup_target_user
 from . import conference
 from . import conference_extension
 from . import context_entity
@@ -182,6 +186,10 @@ __all__ = [
     'call_permission',
     'call_pickup',
     'call_pickup_entity',
+    'call_pickup_interceptor_group',
+    'call_pickup_interceptor_user',
+    'call_pickup_target_group',
+    'call_pickup_target_user',
     'conference',
     'conference_extension',
     'context_entity',

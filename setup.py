@@ -31,6 +31,7 @@ setup(
             'call_filter_user = xivo_confd.plugins.call_filter_user.plugin:Plugin',
             'call_permission = xivo_confd.plugins.call_permission.plugin:Plugin',
             'call_pickup = xivo_confd.plugins.call_pickup.plugin:Plugin',
+            'call_pickup_member = xivo_confd.plugins.call_pickup_member.plugin:Plugin',
             'confbridge = xivo_confd.plugins.confbridge.plugin:Plugin',
             'conference = xivo_confd.plugins.conference.plugin:Plugin',
             'conference_extension = xivo_confd.plugins.conference_extension.plugin:Plugin',

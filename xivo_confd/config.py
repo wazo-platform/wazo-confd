@@ -86,6 +86,7 @@ DEFAULT_CONFIG = {
         'call_filter_user': True,
         'call_permission': True,
         'call_pickup': True,
+        'call_pickup_member': True,
         'confbridge': True,
         'conference': True,
         'conference_extension': True,

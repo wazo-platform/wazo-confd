@@ -526,3 +526,13 @@ definitions:
     properties:
       uuid:
         type: string
+  GroupID:
+    properties:
+      id:
+        type: integer
+  GroupsID:
+    properties:
+      groups:
+        items:
+          $ref: '#/definitions/GroupID'
+        type: array

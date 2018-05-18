@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -85,8 +85,8 @@ class WizardSchema(BaseSchema):
 
     @validates('entity_name')
     def validate_entity_name(self, entity_name):
-        sub_name = ''.join(c for c in entity_name if (c in string.ascii_letters or
-                                                      c in string.digits))
+        sub_name = ''.join(c for c in entity_name if (c in string.ascii_letters
+                                                      or c in string.digits))
         if len(sub_name) < 3:
             raise ValidationError('Shorter than alphanumeric minimum length 3.')
 

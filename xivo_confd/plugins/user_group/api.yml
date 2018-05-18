@@ -25,16 +25,3 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-
-
-definitions:
-  GroupID:
-    properties:
-      id:
-        type: integer
-  GroupsID:
-    properties:
-      groups:
-        items:
-          $ref: '#/definitions/GroupID'
-        type: array
