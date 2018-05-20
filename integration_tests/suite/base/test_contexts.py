@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
+
+from xivo_test_helpers.hamcrest.uuid_ import uuid_
 
 from ..helpers import errors as e
 from ..helpers import fixtures
@@ -175,14 +177,15 @@ def test_get(context):
                                            conference_room_ranges=context['conference_room_ranges'],
                                            incall_ranges=context['incall_ranges'],
                                            description=context['description'],
-                                           enabled=context['enabled']))
+                                           enabled=context['enabled'],
+                                           tenant_uuid=uuid_()))
 
 
 def test_create_minimal_parameters():
     response = confd.contexts.post(name='MyContext')
     response.assert_created('contexts')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=uuid_()))
 
     confd.contexts(response.item['id']).delete().assert_deleted()
 
@@ -202,7 +205,7 @@ def test_create_all_parameters():
     response = confd.contexts.post(**parameters)
     response.assert_created('contexts')
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=uuid_(), **parameters))
 
     confd.contexts(response.item['id']).delete().assert_deleted()
 
