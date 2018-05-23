@@ -24,6 +24,7 @@ paths:
       tags:
       - contexts
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Context to create
