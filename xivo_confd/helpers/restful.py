@@ -29,7 +29,13 @@ class ListResource(ConfdResource):
 
     def get(self):
         params = self.search_params()
-        total, items = self.service.search(params)
+        tenant_uuids = self._build_tenant_list(params)
+
+        kwargs = {}
+        if tenant_uuids is not None:
+            kwargs['tenant_uuids'] = tenant_uuids
+
+        total, items = self.service.search(params, **kwargs)
         return {'total': total,
                 'items': self.schema().dump(items, many=True).data}
 
@@ -38,12 +44,18 @@ class ListResource(ConfdResource):
         params = {}
 
         for key, value in args:
-            if key in ("limit", "skip", "offset"):
+            if key in ('limit', 'skip', 'offset'):
                 params[key] = self.convert_numeric(key, value)
+            elif key in ('recurse'):
+                params[key] = self.convert_boolean(key, value)
             else:
                 params[key] = value
 
         return params
+
+    def convert_boolean(self, key, value):
+        true_values = ('true', 'True')
+        return value in true_values
 
     def convert_numeric(self, key, value):
         if not value.isdigit():
@@ -53,7 +65,7 @@ class ListResource(ConfdResource):
     def post(self):
         form = self.schema().load(request.get_json()).data
 
-        if hasattr(self.model, '__mapper__') and hasattr(self.model.__mapper__.c, 'tenant_uuid'):
+        if self._has_a_tenant_uuid():
             tenant = Tenant.autodetect()
             tenant_dao.get_or_create_tenant(tenant.uuid)
             form['tenant_uuid'] = tenant.uuid
@@ -64,6 +76,23 @@ class ListResource(ConfdResource):
 
     def build_headers(self, model):
         raise NotImplementedError()
+
+    def _has_a_tenant_uuid(self):
+        return (
+            hasattr(self, 'model')
+            and hasattr(self.model, '__mapper__')
+            and hasattr(self.model.__mapper__.c, 'tenant_uuid')
+        )
+
+    def _build_tenant_list(self, params):
+        if not self._has_a_tenant_uuid():
+            return
+
+        recurse = params.get('recurse', False)
+        if recurse:
+            return [t.uuid for t in Tenant.autodetect(many=True)]
+        else:
+            return [Tenant.autodetect().uuid]
 
 
 class ItemResource(ConfdResource):
