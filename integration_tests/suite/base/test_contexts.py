@@ -182,10 +182,11 @@ def test_get(context):
 
 
 def test_create_minimal_parameters():
+    tenant_uuid = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
     response = confd.contexts.post(name='MyContext')
     response.assert_created('contexts')
 
-    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=uuid_()))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=tenant_uuid))
 
     confd.contexts(response.item['id']).delete().assert_deleted()
 
@@ -193,6 +194,15 @@ def test_create_minimal_parameters():
 def test_create_out_of_tree_tenant():
     response = confd.contexts.post(name='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000')
     response.assert_status(401)
+
+
+def test_create_in_authorized_tenant():
+    tenant_uuid = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
+
+    response = confd.contexts.post(name='ZContext', wazo_tenant=tenant_uuid)
+    response.assert_created('context')
+
+    assert_that(response.item, has_entries(tenant_uuid=tenant_uuid))
 
 
 def test_create_all_parameters():

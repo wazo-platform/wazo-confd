@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class ConfdClient(object):
 
     DEFAULT_HEADERS = {'Accept': 'application/json',
-                       'X-Auth-Token': 'valid-token',  # hardcoded in xivo-auth-mock
+                       'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in xivo-auth-mock
                        'Content-Type': 'application/json'}
 
     @classmethod
