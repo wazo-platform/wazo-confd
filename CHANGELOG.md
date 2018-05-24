@@ -12,6 +12,14 @@ Changelog
   * PUT `/1.1/callpickups/<call_pickup_id>/targets/users`
 
 
+* The `/contexts` routes are now multi-tenant. This means that created tenant will be in the same
+  tenant as the creator or in the tenant specified by the Wazo-Tenant HTTP header. Listing contexts
+  will also only list contexts in the user's tenant unless a sub-tenant is specified using the
+  Wazo-Tenant header. The `recurse=true` query string can be used to list from multiple tenants.
+  GET, DELETE and PUT on a context that is not in a tenant accessible to the user will result in a
+  404.
+
+
 18.05
 -----
 
