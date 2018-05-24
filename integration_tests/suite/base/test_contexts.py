@@ -190,6 +190,11 @@ def test_create_minimal_parameters():
     confd.contexts(response.item['id']).delete().assert_deleted()
 
 
+def test_create_out_of_tree_tenant():
+    response = confd.contexts.post(name='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000')
+    response.assert_status(401)
+
+
 def test_create_all_parameters():
     parameters = {'name': 'MyContext',
                   'label': 'Context Power',
