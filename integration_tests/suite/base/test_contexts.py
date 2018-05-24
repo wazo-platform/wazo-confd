@@ -13,9 +13,13 @@ from hamcrest import (assert_that,
                       has_entries,
                       has_entry,
                       has_item,
+                      has_items,
                       is_not,
                       not_)
 from . import confd
+
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_get_errors():
@@ -151,6 +155,22 @@ def check_search(url, context, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(sub, main):
+    response = confd.contexts.get(wazo_tenant=MAIN_TENANT)
+    expected = has_item(main)
+    assert_that(response.items, expected)
+
+    response = confd.contexts.get(wazo_tenant=SUB_TENANT)
+    expected = has_item(sub)
+    assert_that(response.items, expected)
+
+    response = confd.contexts.get(wazo_tenant=SUB_TENANT, recurse=True)
+    expected = has_items(main, sub)
+    assert_that(response.items, expected)
+
+
 @fixtures.context(name='sort1', description='sort1')
 @fixtures.context(name='sort2', description='sort2')
 def test_sorting_offset_limit(context1, context2):
@@ -182,11 +202,10 @@ def test_get(context):
 
 
 def test_create_minimal_parameters():
-    tenant_uuid = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
     response = confd.contexts.post(name='MyContext')
     response.assert_created('contexts')
 
-    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=tenant_uuid))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
     confd.contexts(response.item['id']).delete().assert_deleted()
 
@@ -197,12 +216,10 @@ def test_create_out_of_tree_tenant():
 
 
 def test_create_in_authorized_tenant():
-    tenant_uuid = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
-
-    response = confd.contexts.post(name='ZContext', wazo_tenant=tenant_uuid)
+    response = confd.contexts.post(name='ZContext', wazo_tenant=SUB_TENANT)
     response.assert_created('context')
 
-    assert_that(response.item, has_entries(tenant_uuid=tenant_uuid))
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 def test_create_all_parameters():
