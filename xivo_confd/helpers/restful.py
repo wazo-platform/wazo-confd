@@ -46,7 +46,7 @@ class ListResource(ConfdResource):
         for key, value in args:
             if key in ('limit', 'skip', 'offset'):
                 params[key] = self.convert_numeric(key, value)
-            elif key in ('recurse'):
+            elif key == 'recurse':
                 params[key] = self.convert_boolean(key, value)
             else:
                 params[key] = value
