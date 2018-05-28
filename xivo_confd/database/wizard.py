@@ -101,20 +101,22 @@ def set_netiface(interface, address, netmask, gateway):
                          description='Wizard Configuration'))
 
 
-def set_context_switchboard(entity):
+def set_context_switchboard(entity, tenant_uuid):
     Session.add(Context(name='__switchboard_directory',
                         displayname='Switchboard',
                         entity=entity,
                         contexttype='others',
-                        description=''))
+                        description='',
+                        tenant_uuid=str(tenant_uuid)))
 
 
-def set_context_internal(context, entity):
+def set_context_internal(context, entity, tenant_uuid):
     Session.add(Context(name='default',
                         displayname=context['display_name'],
                         entity=entity,
                         contexttype='internal',
-                        description=''))
+                        description='',
+                        tenant_uuid=str(tenant_uuid)))
 
     Session.add(ContextNumbers(context='default',
                                type='user',
@@ -122,12 +124,13 @@ def set_context_internal(context, entity):
                                numberend=context['number_end']))
 
 
-def set_context_incall(context, entity):
+def set_context_incall(context, entity, tenant_uuid):
     Session.add(Context(name='from-extern',
                         displayname=context['display_name'],
                         entity=entity,
                         contexttype='incall',
-                        description=''))
+                        description='',
+                        tenant_uuid=str(tenant_uuid)))
 
     if context.get('number_start') and context.get('number_end'):
         Session.add(ContextNumbers(context='from-extern',
@@ -137,12 +140,13 @@ def set_context_incall(context, entity):
                                    didlength=context['did_length']))
 
 
-def set_context_outcall(context, entity):
+def set_context_outcall(context, entity, tenant_uuid):
     Session.add(Context(name='to-extern',
                         displayname=context['display_name'],
                         entity=entity,
                         contexttype='outcall',
-                        description=''))
+                        description='',
+                        tenant_uuid=str(tenant_uuid)))
 
 
 def set_phonebook(entity, phonebook_body):
@@ -219,8 +223,8 @@ def create(wizard, autoprov_username, tenant_uuid):
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
-    set_context_switchboard(entity)
-    set_context_incall(wizard['context_incall'], entity)
-    set_context_internal(wizard['context_internal'], entity)
-    set_context_outcall(wizard['context_outcall'], entity)
+    set_context_switchboard(entity, tenant_uuid)
+    set_context_incall(wizard['context_incall'], entity, tenant_uuid)
+    set_context_internal(wizard['context_internal'], entity, tenant_uuid)
+    set_context_outcall(wizard['context_outcall'], entity, tenant_uuid)
     include_outcall_context_in_internal_context()
