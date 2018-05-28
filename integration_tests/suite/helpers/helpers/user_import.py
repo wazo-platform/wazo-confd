@@ -21,7 +21,7 @@ else:
 
 def csv_client():
     new_client.headers = {"Content-Type": "text/csv; charset=utf-8",
-                          "X-Auth-Token": "valid-token"}
+                          "X-Auth-Token": "valid-token-multitenant"}
     new_client.encoder = generate_csv
     return new_client
 
