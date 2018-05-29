@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class ConfdClient(object):
 
     DEFAULT_HEADERS = {'Accept': 'application/json',
-                       'X-Auth-Token': 'valid-token',  # hardcoded in xivo-auth-mock
+                       'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in xivo-auth-mock
                        'Content-Type': 'application/json'}
 
     @classmethod
@@ -53,12 +53,12 @@ class ConfdClient(object):
         self.session.auth = requests.auth.HTTPDigestAuth(username, password)
         self.session.headers.update(headers or self.DEFAULT_HEADERS)
 
-    def request(self, method, url, parameters=None, data=None):
+    def request(self, method, url, parameters=None, data=None, headers=None):
         full_url = self._build_url(url)
         data = self.encode(data)
         self.log_request(method, full_url, parameters, data)
 
-        response = self.session.request(method, full_url, params=parameters, data=data)
+        response = self.session.request(method, full_url, params=parameters, data=data, headers=headers)
         logger.debug('Response - %s %s', response.status_code, response.text)
 
         return Response(response)
@@ -74,8 +74,11 @@ class ConfdClient(object):
     def get(self, url, **parameters):
         return self.request('GET', url, parameters=parameters)
 
-    def post(self, url, body):
-        return self.request('POST', url, data=body)
+    def post(self, url, body, headers=None):
+        kwargs = {'data': body}
+        if headers:
+            kwargs['headers'] = headers
+        return self.request('POST', url, **kwargs)
 
     def put(self, url, body, parameters=None):
         return self.request('PUT', url, data=body, parameters=parameters)
@@ -116,10 +119,11 @@ class RestUrlClient(UrlFragment):
         params = self._merge_params(params, self.body)
         return self.client.get(url, **params)
 
-    def post(self, body=None, **params):
+    def post(self, body=None, wazo_tenant=None, **params):
         url = str(self)
         params = self._merge_params(params, body, self.body)
-        return self.client.post(url, params)
+        headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
+        return self.client.post(url, params, headers=headers)
 
     def put(self, body=None, query_string=None, **params):
         url = str(self)

@@ -30,6 +30,7 @@ class ContextSchema(BaseSchema):
     conference_room_ranges = fields.Nested(RangeSchema, many=True)
     incall_ranges = fields.Nested(IncallRangeSchema, many=True)
     description = fields.String(allow_none=True)
+    tenant_uuid = fields.String(dump_only=True)
     enabled = StrictBoolean()
     links = ListLink(Link('contexts'))
 

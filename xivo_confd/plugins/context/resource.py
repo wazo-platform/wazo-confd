@@ -32,6 +32,7 @@ class ContextList(ListResource):
 class ContextItem(ItemResource):
 
     schema = ContextSchemaPUT
+    has_tenant_uuid = True
 
     @required_acl('confd.contexts.{id}.read')
     def get(self, id):

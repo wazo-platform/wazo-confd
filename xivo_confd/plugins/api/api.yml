@@ -91,6 +91,13 @@ parameters:
     type: integer
     in: path
     description: Queue’s ID
+  recurse:
+    name: recurse
+    in: query
+    type: boolean
+    description: Should the query include sub-tenants
+    default: false
+    required: false
   search:
     required: false
     name: search

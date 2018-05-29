@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
+
+from xivo_test_helpers.hamcrest.uuid_ import uuid_
 
 from ..helpers import errors as e
 from ..helpers import fixtures
@@ -11,9 +13,13 @@ from hamcrest import (assert_that,
                       has_entries,
                       has_entry,
                       has_item,
+                      has_items,
                       is_not,
                       not_)
 from . import confd
+
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_get_errors():
@@ -149,6 +155,22 @@ def check_search(url, context, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(sub, main):
+    response = confd.contexts.get(wazo_tenant=MAIN_TENANT)
+    expected = has_item(main)
+    assert_that(response.items, expected)
+
+    response = confd.contexts.get(wazo_tenant=SUB_TENANT)
+    expected = has_item(sub)
+    assert_that(response.items, expected)
+
+    response = confd.contexts.get(wazo_tenant=SUB_TENANT, recurse=True)
+    expected = has_items(main, sub)
+    assert_that(response.items, expected)
+
+
 @fixtures.context(name='sort1', description='sort1')
 @fixtures.context(name='sort2', description='sort2')
 def test_sorting_offset_limit(context1, context2):
@@ -175,16 +197,29 @@ def test_get(context):
                                            conference_room_ranges=context['conference_room_ranges'],
                                            incall_ranges=context['incall_ranges'],
                                            description=context['description'],
-                                           enabled=context['enabled']))
+                                           enabled=context['enabled'],
+                                           tenant_uuid=uuid_()))
 
 
 def test_create_minimal_parameters():
     response = confd.contexts.post(name='MyContext')
     response.assert_created('contexts')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
     confd.contexts(response.item['id']).delete().assert_deleted()
+
+
+def test_create_out_of_tree_tenant():
+    response = confd.contexts.post(name='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000')
+    response.assert_status(401)
+
+
+def test_create_in_authorized_tenant():
+    response = confd.contexts.post(name='ZContext', wazo_tenant=SUB_TENANT)
+    response.assert_created('context')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 def test_create_all_parameters():
@@ -202,7 +237,7 @@ def test_create_all_parameters():
     response = confd.contexts.post(**parameters)
     response.assert_created('contexts')
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=uuid_(), **parameters))
 
     confd.contexts(response.item['id']).delete().assert_deleted()
 

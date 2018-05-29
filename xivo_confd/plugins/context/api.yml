@@ -7,6 +7,8 @@ paths:
       tags:
       - contexts
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - contexts
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Context to create
