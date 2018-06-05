@@ -71,12 +71,6 @@ def user_call_permission(user, call_permission, check=True):
 
 
 @contextmanager
-def user_entity(user, entity, check=True):
-    h.user_entity.associate(user['id'], entity['id'], check)
-    yield
-
-
-@contextmanager
 def user_agent(user, agent, check=True):
     h.user_agent.associate(user['id'], agent['id'], check)
     yield

@@ -14,7 +14,7 @@ flask==0.12.1
 kombu==3.0.35
 marshmallow==2.10.3
 netifaces==0.10.4
-psycopg2==2.6.2  # from xivo-dao
+psycopg2-binary
 python-consul==0.7.0
 pyyaml==3.12
 requests==2.12.4
