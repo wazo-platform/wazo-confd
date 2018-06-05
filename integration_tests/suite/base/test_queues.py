@@ -4,6 +4,7 @@
 
 from hamcrest import (
     assert_that,
+    contains_inanyorder,
     empty,
     has_entries,
     has_entry,
@@ -19,6 +20,50 @@ from ..helpers import (
     scenarios as s,
 )
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+
+ALL_OPTIONS = [
+    ['announce', 'MyAnnounce'],
+    ['timeout', '42'],
+    ['monitor-type', 'mixmonitor'],
+    ['monitor-format', 'MyFormat'],
+    ['queue-youarenext', 'YouAreNext'],
+    ['queue-thereare', 'ThereAre'],
+    ['queue-callswaiting', 'callswaiting'],
+    ['queue-holdtime', 'HoldTime'],
+    ['queue-minutes', 'Minutes'],
+    ['queue-seconds', 'Seconds'],
+    ['queue-thankyou', 'ThankYou'],
+    ['queue-reporthold', 'ReportHold'],
+    ['periodic-announce', 'Announce'],
+    ['announce-frequency', '43'],
+    ['periodic-announce-frequency', '44'],
+    ['announce-round-seconds', '45'],
+    ['announce-holdtime', 'ABCD'],
+    ['retry', '46'],
+    ['wrapuptime', '47'],
+    ['maxlen', '48'],
+    ['servicelevel', '50'],
+    ['strategy', 'Random'],
+    ['joinempty', 'Join,Empty'],
+    ['leavewhenempty', 'Leave,When,Empty'],
+    ['ringinuse', 'yes'],
+    ['reportholdtime', 'yes'],
+    ['memberdelay', '51'],
+    ['weight', '52'],
+    ['timeoutrestart', 'yes'],
+    ['timeoutpriority', 'otherapp'],
+    ['autofill', 'no'],
+    ['autopause', 'yes'],
+    ['setinterfacevar', 'yes'],
+    ['setqueueentryvar', 'yes'],
+    ['setqueuevar', 'yes'],
+    ['membermacro', 'MemberMacro'],
+    ['min-announce-frequency', '53'],
+    ['random-periodic-announce', 'yes'],
+    ['announce-position', 'no'],
+    ['announce-position-limit', '54'],
+    ['defaultrule', 'DefaultRule'],
+]
 
 
 def test_get_errors():
@@ -268,10 +313,10 @@ def test_create_all_parameters():
         'announce_hold_time_on_entry': True,
         'ignore_forward': True,
         'wait_time_threshold': True,
-        # 'wait_time_destination': True,
+        'wait_time_destination': {'type': 'none'},
         'wait_ratio_threshold': True,
-        # 'wait_ratio_destination': True,
-        # 'options': [],
+        'wait_ratio_destination': {'type': 'none'},
+        'options': ALL_OPTIONS,
         'caller_id_mode': 'prepend',
         'caller_id_name': 'QUEUE-',
         'timeout': 42,
@@ -283,7 +328,9 @@ def test_create_all_parameters():
     response = confd.queues.post(**parameters)
     response.assert_created('queues')
 
+    options = parameters.pop('options')
     assert_that(response.item, has_entries(parameters))
+    assert_that(response.item['options'], contains_inanyorder(*options))
 
     confd.queues(response.item['id']).delete().assert_deleted()
 
@@ -346,7 +393,7 @@ def test_edit_all_parameters(queue):
         'wait_time_destination': {'type': 'none'},
         'wait_ratio_threshold': True,
         'wait_ratio_destination': {'type': 'none'},
-        # 'options': [],
+        'options': ALL_OPTIONS,
         'caller_id_mode': 'prepend',
         'caller_id_name': 'QUEUE-',
         'timeout': 42,
@@ -359,7 +406,9 @@ def test_edit_all_parameters(queue):
     response.assert_updated()
 
     response = confd.queues(queue['id']).get()
+    options = parameters.pop('options')
     assert_that(response.item, has_entries(parameters))
+    assert_that(response.item['options'], contains_inanyorder(*options))
 
 
 @fixtures.queue()
