@@ -99,40 +99,6 @@ class DatabaseQueries(object):
 
         return queue_id
 
-    def insert_queue_only(self, name, displayname='', number='', context=None):
-        queuefeatures_query = text("""
-        INSERT INTO queuefeatures (name, displayname, number, context)
-        VALUES (:name, :displayname, :number, :context)
-        RETURNING id
-        """)
-
-        queuefeatures_id = (self.connection
-                            .execute(queuefeatures_query,
-                                     name=name,
-                                     displayname=name,
-                                     number=number,
-                                     context=context)
-                            .scalar())
-
-        queue_query = text("""
-        INSERT INTO queue (name, category)
-        VALUES (:name, 'queue')
-        RETURNING name
-        """)
-        self.connection.execute(queue_query, name=name).scalar()
-
-        return queuefeatures_id
-
-    def delete_queue(self, queue_id):
-        query = text("DELETE FROM queue WHERE name = (SELECT name FROM queuefeatures WHERE id = :queue_id)")
-        self.connection.execute(query, queue_id=queue_id)
-        query = text("DELETE FROM queuefeatures WHERE id = :queue_id")
-        self.connection.execute(query, queue_id=queue_id)
-
-    def get_queues(self):
-        query = text("SELECT * FROM queuefeatures")
-        return self.connection.execute(query)
-
     def associate_queue_extension(self, queue_id, extension_id):
         query = text("UPDATE extensions SET type = 'queue', typeval = :queue_id WHERE id = :extension_id")
         self.connection.execute(query, queue_id=queue_id, extension_id=extension_id)

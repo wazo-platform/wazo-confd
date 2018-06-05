@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import random
 import string
 
-from . import db
+from . import confd
 
 
 def generate_queue(**parameters):
@@ -14,21 +14,19 @@ def generate_queue(**parameters):
 
 
 def add_queue(**parameters):
-    with db.queries() as queries:
-        id_ = queries.insert_queue_only(**parameters)
-    parameters['id'] = id_
-    return parameters
+    response = confd.queues.post(parameters)
+    return response.item
 
 
 def delete_queue(queue_id, check=False):
-    with db.queries() as queries:
-        queries.delete_queue(queue_id)
+    response = confd.queues(queue_id).delete()
+    if check:
+        response.assert_ok()
 
 
 def generate_name():
-    with db.queries() as queries:
-        response = queries.get_queues()
-    names = set(d['name'] for d in response)
+    response = confd.queues.get()
+    names = set(d['name'] for d in response.items)
     return _random_name(names)
 
 
