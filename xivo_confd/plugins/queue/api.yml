@@ -104,39 +104,50 @@ definitions:
         data_quality:
           type: boolean
           default: false
+          description: "Asterisk definition: data-quality (modem) call (minimum delay)"
         dtmf_hangup_callee_enabled:
           type: boolean
           default: false
+          description: Enable DTMF hangup by callee
         dtmf_hangup_caller_enabled:
           type: boolean
           default: false
+          description: Enable DTMF hangup by caller
         dtmf_transfer_callee_enabled:
           type: boolean
           default: false
+          description: Enable DTMF transfers by callee
         dtmf_transfer_caller_enabled:
           type: boolean
           default: false
+          description: Enable DTMF transfers by caller
         dtmf_record_callee_enabled:
           type: boolean
           default: false
+          description: Enable DTMF records by callee
         dtmf_record_caller_enabled:
           type: boolean
           default: false
+          description: Enable DTMF records by caller
         retry_on_timeout:
           type: boolean
           default: true
+          description: Retry when time has elapsed
         ring_on_hold:
           type: boolean
           default: false
+          description: Ring instead of On-Hold Music
         timeout:
           type: integer
           description: Number of seconds the queue will ring before falling back
         announce_hold_time_on_entry:
           type: boolean
           default: false
+          description: Announce hold time on entry
         ignore_forward:
           type: boolean
           default: false
+          description: Ignore call forward requests from members
         preprocess_subroutine:
           type: string
         music_on_hold:
@@ -144,12 +155,16 @@ definitions:
           description: Name of the MOH category to use for music on hold
         wait_time_threshold:
           type: integer
+          description: Wait time threshold before fallback on 'wait_time_destination'. Set to 'null' to disable it.
         wait_time_destination:
           $ref: '#/definitions/DestinationType'
+          description: Go to that destination when 'wait_time_threshold' is reached
         wait_ratio_threshold:
           type: integer
+          description: Wait ratio (waiting calls per logged-in agent) threshold before fallback on 'wait_ratio_destination'. Set to 'null' to disable it.
         wait_ratio_destination:
           $ref: '#/definitions/DestinationType'
+          description: Go to that destination when 'wait_ratio_threshold' is reached
         caller_id_mode:
           type: string
           enum:
