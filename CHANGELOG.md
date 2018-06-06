@@ -1,6 +1,14 @@
 Changelog
 =========
 
+18.07
+-----
+
+* The entity of a user cannot be changed anymore. The following resource has been removed:
+
+  * PUT `/1.1/users/<user_id>/entities/<entity_id>`
+
+
 18.06
 -----
 

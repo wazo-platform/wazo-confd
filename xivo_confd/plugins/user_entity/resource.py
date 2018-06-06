@@ -29,16 +29,6 @@ class UserEntityResource(ConfdResource):
         self.entity_dao = entity_dao
 
 
-class UserEntityItem(UserEntityResource):
-
-    @required_acl('confd.users.{user_id}.entities.{entity_id}.update')
-    def put(self, user_id, entity_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
-        entity = self.entity_dao.get(entity_id)
-        self.service.associate(user, entity)
-        return '', 204
-
-
 class UserEntityList(UserEntityResource):
 
     schema = UserEntitySchema
