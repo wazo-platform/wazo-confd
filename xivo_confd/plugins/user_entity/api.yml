@@ -23,3 +23,6 @@ definitions:
       user_id:
         type: integer
         description: User's ID
+      entity_id:
+        type: integer
+        description: Entity's ID
