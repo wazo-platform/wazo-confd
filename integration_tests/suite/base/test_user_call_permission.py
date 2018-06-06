@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      contains,
-                      empty,
-                      has_entries,
-                      not_)
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    has_entries,
+    not_,
+)
 
-from ..helpers import scenarios as s
-from ..helpers import helpers as h
-from ..helpers import fixtures
-from ..helpers import associations as a
 from . import confd
+from ..helpers import (
+    associations as a,
+    fixtures,
+    helpers as h,
+    scenarios as s,
+)
 
 
 FAKE_ID = 999999999
@@ -84,18 +88,19 @@ def test_associate_multiple_users_to_call_permission(user1, user2, user3, call_p
 @fixtures.call_permission()
 @fixtures.call_permission()
 def test_get_call_permissions_associated_to_user(user, perm1, perm2):
-    expected = contains(has_entries({'user_id': user['id'],
-                                     'call_permission_id': perm1['id']}),
-                        has_entries({'user_id': user['id'],
-                                     'call_permission_id': perm2['id']}))
-
     with a.user_call_permission(user, perm1):
         with a.user_call_permission(user, perm2):
             response = confd.users(user['id']).callpermissions.get()
-            assert_that(response.items, expected)
+            assert_that(response.items, contains(
+                has_entries({'user_id': user['id'], 'call_permission_id': perm1['id']}),
+                has_entries({'user_id': user['id'], 'call_permission_id': perm2['id']})
+            ))
 
             response = confd.users(user['uuid']).callpermissions.get()
-            assert_that(response.items, expected)
+            assert_that(response.items, contains(
+                has_entries({'user_id': user['id'], 'call_permission_id': perm1['id']}),
+                has_entries({'user_id': user['id'], 'call_permission_id': perm2['id']})
+            ))
 
 
 @fixtures.user()
@@ -115,15 +120,13 @@ def test_get_call_permission_after_dissociation(user, call_permission):
 @fixtures.user()
 @fixtures.call_permission()
 def test_get_users_associated_to_call_permission(user1, user2, call_permission):
-    expected = contains(has_entries({'user_id': user1['id'],
-                                     'call_permission_id': call_permission['id']}),
-                        has_entries({'user_id': user2['id'],
-                                     'call_permission_id': call_permission['id']}))
-
     with a.user_call_permission(user1, call_permission):
         with a.user_call_permission(user2, call_permission):
             response = confd.callpermissions(call_permission['id']).users.get()
-            assert_that(response.items, expected)
+            assert_that(response.items, contains(
+                has_entries({'user_id': user1['id'], 'call_permission_id': call_permission['id']}),
+                has_entries({'user_id': user2['id'], 'call_permission_id': call_permission['id']})
+            ))
 
 
 @fixtures.user()

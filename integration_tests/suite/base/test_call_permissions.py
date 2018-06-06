@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from . import confd
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+)
 
-from hamcrest import (assert_that,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not)
+
+from . import confd
+from ..helpers import (
+    scenarios as s,
+    errors as e,
+    fixtures,
+)
 
 
 def test_get_errors():
