@@ -19,6 +19,10 @@ class UserEntityService(object):
             user.user_id = user_id
         return user
 
+    def associate(self, user, entity):
+        user.entity_id = entity.id
+        self.dao.edit(user)
+
 
 def build_service():
     return UserEntityService(user_dao)
