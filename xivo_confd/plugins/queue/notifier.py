@@ -17,24 +17,27 @@ class QueueNotifier(object):
         self.bus = bus
         self.sysconfd = sysconfd
 
-    def send_sysconfd_handlers(self):
-        handlers = {'ctibus': [],  # TODO Check cti protocol to update queue
+    def send_sysconfd_handlers(self, ctibus_command):
+        handlers = {'ctibus': [ctibus_command],
                     'ipbx': ['module reload app_queue.so'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, queue):
-        self.send_sysconfd_handlers()
+        ctibus_command = 'xivo[queue,add,{queue_id}]'.format(queue_id=queue.id)
+        self.send_sysconfd_handlers(ctibus_command)
         event = CreateQueueEvent(queue.id)
         self.bus.send_bus_event(event)
 
     def edited(self, queue):
-        self.send_sysconfd_handlers()
+        ctibus_command = 'xivo[queue,edit,{queue_id}]'.format(queue_id=queue.id)
+        self.send_sysconfd_handlers(ctibus_command)
         event = EditQueueEvent(queue.id)
         self.bus.send_bus_event(event)
 
     def deleted(self, queue):
-        self.send_sysconfd_handlers()
+        ctibus_command = 'xivo[queue,delete,{queue_id}]'.format(queue_id=queue.id)
+        self.send_sysconfd_handlers(ctibus_command)
         event = DeleteQueueEvent(queue.id)
         self.bus.send_bus_event(event)
 
