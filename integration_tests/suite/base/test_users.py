@@ -508,6 +508,7 @@ def test_get_user(user):
     assert_that(response.item, has_entries(FULL_USER))
     assert_that(response.item, has_entries(
         agent=none(),
+        call_permissions=empty(),
         incalls=empty(),
         lines=empty(),
         groups=empty(),

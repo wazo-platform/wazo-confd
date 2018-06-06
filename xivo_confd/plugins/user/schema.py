@@ -60,6 +60,10 @@ class UserSchema(BaseSchema):
                                       'name',
                                       'links'],
                                 dump_only=True)
+    call_permissions = fields.Nested('CallPermissionSchema',
+                                     only=['id', 'name', 'links'],
+                                     many=True,
+                                     dump_only=True)
     fallbacks = fields.Nested('UserFallbackSchema',
                               dump_only=True)
     groups = fields.Nested('GroupSchema',

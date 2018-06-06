@@ -130,12 +130,17 @@ def check_search(url, call_permission, hidden, field, term):
                           extensions=['123', '456'])
 def test_get(call_permission):
     response = confd.callpermissions(call_permission['id']).get()
-    assert_that(response.item, has_entries(name='search',
-                                           password='123',
-                                           description='SearchDesc',
-                                           mode='deny',
-                                           enabled=True,
-                                           extensions=['123', '456']))
+    assert_that(response.item, has_entries(
+        name='search',
+        password='123',
+        description='SearchDesc',
+        mode='deny',
+        enabled=True,
+        extensions=['123', '456'],
+        users=empty(),
+        outcalls=empty(),
+        groups=empty(),
+    ))
 
 
 def test_create_call_permission_minimal_parameters():
