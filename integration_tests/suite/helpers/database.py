@@ -449,6 +449,10 @@ class DatabaseQueries(object):
         query = text("UPDATE userfeatures SET cti_profile_id = NULL WHERE cti_profile_id = :cti_profile_id")
         self.connection.execute(query, cti_profile_id=cti_profile_id)
 
+    def associate_user_entity(self, user_id, entity_id):
+        query = text("UPDATE userfeatures SET entityid = :entity_id WHERE id = :user_id")
+        self.connection.execute(query, entity_id=entity_id, user_id=user_id)
+
     def associate_call_pickup_entity(self, call_pickup_id, entity_id):
         query = text("UPDATE pickup SET entity_id = :entity_id WHERE id = :call_pickup_id")
         self.connection.execute(query, entity_id=entity_id, call_pickup_id=call_pickup_id)

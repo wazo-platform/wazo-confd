@@ -1,11 +1,10 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from . import confd
+from . import db
 
 
 def associate(user_id, entity_id, check=True):
-    response = confd.users(user_id).entities(entity_id).put()
-    if check:
-        response.assert_ok()
+    with db.queries() as q:
+        q.associate_user_entity(user_id, entity_id)

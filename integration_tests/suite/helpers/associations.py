@@ -85,6 +85,12 @@ def user_funckey_template(user, funckey_template, check=True):
 
 
 @contextmanager
+def user_entity(user, entity, check=True):
+    h.user_entity.associate(user['id'], entity['id'], check)
+    yield
+
+
+@contextmanager
 def call_filter_entity(call_filter, entity, check=True):
     h.call_filter_entity.associate(call_filter['id'], entity['id'], check)
     yield
