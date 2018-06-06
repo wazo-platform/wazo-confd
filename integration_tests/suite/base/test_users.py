@@ -306,7 +306,7 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
                            firstname=user['firstname'],
                            lastname=user['lastname'],
                            email=user['email'],
-                           provisioning_code=none(),
+                           provisioning_code=line['provisioning_code'],
                            extension=extension['exten'],
                            context=extension['context'],
                            entity=config.ENTITY_NAME,
