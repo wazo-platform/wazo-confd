@@ -9,9 +9,11 @@ from hamcrest import (
     not_,
 )
 
-from ..helpers import scenarios as s
-from ..helpers import fixtures
 from . import confd
+from ..helpers import (
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 
@@ -23,11 +25,11 @@ def test_get_errors():
 
 @fixtures.user()
 def test_get_entities_associated_to_user(user):
-    expected = has_entries({'user_id': user['id'],
-                            'entity_id': not_(empty())})
-
     response = confd.users(user['id']).entities.get()
-    assert_that(response.item, expected)
+    assert_that(response.item, has_entries(
+        user_id=user['id'],
+        entity_id=not_(empty())
+    ))
 
 
 @fixtures.user()
