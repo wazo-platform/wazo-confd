@@ -378,7 +378,6 @@ def test_edit_minimal_parameters(queue):
 @fixtures.queue()
 def test_edit_all_parameters(queue):
     parameters = {
-        'name': 'MyQueue',
         'label': 'Label',
         'data_quality': True,
         'dtmf_hangup_callee_enabled': True,
