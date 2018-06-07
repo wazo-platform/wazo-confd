@@ -9,7 +9,7 @@ from xivo_dao.alchemy.queuefeatures import QueueFeatures as Queue
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import QueueSchema
+from .schema import QueueSchema, QueueSchemaPUT
 
 
 class QueueList(ListResource):
@@ -31,7 +31,7 @@ class QueueList(ListResource):
 
 class QueueItem(ItemResource):
 
-    schema = QueueSchema
+    schema = QueueSchemaPUT
 
     @required_acl('confd.queues.{id}.read')
     def get(self, id):

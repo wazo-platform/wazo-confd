@@ -43,3 +43,7 @@ class QueueSchema(BaseSchema):
         for key in ('wait_time_destination', 'wait_ratio_destination'):
             if data.get(key):
                 data[key] = Dialaction(**data[key])
+
+
+class QueueSchemaPUT(QueueSchema):
+    name = fields.String(dump_only=True)

@@ -82,6 +82,16 @@ def test_post_errors():
     for check in error_checks(url):
         yield check
 
+    yield s.check_bogus_field_returns_error, url, 'name', 123
+    yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'name', None
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'name', []
+    yield s.check_bogus_field_returns_error, url, 'name', {}
+
+    for check in unique_error_checks(url):
+        yield check
+
 
 @fixtures.queue()
 def test_put_errors(queue):
@@ -91,12 +101,6 @@ def test_put_errors(queue):
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'label', 123
     yield s.check_bogus_field_returns_error, url, 'label', True
     yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
@@ -199,9 +203,6 @@ def error_checks(url):
         yield s.check_bogus_field_returns_error, url, 'wait_time_destination', destination
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', destination
-
-    for check in unique_error_checks(url):
-        yield check
 
 
 @fixtures.queue(name='unique')
@@ -410,6 +411,15 @@ def test_edit_all_parameters(queue):
     options = parameters.pop('options')
     assert_that(response.item, has_entries(parameters))
     assert_that(response.item['options'], contains_inanyorder(*options))
+
+
+@fixtures.queue(name='OriginalName')
+def test_edit_name_unavailable(queue):
+    response = confd.queues(queue['id']).put(name='ModifiedName')
+    response.assert_updated()
+
+    response = confd.queues(queue['id']).get()
+    assert_that(response.item, has_entries(name=queue['name']))
 
 
 @fixtures.queue()
