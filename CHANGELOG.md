@@ -8,6 +8,14 @@ Changelog
 
   * PUT `/1.1/users/<user_id>/entities/<entity_id>`
 
+* Added queue endpoints:
+
+  * GET `/1.1/queues`
+  * POST `/1.1/queues`
+  * DELETE `/1.1/queues/<queue_id>`
+  * GET `/1.1/queues/<queue_id>`
+  * PUT `/1.1/queues/<queue_id>`
+
 
 18.06
 -----

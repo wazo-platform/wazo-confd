@@ -131,6 +131,7 @@ DEFAULT_CONFIG = {
         'paging_user': True,
         'parking_lot': True,
         'parking_lot_extension': True,
+        'queue': True,
         'queue_member': True,
         'register_iax': True,
         'register_sip': True,
