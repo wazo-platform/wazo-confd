@@ -22,6 +22,7 @@ from ..helpers import (
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 ALL_OPTIONS = [
+    ['context', 'Default'],
     ['announce', 'MyAnnounce'],
     ['timeout', '42'],
     ['monitor-type', 'mixmonitor'],
