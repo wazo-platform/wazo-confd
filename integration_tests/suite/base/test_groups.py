@@ -238,6 +238,6 @@ def test_delete(group):
 
 @fixtures.group()
 def test_bus_events(group):
-    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {'name': 'bus_event'}
+    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {'name': 'group_bus_event'}
     yield s.check_bus_event, 'config.groups.edited', confd.groups(group['id']).put
     yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['id']).delete

@@ -432,6 +432,6 @@ def test_delete(queue):
 
 @fixtures.queue()
 def test_bus_events(queue):
-    yield s.check_bus_event, 'config.queue.created', confd.queues.post, {'name': 'bus_event'}
+    yield s.check_bus_event, 'config.queue.created', confd.queues.post, {'name': 'queue_bus_event'}
     yield s.check_bus_event, 'config.queue.edited', confd.queues(queue['id']).put
     yield s.check_bus_event, 'config.queue.deleted', confd.queues(queue['id']).delete
