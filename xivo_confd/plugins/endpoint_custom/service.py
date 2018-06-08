@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2016 Avencall
 # SPDX-License-Identifier: GPL-3.0+
 

@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 """Plugin that offers no configuration service and serves TFTP/HTTP requests
 in its var/tftpboot directory.

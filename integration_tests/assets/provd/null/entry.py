@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 """Plugin that offers no configuration service and rejects TFTP/HTTP requests
 by returning file not found errors.
