@@ -173,3 +173,11 @@ def test_delete_extension_associated_to_queue(queue, extension):
     with a.queue_extension(queue, extension):
         response = confd.extensions(extension['id']).delete()
         response.assert_match(400, e.resource_associated('Extension', 'queue'))
+
+
+@fixtures.queue()
+@fixtures.extension(exten=gen_queue_exten())
+def test_bus_events(queue, extension):
+    url = confd.queues(queue['id']).extensions(extension['id'])
+    yield s.check_bus_event, 'config.queues.extensions.updated', url.put
+    yield s.check_bus_event, 'config.queues.extensions.deleted', url.delete
