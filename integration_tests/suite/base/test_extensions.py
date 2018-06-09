@@ -31,6 +31,7 @@ from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     gen_conference_exten,
     gen_group_exten,
+    gen_queue_exten,
     gen_line_exten,
 )
 from . import confd, provd
@@ -89,14 +90,18 @@ def error_checks(url):
 @fixtures.extension()
 def test_get(extension):
     response = confd.extensions(extension['id']).get()
-    assert_that(response.item, has_entries(exten=extension['exten'],
-                                           context=extension['context'],
-                                           enabled=True,
-                                           incall=none(),
-                                           outcall=none(),
-                                           lines=empty(),
-                                           conference=none(),
-                                           parking_lot=none()))
+    assert_that(response.item, has_entries(
+        exten=extension['exten'],
+        context=extension['context'],
+        enabled=True,
+        group=none(),
+        queue=none(),
+        incall=none(),
+        outcall=none(),
+        lines=empty(),
+        conference=none(),
+        parking_lot=none(),
+    ))
 
 
 def test_create_minimal_parameters():

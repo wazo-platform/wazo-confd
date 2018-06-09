@@ -125,6 +125,33 @@ def test_dissociate_not_associated(queue, extension):
 
 @fixtures.queue()
 @fixtures.extension(exten=gen_queue_exten())
+def test_get_queue_relation(queue, extension):
+    with a.queue_extension(queue, extension):
+        response = confd.queues(queue['id']).get()
+        assert_that(response.item, has_entries(
+            extensions=contains(has_entries(
+                id=extension['id'],
+                exten=extension['exten'],
+                context=extension['context']
+            ))
+        ))
+
+
+@fixtures.extension(exten=gen_queue_exten())
+@fixtures.queue()
+def test_get_extension_relation(extension, queue):
+    with a.queue_extension(queue, extension):
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, has_entries(
+            queue=has_entries(
+                id=queue['id'],
+                name=queue['name']
+            )
+        ))
+
+
+@fixtures.queue()
+@fixtures.extension(exten=gen_queue_exten())
 def test_edit_context_to_incall_when_associated(queue, extension):
     with a.queue_extension(queue, extension):
         response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
