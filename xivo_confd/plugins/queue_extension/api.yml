@@ -1,0 +1,36 @@
+paths:
+  /queues/{queue_id}/extensions/{extension_id}:
+    put:
+      operationId: associate_queue_extension
+      summary: Associate queue and extension
+      description: '**Required ACL:** `confd.queues.{queue_id}.extensions.{extension_id}.update`'
+      tags:
+      - queues
+      - extensions
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Queue and Extension associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_queue_extension
+      summary: Dissociate queue and extension
+      description: '**Required ACL:** `confd.queues.{queue_id}.extensions.{extension_id}.delete`'
+      tags:
+      - queues
+      - extensions
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/extensionid'
+      responses:
+        '204':
+          description: Queue and Extension dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

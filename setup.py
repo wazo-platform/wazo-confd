@@ -77,6 +77,7 @@ setup(
             'parking_lot = xivo_confd.plugins.parking_lot.plugin:Plugin',
             'parking_lot_extension = xivo_confd.plugins.parking_lot_extension.plugin:Plugin',
             'queue = xivo_confd.plugins.queue.plugin:Plugin',
+            'queue_extension = xivo_confd.plugins.queue_extension.plugin:Plugin',
             'queue_fallback = xivo_confd.plugins.queue_fallback.plugin:Plugin',
             'queue_member = xivo_confd.plugins.queue_member.plugin:Plugin',
             'register_iax = xivo_confd.plugins.register_iax.plugin:Plugin',

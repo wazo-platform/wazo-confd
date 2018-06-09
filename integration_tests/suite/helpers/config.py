@@ -20,5 +20,9 @@ def gen_group_exten():
     return str(random.randint(2000, 2999))
 
 
+def gen_queue_exten():
+    return str(random.randint(3000, 3999))
+
+
 def gen_conference_exten():
     return str(random.randint(4000, 4999))

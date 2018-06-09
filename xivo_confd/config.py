@@ -132,6 +132,7 @@ DEFAULT_CONFIG = {
         'parking_lot': True,
         'parking_lot_extension': True,
         'queue': True,
+        'queue_extension': True,
         'queue_fallback': True,
         'queue_member': True,
         'register_iax': True,
