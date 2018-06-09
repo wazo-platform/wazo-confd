@@ -201,6 +201,14 @@ def test_edit_extension_group_with_exten_outside_range(extension, group):
         response.assert_match(400, outside_range_regex)
 
 
+@fixtures.extension(exten=gen_queue_exten(), context=CONTEXT)
+@fixtures.queue()
+def test_edit_extension_queue_with_exten_outside_range(extension, queue):
+    with a.queue_extension(queue, extension):
+        response = confd.extensions(extension['id']).put(exten=EXTEN_OUTSIDE_RANGE)
+        response.assert_match(400, outside_range_regex)
+
+
 @fixtures.extension(exten=gen_line_exten(), context=CONTEXT)
 @fixtures.line_sip()
 def test_edit_extension_line_with_exten_outside_range(extension, line):

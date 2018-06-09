@@ -115,6 +115,9 @@ class ContextOnUpdateValidator(Validator):
         if extension.outcall and context.type != 'outcall':
             raise errors.unhandled_context_type(context.type)
 
+        if extension.queue and context.type != 'internal':
+            raise errors.unhandled_context_type(context.type)
+
 
 class ExtensionRangeValidator(Validator, BaseExtensionRangeMixin):
 
@@ -137,6 +140,9 @@ class ExtensionRangeValidator(Validator, BaseExtensionRangeMixin):
             raise errors.outside_context_range(extension.exten, extension.context)
 
         if extension.lines and not self._exten_in_range(extension.exten, context.user_ranges):
+            raise errors.outside_context_range(extension.exten, extension.context)
+
+        if extension.queue and not self._exten_in_range(extension.exten, context.queue_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
 
 

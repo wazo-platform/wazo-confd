@@ -125,6 +125,14 @@ def test_dissociate_not_associated(queue, extension):
 
 @fixtures.queue()
 @fixtures.extension(exten=gen_queue_exten())
+def test_edit_context_to_incall_when_associated(queue, extension):
+    with a.queue_extension(queue, extension):
+        response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
+        response.assert_status(400)
+
+
+@fixtures.queue()
+@fixtures.extension(exten=gen_queue_exten())
 def test_delete_queue_when_queue_and_extension_associated(queue, extension):
     with a.queue_extension(queue, extension, check=False):
         response = confd.queues(queue['id']).delete()
