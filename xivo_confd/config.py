@@ -92,6 +92,7 @@ DEFAULT_CONFIG = {
         'conference_extension': True,
         'configuration': True,
         'context': True,
+        'context_context': True,
         'cti_profile': True,
         'device': True,
         'endpoint_custom': True,

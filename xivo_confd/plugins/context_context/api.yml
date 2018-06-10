@@ -1,0 +1,36 @@
+paths:
+  /contexts/{context_id}/contexts:
+    put:
+      operationId: associate_context_contexts
+      summary: Include contexts inside context
+      description: '**Required ACL:** `confd.contexts.{context_id}.contexts.update`'
+      tags:
+      - contexts
+      parameters:
+      - $ref: '#/parameters/contextid'
+      - name: body
+        in: body
+        description: Contexts to associated
+        required: true
+        schema:
+          $ref: '#/definitions/ContextsId'
+      responses:
+        '204':
+          description: Context and Contexts associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  ContextsId:
+    title: ContextsId
+    properties:
+      contexts:
+        items:
+          $ref: '#/definitions/ContextId'
+        type: array
+  ContextId:
+    title: ContextId
+    properties:
+      id:
+        type: integer
