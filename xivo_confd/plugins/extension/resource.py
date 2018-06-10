@@ -32,6 +32,7 @@ class ExtensionList(ListResource):
 class ExtensionItem(ItemResource):
 
     schema = ExtensionSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.extensions.{id}.read')
     def get(self, id):

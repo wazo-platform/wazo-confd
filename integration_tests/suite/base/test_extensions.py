@@ -39,6 +39,8 @@ from . import confd, provd
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 
 FAKE_ID = 999999999
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_search_errors():
@@ -85,6 +87,23 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'context', True
     yield s.check_bogus_field_returns_error, url, 'context', {}
     yield s.check_bogus_field_returns_error, url, 'context', []
+
+
+def test_get_multi_tenant():
+    main = confd.contexts.post(name='main', wazo_tenant=MAIN_TENANT).item
+    sub = confd.contexts.post(name='sub', wazo_tenant=SUB_TENANT).item
+
+    in_main = confd.extensions.post(exten='1001', context=main['name']).item
+    in_sub = confd.extensions.post(exten='1001', context=sub['name']).item
+
+    assert_that(in_main, has_entries(tenant_uuid=MAIN_TENANT))
+    assert_that(in_sub, has_entries(tenant_uuid=SUB_TENANT))
+
+    response = confd.extensions(in_main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.extensions(in_sub['id']).get(wazo_tenant=SUB_TENANT)
+    assert_that(response.item, equal_to(in_sub))
 
 
 @fixtures.extension()

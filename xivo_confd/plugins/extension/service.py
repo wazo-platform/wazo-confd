@@ -22,8 +22,8 @@ class ExtensionService(CRUDService):
         parameters['is_feature'] = False
         return self.dao.search(**parameters)
 
-    def get(self, resource_id):
-        return self.dao.get_by(id=resource_id, is_feature=False)
+    def get(self, resource_id, **kwargs):
+        return self.dao.get_by(id=resource_id, is_feature=False, **kwargs)
 
     def edit(self, extension, updated_fields=None):
         with Session.no_autoflush:

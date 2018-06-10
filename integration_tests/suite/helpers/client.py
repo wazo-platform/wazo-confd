@@ -71,8 +71,8 @@ class ConfdClient(object):
     def head(self, url, **parameters):
         return self.request('HEAD', url, parameters=parameters)
 
-    def get(self, url, **parameters):
-        return self.request('GET', url, parameters=parameters)
+    def get(self, url, headers=None, **parameters):
+        return self.request('GET', url, parameters=parameters, headers=headers)
 
     def post(self, url, body, headers=None):
         kwargs = {'data': body}
@@ -114,9 +114,11 @@ class RestUrlClient(UrlFragment):
         params = self._merge_params(params, self.body)
         return self.client.head(url, **params)
 
-    def get(self, **params):
+    def get(self, wazo_tenant=None, **params):
         url = str(self)
         params = self._merge_params(params, self.body)
+        if wazo_tenant:
+            params['headers'] = {'Wazo-Tenant': wazo_tenant}
         return self.client.get(url, **params)
 
     def post(self, body=None, wazo_tenant=None, **params):
