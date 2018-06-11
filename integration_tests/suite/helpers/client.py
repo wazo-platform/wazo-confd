@@ -83,8 +83,8 @@ class ConfdClient(object):
     def put(self, url, body, parameters=None, headers=None):
         return self.request('PUT', url, data=body, parameters=parameters, headers=headers)
 
-    def delete(self, url):
-        return self.request('DELETE', url)
+    def delete(self, url, headers=None):
+        return self.request('DELETE', url, headers=headers)
 
     def _encode_dict(self, parameters=None):
         if parameters is not None:
@@ -133,9 +133,12 @@ class RestUrlClient(UrlFragment):
         headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
         return self.client.put(url, params, query_string, headers=headers)
 
-    def delete(self):
+    def delete(self, wazo_tenant=None):
         url = str(self)
-        return self.client.delete(url)
+        headers = {}
+        if wazo_tenant:
+            headers['Wazo-Tenant'] = wazo_tenant
+        return self.client.delete(url, headers=headers)
 
     def _copy(self):
         return self.__class__(self.client, list(self.fragments), dict(self.body))

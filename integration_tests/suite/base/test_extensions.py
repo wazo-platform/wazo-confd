@@ -473,3 +473,15 @@ def test_search_extensions_by_type(internal, incall):
 def test_delete(extension):
     response = confd.extensions(extension['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
+@fixtures.extension(exten='1001', context='main')
+@fixtures.extension(exten='1001', context='sub')
+def test_delete_multi_tenant(_, __, in_main, in_sub):
+    response = confd.extensions(in_main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.extensions(in_sub['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_deleted()
