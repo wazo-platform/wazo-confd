@@ -132,7 +132,8 @@ def test_create_minimal_parameters():
 
     assert_that(response.item, has_entries(exten=exten,
                                            context=CONTEXT,
-                                           enabled=True))
+                                           enabled=True,
+                                           tenant_uuid=not_(none())))
 
 
 def test_create_with_enabled_parameter():
@@ -145,7 +146,8 @@ def test_create_with_enabled_parameter():
 
     assert_that(response.item, has_entries(exten=exten,
                                            context=CONTEXT,
-                                           enabled=False))
+                                           enabled=False,
+                                           tenant_uuid=not_(none())))
 
 
 def test_create_extension_in_different_ranges():
