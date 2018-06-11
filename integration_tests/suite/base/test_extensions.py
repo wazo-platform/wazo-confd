@@ -89,16 +89,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'context', []
 
 
-def test_get_multi_tenant():
-    main = confd.contexts.post(name='main', wazo_tenant=MAIN_TENANT).item
-    sub = confd.contexts.post(name='sub', wazo_tenant=SUB_TENANT).item
-
-    in_main = confd.extensions.post(exten='1001', context=main['name']).item
-    in_sub = confd.extensions.post(exten='1001', context=sub['name']).item
-
-    assert_that(in_main, has_entries(tenant_uuid=MAIN_TENANT))
-    assert_that(in_sub, has_entries(tenant_uuid=SUB_TENANT))
-
+@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
+@fixtures.extension(exten='1001', context='main')
+@fixtures.extension(exten='1001', context='sub')
+def test_get_multi_tenant(_, __, in_main, in_sub):
     response = confd.extensions(in_main['id']).get(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Extension'))
 
@@ -284,13 +279,11 @@ def test_update_additional_parameters(extension1):
     assert_that(response.item, has_entries(enabled=False))
 
 
-def test_update_and_multi_tenant():
-    main = confd.contexts.post(name='main', wazo_tenant=MAIN_TENANT).item
-    sub = confd.contexts.post(name='sub', wazo_tenant=SUB_TENANT).item
-
-    in_main = confd.extensions.post(exten='1001', context=main['name']).item
-    in_sub = confd.extensions.post(exten='1001', context=sub['name']).item
-
+@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
+@fixtures.extension(exten='1001', context='main')
+@fixtures.extension(exten='1001', context='sub')
+def test_update_and_multi_tenant(_, __, in_main, in_sub):
     response = confd.extensions(in_main['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
     response.assert_match(404, e.not_found('Extension'))
 

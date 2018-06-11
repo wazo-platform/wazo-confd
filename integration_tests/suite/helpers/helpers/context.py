@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import random
@@ -18,8 +18,8 @@ def generate_context(**parameters):
     return add_context(**parameters)
 
 
-def add_context(**parameters):
-    response = confd.contexts.post(parameters)
+def add_context(wazo_tenant=None, **parameters):
+    response = confd.contexts.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 
