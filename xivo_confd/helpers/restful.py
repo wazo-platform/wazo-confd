@@ -5,7 +5,7 @@
 from flask import request
 from flask_restful import Resource
 
-from xivo.tenant_flask_helpers import Tenant
+from xivo.tenant_flask_helpers import get_auth_client, Tenant
 from xivo_dao import tenant_dao
 from xivo_dao.helpers import errors
 
@@ -88,11 +88,15 @@ class ListResource(ConfdResource):
         if not self._has_a_tenant_uuid():
             return
 
+        tenant = Tenant.autodetect().uuid
         recurse = params.get('recurse', False)
-        if recurse:
-            return [t.uuid for t in Tenant.autodetect(many=True)]
-        else:
-            return [Tenant.autodetect().uuid]
+        if not recurse:
+            return [tenant]
+
+        tenants = []
+        for tenant in get_auth_client().tenants.list(tenant_uuid=tenant)['items']:
+            tenants.append(tenant['uuid'])
+        return tenants
 
 
 class ItemResource(ConfdResource):

@@ -18,9 +18,9 @@ class ExtensionService(CRUDService):
         super(ExtensionService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
 
-    def search(self, parameters):
+    def search(self, parameters, tenant_uuids=None):
         parameters['is_feature'] = False
-        return self.dao.search(**parameters)
+        return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
 
     def get(self, resource_id, **kwargs):
         return self.dao.get_by(id=resource_id, is_feature=False, **kwargs)

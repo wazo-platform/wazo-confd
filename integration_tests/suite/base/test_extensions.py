@@ -6,6 +6,7 @@ import re
 import datetime
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     contains_inanyorder,
@@ -14,6 +15,7 @@ from hamcrest import (
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -380,6 +382,39 @@ def check_search(url, extension, hidden, field, term):
     hidden_extension = is_not(has_item(has_entry('id', hidden['id'])))
     assert_that(response.items, expected_extension)
     assert_that(response.items, hidden_extension)
+
+
+@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
+@fixtures.extension(exten='1001', context='main')
+@fixtures.extension(exten='1001', context='sub')
+def test_search_multi_tenant(*_):
+    response = confd.extensions.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(
+            not_(has_item(has_entries(context='main'))),
+            has_item(has_entries(context='sub')),
+        )
+    )
+
+    response = confd.extensions.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        has_items(
+            has_entries(context='main'),
+            not_(has_entries(context='sub')),
+        )
+    )
+
+    response = confd.extensions.get(recurse=True, wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        has_items(
+            has_entries(context='main'),
+            has_entries(context='sub'),
+        )
+    )
 
 
 @fixtures.extension(exten='9998', context='from-extern')

@@ -2,7 +2,7 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from flask import url_for
+from flask import request, url_for
 
 from xivo_dao.alchemy.extension import Extension
 
@@ -26,7 +26,15 @@ class ExtensionList(ListResource):
 
     @required_acl('confd.extensions.create')
     def post(self):
-        return super(ExtensionList, self).post()
+        form = self.schema().load(request.get_json()).data
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model).data, 201, self.build_headers(model)
+
+    def _has_a_tenant_uuid(self):
+        # The base function does not work because the tenant_uuid is not part
+        # of the Extension model and is added by the dao.
+        return True
 
 
 class ExtensionItem(ItemResource):
