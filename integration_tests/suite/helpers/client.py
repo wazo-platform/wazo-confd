@@ -80,8 +80,8 @@ class ConfdClient(object):
             kwargs['headers'] = headers
         return self.request('POST', url, **kwargs)
 
-    def put(self, url, body, parameters=None):
-        return self.request('PUT', url, data=body, parameters=parameters)
+    def put(self, url, body, parameters=None, headers=None):
+        return self.request('PUT', url, data=body, parameters=parameters, headers=headers)
 
     def delete(self, url):
         return self.request('DELETE', url)
@@ -127,10 +127,11 @@ class RestUrlClient(UrlFragment):
         headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
         return self.client.post(url, params, headers=headers)
 
-    def put(self, body=None, query_string=None, **params):
+    def put(self, body=None, query_string=None, wazo_tenant=None, **params):
         url = str(self)
         params = self._merge_params(params, body, self.body)
-        return self.client.put(url, params, query_string)
+        headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
+        return self.client.put(url, params, query_string, headers=headers)
 
     def delete(self):
         url = str(self)

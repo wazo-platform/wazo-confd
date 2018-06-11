@@ -284,6 +284,23 @@ def test_update_additional_parameters(extension1):
     assert_that(response.item, has_entries(enabled=False))
 
 
+def test_update_and_multi_tenant():
+    main = confd.contexts.post(name='main', wazo_tenant=MAIN_TENANT).item
+    sub = confd.contexts.post(name='sub', wazo_tenant=SUB_TENANT).item
+
+    in_main = confd.extensions.post(exten='1001', context=main['name']).item
+    in_sub = confd.extensions.post(exten='1001', context=sub['name']).item
+
+    response = confd.extensions(in_main['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.extensions(in_sub['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
+    response.assert_updated()
+
+    response = confd.extensions(in_sub['id']).get()
+    assert_that(response.item, has_entries(id=in_sub['id'], enabled=False))
+
+
 @fixtures.user()
 @fixtures.user()
 @fixtures.user()
