@@ -4,6 +4,10 @@ Changelog
 18.07
 -----
 
+* A new API for including contexts inside context has been added:
+
+  * PUT `/1.1/contexts/<context_id>/contexts`
+
 * The entity of a user cannot be changed anymore. The following resource has been removed:
 
   * PUT `/1.1/users/<user_id>/entities/<entity_id>`
