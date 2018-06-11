@@ -82,6 +82,13 @@ def test_associate_same_sub_context(context, sub_context):
 
 
 @fixtures.context()
+def test_associate_same_context(context):
+    contexts = [{'id': context['id']}]
+    response = confd.contexts(context['id']).contexts.put(contexts=contexts)
+    response.assert_status(400)
+
+
+@fixtures.context()
 @fixtures.context()
 @fixtures.context()
 def test_get_contexts_associated_to_context(context, sub_context1, sub_context2):

@@ -11,10 +11,15 @@ class ContextContextAssociationValidator(ValidatorAssociation):
 
     def validate(self, context, contexts):
         self.validate_no_duplicate_context(contexts)
+        self.validate_no_self_context(context, contexts)
 
     def validate_no_duplicate_context(self, contexts):
         if len(contexts) != len(set(contexts)):
-            raise errors.not_permitted('Cannot associate same context more than once')
+            raise errors.not_permitted('Cannot include same context more than once')
+
+    def validate_no_self_context(self, context, contexts):
+        if context in contexts:
+            raise errors.not_permitted('Cannot include context inside itself')
 
 
 def build_validator():
