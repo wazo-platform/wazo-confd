@@ -28,7 +28,8 @@ class ExtensionList(ListResource):
     def post(self):
         form = self.schema().load(request.get_json()).data
         model = self.model(**form)
-        model = self.service.create(model)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        model = self.service.create(model, tenant_uuids)
         return self.schema().dump(model).data, 201, self.build_headers(model)
 
     def _has_a_tenant_uuid(self):

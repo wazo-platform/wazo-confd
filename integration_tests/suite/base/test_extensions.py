@@ -208,6 +208,12 @@ def test_create_2_extensions_same_exten_different_context(context):
     response.assert_created('extensions')
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+def test_post_multi_tenant(in_main):
+    response = confd.extensions.post(exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT)
+    response.assert_status(400)
+
+
 @fixtures.extension(exten=gen_conference_exten(), context=CONTEXT)
 @fixtures.conference()
 def test_edit_extension_conference_with_exten_outside_range(extension, conference):
