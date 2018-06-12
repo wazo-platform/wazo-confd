@@ -8,7 +8,8 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 
-from hamcrest import (assert_that,
+from hamcrest import (all_of,
+                      assert_that,
                       empty,
                       has_entries,
                       has_entry,
@@ -157,16 +158,16 @@ def check_search(url, context, hidden, field, term):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
 @fixtures.context(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(sub, main):
+def test_list_multi_tenant(main, sub):
     response = confd.contexts.get(wazo_tenant=MAIN_TENANT)
-    expected = has_item(main)
+    expected = all_of(has_item(main)), not_(has_item(sub))
     assert_that(response.items, expected)
 
     response = confd.contexts.get(wazo_tenant=SUB_TENANT)
-    expected = has_item(sub)
+    expected = all_of(has_item(sub), not_(has_item(main)))
     assert_that(response.items, expected)
 
-    response = confd.contexts.get(wazo_tenant=SUB_TENANT, recurse=True)
+    response = confd.contexts.get(wazo_tenant=MAIN_TENANT, recurse=True)
     expected = has_items(main, sub)
     assert_that(response.items, expected)
 
