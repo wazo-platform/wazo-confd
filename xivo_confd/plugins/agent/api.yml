@@ -1,0 +1,140 @@
+paths:
+  /agents:
+    get:
+      operationId: list_agents
+      summary: List agents
+      description: '**Required ACL:** `confd.agents.read`'
+      tags:
+      - agents
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Agents list
+          schema:
+            $ref: '#/definitions/AgentItems'
+    post:
+      operationId: create_agent
+      summary: Create agent
+      description: '**Required ACL:** `confd.agents.create`'
+      tags:
+      - agents
+      parameters:
+      - name: body
+        in: body
+        description: Agent to create
+        required: true
+        schema:
+          $ref: '#/definitions/Agent'
+      responses:
+        '201':
+          description: Agent created
+          schema:
+            $ref: '#/definitions/Agent'
+        '400':
+          $ref: '#/responses/CreateError'
+  /agents/{agent_id}:
+    get:
+      operationId: get_agent
+      summary: Get agent
+      description: '**Required ACL:** `confd.agents.{agent_id}.read`'
+      tags:
+      - agents
+      parameters:
+      - $ref: '#/parameters/agentid'
+      responses:
+        '200':
+          description: Agent
+          schema:
+            $ref: '#/definitions/Agent'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_agent
+      summary: Update agent
+      description: '**Required ACL:** `confd.agents.{agent_id}.update`'
+      tags:
+      - agents
+      parameters:
+      - $ref: '#/parameters/agentid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Agent'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_agent
+      summary: Delete agent
+      description: '**Required ACL:** `confd.agents.{agent_id}.delete`'
+      tags:
+      - agents
+      parameters:
+      - $ref: '#/parameters/agentid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  agentid:
+    required: true
+    type: integer
+    name: agent_id
+    in: path
+    description: Agent's ID
+
+definitions:
+  Agent:
+    title: Agent
+    allOf:
+    - properties:
+        id:
+          type: integer
+          readOnly: true
+          description: The id of the agent
+        firstname:
+          type: string
+        lastname:
+          type: string
+        number:
+          type: string
+          description: Agent number
+        password:
+          type: string
+          description: Numeric password used to log agent.
+        language:
+          type: string
+          description: Language used for the agent menu prompt
+        preprocess_subroutine:
+          type: string
+          description: Name of the subroutine to execute in asterisk before receiving a call
+        description:
+          type: string
+          description: Additional information about the agent
+      required:
+      - number
+  AgentItems:
+    title: AgentItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Agent'
+      total:
+        type: integer
+    required:
+    - total
