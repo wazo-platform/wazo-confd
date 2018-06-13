@@ -15,11 +15,6 @@ PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
 CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
 
 
-class AgentSchema(BaseSchema):
-    id = fields.Integer(dump_only=True)
-    number = fields.String(dump_only=True)
-
-
 class UserSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     uuid = fields.String(dump_only=True)
@@ -53,7 +48,8 @@ class UserSchema(BaseSchema):
 
     agent = fields.Nested('AgentSchema',
                           only=['id',
-                                'number'],
+                                'number',
+                                'links'],
                           dump_only=True)
     cti_profile = fields.Nested('CtiProfileSchema',
                                 only=['id',
