@@ -55,6 +55,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'lastname', {}
     yield s.check_bogus_field_returns_error, url, 'number', 123
     yield s.check_bogus_field_returns_error, url, 'number', True
+    yield s.check_bogus_field_returns_error, url, 'number', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(0)
     yield s.check_bogus_field_returns_error, url, 'number', s.random_string(41)
     yield s.check_bogus_field_returns_error, url, 'number', []
     yield s.check_bogus_field_returns_error, url, 'number', {}
@@ -82,7 +84,7 @@ def error_checks(url):
         yield check
 
 
-@fixtures.agent(number='unique')
+@fixtures.agent(number='1234')
 def unique_error_checks(url, agent):
     yield s.check_bogus_field_returns_error, url, 'number', agent['number']
 
