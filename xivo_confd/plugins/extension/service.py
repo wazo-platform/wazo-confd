@@ -30,8 +30,9 @@ class ExtensionService(CRUDService):
     def get(self, resource_id, **kwargs):
         return self.dao.get_by(id=resource_id, is_feature=False, **kwargs)
 
-    def edit(self, extension, updated_fields=None):
+    def edit(self, extension, updated_fields=None, tenant_uuids=None):
         with Session.no_autoflush:
+            self.context_exists_validator.validate(extension, tenant_uuids)
             self.validator.validate_edit(extension)
         self.dao.edit(extension)
         self.notifier.edited(extension, updated_fields)

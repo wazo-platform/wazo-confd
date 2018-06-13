@@ -301,6 +301,9 @@ def test_update_and_multi_tenant(_, __, in_main, in_sub):
     response = confd.extensions(in_sub['id']).get()
     assert_that(response.item, has_entries(id=in_sub['id'], enabled=False))
 
+    response = confd.extensions(in_sub['id']).put(context='main', wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.not_found('Context'))
+
 
 @fixtures.user()
 @fixtures.user()

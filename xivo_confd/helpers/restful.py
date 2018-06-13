@@ -18,7 +18,32 @@ class ErrorCatchingResource(Resource):
 
 
 class ConfdResource(ErrorCatchingResource):
+
     method_decorators = [authentication.login_required] + ErrorCatchingResource.method_decorators
+
+    def _has_a_tenant_uuid(self):
+        if getattr(self, 'has_tenant_uuid', None):
+            return True
+
+        return (
+            hasattr(self, 'model')
+            and hasattr(self.model, '__mapper__')
+            and hasattr(self.model.__mapper__.c, 'tenant_uuid')
+        )
+
+    def _build_tenant_list(self, params):
+        if not self._has_a_tenant_uuid():
+            return
+
+        tenant = Tenant.autodetect().uuid
+        recurse = params.get('recurse', False)
+        if not recurse:
+            return [tenant]
+
+        tenants = []
+        for tenant in get_auth_client().tenants.list(tenant_uuid=tenant)['items']:
+            tenants.append(tenant['uuid'])
+        return tenants
 
 
 class ListResource(ConfdResource):
@@ -77,27 +102,6 @@ class ListResource(ConfdResource):
     def build_headers(self, model):
         raise NotImplementedError()
 
-    def _has_a_tenant_uuid(self):
-        return (
-            hasattr(self, 'model')
-            and hasattr(self.model, '__mapper__')
-            and hasattr(self.model.__mapper__.c, 'tenant_uuid')
-        )
-
-    def _build_tenant_list(self, params):
-        if not self._has_a_tenant_uuid():
-            return
-
-        tenant = Tenant.autodetect().uuid
-        recurse = params.get('recurse', False)
-        if not recurse:
-            return [tenant]
-
-        tenants = []
-        for tenant in get_auth_client().tenants.list(tenant_uuid=tenant)['items']:
-            tenants.append(tenant['uuid'])
-        return tenants
-
 
 class ItemResource(ConfdResource):
 
@@ -115,15 +119,15 @@ class ItemResource(ConfdResource):
     def put(self, id):
         kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
-        self.parse_and_update(model)
+        self.parse_and_update(model, **kwargs)
         return '', 204
 
-    def parse_and_update(self, model):
+    def parse_and_update(self, model, **kwargs):
         form = self.schema().load(request.get_json(), partial=True).data
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model, updated_fields)
+        self.service.edit(model, updated_fields, **kwargs)
 
     def find_updated_fields(self, model, form):
         updated_fields = []
@@ -145,5 +149,5 @@ class ItemResource(ConfdResource):
         if not self.has_tenant_uuid:
             return {}
 
-        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         return {'tenant_uuids': tenant_uuids}
