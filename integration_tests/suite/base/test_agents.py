@@ -34,6 +34,17 @@ def test_post_errors():
     for check in error_checks(url):
         yield check
 
+    yield s.check_bogus_field_returns_error, url, 'number', 123
+    yield s.check_bogus_field_returns_error, url, 'number', True
+    yield s.check_bogus_field_returns_error, url, 'number', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(0)
+    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(41)
+    yield s.check_bogus_field_returns_error, url, 'number', []
+    yield s.check_bogus_field_returns_error, url, 'number', {}
+
+    for check in unique_error_checks(url):
+        yield check
+
 
 @fixtures.agent()
 def test_put_errors(agent):
@@ -53,13 +64,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'lastname', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'lastname', []
     yield s.check_bogus_field_returns_error, url, 'lastname', {}
-    yield s.check_bogus_field_returns_error, url, 'number', 123
-    yield s.check_bogus_field_returns_error, url, 'number', True
-    yield s.check_bogus_field_returns_error, url, 'number', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(0)
-    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(41)
-    yield s.check_bogus_field_returns_error, url, 'number', []
-    yield s.check_bogus_field_returns_error, url, 'number', {}
     yield s.check_bogus_field_returns_error, url, 'password', 123
     yield s.check_bogus_field_returns_error, url, 'password', True
     yield s.check_bogus_field_returns_error, url, 'password', s.random_string(129)
@@ -79,9 +83,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-
-    for check in unique_error_checks(url):
-        yield check
 
 
 @fixtures.agent(number='1234')
@@ -190,7 +191,6 @@ def test_edit_minimal_parameters(agent):
 @fixtures.agent()
 def test_edit_all_parameters(agent):
     parameters = {
-        'number': '1234',
         'firstname': 'Firstname',
         'lastname': 'Lastname',
         'password': '5678',
@@ -203,6 +203,15 @@ def test_edit_all_parameters(agent):
 
     response = confd.agents(agent['id']).get()
     assert_that(response.item, has_entries(parameters))
+
+
+@fixtures.agent(number='1234')
+def test_edit_number_unavailable(agent):
+    response = confd.agents(agent['id']).put(number='4567')
+    response.assert_updated()
+
+    response = confd.agents(agent['id']).get()
+    assert_that(response.item, has_entries(number=agent['number']))
 
 
 @fixtures.agent()

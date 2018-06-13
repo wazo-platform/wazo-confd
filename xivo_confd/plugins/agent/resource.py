@@ -9,7 +9,7 @@ from xivo_dao.alchemy.agentfeatures import AgentFeatures as Agent
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import AgentSchema
+from .schema import AgentSchema, AgentSchemaPUT
 
 
 class AgentList(ListResource):
@@ -31,7 +31,7 @@ class AgentList(ListResource):
 
 class AgentItem(ItemResource):
 
-    schema = AgentSchema
+    schema = AgentSchemaPUT
 
     @required_acl('confd.agents.{id}.read')
     def get(self, id):

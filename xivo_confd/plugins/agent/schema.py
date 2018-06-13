@@ -22,4 +22,5 @@ class AgentSchema(BaseSchema):
     links = ListLink(Link('agents'))
 
 
-# TODO cannot editing number
+class AgentSchemaPUT(AgentSchema):
+    number = fields.String(dump_only=True)
