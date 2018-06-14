@@ -129,12 +129,6 @@ def test_delete_context_when_context_and_sub_context_associated(context, sub_con
         deleted_context = confd.contexts(context['id']).get
         yield s.check_resource_not_found, deleted_context, 'Context'
 
-        response = confd.contexts(sub_context1['id']).get()
-        yield assert_that, response.item['contexts'], empty()
-
-        response = confd.contexts(sub_context2['id']).get()
-        yield assert_that, response.item['contexts'], empty()
-
 
 @fixtures.context()
 @fixtures.context()
