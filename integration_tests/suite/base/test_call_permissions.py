@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from . import confd
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+)
 
-from hamcrest import (assert_that,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not)
+
+from . import confd
+from ..helpers import (
+    scenarios as s,
+    errors as e,
+    fixtures,
+)
 
 
 def test_get_errors():
@@ -124,12 +130,17 @@ def check_search(url, call_permission, hidden, field, term):
                           extensions=['123', '456'])
 def test_get(call_permission):
     response = confd.callpermissions(call_permission['id']).get()
-    assert_that(response.item, has_entries(name='search',
-                                           password='123',
-                                           description='SearchDesc',
-                                           mode='deny',
-                                           enabled=True,
-                                           extensions=['123', '456']))
+    assert_that(response.item, has_entries(
+        name='search',
+        password='123',
+        description='SearchDesc',
+        mode='deny',
+        enabled=True,
+        extensions=['123', '456'],
+        users=empty(),
+        outcalls=empty(),
+        groups=empty(),
+    ))
 
 
 def test_create_call_permission_minimal_parameters():
