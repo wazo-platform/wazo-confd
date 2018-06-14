@@ -101,6 +101,51 @@ parameters:
 definitions:
   Context:
     title: Context
+    allOf:
+    - $ref: '#/definitions/ContextRelationBase'
+    - properties:
+        label:
+          type: string
+          description: The label of the context
+        type:
+          type: string
+          default: internal
+          enum:
+          - internal
+          - incall
+          - outcall
+          - services
+          - others
+        user_ranges:
+          type: array
+          items:
+            $ref: '#/definitions/ContextRange'
+        group_ranges:
+          type: array
+          items:
+            $ref: '#/definitions/ContextRange'
+        queue_ranges:
+          type: array
+          items:
+            $ref: '#/definitions/ContextRange'
+        conference_room_ranges:
+          type: array
+          items:
+            $ref: '#/definitions/ContextRange'
+        incall_ranges:
+          type: array
+          items:
+            $ref: '#/definitions/ContextIncallRange'
+        description:
+          type: string
+          description: Additional information about the context
+        enabled:
+          type: boolean
+          default: true
+    - $ref: '#/definitions/ContextRelationContexts'
+    required:
+    - name
+  ContextRelationBase:
     properties:
       id:
         type: integer
@@ -109,46 +154,6 @@ definitions:
       name:
         type: string
         description: The name used by Asterisk (can only by set on create)
-      label:
-        type: string
-        description: The label of the context
-      type:
-        type: string
-        default: internal
-        enum:
-        - internal
-        - incall
-        - outcall
-        - services
-        - others
-      user_ranges:
-        type: array
-        items:
-          $ref: '#/definitions/ContextRange'
-      group_ranges:
-        type: array
-        items:
-          $ref: '#/definitions/ContextRange'
-      queue_ranges:
-        type: array
-        items:
-          $ref: '#/definitions/ContextRange'
-      conference_room_ranges:
-        type: array
-        items:
-          $ref: '#/definitions/ContextRange'
-      incall_ranges:
-        type: array
-        items:
-          $ref: '#/definitions/ContextIncallRange'
-      description:
-        type: string
-        description: Additional information about the context
-      enabled:
-        type: boolean
-        default: true
-    required:
-    - name
   ContextRange:
     title: ContextRange
     properties:
@@ -179,3 +184,12 @@ definitions:
         type: integer
     required:
     - total
+  ContextRelationContext:
+    $ref: '#/definitions/ContextRelationBase'
+  ContextRelationContexts:
+    properties:
+      contexts:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ContextRelationContext'
