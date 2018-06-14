@@ -49,7 +49,10 @@ class ExtensionItem(ItemResource):
 
     @required_acl('confd.extensions.{id}.update')
     def put(self, id):
-        return super(ExtensionItem, self).put(id)
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get(id, **kwargs)
+        self.parse_and_update(model, **kwargs)
+        return '', 204
 
     @required_acl('confd.extensions.{id}.delete')
     def delete(self, id):

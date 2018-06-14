@@ -121,7 +121,7 @@ class ItemResource(ConfdResource):
     def put(self, id):
         kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
-        self.parse_and_update(model, **kwargs)
+        self.parse_and_update(model)
         return '', 204
 
     def parse_and_update(self, model, **kwargs):
