@@ -25,9 +25,9 @@ from . import confd
 FAKE_ID = 999999999
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_associate_errors(group, extension):
+@fixtures.group()
+def test_associate_errors(extension, group):
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).put
 
@@ -35,9 +35,9 @@ def test_associate_errors(group, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_dissociate_errors(group, extension):
+@fixtures.group()
+def test_dissociate_errors(extension, group):
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).delete
 
@@ -45,88 +45,88 @@ def test_dissociate_errors(group, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_associate(group, extension):
+@fixtures.group()
+def test_associate(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_updated()
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_associate_already_associated(group, extension):
+@fixtures.group()
+def test_associate_already_associated(extension, group):
     with a.group_extension(group, extension):
         response = confd.groups(group['id']).extensions(extension['id']).put()
         response.assert_updated()
 
 
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
-@fixtures.extension(exten=gen_group_exten())
-@fixtures.extension(exten=gen_group_exten())
-def test_associate_multiple_extensions_to_group(group, extension1, extension2):
+def test_associate_multiple_extensions_to_group(extension1, extension2, group):
     with a.group_extension(group, extension1):
         response = confd.groups(group['id']).extensions(extension2['id']).put()
         response.assert_match(400, e.resource_associated('Group', 'Extension'))
 
 
-@fixtures.group()
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_associate_multiple_groups_to_extension(group1, group2, extension):
+@fixtures.group()
+@fixtures.group()
+def test_associate_multiple_groups_to_extension(extension, group1, group2):
     with a.group_extension(group1, extension):
         response = confd.groups(group2['id']).extensions(extension['id']).put()
         response.assert_match(400, e.resource_associated('Group', 'Extension'))
 
 
+@fixtures.extension()
 @fixtures.group()
 @fixtures.user()
 @fixtures.line_sip()
-@fixtures.extension()
-def test_associate_when_user_already_associated(group, user, line_sip, extension):
+def test_associate_when_user_already_associated(extension, group, user, line_sip):
     with a.user_line(user, line_sip), a.line_extension(line_sip, extension):
         response = confd.groups(group['id']).extensions(extension['id']).put()
         response.assert_match(400, e.resource_associated('user', 'Extension'))
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten(), context=INCALL_CONTEXT)
-def test_associate_when_not_internal_context(group, extension):
+@fixtures.group()
+def test_associate_when_not_internal_context(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_status(400)
 
 
-@fixtures.group()
 @fixtures.extension(exten=EXTEN_OUTSIDE_RANGE)
-def test_associate_when_exten_outside_range(group, extension):
+@fixtures.group()
+def test_associate_when_exten_outside_range(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_status(400)
 
 
-@fixtures.group()
 @fixtures.extension(exten='_5678')
-def test_associate_when_exten_pattern(group, extension):
+@fixtures.group()
+def test_associate_when_exten_pattern(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_updated()
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_dissociate(group, extension):
+@fixtures.group()
+def test_dissociate(extension, group):
     with a.group_extension(group, extension, check=False):
         response = confd.groups(group['id']).extensions(extension['id']).delete()
         response.assert_deleted()
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_dissociate_not_associated(group, extension):
+@fixtures.group()
+def test_dissociate_not_associated(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).delete()
     response.assert_deleted()
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_get_group_relation(group, extension):
+@fixtures.group()
+def test_get_group_relation(extension, group):
     with a.group_extension(group, extension):
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
@@ -147,17 +147,17 @@ def test_get_extension_relation(extension, group):
         ))
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_edit_context_to_incall_when_associated(group, extension):
+@fixtures.group()
+def test_edit_context_to_incall_when_associated(extension, group):
     with a.group_extension(group, extension):
         response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
         response.assert_status(400)
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_delete_group_when_group_and_extension_associated(group, extension):
+@fixtures.group()
+def test_delete_group_when_group_and_extension_associated(extension, group):
     with a.group_extension(group, extension, check=False):
         response = confd.groups(group['id']).delete()
         response.assert_deleted()
@@ -168,9 +168,9 @@ def test_delete_extension_when_group_and_extension_associated():
     pass
 
 
-@fixtures.group()
 @fixtures.extension(exten=gen_group_exten())
-def test_bus_events(group, extension):
+@fixtures.group()
+def test_bus_events(extension, group):
     url = confd.groups(group['id']).extensions(extension['id'])
     yield s.check_bus_event, 'config.groups.extensions.updated', url.put
     yield s.check_bus_event, 'config.groups.extensions.deleted', url.delete
