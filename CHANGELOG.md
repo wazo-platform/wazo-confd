@@ -4,6 +4,11 @@ Changelog
 18.07
 -----
 
+* A new API for associating an extension with a queue has been added:
+
+  * DELETE `/1.1/queues/<queue_id>/extensions/<extension_id>`
+  * PUT `/1.1/queues/<queue_id>/extensions/<extension_id>`
+
 * A new API for editing fallbacks for a queue has been added:
 
   * GET `/1.1/queues/<queue_id>/fallbacks`

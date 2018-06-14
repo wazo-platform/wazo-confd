@@ -166,3 +166,11 @@ def test_delete_group_when_group_and_extension_associated(group, extension):
 def test_delete_extension_when_group_and_extension_associated():
     # It is impossible to delete an extension while it associated to an object
     pass
+
+
+@fixtures.group()
+@fixtures.extension(exten=gen_group_exten())
+def test_bus_events(group, extension):
+    url = confd.groups(group['id']).extensions(extension['id'])
+    yield s.check_bus_event, 'config.groups.extensions.updated', url.put
+    yield s.check_bus_event, 'config.groups.extensions.deleted', url.delete

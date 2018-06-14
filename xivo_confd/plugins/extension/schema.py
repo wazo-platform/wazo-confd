@@ -35,3 +35,6 @@ class ExtensionSchema(BaseSchema):
     outcall = fields.Nested('OutcallSchema',
                             only=['id', 'name', 'links'],
                             dump_only=True)
+    queue = fields.Nested('QueueSchema',
+                          only=['id', 'name', 'label', 'links'],
+                          dump_only=True)

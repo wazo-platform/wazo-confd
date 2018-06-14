@@ -38,6 +38,13 @@ class QueueSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('queues'))
 
+    extensions = fields.Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
+        dump_only=True,
+    )
+
     @post_load
     def create_objects(self, data):
         for key in ('wait_time_destination', 'wait_ratio_destination'):
