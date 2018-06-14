@@ -5,7 +5,7 @@
 from flask import request
 from flask_restful import Resource
 
-from xivo.tenant_flask_helpers import get_auth_client, Tenant
+from xivo.tenant_flask_helpers import get_auth_client, get_token, Tenant
 from xivo_dao import tenant_dao
 from xivo_dao.helpers import errors
 
@@ -41,7 +41,9 @@ class ConfdResource(ErrorCatchingResource):
             return [tenant]
 
         tenants = []
-        for tenant in get_auth_client().tenants.list(tenant_uuid=tenant)['items']:
+        auth_client = get_auth_client()
+        auth_client.set_token(get_token()['token'])
+        for tenant in auth_client.tenants.list(tenant_uuid=tenant)['items']:
             tenants.append(tenant['uuid'])
         return tenants
 
