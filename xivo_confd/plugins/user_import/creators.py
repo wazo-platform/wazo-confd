@@ -185,7 +185,8 @@ class ExtensionCreator(Creator):
         context = fields.get('context')
         if exten and context:
             form = self.schema(handle_error=False, strict=True).load(fields).data
-            return self.service.create(Extension(**form))
+            tenant_uuids = [tenant_uuid] if tenant_uuid is not None else None
+            return self.service.create(Extension(**form), tenant_uuids=tenant_uuids)
 
 
 class CtiProfileCreator(Creator):
