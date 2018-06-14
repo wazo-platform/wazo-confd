@@ -34,6 +34,13 @@ class ContextSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('contexts'))
 
+    contexts = fields.Nested(
+        'ContextSchema',
+        only=['id', 'name', 'label', 'links'],
+        many=True,
+        dump_only=True,
+    )
+
     @post_load
     def create_objects(self, data):
         for key in ['user_ranges', 'group_ranges', 'queue_ranges', 'conference_room_ranges', 'incall_ranges']:

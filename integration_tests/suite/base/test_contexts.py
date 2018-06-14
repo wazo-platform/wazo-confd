@@ -187,18 +187,21 @@ def test_sorting_offset_limit(context1, context2):
 @fixtures.context()
 def test_get(context):
     response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(id=context['id'],
-                                           name=context['name'],
-                                           label=context['label'],
-                                           type=context['type'],
-                                           user_ranges=context['user_ranges'],
-                                           group_ranges=context['group_ranges'],
-                                           queue_ranges=context['queue_ranges'],
-                                           conference_room_ranges=context['conference_room_ranges'],
-                                           incall_ranges=context['incall_ranges'],
-                                           description=context['description'],
-                                           enabled=context['enabled'],
-                                           tenant_uuid=uuid_()))
+    assert_that(response.item, has_entries(
+        id=context['id'],
+        name=context['name'],
+        label=context['label'],
+        type=context['type'],
+        user_ranges=context['user_ranges'],
+        group_ranges=context['group_ranges'],
+        queue_ranges=context['queue_ranges'],
+        conference_room_ranges=context['conference_room_ranges'],
+        incall_ranges=context['incall_ranges'],
+        description=context['description'],
+        enabled=context['enabled'],
+        tenant_uuid=uuid_(),
+        contexts=empty(),
+    ))
 
 
 def test_create_minimal_parameters():

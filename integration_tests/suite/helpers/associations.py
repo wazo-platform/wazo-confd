@@ -351,3 +351,12 @@ def call_pickup_target_group(call_pickup, *groups, **kwargs):
     h.call_pickup_target_group.associate(call_pickup['id'], group_ids, check=check)
     yield
     h.call_pickup_target_group.dissociate(call_pickup['id'], check=check)
+
+
+@contextmanager
+def context_context(context, *contexts, **kwargs):
+    context_ids = [c['id'] for c in contexts]
+    check = kwargs.get('check', True)
+    h.context_context.associate(context['id'], context_ids, check=check)
+    yield
+    h.context_context.dissociate(context['id'], check=check)
