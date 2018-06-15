@@ -79,6 +79,7 @@ DEFAULT_CONFIG = {
         'port': '8668'
     },
     'enabled_plugins': {
+        'agent': True,
         'api': True,
         'call_log': True,
         'call_filter': True,

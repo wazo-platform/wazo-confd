@@ -18,6 +18,14 @@ Changelog
 
   * PUT `/1.1/contexts/<context_id>/contexts`
 
+* Added agent endpoints:
+
+  * GET `/1.1/agents`
+  * POST `/1.1/agents`
+  * DELETE `/1.1/agents/<agent_id>`
+  * GET `/1.1/agents/<agent_id>`
+  * PUT `/1.1/agents/<agent_id>`
+
 * The entity of a user cannot be changed anymore. The following resource has been removed:
 
   * PUT `/1.1/users/<user_id>/entities/<entity_id>`

@@ -309,13 +309,6 @@ class DatabaseQueries(object):
         query = text("SELECT * FROM agentfeatures")
         return self.connection.execute(query)
 
-    def delete_agent(self, agent_id):
-        query = text("DELETE FROM func_key_dest_agent WHERE agent_id = :agent_id")
-        self.connection.execute(query, agent_id=agent_id)
-
-        query = text("DELETE FROM agentfeatures WHERE id = :agent_id")
-        self.connection.execute(query, agent_id=agent_id)
-
     def insert_agent_login_status(self, context='default'):
         query = text("""
         INSERT INTO agent_login_status (agent_id, agent_number, extension, context, interface, state_interface)
