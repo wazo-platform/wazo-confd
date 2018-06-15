@@ -3,15 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
+from xivo_dao.resources.call_filter import dao as call_filter_dao
+from xivo_dao.resources.call_pickup import dao as call_pickup_dao
+from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.entity import dao as entity_dao
+from xivo_dao.resources.schedule import dao as schedule_dao
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.database import (
-    call_filter as call_filter_dao,
-    call_pickup as call_pickup_dao,
-    context as context_dao,
-    schedule as schedule_dao,
-)
 from xivo_confd.helpers.validator import (
     UniqueField,
     ValidationGroup,
