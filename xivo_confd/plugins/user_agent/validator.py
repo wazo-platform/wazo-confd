@@ -4,17 +4,12 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.database import agent as agent_db_module
 from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 
 
 class UserAgentAssociationValidator(ValidatorAssociation):
 
-    def __init__(self, agent_db):
-        self.agent_db = agent_db
-
     def validate(self, user, agent):
-        self.validate_agent_exists(agent)
         self.validate_user_not_already_associated(user, agent)
 
     def validate_user_not_already_associated(self, user, agent):
@@ -22,15 +17,10 @@ class UserAgentAssociationValidator(ValidatorAssociation):
             raise errors.resource_associated('User', 'Agent',
                                              user_id=user.id, agent=agent.id)
 
-    def validate_agent_exists(self, agent):
-        exists = self.agent_db.agent_id_exists(agent.id)
-        if not exists:
-            raise errors.not_found('Agent', id=agent.id)
-
 
 def build_validator():
     return ValidationAssociation(
         association=[
-            UserAgentAssociationValidator(agent_db_module)
+            UserAgentAssociationValidator()
         ],
     )
