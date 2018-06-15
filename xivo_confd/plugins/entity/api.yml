@@ -94,6 +94,10 @@ definitions:
       display_name:
         type: string
         description: The displayed name on the web interface
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
     required:
     - name
   EntityItems:

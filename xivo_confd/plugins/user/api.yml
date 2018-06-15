@@ -380,6 +380,10 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the user
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/UserRelationAgent'
     - $ref: '#/definitions/UserRelationCtiProfile'
     - $ref: '#/definitions/UserRelationFallbacks'

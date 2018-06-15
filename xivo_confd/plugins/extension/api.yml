@@ -151,6 +151,10 @@ definitions:
         enabled:
           type: boolean
           description: If False the extension is disabled.
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/ExtensionRelationConference'
     - $ref: '#/definitions/ExtensionRelationGroup'
     - $ref: '#/definitions/ExtensionRelationIncall'
