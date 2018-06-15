@@ -309,13 +309,6 @@ def test_delete_when_voicemail_associated(context, voicemail):
 
 
 @fixtures.context(name='error')
-@fixtures.agent(context='error')
-def test_delete_when_agent_associated(context, agent):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Agent'))
-
-
-@fixtures.context(name='error')
 @fixtures.agent_login_status(context='error')
 def test_delete_when_agent_is_logged(context, agent_login_status):
     response = confd.contexts(context['id']).delete()

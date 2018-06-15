@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright (C) 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -30,7 +30,6 @@ class ContextDeleteValidator(Validator):
         self.validate_has_no_extensions(context)
         self.validate_has_no_voicemails(context)
         self.validate_has_no_trunks(context)
-        self.validate_has_no_agents(context)
         self.validate_has_no_agent_status(context)
         self.validate_has_no_sip_general(context)
 
@@ -54,13 +53,6 @@ class ContextDeleteValidator(Validator):
             raise errors.resource_associated('Context', 'Trunk',
                                              context_id=context.id,
                                              trunk_id=trunk.id)
-
-    def validate_has_no_agents(self, context):
-        agent = self.agent_dao.find_by(context=context.name)
-        if agent:
-            raise errors.resource_associated('Context', 'Agent',
-                                             context_id=context.id,
-                                             agent_id=agent.id)
 
     def validate_has_no_agent_status(self, context):
         agent_status = self.agent_login_status_dao.find_by(context=context.name)
