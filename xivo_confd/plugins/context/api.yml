@@ -142,6 +142,10 @@ definitions:
         enabled:
           type: boolean
           default: true
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/ContextRelationContexts'
     required:
     - name

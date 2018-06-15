@@ -7,6 +7,8 @@ paths:
       tags:
       - extensions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -45,6 +47,7 @@ paths:
       tags:
       - extensions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Extension to create
@@ -148,6 +151,10 @@ definitions:
         enabled:
           type: boolean
           description: If False the extension is disabled.
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/ExtensionRelationConference'
     - $ref: '#/definitions/ExtensionRelationGroup'
     - $ref: '#/definitions/ExtensionRelationIncall'

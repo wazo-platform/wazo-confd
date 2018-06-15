@@ -10,6 +10,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class ExtensionSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     exten = fields.String(validate=Length(max=40), required=True)
     context = fields.String(required=True)
     commented = fields.Boolean(attribute='legacy_commented')
