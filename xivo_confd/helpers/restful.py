@@ -4,6 +4,7 @@
 
 from flask import request
 from flask_restful import Resource
+from requests import HTTPError
 
 from xivo.tenant_flask_helpers import get_auth_client, get_token, Tenant
 from xivo_dao import tenant_dao
@@ -43,9 +44,17 @@ class ConfdResource(ErrorCatchingResource):
         tenants = []
         auth_client = get_auth_client()
         auth_client.set_token(get_token()['token'])
-        for tenant in auth_client.tenants.list(tenant_uuid=tenant)['items']:
-            tenants.append(tenant['uuid'])
-        return tenants
+
+        try:
+            tenants = auth_client.tenants.list(tenant_uuid=tenant)['items']
+        except HTTPError as e:
+            response = getattr(e, 'response', None)
+            status_code = getattr(response, 'status_code', None)
+            if status_code == 401:
+                return [tenant]
+            raise
+
+        return [t['uuid'] for t in tenants]
 
 
 class ListResource(ConfdResource):
