@@ -17,26 +17,30 @@ class UserAgentSchema(BaseSchema):
                           target='id'))
 
 
-class UserAgentResource(ConfdResource):
+class UserAgentItem(ConfdResource):
 
-    def __init__(self, service, user_dao):
-        super(UserAgentResource, self).__init__()
+    def __init__(self, service, user_dao, agent_dao):
+        super(UserAgentItem, self).__init__()
         self.service = service
         self.user_dao = user_dao
-
-
-class UserAgentItem(UserAgentResource):
+        self.agent_dao = agent_dao
 
     @required_acl('confd.users.{user_id}.agents.{agent_id}.update')
     def put(self, user_id, agent_id):
         user = self.user_dao.get_by_id_uuid(user_id)
-        self.service.associate(user, agent_id)
+        agent = self.agent_dao.get(agent_id)
+        self.service.associate(user, agent)
         return '', 204
 
 
-class UserAgentList(UserAgentResource):
+class UserAgentList(ConfdResource):
 
     schema = UserAgentSchema
+
+    def __init__(self, service, user_dao):
+        super(UserAgentList, self).__init__()
+        self.service = service
+        self.user_dao = user_dao
 
     @required_acl('confd.users.{user_id}.agents.read')
     def get(self, user_id):

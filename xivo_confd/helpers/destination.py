@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import Schema, fields, pre_dump, post_load, post_dump
@@ -412,7 +412,7 @@ class DestinationValidator(object):
         'meetme': [ResourceExists('actionarg1', meetme_dao.exists, 'Conference')],
         'none': [],
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
-        'queue': [ResourceExists('actionarg1', queue_dao.exists, 'Queue')],
+        'queue': [GetResource('actionarg1', queue_dao.get, 'Queue')],
         'sound': [],
         'switchboard': [GetResource('actionarg1', switchboard_dao.get, 'Switchboard')],
         'user': [GetResource('actionarg1', user_dao.get, 'User')],
