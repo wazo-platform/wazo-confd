@@ -2,6 +2,12 @@ version: '3'
 services:
   sync:
     depends_on:
+      - auth
+      - postgres
+      - provd
+      - rabbitmq
+      - sysconfd
+      - confd
       - ari
     environment:
       TARGETS: "ari:5039,postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"

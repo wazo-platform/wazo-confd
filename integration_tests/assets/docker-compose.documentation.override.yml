@@ -2,6 +2,8 @@ version: '3'
 services:
   sync:
     depends_on:
+      - postgres
+      - confd
       - swagger-validator
     environment:
       TARGETS: "swagger-validator:8080,postgres:5432,confd:9486"
