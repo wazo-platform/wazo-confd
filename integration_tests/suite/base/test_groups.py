@@ -267,6 +267,16 @@ def test_edit_all_parameters(group):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.groups(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.group()
 def test_delete(group):
     response = confd.groups(group['id']).delete()

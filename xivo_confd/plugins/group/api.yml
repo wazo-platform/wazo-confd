@@ -64,6 +64,7 @@ paths:
       tags:
       - groups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/groupid'
       - name: body
         in: body
