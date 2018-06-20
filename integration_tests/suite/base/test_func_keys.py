@@ -23,6 +23,7 @@ from ..helpers import (
 )
 
 FAKE_ID = 999999999
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 
 invalid_destinations = [
     1234,
@@ -191,7 +192,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         park_pos = 701
 
         with self.db.queries() as queries:
-            group_id = queries.insert_group(number=group_exten)
+            group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
             queue_id = queries.insert_queue(number=queue_exten)
             conference_id = queries.insert_conference(number=conf_exten)
             agent_id = queries.insert_agent(self.user['id'])
