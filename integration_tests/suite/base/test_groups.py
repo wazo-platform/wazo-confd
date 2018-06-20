@@ -285,6 +285,16 @@ def test_delete(group):
     response.assert_match(404, e.not_found(resource='Group'))
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.groups(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.group()
 def test_bus_events(group):
     yield s.check_bus_event, 'config.groups.created', confd.groups.post, {'name': 'group_bus_event'}
