@@ -32,6 +32,7 @@ class GroupList(ListResource):
 class GroupItem(ItemResource):
 
     schema = GroupSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.groups.{id}.read')
     def get(self, id):
