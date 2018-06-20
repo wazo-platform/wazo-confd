@@ -20,6 +20,9 @@ from ..helpers import (
     scenarios as s,
 )
 
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
+
 
 def test_get_errors():
     fake_group = confd.groups(999999).get
@@ -175,7 +178,8 @@ def test_create_minimal_parameters():
     response.assert_created('groups')
 
     assert_that(response.item, has_entries(id=not_(empty()),
-                                           name='MyGroup'))
+                                           name='MyGroup',
+                                           tenant_uuid=MAIN_TENANT))
 
     confd.groups(response.item['id']).delete().assert_deleted()
 
@@ -196,9 +200,16 @@ def test_create_all_parameters():
     response = confd.groups.post(**parameters)
     response.assert_created('groups')
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.groups(response.item['id']).delete().assert_deleted()
+
+
+def test_create_multi_tenant():
+    response = confd.groups.post(name='MyGroup', wazo_tenant=SUB_TENANT)
+    response.assert_created('groups')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 @fixtures.group()

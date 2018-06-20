@@ -24,6 +24,7 @@ paths:
       tags:
       - groups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Group to create
@@ -146,6 +147,10 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the group
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/GroupRelationExtensions'
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
