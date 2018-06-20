@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -135,6 +137,22 @@ def check_search(url, group, hidden, field, term):
     not_expected = has_item(has_entry('id', hidden['id']))
     assert_that(response.items, expected)
     assert_that(response.items, is_not(not_expected))
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.groups.get(wazo_tenant=MAIN_TENANT)
+    expected = all_of(has_item(main)), not_(has_item(sub))
+    assert_that(response.items, expected)
+
+    response = confd.groups.get(wazo_tenant=SUB_TENANT)
+    expected = all_of(has_item(sub), not_(has_item(main)))
+    assert_that(response.items, expected)
+
+    response = confd.groups.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    expected = has_items(main, sub)
+    assert_that(response.items, expected)
 
 
 @fixtures.group(name='sort1', preprocess_subroutine='sort1')
