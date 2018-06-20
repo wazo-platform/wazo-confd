@@ -48,6 +48,7 @@ paths:
       tags:
       - groups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/groupid'
       responses:
         '200':
