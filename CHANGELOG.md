@@ -4,6 +4,14 @@ Changelog
 18.07
 -----
 
+* The `/extensions` routes are now multi-tenant. This means that created tenant will be in the same
+  tenant as the creator or in the tenant specified by the Wazo-Tenant HTTP header. Listing
+  extensions will also only list extensions in the user's tenant unless a sub-tenant is specified using
+  the Wazo-Tenant header. The `recurse=true` query string can be used to list from multiple tenants.
+  GET, DELETE and PUT on a extension that is not in a tenant accessible to the user will result in a
+  404.
+
+
 * A new API for associating an extension with a queue has been added:
 
   * DELETE `/1.1/queues/<queue_id>/extensions/<extension_id>`
