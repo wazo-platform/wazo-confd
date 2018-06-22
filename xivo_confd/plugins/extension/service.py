@@ -2,6 +2,8 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import logging
+
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.extension import dao as extension_dao_module
 
@@ -10,6 +12,8 @@ from xivo_confd.plugins.device import builder as device_builder
 
 from .notifier import build_notifier
 from .validator import build_context_exists_validator, build_validator
+
+logger = logging.getLogger(__name__)
 
 
 class ExtensionService(CRUDService):
@@ -20,6 +24,7 @@ class ExtensionService(CRUDService):
         self.context_exists_validator = context_exists_validator
 
     def create(self, extension, tenant_uuids):
+        logger.debug('creating %s tenant: %s', extension, tenant_uuids)
         self.context_exists_validator.validate(extension, tenant_uuids)
         return super(ExtensionService, self).create(extension)
 

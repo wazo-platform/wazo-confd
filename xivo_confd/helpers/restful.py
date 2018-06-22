@@ -43,6 +43,7 @@ class ConfdResource(ErrorCatchingResource):
             logger.debug('does not have a tenant uuid')
             return
 
+        logger.debug('headers: %s', request.headers)
         tenant = Tenant.autodetect().uuid
         logger.debug('%s detected', tenant)
         recurse = params.get('recurse', False)
@@ -59,7 +60,7 @@ class ConfdResource(ErrorCatchingResource):
 
         try:
             tenants = auth_client.tenants.list(tenant_uuid=tenant)['items']
-            logger.debug('found the following tenants')
+            logger.debug('found the following tenants: %s', tenants)
         except HTTPError as e:
             response = getattr(e, 'response', None)
             status_code = getattr(response, 'status_code', None)
