@@ -173,6 +173,11 @@ def test_get(schedule):
         open_periods=schedule['open_periods'],
         exceptional_periods=schedule['exceptional_periods'],
         enabled=schedule['enabled'],
+
+        groups=empty(),
+        incalls=empty(),
+        outcalls=empty(),
+        users=empty(),
     ))
 
 
