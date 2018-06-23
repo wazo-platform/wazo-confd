@@ -2,20 +2,24 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
+from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s
+)
 from ..helpers.config import (
     INCALL_CONTEXT,
     EXTEN_OUTSIDE_RANGE,
     gen_conference_exten,
 )
-from . import confd
-
 
 FAKE_ID = 999999999
 

@@ -2,22 +2,25 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    all_of,
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    is_not,
+    not_,
+)
 from xivo_test_helpers.hamcrest.uuid_ import uuid_
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-
-from hamcrest import (all_of,
-                      assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      has_items,
-                      is_not,
-                      not_)
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'

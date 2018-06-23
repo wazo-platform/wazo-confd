@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
-
 
 import unittest
 
 from datetime import datetime
-from hamcrest import assert_that
-from hamcrest import contains
-from hamcrest import empty
 
-from ..helpers import errors as e
-from ..helpers import fixtures
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+)
+
 from . import BaseIntegrationTest
+from ..helpers import (
+    errors as e,
+    fixtures,
+)
 
 
 class TestCallLogs(unittest.TestCase):

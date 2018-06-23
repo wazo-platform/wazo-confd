@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+    has_entry,
+    has_items,
+    has_length,
+    instance_of,
+)
 
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries,
-                      has_entry,
-                      has_items,
-                      has_length,
-                      instance_of)
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 ALL_OPTIONS = [
     ['buggymwi', 'yes'],

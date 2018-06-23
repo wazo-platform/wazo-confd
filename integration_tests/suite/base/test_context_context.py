@@ -16,7 +16,6 @@ from ..helpers import (
     scenarios as s,
 )
 
-
 FAKE_ID = 999999999
 
 

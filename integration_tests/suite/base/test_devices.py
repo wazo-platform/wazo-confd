@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
 
 from datetime import datetime
 
-from ..helpers import helpers as h
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import associations as a
-from ..helpers import fixtures
-from . import confd
-from . import mocks, provd
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    has_key,
+    is_not,
+    none,
+    not_none,
+    starts_with,
+)
 
-from hamcrest import (assert_that,
-                      has_entry,
-                      has_entries,
-                      has_key,
-                      none,
-                      not_none,
-                      is_not,
-                      has_item,
-                      starts_with,
-                      empty)
+from . import confd, mocks, provd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    helpers as h,
+    scenarios as s,
+)
 
 
 class TestDeviceCreateWithTemplate(unittest.TestCase):
