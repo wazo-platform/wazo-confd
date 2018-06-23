@@ -177,6 +177,7 @@ def test_get(schedule):
         groups=empty(),
         incalls=empty(),
         outcalls=empty(),
+        queues=empty(),
         users=empty(),
     ))
 

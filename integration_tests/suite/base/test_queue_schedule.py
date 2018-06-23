@@ -89,6 +89,37 @@ def test_dissociate_not_associated(queue, schedule):
 
 @fixtures.queue()
 @fixtures.schedule()
+def test_get_queue_relation(queue, schedule):
+    with a.queue_schedule(queue, schedule):
+        response = confd.queues(queue['id']).get()
+        assert_that(response.item, has_entries(
+            schedules=contains(
+                has_entries(
+                    id=schedule['id'],
+                    name=schedule['name'],
+                )
+            )
+        ))
+
+
+@fixtures.schedule()
+@fixtures.queue()
+def test_get_schedule_relation(schedule, queue):
+    with a.queue_schedule(queue, schedule):
+        response = confd.schedules(schedule['id']).get()
+        assert_that(response.item, has_entries(
+            queues=contains(
+                has_entries(
+                    id=queue['id'],
+                    name=queue['name'],
+                    label=queue['label'],
+                )
+            )
+        ))
+
+
+@fixtures.queue()
+@fixtures.schedule()
 def test_delete_queue_when_queue_and_schedule_associated(queue, schedule):
     with a.queue_schedule(queue, schedule, check=False):
         response = confd.queues(queue['id']).delete()

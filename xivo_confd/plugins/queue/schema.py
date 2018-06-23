@@ -44,6 +44,12 @@ class QueueSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    schedules = fields.Nested(
+        'ScheduleSchema',
+        only=['id', 'name', 'links'],
+        many=True,
+        dump_only=True,
+    )
 
     @post_load
     def create_objects(self, data):

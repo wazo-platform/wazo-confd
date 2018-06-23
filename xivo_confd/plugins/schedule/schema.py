@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields, post_load, validates, validates_schema
@@ -99,6 +99,10 @@ class ScheduleSchema(BaseSchema):
                           dump_only=True)
     groups = fields.Nested('GroupSchema',
                            only=['id', 'name', 'links'],
+                           many=True,
+                           dump_only=True)
+    queues = fields.Nested('QueueSchema',
+                           only=['id', 'name', 'label', 'links'],
                            many=True,
                            dump_only=True)
     outcalls = fields.Nested('OutcallSchema',
