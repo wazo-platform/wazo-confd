@@ -1,0 +1,36 @@
+paths:
+  /queues/{queue_id}/schedules/{schedule_id}:
+    put:
+      operationId: associate_queue_schedule
+      summary: Associate queue and schedule
+      description: '**Required ACL:** `confd.queues.{queue_id}.schedules.{schedule_id}.update`'
+      tags:
+      - queues
+      - schedules
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Queue and Schedule associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_queue_schedule
+      summary: Dissociate queue and schedule
+      description: '**Required ACL:** `confd.queues.{queue_id}.schedules.{schedule_id}.delete`'
+      tags:
+      - queues
+      - schedules
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/scheduleid'
+      responses:
+        '204':
+          description: Queue and Schedule dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
