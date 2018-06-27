@@ -30,12 +30,12 @@ class QueueMemberAssociation(QueueMemberResource):
 
     schema = QueueMemberSchema
 
-    @required_acl('confd.queues.{queue_id}.members.{agent_id}.read')
+    @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.read')
     def get(self, queue_id, agent_id):
         queue_member_agent = self.service.get(queue_id, agent_id)
         return self.schema().dump(queue_member_agent).data
 
-    @required_acl('confd.queues.{queue_id}.members.{agent_id}.update')
+    @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.update')
     def put(self, queue_id, agent_id):
         form = self.schema().load(request.get_json(), partial=True).data
         model = self.service.get(queue_id, agent_id)
@@ -43,7 +43,7 @@ class QueueMemberAssociation(QueueMemberResource):
         self.service.edit(model)
         return '', 204
 
-    @required_acl('confd.queues.{queue_id}.members.{agent_id}.delete')
+    @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.delete')
     def delete(self, queue_id, agent_id):
         queue_member_agent = self.service.get(queue_id, agent_id)
         self.service.dissociate(queue_member_agent)
@@ -61,7 +61,7 @@ class QueueMemberPost(QueueMemberResource):
                                     agent_id=queue_member.agent_id,
                                     _external=True)}
 
-    @required_acl('confd.queues.{queue_id}.members.create')
+    @required_acl('confd.queues.{queue_id}.members.agents.create')
     def post(self, queue_id):
         form = self.schema().load(request.get_json()).data
         form['queue_id'] = queue_id
