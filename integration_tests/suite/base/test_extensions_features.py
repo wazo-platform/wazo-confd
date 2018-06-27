@@ -10,10 +10,12 @@ from hamcrest import (
     is_not,
 )
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 

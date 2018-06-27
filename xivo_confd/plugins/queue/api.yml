@@ -250,6 +250,7 @@ definitions:
           items:
             $ref: '#/definitions/KeyValueOption'
           default: []
+    - $ref: '#/definitions/QueueRelationSchedules'
     required:
     - name
   QueueRelationBase:
@@ -264,6 +265,13 @@ definitions:
       label:
         type: string
         description: The label of the queue
+  QueueRelationSchedules:
+    properties:
+      schedules:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ScheduleRelationBase'
   QueueItems:
     title: QueueItems
     properties:

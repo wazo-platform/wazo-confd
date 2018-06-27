@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from . import confd
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    is_not,
+    not_,
+)
 
-from hamcrest import (assert_that,
-                      contains,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      has_items,
-                      is_not,
-                      not_)
+from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 
 def test_get_errors():
@@ -161,13 +165,21 @@ def test_sort_offset_limit(schedule1, schedule2):
 @fixtures.schedule()
 def test_get(schedule):
     response = confd.schedules(schedule['id']).get()
-    assert_that(response.item, has_entries(id=schedule['id'],
-                                           name=schedule['name'],
-                                           timezone=schedule['timezone'],
-                                           closed_destination=schedule['closed_destination'],
-                                           open_periods=schedule['open_periods'],
-                                           exceptional_periods=schedule['exceptional_periods'],
-                                           enabled=schedule['enabled']))
+    assert_that(response.item, has_entries(
+        id=schedule['id'],
+        name=schedule['name'],
+        timezone=schedule['timezone'],
+        closed_destination=schedule['closed_destination'],
+        open_periods=schedule['open_periods'],
+        exceptional_periods=schedule['exceptional_periods'],
+        enabled=schedule['enabled'],
+
+        groups=empty(),
+        incalls=empty(),
+        outcalls=empty(),
+        queues=empty(),
+        users=empty(),
+    ))
 
 
 def test_create_minimal_parameters():
@@ -180,25 +192,35 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MySchedule',
-                  'timezone': 'American/Toronto',
-                  'closed_destination': {'type': 'hangup',
-                                         'cause': 'busy',
-                                         'timeout': 25},
-                  'open_periods': [{'hours_start': '07:15',
-                                    'hours_end': '08:15',
-                                    'week_days': [1, 2, 3, 4, 5],
-                                    'month_days': [1, 15, 30],
-                                    'months': [1, 6, 12]}],
-                  'exceptional_periods': [{'hours_start': '07:25',
-                                           'hours_end': '07:35',
-                                           'week_days': [1, 2, 3, 4, 5],
-                                           'month_days': [1, 30],
-                                           'months': [1, 12],
-                                           'destination': {'type': 'hangup',
-                                                           'cause': 'congestion',
-                                                           'timeout': 30}}],
-                  'enabled': False}
+    parameters = {
+        'name': 'MySchedule',
+        'timezone': 'American/Toronto',
+        'closed_destination': {
+            'type': 'hangup',
+            'cause': 'busy',
+            'timeout': 25
+        },
+        'open_periods': [{
+            'hours_start': '07:15',
+            'hours_end': '08:15',
+            'week_days': [1, 2, 3, 4, 5],
+            'month_days': [1, 15, 30],
+            'months': [1, 6, 12]
+        }],
+        'exceptional_periods': [{
+            'hours_start': '07:25',
+            'hours_end': '07:35',
+            'week_days': [1, 2, 3, 4, 5],
+            'month_days': [1, 30],
+            'months': [1, 12],
+            'destination': {
+                'type': 'hangup',
+                'cause': 'congestion',
+                'timeout': 30
+            }
+        }],
+        'enabled': False
+    }
 
     response = confd.schedules.post(**parameters)
     response.assert_created('schedules')
@@ -210,19 +232,22 @@ def test_create_all_parameters():
 
 
 def test_create_open_periods_default_values():
-    response = confd.schedules.post(open_periods=[{'hours_start': '07:15',
-                                                   'hours_end': '08:15'}],
-                                    closed_destination={'type': 'none'})
+    response = confd.schedules.post(
+        open_periods=[{'hours_start': '07:15', 'hours_end': '08:15'}],
+        closed_destination={'type': 'none'}
+    )
 
     assert_that(response.item, has_entries(
         open_periods=contains(has_entries(
             hours_start='07:15',
             hours_end='08:15',
             week_days=[1, 2, 3, 4, 5, 6, 7],
-            month_days=[1, 2, 3, 4, 5, 6, 7, 8, 9,
-                        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                        20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                        30, 31],
+            month_days=[
+                1, 2, 3, 4, 5, 6, 7, 8, 9,
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                30, 31
+            ],
             months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         ))
     ))
@@ -231,20 +256,26 @@ def test_create_open_periods_default_values():
 
 
 def test_create_exceptional_periods_default_values():
-    response = confd.schedules.post(exceptional_periods=[{'hours_start': '07:15',
-                                                          'hours_end': '08:15',
-                                                          'destination': {'type': 'none'}}],
-                                    closed_destination={'type': 'none'})
+    response = confd.schedules.post(
+        exceptional_periods=[{
+            'hours_start': '07:15',
+            'hours_end': '08:15',
+            'destination': {'type': 'none'}
+        }],
+        closed_destination={'type': 'none'}
+    )
 
     assert_that(response.item, has_entries(
         exceptional_periods=contains(has_entries(
             hours_start='07:15',
             hours_end='08:15',
             week_days=[1, 2, 3, 4, 5, 6, 7],
-            month_days=[1, 2, 3, 4, 5, 6, 7, 8, 9,
-                        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                        20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                        30, 31],
+            month_days=[
+                1, 2, 3, 4, 5, 6, 7, 8, 9,
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                30, 31
+            ],
             months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             destination={'type': 'none'}
         ))
@@ -261,25 +292,35 @@ def test_edit_minimal_parameters(schedule):
 
 @fixtures.schedule()
 def test_edit_all_parameters(schedule):
-    parameters = {'name': 'MySchedule',
-                  'timezone': 'American/Toronto',
-                  'closed_destination': {'type': 'hangup',
-                                         'cause': 'busy',
-                                         'timeout': 25},
-                  'open_periods': [{'hours_start': '07:15',
-                                    'hours_end': '08:15',
-                                    'week_days': [1, 2, 3, 4, 5],
-                                    'month_days': [1, 15, 30],
-                                    'months': [1, 6, 12]}],
-                  'exceptional_periods': [{'hours_start': '07:25',
-                                           'hours_end': '07:35',
-                                           'week_days': [1, 2, 3, 4, 5],
-                                           'month_days': [1, 30],
-                                           'months': [1, 12],
-                                           'destination': {'type': 'hangup',
-                                                           'cause': 'congestion',
-                                                           'timeout': 30}}],
-                  'enabled': False}
+    parameters = {
+        'name': 'MySchedule',
+        'timezone': 'American/Toronto',
+        'closed_destination': {
+            'type': 'hangup',
+            'cause': 'busy',
+            'timeout': 25
+        },
+        'open_periods': [{
+            'hours_start': '07:15',
+            'hours_end': '08:15',
+            'week_days': [1, 2, 3, 4, 5],
+            'month_days': [1, 15, 30],
+            'months': [1, 6, 12]
+        }],
+        'exceptional_periods': [{
+            'hours_start': '07:25',
+            'hours_end': '07:35',
+            'week_days': [1, 2, 3, 4, 5],
+            'month_days': [1, 30],
+            'months': [1, 12],
+            'destination': {
+                'type': 'hangup',
+                'cause': 'congestion',
+                'timeout': 30
+            }
+        }],
+        'enabled': False
+    }
 
     response = confd.schedules(schedule['id']).put(**parameters)
     response.assert_updated()
@@ -307,9 +348,11 @@ def test_valid_destinations(schedule, meetme, ivr, group, outcall, queue, switch
 def create_schedule_with_destination(destination):
     response = confd.schedules.post(
         closed_destination=destination,
-        exceptional_periods=[{'hours_start': '07:15',
-                              'hours_end': '08:15',
-                              'destination': destination}]
+        exceptional_periods=[{
+            'hours_start': '07:15',
+            'hours_end': '08:15',
+            'destination': destination
+        }]
     )
     response.assert_created('schedules')
     assert_that(response.item, has_entries(
@@ -323,9 +366,11 @@ def create_schedule_with_destination(destination):
 def update_schedule_with_destination(schedule_id, destination):
     response = confd.schedules(schedule_id).put(
         closed_destination=destination,
-        exceptional_periods=[{'hours_start': '07:15',
-                              'hours_end': '08:15',
-                              'destination': destination}]
+        exceptional_periods=[{
+            'hours_start': '07:15',
+            'hours_end': '08:15',
+            'destination': destination
+        }]
     )
     response.assert_updated()
     response = confd.schedules(schedule_id).get()

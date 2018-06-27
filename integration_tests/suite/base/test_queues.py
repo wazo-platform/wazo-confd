@@ -284,7 +284,9 @@ def test_get(queue):
         preprocess_subroutine=queue['preprocess_subroutine'],
         enabled=queue['enabled'],
         options=not_(empty()),
+
         extensions=empty(),
+        schedules=empty(),
     ))
 
 

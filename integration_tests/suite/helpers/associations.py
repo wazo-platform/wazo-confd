@@ -265,6 +265,13 @@ def group_schedule(group, schedule, check=True):
 
 
 @contextmanager
+def queue_schedule(queue, schedule, check=True):
+    h.queue_schedule.associate(queue['id'], schedule['id'], check)
+    yield
+    h.queue_schedule.dissociate(queue['id'], schedule['id'], check)
+
+
+@contextmanager
 def outcall_schedule(outcall, schedule, check=True):
     h.outcall_schedule.associate(outcall['id'], schedule['id'], check)
     yield

@@ -137,6 +137,7 @@ DEFAULT_CONFIG = {
         'queue_extension': True,
         'queue_fallback': True,
         'queue_member': True,
+        'queue_schedule': True,
         'register_iax': True,
         'register_sip': True,
         'schedule': True,

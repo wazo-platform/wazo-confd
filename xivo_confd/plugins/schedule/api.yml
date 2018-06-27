@@ -119,6 +119,10 @@ definitions:
           type: boolean
           default: true
     - $ref: '#/definitions/ScheduleRelationIncalls'
+    - $ref: '#/definitions/ScheduleRelationGroups'
+    - $ref: '#/definitions/ScheduleRelationQueues'
+    - $ref: '#/definitions/ScheduleRelationUsers'
+    - $ref: '#/definitions/ScheduleRelationOutcalls'
     required:
     - closed_destination
   ScheduleRelationBase:
@@ -166,6 +170,34 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/IncallRelationBase'
+  ScheduleRelationOutcalls:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/OutcallRelationBase'
+  ScheduleRelationGroups:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/GroupRelationBase'
+  ScheduleRelationUsers:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/UserRelationBase'
+  ScheduleRelationQueues:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/QueueRelationBase'
   ScheduleItems:
     title: ScheduleItems
     properties:

@@ -1,6 +1,15 @@
 Changelog
 =========
 
+18.08
+-----
+
+* A new API for associating a queue with a schedule has been added:
+
+  * DELETE `/1.1/queues/<queue_id>/schedules/<schedule_id>`
+  * PUT `/1.1/queues/<queue_id>/schedules/<schedule_id>`
+
+
 18.07
 -----
 

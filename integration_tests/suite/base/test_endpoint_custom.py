@@ -10,10 +10,12 @@ from hamcrest import (
     instance_of,
 )
 
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from ..helpers import errors as e
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 def test_get_errors():

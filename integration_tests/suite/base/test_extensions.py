@@ -2,8 +2,8 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import re
 import datetime
+import re
 
 from hamcrest import (
     all_of,
@@ -21,12 +21,13 @@ from hamcrest import (
     not_,
 )
 
+from . import confd, provd
 from ..helpers import (
     associations as a,
-    scenarios as s,
-    helpers as h,
     errors as e,
     fixtures,
+    helpers as h,
+    scenarios as s,
 )
 from ..helpers.config import (
     CONTEXT,
@@ -36,7 +37,6 @@ from ..helpers.config import (
     gen_queue_exten,
     gen_line_exten,
 )
-from . import confd, provd
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 

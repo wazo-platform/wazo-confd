@@ -82,6 +82,7 @@ setup(
             'queue_extension = xivo_confd.plugins.queue_extension.plugin:Plugin',
             'queue_fallback = xivo_confd.plugins.queue_fallback.plugin:Plugin',
             'queue_member = xivo_confd.plugins.queue_member.plugin:Plugin',
+            'queue_schedule = xivo_confd.plugins.queue_schedule.plugin:Plugin',
             'register_iax = xivo_confd.plugins.register_iax.plugin:Plugin',
             'register_sip = xivo_confd.plugins.register_sip.plugin:Plugin',
             'schedule = xivo_confd.plugins.schedule.plugin:Plugin',
