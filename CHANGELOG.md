@@ -4,6 +4,16 @@ Changelog
 18.08
 -----
 
+* New readonly parameters have been added to the queue resource:
+
+  * `members`
+
+    * `agents`
+
+* New readonly parameters have been added to the agent resource:
+
+  * `queues`
+
 * New parameter have been added to the queue-member agent association:
 
   * `priority`
