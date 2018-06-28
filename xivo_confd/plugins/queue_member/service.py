@@ -38,21 +38,21 @@ class QueueMemberService(object):
         if member in queue.agent_queue_members:
             raise errors.resource_associated('Agent', 'Queue', member.agent.id, queue.id)
         self.queue_dao.associate_member_agent(queue, member)
-        self.notifier.associated(queue, member)
+        self.notifier.agent_associated(queue, member)
 
     def associate_member_agent(self, queue, member):
         if member in queue.agent_queue_members:
             return
 
         self.queue_dao.associate_member_agent(queue, member)
-        self.notifier.associated(queue, member)
+        self.notifier.agent_associated(queue, member)
 
     def dissociate_member_agent(self, queue, member):
         if member not in queue.agent_queue_members:
             return
 
         self.queue_dao.dissociate_member_agent(queue, member)
-        self.notifier.dissociated(queue, member)
+        self.notifier.agent_dissociated(queue, member)
 
 
 def build_service():

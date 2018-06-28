@@ -2,9 +2,8 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_bus.resources.queue_members.event import (
+from xivo_bus.resources.queue_member.event import (
     AgentQueueAssociatedEvent,
-    AgentQueueAssociationEditedEvent,
     AgentRemovedFromQueueEvent,
 )
 
@@ -23,7 +22,7 @@ class QueueMemberNotifier(object):
                     'agentbus': agent_command}
         self.sysconfd.exec_request_handlers(handlers)
 
-    def associated(self, queue, member):
+    def agent_associated(self, queue, member):
         event = AgentQueueAssociatedEvent(
             queue.id,
             member.agent.id,
@@ -35,18 +34,7 @@ class QueueMemberNotifier(object):
             agent_command=['agent.edit.{}'.format(member.agent.id)]
         )
 
-    def edited(self, queue, member):
-        event = AgentQueueAssociationEditedEvent(
-            queue.id,
-            member.agent.id,
-            member.penalty,
-        )
-        self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(
-            agent_command=['agent.edit.{}'.format(member.agent.id)]
-        )
-
-    def dissociated(self, queue, member):
+    def agent_dissociated(self, queue, member):
         event = AgentRemovedFromQueueEvent(queue.id, member.agent.id)
         self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(
