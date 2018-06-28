@@ -4,6 +4,10 @@ Changelog
 18.08
 -----
 
+* New parameter have been added to the queue-member agent association:
+
+  * `priority`
+
 * The following endpoint does not return an error (400) when the resources are not already associated.
   Instead, it associate resources and return a successful association code (204).
 
