@@ -31,10 +31,10 @@ paths:
     get:
       operationId: get_agent_queue_association
       summary: Get Agent-Queue association
+      deprecated: true
       description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.read`'
       tags:
-      - agents
-      - queues
+      - deprecated
       parameters:
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/agentid'
