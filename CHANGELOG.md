@@ -4,6 +4,16 @@ Changelog
 18.08
 -----
 
+* The following endpoint does not return an error (400) when the resources are not already associated.
+  Instead, it associate resources and return a successful association code (204).
+
+  * PUT `/1.1/queues/<queue_id>/members/agents/<agent_id>`
+
+* The following endpoint does not return a (400) error when the resources are not associated.
+  Instead, it returns a successful dissociation code (204).
+
+  * DELETE `/1.1/queues/<queue_id>/members/agents/<agent_id>`
+
 * A new API for associating a queue with a schedule has been added:
 
   * DELETE `/1.1/queues/<queue_id>/schedules/<schedule_id>`
