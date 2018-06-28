@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
 
-from hamcrest import (assert_that,
-                      contains,
-                      contains_inanyorder,
-                      empty,
-                      has_entries)
+from hamcrest import (
+    assert_that,
+    contains,
+    contains_inanyorder,
+    empty,
+    has_entries,
+)
 
-from ..helpers import errors as e
-from ..helpers import scenarios as s
 from . import confd
-from ..helpers import fixtures
-from ..helpers import associations as a
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 FAKE_ID = 999999999
@@ -77,12 +81,11 @@ def test_associate_multiple_with_priority(group, user1, user2, user3, line1, lin
 
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
-            members=has_entries(users=contains(has_entries(uuid=user2['uuid'],
-                                                           priority=1),
-                                               has_entries(uuid=user3['uuid'],
-                                                           priority=2),
-                                               has_entries(uuid=user1['uuid'],
-                                                           priority=4)))
+            members=has_entries(users=contains(
+                has_entries(uuid=user2['uuid'], priority=1),
+                has_entries(uuid=user3['uuid'], priority=2),
+                has_entries(uuid=user1['uuid'], priority=4),
+            ))
         ))
 
 
@@ -123,12 +126,10 @@ def test_get_users_associated_to_group(group, user1, user2, line1, line2):
             a.group_member_user(group, user2, user1):
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
-            members=has_entries(users=contains_inanyorder(has_entries(uuid=user2['uuid'],
-                                                                      firstname=user2['firstname'],
-                                                                      lastname=user2['lastname']),
-                                                          has_entries(uuid=user1['uuid'],
-                                                                      firstname=user1['firstname'],
-                                                                      lastname=user1['lastname'])))
+            members=has_entries(users=contains_inanyorder(
+                has_entries(uuid=user2['uuid'], firstname=user2['firstname'], lastname=user2['lastname']),
+                has_entries(uuid=user1['uuid'], firstname=user1['firstname'], lastname=user1['lastname']),
+            ))
         ))
 
 
@@ -140,10 +141,10 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
     with a.user_line(user, line), a.group_member_user(group2, user), a.group_member_user(group1, user):
         response = confd.users(user['uuid']).get()
         assert_that(response.item, has_entries(
-            groups=contains_inanyorder(has_entries(id=group2['id'],
-                                                   name=group2['name']),
-                                       has_entries(id=group1['id'],
-                                                   name=group1['name']))
+            groups=contains_inanyorder(
+                has_entries(id=group2['id'], name=group2['name']),
+                has_entries(id=group1['id'], name=group1['name']),
+            )
         ))
 
 

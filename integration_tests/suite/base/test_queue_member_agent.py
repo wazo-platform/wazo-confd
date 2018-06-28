@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import assert_that, has_entries
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from . import confd
+from hamcrest import (
+    assert_that,
+    has_entries,
+)
 
+from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 
@@ -64,20 +69,23 @@ def test_get_errors(queue, agent):
 def test_get(queue, agent):
     with a.queue_member_agent(queue, agent, penalty=5):
         response = confd.queues(queue['id']).members.agents(agent['id']).get()
-        assert_that(response.item, has_entries(queue_id=queue['id'],
-                                               agent_id=agent['id'],
-                                               penalty=5))
+        assert_that(response.item, has_entries(
+            queue_id=queue['id'],
+            agent_id=agent['id'],
+            penalty=5,
+        ))
 
 
 @fixtures.queue()
 @fixtures.agent()
 def test_associate(queue, agent):
-    response = confd.queues(queue['id']).members.agents.post(agent_id=agent['id'],
-                                                             penalty=7)
+    response = confd.queues(queue['id']).members.agents.post(agent_id=agent['id'], penalty=7)
     response.assert_created()
-    assert_that(response.item, has_entries(agent_id=agent['id'],
-                                           queue_id=queue['id'],
-                                           penalty=7))
+    assert_that(response.item, has_entries(
+        agent_id=agent['id'],
+        queue_id=queue['id'],
+        penalty=7,
+    ))
 
 
 @fixtures.queue()
