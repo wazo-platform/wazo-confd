@@ -6,8 +6,8 @@ import unittest
 from mock import Mock
 
 from xivo_bus.resources.queue_member.event import (
-    AgentQueueAssociatedEvent,
-    AgentRemovedFromQueueEvent
+    QueueMemberAgentAssociatedEvent,
+    QueueMemberAgentDissociatedEvent
 )
 
 from ..notifier import QueueMemberNotifier
@@ -23,7 +23,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.notifier = QueueMemberNotifier(self.bus, self.sysconfd)
 
     def test_agent_associate_then_bus_event(self):
-        expected_event = AgentQueueAssociatedEvent(
+        expected_event = QueueMemberAgentAssociatedEvent(
             self.queue.id,
             self.member.agent.id,
             self.member.penalty,
@@ -45,7 +45,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_agent_dissociate_then_bus_event(self):
-        expected_event = AgentRemovedFromQueueEvent(
+        expected_event = QueueMemberAgentDissociatedEvent(
             self.queue.id,
             self.member.agent.id,
         )

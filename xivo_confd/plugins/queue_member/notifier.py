@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_bus.resources.queue_member.event import (
-    AgentQueueAssociatedEvent,
-    AgentRemovedFromQueueEvent,
+    QueueMemberAgentAssociatedEvent,
+    QueueMemberAgentDissociatedEvent,
 )
 
 from xivo_confd import bus, sysconfd
@@ -23,7 +23,7 @@ class QueueMemberNotifier(object):
         self.sysconfd.exec_request_handlers(handlers)
 
     def agent_associated(self, queue, member):
-        event = AgentQueueAssociatedEvent(
+        event = QueueMemberAgentAssociatedEvent(
             queue.id,
             member.agent.id,
             member.penalty,
@@ -35,7 +35,7 @@ class QueueMemberNotifier(object):
         )
 
     def agent_dissociated(self, queue, member):
-        event = AgentRemovedFromQueueEvent(queue.id, member.agent.id)
+        event = QueueMemberAgentDissociatedEvent(queue.id, member.agent.id)
         self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(
             cti_command=['xivo[queuemember,update]'],
