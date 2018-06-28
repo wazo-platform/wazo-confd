@@ -16,8 +16,8 @@ class QueueMemberService(object):
         self.agent_dao = agent_dao
         self.notifier = notifier
 
-    def get(self, queue, agent):
-        member = self.find(queue, agent)
+    def get_member_agent(self, queue, agent):
+        member = self.find_member_agent(queue, agent)
         if not member:
             raise errors.not_found('QueueMember', agent_id=agent.id, queue_id=queue.id)
         return member
@@ -28,7 +28,7 @@ class QueueMemberService(object):
             raise errors.param_not_found('agent_id', 'Agent')
         return agent
 
-    def find(self, queue, agent):
+    def find_member_agent(self, queue, agent):
         for member in queue.agent_queue_members:
             if member.agent == agent:
                 return member

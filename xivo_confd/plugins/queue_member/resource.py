@@ -38,7 +38,7 @@ class QueueMemberAgentItem(ConfdResource):
     def get(self, queue_id, agent_id):
         queue = self.queue_dao.get(queue_id)
         agent = self.agent_dao.get(agent_id)
-        member = self.service.get(queue, agent)
+        member = self.service.get_member_agent(queue, agent)
         return QueueMemberAgentLegacySchema().dump(member).data
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.update')
@@ -61,7 +61,7 @@ class QueueMemberAgentItem(ConfdResource):
         return '', 204
 
     def _find_or_create_member(self, queue, agent):
-        member = self.service.find(queue, agent)
+        member = self.service.find_member_agent(queue, agent)
         if not member:
             member = QueueMember(agent=agent)
         return member
@@ -94,7 +94,7 @@ class QueueMemberAgentListLegacy(ConfdResource):
         return self.schema().dump(member).data, 201, self.build_headers(member)
 
     def _find_or_create_member(self, queue, agent):
-        member = self.service.find(queue, agent)
+        member = self.service.find_member_agent(queue, agent)
         if not member:
             member = QueueMember(agent=agent)
         return member
