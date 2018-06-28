@@ -251,6 +251,7 @@ definitions:
             $ref: '#/definitions/KeyValueOption'
           default: []
     - $ref: '#/definitions/QueueRelationSchedules'
+    - $ref: '#/definitions/QueueRelationMembers'
     required:
     - name
   QueueRelationBase:
@@ -272,6 +273,30 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/ScheduleRelationBase'
+  QueueRelationMembers:
+    properties:
+      members:
+        readOnly: true
+        $ref: '#/definitions/QueueRelationMemberAgents'
+  QueueRelationMemberAgents:
+    properties:
+      agents:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/QueueRelationMemberAgent'
+  QueueRelationMemberAgent:
+    allOf:
+    - $ref: '#/definitions/AgentRelationBase'
+    - properties:
+        penalty:
+          type: integer
+          readOnly: true
+          description: Agent's penalty. A priority used for distributing calls.
+        priority:
+          type: integer
+          readOnly: true
+          description: Priority of agent in the queue. Only used for linear ring strategy
   QueueItems:
     title: QueueItems
     properties:

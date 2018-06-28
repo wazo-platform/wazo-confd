@@ -4,6 +4,7 @@
 
 from hamcrest import (
     assert_that,
+    contains,
     has_entries,
 )
 
@@ -106,12 +107,20 @@ def test_associate(queue, agent):
 
 @fixtures.queue()
 @fixtures.agent()
-def test_update_prioperties(queue, agent):
+def test_update_properties(queue, agent):
     with a.queue_member_agent(queue, agent, penalty=0, priority=0):
         response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=41, priority=42)
         response.assert_updated()
 
-    # TODO check if penlaty and priority are changed
+        response = confd.queues(queue['id']).get()
+        assert_that(response.item, has_entries(
+            members=has_entries(
+                agents=contains(has_entries(
+                    penalty=41,
+                    priority=42,
+                ))
+            )
+        ))
 
 
 @fixtures.queue()
@@ -186,6 +195,28 @@ def test_dissociate(queue, agent):
 def test_dissociate_not_associated(queue, agent):
     response = confd.queues(queue['id']).members.agents(agent['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.queue()
+@fixtures.agent()
+def test_get_queue_relation(queue, agent):
+    with a.queue_member_agent(queue, agent, priority=0, penalty=0):
+        response = confd.queues(queue['id']).get()
+        assert_that(response.item, has_entries(
+            members=has_entries(
+                agents=contains(
+                    has_entries(
+                        id=agent['id'],
+                        number=agent['number'],
+                        firstname=agent['firstname'],
+                        lastname=agent['lastname'],
+                        priority=0,
+                        penalty=0,
+                        links=agent['links'],
+                    )
+                )
+            )
+        ))
 
 
 @fixtures.queue()

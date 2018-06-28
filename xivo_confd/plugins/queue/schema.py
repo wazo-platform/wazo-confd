@@ -2,7 +2,7 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from marshmallow import fields, post_load
+from marshmallow import fields, post_load, post_dump
 from marshmallow.validate import Length, Range, OneOf
 
 from xivo_dao.alchemy.dialaction import Dialaction
@@ -50,12 +50,49 @@ class QueueSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    agent_queue_members = fields.Nested(
+        'QueueAgentQueueMembersSchema',
+        many=True,
+        dump_only=True,
+    )
 
     @post_load
     def create_objects(self, data):
         for key in ('wait_time_destination', 'wait_ratio_destination'):
             if data.get(key):
                 data[key] = Dialaction(**data[key])
+
+    @post_dump
+    def wrap_members(self, data):
+        agent_queue_members = data.pop('agent_queue_members', [])
+        if not self.only or 'members' in self.only:
+            data['members'] = {'agents': agent_queue_members}
+        return data
+
+
+class QueueAgentQueueMembersSchema(BaseSchema):
+    priority = fields.Integer()
+    penalty = fields.Integer()
+    agent = fields.Nested(
+        'AgentSchema',
+        only=['id', 'number', 'firstname', 'lastname', 'links'],
+    )
+
+    @post_dump(pass_many=True)
+    def merge_agent_queue_member(self, data, many):
+        if not many:
+            return self.merge_agent(data)
+
+        return [self._merge_agent(row) for row in data if row.get('agent')]
+
+    def _merge_agent(self, row):
+        user = row.pop('agent')
+        row['id'] = user.get('id', None)
+        row['number'] = user.get('number', None)
+        row['firstname'] = user.get('firstname', None)
+        row['lastname'] = user.get('lastname', None)
+        row['links'] = user.get('links', [])
+        return row
 
 
 class QueueSchemaPUT(QueueSchema):
