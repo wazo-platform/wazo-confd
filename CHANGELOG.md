@@ -4,6 +4,11 @@ Changelog
 18.08
 -----
 
+* The following URLs have been deprecated. Please use the new API instead:
+
+  * POST `/1.1/queues/<queue_id>/members/agents`
+  * GET `/1.1/queues/<queue_id>/members/agents/<agent_id>`
+
 * New readonly parameters have been added to the queue resource:
 
   * `members`
