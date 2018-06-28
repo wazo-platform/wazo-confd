@@ -115,6 +115,7 @@ definitions:
         description:
           type: string
           description: Additional information about the agent
+    - $ref: '#/definitions/AgentRelationQueues'
     required:
     - number
   AgentRelationBase:
@@ -130,6 +131,17 @@ definitions:
       number:
         type: string
         description: Agent number
+  AgentRelationQueues:
+    properties:
+      queues:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/AgentRelationQueue'
+  AgentRelationQueue:
+    allOf:
+    - $ref: '#/definitions/QueueRelationBase'
+    - $ref: '#/definitions/QueueAgentRelationBase'
   AgentItems:
     title: AgentItems
     properties:

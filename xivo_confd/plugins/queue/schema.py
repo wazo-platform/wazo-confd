@@ -86,12 +86,12 @@ class QueueAgentQueueMembersSchema(BaseSchema):
         return [self._merge_agent(row) for row in data if row.get('agent')]
 
     def _merge_agent(self, row):
-        user = row.pop('agent')
-        row['id'] = user.get('id', None)
-        row['number'] = user.get('number', None)
-        row['firstname'] = user.get('firstname', None)
-        row['lastname'] = user.get('lastname', None)
-        row['links'] = user.get('links', [])
+        agent = row.pop('agent')
+        row['id'] = agent.get('id', None)
+        row['number'] = agent.get('number', None)
+        row['firstname'] = agent.get('firstname', None)
+        row['lastname'] = agent.get('lastname', None)
+        row['links'] = agent.get('links', [])
         return row
 
 
