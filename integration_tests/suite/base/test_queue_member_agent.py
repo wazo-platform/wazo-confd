@@ -40,11 +40,9 @@ def test_associate_errors(queue, agent):
 def test_dissociate_errors(queue, agent):
     fake_queue = confd.queues(FAKE_ID).members.agents(agent['id']).delete
     fake_agent = confd.queues(queue['id']).members.agents(FAKE_ID).delete
-    fake_queue_member = confd.queues(queue['id']).members.agents(agent['id']).delete
 
     yield s.check_resource_not_found, fake_queue, 'Queue'
     yield s.check_resource_not_found, fake_agent, 'Agent'
-    yield s.check_resource_not_found, fake_queue_member, 'QueueMember'
 
 
 @fixtures.queue()
@@ -156,6 +154,11 @@ def test_dissociate(queue, agent):
         response.assert_match(404, e.not_found(resource='QueueMember'))
 
 
+@fixtures.queue()
+@fixtures.agent()
+def test_dissociate_not_associated(queue, agent):
+    response = confd.queues(queue['id']).members.agents(agent['id']).delete()
+    response.assert_deleted()
 
 
 @fixtures.queue()

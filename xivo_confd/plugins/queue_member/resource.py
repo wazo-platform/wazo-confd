@@ -54,7 +54,7 @@ class QueueMemberAgentItem(ConfdResource):
     def delete(self, queue_id, agent_id):
         queue = self.queue_dao.get(queue_id)
         agent = self.agent_dao.get(agent_id)
-        member = self.service.get(queue, agent)
+        member = self._find_or_create_member(queue, agent)
         self.service.dissociate_member_agent(queue, member)
         return '', 204
 
