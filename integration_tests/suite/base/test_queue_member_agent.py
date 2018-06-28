@@ -27,12 +27,29 @@ def test_associate_errors(queue, agent):
     yield s.check_resource_not_found, fake_queue, 'Queue'
     yield s.check_resource_not_found, fake_agent, 'Agent'
 
+    url = confd.queues(queue['id']).members.agents(agent['id']).put
+    for check in error_checks(url):
+        yield check
+
     # Legacy
     fake_queue = confd.queues(FAKE_ID).members.agents.post
     yield s.check_resource_not_found, fake_queue, 'Queue'
 
     url = confd.queues(queue['id']).members.agents.post
     yield s.check_bogus_field_returns_error, url, 'agent_id', FAKE_ID
+
+
+def error_checks(url):
+    yield s.check_bogus_field_returns_error, url, 'penalty', -1
+    yield s.check_bogus_field_returns_error, url, 'penalty', None
+    yield s.check_bogus_field_returns_error, url, 'penalty', 'string'
+    yield s.check_bogus_field_returns_error, url, 'penalty', []
+    yield s.check_bogus_field_returns_error, url, 'penalty', {}
+    yield s.check_bogus_field_returns_error, url, 'priority', -1
+    yield s.check_bogus_field_returns_error, url, 'priority', None
+    yield s.check_bogus_field_returns_error, url, 'priority', 'string'
+    yield s.check_bogus_field_returns_error, url, 'priority', []
+    yield s.check_bogus_field_returns_error, url, 'priority', {}
 
 
 @fixtures.queue()
@@ -72,7 +89,7 @@ def test_get(queue, agent):
 @fixtures.queue()
 @fixtures.agent()
 def test_associate(queue, agent):
-    response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=7)
+    response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=7, priority=42)
     response.assert_updated()
 
     confd.queues(queue['id']).members.agents(agent['id']).delete().assert_deleted()
@@ -85,6 +102,16 @@ def test_associate(queue, agent):
         queue_id=queue['id'],
         penalty=7,
     ))
+
+
+@fixtures.queue()
+@fixtures.agent()
+def test_update_prioperties(queue, agent):
+    with a.queue_member_agent(queue, agent, penalty=0, priority=0):
+        response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=41, priority=42)
+        response.assert_updated()
+
+    # TODO check if penlaty and priority are changed
 
 
 @fixtures.queue()

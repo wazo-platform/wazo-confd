@@ -21,6 +21,7 @@ class QueueMemberAgentLegacySchema(BaseSchema):
 
 class QueueMemberAgentSchema(BaseSchema):
     penalty = fields.Integer(validate=Range(min=0), missing=0)
+    priority = fields.Integer(validate=Range(min=0), missing=0)
 
 
 class QueueMemberAgentItem(ConfdResource):
@@ -47,6 +48,7 @@ class QueueMemberAgentItem(ConfdResource):
         member = self._find_or_create_member(queue, agent)
         form = self.schema().load(request.get_json()).data
         member.penalty = form['penalty']
+        member.priority = form['priority']
         self.service.associate_member_agent(queue, member)
         return '', 204
 
