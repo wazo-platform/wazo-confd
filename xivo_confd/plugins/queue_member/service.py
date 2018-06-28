@@ -34,13 +34,16 @@ class QueueMemberService(object):
                 return member
         return None
 
-    def edit(self, queue, member):
-        self.queue_dao.edit(queue)
-        self.notifier.edited(queue, member)
-
     def associate_legacy(self, queue, member):
         if member in queue.agent_queue_members:
             raise errors.resource_associated('Agent', 'Queue', member.agent.id, queue.id)
+        self.queue_dao.associate_member_agent(queue, member)
+        self.notifier.associated(queue, member)
+
+    def associate_member_agent(self, queue, member):
+        if member in queue.agent_queue_members:
+            return
+
         self.queue_dao.associate_member_agent(queue, member)
         self.notifier.associated(queue, member)
 

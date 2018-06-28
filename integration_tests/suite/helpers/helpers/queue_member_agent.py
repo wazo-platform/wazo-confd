@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
@@ -7,8 +7,7 @@ from . import confd
 
 def associate(queue_id, agent_id, **kwargs):
     check = kwargs.pop('check', True)
-    kwargs['agent_id'] = agent_id
-    response = confd.queues(queue_id).members.agents.post(**kwargs)
+    response = confd.queues(queue_id).members.agents(agent_id).put(**kwargs)
     if check:
         response.assert_ok()
 

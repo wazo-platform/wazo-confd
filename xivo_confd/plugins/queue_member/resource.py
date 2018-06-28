@@ -44,11 +44,10 @@ class QueueMemberAgentItem(ConfdResource):
     def put(self, queue_id, agent_id):
         queue = self.queue_dao.get(queue_id)
         agent = self.agent_dao.get(agent_id)
-        # This endpoint does not associate queue-agent, but only update penalty
-        member = self.service.get(queue, agent)
+        member = self._find_or_create_member(queue, agent)
         form = self.schema().load(request.get_json()).data
         member.penalty = form['penalty']
-        self.service.edit(queue, member)
+        self.service.associate_member_agent(queue, member)
         return '', 204
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.delete')
@@ -58,6 +57,12 @@ class QueueMemberAgentItem(ConfdResource):
         member = self.service.get(queue, agent)
         self.service.dissociate_member_agent(queue, member)
         return '', 204
+
+    def _find_or_create_member(self, queue, agent):
+        member = self.service.find(queue, agent)
+        if not member:
+            member = QueueMember(agent=agent)
+        return member
 
 
 class QueueMemberAgentListLegacy(ConfdResource):
