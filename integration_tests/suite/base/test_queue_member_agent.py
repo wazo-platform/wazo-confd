@@ -90,10 +90,34 @@ def test_associate(queue, agent):
 
 @fixtures.queue()
 @fixtures.agent()
-def test_associate_when_agent_already_associated_to_same_queue(queue, agent):
+def test_associate_already_associated(queue, agent):
+
+    # Legacy
     with a.queue_member_agent(queue, agent):
         response = confd.queues(queue['id']).members.agents.post(agent_id=agent['id'])
         response.assert_match(400, e.resource_associated('Agent', 'Queue'))
+
+
+@fixtures.queue()
+@fixtures.agent()
+@fixtures.agent()
+def test_associate_multiple_agents_to_queue(queue, agent1, agent2):
+
+    # Legacy
+    with a.queue_member_agent(queue, agent1):
+        response = confd.queues(queue['id']).members.agents.post(agent_id=agent2['id'])
+        response.assert_created()
+
+
+@fixtures.queue()
+@fixtures.queue()
+@fixtures.agent()
+def test_associate_multiple_queues_to_agent(queue1, queue2, agent):
+
+    # Legacy
+    with a.queue_member_agent(queue1, agent):
+        response = confd.queues(queue2['id']).members.agents.post(agent_id=agent['id'])
+        response.assert_created()
 
 
 @fixtures.queue()
@@ -116,3 +140,21 @@ def test_dissociate(queue, agent):
 
         response = confd.queues(queue['id']).members.agents(agent['id']).get()
         response.assert_match(404, e.not_found(resource='QueueMember'))
+
+
+
+
+@fixtures.queue()
+@fixtures.agent()
+def test_delete_queue_when_queue_and_agent_associated(queue, agent):
+    with a.queue_member_agent(queue, agent, check=False):
+        response = confd.queues(queue['id']).delete()
+        response.assert_deleted()
+
+
+@fixtures.queue()
+@fixtures.agent()
+def test_delete_agent_when_queue_and_agent_associated(queue, agent):
+    with a.queue_member_agent(queue, agent, check=False):
+        response = confd.agents(agent['id']).delete()
+        response.assert_deleted()
