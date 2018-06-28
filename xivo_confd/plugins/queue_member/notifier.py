@@ -23,26 +23,36 @@ class QueueMemberNotifier(object):
                     'agentbus': agent_command}
         self.sysconfd.exec_request_handlers(handlers)
 
-    def associated(self, queue_member):
-        event = AgentQueueAssociatedEvent(queue_member.queue_id,
-                                          queue_member.agent_id,
-                                          queue_member.penalty)
+    def associated(self, queue, member):
+        event = AgentQueueAssociatedEvent(
+            queue.id,
+            member.agent.id,
+            member.penalty,
+        )
         self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(cti_command=['xivo[queuemember,update]'],
-                                    agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
+        self.send_sysconfd_handlers(
+            cti_command=['xivo[queuemember,update]'],
+            agent_command=['agent.edit.{}'.format(member.agent.id)]
+        )
 
-    def edited(self, queue_member):
-        event = AgentQueueAssociationEditedEvent(queue_member.queue_id,
-                                                 queue_member.agent_id,
-                                                 queue_member.penalty)
+    def edited(self, queue, member):
+        event = AgentQueueAssociationEditedEvent(
+            queue.id,
+            member.agent.id,
+            member.penalty,
+        )
         self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
+        self.send_sysconfd_handlers(
+            agent_command=['agent.edit.{}'.format(member.agent.id)]
+        )
 
-    def dissociated(self, queue_member):
-        event = AgentRemovedFromQueueEvent(queue_member.queue_id, queue_member.agent_id)
+    def dissociated(self, queue, member):
+        event = AgentRemovedFromQueueEvent(queue.id, member.agent.id)
         self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(cti_command=['xivo[queuemember,update]'],
-                                    agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
+        self.send_sysconfd_handlers(
+            cti_command=['xivo[queuemember,update]'],
+            agent_command=['agent.edit.{}'.format(member.agent.id)],
+        )
 
 
 def build_notifier():
