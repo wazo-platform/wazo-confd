@@ -148,6 +148,7 @@ from . import outcall_trunk
 from . import queue
 from . import queue_extension
 from . import queue_member_agent
+from . import queue_member_user
 from . import queue_schedule
 from . import register_iax
 from . import register_sip
@@ -239,6 +240,7 @@ __all__ = [
     'queue',
     'queue_extension',
     'queue_member_agent',
+    'queue_member_user',
     'queue_schedule',
     'register_iax',
     'register_sip',

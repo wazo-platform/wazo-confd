@@ -180,6 +180,13 @@ def queue_member_agent(queue, agent, **kwargs):
 
 
 @contextmanager
+def queue_member_user(queue, user, **kwargs):
+    h.queue_member_user.associate(queue['id'], user['id'], **kwargs)
+    yield
+    h.queue_member_user.dissociate(queue['id'], user['id'], **kwargs)
+
+
+@contextmanager
 def group_extension(group, extension, check=True):
     h.group_extension.associate(group['id'], extension['id'], check)
     yield
