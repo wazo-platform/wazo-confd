@@ -285,10 +285,19 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/QueueRelationMemberAgent'
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/QueueRelationMemberUser'
   QueueRelationMemberAgent:
     allOf:
     - $ref: '#/definitions/AgentRelationBase'
     - $ref: '#/definitions/QueueMemberAgentRelationBase'
+  QueueRelationMemberUser:
+    allOf:
+    - $ref: '#/definitions/UserRelationBase'
+    - $ref: '#/definitions/QueueMemberUserRelationBase'
   QueueItems:
     title: QueueItems
     properties:

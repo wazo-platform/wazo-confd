@@ -4,6 +4,12 @@
 
 import re
 
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
 from . import confd
 from ..helpers import (
     associations as a,
@@ -64,6 +70,15 @@ def test_update_properties(queue, user, line):
         with a.queue_member_user(queue, user, priority=0):
             response = confd.queues(queue['id']).members.users(user['id']).put(priority=42)
             response.assert_updated()
+
+            response = confd.queues(queue['id']).get()
+            assert_that(response.item, has_entries(
+                members=has_entries(
+                    users=contains(has_entries(
+                        priority=42,
+                    ))
+                )
+            ))
 
 
 @fixtures.queue()
@@ -127,6 +142,28 @@ def test_dissociate_not_associated(queue, user, line):
     with a.user_line(user, line):
         response = confd.queues(queue['id']).members.users(user['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.queue()
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_queue_relation(queue, user, line):
+    with a.user_line(user, line):
+        with a.queue_member_user(queue, user, priority=0):
+            response = confd.queues(queue['id']).get()
+            assert_that(response.item, has_entries(
+                members=has_entries(
+                    users=contains(
+                        has_entries(
+                            uuid=user['uuid'],
+                            firstname=user['firstname'],
+                            lastname=user['lastname'],
+                            priority=0,
+                            links=user['links'],
+                        )
+                    )
+                )
+            ))
 
 
 @fixtures.queue()

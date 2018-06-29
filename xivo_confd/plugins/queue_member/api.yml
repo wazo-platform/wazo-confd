@@ -151,11 +151,8 @@ definitions:
   QueueMemberUser:
     title: QueueMemberUser
     description: An association between a user and a queue.
-    properties:
-      priority:
-        type: integer
-        minimum: 0
-        description: Priority of user in the queue. Only used for linear ring strategy
+    allOf:
+    - $ref: '#/definitions/QueueMemberUserRelationBase'
   QueueMemberAgentRelationBase:
     properties:
       penalty:
@@ -164,3 +161,9 @@ definitions:
       priority:
         type: integer
         description: Priority of agent in the queue. Only used for linear ring strategy
+  QueueMemberUserRelationBase:
+    properties:
+      priority:
+        type: integer
+        minimum: 0
+        description: Priority of user in the queue. Only used for linear ring strategy

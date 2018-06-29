@@ -55,6 +55,11 @@ class QueueSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    user_queue_members = fields.Nested(
+        'QueueUserQueueMembersSchema',
+        many=True,
+        dump_only=True,
+    )
 
     @post_load
     def create_objects(self, data):
@@ -64,9 +69,11 @@ class QueueSchema(BaseSchema):
 
     @post_dump
     def wrap_members(self, data):
-        agent_queue_members = data.pop('agent_queue_members', [])
         if not self.only or 'members' in self.only:
-            data['members'] = {'agents': agent_queue_members}
+            data['members'] = {
+                'agents': data.pop('agent_queue_members', []),
+                'users': data.pop('user_queue_members', []),
+            }
         return data
 
 
@@ -92,6 +99,29 @@ class QueueAgentQueueMembersSchema(BaseSchema):
         row['firstname'] = agent.get('firstname', None)
         row['lastname'] = agent.get('lastname', None)
         row['links'] = agent.get('links', [])
+        return row
+
+
+class QueueUserQueueMembersSchema(BaseSchema):
+    priority = fields.Integer()
+    user = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+    )
+
+    @post_dump(pass_many=True)
+    def merge_user_queue_member(self, data, many):
+        if not many:
+            return self.merge_user(data)
+
+        return [self._merge_user(row) for row in data if row.get('user')]
+
+    def _merge_user(self, row):
+        user = row.pop('user')
+        row['uuid'] = user.get('uuid', None)
+        row['firstname'] = user.get('firstname', None)
+        row['lastname'] = user.get('lastname', None)
+        row['links'] = user.get('links', [])
         return row
 
 
