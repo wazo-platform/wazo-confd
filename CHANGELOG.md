@@ -19,8 +19,13 @@ Changelog
   * `members`
 
     * `agents`
+    * `users`
 
 * New readonly parameters have been added to the agent resource:
+
+  * `queues`
+
+* New readonly parameters have been added to the user resource:
 
   * `queues`
 
