@@ -3,11 +3,14 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
+
 from mock import Mock
 
 from xivo_bus.resources.queue_member.event import (
     QueueMemberAgentAssociatedEvent,
-    QueueMemberAgentDissociatedEvent
+    QueueMemberAgentDissociatedEvent,
+    QueueMemberUserAssociatedEvent,
+    QueueMemberUserDissociatedEvent,
 )
 
 from ..notifier import QueueMemberNotifier
@@ -45,10 +48,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_agent_dissociate_then_bus_event(self):
-        expected_event = QueueMemberAgentDissociatedEvent(
-            self.queue.id,
-            self.member.agent.id,
-        )
+        expected_event = QueueMemberAgentDissociatedEvent(self.queue.id, self.member.agent.id)
 
         self.notifier.agent_dissociated(self.queue, self.member)
 
@@ -62,5 +62,41 @@ class TestQueueMemberNotifier(unittest.TestCase):
         }
 
         self.notifier.agent_dissociated(self.queue, self.member)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
+
+    def test_user_associate_then_bus_event(self):
+        expected_event = QueueMemberUserAssociatedEvent(self.queue.id, self.member.user.id)
+
+        self.notifier.user_associated(self.queue, self.member)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_user_associate_then_sysconfd_event(self):
+        expected_handlers = {
+            'agentbus': [],
+            'ipbx': ['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            'ctibus': ['xivo[queuemember,update]'],
+        }
+
+        self.notifier.user_associated(self.queue, self.member)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
+
+    def test_user_dissociate_then_bus_event(self):
+        expected_event = QueueMemberUserDissociatedEvent(self.queue.id, self.member.user.id)
+
+        self.notifier.user_dissociated(self.queue, self.member)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_user_dissociate_then_sysconfd_event(self):
+        expected_handlers = {
+            'agentbus': [],
+            'ipbx': ['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            'ctibus': ['xivo[queuemember,update]'],
+        }
+
+        self.notifier.user_dissociated(self.queue, self.member)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)

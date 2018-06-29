@@ -24,6 +24,10 @@ class QueueMemberAgentSchema(BaseSchema):
     priority = fields.Integer(validate=Range(min=0), missing=0)
 
 
+class QueueMemberUserSchema(BaseSchema):
+    priority = fields.Integer(validate=Range(min=0), missing=0)
+
+
 class QueueMemberAgentItem(ConfdResource):
 
     schema = QueueMemberAgentSchema
@@ -64,6 +68,41 @@ class QueueMemberAgentItem(ConfdResource):
         member = self.service.find_member_agent(queue, agent)
         if not member:
             member = QueueMember(agent=agent)
+        return member
+
+
+class QueueMemberUserItem(ConfdResource):
+
+    schema = QueueMemberUserSchema
+
+    def __init__(self, service, queue_dao, user_dao):
+        super(QueueMemberUserItem, self).__init__()
+        self.service = service
+        self.queue_dao = queue_dao
+        self.user_dao = user_dao
+
+    @required_acl('confd.queues.{queue_id}.members.users.{user_id}.update')
+    def put(self, queue_id, user_id):
+        queue = self.queue_dao.get(queue_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
+        member = self._find_or_create_member(queue, user)
+        form = self.schema().load(request.get_json()).data
+        setattr(member, 'priority', form['priority'])
+        self.service.associate_member_user(queue, member)
+        return '', 204
+
+    @required_acl('confd.queues.{queue_id}.members.users.{user_id}.delete')
+    def delete(self, queue_id, user_id):
+        queue = self.queue_dao.get(queue_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
+        member = self._find_or_create_member(queue, user)
+        self.service.dissociate_member_user(queue, member)
+        return '', 204
+
+    def _find_or_create_member(self, queue, user):
+        member = self.service.find_member_user(queue, user)
+        if not member:
+            member = QueueMember(user=user)
         return member
 
 

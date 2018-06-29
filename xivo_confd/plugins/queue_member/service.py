@@ -34,6 +34,12 @@ class QueueMemberService(object):
                 return member
         return None
 
+    def find_member_user(self, queue, user):
+        for member in queue.user_queue_members:
+            if member.user == user:
+                return member
+        return None
+
     def associate_legacy(self, queue, member):
         if member in queue.agent_queue_members:
             raise errors.resource_associated('Agent', 'Queue', member.agent.id, queue.id)
@@ -53,6 +59,21 @@ class QueueMemberService(object):
 
         self.queue_dao.dissociate_member_agent(queue, member)
         self.notifier.agent_dissociated(queue, member)
+
+    def associate_member_user(self, queue, member):
+        if member in queue.user_queue_members:
+            return
+
+        # TODO add some validation about user/line/endpoint
+        self.queue_dao.associate_member_user(queue, member)
+        self.notifier.user_associated(queue, member)
+
+    def dissociate_member_user(self, queue, member):
+        if member not in queue.user_queue_members:
+            return
+
+        self.queue_dao.dissociate_member_user(queue, member)
+        self.notifier.user_dissociated(queue, member)
 
 
 def build_service():

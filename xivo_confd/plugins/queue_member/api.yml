@@ -84,6 +84,45 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /queues/{queue_id}/members/users/{user_id}:
+    put:
+      operationId: update_user_queue_association
+      summary: Update User-Queue association
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.users.{user_id}.update`'
+      tags:
+      - queues
+      - users
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        schema:
+          $ref: '#/definitions/QueueMemberUser'
+      responses:
+        '204':
+          description: Association updated
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_user_queue
+      summary: Dissociate user and queue
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.users.{user_id}.delete`'
+      tags:
+      - queues
+      - users
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '204':
+          description: User and Queue dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
 
 definitions:
   QueueMemberAgentLegacy:
@@ -115,6 +154,14 @@ definitions:
         type: integer
         minimum: 0
         description: Agent's penalty. A priority used for distributing calls.
+      priority:
+        type: integer
+        minimum: 0
+        description: priority of extension in the queue. Only used for linear ring strategy
+  QueueMemberUser:
+    title: QueueMemberUser
+    description: An association between a user and a queue.
+    properties:
       priority:
         type: integer
         minimum: 0
