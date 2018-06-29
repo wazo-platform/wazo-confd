@@ -101,6 +101,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/IncallRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         preprocess_subroutine:
           type: string
           description: Name of the subroutine to execute in asterisk before receiving

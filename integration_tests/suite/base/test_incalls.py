@@ -140,7 +140,7 @@ def test_create_minimal_parameters():
     response = confd.incalls.post(destination={'type': 'none'})
     response.assert_created('incalls')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
 
 def test_create_all_parameters():
@@ -148,14 +148,16 @@ def test_create_all_parameters():
                                   description='description',
                                   caller_id_mode='prepend',
                                   caller_id_name='name_',
-                                  destination={'type': 'none'})
+                                  destination={'type': 'none'},
+                                  wazo_tenant=SUB_TENANT)
     response.assert_created('incalls')
 
     assert_that(response.item, has_entries(preprocess_subroutine='default',
                                            description='description',
                                            caller_id_mode='prepend',
                                            caller_id_name='name_',
-                                           destination={'type': 'none'}))
+                                           destination={'type': 'none'},
+                                           tenant_uuid=SUB_TENANT))
 
 
 @fixtures.incall()

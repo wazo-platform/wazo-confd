@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
@@ -11,6 +11,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class IncallSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
     caller_id_mode = fields.String(validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True)
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
