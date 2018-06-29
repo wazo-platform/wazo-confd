@@ -178,17 +178,6 @@ def test_associate_multiple_queues_to_agent(queue1, queue2, agent):
 
 @fixtures.queue()
 @fixtures.agent()
-def test_put(queue, agent):
-    with a.queue_member_agent(queue, agent, penalty=5):
-        response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=7)
-        response.assert_updated()
-
-        response = confd.queues(queue['id']).members.agents(agent['id']).get()
-        assert_that(response.item, has_entries(penalty=7))
-
-
-@fixtures.queue()
-@fixtures.agent()
 def test_dissociate(queue, agent):
     with a.queue_member_agent(queue, agent, check=False):
         response = confd.queues(queue['id']).members.agents(agent['id']).delete()
