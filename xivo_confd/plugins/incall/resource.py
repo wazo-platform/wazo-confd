@@ -26,6 +26,7 @@ class IncallList(ListResource):
         schema = self.schema()
         form = schema.load(request.get_json()).data
         form['destination'] = Dialaction(**form['destination'])
+        form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
         return schema.dump(model).data, 201, self.build_headers(model)
@@ -38,6 +39,7 @@ class IncallList(ListResource):
 class IncallItem(ItemResource):
 
     schema = IncallSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.incalls.{id}.read')
     def get(self, id):
