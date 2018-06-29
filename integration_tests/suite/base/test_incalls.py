@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
@@ -8,14 +8,19 @@ from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
-from hamcrest import (assert_that,
+from hamcrest import (all_of,
+                      assert_that,
                       contains_inanyorder,
                       empty,
                       has_entries,
                       has_entry,
                       has_item,
+                      has_items,
                       is_not,
                       not_)
+
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_get_errors():
@@ -89,6 +94,22 @@ def check_search(url, incall, hidden, field, term):
     not_expected = has_item(has_entry('id', hidden['id']))
     assert_that(response.items, expected)
     assert_that(response.items, is_not(not_expected))
+
+
+@fixtures.incall(wazo_tenant=MAIN_TENANT)
+@fixtures.incall(wazo_tenant=SUB_TENANT)
+def test_search_multi_tenant(main, sub):
+    response = confd.incalls.get(wazo_tenant=MAIN_TENANT)
+    expected = all_of(has_item(main)), not_(has_item(sub))
+    assert_that(response.items, expected)
+
+    response = confd.incalls.get(wazo_tenant=SUB_TENANT)
+    expected = all_of(has_item(sub), not_(has_item(main)))
+    assert_that(response.items, expected)
+
+    response = confd.incalls.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    expected = has_items(main, sub)
+    assert_that(response.items, expected)
 
 
 @fixtures.incall(description='sort1')
