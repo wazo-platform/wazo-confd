@@ -394,6 +394,7 @@ definitions:
     - $ref: '#/definitions/UserRelationServices'
     - $ref: '#/definitions/UserRelationSwitchboards'
     - $ref: '#/definitions/UserRelationVoicemail'
+    - $ref: '#/definitions/UserRelationQueues'
     required:
     - firstname
   UserRelationBase:
@@ -470,6 +471,13 @@ definitions:
       voicemail:
         readOnly: true
         $ref: '#/definitions/VoicemailRelationBase'
+  UserRelationQueues:
+    properties:
+      queues:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/QueueRelationBase'
   UserRelationAgent:
     properties:
       agent:

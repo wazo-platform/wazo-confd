@@ -169,6 +169,25 @@ def test_get_queue_relation(queue, user, line):
 @fixtures.queue()
 @fixtures.user()
 @fixtures.line_sip()
+def test_get_user_relation(queue, user, line):
+    with a.user_line(user, line):
+        with a.queue_member_user(queue, user):
+            response = confd.users(user['id']).get()
+            assert_that(response.item, has_entries(
+                queues=contains(
+                    has_entries(
+                        id=queue['id'],
+                        name=queue['name'],
+                        label=queue['label'],
+                        links=queue['links'],
+                    )
+                )
+            ))
+
+
+@fixtures.queue()
+@fixtures.user()
+@fixtures.line_sip()
 def test_delete_queue_when_queue_and_user_associated(queue, user, line):
     with a.user_line(user, line):
         with a.queue_member_user(queue, user, check=False):

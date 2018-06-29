@@ -100,6 +100,13 @@ class UserSchema(BaseSchema):
                                     'name',
                                     'links'],
                               dump_only=True)
+    queues = fields.Nested('QueueSchema',
+                           only=['id',
+                                 'name',
+                                 'label',
+                                 'links'],
+                           many=True,
+                           dump_only=True)
 
 
 class UserDirectorySchema(BaseSchema):

@@ -518,6 +518,7 @@ def test_get_user(user):
         services={'dnd': {'enabled': False},
                   'incallfilter': {'enabled': False}},
         voicemail=none(),
+        queues=empty(),
     ))
 
 
