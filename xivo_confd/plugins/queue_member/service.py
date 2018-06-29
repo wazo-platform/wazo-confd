@@ -7,14 +7,16 @@ from xivo_dao.resources.agent import dao as agent_dao_module
 from xivo_dao.resources.queue import dao as queue_dao_module
 
 from .notifier import build_notifier
+from .validator import build_validator_member_user
 
 
 class QueueMemberService(object):
 
-    def __init__(self, queue_dao, agent_dao, notifier):
+    def __init__(self, queue_dao, agent_dao, validator_member_user, notifier):
         self.queue_dao = queue_dao
         self.agent_dao = agent_dao
         self.notifier = notifier
+        self.validator_member_user = validator_member_user
 
     def get_member_agent(self, queue, agent):
         member = self.find_member_agent(queue, agent)
@@ -64,7 +66,7 @@ class QueueMemberService(object):
         if member in queue.user_queue_members:
             return
 
-        # TODO add some validation about user/line/endpoint
+        self.validator_member_user.validate_association(queue, member)
         self.queue_dao.associate_member_user(queue, member)
         self.notifier.user_associated(queue, member)
 
@@ -80,5 +82,6 @@ def build_service():
     return QueueMemberService(
         queue_dao_module,
         agent_dao_module,
+        build_validator_member_user(),
         build_notifier(),
     )

@@ -2,6 +2,8 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import re
+
 from . import confd
 from ..helpers import (
     associations as a,
@@ -72,6 +74,17 @@ def test_associate_already_associated(queue, user, line):
         with a.queue_member_user(queue, user):
             response = confd.queues(queue['id']).members.users(user['id']).put()
             response.assert_updated()
+
+
+@fixtures.queue()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+def test_associate_multiple_user_with_same_line(queue, user1, user2, line):
+    with a.user_line(user1, line), a.user_line(user2, line):
+        with a.queue_member_user(queue, user1):
+            response = confd.queues(queue['id']).members.users(user2['id']).put()
+            response.assert_match(400, re.compile('Cannot associate different users with the same line'))
 
 
 @fixtures.queue()
