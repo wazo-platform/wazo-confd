@@ -30,7 +30,6 @@ class AgentSchema(BaseSchema):
 
 
 class AgentQueuesMemberSchema(BaseSchema):
-    priority = fields.Integer()
     penalty = fields.Integer()
     queue = fields.Nested(
         'QueueSchema',

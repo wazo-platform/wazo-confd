@@ -122,14 +122,6 @@ def test_update_properties(queue, agent):
             )
         ))
 
-        response = confd.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            queues=contains(has_entries(
-                penalty=41,
-                priority=42,
-            ))
-        ))
-
 
 @fixtures.queue()
 @fixtures.agent()
@@ -219,7 +211,7 @@ def test_get_queue_relation(queue, agent):
 @fixtures.agent()
 @fixtures.queue()
 def test_get_agent_relation(agent, queue):
-    with a.queue_member_agent(queue, agent, priority=0, penalty=0):
+    with a.queue_member_agent(queue, agent, penalty=0):
         response = confd.agents(agent['id']).get()
         assert_that(response.item, has_entries(
             queues=contains(
@@ -227,7 +219,6 @@ def test_get_agent_relation(agent, queue):
                     id=queue['id'],
                     name=queue['name'],
                     label=queue['label'],
-                    priority=0,
                     penalty=0,
                     links=queue['links'],
                 )

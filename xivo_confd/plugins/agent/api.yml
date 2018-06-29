@@ -141,7 +141,10 @@ definitions:
   AgentRelationQueue:
     allOf:
     - $ref: '#/definitions/QueueRelationBase'
-    - $ref: '#/definitions/QueueMemberAgentRelationBase'
+    - properties:
+        penalty:
+          type: integer
+          description: Agent's penalty. A priority used for distributing calls.
   AgentItems:
     title: AgentItems
     properties:
