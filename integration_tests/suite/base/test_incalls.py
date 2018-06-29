@@ -231,6 +231,16 @@ def test_delete(incall):
     response.assert_match(404, e.not_found(resource='Incall'))
 
 
+@fixtures.incall(wazo_tenant=MAIN_TENANT)
+@fixtures.incall(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.incalls(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Incall'))
+
+    response = confd.incalls(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.group()
 def test_get_group_destination_relation(group):
     incall = confd.incalls.post(destination={'type': 'group',
