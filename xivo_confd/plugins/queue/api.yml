@@ -288,17 +288,7 @@ definitions:
   QueueRelationMemberAgent:
     allOf:
     - $ref: '#/definitions/AgentRelationBase'
-    - $ref: '#/definitions/QueueAgentRelationBase'
-  QueueAgentRelationBase:
-    properties:
-      penalty:
-        type: integer
-        readOnly: true
-        description: Agent's penalty. A priority used for distributing calls.
-      priority:
-        type: integer
-        readOnly: true
-        description: Priority of agent in the queue. Only used for linear ring strategy
+    - $ref: '#/definitions/QueueMemberAgentRelationBase'
   QueueItems:
     title: QueueItems
     properties:

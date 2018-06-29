@@ -57,7 +57,6 @@ paths:
       - $ref: '#/parameters/agentid'
       - name: body
         in: body
-        required: true
         schema:
           $ref: '#/definitions/QueueMemberAgent'
       responses:
@@ -147,17 +146,8 @@ definitions:
     title: QueueMemberAgent
     description: An association between an agent and a queue. Agents associated to
       a Queue will receive calls when they are logged in.
-    required:
-    - agent_id
-    properties:
-      penalty:
-        type: integer
-        minimum: 0
-        description: Agent's penalty. A priority used for distributing calls.
-      priority:
-        type: integer
-        minimum: 0
-        description: priority of extension in the queue. Only used for linear ring strategy
+    allOf:
+    - $ref: '#/definitions/QueueMemberAgentRelationBase'
   QueueMemberUser:
     title: QueueMemberUser
     description: An association between a user and a queue.
@@ -165,4 +155,12 @@ definitions:
       priority:
         type: integer
         minimum: 0
-        description: priority of extension in the queue. Only used for linear ring strategy
+        description: Priority of user in the queue. Only used for linear ring strategy
+  QueueMemberAgentRelationBase:
+    properties:
+      penalty:
+        type: integer
+        description: Agent's penalty. A priority used for distributing calls.
+      priority:
+        type: integer
+        description: Priority of agent in the queue. Only used for linear ring strategy

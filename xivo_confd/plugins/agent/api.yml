@@ -141,7 +141,7 @@ definitions:
   AgentRelationQueue:
     allOf:
     - $ref: '#/definitions/QueueRelationBase'
-    - $ref: '#/definitions/QueueAgentRelationBase'
+    - $ref: '#/definitions/QueueMemberAgentRelationBase'
   AgentItems:
     title: AgentItems
     properties:
