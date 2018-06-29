@@ -4,6 +4,11 @@ Changelog
 18.08
 -----
 
+* A new API for associating user with a queue has been added:
+
+  * PUT `/1.1/queues/<queue_id>/members/users/<user_id>`
+  * DELETE `/1.1/queues/<queue_id>/members/users/<user_id>`
+
 * The following URLs have been deprecated. Please use the new API instead:
 
   * POST `/1.1/queues/<queue_id>/members/agents`
