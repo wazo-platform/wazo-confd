@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -19,6 +21,9 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
+
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_get_errors():
@@ -134,6 +139,22 @@ def check_search(url, group, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.groups.get(wazo_tenant=MAIN_TENANT)
+    expected = all_of(has_item(main)), not_(has_item(sub))
+    assert_that(response.items, expected)
+
+    response = confd.groups.get(wazo_tenant=SUB_TENANT)
+    expected = all_of(has_item(sub), not_(has_item(main)))
+    assert_that(response.items, expected)
+
+    response = confd.groups.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    expected = has_items(main, sub)
+    assert_that(response.items, expected)
+
+
 @fixtures.group(name='sort1', preprocess_subroutine='sort1')
 @fixtures.group(name='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(group1, group2):
@@ -170,12 +191,23 @@ def test_get(group):
     ))
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.groups(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.groups.post(name='MyGroup')
     response.assert_created('groups')
 
     assert_that(response.item, has_entries(id=not_(empty()),
-                                           name='MyGroup'))
+                                           name='MyGroup',
+                                           tenant_uuid=MAIN_TENANT))
 
     confd.groups(response.item['id']).delete().assert_deleted()
 
@@ -196,9 +228,16 @@ def test_create_all_parameters():
     response = confd.groups.post(**parameters)
     response.assert_created('groups')
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.groups(response.item['id']).delete().assert_deleted()
+
+
+def test_create_multi_tenant():
+    response = confd.groups.post(name='MyGroup', wazo_tenant=SUB_TENANT)
+    response.assert_created('groups')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 @fixtures.group()
@@ -228,12 +267,32 @@ def test_edit_all_parameters(group):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.groups(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.group()
 def test_delete(group):
     response = confd.groups(group['id']).delete()
     response.assert_deleted()
     response = confd.groups(group['id']).get()
     response.assert_match(404, e.not_found(resource='Group'))
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.groups(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.group()

@@ -243,10 +243,10 @@ class DatabaseQueries(object):
                          typeval=str(typeval))
                 .scalar())
 
-    def insert_group(self, name='mygroup', number='1234', context='default'):
+    def insert_group(self, name='mygroup', number='1234', context='default', tenant_uuid=None):
         query = text("""
-        INSERT INTO groupfeatures (name, number, context)
-        VALUES (:name, :number, :context)
+        INSERT INTO groupfeatures (name, number, context, tenant_uuid)
+        VALUES (:name, :number, :context, :tenant_uuid)
         RETURNING id
         """)
 
@@ -254,7 +254,8 @@ class DatabaseQueries(object):
                     .execute(query,
                              name=name,
                              number=number,
-                             context=context)
+                             context=context,
+                             tenant_uuid=tenant_uuid)
                     .scalar())
         self.insert_extension(number, context, 'group', group_id)
 
