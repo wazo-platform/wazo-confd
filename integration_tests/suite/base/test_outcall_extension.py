@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (assert_that,
@@ -9,7 +9,12 @@ from ..helpers import scenarios as s
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import associations as a
-from ..helpers.config import OUTCALL_CONTEXT, CONTEXT
+from ..helpers.config import (
+    OUTCALL_CONTEXT,
+    CONTEXT,
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 from . import confd
 
 
@@ -122,6 +127,22 @@ def test_associate_when_user_already_associated(outcall, user, line_sip, extensi
 def test_associate_when_not_outcall_context(outcall, extension):
     response = confd.outcalls(outcall['id']).extensions(extension['id']).put()
     response.assert_status(400)
+
+
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, type='outcall', name='sub-outcall')
+@fixtures.extension(context='sub-outcall')
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_associate_multi_tenant(main_outcall, sub_outcall, sub_ctx, sub_exten, main_exten):
+    response = confd.outcalls(sub_outcall['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.outcalls(main_outcall['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Outcall'))
+
+    response = confd.outcalls(main_outcall['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.outcall()

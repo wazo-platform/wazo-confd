@@ -26,6 +26,7 @@ class OutcallExtensionSchema(BaseSchema):
 class OutcallExtensionItem(ConfdResource):
 
     schema = OutcallExtensionSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, outcall_dao, extension_dao):
         super(OutcallExtensionItem, self).__init__()
@@ -42,8 +43,11 @@ class OutcallExtensionItem(ConfdResource):
 
     @required_acl('confd.outcalls.{outcall_id}.extensions.{extension_id}.update')
     def put(self, outcall_id, extension_id):
-        outcall = self.outcall_dao.get(outcall_id)
-        extension = self.extension_dao.get(extension_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
+        extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
+
         outcall_extension = self.schema().load(request.get_json()).data
         self.service.associate(outcall, extension, outcall_extension)
         return '', 204
