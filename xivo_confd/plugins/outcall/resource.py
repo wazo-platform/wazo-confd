@@ -32,6 +32,7 @@ class OutcallList(ListResource):
 class OutcallItem(ItemResource):
 
     schema = OutcallSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.outcalls.{id}.read')
     def get(self, id):

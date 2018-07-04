@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import random
@@ -15,8 +15,8 @@ def generate_outcall(**parameters):
     return add_outcall(**parameters)
 
 
-def add_outcall(**parameters):
-    response = confd.outcalls.post(parameters)
+def add_outcall(wazo_tenant=None, **parameters):
+    response = confd.outcalls.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

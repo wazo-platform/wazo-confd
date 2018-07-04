@@ -7,17 +7,20 @@ from ..helpers import fixtures
 from ..helpers import scenarios as s
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     not_,
 )
 from . import confd
 
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_get_errors():
@@ -103,6 +106,28 @@ def check_search(url, outcall, hidden, field, term):
     not_expected = has_item(has_entry('id', hidden['id']))
     assert_that(response.items, expected)
     assert_that(response.items, is_not(not_expected))
+
+
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.outcalls.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.outcalls.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.outcalls.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.outcall(description='sort1')
