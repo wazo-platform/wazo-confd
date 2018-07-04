@@ -239,6 +239,16 @@ def test_delete(outcall):
     response.assert_match(404, e.not_found(resource='Outcall'))
 
 
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.outcalls(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Outcall'))
+
+    response = confd.outcalls(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.outcall()
 def test_bus_events(outcall):
     yield s.check_bus_event, 'config.outcalls.created', confd.outcalls.post, {'name': 'a'}
