@@ -4,6 +4,7 @@
 
 from flask import request
 
+from xivo_dao.alchemy.queuemember import QueueMember
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
@@ -11,6 +12,13 @@ from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ConfdResource
 
 from .schema import GroupUsersSchema, GroupExtensionsSchema
+
+
+class Extension(object):
+
+    def __init__(self, exten=None, context=None):
+        self.exten = exten
+        self.context = context
 
 
 class GroupMemberItem(ConfdResource):
@@ -32,14 +40,24 @@ class GroupMemberUserItem(GroupMemberItem):
     def put(self, group_id):
         group = self.group_dao.get(group_id)
         form = self.schema().load(request.get_json()).data
+        members = []
         try:
-            for user in form['users']:
-                user['user'] = self.user_dao.get_by(uuid=user['user']['uuid'])
+            for member_form in form['users']:
+                user = self.user_dao.get_by(uuid=member_form['user']['uuid'])
+                member = self._find_or_create_member(group, user)
+                member.priority = member_form['priority']
+                members.append(member)
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 
-        self.service.associate_all_users(group, form['users'])
+        self.service.associate_all_users(group, members)
         return '', 204
+
+    def _find_or_create_member(self, group, user):
+        member = self.service.find_member_user(group, user)
+        if not member:
+            member = QueueMember(user=user)
+        return member
 
 
 class GroupMemberExtensionItem(GroupMemberItem):
@@ -50,5 +68,18 @@ class GroupMemberExtensionItem(GroupMemberItem):
     def put(self, group_id):
         group = self.group_dao.get(group_id)
         form = self.schema().load(request.get_json()).data
-        self.service.associate_all_extensions(group, form['extensions'])
+        members = []
+        for member_form in form['extensions']:
+            extension = Extension(**member_form['extension'])
+            member = self._find_or_create_member(group, extension)
+            member.priority = member_form['priority']
+            members.append(member)
+
+        self.service.associate_all_extensions(group, members)
         return '', 204
+
+    def _find_or_create_member(self, group, extension):
+        member = self.service.find_member_user(group, extension)
+        if not member:
+            member = QueueMember(extension=extension)
+        return member

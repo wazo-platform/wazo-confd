@@ -16,21 +16,33 @@ class GroupMemberUserService(object):
         self.validator_extension = validator_extension
         self.notifier = notifier
 
+    def find_member_user(self, queue, user):
+        for member in queue.user_queue_members:
+            if member.user == user:
+                return member
+        return None
+
+    def find_member_extension(self, queue, extension):
+        for member in queue.extension_queue_members:
+            if member.extension.exten == extension.exten and member.extension.context == extension.context:
+                return member
+        return None
+
     def associate_all_users(self, group, members):
-        users = [member['user'] for member in members]
-        self.validator_user.validate_association(group, users)
+        self.validator_user.validate_association(group, members)
         self.group_dao.associate_all_member_users(group, members)
-        self.notifier.users_associated(group, users)
+        self.notifier.users_associated(group, members)
 
     def associate_all_extensions(self, group, members):
-        extensions = [member['extension'] for member in members]
-        self.validator_extension.validate_association(group, extensions)
+        self.validator_extension.validate_association(group, members)
         self.group_dao.associate_all_member_extensions(group, members)
-        self.notifier.extensions_associated(group, extensions)
+        self.notifier.extensions_associated(group, members)
 
 
 def build_service():
-    return GroupMemberUserService(group_dao_module,
-                                  build_notifier(),
-                                  build_validator_member_user(),
-                                  build_validator_member_extension())
+    return GroupMemberUserService(
+        group_dao_module,
+        build_notifier(),
+        build_validator_member_user(),
+        build_validator_member_extension()
+    )
