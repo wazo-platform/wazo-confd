@@ -82,34 +82,34 @@ def test_search(incall, hidden):
 
 def check_search(url, incall, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, incall[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(
+        response.items,
+        all_of(
+            has_item(has_entry(field, incall[field])),
+            is_not(has_item(has_entry(field, hidden[field]))),
+        ))
 
     response = url.get(**{field: incall[field]})
-
-    expected = has_item(has_entry('id', incall['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(
+        response.items,
+        all_of(
+            has_item(has_entry('id', incall['id'])),
+            is_not(has_item(has_entry('id', hidden['id']))),
+        )
+    )
 
 
 @fixtures.incall(wazo_tenant=MAIN_TENANT)
 @fixtures.incall(wazo_tenant=SUB_TENANT)
 def test_search_multi_tenant(main, sub):
     response = confd.incalls.get(wazo_tenant=MAIN_TENANT)
-    expected = all_of(has_item(main)), not_(has_item(sub))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.incalls.get(wazo_tenant=SUB_TENANT)
-    expected = all_of(has_item(sub), not_(has_item(main)))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.incalls.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    expected = has_items(main, sub)
-    assert_that(response.items, expected)
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.incall(description='sort1')
