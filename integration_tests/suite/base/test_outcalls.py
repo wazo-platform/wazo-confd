@@ -159,6 +159,16 @@ def test_get(outcall):
         ))
 
 
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.outcalls(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Outcall'))
+
+    response = confd.outcalls(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.outcalls.post(name='MyOutcall')
     response.assert_created('outcalls')
