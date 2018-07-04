@@ -102,7 +102,7 @@ class GroupSchema(BaseSchema):
 
 
 class GroupUsersMemberSchema(BaseSchema):
-    priority = fields.Integer(attribute='position')
+    priority = fields.Integer()
     user = fields.Nested('UserSchema',
                          only=['uuid', 'firstname', 'lastname', 'links'],
                          dump_only=True)
@@ -124,6 +124,6 @@ class GroupUsersMemberSchema(BaseSchema):
 
 
 class GroupExtensionsMemberSchema(BaseSchema):
-    priority = fields.Integer(attribute='position')
+    priority = fields.Integer()
     exten = fields.String(dump_only=True)
     context = fields.String(dump_only=True)
