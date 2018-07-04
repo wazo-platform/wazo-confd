@@ -2,10 +2,11 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_bus.resources.queue_members.event import (
-    AgentQueueAssociatedEvent,
-    AgentQueueAssociationEditedEvent,
-    AgentRemovedFromQueueEvent,
+from xivo_bus.resources.queue_member.event import (
+    QueueMemberAgentAssociatedEvent,
+    QueueMemberAgentDissociatedEvent,
+    QueueMemberUserAssociatedEvent,
+    QueueMemberUserDissociatedEvent,
 )
 
 from xivo_confd import bus, sysconfd
@@ -17,32 +18,53 @@ class QueueMemberNotifier(object):
         self.bus = bus
         self.sysconfd = sysconfd
 
-    def send_sysconfd_handlers(self, cti_command=[], agent_command=[]):
+    def send_sysconfd_handlers(self, cti_command=[], ipbx_command=[], agent_command=[]):
         handlers = {'ctibus': cti_command,
-                    'ipbx': [],
+                    'ipbx': ipbx_command,
                     'agentbus': agent_command}
         self.sysconfd.exec_request_handlers(handlers)
 
-    def associated(self, queue_member):
-        event = AgentQueueAssociatedEvent(queue_member.queue_id,
-                                          queue_member.agent_id,
-                                          queue_member.penalty)
+    def agent_associated(self, queue, member):
+        event = QueueMemberAgentAssociatedEvent(
+            queue.id,
+            member.agent.id,
+            member.penalty,
+        )
         self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(cti_command=['xivo[queuemember,update]'],
-                                    agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
+        self.send_sysconfd_handlers(
+            cti_command=['xivo[queuemember,update]'],
 
-    def edited(self, queue_member):
-        event = AgentQueueAssociationEditedEvent(queue_member.queue_id,
-                                                 queue_member.agent_id,
-                                                 queue_member.penalty)
-        self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
+            # Only used if the agent is logged
+            # EditAgentEvent can be sent without passing by sysconfd
+            agent_command=['agent.edit.{}'.format(member.agent.id)]
+        )
 
-    def dissociated(self, queue_member):
-        event = AgentRemovedFromQueueEvent(queue_member.queue_id, queue_member.agent_id)
+    def agent_dissociated(self, queue, member):
+        event = QueueMemberAgentDissociatedEvent(queue.id, member.agent.id)
         self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(cti_command=['xivo[queuemember,update]'],
-                                    agent_command=['agent.edit.{}'.format(queue_member.agent_id)])
+        self.send_sysconfd_handlers(
+            cti_command=['xivo[queuemember,update]'],
+
+            # Only used if the agent is logged
+            # EditAgentEvent can be sent without passing by sysconfd
+            agent_command=['agent.edit.{}'.format(member.agent.id)],
+        )
+
+    def user_associated(self, queue, member):
+        event = QueueMemberUserAssociatedEvent(queue.id, member.user.id)
+        self.bus.send_bus_event(event)
+        self.send_sysconfd_handlers(
+            cti_command=['xivo[queuemember,update]'],
+            ipbx_command=['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+        )
+
+    def user_dissociated(self, queue, member):
+        event = QueueMemberUserDissociatedEvent(queue.id, member.user.id)
+        self.bus.send_bus_event(event)
+        self.send_sysconfd_handlers(
+            cti_command=['xivo[queuemember,update]'],
+            ipbx_command=['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+        )
 
 
 def build_notifier():

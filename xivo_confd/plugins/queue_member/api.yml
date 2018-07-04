@@ -3,21 +3,21 @@ paths:
     post:
       operationId: associate_agent_queue
       summary: Associate an agent and queue
+      deprecated: true
       description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.create`
 
 
         Position in queue is set to max position + 1 or 0 if it is the first member
         of the queue'
       tags:
-      - agents
-      - queues
+      - deprecated
       parameters:
       - $ref: '#/parameters/queueid'
       - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/AgentQueue'
+          $ref: '#/definitions/QueueMemberAgentLegacy'
       responses:
         '200':
           description: Agent and Queue associated
@@ -31,10 +31,10 @@ paths:
     get:
       operationId: get_agent_queue_association
       summary: Get Agent-Queue association
+      deprecated: true
       description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.read`'
       tags:
-      - agents
-      - queues
+      - deprecated
       parameters:
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/agentid'
@@ -42,7 +42,7 @@ paths:
         '200':
           description: Agent-Queue association
           schema:
-            $ref: '#/definitions/AgentQueue'
+            $ref: '#/definitions/QueueMemberAgentLegacy'
         '404':
           $ref: '#/responses/NotFoundError'
     put:
@@ -57,9 +57,8 @@ paths:
       - $ref: '#/parameters/agentid'
       - name: body
         in: body
-        required: true
         schema:
-          $ref: '#/definitions/AgentQueue'
+          $ref: '#/definitions/QueueMemberAgent'
       responses:
         '204':
           description: Association updated
@@ -84,10 +83,49 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /queues/{queue_id}/members/users/{user_id}:
+    put:
+      operationId: update_user_queue_association
+      summary: Update User-Queue association
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.users.{user_id}.update`'
+      tags:
+      - queues
+      - users
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        schema:
+          $ref: '#/definitions/QueueMemberUser'
+      responses:
+        '204':
+          description: Association updated
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_user_queue
+      summary: Dissociate user and queue
+      description: '**Required ACL:** `confd.queues.{queue_id}.members.users.{user_id}.delete`'
+      tags:
+      - queues
+      - users
+      parameters:
+      - $ref: '#/parameters/queueid'
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '204':
+          description: User and Queue dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
 
 definitions:
-  AgentQueue:
-    title: AgentQueue
+  QueueMemberAgentLegacy:
+    title: QueueMemberAgentLegacy
     description: An association between an agent and a queue. Agents associated to
       a Queue will receive calls when they are logged in.
     required:
@@ -95,15 +133,37 @@ definitions:
     properties:
       agent_id:
         type: integer
-        format: int32
         description: Agent's ID
       queue_id:
         type: integer
-        format: int32
         description: Queue's ID
         readOnly: true
       penalty:
         type: integer
-        format: int32
         minimum: 0
         description: Agent's penalty. A priority used for distributing calls.
+  QueueMemberAgent:
+    title: QueueMemberAgent
+    description: An association between an agent and a queue. Agents associated to
+      a Queue will receive calls when they are logged in.
+    allOf:
+    - $ref: '#/definitions/QueueMemberAgentRelationBase'
+  QueueMemberUser:
+    title: QueueMemberUser
+    description: An association between a user and a queue.
+    allOf:
+    - $ref: '#/definitions/QueueMemberUserRelationBase'
+  QueueMemberAgentRelationBase:
+    properties:
+      penalty:
+        type: integer
+        description: Agent's penalty. A priority used for distributing calls.
+      priority:
+        type: integer
+        description: Priority of agent in the queue. Only used for linear ring strategy
+  QueueMemberUserRelationBase:
+    properties:
+      priority:
+        type: integer
+        minimum: 0
+        description: Priority of user in the queue. Only used for linear ring strategy

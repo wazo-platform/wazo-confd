@@ -4,6 +4,7 @@
 
 from hamcrest import (
     assert_that,
+    empty,
     has_entries,
     has_entry,
     has_item,
@@ -144,6 +145,8 @@ def test_get(agent):
         password=agent['password'],
         preprocess_subroutine=agent['preprocess_subroutine'],
         description=agent['description'],
+
+        queues=empty(),
     ))
 
 

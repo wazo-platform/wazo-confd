@@ -251,6 +251,7 @@ definitions:
             $ref: '#/definitions/KeyValueOption'
           default: []
     - $ref: '#/definitions/QueueRelationSchedules'
+    - $ref: '#/definitions/QueueRelationMembers'
     required:
     - name
   QueueRelationBase:
@@ -272,6 +273,31 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/ScheduleRelationBase'
+  QueueRelationMembers:
+    properties:
+      members:
+        readOnly: true
+        $ref: '#/definitions/QueueRelationMemberAgents'
+  QueueRelationMemberAgents:
+    properties:
+      agents:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/QueueRelationMemberAgent'
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/QueueRelationMemberUser'
+  QueueRelationMemberAgent:
+    allOf:
+    - $ref: '#/definitions/AgentRelationBase'
+    - $ref: '#/definitions/QueueMemberAgentRelationBase'
+  QueueRelationMemberUser:
+    allOf:
+    - $ref: '#/definitions/UserRelationBase'
+    - $ref: '#/definitions/QueueMemberUserRelationBase'
   QueueItems:
     title: QueueItems
     properties:

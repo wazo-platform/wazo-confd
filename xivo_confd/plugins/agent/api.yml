@@ -101,18 +101,8 @@ definitions:
   Agent:
     title: Agent
     allOf:
+    - $ref: '#/definitions/AgentRelationBase'
     - properties:
-        id:
-          type: integer
-          readOnly: true
-          description: The id of the agent
-        firstname:
-          type: string
-        lastname:
-          type: string
-        number:
-          type: string
-          description: Agent number
         password:
           type: string
           description: Numeric password used to log agent.
@@ -125,8 +115,36 @@ definitions:
         description:
           type: string
           description: Additional information about the agent
-      required:
-      - number
+    - $ref: '#/definitions/AgentRelationQueues'
+    required:
+    - number
+  AgentRelationBase:
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the agent
+      firstname:
+        type: string
+      lastname:
+        type: string
+      number:
+        type: string
+        description: Agent number
+  AgentRelationQueues:
+    properties:
+      queues:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/AgentRelationQueue'
+  AgentRelationQueue:
+    allOf:
+    - $ref: '#/definitions/QueueRelationBase'
+    - properties:
+        penalty:
+          type: integer
+          description: Agent's penalty. A priority used for distributing calls.
   AgentItems:
     title: AgentItems
     properties:

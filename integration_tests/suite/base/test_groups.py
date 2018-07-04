@@ -185,7 +185,10 @@ def test_get(group):
         retry_delay=group['retry_delay'],
         enabled=group['enabled'],
         extensions=empty(),
-        members=has_entries(users=empty()),
+        members=has_entries(
+            users=empty(),
+            extensions=empty(),
+        ),
         incalls=empty(),
         fallbacks=has_entries(noanswer_destination=none())
     ))

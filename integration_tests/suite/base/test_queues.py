@@ -287,6 +287,10 @@ def test_get(queue):
 
         extensions=empty(),
         schedules=empty(),
+        members=has_entries(
+            agents=empty(),
+            users=empty(),
+        ),
     ))
 
 

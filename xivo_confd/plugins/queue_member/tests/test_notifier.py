@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
+
 from mock import Mock
 
-from xivo_bus.resources.queue_members.event import (
-    AgentQueueAssociatedEvent,
-    AgentQueueAssociationEditedEvent,
-    AgentRemovedFromQueueEvent
+from xivo_bus.resources.queue_member.event import (
+    QueueMemberAgentAssociatedEvent,
+    QueueMemberAgentDissociatedEvent,
+    QueueMemberUserAssociatedEvent,
+    QueueMemberUserDissociatedEvent,
 )
-from xivo_dao.resources.queue_members.model import QueueMemberAgent
 
 from ..notifier import QueueMemberNotifier
 
@@ -20,56 +21,82 @@ class TestQueueMemberNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.device_db = Mock()
-        self.queue_member = Mock(QueueMemberAgent, agent_id=10, queue_id=100, penalty=5)
+        self.queue = Mock(id=1)
+        self.member = Mock(agent=Mock(id=1), penalty=5)
         self.notifier = QueueMemberNotifier(self.bus, self.sysconfd)
 
-    def test_when_queue_member_associated_then_event_sent_on_bus(self):
-        expected_event = AgentQueueAssociatedEvent(self.queue_member.queue_id,
-                                                   self.queue_member.agent_id,
-                                                   self.queue_member.penalty)
+    def test_agent_associate_then_bus_event(self):
+        expected_event = QueueMemberAgentAssociatedEvent(
+            self.queue.id,
+            self.member.agent.id,
+            self.member.penalty,
+        )
 
-        self.notifier.associated(self.queue_member)
+        self.notifier.agent_associated(self.queue, self.member)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_when_queue_member_associated_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': [],
-                             'agentbus': ['agent.edit.{}'.format(self.queue_member.agent_id)],
-                             'ctibus': ['xivo[queuemember,update]']}
-        self.notifier.associated(self.queue_member)
+    def test_agent_associate_then_sysconfd_event(self):
+        expected_handlers = {
+            'ipbx': [],
+            'agentbus': ['agent.edit.{}'.format(self.member.agent.id)],
+            'ctibus': ['xivo[queuemember,update]'],
+        }
+
+        self.notifier.agent_associated(self.queue, self.member)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
-    def test_when_queue_member_edited_then_event_sent_on_bus(self):
-        expected_event = AgentQueueAssociationEditedEvent(self.queue_member.queue_id,
-                                                          self.queue_member.agent_id,
-                                                          self.queue_member.penalty)
+    def test_agent_dissociate_then_bus_event(self):
+        expected_event = QueueMemberAgentDissociatedEvent(self.queue.id, self.member.agent.id)
 
-        self.notifier.edited(self.queue_member)
+        self.notifier.agent_dissociated(self.queue, self.member)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_when_queue_member_edited_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': [],
-                             'agentbus': ['agent.edit.{}'.format(self.queue_member.agent_id)],
-                             'ctibus': []}
-        self.notifier.edited(self.queue_member)
+    def test_agent_dissociate_then_sysconfd_event(self):
+        expected_handlers = {
+            'ipbx': [],
+            'agentbus': ['agent.edit.{}'.format(self.member.agent.id)],
+            'ctibus': ['xivo[queuemember,update]'],
+        }
+
+        self.notifier.agent_dissociated(self.queue, self.member)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
-    def test_when_queue_member_dissociated_then_event_sent_on_bus(self):
-        expected_event = AgentRemovedFromQueueEvent(self.queue_member.queue_id,
-                                                    self.queue_member.agent_id)
+    def test_user_associate_then_bus_event(self):
+        expected_event = QueueMemberUserAssociatedEvent(self.queue.id, self.member.user.id)
 
-        self.notifier.dissociated(self.queue_member)
+        self.notifier.user_associated(self.queue, self.member)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_when_queue_member_dissociated_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': [],
-                             'agentbus': ['agent.edit.{}'.format(self.queue_member.agent_id)],
-                             'ctibus': ['xivo[queuemember,update]']}
-        self.notifier.dissociated(self.queue_member)
+    def test_user_associate_then_sysconfd_event(self):
+        expected_handlers = {
+            'agentbus': [],
+            'ipbx': ['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            'ctibus': ['xivo[queuemember,update]'],
+        }
+
+        self.notifier.user_associated(self.queue, self.member)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
+
+    def test_user_dissociate_then_bus_event(self):
+        expected_event = QueueMemberUserDissociatedEvent(self.queue.id, self.member.user.id)
+
+        self.notifier.user_dissociated(self.queue, self.member)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_user_dissociate_then_sysconfd_event(self):
+        expected_handlers = {
+            'agentbus': [],
+            'ipbx': ['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            'ctibus': ['xivo[queuemember,update]'],
+        }
+
+        self.notifier.user_dissociated(self.queue, self.member)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
