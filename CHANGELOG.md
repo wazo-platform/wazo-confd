@@ -4,6 +4,13 @@ Changelog
 18.08
 -----
 
+* The `/outcalls` routes are now multi-tenant. This means that created outcalls will be in the same
+  tenant as the creator or in the tenant specified by the Wazo-Tenant HTTP header. Listing outcalls
+  will also only list outcalls in the user's tenant unless a sub-tenant is specified using the
+  Wazo-Tenant header. The `recurse=true` query string can be used to list from multiple tenants.
+  GET, DELETE and PUT on an outcall that is not in a tenant accessible to the user will result in a
+  404.
+
 * New readonly parameters have been added to the outcall resource:
 
   * `tenant_uuid`
