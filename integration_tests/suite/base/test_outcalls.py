@@ -6,13 +6,15 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      not_)
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    not_,
+)
 from . import confd
 
 
@@ -116,13 +118,17 @@ def test_sorting_offset_limit(outcall1, outcall2):
 @fixtures.outcall()
 def test_get(outcall):
     response = confd.outcalls(outcall['id']).get()
-    assert_that(response.item, has_entries(id=outcall['id'],
-                                           preprocess_subroutine=outcall['preprocess_subroutine'],
-                                           description=outcall['description'],
-                                           internal_caller_id=outcall['internal_caller_id'],
-                                           name=outcall['name'],
-                                           ring_time=outcall['ring_time'],
-                                           trunks=empty()))
+    assert_that(
+        response.item,
+        has_entries(
+            id=outcall['id'],
+            preprocess_subroutine=outcall['preprocess_subroutine'],
+            description=outcall['description'],
+            internal_caller_id=outcall['internal_caller_id'],
+            name=outcall['name'],
+            ring_time=outcall['ring_time'],
+            trunks=empty(),
+        ))
 
 
 def test_create_minimal_parameters():
