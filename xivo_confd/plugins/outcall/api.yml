@@ -118,6 +118,10 @@ definitions:
         ring_time:
           type: integer
           description: Ringing time before hangup
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/OutcallRelationTrunks'
     - $ref: '#/definitions/OutcallRelationExtensions'
     required:

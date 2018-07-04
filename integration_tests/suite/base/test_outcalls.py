@@ -17,6 +17,8 @@ from hamcrest import (
 )
 from . import confd
 
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+
 
 def test_get_errors():
     fake_outcall = confd.outcalls(999999).get
@@ -122,6 +124,7 @@ def test_get(outcall):
         response.item,
         has_entries(
             id=outcall['id'],
+            tenant_uuid=MAIN_TENANT,
             preprocess_subroutine=outcall['preprocess_subroutine'],
             description=outcall['description'],
             internal_caller_id=outcall['internal_caller_id'],
@@ -135,7 +138,12 @@ def test_create_minimal_parameters():
     response = confd.outcalls.post(name='MyOutcall')
     response.assert_created('outcalls')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(
+        response.item,
+        has_entries(
+            id=not_(empty()),
+            tenant_uuid=MAIN_TENANT,
+        ))
 
     confd.outcalls(response.item['id']).delete().assert_deleted()
 
@@ -151,7 +159,7 @@ def test_create_all_parameters():
     response = confd.outcalls.post(**parameters)
     response.assert_created('outcalls')
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.outcalls(response.item['id']).delete().assert_deleted()
 
