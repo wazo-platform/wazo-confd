@@ -4,6 +4,18 @@ Changelog
 18.08
 -----
 
+* New readonly parameters have been added to the outcall resource:
+
+  * `tenant_uuid`
+
+* New readonly parameters have been added to the incall resource:
+
+  * `tenant_uuid`
+
+* New readonly parameters have been added to the group resource:
+
+  * `tenant_uuid`
+
 * A new API for associating user with a queue has been added:
 
   * PUT `/1.1/queues/<queue_id>/members/users/<user_id>`
@@ -28,6 +40,7 @@ Changelog
 * New readonly parameters have been added to the user resource:
 
   * `queues`
+  * `tenant_uuid`
 
 * New parameter have been added to the queue-member agent association:
 
