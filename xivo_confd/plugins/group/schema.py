@@ -45,10 +45,9 @@ class GroupSchema(BaseSchema):
                                   'links'],
                             many=True,
                             dump_only=True)
-    users_member = fields.Nested('GroupUsersMemberSchema',
-                                 attribute='group_members',
-                                 many=True,
-                                 dump_only=True)
+    user_queue_members = fields.Nested('GroupUsersMemberSchema',
+                                       many=True,
+                                       dump_only=True)
     extensions_member = fields.Nested('GroupExtensionsMemberSchema',
                                       many=True,
                                       dump_only=True)
@@ -78,7 +77,7 @@ class GroupSchema(BaseSchema):
 
     @post_dump
     def wrap_users_member(self, data):
-        users_member = data.pop('users_member', [])
+        users_member = data.pop('user_queue_members', [])
         extensions_member = data.pop('extensions_member', [])
         if not self.only or 'members' in self.only:
             data['members'] = {'users': users_member,
