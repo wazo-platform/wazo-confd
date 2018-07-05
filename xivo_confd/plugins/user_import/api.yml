@@ -62,6 +62,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/csvbody'
+      - $ref: '#/parameters/tenantuuid'
       responses:
         '200':
           description: Users updated successfully

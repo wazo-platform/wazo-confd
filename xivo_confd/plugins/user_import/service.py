@@ -38,13 +38,13 @@ class ImportService(object):
         self.entry_associator.associate(entry)
         return entry
 
-    def update_rows(self, parser):
+    def update_rows(self, parser, tenant_uuid):
         updated = []
         errors = []
 
         for row in parser:
             try:
-                entry = self.update_row(row)
+                entry = self.update_row(row, tenant_uuid)
                 updated.append(entry)
             except (ServiceError, ValidationError) as e:
                 logger.warn("ERROR importing CSV row %s: %s", row.position, e)
@@ -52,8 +52,8 @@ class ImportService(object):
 
         return updated, errors
 
-    def update_row(self, row):
-        entry = self.entry_updater.update_row(row)
+    def update_row(self, row, tenant_uuid):
+        entry = self.entry_updater.update_row(row, tenant_uuid)
         return entry
 
 

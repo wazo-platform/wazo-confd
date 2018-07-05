@@ -58,9 +58,9 @@ class Entry(object):
         fields = self.entry_dict[resource]
         setattr(self, resource, creator.create(fields, tenant_uuid))
 
-    def find_or_create(self, resource, creator):
+    def find_or_create(self, resource, creator, tenant_uuid=None):
         if not self.find(resource, creator):
-            self.create(resource, creator)
+            self.create(resource, creator, tenant_uuid)
 
     def update(self, resource, creator):
         model = self.get_resource(resource)
@@ -91,7 +91,7 @@ class EntryCreator(object):
         entry.find_or_create('line', self.creators['line'])
         entry.find_or_create('extension', self.creators['extension'])
         entry.find_or_create('extension_incall', self.creators['extension_incall'])
-        entry.find_or_create('incall', self.creators['incall'])
+        entry.find_or_create('incall', self.creators['incall'], tenant_uuid=tenant_uuid)
         entry.find_or_create('cti_profile', self.creators['cti_profile'])
         self.create_endpoint(entry)
         return entry
@@ -198,19 +198,19 @@ class EntryUpdater(object):
         self.associators = associators
         self.finder = finder
 
-    def update_row(self, row):
+    def update_row(self, row, tenant_uuid):
         entry = self.finder.get_entry(row)
-        self.create_missing_resources(entry)
+        self.create_missing_resources(entry, tenant_uuid)
         self.associate_resources(entry)
         self.update_resources(entry)
         return entry
 
-    def create_missing_resources(self, entry):
+    def create_missing_resources(self, entry, tenant_uuid):
         entry.find_or_create('voicemail', self.creators['voicemail'])
         entry.find_or_create('call_permissions', self.creators['call_permissions'])
         entry.find_or_create('extension', self.creators['extension'])
         entry.find_or_create('extension_incall', self.creators['extension_incall'])
-        entry.find_or_create('incall', self.creators['incall'])
+        entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
         entry.find_or_create('cti_profile', self.creators['cti_profile'])
         entry.find_or_create('line', self.creators['line'])
         self.find_or_create_endpoint(entry)

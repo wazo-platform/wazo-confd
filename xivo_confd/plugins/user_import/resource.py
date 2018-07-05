@@ -39,7 +39,8 @@ class UserImportResource(ConfdResource):
     @required_acl('confd.users.import.update')
     def put(self):
         parser = csvparse.parse()
-        entries, errors = self.service.update_rows(parser)
+        tenant = Tenant.autodetect()
+        entries, errors = self.service.update_rows(parser, tenant.uuid)
 
         if errors:
             status_code = 400

@@ -256,7 +256,7 @@ class IncallCreator(Creator):
     def create(self, fields, tenant_uuid=None):
         fields = self.extract_extension_fields(fields)
         if fields:
-            incall = Incall(destination=Dialaction(action='none'))
+            incall = Incall(destination=Dialaction(action='none'), tenant_uuid=tenant_uuid)
             return self.service.create(incall)
 
     def update(self, fields, resource):
