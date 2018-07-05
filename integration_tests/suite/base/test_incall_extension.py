@@ -103,6 +103,9 @@ def test_associate_multi_tenant(main_incall, sub_incall, sub_ctx, sub_exten, mai
     response = confd.incalls(main_incall['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Incall'))
 
+    response = confd.incalls(main_incall['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
 
 @fixtures.incall()
 @fixtures.extension(context=INCALL_CONTEXT)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -16,6 +16,7 @@ class IncallExtensionAssociationValidator(ValidatorAssociation):
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_incall_context(extension)
+        self.validate_same_tenant(incall, extension)
 
     def validate_incall_not_already_associated(self, incall):
         extension = extension_dao.find_by(type='incall', typeval=str(incall.id))
@@ -44,6 +45,10 @@ class IncallExtensionAssociationValidator(ValidatorAssociation):
                                                 extension.context,
                                                 id=extension.id,
                                                 context=extension.context)
+
+    def validate_same_tenant(self, incall, extension):
+        if extension.tenant_uuid != incall.tenant_uuid:
+            raise errors.different_tenants(extension.tenant_uuid, incall.tenant_uuid)
 
 
 def build_validator():
