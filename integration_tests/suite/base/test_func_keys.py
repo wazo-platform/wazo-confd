@@ -21,9 +21,9 @@ from ..helpers import (
     helpers,
     scenarios as s,
 )
+from ..helpers.config import MAIN_TENANT
 
 FAKE_ID = 999999999
-MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 
 invalid_destinations = [
     1234,

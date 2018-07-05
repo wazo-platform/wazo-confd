@@ -10,6 +10,8 @@ OUTCALL_CONTEXT = 'to-extern'
 ENTITY_NAME = 'xivotest'
 EXTEN_OUTSIDE_RANGE = str('99999')
 USER_EXTENSION_RANGE = list(range(1000, 2000))
+MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def gen_line_exten():

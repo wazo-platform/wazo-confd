@@ -21,10 +21,14 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
-from ..helpers.helpers.destination import invalid_destinations, valid_destinations
-
-MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
-SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
+from ..helpers.helpers.destination import (
+    invalid_destinations,
+    valid_destinations,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_get_errors():

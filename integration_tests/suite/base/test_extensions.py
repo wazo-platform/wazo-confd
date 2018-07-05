@@ -37,12 +37,14 @@ from ..helpers.config import (
     gen_queue_exten,
     gen_line_exten,
 )
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
 
 FAKE_ID = 999999999
-MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
-SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 
 
 def test_search_errors():

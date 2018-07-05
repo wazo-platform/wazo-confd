@@ -21,9 +21,10 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
-
-MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
-SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_get_errors():

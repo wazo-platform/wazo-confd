@@ -6,8 +6,7 @@ import random
 import string
 
 from . import confd
-
-MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
+from ..config import MAIN_TENANT
 
 
 def generate_group(**parameters):
