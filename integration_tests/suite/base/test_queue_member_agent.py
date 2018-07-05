@@ -240,3 +240,11 @@ def test_delete_agent_when_queue_and_agent_associated(queue, agent):
     with a.queue_member_agent(queue, agent, check=False):
         response = confd.agents(agent['id']).delete()
         response.assert_deleted()
+
+
+@fixtures.queue()
+@fixtures.agent()
+def test_bus_events(queue, agent):
+    url = confd.queues(queue['id']).members.agents(agent['id'])
+    yield s.check_bus_event, 'config.agent_queue_association.created', url.put
+    yield s.check_bus_event, 'config.agent_queue_association.deleted', url.delete

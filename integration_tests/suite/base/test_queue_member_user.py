@@ -204,3 +204,13 @@ def test_delete_user_when_queue_and_user_associated(queue, user, line):
             confd.lines(line['id']).delete().assert_deleted()
             response = confd.users(user['id']).delete()
             response.assert_deleted()
+
+
+@fixtures.queue()
+@fixtures.user()
+@fixtures.line_sip()
+def test_bus_events(queue, user, line):
+    with a.user_line(user, line):
+        url = confd.queues(queue['id']).members.users(user['uuid'])
+        yield s.check_bus_event, 'config.user_queue_association.created', url.put
+        yield s.check_bus_event, 'config.user_queue_association.deleted', url.delete
