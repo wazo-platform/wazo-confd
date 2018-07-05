@@ -7,6 +7,8 @@ paths:
       tags:
       - incalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -45,6 +47,7 @@ paths:
       tags:
       - incalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/incallid'
       responses:
         '200':
@@ -60,6 +63,7 @@ paths:
       tags:
       - incalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/incallid'
       - name: body
         in: body
@@ -80,6 +84,7 @@ paths:
       tags:
       - incalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/incallid'
       responses:
         '204':
@@ -101,6 +106,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/IncallRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         preprocess_subroutine:
           type: string
           description: Name of the subroutine to execute in asterisk before receiving

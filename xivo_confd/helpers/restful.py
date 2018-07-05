@@ -113,14 +113,18 @@ class ListResource(ConfdResource):
             raise errors.wrong_type(key, "positive number")
         return int(value)
 
+    def add_tenant_to_form(self, form):
+        if not self._has_a_tenant_uuid():
+            return form
+
+        tenant = Tenant.autodetect()
+        tenant_dao.get_or_create_tenant(tenant.uuid)
+        form['tenant_uuid'] = tenant.uuid
+        return form
+
     def post(self):
         form = self.schema().load(request.get_json()).data
-
-        if self._has_a_tenant_uuid():
-            tenant = Tenant.autodetect()
-            tenant_dao.get_or_create_tenant(tenant.uuid)
-            form['tenant_uuid'] = tenant.uuid
-
+        form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model).data, 201, self.build_headers(model)
