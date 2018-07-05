@@ -48,7 +48,10 @@ class IncallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate_same_tenant(self, incall, extension):
         if extension.tenant_uuid != incall.tenant_uuid:
-            raise errors.different_tenants(extension.tenant_uuid, incall.tenant_uuid)
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                incall_tenant_uuid=incall.tenant_uuid
+            )
 
 
 def build_validator():

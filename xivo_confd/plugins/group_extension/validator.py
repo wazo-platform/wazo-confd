@@ -62,7 +62,10 @@ class GroupExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRang
 
     def validate_same_tenant(self, group, extension):
         if extension.tenant_uuid != group.tenant_uuid:
-            raise errors.different_tenants(extension.tenant_uuid, group.tenant_uuid)
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                group_tenant_uuid=group.tenant_uuid,
+            )
 
 
 def build_validator():
