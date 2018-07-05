@@ -23,6 +23,7 @@ class GroupExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRang
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
         self.validate_exten_is_in_context_group_range(extension)
+        self.validate_same_tenant(group, extension)
 
     def validate_group_not_already_associated(self, group):
         if group.extensions:
@@ -58,6 +59,13 @@ class GroupExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRang
         context = self._context_dao.get_by_name(extension.context)
         if not self._exten_in_range(extension.exten, context.group_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
+
+    def validate_same_tenant(self, group, extension):
+        if extension.tenant_uuid != group.tenant_uuid:
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                group_tenant_uuid=group.tenant_uuid,
+            )
 
 
 def build_validator():

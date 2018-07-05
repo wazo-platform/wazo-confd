@@ -17,6 +17,8 @@ from ..helpers import (
 from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
+    MAIN_TENANT,
+    SUB_TENANT,
     gen_group_exten,
 )
 from . import confd
@@ -109,6 +111,23 @@ def test_associate_when_exten_pattern(extension, group):
     response.assert_updated()
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.extension(context='main-internal', exten=gen_group_exten())
+@fixtures.extension(context='sub-internal', exten=gen_group_exten())
+def test_associate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten):
+    response = confd.groups(sub_group['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.groups(main_group['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Group'))
+
+    response = confd.groups(main_group['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 def test_dissociate(extension, group):
@@ -122,6 +141,20 @@ def test_dissociate(extension, group):
 def test_dissociate_not_associated(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.extension(context='main-internal', exten=gen_group_exten())
+@fixtures.extension(context='sub-internal', exten=gen_group_exten())
+def test_dissociate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten):
+    response = confd.groups(sub_group['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.groups(main_group['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Group'))
 
 
 @fixtures.extension(exten=gen_group_exten())
