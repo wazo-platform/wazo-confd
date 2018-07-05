@@ -4,16 +4,20 @@
 
 import string
 import random
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
 
-from ..helpers import scenarios as s
-from ..helpers import fixtures
-from ..helpers import wrappers
-from ..helpers import associations as a
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
 from . import confd
-
+from ..helpers import (
+    associations as a,
+    fixtures,
+    scenarios as s,
+    wrappers,
+)
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -89,15 +93,11 @@ def test_associate_multiple_with_priority(group, extension1, extension2, extensi
 
     response = confd.groups(group['id']).get()
     assert_that(response.item, has_entries(
-        members=has_entries(extensions=contains(has_entries(exten=extension2['exten'],
-                                                            context=extension2['context'],
-                                                            priority=1),
-                                                has_entries(exten=extension3['exten'],
-                                                            context=extension3['context'],
-                                                            priority=2),
-                                                has_entries(exten=extension1['exten'],
-                                                            context=extension1['context'],
-                                                            priority=4)))
+        members=has_entries(extensions=contains(
+            has_entries(exten=extension2['exten'], context=extension2['context'], priority=1),
+            has_entries(exten=extension3['exten'], context=extension3['context'], priority=2),
+            has_entries(exten=extension1['exten'], context=extension1['context'], priority=4),
+        ))
     ))
 
 
@@ -115,10 +115,10 @@ def test_get_extensions_associated_to_group(group, extension1, extension2):
     with a.group_member_extension(group, extension2, extension1):
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
-            members=has_entries(extensions=contains(has_entries(exten=extension2['exten'],
-                                                                context=extension2['context']),
-                                                    has_entries(exten=extension1['exten'],
-                                                                context=extension1['context'])))
+            members=has_entries(extensions=contains(
+                has_entries(exten=extension2['exten'], context=extension2['context']),
+                has_entries(exten=extension1['exten'], context=extension1['context']),
+            ))
         ))
 
 
