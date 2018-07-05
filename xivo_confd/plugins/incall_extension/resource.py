@@ -8,6 +8,8 @@ from xivo_confd.helpers.restful import ConfdResource
 
 class IncallExtensionItem(ConfdResource):
 
+    has_tenant_uuid = True
+
     def __init__(self, service, incall_dao, extension_dao):
         super(IncallExtensionItem, self).__init__()
         self.service = service
@@ -23,7 +25,10 @@ class IncallExtensionItem(ConfdResource):
 
     @required_acl('confd.incalls.{incall_id}.extensions.{extension_id}.update')
     def put(self, incall_id, extension_id):
-        incall = self.incall_dao.get(incall_id)
-        extension = self.extension_dao.get(extension_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        incall = self.incall_dao.get(incall_id, tenant_uuids=tenant_uuids)
+        extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
+
         self.service.associate(incall, extension)
         return '', 204
