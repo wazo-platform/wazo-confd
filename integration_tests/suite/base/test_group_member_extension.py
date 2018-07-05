@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import string
 import random
-from functools import wraps
 from hamcrest import (assert_that,
                       contains,
                       has_entries)
 
 from ..helpers import scenarios as s
 from ..helpers import fixtures
+from ..helpers import wrappers
 from ..helpers import associations as a
 from . import confd
 
@@ -19,19 +19,19 @@ FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
 
 
-def extension(func):
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        exten = ''.join(random.choice(string.digits) for _ in range(10))
+def generate_extension():
+    exten = ''.join(random.choice(string.digits) for _ in range(10))
+    extension = {'exten': exten, 'context': 'default'}
+    return extension
 
-        extension = {'exten': exten, 'context': 'default'}
-        new_args = list(args) + [extension]
-        return func(*new_args, **kwargs)
-    return decorated
+
+class extension(wrappers.IsolatedAction):
+
+    actions = {'generate': generate_extension}
 
 
 @fixtures.group()
-@extension
+@extension()
 def test_associate_errors(group, extension):
     response = confd.groups(FAKE_ID).members.extensions.put(extensions=[extension])
     response.assert_status(404)
@@ -71,16 +71,16 @@ def error_checks(url):
 
 
 @fixtures.group()
-@extension
+@extension()
 def test_associate(group, extension):
     response = confd.groups(group['id']).members.extensions.put(extensions=[extension])
     response.assert_updated()
 
 
 @fixtures.group()
-@extension
-@extension
-@extension
+@extension()
+@extension()
+@extension()
 def test_associate_multiple_with_priority(group, extension1, extension2, extension3):
     extension1['priority'], extension2['priority'], extension3['priority'] = 4, 1, 2
     response = confd.groups(group['id']).members.extensions.put(extensions=[extension1, extension2, extension3])
@@ -101,15 +101,15 @@ def test_associate_multiple_with_priority(group, extension1, extension2, extensi
 
 
 @fixtures.group()
-@extension
+@extension()
 def test_associate_same_extension(group, extension):
     response = confd.groups(group['id']).members.extensions.put(extensions=[extension, extension])
     response.assert_status(400)
 
 
 @fixtures.group()
-@extension
-@extension
+@extension()
+@extension()
 def test_get_extensions_associated_to_group(group, extension1, extension2):
     with a.group_member_extension(group, extension2, extension1):
         response = confd.groups(group['id']).get()
@@ -122,8 +122,8 @@ def test_get_extensions_associated_to_group(group, extension1, extension2):
 
 
 @fixtures.group()
-@extension
-@extension
+@extension()
+@extension()
 def test_dissociate(group, extension1, extension2):
     with a.group_member_extension(group, extension1, extension2):
         response = confd.groups(group['id']).members.extensions.put(extensions=[])
@@ -131,8 +131,8 @@ def test_dissociate(group, extension1, extension2):
 
 
 @fixtures.group()
-@extension
-@extension
+@extension()
+@extension()
 def test_delete_group_when_group_and_extension_associated(group, extension1, extension2):
     with a.group_member_extension(group, extension1, extension2, check=False):
         confd.groups(group['id']).delete().assert_deleted()
@@ -142,7 +142,7 @@ def test_delete_group_when_group_and_extension_associated(group, extension1, ext
 
 
 @fixtures.group()
-@extension
+@extension()
 def test_bus_events(group, extension):
     url = confd.groups(group['id']).members.extensions.put
     body = {'extensions': [extension]}
