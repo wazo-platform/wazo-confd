@@ -2,10 +2,6 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-
 from hamcrest import (
     all_of,
     assert_that,
@@ -18,9 +14,13 @@ from hamcrest import (
     not_,
 )
 from . import confd
-
-MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
-SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_get_errors():
