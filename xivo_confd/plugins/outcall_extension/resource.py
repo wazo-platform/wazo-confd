@@ -36,8 +36,11 @@ class OutcallExtensionItem(ConfdResource):
 
     @required_acl('confd.outcalls.{outcall_id}.extensions.{extension_id}.delete')
     def delete(self, outcall_id, extension_id):
-        outcall = self.outcall_dao.get(outcall_id)
-        extension = self.extension_dao.get(extension_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
+        extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
+
         self.service.dissociate(outcall, extension)
         return '', 204
 

@@ -145,6 +145,19 @@ def test_associate_multi_tenant(main_outcall, sub_outcall, sub_ctx, sub_exten, m
     response.assert_match(400, e.different_tenant())
 
 
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, type='outcall', name='sub-outcall')
+@fixtures.extension(context='sub-outcall')
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_dissociate_multi_tenant(main_outcall, sub_outcall, sub_ctx, sub_exten, main_exten):
+    response = confd.outcalls(sub_outcall['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.outcalls(main_outcall['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Outcall'))
+
+
 @fixtures.outcall()
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_dissociate(outcall, extension):
