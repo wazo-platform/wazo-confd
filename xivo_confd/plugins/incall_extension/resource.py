@@ -18,8 +18,11 @@ class IncallExtensionItem(ConfdResource):
 
     @required_acl('confd.incalls.{incall_id}.extensions.{extension_id}.delete')
     def delete(self, incall_id, extension_id):
-        incall = self.incall_dao.get(incall_id)
-        extension = self.extension_dao.get(extension_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        incall = self.incall_dao.get(incall_id, tenant_uuids=tenant_uuids)
+        extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
+
         self.service.dissociate(incall, extension)
         return '', 204
 

@@ -112,6 +112,19 @@ def test_dissociate(incall, extension):
         response.assert_deleted()
 
 
+@fixtures.incall(wazo_tenant=MAIN_TENANT)
+@fixtures.incall(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, type='incall', name='sub-incall')
+@fixtures.extension(context='sub-incall')
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_dissociate_multi_tenant(main_incall, sub_incall, sub_ctx, sub_exten, main_exten):
+    response = confd.incalls(sub_incall['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.incalls(main_incall['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Incall'))
+
+
 @fixtures.incall()
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_dissociate_not_associated(incall, extension):
