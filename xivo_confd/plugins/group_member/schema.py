@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields, post_load
+from marshmallow.validate import Range
 from xivo_confd.helpers.mallow import BaseSchema
 
 
 class GroupUserSchema(BaseSchema):
     uuid = fields.String(required=True)
-    priority = fields.Integer()
+    priority = fields.Integer(validate=Range(min=0))
 
     @post_load
     def add_envelope(self, data):
@@ -29,7 +30,7 @@ class GroupUsersSchema(BaseSchema):
 class GroupExtensionSchema(BaseSchema):
     exten = fields.String(required=True)
     context = fields.String(required=True)
-    priority = fields.Integer()
+    priority = fields.Integer(validate=Range(min=0))
 
     @post_load
     def add_envelope(self, data):

@@ -54,6 +54,7 @@ def error_checks(url):
     regex = r'extensions.*priority'
     yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': None}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': 'string'}], regex
+    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': -1}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': []}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': {}}], regex
 
