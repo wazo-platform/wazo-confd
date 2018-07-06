@@ -3,13 +3,12 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import os
-import urllib
 import logging
 import cherrypy
 
 from cherrypy.process.servers import ServerAdapter
 from cheroot import wsgi
-from flask import Flask, g, request
+from flask import Flask, g
 from flask_cors import CORS
 from flask_restful import Api
 from sqlalchemy.exc import SQLAlchemyError
@@ -33,11 +32,6 @@ _do_not_log_data_endpoints = []
 cherrypy.engine.signal_handler.set_handler('SIGTERM', cherrypy.engine.exit)
 
 
-def add_endpoint_to_do_not_log_data_list(endpoint):
-    # XXX name is bad
-    _do_not_log_data_endpoints.append(endpoint)
-
-
 def get_bus_publisher():
     publisher = g.get('bus_publisher')
     if not publisher:
@@ -53,17 +47,7 @@ def get_sysconfd_publisher():
 
 
 def log_requests():
-    url = request.url.encode('utf8')
-    url = urllib.unquote(url)
-    params = {
-        'method': request.method,
-        'url': url,
-    }
-    if request.data and request.endpoint not in _do_not_log_data_endpoints:
-        params.update({'data': request.data})
-        logger.info("%(method)s %(url)s with data %(data)s ", params)
-    else:
-        logger.info("%(method)s %(url)s", params)
+    return http_helpers.log_before_request()
 
 
 def after_request(response):
