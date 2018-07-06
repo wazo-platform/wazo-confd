@@ -45,13 +45,12 @@ class GroupSchema(BaseSchema):
                                   'links'],
                             many=True,
                             dump_only=True)
-    users_member = fields.Nested('GroupUsersMemberSchema',
-                                 attribute='group_members',
-                                 many=True,
-                                 dump_only=True)
-    extensions_member = fields.Nested('GroupExtensionsMemberSchema',
-                                      many=True,
-                                      dump_only=True)
+    user_queue_members = fields.Nested('GroupUsersMemberSchema',
+                                       many=True,
+                                       dump_only=True)
+    extension_queue_members = fields.Nested('GroupExtensionsMemberSchema',
+                                            many=True,
+                                            dump_only=True)
     schedules = fields.Nested('ScheduleSchema',
                               only=['id', 'name', 'links'],
                               many=True,
@@ -78,8 +77,8 @@ class GroupSchema(BaseSchema):
 
     @post_dump
     def wrap_users_member(self, data):
-        users_member = data.pop('users_member', [])
-        extensions_member = data.pop('extensions_member', [])
+        users_member = data.pop('user_queue_members', [])
+        extensions_member = data.pop('extension_queue_members', [])
         if not self.only or 'members' in self.only:
             data['members'] = {'users': users_member,
                                'extensions': extensions_member}
@@ -102,7 +101,7 @@ class GroupSchema(BaseSchema):
 
 
 class GroupUsersMemberSchema(BaseSchema):
-    priority = fields.Integer(attribute='position')
+    priority = fields.Integer()
     user = fields.Nested('UserSchema',
                          only=['uuid', 'firstname', 'lastname', 'links'],
                          dump_only=True)
@@ -124,6 +123,6 @@ class GroupUsersMemberSchema(BaseSchema):
 
 
 class GroupExtensionsMemberSchema(BaseSchema):
-    priority = fields.Integer(attribute='position')
+    priority = fields.Integer()
     exten = fields.String(dump_only=True)
     context = fields.String(dump_only=True)

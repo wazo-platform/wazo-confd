@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -9,7 +9,8 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 class GroupMemberUserAssociationValidator(ValidatorAssociation):
 
-    def validate(self, group, users):
+    def validate(self, group, members):
+        users = [member.user for member in members]
         for user in users:
             self.validate_user_has_endpoint(user)
 
@@ -35,7 +36,11 @@ class GroupMemberUserAssociationValidator(ValidatorAssociation):
 
 class GroupMemberExtensionAssociationValidator(ValidatorAssociation):
 
-    def validate(self, group, extensions):
+    def validate(self, group, members):
+        extensions = [{
+            'exten': member.extension.exten,
+            'context': member.extension.context
+        } for member in members]
         self.validate_no_duplicate_extension(extensions)
 
     def validate_no_duplicate_extension(self, extensions):

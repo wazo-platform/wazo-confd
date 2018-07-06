@@ -24,14 +24,15 @@ class GroupMemberNotifier(object):
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
-    def users_associated(self, group, users):
+    def users_associated(self, group, members):
         self.send_sysconfd_handlers()
-        user_uuids = [user.uuid for user in users]
+        user_uuids = [member.user.uuid for member in members]
         event = GroupMemberUsersAssociatedEvent(group.id, user_uuids)
         self.bus.send_bus_event(event)
 
-    def extensions_associated(self, group, extensions):
+    def extensions_associated(self, group, members):
         self.send_sysconfd_handlers()
+        extensions = [{'exten': member.extension.exten, 'context': member.extension.context} for member in members]
         event = GroupMemberExtensionsAssociatedEvent(group.id, extensions)
         self.bus.send_bus_event(event)
 
