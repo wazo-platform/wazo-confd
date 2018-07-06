@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 
-from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
+from xivo_confd.helpers.validator import (
+    ValidatorAssociation,
+    ValidationAssociation,
+)
 
 
 class OutcallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, outcall, extension):
+        self.validate_same_tenant(outcall, extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_outcall_context(extension)
 
@@ -28,6 +32,13 @@ class OutcallExtensionAssociationValidator(ValidatorAssociation):
                                                 extension.context,
                                                 id=extension.id,
                                                 context=extension.context)
+
+    def validate_same_tenant(self, outcall, extension):
+        if extension.tenant_uuid != outcall.tenant_uuid:
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                outcall_tenant_uuid=outcall.tenant_uuid
+            )
 
 
 def build_validator():

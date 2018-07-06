@@ -2,18 +2,25 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    all_of,
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    is_not,
+    not_,
+)
+from . import confd
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      not_)
-from . import confd
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_get_errors():
@@ -101,6 +108,28 @@ def check_search(url, outcall, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.outcalls.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.outcalls.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.outcalls.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.outcall(description='sort1')
 @fixtures.outcall(description='sort2')
 def test_sorting_offset_limit(outcall1, outcall2):
@@ -116,20 +145,40 @@ def test_sorting_offset_limit(outcall1, outcall2):
 @fixtures.outcall()
 def test_get(outcall):
     response = confd.outcalls(outcall['id']).get()
-    assert_that(response.item, has_entries(id=outcall['id'],
-                                           preprocess_subroutine=outcall['preprocess_subroutine'],
-                                           description=outcall['description'],
-                                           internal_caller_id=outcall['internal_caller_id'],
-                                           name=outcall['name'],
-                                           ring_time=outcall['ring_time'],
-                                           trunks=empty()))
+    assert_that(
+        response.item,
+        has_entries(
+            id=outcall['id'],
+            tenant_uuid=MAIN_TENANT,
+            preprocess_subroutine=outcall['preprocess_subroutine'],
+            description=outcall['description'],
+            internal_caller_id=outcall['internal_caller_id'],
+            name=outcall['name'],
+            ring_time=outcall['ring_time'],
+            trunks=empty(),
+        ))
+
+
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.outcalls(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Outcall'))
+
+    response = confd.outcalls(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_parameters():
     response = confd.outcalls.post(name='MyOutcall')
     response.assert_created('outcalls')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(
+        response.item,
+        has_entries(
+            id=not_(empty()),
+            tenant_uuid=MAIN_TENANT,
+        ))
 
     confd.outcalls(response.item['id']).delete().assert_deleted()
 
@@ -145,7 +194,7 @@ def test_create_all_parameters():
     response = confd.outcalls.post(**parameters)
     response.assert_created('outcalls')
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.outcalls(response.item['id']).delete().assert_deleted()
 
@@ -172,12 +221,32 @@ def test_edit_all_parameters(outcall):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.outcalls(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Outcall'))
+
+    response = confd.outcalls(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.outcall()
 def test_delete(outcall):
     response = confd.outcalls(outcall['id']).delete()
     response.assert_deleted()
     response = confd.outcalls(outcall['id']).get()
     response.assert_match(404, e.not_found(resource='Outcall'))
+
+
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.outcalls(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Outcall'))
+
+    response = confd.outcalls(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.outcall()

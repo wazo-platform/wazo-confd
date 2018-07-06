@@ -12,11 +12,11 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class IncallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, incall, extension):
+        self.validate_same_tenant(incall, extension)
         self.validate_incall_not_already_associated(incall)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_incall_context(extension)
-        self.validate_same_tenant(incall, extension)
 
     def validate_incall_not_already_associated(self, incall):
         extension = extension_dao.find_by(type='incall', typeval=str(incall.id))

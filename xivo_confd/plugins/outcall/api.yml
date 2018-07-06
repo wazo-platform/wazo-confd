@@ -7,6 +7,8 @@ paths:
       tags:
       - outcalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -45,6 +47,7 @@ paths:
       tags:
       - outcalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/outcallid'
       responses:
         '200':
@@ -60,6 +63,7 @@ paths:
       tags:
       - outcalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/outcallid'
       - name: body
         in: body
@@ -80,6 +84,7 @@ paths:
       tags:
       - outcalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/outcallid'
       responses:
         '204':
@@ -118,6 +123,10 @@ definitions:
         ring_time:
           type: integer
           description: Ringing time before hangup
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/OutcallRelationTrunks'
     - $ref: '#/definitions/OutcallRelationExtensions'
     required:

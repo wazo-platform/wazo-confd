@@ -11,6 +11,7 @@ from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
 class OutcallSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     internal_caller_id = StrictBoolean()
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
