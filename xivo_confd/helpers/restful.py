@@ -2,8 +2,6 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import logging
-
 from flask import request
 from flask_restful import Resource
 from requests import HTTPError
@@ -14,8 +12,6 @@ from xivo_dao.helpers import errors
 
 from xivo_confd.auth import authentication
 from xivo_confd.helpers.common import handle_api_exception
-
-logger = logging.getLogger(__name__)
 
 
 class ErrorCatchingResource(Resource):
@@ -37,35 +33,25 @@ class ConfdResource(ErrorCatchingResource):
         )
 
     def _build_tenant_list(self, params):
-        # TODO remove all the logging in this function
-        logger.debug('building tenant list: %s', params)
         if not self._has_a_tenant_uuid():
-            logger.debug('does not have a tenant uuid')
             return
 
-        logger.debug('headers: %s', request.headers)
         tenant = Tenant.autodetect().uuid
-        logger.debug('%s detected', tenant)
         recurse = params.get('recurse', False)
-        logger.debug('recurse: %s', recurse)
         if not recurse:
-            logger.debug('no recurse [%s]', tenant)
             return [tenant]
 
         tenants = []
         auth_client = get_auth_client()
         token_data = get_token()
-        logger.debug('using the following token: %s', token_data)
         auth_client.set_token(token_data['token'])
 
         try:
             tenants = auth_client.tenants.list(tenant_uuid=tenant)['items']
-            logger.debug('found the following tenants: %s', tenants)
         except HTTPError as e:
             response = getattr(e, 'response', None)
             status_code = getattr(response, 'status_code', None)
             if status_code == 401:
-                logger.debug('unauthorized returning [%s]', tenant)
                 return [tenant]
             raise
 
