@@ -14,9 +14,9 @@ from xivo_confd.helpers.validator import (
 class OutcallExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, outcall, extension):
+        self.validate_same_tenant(outcall, extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_outcall_context(extension)
-        self.validate_same_tenant(outcall, extension)
 
     def validate_extension_not_associated_to_other_resource(self, extension):
         if not (extension.type == 'user' and extension.typeval == '0'):
