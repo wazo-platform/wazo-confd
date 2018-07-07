@@ -27,6 +27,7 @@ class UserVoicemailSchema(BaseSchema):
 class UserVoicemailResource(ConfdResource):
 
     schema = UserVoicemailSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, user_dao, voicemail_dao):
         super(UserVoicemailResource, self).__init__()
@@ -39,8 +40,6 @@ class UserVoicemailResource(ConfdResource):
 
 
 class UserVoicemailItem(UserVoicemailResource):
-
-    has_tenant_uuid = True
 
     @required_acl('confd.users.{user_id}.voicemails.{voicemail_id}.update')
     def put(self, user_id, voicemail_id):
@@ -63,7 +62,10 @@ class UserVoicemailList(UserVoicemailResource):
 
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
-        user = self.get_user(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+
         self.service.dissociate_all_by_user(user)
         return '', 204
 

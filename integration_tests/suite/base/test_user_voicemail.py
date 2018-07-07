@@ -117,8 +117,6 @@ def test_get_user_voicemail_after_dissociation(user, voicemail):
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
-    print(main_user['tenant_uuid'])
-    print(sub_user['tenant_uuid'])
     response = confd.users(main_user['uuid']).voicemails(sub_vm['id']).put(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('User'))
 
@@ -150,6 +148,12 @@ def test_dissociate_using_uuid(user, voicemail):
 def test_dissociate_not_associated(user, voicemail):
     response = confd.users(user['id']).voicemails.delete()
     response.assert_deleted()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+def test_dissociate_multi_tenant(user):
+    response = confd.users(user['uuid']).voicemails.delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
 
 
 @fixtures.user()
