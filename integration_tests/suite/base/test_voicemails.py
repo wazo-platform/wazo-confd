@@ -294,6 +294,7 @@ def test_create_minimal_voicemail():
             attach_audio=None,
             delete_messages=False,
             options=contains(),
+            tenant_uuid=MAIN_TENANT,
         )
     )
 

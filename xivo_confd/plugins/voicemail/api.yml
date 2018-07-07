@@ -159,6 +159,10 @@ definitions:
           type: boolean
           description: Voicemail can be used when it is enabled
           default: true
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         options:
           description: "Advanced configuration options. Options are appended at the\
             \ end of a \nvoicemail line in the file 'voicemail.conf' used by asterisk.\n\
