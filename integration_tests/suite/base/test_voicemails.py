@@ -4,6 +4,7 @@
 
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     empty,
@@ -12,6 +13,7 @@ from hamcrest import (
     has_item,
     has_items,
     is_not,
+    not_,
 )
 
 from . import confd
@@ -22,6 +24,10 @@ from ..helpers import scenarios as s
 from ..helpers import errors as e
 from ..helpers.helpers import voicemail as vm_helper
 from ..helpers.helpers import context as context_helper
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_search_errors():
@@ -197,6 +203,30 @@ def check_search(url, voicemail, hidden, field, term):
     hidden_voicemail = is_not(has_item(has_entry('id', hidden['id'])))
     assert_that(response.items, expected_voicemail)
     assert_that(response.items, hidden_voicemail)
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+def test_list_multi_tenant(_, __, main, sub):
+    response = confd.voicemails.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.voicemails.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.voicemails.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.voicemail(name='sort1',
