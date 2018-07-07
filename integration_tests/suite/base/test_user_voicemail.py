@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    has_entries,
+    has_items,
+)
+
+from . import confd
 from ..helpers import scenarios as s
 from ..helpers import helpers as h
 from ..helpers import errors as e
 from ..helpers import associations as a
 from ..helpers import fixtures
 
-from hamcrest import assert_that, contains_inanyorder, has_entries, has_items
-from . import confd
 FAKE_ID = 999999999
 
 
@@ -128,26 +134,27 @@ def test_dissociate_not_associated(user, voicemail):
 def test_get_voicemail_relation(user, voicemail):
     with a.user_voicemail(user, voicemail):
         response = confd.users(user['id']).get()
-        assert_that(response.item, has_entries(
-            voicemail=has_entries(id=voicemail['id'],
-                                  name=voicemail['name'])
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                voicemail=has_entries(id=voicemail['id'], name=voicemail['name']),
+            )
+        )
 
 
 @fixtures.user()
 @fixtures.user()
 @fixtures.voicemail()
-def test_get_users_relation(user1, user2, voicemail):
-    with a.user_voicemail(user1, voicemail), a.user_voicemail(user2, voicemail):
+def test_get_users_relation(u1, u2, voicemail):
+    with a.user_voicemail(u1, voicemail), a.user_voicemail(u2, voicemail):
         response = confd.voicemails(voicemail['id']).get()
-        assert_that(response.item, has_entries(
-            users=contains_inanyorder(has_entries(uuid=user1['uuid'],
-                                                  firstname=user1['firstname'],
-                                                  lastname=user1['lastname']),
-                                      has_entries(uuid=user2['uuid'],
-                                                  firstname=user2['firstname'],
-                                                  lastname=user2['lastname']))
-        ))
+        assert_that(
+            response.item['users'],
+            contains_inanyorder(
+                has_entries(uuid=u1['uuid'], firstname=u1['firstname'], lastname=u1['lastname']),
+                has_entries(uuid=u2['uuid'], firstname=u2['firstname'], lastname=u2['lastname']),
+            )
+        )
 
 
 @fixtures.user()
@@ -179,15 +186,15 @@ def test_edit_voicemail_when_still_associated(user, voicemail):
 @fixtures.user()
 @fixtures.voicemail()
 def test_get_multiple_users_associated_to_voicemail(user1, user2, voicemail):
-    expected = has_items(
-        has_entries({'user_id': user1['id'],
-                     'voicemail_id': voicemail['id']}),
-        has_entries({'user_id': user2['id'],
-                     'voicemail_id': voicemail['id']}))
-
     with a.user_voicemail(user1, voicemail), a.user_voicemail(user2, voicemail):
         response = confd.voicemails(voicemail['id']).users.get()
-        assert_that(response.items, expected)
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(user_id=user1['id'], voicemail_id=voicemail['id']),
+                has_entries(user_id=user2['id'], voicemail_id=voicemail['id']),
+            )
+        )
 
 
 @fixtures.user()
