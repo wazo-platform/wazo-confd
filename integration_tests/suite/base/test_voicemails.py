@@ -267,6 +267,18 @@ def test_get_voicemail(voicemail):
     ))
 
 
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+def test_get_multi_tenant(_, __, main, sub):
+    response = confd.voicemails(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Voicemail'))
+
+    response = confd.voicemails(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_voicemail():
     number, context = vm_helper.generate_number_and_context()
     response = confd.voicemails.post(name='minimal', number=number, context=context)

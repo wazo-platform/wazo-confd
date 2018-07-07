@@ -32,6 +32,7 @@ class VoicemailList(ListResource):
 class VoicemailItem(ItemResource):
 
     schema = VoicemailSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.voicemails.{id}.read')
     def get(self, id):
