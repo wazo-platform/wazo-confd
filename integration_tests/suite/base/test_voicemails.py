@@ -430,6 +430,18 @@ def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
     )
 
 
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+def test_edit_multi_tenant(_, __, main, sub):
+    response = confd.voicemails(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Voicemail'))
+
+    response = confd.voicemails(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.voicemail()
 def test_delete_voicemail(voicemail):
     response = confd.voicemails(voicemail['id']).delete()
