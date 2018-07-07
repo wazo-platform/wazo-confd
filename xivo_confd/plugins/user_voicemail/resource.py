@@ -34,16 +34,21 @@ class UserVoicemailResource(ConfdResource):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
 
-    def get_user(self, user_id):
-        return self.user_dao.get_by_id_uuid(user_id)
+    def get_user(self, user_id, tenant_uuids=None):
+        return self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
 
 
 class UserVoicemailItem(UserVoicemailResource):
 
+    has_tenant_uuid = True
+
     @required_acl('confd.users.{user_id}.voicemails.{voicemail_id}.update')
     def put(self, user_id, voicemail_id):
-        user = self.get_user(user_id)
-        voicemail = self.voicemail_dao.get(voicemail_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        voicemail = self.voicemail_dao.get(voicemail_id, tenant_uuids=tenant_uuids)
+
         self.service.associate(user, voicemail)
         return '', 204
 

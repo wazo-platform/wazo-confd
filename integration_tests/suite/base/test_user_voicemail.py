@@ -15,6 +15,10 @@ from ..helpers import helpers as h
 from ..helpers import errors as e
 from ..helpers import associations as a
 from ..helpers import fixtures
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -104,6 +108,25 @@ def test_get_user_voicemail_after_dissociation(user, voicemail):
 
     response = confd.users(user['uuid']).voicemails.get()
     response.assert_match(404, e.not_found('UserVoicemail'))
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
+    print(main_user['tenant_uuid'])
+    print(sub_user['tenant_uuid'])
+    response = confd.users(main_user['uuid']).voicemails(sub_vm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).voicemails(main_vm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Voicemail'))
+
+    response = confd.users(main_user['uuid']).voicemails(sub_vm['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.user()
