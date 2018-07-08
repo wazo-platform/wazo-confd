@@ -99,6 +99,14 @@ def test_get_user_voicemail_association(user, voicemail):
 
 @fixtures.user()
 @fixtures.voicemail()
+def test_get_user_voicemail_association_multi_tenant(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.users(user['id']).voicemails.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('User'))
+
+
+@fixtures.user()
+@fixtures.voicemail()
 def test_get_user_voicemail_after_dissociation(user, voicemail):
     h.user_voicemail.associate(user['id'], voicemail['id'])
     h.user_voicemail.dissociate(user['id'], voicemail['id'])
