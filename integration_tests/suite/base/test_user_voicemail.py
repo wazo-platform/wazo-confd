@@ -248,6 +248,32 @@ def test_get_user_voicemail_legacy_multi_tenant(user, voicemail):
         response.assert_match(404, e.not_found('User'))
 
 
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_legacy_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
+    response = confd.users(main_user['uuid']).voicemail.post(
+        voicemail_id=sub_vm['id'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).voicemail.post(
+        voicemail_id=main_vm['id'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('Voicemail'))
+
+    response = confd.users(main_user['uuid']).voicemail.post(
+        voicemail_id=sub_vm['id'],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 def test_dissociate_legacy_multi_tenant(user):
     response = confd.users(user['uuid']).voicemail.delete(wazo_tenant=SUB_TENANT)

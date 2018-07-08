@@ -98,8 +98,11 @@ class UserVoicemailLegacy(UserVoicemailResource):
 
     @required_acl('confd.users.{user_id}.voicemail.create')
     def post(self, user_id):
-        user = self.get_user(user_id)
-        voicemail = self.get_voicemail_or_fail()
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        voicemail = self.get_voicemail_or_fail(tenant_uuids=tenant_uuids)
+
         user_voicemail = self.service.associate(user, voicemail)
         return self.schema().dump(user_voicemail).data, 201, self.build_headers(user_voicemail)
 
@@ -121,9 +124,9 @@ class UserVoicemailLegacy(UserVoicemailResource):
                       _external=True)
         return {'Location': url}
 
-    def get_voicemail_or_fail(self):
+    def get_voicemail_or_fail(self, tenant_uuids=None):
         form = self.schema().load(request.get_json()).data
         try:
-            return self.voicemail_dao.get(form['voicemail_id'])
+            return self.voicemail_dao.get(form['voicemail_id'], tenant_uuids=tenant_uuids)
         except NotFoundError:
             raise errors.param_not_found('voicemail_id', 'Voicemail')
