@@ -248,6 +248,12 @@ def test_get_user_voicemail_legacy_multi_tenant(user, voicemail):
         response.assert_match(404, e.not_found('User'))
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+def test_dissociate_legacy_multi_tenant(user):
+    response = confd.users(user['uuid']).voicemail.delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+
 @fixtures.user()
 @fixtures.voicemail()
 def test_bus_events(user, voicemail):

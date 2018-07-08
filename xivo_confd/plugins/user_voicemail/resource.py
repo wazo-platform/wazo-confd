@@ -105,7 +105,10 @@ class UserVoicemailLegacy(UserVoicemailResource):
 
     @required_acl('confd.users.{user_id}.voicemail.delete')
     def delete(self, user_id):
-        user = self.get_user(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+
         user_voicemail = self.service.get_by(user_id=user.id)
         voicemail = self.voicemail_dao.get(user_voicemail.voicemail_id)
         self.service.dissociate(user, voicemail)
