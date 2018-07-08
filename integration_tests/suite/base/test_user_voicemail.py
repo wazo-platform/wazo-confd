@@ -242,6 +242,14 @@ def test_get_users_relation_multi_tenant(user, voicemail):
 
 @fixtures.user()
 @fixtures.voicemail()
+def test_get_user_voicemail_legacy_multi_tenant(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.users(user['id']).voicemail.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('User'))
+
+
+@fixtures.user()
+@fixtures.voicemail()
 def test_bus_events(user, voicemail):
     url = confd.users(user['id']).voicemails(voicemail['id']).put
     yield s.check_bus_event, 'config.users.{}.voicemails.updated'.format(user['uuid']), url
