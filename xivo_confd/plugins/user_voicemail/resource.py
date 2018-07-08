@@ -76,7 +76,10 @@ class VoicemailUserList(UserVoicemailResource):
 
     @required_acl('confd.voicemails.{voicemail_id}.users.read')
     def get(self, voicemail_id):
-        voicemail = self.voicemail_dao.get(voicemail_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        voicemail = self.voicemail_dao.get(voicemail_id, tenant_uuids=tenant_uuids)
+
         items = self.service.find_all_by(voicemail_id=voicemail.id)
         return {'total': len(items),
                 'items': self.schema().dump(items, many=True).data}
