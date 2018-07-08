@@ -213,7 +213,7 @@ def test_list_multi_tenant(_, __, main, sub):
     response = confd.voicemails.get(wazo_tenant=MAIN_TENANT)
     assert_that(
         response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
+        all_of(has_item(main), not_(has_item(sub))),
     )
 
     response = confd.voicemails.get(wazo_tenant=SUB_TENANT)
