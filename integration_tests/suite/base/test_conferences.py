@@ -248,6 +248,16 @@ def test_edit_all_parameters(conference):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.conference(wazo_tenant=MAIN_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.conferences(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Conference'))
+
+    response = confd.conferences(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.conference()
 def test_dump_only_parameters(conference):
     parameters = {
