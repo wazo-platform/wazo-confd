@@ -91,8 +91,7 @@ def error_checks(url):
 @fixtures.conference(name='hidden', preprocess_subroutine='hidden')
 def test_search(conference, hidden):
     url = confd.conferences
-    searches = {'name': 'search',
-                'preprocess_subroutine': 'search'}
+    searches = {'name': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, conference, hidden, field, term
@@ -129,19 +128,24 @@ def test_sorting_offset_limit(conference1, conference2):
 @fixtures.conference()
 def test_get(conference):
     response = confd.conferences(conference['id']).get()
-    assert_that(response.item, has_entries(id=conference['id'],
-                                           name=conference['name'],
-                                           preprocess_subroutine=conference['preprocess_subroutine'],
-                                           max_users=conference['max_users'],
-                                           record=conference['record'],
-                                           pin=conference['pin'],
-                                           admin_pin=conference['admin_pin'],
-                                           quiet_join_leave=conference['quiet_join_leave'],
-                                           announce_join_leave=conference['announce_join_leave'],
-                                           announce_user_count=conference['announce_user_count'],
-                                           announce_only_user=conference['announce_only_user'],
-                                           music_on_hold=conference['music_on_hold'],
-                                           extensions=empty()))
+    assert_that(
+        response.item,
+        has_entries(
+            id=conference['id'],
+            name=conference['name'],
+            preprocess_subroutine=conference['preprocess_subroutine'],
+            max_users=conference['max_users'],
+            record=conference['record'],
+            pin=conference['pin'],
+            admin_pin=conference['admin_pin'],
+            quiet_join_leave=conference['quiet_join_leave'],
+            announce_join_leave=conference['announce_join_leave'],
+            announce_user_count=conference['announce_user_count'],
+            announce_only_user=conference['announce_only_user'],
+            music_on_hold=conference['music_on_hold'],
+            extensions=empty(),
+        )
+    )
 
 
 def test_create_minimal_parameters():
@@ -154,17 +158,19 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyConference',
-                  'preprocess_subroutine': 'subroutine',
-                  'max_users': 150,
-                  'record': True,
-                  'pin': '7654',
-                  'admin_pin': '7654',
-                  'quiet_join_leave': True,
-                  'announce_join_leave': True,
-                  'announce_user_count': True,
-                  'announce_only_user': False,
-                  'music_on_hold': 'music'}
+    parameters = {
+        'name': 'MyConference',
+        'preprocess_subroutine': 'subroutine',
+        'max_users': 150,
+        'record': True,
+        'pin': '7654',
+        'admin_pin': '7654',
+        'quiet_join_leave': True,
+        'announce_join_leave': True,
+        'announce_user_count': True,
+        'announce_only_user': False,
+        'music_on_hold': 'music',
+    }
 
     response = confd.conferences.post(**parameters)
     response.assert_created('conferences')
@@ -183,17 +189,19 @@ def test_edit_minimal_parameters(conference):
 
 @fixtures.conference()
 def test_edit_all_parameters(conference):
-    parameters = {'name': 'MyConference',
-                  'preprocess_subroutine': 'subroutine',
-                  'max_users': 150,
-                  'record': True,
-                  'pin': '7654',
-                  'admin_pin': '7654',
-                  'quiet_join_leave': True,
-                  'announce_join_leave': True,
-                  'announce_user_count': True,
-                  'announce_only_user': False,
-                  'music_on_hold': 'music'}
+    parameters = {
+        'name': 'MyConference',
+        'preprocess_subroutine': 'subroutine',
+        'max_users': 150,
+        'record': True,
+        'pin': '7654',
+        'admin_pin': '7654',
+        'quiet_join_leave': True,
+        'announce_join_leave': True,
+        'announce_user_count': True,
+        'announce_only_user': False,
+        'music_on_hold': 'music',
+    }
 
     response = confd.conferences(conference['id']).put(**parameters)
     response.assert_updated()
@@ -204,9 +212,11 @@ def test_edit_all_parameters(conference):
 
 @fixtures.conference()
 def test_dump_only_parameters(conference):
-    parameters = {'id': 'invalid_id',
-                  'extensions': 'invalid_extensions',
-                  'incalls': 'invalid_incalls'}
+    parameters = {
+        'id': 'invalid_id',
+        'extensions': 'invalid_extensions',
+        'incalls': 'invalid_incalls',
+    }
 
     response = confd.conferences(conference['id']).put(**parameters)
     response.assert_updated()
