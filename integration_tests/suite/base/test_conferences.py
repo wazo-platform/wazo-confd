@@ -190,7 +190,7 @@ def test_create_minimal_parameters():
     response = confd.conferences.post(name='MyConference')
     response.assert_created('conferences')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
     confd.conferences(response.item['id']).delete().assert_deleted()
 
@@ -214,7 +214,7 @@ def test_create_all_parameters():
     response.assert_created('conferences')
     response = confd.conferences(response.item['id']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.conferences(response.item['id']).delete().assert_deleted()
 

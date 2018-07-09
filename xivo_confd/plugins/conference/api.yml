@@ -157,6 +157,10 @@ definitions:
           type: boolean
           description: Record the conference
           default: false
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/GroupRelationExtensions'
   ConferenceRelationBase:
     properties:
