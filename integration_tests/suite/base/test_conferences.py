@@ -281,6 +281,16 @@ def test_delete(conference):
     response.assert_match(404, e.not_found(resource='Conference'))
 
 
+@fixtures.conference(wazo_tenant=MAIN_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.conferences(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Conference'))
+
+    response = confd.conferences(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.conference()
 def test_bus_events(conference):
     yield s.check_bus_event, 'config.conferences.created', confd.conferences.post
