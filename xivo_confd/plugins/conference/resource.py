@@ -32,6 +32,7 @@ class ConferenceList(ListResource):
 class ConferenceItem(ItemResource):
 
     schema = ConferenceSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.conferences.{id}.read')
     def get(self, id):

@@ -176,6 +176,16 @@ def test_get(conference):
     )
 
 
+@fixtures.conference(wazo_tenant=MAIN_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.conferences(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Conference'))
+
+    response = confd.conferences(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.conferences.post(name='MyConference')
     response.assert_created('conferences')
