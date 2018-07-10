@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
 
 
-def add_user(**params):
-    response = confd.users.post(params)
+def add_user(wazo_tenant=None, **params):
+    response = confd.users.post(params, wazo_tenant=wazo_tenant)
     user_uuid = response.item['uuid']
     if 'services' in params:
         if 'dnd' in params['services']:

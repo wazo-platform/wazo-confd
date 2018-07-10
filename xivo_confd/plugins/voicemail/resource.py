@@ -16,6 +16,7 @@ class VoicemailList(ListResource):
 
     model = Voicemail
     schema = VoicemailSchema
+    has_tenant_uuid = True
 
     def build_headers(self, voicemail):
         return {'Location': url_for('voicemails', id=voicemail.id, _external=True)}
@@ -32,6 +33,7 @@ class VoicemailList(ListResource):
 class VoicemailItem(ItemResource):
 
     schema = VoicemailSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.voicemails.{id}.read')
     def get(self, id):

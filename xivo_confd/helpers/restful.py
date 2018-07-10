@@ -22,15 +22,18 @@ class ConfdResource(ErrorCatchingResource):
 
     method_decorators = [authentication.login_required] + ErrorCatchingResource.method_decorators
 
-    def _has_a_tenant_uuid(self):
-        if getattr(self, 'has_tenant_uuid', None):
-            return True
-
+    def _has_write_tenant_uuid(self):
         return (
             hasattr(self, 'model')
             and hasattr(self.model, '__mapper__')
             and hasattr(self.model.__mapper__.c, 'tenant_uuid')
         )
+
+    def _has_a_tenant_uuid(self):
+        if getattr(self, 'has_tenant_uuid', None):
+            return True
+
+        return self._has_write_tenant_uuid()
 
     def _build_tenant_list(self, params):
         if not self._has_a_tenant_uuid():
@@ -100,7 +103,7 @@ class ListResource(ConfdResource):
         return int(value)
 
     def add_tenant_to_form(self, form):
-        if not self._has_a_tenant_uuid():
+        if not self._has_write_tenant_uuid():
             return form
 
         tenant = Tenant.autodetect()

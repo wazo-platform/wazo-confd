@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    has_entries,
+    has_items,
+)
+
+from . import confd
 from ..helpers import scenarios as s
 from ..helpers import helpers as h
 from ..helpers import errors as e
 from ..helpers import associations as a
 from ..helpers import fixtures
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
-from hamcrest import assert_that, contains_inanyorder, has_entries, has_items
-from . import confd
 FAKE_ID = 999999999
 
 
@@ -89,6 +99,14 @@ def test_get_user_voicemail_association(user, voicemail):
 
 @fixtures.user()
 @fixtures.voicemail()
+def test_get_user_voicemail_association_multi_tenant(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.users(user['id']).voicemails.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('User'))
+
+
+@fixtures.user()
+@fixtures.voicemail()
 def test_get_user_voicemail_after_dissociation(user, voicemail):
     h.user_voicemail.associate(user['id'], voicemail['id'])
     h.user_voicemail.dissociate(user['id'], voicemail['id'])
@@ -98,6 +116,23 @@ def test_get_user_voicemail_after_dissociation(user, voicemail):
 
     response = confd.users(user['uuid']).voicemails.get()
     response.assert_match(404, e.not_found('UserVoicemail'))
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
+    response = confd.users(main_user['uuid']).voicemails(sub_vm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).voicemails(main_vm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Voicemail'))
+
+    response = confd.users(main_user['uuid']).voicemails(sub_vm['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.user()
@@ -123,31 +158,38 @@ def test_dissociate_not_associated(user, voicemail):
     response.assert_deleted()
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+def test_dissociate_multi_tenant(user):
+    response = confd.users(user['uuid']).voicemails.delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+
 @fixtures.user()
 @fixtures.voicemail()
 def test_get_voicemail_relation(user, voicemail):
     with a.user_voicemail(user, voicemail):
         response = confd.users(user['id']).get()
-        assert_that(response.item, has_entries(
-            voicemail=has_entries(id=voicemail['id'],
-                                  name=voicemail['name'])
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                voicemail=has_entries(id=voicemail['id'], name=voicemail['name']),
+            )
+        )
 
 
 @fixtures.user()
 @fixtures.user()
 @fixtures.voicemail()
-def test_get_users_relation(user1, user2, voicemail):
-    with a.user_voicemail(user1, voicemail), a.user_voicemail(user2, voicemail):
+def test_get_users_relation(u1, u2, voicemail):
+    with a.user_voicemail(u1, voicemail), a.user_voicemail(u2, voicemail):
         response = confd.voicemails(voicemail['id']).get()
-        assert_that(response.item, has_entries(
-            users=contains_inanyorder(has_entries(uuid=user1['uuid'],
-                                                  firstname=user1['firstname'],
-                                                  lastname=user1['lastname']),
-                                      has_entries(uuid=user2['uuid'],
-                                                  firstname=user2['firstname'],
-                                                  lastname=user2['lastname']))
-        ))
+        assert_that(
+            response.item['users'],
+            contains_inanyorder(
+                has_entries(uuid=u1['uuid'], firstname=u1['firstname'], lastname=u1['lastname']),
+                has_entries(uuid=u2['uuid'], firstname=u2['firstname'], lastname=u2['lastname']),
+            )
+        )
 
 
 @fixtures.user()
@@ -179,15 +221,63 @@ def test_edit_voicemail_when_still_associated(user, voicemail):
 @fixtures.user()
 @fixtures.voicemail()
 def test_get_multiple_users_associated_to_voicemail(user1, user2, voicemail):
-    expected = has_items(
-        has_entries({'user_id': user1['id'],
-                     'voicemail_id': voicemail['id']}),
-        has_entries({'user_id': user2['id'],
-                     'voicemail_id': voicemail['id']}))
-
     with a.user_voicemail(user1, voicemail), a.user_voicemail(user2, voicemail):
         response = confd.voicemails(voicemail['id']).users.get()
-        assert_that(response.items, expected)
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(user_id=user1['id'], voicemail_id=voicemail['id']),
+                has_entries(user_id=user2['id'], voicemail_id=voicemail['id']),
+            )
+        )
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_users_relation_multi_tenant(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.voicemails(voicemail['id']).users.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Voicemail'))
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_user_voicemail_legacy_multi_tenant(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.users(user['id']).voicemail.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('User'))
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_legacy_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
+    response = confd.users(main_user['uuid']).voicemail.post(
+        voicemail_id=sub_vm['id'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).voicemail.post(
+        voicemail_id=main_vm['id'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('Voicemail'))
+
+    response = confd.users(main_user['uuid']).voicemail.post(
+        voicemail_id=sub_vm['id'],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+def test_dissociate_legacy_multi_tenant(user):
+    response = confd.users(user['uuid']).voicemail.delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
 
 
 @fixtures.user()
