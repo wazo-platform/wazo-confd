@@ -5,6 +5,7 @@ paths:
       summary: List skill
       description: '**Required ACL:** `confd.agents.skills.read`'
       tags:
+      - agents
       - skills
       parameters:
       - $ref: '#/parameters/order'
@@ -22,6 +23,7 @@ paths:
       summary: Create skill
       description: '**Required ACL:** `confd.agents.skills.create`'
       tags:
+      - agents
       - skills
       parameters:
       - name: body
@@ -43,6 +45,7 @@ paths:
       summary: Get skill
       description: '**Required ACL:** `confd.agents.skills.{skill_id}.read`'
       tags:
+      - agents
       - skills
       parameters:
       - $ref: '#/parameters/skillid'
