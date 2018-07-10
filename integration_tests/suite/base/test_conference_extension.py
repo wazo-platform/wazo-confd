@@ -143,6 +143,28 @@ def test_dissociate(conference, extension):
         response.assert_deleted()
 
 
+@fixtures.conference(wazo_tenant=MAIN_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+@fixtures.context(
+    wazo_tenant=MAIN_TENANT,
+    name='main-internal',
+    conference_room_ranges=[{'start': '4000', 'end': '4999'}],
+)
+@fixtures.context(
+    wazo_tenant=SUB_TENANT,
+    name='sub-internal',
+    conference_room_ranges=[{'start': '4000', 'end': '4999'}],
+)
+@fixtures.extension(context='main-internal', exten=gen_conference_exten())
+@fixtures.extension(context='sub-internal', exten=gen_conference_exten())
+def test_dissociate_multi_tenant(main, sub, _, __, main_exten, sub_exten):
+    response = confd.conferences(sub['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.conferences(main['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Conference'))
+
+
 @fixtures.conference()
 @fixtures.extension(exten=gen_conference_exten())
 def test_dissociate_not_associated(conference, extension):

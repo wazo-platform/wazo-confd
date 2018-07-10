@@ -18,8 +18,11 @@ class ConferenceExtensionItem(ConfdResource):
 
     @required_acl('confd.conferences.{conference_id}.extensions.{extension_id}.delete')
     def delete(self, conference_id, extension_id):
-        conference = self.conference_dao.get(conference_id)
-        extension = self.extension_dao.get(extension_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        conference = self.conference_dao.get(conference_id, tenant_uuids=tenant_uuids)
+        extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
+
         self.service.dissociate(conference, extension)
         return '', 204
 
