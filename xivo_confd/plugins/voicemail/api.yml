@@ -7,6 +7,8 @@ paths:
       tags:
       - voicemails
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -45,6 +47,7 @@ paths:
       tags:
       - voicemails
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/voicemailid'
       responses:
         '200':
@@ -60,6 +63,7 @@ paths:
       tags:
       - voicemails
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/voicemailid'
       - name: body
         in: body
@@ -85,6 +89,7 @@ paths:
       tags:
       - voicemails
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/voicemailid'
       responses:
         '204':
