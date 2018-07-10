@@ -19,6 +19,8 @@ from ..helpers.config import (
     INCALL_CONTEXT,
     EXTEN_OUTSIDE_RANGE,
     gen_conference_exten,
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -49,6 +51,31 @@ def test_dissociate_errors(conference, extension):
 def test_associate(conference, extension):
     response = confd.conferences(conference['id']).extensions(extension['id']).put()
     response.assert_updated()
+
+
+@fixtures.conference(wazo_tenant=MAIN_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+@fixtures.context(
+    wazo_tenant=MAIN_TENANT,
+    name='main-internal',
+    conference_room_ranges=[{'start': '4000', 'end': '4999'}],
+)
+@fixtures.context(
+    wazo_tenant=SUB_TENANT,
+    name='sub-internal',
+    conference_room_ranges=[{'start': '4000', 'end': '4999'}],
+)
+@fixtures.extension(context='main-internal', exten=gen_conference_exten())
+@fixtures.extension(context='sub-internal', exten=gen_conference_exten())
+def test_associate_multi_tenant(main, sub, _, __, main_exten, sub_exten):
+    response = confd.conferences(sub['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.conferences(main['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Conference'))
+
+    response = confd.conferences(main['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.conference()
