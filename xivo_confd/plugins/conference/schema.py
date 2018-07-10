@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright (C) 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
@@ -10,6 +10,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class ConferenceSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(allow_none=True, validate=Length(max=128))
     preprocess_subroutine = fields.String(allow_none=True, validate=Length(max=39))
     max_users = fields.Integer(validate=Range(min=0))

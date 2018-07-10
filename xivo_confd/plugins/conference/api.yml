@@ -7,6 +7,8 @@ paths:
       tags:
       - conferences
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -66,6 +68,7 @@ paths:
       tags:
       - conferences
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/conferenceid'
       responses:
         '200':
@@ -81,6 +84,7 @@ paths:
       tags:
       - conferences
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/conferenceid'
       - name: body
         in: body
@@ -101,6 +105,7 @@ paths:
       tags:
       - conferences
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/conferenceid'
       responses:
         '204':
@@ -157,6 +162,10 @@ definitions:
           type: boolean
           description: Record the conference
           default: false
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/GroupRelationExtensions'
   ConferenceRelationBase:
     properties:

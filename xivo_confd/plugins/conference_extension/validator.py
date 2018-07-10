@@ -18,6 +18,7 @@ class ConferenceExtensionAssociationValidator(ValidatorAssociation, BaseExtensio
         self._context_dao = context_dao
 
     def validate(self, conference, extension):
+        self.validate_same_tenant(conference, extension)
         self.validate_conference_not_already_associated(conference)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
@@ -58,6 +59,13 @@ class ConferenceExtensionAssociationValidator(ValidatorAssociation, BaseExtensio
         context = self._context_dao.get_by_name(extension.context)
         if not self._exten_in_range(extension.exten, context.conference_room_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
+
+    def validate_same_tenant(self, conference, extension):
+        if extension.tenant_uuid != conference.tenant_uuid:
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                conference_tenant_uuid=conference.tenant_uuid,
+            )
 
 
 def build_validator():
