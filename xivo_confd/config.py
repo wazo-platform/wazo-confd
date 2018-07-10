@@ -143,6 +143,7 @@ DEFAULT_CONFIG = {
         'schedule': True,
         'sccp_general': True,
         'sip_general': True,
+        'skill': True,
         'sound': True,
         'sound_language': True,
         'switchboard': True,

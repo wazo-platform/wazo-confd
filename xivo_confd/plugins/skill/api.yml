@@ -1,0 +1,127 @@
+paths:
+  /agents/skills:
+    get:
+      operationId: list_skills
+      summary: List skill
+      description: '**Required ACL:** `confd.agents.skills.read`'
+      tags:
+      - skills
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Skills list
+          schema:
+            $ref: '#/definitions/SkillItems'
+    post:
+      operationId: create_skill
+      summary: Create skill
+      description: '**Required ACL:** `confd.agents.skills.create`'
+      tags:
+      - skills
+      parameters:
+      - name: body
+        in: body
+        description: Skill to create
+        required: true
+        schema:
+          $ref: '#/definitions/Skill'
+      responses:
+        '201':
+          description: Skill created
+          schema:
+            $ref: '#/definitions/Skill'
+        '400':
+          $ref: '#/responses/CreateError'
+  /agents/skills/{skill_id}:
+    get:
+      operationId: get_skill
+      summary: Get skill
+      description: '**Required ACL:** `confd.agents.skills.{skill_id}.read`'
+      tags:
+      - skills
+      parameters:
+      - $ref: '#/parameters/skillid'
+      responses:
+        '200':
+          description: Skill
+          schema:
+            $ref: '#/definitions/Skill'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_skill
+      summary: Update skill
+      description: '**Required ACL:** `confd.agents.skills.{skill_id}.update`'
+      tags:
+      - skills
+      parameters:
+      - $ref: '#/parameters/skillid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Skill'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_skill
+      summary: Delete skill
+      description: '**Required ACL:** `confd.agents.skills.{skill_id}.delete`'
+      tags:
+      - skills
+      parameters:
+      - $ref: '#/parameters/skillid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  skillid:
+    required: true
+    type: integer
+    name: skill_id
+    in: path
+    description: Skill's ID
+definitions:
+  Skill:
+    title: Skill
+    allOf:
+    - $ref: '#/definitions/SkillRelationBase'
+    - properties:
+        category:
+          type: string
+          description: The category of the skill
+    required:
+    - name
+  SkillRelationBase:
+    properties:
+      id:
+        type: integer
+        readOnly: true
+      name:
+        type: string
+        description: The name to identify the skill
+  SkillItems:
+    title: SkillItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Skill'
+      total:
+        type: integer
+    required:
+    - total
