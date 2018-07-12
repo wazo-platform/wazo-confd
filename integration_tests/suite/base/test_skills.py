@@ -4,6 +4,7 @@
 
 from hamcrest import (
     assert_that,
+    empty,
     has_entries,
     has_entry,
     has_item,
@@ -116,6 +117,8 @@ def test_get(skill):
         name=skill['name'],
         category=skill['category'],
         description=skill['description'],
+
+        agents=empty(),
     ))
 
 

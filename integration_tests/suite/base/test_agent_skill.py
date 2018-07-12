@@ -107,6 +107,14 @@ def test_associate_multiple_agents_to_skill(agent1, agent2, skill):
         response = confd.agents(agent2['id']).skills(skill['id']).put()
         response.assert_updated()
 
+        response = confd.agents.skills(skill['id']).get()
+        assert_that(response.item, has_entries(
+            agents=contains_inanyorder(
+                has_entries(id=agent1['id']),
+                has_entries(id=agent2['id']),
+            )
+        ))
+
 
 @fixtures.agent()
 @fixtures.skill()
@@ -135,6 +143,25 @@ def test_get_agent_relation(agent, skill):
                     name=skill['name'],
                     skill_weight=0,
                     links=skill['links'],
+                )
+            )
+        ))
+
+
+@fixtures.skill()
+@fixtures.agent()
+def test_get_skill_relation(skill, agent):
+    with a.agent_skill(agent, skill, skill_weight=0):
+        response = confd.agents.skills(skill['id']).get()
+        assert_that(response.item, has_entries(
+            agents=contains_inanyorder(
+                has_entries(
+                    id=agent['id'],
+                    number=agent['number'],
+                    firstname=agent['firstname'],
+                    lastname=agent['lastname'],
+                    skill_weight=0,
+                    links=agent['links'],
                 )
             )
         ))
