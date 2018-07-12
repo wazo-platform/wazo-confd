@@ -80,6 +80,7 @@ DEFAULT_CONFIG = {
     },
     'enabled_plugins': {
         'agent': True,
+        'agent_skill': True,
         'api': True,
         'call_log': True,
         'call_filter': True,

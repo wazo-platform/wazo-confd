@@ -374,3 +374,10 @@ def context_context(context, *contexts, **kwargs):
     h.context_context.associate(context['id'], context_ids, check=check)
     yield
     h.context_context.dissociate(context['id'], check=check)
+
+
+@contextmanager
+def agent_skill(agent, skill, **kwargs):
+    h.agent_skill.associate(agent['id'], skill['id'], **kwargs)
+    yield
+    h.agent_skill.dissociate(agent['id'], skill['id'], **kwargs)
