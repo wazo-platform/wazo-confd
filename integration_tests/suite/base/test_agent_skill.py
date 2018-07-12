@@ -2,6 +2,12 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    has_entries,
+)
+
 from . import confd
 from ..helpers import (
     associations as a,
@@ -60,6 +66,13 @@ def test_update_properties(agent, skill):
         response = confd.agents(agent['id']).skills(skill['id']).put(skill_weight=5)
         response.assert_updated()
 
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(
+            skills=contains_inanyorder(has_entries(
+                skill_weight=5,
+            ))
+        ))
+
 
 @fixtures.agent()
 @fixtures.skill()
@@ -76,6 +89,14 @@ def test_associate_multiple_skills_to_agent(agent, skill1, skill2):
     with a.agent_skill(agent, skill1):
         response = confd.agents(agent['id']).skills(skill2['id']).put()
         response.assert_updated()
+
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(
+            skills=contains_inanyorder(
+                has_entries(id=skill1['id']),
+                has_entries(id=skill2['id']),
+            )
+        ))
 
 
 @fixtures.agent()
@@ -100,6 +121,23 @@ def test_dissociate(agent, skill):
 def test_dissociate_not_associated(agent, skill):
     response = confd.agents(agent['id']).skills(skill['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.agent()
+@fixtures.skill()
+def test_get_agent_relation(agent, skill):
+    with a.agent_skill(agent, skill, skill_weight=0):
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(
+            skills=contains_inanyorder(
+                has_entries(
+                    id=skill['id'],
+                    name=skill['name'],
+                    skill_weight=0,
+                    links=skill['links'],
+                )
+            )
+        ))
 
 
 @fixtures.agent()

@@ -147,6 +147,7 @@ def test_get(agent):
         description=agent['description'],
 
         queues=empty(),
+        skills=empty(),
     ))
 
 
