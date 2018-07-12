@@ -4,6 +4,14 @@ Changelog
 18.08
 -----
 
+* Added agent skill endpoints:
+
+  * GET `/1.1/agents/skills`
+  * POST `/1.1/agents/skills`
+  * DELETE `/1.1/agents/skills/<skill_id>`
+  * GET `/1.1/agents/skills/<skill_id>`
+  * PUT `/1.1/agents/skills/<skill_id>`
+
 * The following endpoints are now multi-tenant.
 
   This means that created resources will be in the same tenant as the creator or in the tenant

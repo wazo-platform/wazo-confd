@@ -88,6 +88,7 @@ setup(
             'schedule = xivo_confd.plugins.schedule.plugin:Plugin',
             'sccp_general = xivo_confd.plugins.sccp_general.plugin:Plugin',
             'sip_general = xivo_confd.plugins.sip_general.plugin:Plugin',
+            'skill = xivo_confd.plugins.skill.plugin:Plugin',
             'sound = xivo_confd.plugins.sound.plugin:Plugin',
             'sound_language = xivo_confd.plugins.sound_language.plugin:Plugin',
             'switchboard = xivo_confd.plugins.switchboard.plugin:Plugin',

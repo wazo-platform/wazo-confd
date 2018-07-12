@@ -251,3 +251,9 @@ class iax(IsolatedAction):
 
     actions = {'generate': h.endpoint_iax.generate_iax,
                'delete': h.endpoint_iax.delete_iax}
+
+
+class skill(IsolatedAction):
+
+    actions = {'generate': h.skill.generate_skill,
+               'delete': h.skill.delete_skill}
