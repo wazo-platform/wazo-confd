@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
 
-
 import re
 
-from ..helpers import config
-from . import confd
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import associations as a
+from hamcrest import (
+    assert_that,
+    contains,
+    contains_inanyorder,
+    empty,
+    has_entries,
+    has_entry,
+    has_items,
+    has_length,
+    none,
+    not_,
+)
 
-from hamcrest import (assert_that,
-                      contains,
-                      contains_inanyorder,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_items,
-                      has_length,
-                      none,
-                      not_)
+from . import confd
+from ..helpers import (
+    associations as a,
+    config,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 def test_get_errors():
@@ -90,41 +93,47 @@ def test_delete_errors(line):
 
 @fixtures.line(context=config.CONTEXT)
 def test_get(line):
-    expected = has_entries({'context': config.CONTEXT,
-                            'position': 1,
-                            'device_slot': 1,
-                            'name': none(),
-                            'protocol': none(),
-                            'device_id': none(),
-                            'caller_id_name': none(),
-                            'caller_id_num': none(),
-                            'registrar': 'default',
-                            'provisioning_code': has_length(6),
-                            'provisioning_extension': has_length(6),
-                            'endpoint_sip': none(),
-                            'endpoint_sccp': none(),
-                            'endpoint_custom': none(),
-                            'extensions': empty(),
-                            'users': empty()}
-                           )
-
     response = confd.lines(line['id']).get()
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            context=config.CONTEXT,
+            position=1,
+            device_slot=1,
+            name=none(),
+            protocol=none(),
+            device_id=none(),
+            caller_id_name=none(),
+            caller_id_num=none(),
+            registrar='default',
+            provisioning_code=has_length(6),
+            provisioning_extension=has_length(6),
+            endpoint_sip=none(),
+            endpoint_sccp=none(),
+            endpoint_custom=none(),
+            extensions=empty(),
+            users=empty(),
+        )
+    )
 
 
 @fixtures.line()
 @fixtures.line()
 def test_search(line1, line2):
-    expected = has_items(has_entry('id', line1['id']),
-                         has_entry('id', line2['id']))
-
     response = confd.lines.get()
-    assert_that(response.items, expected)
-
-    expected = contains(has_entry('id', line1['id']))
+    assert_that(
+        response.items,
+        has_items(
+            has_entry('id', line1['id']),
+            has_entry('id', line2['id']),
+        )
+    )
 
     response = confd.lines.get(search=line1['provisioning_code'])
-    assert_that(response.items, expected)
+    assert_that(
+        response.items,
+        contains(has_entry('id', line1['id']))
+    )
 
 
 def test_create_line_with_fake_context():
@@ -133,60 +142,70 @@ def test_create_line_with_fake_context():
 
 
 def test_create_line_with_minimal_parameters():
-    expected = has_entries({'context': config.CONTEXT,
-                            'position': 1,
-                            'device_slot': 1,
-                            'name': none(),
-                            'protocol': none(),
-                            'device_id': none(),
-                            'caller_id_name': none(),
-                            'caller_id_num': none(),
-                            'registrar': 'default',
-                            'provisioning_code': has_length(6),
-                            'provisioning_extension': has_length(6)}
-                           )
-
     response = confd.lines.post(context=config.CONTEXT)
 
     response.assert_created('lines')
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            context=config.CONTEXT,
+            position=1,
+            device_slot=1,
+            name=none(),
+            protocol=none(),
+            device_id=none(),
+            caller_id_name=none(),
+            caller_id_num=none(),
+            registrar='default',
+            provisioning_code=has_length(6),
+            provisioning_extension=has_length(6),
+        )
+    )
 
 
 @fixtures.registrar()
 def test_create_line_with_all_parameters(registrar):
-    expected = has_entries({'context': config.CONTEXT,
-                            'position': 2,
-                            'device_slot': 2,
-                            'name': none(),
-                            'protocol': none(),
-                            'device_id': none(),
-                            'caller_id_name': none(),
-                            'caller_id_num': none(),
-                            'registrar': registrar['id'],
-                            'provisioning_code': "887865",
-                            'provisioning_extension': "887865"}
-                           )
+    response = confd.lines.post(
+        context=config.CONTEXT,
+        position=2,
+        registrar=registrar['id'],
+        provisioning_code="887865",
+    )
 
-    response = confd.lines.post(context=config.CONTEXT,
-                                position=2,
-                                registrar=registrar['id'],
-                                provisioning_code="887865")
-
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            context=config.CONTEXT,
+            position=2,
+            device_slot=2,
+            name=none(),
+            protocol=none(),
+            device_id=none(),
+            caller_id_name=none(),
+            caller_id_num=none(),
+            registrar=registrar['id'],
+            provisioning_code="887865",
+            provisioning_extension="887865",
+        )
+    )
 
 
 def test_create_line_with_caller_id_raises_error():
-    response = confd.lines.post(context=config.CONTEXT,
-                                caller_id_name="Jôhn Smîth",
-                                caller_id_num="1000")
+    response = confd.lines.post(
+        context=config.CONTEXT,
+        caller_id_name="Jôhn Smîth",
+        caller_id_num="1000",
+    )
 
     response.assert_status(400)
 
 
 @fixtures.line(provisioning_code="135246")
 def test_create_line_with_provisioning_code_already_taken(line):
-    response = confd.lines.post(context=config.CONTEXT,
-                                provisioning_code="135246")
+    response = confd.lines.post(
+        context=config.CONTEXT,
+        provisioning_code="135246",
+    )
     response.assert_match(400, re.compile("provisioning_code"))
 
 
@@ -201,27 +220,32 @@ def test_update_line_with_fake_context(line):
 @fixtures.registrar()
 def test_update_all_parameters_on_line(line, context, registrar):
     url = confd.lines(line['id'])
-    expected = has_entries({'context': context['name'],
-                            'position': 2,
-                            'caller_id_name': none(),
-                            'caller_id_num': none(),
-                            'registrar': registrar['id'],
-                            'provisioning_code': '243546'})
 
-    response = url.put(context=context['name'],
-                       position=2,
-                       registrar=registrar['id'],
-                       provisioning_code='243546')
+    response = url.put(
+        context=context['name'],
+        position=2,
+        registrar=registrar['id'],
+        provisioning_code='243546',
+    )
     response.assert_updated()
 
     response = url.get()
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            context=context['name'],
+            position=2,
+            caller_id_name=none(),
+            caller_id_num=none(),
+            registrar=registrar['id'],
+            provisioning_code='243546',
+        )
+    )
 
 
 @fixtures.line()
 def test_update_caller_id_on_line_without_endpoint_raises_error(line):
-    response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth",
-                                           caller_id_num="1000")
+    response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth", caller_id_num="1000")
     response.assert_status(400)
 
 
@@ -238,8 +262,7 @@ def test_when_updating_line_then_values_are_not_overwriten_with_defaults(line):
 
 @fixtures.line()
 def test_when_line_has_no_endpoint_then_caller_id_can_be_set_to_null(line):
-    response = confd.lines(line['id']).put(caller_id_name=None,
-                                           caller_id_num=None)
+    response = confd.lines(line['id']).put(caller_id_name=None, caller_id_num=None)
     response.assert_updated()
 
 
@@ -255,15 +278,19 @@ def test_delete_line(line):
 @fixtures.extension()
 @fixtures.device()
 def test_delete_line_then_associatons_are_removed(user, line1, line2, extension, device):
-    with a.user_line(user, line1, check=False), a.user_line(user, line2, check=False), \
-            a.line_extension(line1, extension, check=False), a.line_device(line1, device, check=False):
+    with a.user_line(user, line1, check=False), \
+         a.user_line(user, line2, check=False), \
+         a.line_extension(line1, extension, check=False), \
+         a.line_device(line1, device, check=False):
         response = confd.users(user['id']).lines.get()
-        assert_that(response.items, contains_inanyorder(
-            has_entries(line_id=line1['id'],
-                        main_line=True),
-            has_entries(line_id=line2['id'],
-                        main_line=False),
-        ))
+        assert_that(
+            response.items,
+            contains_inanyorder(
+                has_entries(line_id=line1['id'], main_line=True),
+                has_entries(line_id=line2['id'], main_line=False),
+            )
+        )
+
         response = confd.devices(device['id']).lines.get()
         assert_that(response.items, not_(empty()))
 
@@ -273,10 +300,10 @@ def test_delete_line_then_associatons_are_removed(user, line1, line2, extension,
         confd.lines(line1['id']).delete()
 
         response = confd.users(user['id']).lines.get()
-        assert_that(response.items, contains(
-            has_entries(line_id=line2['id'],
-                        main_line=True)
-        ))
+        assert_that(
+            response.items,
+            contains(has_entries(line_id=line2['id'], main_line=True))
+        )
         response = confd.devices(device['id']).lines.get()
         assert_that(response.items, empty())
 
