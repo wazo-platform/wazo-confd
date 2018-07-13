@@ -27,6 +27,10 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_get_errors():
@@ -115,6 +119,18 @@ def test_get(line):
             users=empty(),
         )
     )
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.line(context='main_ctx')
+@fixtures.line(context='sub_ctx')
+def test_get_multi_tenant(_, __, main, sub):
+    response = confd.lines(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Line'))
+
+    response = confd.lines(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 @fixtures.line()

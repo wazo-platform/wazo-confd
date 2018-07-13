@@ -31,6 +31,7 @@ class LineList(ListResource):
 class LineItem(ItemResource):
 
     schema = LineSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.lines.{id}.read')
     def get(self, id):
