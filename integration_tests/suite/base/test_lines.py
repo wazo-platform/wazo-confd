@@ -7,12 +7,14 @@ from __future__ import unicode_literals
 import re
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     contains_inanyorder,
     empty,
     has_entries,
     has_entry,
+    has_item,
     has_items,
     has_length,
     none,
@@ -149,6 +151,30 @@ def test_search(line1, line2):
     assert_that(
         response.items,
         contains(has_entry('id', line1['id']))
+    )
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.line(context='main_ctx')
+@fixtures.line(context='sub_ctx')
+def test_list_multi_tenant(_, __, main, sub):
+    response = confd.lines.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main), not_(has_item(sub))),
+    )
+
+    response = confd.lines.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.lines.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
     )
 
 
