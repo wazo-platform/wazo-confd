@@ -201,6 +201,7 @@ def test_create_line_with_minimal_parameters():
             registrar='default',
             provisioning_code=has_length(6),
             provisioning_extension=has_length(6),
+            tenant_uuid=MAIN_TENANT,
         )
     )
 
@@ -228,6 +229,7 @@ def test_create_line_with_all_parameters(registrar):
             registrar=registrar['id'],
             provisioning_code="887865",
             provisioning_extension="887865",
+            tenant_uuid=MAIN_TENANT,
         )
     )
 

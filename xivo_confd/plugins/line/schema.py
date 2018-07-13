@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields
@@ -11,6 +10,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class LineSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(dump_only=True)
     protocol = fields.String(dump_only=True)
     device_id = fields.String(dump_only=True)
