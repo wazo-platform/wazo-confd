@@ -2,17 +2,20 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import re
 
 from marshmallow import fields, post_load, post_dump
-from marshmallow.validate import Length, Range, OneOf
+from marshmallow.validate import Length, OneOf, Range, Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+
+NAME_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
 
 
 class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=Length(max=128), required=True)
+    name = fields.String(validate=(Regexp(NAME_REGEX), Length(max=128)), required=True)
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
     ring_strategy = fields.String(validate=OneOf([
         'all',
