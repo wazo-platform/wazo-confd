@@ -65,6 +65,20 @@ def test_dissociate_errors(line, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line_sip(context='main-internal')
+@fixtures.line_sip(context='sub-internal')
+@fixtures.extension(context='main-internal')
+@fixtures.extension(context='sub-internal')
+def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten):
+    response = confd.lines(sub_line['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.lines(main_line['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+
 def test_get_errors():
     fake_line = confd.lines(FAKE_ID).extensions.get
     fake_extension = confd.extensions(FAKE_ID).lines.get
