@@ -84,6 +84,8 @@ class LineExtensionList(LineExtensionResource):
 
 class LineExtensionItem(LineExtensionResource):
 
+    has_tenant_uuid = True
+
     @required_acl('confd.lines.{line_id}.extensions.{extension_id}.delete')
     def delete(self, line_id, extension_id):
         line = self.line_dao.get(line_id)
@@ -93,7 +95,10 @@ class LineExtensionItem(LineExtensionResource):
 
     @required_acl('confd.lines.{line_id}.extensions.{extension_id}.update')
     def put(self, line_id, extension_id):
-        line = self.line_dao.get(line_id)
-        extension = self.extension_dao.get(extension_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
+
         self.service.associate(line, extension)
         return '', 204
