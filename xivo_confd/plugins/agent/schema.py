@@ -27,6 +27,12 @@ class AgentSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    skills = fields.Nested(
+        'AgentSkillsSchema',
+        attribute='agent_queue_skills',
+        many=True,
+        dump_only=True,
+    )
 
 
 class AgentQueuesMemberSchema(BaseSchema):
@@ -50,6 +56,29 @@ class AgentQueuesMemberSchema(BaseSchema):
         row['name'] = queue.get('name', None)
         row['label'] = queue.get('label', None)
         row['links'] = queue.get('links', [])
+        return row
+
+
+class AgentSkillsSchema(BaseSchema):
+    skill_weight = fields.Integer(attribute='weight')
+    skill = fields.Nested(
+        'SkillSchema',
+        only=['id', 'name', 'links'],
+        dump_only=True,
+    )
+
+    @post_dump(pass_many=True)
+    def merge_agent_queue_skills(self, data, many):
+        if not many:
+            return self.merge_skill(data)
+
+        return [self._merge_skill(row) for row in data if row.get('skill')]
+
+    def _merge_skill(self, row):
+        skill = row.pop('skill')
+        row['id'] = skill.get('id', None)
+        row['name'] = skill.get('name', None)
+        row['links'] = skill.get('links', [])
         return row
 
 

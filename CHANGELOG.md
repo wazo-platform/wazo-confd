@@ -4,6 +4,11 @@ Changelog
 18.08
 -----
 
+* A new API for associating a agent with a skill has been added:
+
+  * PUT `/1.1/agents/<agent_id>/skills/<skill_id>`
+  * DELETE `/1.1/agents/<agent_id>/skills/<skill_id>`
+
 * Added agent skill endpoints:
 
   * GET `/1.1/agents/skills`
@@ -57,6 +62,7 @@ Changelog
 * New readonly parameters have been added to the agent resource:
 
   * `queues`
+  * `skills`
 
 * New readonly parameters have been added to the user resource:
 

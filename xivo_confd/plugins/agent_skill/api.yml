@@ -1,0 +1,51 @@
+paths:
+  /agents/{agent_id}/skills/{skill_id}:
+    put:
+      operationId: associate_agent_skill
+      summary: Associate agent and skill
+      description: '**Required ACL:** `confd.agents.{agent_id}.skills.{skill_id}.update`'
+      tags:
+      - skills
+      - agents
+      parameters:
+      - $ref: '#/parameters/agentid'
+      - $ref: '#/parameters/skillid'
+      - name: body
+        in: body
+        schema:
+          $ref: '#/definitions/AgentSkill'
+      responses:
+        '204':
+          description: Association updated
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_agent_skill
+      summary: Dissociate agent and skill
+      description: '**Required ACL:** `confd.agents.{agent_id}.skills.{skill_id}.delete`'
+      tags:
+      - skills
+      - agents
+      parameters:
+      - $ref: '#/parameters/agentid'
+      - $ref: '#/parameters/skillid'
+      responses:
+        '204':
+          description: Skill and Agent dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  AgentSkill:
+    title: AgentSkill
+    allOf:
+    - $ref: '#/definitions/AgentSkillRelationBase'
+  AgentSkillRelationBase:
+    properties:
+      skill_weight:
+        type: integer
+        description: Skill's weight.
