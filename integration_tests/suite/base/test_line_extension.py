@@ -72,10 +72,12 @@ def test_dissociate_errors(line, extension):
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
 def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten):
-    response = confd.lines(sub_line['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    url = confd.lines(sub_line['id']).extensions(main_exten['id'])
+    response = url.delete(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.lines(main_line['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    url = confd.lines(main_line['id']).extensions(sub_exten['id'])
+    response = url.delete(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Line'))
 
 
@@ -120,8 +122,12 @@ def test_associate_line_and_internal_extension(line, extension):
     response.assert_updated()
 
     response = confd.lines(line['id']).extensions.get()
-    assert_that(response.items, contains(has_entries({'line_id': line['id'],
-                                                      'extension_id': extension['id']})))
+    assert_that(
+        response.items,
+        contains(
+            has_entries(line_id=line['id'], extension_id=extension['id']),
+        )
+    )
 
 
 @fixtures.extension(context=INCALL_CONTEXT)
@@ -185,12 +191,12 @@ def test_associate_multi_lines_to_extension_with_same_user(user, extension, line
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_extension_with_different_user(user1, user2, extension, line1, line2):
-    with a.user_line(user1, line1), a.user_line(user2, line2):
-        response = confd.lines(line1['id']).extensions(extension['id']).put()
+def test_associate_multi_lines_to_extension_with_different_user(user1, user2, exten, l1, l2):
+    with a.user_line(user1, l1), a.user_line(user2, l2):
+        response = confd.lines(l1['id']).extensions(exten['id']).put()
         response.assert_updated()
 
-        response = confd.lines(line2['id']).extensions(extension['id']).put()
+        response = confd.lines(l2['id']).extensions(exten['id']).put()
         response.assert_match(400, e.resource_associated('User', 'Line'))
 
 
@@ -199,12 +205,12 @@ def test_associate_multi_lines_to_extension_with_different_user(user1, user2, ex
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extension1, extension2, line1, line2):
-    with a.user_line(user, line1), a.user_line(user, line2):
-        response = confd.lines(line1['id']).extensions(extension1['id']).put()
+def test_associate_multi_lines_to_multi_extensions_with_same_user(user, exten1, exten2, l1, l2):
+    with a.user_line(user, l1), a.user_line(user, l2):
+        response = confd.lines(l1['id']).extensions(exten1['id']).put()
         response.assert_updated()
 
-        response = confd.lines(line2['id']).extensions(extension2['id']).put()
+        response = confd.lines(l2['id']).extensions(exten2['id']).put()
         response.assert_updated()
 
 
@@ -242,8 +248,12 @@ def test_associate_line_with_endpoint(line, sip, extension):
         response = confd.lines(line['id']).extensions(extension['id']).put()
         response.assert_updated()
         response = confd.lines(line['id']).extensions.get()
-        assert_that(response.items, contains(has_entries({'line_id': line['id'],
-                                                          'extension_id': extension['id']})))
+        assert_that(
+            response.items,
+            contains(
+                has_entries(line_id=line['id'], extension_id=extension['id']),
+            )
+        )
 
 
 @fixtures.line_sip()
@@ -301,14 +311,15 @@ def test_get_line_extension(line, extension):
 @fixtures.line_sip()
 @fixtures.extension()
 def test_get_multi_lines_extension(line1, line2, extension):
-    expected = has_items(has_entries(line_id=line1['id'],
-                                     extension_id=extension['id']),
-                         has_entries(line_id=line2['id'],
-                                     extension_id=extension['id']))
-
     with a.line_extension(line1, extension), a.line_extension(line2, extension):
         response = confd.extensions(extension['id']).lines.get()
-        assert_that(response.items, expected)
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(line_id=line1['id'], extension_id=extension['id']),
+                has_entries(line_id=line2['id'], extension_id=extension['id']),
+            )
+        )
 
 
 @fixtures.line_sip()
@@ -330,25 +341,25 @@ def test_edit_context_to_incall_when_associated(line, extension):
 
 @fixtures.line_sip()
 @fixtures.extension()
-def test_get_extension_relation(line, extension):
-    expected = has_entries(
-        extensions=contains(has_entries(id=extension['id'],
-                                        exten=extension['exten'],
-                                        context=extension['context']))
-    )
-
-    with a.line_extension(line, extension):
+def test_get_extension_relation(line, exten):
+    with a.line_extension(line, exten):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item['extensions'],
+            contains(
+                has_entries(id=exten['id'], exten=exten['exten'], context=exten['context']),
+            )
+        )
 
 
 @fixtures.line_sip()
 @fixtures.extension()
 def test_get_line_relation(line, extension):
-    expected = has_entries(
-        lines=contains(has_entries(id=line['id']))
-    )
-
     with a.line_extension(line, extension):
         response = confd.extensions(extension['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item['lines'],
+            contains(
+                has_entries(id=line['id']),
+            )
+        )
