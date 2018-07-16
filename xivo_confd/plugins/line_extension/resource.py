@@ -2,26 +2,31 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from flask import url_for, request
+from flask import (
+    url_for,
+    request,
+)
 from marshmallow import fields
 
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+)
 from xivo_confd.helpers.restful import ConfdResource
 
 
 class LineExtensionSchema(BaseSchema):
     line_id = fields.Integer()
     extension_id = fields.Integer(required=True)
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('extensions',
-                          field='extension_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('extensions', field='extension_id', target='id'),
+    )
 
 
 class LineExtensionResource(ConfdResource):
