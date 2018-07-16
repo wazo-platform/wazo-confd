@@ -248,12 +248,12 @@ def test_associate_user_to_multiple_lines_with_same_extension(user, extension, l
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_user_to_multiple_lines_with_different_extension(user, exten1, exten2, l1, l2):
-    with a.line_extension(l1, exten1), a.line_extension(l2, exten2):
-        response = confd.users(user['id']).lines(l1['id']).put()
+def test_associate_user_to_multiple_lines_with_different_extension(user, extension1, extension2, line1, line2):
+    with a.line_extension(line1, extension1), a.line_extension(line2, extension2):
+        response = confd.users(user['id']).lines(line1['id']).put()
         response.assert_updated()
 
-        response = confd.users(user['id']).lines(l2['id']).put()
+        response = confd.users(user['id']).lines(line2['id']).put()
         response.assert_updated()
 
 
@@ -262,8 +262,8 @@ def test_associate_user_to_multiple_lines_with_different_extension(user, exten1,
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_two_users_to_two_lines_with_same_extension(user1, user2, exten, line1, line2):
-    with a.line_extension(line1, exten), a.line_extension(line2, exten):
+def test_associate_two_users_to_two_lines_with_same_extension(user1, user2, extension, line1, line2):
+    with a.line_extension(line1, extension), a.line_extension(line2, extension):
         response = confd.users(user1['id']).lines(line1['id']).put()
         response.assert_updated()
 

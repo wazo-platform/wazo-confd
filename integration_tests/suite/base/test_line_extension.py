@@ -191,12 +191,12 @@ def test_associate_multi_lines_to_extension_with_same_user(user, extension, line
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_extension_with_different_user(user1, user2, exten, l1, l2):
-    with a.user_line(user1, l1), a.user_line(user2, l2):
-        response = confd.lines(l1['id']).extensions(exten['id']).put()
+def test_associate_multi_lines_to_extension_with_different_user(user1, user2, exten, line1, line2):
+    with a.user_line(user1, line1), a.user_line(user2, line2):
+        response = confd.lines(line1['id']).extensions(exten['id']).put()
         response.assert_updated()
 
-        response = confd.lines(l2['id']).extensions(exten['id']).put()
+        response = confd.lines(line2['id']).extensions(exten['id']).put()
         response.assert_match(400, e.resource_associated('User', 'Line'))
 
 
@@ -205,12 +205,12 @@ def test_associate_multi_lines_to_extension_with_different_user(user1, user2, ex
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_multi_extensions_with_same_user(user, exten1, exten2, l1, l2):
-    with a.user_line(user, l1), a.user_line(user, l2):
-        response = confd.lines(l1['id']).extensions(exten1['id']).put()
+def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extension1, extension2, line1, line2):
+    with a.user_line(user, line1), a.user_line(user, line2):
+        response = confd.lines(line1['id']).extensions(extension1['id']).put()
         response.assert_updated()
 
-        response = confd.lines(l2['id']).extensions(exten2['id']).put()
+        response = confd.lines(line2['id']).extensions(extension2['id']).put()
         response.assert_updated()
 
 
@@ -296,8 +296,7 @@ def test_delete_extension_associated_to_line(line, extension):
 @fixtures.line_sip()
 @fixtures.extension()
 def test_get_line_extension(line, extension):
-    expected = has_item(has_entries(line_id=line['id'],
-                                    extension_id=extension['id']))
+    expected = has_item(has_entries(line_id=line['id'], extension_id=extension['id']))
 
     with a.line_extension(line, extension):
         response = confd.lines(line['id']).extensions.get()
