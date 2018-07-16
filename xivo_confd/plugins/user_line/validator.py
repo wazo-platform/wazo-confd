@@ -6,7 +6,10 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 
-from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
+from xivo_confd.helpers.validator import (
+    ValidatorAssociation,
+    ValidationAssociation,
+)
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 
@@ -27,10 +30,16 @@ class UserLineAssociationValidator(ValidatorAssociation):
         if not main_line_extension:
             return
 
-        lines_reachable_from_extension = set(line_extension.line_id for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id))
-        users_reachable_from_extension = set(user_line.user_id
-                                             for line_id in lines_reachable_from_extension
-                                             for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True))
+        lines_reachable_from_extension = set(
+            line_extension.line_id
+            for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id),
+        )
+
+        users_reachable_from_extension = set(
+            user_line.user_id
+            for line_id in lines_reachable_from_extension
+            for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True),
+        )
         users_reachable_from_extension.add(user.id)
 
         if len(users_reachable_from_extension) == 1:

@@ -9,7 +9,11 @@ from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+)
 from xivo_confd.helpers.restful import ConfdResource
 
 
@@ -18,12 +22,10 @@ class UserLineSchema(BaseSchema):
     line_id = fields.Integer(required=True)
     main_user = fields.Boolean(dump_only=True)
     main_line = fields.Boolean(dump_only=True)
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('users',
-                          field='user_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('users', field='user_id', target='id'),
+    )
 
 
 class LineSchemaIDLoad(BaseSchema):
