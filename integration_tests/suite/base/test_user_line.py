@@ -443,6 +443,20 @@ def test_dissociate_not_associated(user, line):
     response.assert_deleted()
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line_sip(context='main-internal')
+@fixtures.line_sip(context='sub-internal')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user):
+    response = confd.users(sub_user['id']).lines(main_line['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+    response = confd.users(main_user['id']).lines(sub_line['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+
 @fixtures.user()
 @fixtures.line_sip()
 def test_get_users_relation(user, line):

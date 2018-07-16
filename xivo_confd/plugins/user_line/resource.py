@@ -103,8 +103,11 @@ class UserLineItem(UserLineResource):
 
     @required_acl('confd.users.{user_id}.lines.{line_id}.delete')
     def delete(self, user_id, line_id):
-        user = self.get_user(user_id)
-        line = self.line_dao.get(line_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+
         self.service.dissociate(user, line)
         return '', 204
 
