@@ -22,6 +22,10 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 secondary_user_regex = re.compile(r"There are secondary users associated to the line")
@@ -68,6 +72,23 @@ def test_get_errors():
 def test_associate_user_line(user, line):
     response = confd.users(user['id']).lines(line['id']).put()
     response.assert_updated()
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line_sip(context='main-internal')
+@fixtures.line_sip(context='sub-internal')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user):
+    response = confd.users(sub_user['id']).lines(main_line['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+    response = confd.users(main_user['id']).lines(sub_line['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(main_user['id']).lines(sub_line['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.user()

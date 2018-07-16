@@ -13,6 +13,7 @@ from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 class UserLineAssociationValidator(ValidatorAssociation):
 
     def validate(self, user, line):
+        self.validate_same_tenant(user, line)
         self.validate_line_has_endpoint(line)
         self.validate_we_are_not_creating_a_group_under_the_same_extension(user, line)
 
@@ -42,6 +43,13 @@ class UserLineAssociationValidator(ValidatorAssociation):
             raise errors.resource_associated('Line', 'Extension',
                                              line_id=faulty_line_id,
                                              extension_id=main_line_extension.extension_id)
+
+    def validate_same_tenant(self, user, line):
+        if user.tenant_uuid != line.tenant_uuid:
+            raise errors.different_tenants(
+                user_tenant_uuid=user.tenant_uuid,
+                line_tenant_uuid=line.tenant_uuid,
+            )
 
 
 class UserLineDissociationValidator(ValidatorAssociation):
