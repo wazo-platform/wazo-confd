@@ -7,6 +7,8 @@ paths:
       tags:
       - lines
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -44,6 +46,7 @@ paths:
       tags:
       - lines
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/lineid'
       responses:
         '200':
@@ -59,6 +62,7 @@ paths:
       tags:
       - lines
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/lineid'
       - name: body
         in: body
@@ -79,6 +83,7 @@ paths:
       tags:
       - lines
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/lineid'
       responses:
         '204':

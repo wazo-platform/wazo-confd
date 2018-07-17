@@ -22,6 +22,7 @@ class LineExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRange
         self._context_dao = context_dao
 
     def validate(self, line, extension):
+        self.validate_same_tenant(line, extension)
         self.validate_line_has_endpoint(line)
         self.validate_line_has_no_extension(line)
         self.validate_extension_not_associated_to_other_resource(extension)
@@ -80,6 +81,13 @@ class LineExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRange
         context = self._context_dao.get_by_name(extension.context)
         if not self._exten_in_range(extension.exten, context.user_ranges):
             raise errors.outside_context_range(extension.exten, extension.context)
+
+    def validate_same_tenant(self, line, extension):
+        if extension.tenant_uuid != line.tenant_uuid:
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                line_tenant_uuid=line.tenant_uuid,
+            )
 
 
 class LineExtensionDissociationValidator(ValidatorAssociation):

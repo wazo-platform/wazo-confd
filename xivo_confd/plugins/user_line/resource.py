@@ -9,7 +9,11 @@ from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from xivo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+)
 from xivo_confd.helpers.restful import ConfdResource
 
 
@@ -18,12 +22,10 @@ class UserLineSchema(BaseSchema):
     line_id = fields.Integer(required=True)
     main_user = fields.Boolean(dump_only=True)
     main_line = fields.Boolean(dump_only=True)
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('users',
-                          field='user_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('users', field='user_id', target='id'),
+    )
 
 
 class LineSchemaIDLoad(BaseSchema):
@@ -42,8 +44,8 @@ class UserLineResource(ConfdResource):
         self.user_dao = user_dao
         self.line_dao = line_dao
 
-    def get_user(self, user_id):
-        return self.user_dao.get_by_id_uuid(user_id)
+    def get_user(self, user_id, tenant_uuids=None):
+        return self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
 
 
 class UserLineList(UserLineResource):
@@ -97,17 +99,25 @@ class UserLineList(UserLineResource):
 
 class UserLineItem(UserLineResource):
 
+    has_tenant_uuid = True
+
     @required_acl('confd.users.{user_id}.lines.{line_id}.delete')
     def delete(self, user_id, line_id):
-        user = self.get_user(user_id)
-        line = self.line_dao.get(line_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+
         self.service.dissociate(user, line)
         return '', 204
 
     @required_acl('confd.users.{user_id}.lines.{line_id}.update')
     def put(self, user_id, line_id):
-        user = self.get_user(user_id)
-        line = self.line_dao.get(line_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+
         self.service.associate(user, line)
         return '', 204
 

@@ -15,6 +15,7 @@ class LineList(ListResource):
 
     model = Line
     schema = LineSchemaNullable
+    has_tenant_uuid = True
 
     def build_headers(self, line):
         return {'Location': url_for('lines', id=line.id, _external=True)}
@@ -31,6 +32,7 @@ class LineList(ListResource):
 class LineItem(ItemResource):
 
     schema = LineSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.lines.{id}.read')
     def get(self, id):

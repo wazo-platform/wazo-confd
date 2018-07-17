@@ -6,13 +6,17 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 
-from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
+from xivo_confd.helpers.validator import (
+    ValidatorAssociation,
+    ValidationAssociation,
+)
 from xivo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 
 class UserLineAssociationValidator(ValidatorAssociation):
 
     def validate(self, user, line):
+        self.validate_same_tenant(user, line)
         self.validate_line_has_endpoint(line)
         self.validate_we_are_not_creating_a_group_under_the_same_extension(user, line)
 
@@ -26,10 +30,16 @@ class UserLineAssociationValidator(ValidatorAssociation):
         if not main_line_extension:
             return
 
-        lines_reachable_from_extension = set(line_extension.line_id for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id))
-        users_reachable_from_extension = set(user_line.user_id
-                                             for line_id in lines_reachable_from_extension
-                                             for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True))
+        lines_reachable_from_extension = set(
+            line_extension.line_id
+            for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id),
+        )
+
+        users_reachable_from_extension = set(
+            user_line.user_id
+            for line_id in lines_reachable_from_extension
+            for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True),
+        )
         users_reachable_from_extension.add(user.id)
 
         if len(users_reachable_from_extension) == 1:
@@ -42,6 +52,13 @@ class UserLineAssociationValidator(ValidatorAssociation):
             raise errors.resource_associated('Line', 'Extension',
                                              line_id=faulty_line_id,
                                              extension_id=main_line_extension.extension_id)
+
+    def validate_same_tenant(self, user, line):
+        if user.tenant_uuid != line.tenant_uuid:
+            raise errors.different_tenants(
+                user_tenant_uuid=user.tenant_uuid,
+                line_tenant_uuid=line.tenant_uuid,
+            )
 
 
 class UserLineDissociationValidator(ValidatorAssociation):
