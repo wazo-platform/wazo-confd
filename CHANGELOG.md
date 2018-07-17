@@ -29,6 +29,7 @@ Changelog
   * `/groups`
   * `/incalls`
   * `/conferences`
+  * `/lines`
 
 * New readonly parameters have been added to the outcall resource:
 
