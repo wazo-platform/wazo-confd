@@ -157,6 +157,7 @@ from . import sound
 from . import schedule
 from . import schedule_entity
 from . import skill
+from . import skill_rule
 from . import switchboard
 from . import switchboard_member_user
 from . import trunk
@@ -251,6 +252,7 @@ __all__ = [
     'schedule',
     'schedule_entity',
     'skill',
+    'skill_rule',
     'switchboard',
     'switchboard_member_user',
     'trunk',

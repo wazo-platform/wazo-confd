@@ -145,6 +145,7 @@ DEFAULT_CONFIG = {
         'sccp_general': True,
         'sip_general': True,
         'skill': True,
+        'skill_rule': True,
         'sound': True,
         'sound_language': True,
         'switchboard': True,
