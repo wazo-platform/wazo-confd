@@ -257,3 +257,9 @@ class skill(IsolatedAction):
 
     actions = {'generate': h.skill.generate_skill,
                'delete': h.skill.delete_skill}
+
+
+class skill_rule(IsolatedAction):
+
+    actions = {'generate': h.skill_rule.generate_skill_rule,
+               'delete': h.skill_rule.delete_skill_rule}

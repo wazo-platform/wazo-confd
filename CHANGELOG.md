@@ -4,6 +4,14 @@ Changelog
 18.08
 -----
 
+* Added queue skill rule endpoints:
+
+  * GET `/1.1/queues/skillrules`
+  * POST `/1.1/queues/skillrules`
+  * DELETE `/1.1/queues/skillrules/<skill_rule_id>`
+  * GET `/1.1/queues/skillrules/<skill_rule_id>`
+  * PUT `/1.1/queues/skillrules/<skill_rule_id>`
+
 * A new API for associating a agent with a skill has been added:
 
   * PUT `/1.1/agents/<agent_id>/skills/<skill_id>`

@@ -1,0 +1,131 @@
+paths:
+  /queues/skillrules:
+    get:
+      operationId: list_skill_rules
+      summary: List skill rule
+      description: '**Required ACL:** `confd.queues.skillrules.read`'
+      tags:
+      - queues
+      - skills
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Skill rules list
+          schema:
+            $ref: '#/definitions/SkillRuleItems'
+    post:
+      operationId: create_skill_rule
+      summary: Create skill rule
+      description: '**Required ACL:** `confd.queues.skillrules.create`'
+      tags:
+      - queues
+      - skills
+      parameters:
+      - name: body
+        in: body
+        description: Skill rule to create
+        required: true
+        schema:
+          $ref: '#/definitions/SkillRule'
+      responses:
+        '201':
+          description: Skill rule created
+          schema:
+            $ref: '#/definitions/SkillRule'
+        '400':
+          $ref: '#/responses/CreateError'
+  /queues/skillrules/{skillrule_id}:
+    get:
+      operationId: get_skill_rule
+      summary: Get skill rule
+      description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.read`'
+      tags:
+      - queues
+      - skills
+      parameters:
+      - $ref: '#/parameters/skillruleid'
+      responses:
+        '200':
+          description: Skill rule
+          schema:
+            $ref: '#/definitions/SkillRule'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_skill_rule
+      summary: Update skill rule
+      description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.update`'
+      tags:
+      - skills
+      parameters:
+      - $ref: '#/parameters/skillruleid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/SkillRule'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_skill_rule
+      summary: Delete skill rule
+      description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.delete`'
+      tags:
+      - skills
+      parameters:
+      - $ref: '#/parameters/skillruleid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  skillruleid:
+    required: true
+    type: integer
+    name: skillrule_id
+    in: path
+    description: Skill's ID
+definitions:
+  SkillRule:
+    title: SkillRule
+    properties:
+      id:
+        type: integer
+        readOnly: true
+      name:
+        type: string
+        description: The name to identify the skill rule
+      rules:
+        type: array
+        items:
+          $ref: '#/definitions/SkillRuleRule'
+  SkillRuleRule:
+    title: SkillRuleRule
+    properties:
+      definition:
+        type: string
+        description: The rule definition
+  SkillRuleItems:
+    title: SkillRuleItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/SkillRule'
+      total:
+        type: integer
+    required:
+    - total
