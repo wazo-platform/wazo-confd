@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from .. import scenarios as s
@@ -111,6 +111,11 @@ def invalid_destinations():
         {'type': 'queue', 'queue_id': 'string'},
         {'type': 'queue', 'queue_id': None},
         {'type': 'queue', 'queue_id': 1, 'ring_time': -10},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 'string'},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': 'string'},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': None},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': 1},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_variables': {'skill_rule_id': 'undefined'}},
 
         {'type': 'sound'},
         {'type': 'sound', 'missing_required_field': 'string'},
@@ -189,8 +194,10 @@ def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, vo
         {'type': 'none'},
         {'type': 'outcall', 'outcall_id': outcall['id'], 'exten': '1234567890'},
         {'type': 'queue', 'queue_id': queue['id']},
-        {'type': 'queue', 'queue_id': queue['id'], 'ring_time': 0.9},
-        {'type': 'queue', 'queue_id': queue['id'], 'ring_time': None},
+        {'type': 'queue', 'queue_id': queue['id'], 'ring_time': 0.9,
+         'skill_rule_id': 1, 'skill_rule_variables': {'var1': 'value1'}},
+        {'type': 'queue', 'queue_id': queue['id'], 'ring_time': None,
+         'skill_rule_id': None, 'skill_rule_variables': None},
         {'type': 'sound', 'filename': 'filename_without_extension'},
         {'type': 'sound', 'filename': 'filename_without_extension',
          'skip': True},

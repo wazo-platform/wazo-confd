@@ -2,8 +2,12 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from marshmallow import Schema, fields, pre_dump, post_load, post_dump
+import json
+
+from marshmallow import Schema, fields, pre_dump, post_load, post_dump, validates_schema
+from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
+
 from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
@@ -225,7 +229,50 @@ class OutcallDestinationSchema(BaseDestinationSchema):
 
 class QueueDestinationSchema(BaseDestinationSchema):
     queue_id = fields.Integer(attribute='actionarg1', required=True)
-    ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
+    ring_time = fields.Float(validate=Range(min=0), allow_none=True)
+    skill_rule_id = fields.Integer(allow_none=True)
+    skill_rule_variables = fields.Dict(keys=fields.Str(), values=fields.Str(), allow_none=True)
+
+    @pre_dump
+    def separate_action(self, data):
+        options = data.actionarg2.split(',') if data.actionarg2 else []
+        data.ring_time = None
+        data.skill_rule_id = None
+        data.skill_rule_variables = None
+        if len(options) == 1:
+            data.ring_time = options[0] or None
+        elif len(options) == 2:  # id is always bound with variables
+            data.skill_rule_id = options[0]
+            data.skill_rule_variables = json.loads(options[1]) if options[1] else None
+        elif len(options) == 3:
+            data.ring_time = options[0]
+            data.skill_rule_id = options[1]
+            data.skill_rule_variables = json.loads(options[2]) if options[2] else None
+        return data
+
+    @post_load
+    def merge_action(self, data):
+        ring_time = data.pop('ring_time', None)
+        skill_rule_id = data.pop('skill_rule_id', None)
+        skill_rule_variables = data.pop('skill_rule_variables', None)
+        data['actionarg2'] = '{ring_time}{sep1}{skill_rule_id}{sep2}{skill_rule_variables}'.format(
+            ring_time=ring_time or '',
+            sep1=',' if ring_time and skill_rule_id else '',
+            skill_rule_id=skill_rule_id or '',
+            sep2=',' if skill_rule_id else '',
+            skill_rule_variables=json.dumps(skill_rule_variables) if skill_rule_variables else '',
+        )
+        return data
+
+    @validates_schema
+    def _validate_skill_rule_variables(self, data):
+        if not data.get('skill_rule_variables'):
+            return
+        if not data.get('skill_rule_id'):
+            raise ValidationError(
+                'Missing data for required field. When `skill_rule_variables` is defined',
+                ['skill_rule_id']
+            )
 
 
 class SoundDestinationSchema(BaseDestinationSchema):
