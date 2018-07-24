@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import assert_that, has_entries
-from ..helpers import scenarios as s
+
 from . import confd
+from ..helpers import scenarios as s
 from ..helpers import fixtures
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
-
 
 FAKE_ID = 999999999
 
@@ -100,8 +100,11 @@ def test_edit_to_none(user):
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(user, meetme, ivr, group, outcall, queue, switchboard, dest_user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, dest_user, voicemail, conference):
+@fixtures.skill_rule()
+def test_valid_destinations(user, meetme, ivr, group, outcall, queue, switchboard,
+                            dest_user, voicemail, conference, skill_rule):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
+                                          dest_user, voicemail, conference, skill_rule):
         yield _update_user_fallbacks_with_destination, user['uuid'], destination
 
 
@@ -120,9 +123,10 @@ def _update_user_fallbacks_with_destination(user_id, destination):
 
 @fixtures.user()
 def test_nonexistent_destinations(user):
-    meetme = ivr = group = outcall = queue = dest_user = voicemail = conference = {'id': 99999999}
+    meetme = ivr = group = outcall = queue = dest_user = voicemail = conference = skill_rule = {'id': 99999999}
     switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, dest_user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
+                                          dest_user, voicemail, conference, skill_rule):
         if destination['type'] in ('meetme',
                                    'ivr',
                                    'group',

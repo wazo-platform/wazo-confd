@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from . import confd
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    not_,
+)
 
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      not_)
+from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 
 def test_get_errors():
@@ -231,8 +235,11 @@ def test_edit_all_parameters(ivr):
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(ivr, meetme, dest_ivr, group, outcall, queue, switchboard, user, voicemail, conference):
-    for destination in valid_destinations(meetme, dest_ivr, group, outcall, queue, switchboard, user, voicemail, conference):
+@fixtures.skill_rule()
+def test_valid_destinations(ivr, meetme, dest_ivr, group, outcall, queue,
+                            switchboard, user, voicemail, conference, skill_rule):
+    for destination in valid_destinations(meetme, dest_ivr, group, outcall, queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         yield create_ivr_with_destination, destination
         yield update_ivr_with_destination, ivr['id'], destination
 

@@ -8,18 +8,21 @@ from marshmallow import Schema, fields, pre_dump, post_load, post_dump, validate
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.queue import dao as queue_dao
+from xivo_dao.resources.skill_rule import dao as skill_rule_dao
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from xivo_confd.helpers.mallow import StrictBoolean
-from xivo_confd.helpers.validator import GetResource, ResourceExists
+from xivo_confd.helpers.validator import GetResource, ResourceExists, Validator
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
 CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,39}$'
@@ -440,6 +443,23 @@ class DestinationField(fields.Nested):
         return fields.Nested(schema)._serialize(nested_obj, attr, obj)
 
 
+class OptionalGetSkillRuleFromActionArg2Resource(Validator):
+
+    def __init__(self, dao_get):
+        self.dao_get = dao_get
+
+    def validate(self, model):
+        destination, _ = QueueDestinationSchema().dump(model)
+        skill_rule_id = destination.get('skill_rule_id', None)
+        if not skill_rule_id:
+            return
+        try:
+            self.dao_get(skill_rule_id)
+        except NotFoundError:
+            metadata = {'skill_rule_id': skill_rule_id}
+            raise errors.param_not_found('skill_rule_id', 'SkillRule', **metadata)
+
+
 class DestinationValidator(object):
 
     _VALIDATORS = {
@@ -459,7 +479,10 @@ class DestinationValidator(object):
         'meetme': [ResourceExists('actionarg1', meetme_dao.exists, 'Conference')],
         'none': [],
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
-        'queue': [GetResource('actionarg1', queue_dao.get, 'Queue')],
+        'queue': [
+            GetResource('actionarg1', queue_dao.get, 'Queue'),
+            OptionalGetSkillRuleFromActionArg2Resource(skill_rule_dao.get),
+        ],
         'sound': [],
         'switchboard': [GetResource('actionarg1', switchboard_dao.get, 'Switchboard')],
         'user': [GetResource('actionarg1', user_dao.get, 'User')],

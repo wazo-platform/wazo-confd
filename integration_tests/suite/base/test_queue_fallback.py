@@ -112,8 +112,11 @@ def test_edit_to_none(queue):
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(queue, meetme, ivr, group, outcall, dest_queue, switchboard, user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue, switchboard, user, voicemail, conference):
+@fixtures.skill_rule()
+def test_valid_destinations(queue, meetme, ivr, group, outcall, dest_queue,
+                            switchboard, user, voicemail, conference, skill_rule):
+    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         yield _update_queue_fallbacks_with_destination, queue['id'], destination
 
 
@@ -126,9 +129,10 @@ def _update_queue_fallbacks_with_destination(queue_id, destination):
 
 @fixtures.queue()
 def test_nonexistent_destinations(queue):
-    meetme = ivr = group = outcall = dest_queue = user = voicemail = conference = {'id': 99999999}
+    meetme = ivr = group = outcall = dest_queue = user = voicemail = conference = skill_rule = {'id': 99999999}
     switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
-    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue, switchboard, user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         if destination['type'] in ('meetme',
                                    'ivr',
                                    'group',

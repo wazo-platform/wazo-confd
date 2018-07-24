@@ -113,7 +113,6 @@ def invalid_destinations():
         {'type': 'queue', 'queue_id': 1, 'ring_time': -10},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 'string'},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': 'string'},
-        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': None},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': 1},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_variables': {'skill_rule_id': 'undefined'}},
 
@@ -156,7 +155,7 @@ def invalid_destinations():
     ]
 
 
-def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
+def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference, skill_rule):
     return [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
@@ -195,7 +194,7 @@ def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, vo
         {'type': 'outcall', 'outcall_id': outcall['id'], 'exten': '1234567890'},
         {'type': 'queue', 'queue_id': queue['id']},
         {'type': 'queue', 'queue_id': queue['id'], 'ring_time': 0.9,
-         'skill_rule_id': 1, 'skill_rule_variables': {'var1': 'value1'}},
+         'skill_rule_id': skill_rule['id'], 'skill_rule_variables': {'var1': 'value1'}},
         {'type': 'queue', 'queue_id': queue['id'], 'ring_time': None,
          'skill_rule_id': None, 'skill_rule_variables': None},
         {'type': 'sound', 'filename': 'filename_without_extension'},

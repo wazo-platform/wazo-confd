@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      equal_to,
-                      has_entries)
-from ..helpers import scenarios as s
+from hamcrest import (
+    assert_that,
+    equal_to,
+    has_entries
+)
+
 from . import confd
+from ..helpers import scenarios as s
 from ..helpers import fixtures
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
@@ -83,8 +86,11 @@ def test_edit_to_none(group):
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(group, meetme, ivr, dest_group, outcall, queue, switchboard, user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard, user, voicemail, conference):
+@fixtures.skill_rule()
+def test_valid_destinations(group, meetme, ivr, dest_group, outcall, queue,
+                            switchboard, user, voicemail, conference, skill_rule):
+    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         yield _update_group_fallbacks_with_destination, group['id'], destination
 
 
@@ -97,9 +103,10 @@ def _update_group_fallbacks_with_destination(group_id, destination):
 
 @fixtures.group()
 def test_nonexistent_destinations(group):
-    meetme = ivr = dest_group = outcall = queue = user = voicemail = conference = {'id': 99999999}
+    meetme = ivr = dest_group = outcall = queue = user = voicemail = conference = skill_rule = {'id': 99999999}
     switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
-    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard, user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         if destination['type'] in ('meetme',
                                    'ivr',
                                    'group',

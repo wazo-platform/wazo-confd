@@ -87,8 +87,11 @@ def test_edit_to_none(call_filter):
 @fixtures.user()
 @fixtures.voicemail()
 @fixtures.conference()
-def test_valid_destinations(call_filter, meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
+@fixtures.skill_rule()
+def test_valid_destinations(call_filter, meetme, ivr, group, outcall, queue,
+                            switchboard, user, voicemail, conference, skill_rule):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         yield _update_call_filter_fallbacks_with_destination, call_filter['id'], destination
 
 
@@ -101,9 +104,10 @@ def _update_call_filter_fallbacks_with_destination(call_filter_id, destination):
 
 @fixtures.call_filter()
 def test_nonexistent_destinations(call_filter):
-    meetme = ivr = group = outcall = queue = user = voicemail = conference = {'id': 99999999}
+    meetme = ivr = group = outcall = queue = user = voicemail = conference = skill_rule = {'id': 99999999}
     switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference):
+    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
+                                          user, voicemail, conference, skill_rule):
         if destination['type'] in ('meetme',
                                    'ivr',
                                    'group',
