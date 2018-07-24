@@ -114,6 +114,8 @@ def invalid_destinations():
         {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 'string'},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': 'string'},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': 1},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': {'invalid;': 'char'}},
+        {'type': 'queue', 'queue_id': 1, 'skill_rule_id': 1, 'skill_rule_variables': {'invalid': 'char|'}},
         {'type': 'queue', 'queue_id': 1, 'skill_rule_variables': {'skill_rule_id': 'undefined'}},
 
         {'type': 'sound'},

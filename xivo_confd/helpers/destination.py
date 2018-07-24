@@ -4,7 +4,7 @@
 
 import json
 
-from marshmallow import Schema, fields, pre_dump, post_load, post_dump, validates_schema
+from marshmallow import Schema, fields, pre_dump, post_load, post_dump, validates_schema, validates
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 
@@ -27,6 +27,7 @@ from xivo_confd.helpers.validator import GetResource, ResourceExists, Validator
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
 CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,39}$'
 EXTEN_REGEX = r'^[0-9*#]{1,255}$'
+SKILL_RULE_VARIABLE_REGEX = r'^[^[;\|]+$'
 
 
 class BaseDestinationSchema(Schema):
@@ -234,23 +235,27 @@ class QueueDestinationSchema(BaseDestinationSchema):
     queue_id = fields.Integer(attribute='actionarg1', required=True)
     ring_time = fields.Float(validate=Range(min=0), allow_none=True)
     skill_rule_id = fields.Integer(allow_none=True)
-    skill_rule_variables = fields.Dict(keys=fields.Str(), values=fields.Str(), allow_none=True)
+    skill_rule_variables = fields.Dict(allow_none=True)
 
     @pre_dump
     def separate_action(self, data):
-        options = data.actionarg2.split(',') if data.actionarg2 else []
+        options = data.actionarg2.split(';') if data.actionarg2 else []
         data.ring_time = None
         data.skill_rule_id = None
-        data.skill_rule_variables = None
+        _skill_rule_variables = None
         if len(options) == 1:
             data.ring_time = options[0] or None
         elif len(options) == 2:  # id is always bound with variables
             data.skill_rule_id = options[0]
-            data.skill_rule_variables = json.loads(options[1]) if options[1] else None
+            _skill_rule_variables = options[1] or None
         elif len(options) == 3:
             data.ring_time = options[0]
             data.skill_rule_id = options[1]
-            data.skill_rule_variables = json.loads(options[2]) if options[2] else None
+            _skill_rule_variables = options[2] or None
+
+        if _skill_rule_variables:
+            _skill_rule_variables = _skill_rule_variables.replace('|', ',')  # dialplan interpret comma ...
+            data.skill_rule_variables = json.loads(_skill_rule_variables)
         return data
 
     @post_load
@@ -258,12 +263,13 @@ class QueueDestinationSchema(BaseDestinationSchema):
         ring_time = data.pop('ring_time', None)
         skill_rule_id = data.pop('skill_rule_id', None)
         skill_rule_variables = data.pop('skill_rule_variables', None)
+        skill_rule_variables_str = json.dumps(skill_rule_variables).replace(',', '|') if skill_rule_variables else ''
         data['actionarg2'] = '{ring_time}{sep1}{skill_rule_id}{sep2}{skill_rule_variables}'.format(
             ring_time=ring_time or '',
-            sep1=',' if ring_time and skill_rule_id else '',
+            sep1=';' if ring_time and skill_rule_id else '',
             skill_rule_id=skill_rule_id or '',
-            sep2=',' if skill_rule_id else '',
-            skill_rule_variables=json.dumps(skill_rule_variables) if skill_rule_variables else '',
+            sep2=';' if skill_rule_id else '',
+            skill_rule_variables=skill_rule_variables_str,
         )
         return data
 
@@ -276,6 +282,17 @@ class QueueDestinationSchema(BaseDestinationSchema):
                 'Missing data for required field. When `skill_rule_variables` is defined',
                 ['skill_rule_id']
             )
+
+    @validates('skill_rule_variables')
+    def _validate_skill_rule_variables_value(self, variables):
+        # with marshmallow 3.0 we can set this validator on the field declaration
+        if not variables:
+            return
+
+        validator = Regexp(SKILL_RULE_VARIABLE_REGEX)
+        for key, value in variables.items():
+            validator(key)
+            validator(value)
 
 
 class SoundDestinationSchema(BaseDestinationSchema):
