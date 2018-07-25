@@ -14,6 +14,11 @@ Changelog
   * GET `/1.1/asterisk/rtp/ice_host_candidates`
   * PUT `/1.1/asterisk/rtp/ice_host_candidates`
 
+* Added queues general endpoints:
+
+  * GET `/1.1/asterisk/queues/general`
+  * PUT `/1.1/asterisk/queues/general`
+
 
 18.08
 -----
