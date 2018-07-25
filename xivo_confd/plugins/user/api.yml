@@ -344,11 +344,11 @@ definitions:
           description: Phone number for the user’s mobile device
         username:
           type: string
-          description: Username for connecting to the CTI
+          description: Username for connecting to the CTI (deprecated)
         password:
           type: string
           minLength: 4
-          description: Password for connecting to the CTI
+          description: Password for connecting to the CTI (deprecated)
         music_on_hold:
           type: string
           description: Name of the MOH category to use for music on hold
