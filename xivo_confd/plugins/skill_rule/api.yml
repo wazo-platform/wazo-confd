@@ -112,6 +112,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SkillRuleRule'
+    required:
+    - name
   SkillRuleRule:
     title: SkillRuleRule
     properties:
