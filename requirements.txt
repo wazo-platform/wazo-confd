@@ -12,7 +12,7 @@ flask-httpauth==3.2.1
 flask-restful==0.3.5
 flask==0.12.1
 kombu==3.0.35
-marshmallow==2.10.3
+marshmallow==2.15.3
 netifaces==0.10.4
 psycopg2==2.6.2  # from xivo-dao
 python-consul==0.7.0
