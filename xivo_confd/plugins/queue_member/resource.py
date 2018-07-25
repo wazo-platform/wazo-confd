@@ -126,7 +126,7 @@ class QueueMemberAgentListLegacy(ConfdResource):
     def post(self, queue_id):
         queue = self.queue_dao.get(queue_id)
         form = self.schema().load(request.get_json()).data
-        agent = self.service.get_agent(form['agent.id'])
+        agent = self.service.get_agent(form['agent']['id'])
         member = self._find_or_create_member(queue, agent)
         member.penalty = form['penalty']
         self.service.associate_legacy(queue, member)
