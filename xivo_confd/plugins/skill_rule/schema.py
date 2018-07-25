@@ -10,7 +10,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class SkillRuleSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String(validate=Length(max=64), allow_none=True)
+    name = fields.String(validate=Length(max=64))
     rules = fields.Nested('SkillRuleRuleSchema', many=True, allow_none=True)
     links = ListLink(Link('skillrules'))
 

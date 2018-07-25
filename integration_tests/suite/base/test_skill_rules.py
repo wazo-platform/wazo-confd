@@ -45,6 +45,7 @@ def test_put_errors(skill):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', 1234
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(65)
     yield s.check_bogus_field_returns_error, url, 'name', []
