@@ -63,6 +63,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': []}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': {}}], regex
 
+    for check in unique_error_checks(url):
+        yield check
+
+
+@fixtures.skill_rule(name='unique')
+def unique_error_checks(url, skill_rule):
+    yield s.check_bogus_field_returns_error, url, 'name', skill_rule['name']
+
 
 @fixtures.skill_rule(name='search')
 @fixtures.skill_rule(name='hidden')
