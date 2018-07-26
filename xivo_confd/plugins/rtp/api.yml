@@ -1,0 +1,84 @@
+paths:
+  /asterisk/rtp/general:
+    get:
+      operationId: list_asterisk_rtp_general
+      summary: List RTP general options
+      description: '**Required ACL:** `confd.asterisk.rtp.general.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: RTP general
+          schema:
+            $ref: '#/definitions/RTPConfiguration'
+    put:
+      operationId: update_asterisk_rtp_general
+      summary: Update RTP general option
+      description: '**Required ACL:** `confd.asterisk.rtp.general.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/RTPConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /asterisk/rtp/ice_host_candidates:
+    get:
+      operationId: list_asterisk_rtp_ice_host_candidates
+      summary: List RTP ice_host_candidates options
+      description: '**Required ACL:** `confd.asterisk.rtp.ice_host_candidates.read`'
+      tags:
+      - asterisk
+      responses:
+        '200':
+          description: RTP ice_host_candidates
+          schema:
+            $ref: '#/definitions/RTPConfiguration'
+    put:
+      operationId: update_asterisk_rtp_ice_host_candidates
+      summary: Update RTP ice_host_candidates option
+      description: '**Required ACL:** `confd.asterisk.rtp.ice_host_candidates.update`
+
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/RTPConfiguration'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  RTPConfiguration:
+    title: RTPConfiguration
+    description: 'This configuration will be in the file ''rtp.conf'' used by asterisk.
+
+      Please consult the asterisk documentation for further details on available parameters.'
+    properties:
+      options:
+        description: "These options must be unique and unordered.\
+          \ Otherwise, use `ordered_options`. Option must have the following form:\n\
+          \n```\n{\n  \"options\": {\n    \"name1\": \"value1\",\n    ...\n  }\n}\n\
+          ```\n\n"
+        type: object
