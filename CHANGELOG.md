@@ -1,6 +1,20 @@
 Changelog
 =========
 
+18.09
+-----
+
+* Added RTP general endpoints:
+
+  * GET `/1.1/asterisk/rtp/general`
+  * PUT `/1.1/asterisk/rtp/general`
+
+* Added RTP ice host candidates endpoints:
+
+  * GET `/1.1/asterisk/rtp/ice_host_candidates`
+  * PUT `/1.1/asterisk/rtp/ice_host_candidates`
+
+
 18.08
 -----
 
