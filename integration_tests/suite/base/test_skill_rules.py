@@ -123,7 +123,7 @@ def test_create_minimal_parameters():
 def test_create_all_parameters():
     parameters = {
         'name': 'MySkillRule',
-        'rules': [{'definition': 'asterisk rule definition'}],
+        'rules': [{'definition': 'asterisk rule definition'}, {'definition': 'another rule definition'}],
     }
 
     response = confd.queues.skillrules.post(**parameters)
@@ -145,7 +145,7 @@ def test_edit_minimal_parameters(skill_rule):
 def test_edit_all_parameters(skill_rule):
     parameters = {
         'name': 'UpdatedSkillRule',
-        'rules': [{'definition': 'updated asterisk rule definition'}],
+        'rules': [{'definition': 'updated rule definition'}, {'definition': 'another rule definition'}],
     }
 
     response = confd.queues.skillrules(skill_rule['id']).put(**parameters)
