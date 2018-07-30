@@ -192,6 +192,16 @@ def test_edit_all_parameters(context, trunk):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.trunks(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Trunk'))
+
+    response = confd.trunks(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.trunk()
 def test_delete(trunk):
     response = confd.trunks(trunk['id']).delete()
