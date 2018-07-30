@@ -7,6 +7,8 @@ paths:
       tags:
       - trunks
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -45,6 +47,7 @@ paths:
       tags:
       - trunks
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/trunkid'
       responses:
         '200':
@@ -60,6 +63,7 @@ paths:
       tags:
       - trunks
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/trunkid'
       - name: body
         in: body
@@ -80,6 +84,7 @@ paths:
       tags:
       - trunks
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/trunkid'
       responses:
         '204':
