@@ -46,6 +46,7 @@ class TrunkList(ListResource):
 class TrunkItem(ItemResource):
 
     schema = TrunkSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.trunks.{id}.read')
     def get(self, id):
