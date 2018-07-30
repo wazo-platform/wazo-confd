@@ -79,7 +79,7 @@ class GroupMemberExtensionItem(GroupMemberItem):
         return '', 204
 
     def _find_or_create_member(self, group, extension):
-        member = self.service.find_member_user(group, extension)
+        member = self.service.find_member_extension(group, extension)
         if not member:
             member = QueueMember(extension=extension)
         return member
