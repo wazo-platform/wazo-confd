@@ -206,3 +206,13 @@ def test_edit_multi_tenant(main, sub):
 def test_delete(trunk):
     response = confd.trunks(trunk['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.trunks(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Trunk'))
+
+    response = confd.trunks(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
