@@ -31,6 +31,7 @@ class GroupMemberItem(ConfdResource):
 class GroupMemberUserItem(GroupMemberItem):
 
     schema = GroupUsersSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, group_dao, user_dao):
         super(GroupMemberUserItem, self).__init__(service, group_dao)
@@ -38,12 +39,14 @@ class GroupMemberUserItem(GroupMemberItem):
 
     @required_acl('confd.groups.{group_id}.members.users.update')
     def put(self, group_id):
-        group = self.group_dao.get(group_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+
+        group = self.group_dao.get(group_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
         members = []
         try:
             for member_form in form['users']:
-                user = self.user_dao.get_by(uuid=member_form['user']['uuid'])
+                user = self.user_dao.get_by(uuid=member_form['user']['uuid'], tenant_uuids=tenant_uuids)
                 member = self._find_or_create_member(group, user)
                 member.priority = member_form['priority']
                 members.append(member)

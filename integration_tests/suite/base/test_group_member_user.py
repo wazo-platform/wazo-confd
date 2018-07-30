@@ -19,7 +19,10 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
-
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -147,6 +150,30 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
                 has_entries(id=group1['id'], name=group1['name']),
             )
         ))
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_group, sub_group, main_user, sub_user):
+    response = confd.groups(main_group['id']).members.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('Group'))
+
+    response = confd.groups(sub_group['id']).members.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('User'))
+
+    response = confd.groups(main_group['id']).members.users.put(
+        users=[{'uuid': sub_user['uuid']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.group()

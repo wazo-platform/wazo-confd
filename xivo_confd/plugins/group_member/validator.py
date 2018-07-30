@@ -12,10 +12,19 @@ class GroupMemberUserAssociationValidator(ValidatorAssociation):
     def validate(self, group, members):
         users = [member.user for member in members]
         for user in users:
+            self.validate_same_tenant(group, user)
+        for user in users:
             self.validate_user_has_endpoint(user)
 
         self.validate_no_duplicate_user(users)
         self.validate_no_users_have_same_line(users)
+
+    def validate_same_tenant(self, group, user):
+        if group.tenant_uuid != user.tenant_uuid:
+            raise errors.different_tenants(
+                group_tenant_uuid=group.tenant_uuid,
+                user_tenant_uuid=user.tenant_uuid
+            )
 
     def validate_user_has_endpoint(self, user):
         if not user.lines:
