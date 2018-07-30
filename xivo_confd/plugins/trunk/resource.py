@@ -14,6 +14,7 @@ from xivo_confd.helpers.restful import ListResource, ItemResource
 
 class TrunkSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     context = fields.String(allow_none=True)
     twilio_incoming = StrictBoolean(allow_none=True)
     links = ListLink(Link('trunks'))

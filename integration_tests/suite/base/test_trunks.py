@@ -154,15 +154,19 @@ def test_create_minimal_parameters():
     response = confd.trunks.post()
     response.assert_created('trunks')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
 
 @fixtures.context()
 def test_create_all_parameters(context):
-    response = confd.trunks.post(context=context['name'], twilio_incoming=True)
+    parameters = {
+        'context': context['name'],
+        'twilio_incoming': True,
+    }
+    response = confd.trunks.post(**parameters)
     response.assert_created('trunks')
 
-    assert_that(response.item, has_entries(context=context['name'], twilio_incoming=True))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
 
 @fixtures.trunk()
