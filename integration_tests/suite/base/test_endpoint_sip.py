@@ -215,7 +215,7 @@ def test_list(sip1, sip2):
     assert_that(response.items, contains(has_entry('id', sip1['id'])))
 
 
-def test_create_sip_with_minimal_parameters():
+def test_create_minimal_parameters():
     response = confd.endpoints.sip.post()
 
     response.assert_created('endpoint_sip', location='endpoints/sip')
@@ -228,7 +228,7 @@ def test_create_sip_with_minimal_parameters():
     }))
 
 
-def test_create_sip_with_all_parameters():
+def test_create_all_parameters():
     response = confd.endpoints.sip.post(username="myusername",
                                         secret="mysecret",
                                         type="peer",
@@ -244,7 +244,7 @@ def test_create_sip_with_all_parameters():
     }))
 
 
-def test_create_sip_with_additional_options():
+def test_create_additional_options():
     options = ALL_OPTIONS + [
         ["foo", "bar"],
         ["spam", "eggs"]
@@ -255,7 +255,7 @@ def test_create_sip_with_additional_options():
 
 
 @fixtures.sip(username="dupusername")
-def test_create_sip_with_username_already_taken(sip):
+def test_create_username_already_taken(sip):
     response = confd.endpoints.sip.post(username="dupusername")
     response.assert_match(400, e.resource_exists('SIPEndpoint'))
 
@@ -326,6 +326,6 @@ def test_update_values_other_than_host_does_not_touch_it(sip):
 
 
 @fixtures.sip()
-def test_delete_sip(sip):
+def test_delete(sip):
     response = confd.endpoints.sip(sip['id']).delete()
     response.assert_deleted()
