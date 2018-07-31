@@ -187,6 +187,16 @@ def test_when_updating_endpoint_then_values_are_not_overwriten_with_defaults(cus
     assert_that(custom, has_entries(enabled=False))
 
 
+@fixtures.custom(wazo_tenant=MAIN_TENANT)
+@fixtures.custom(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.endpoints.custom(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CustomEndpoint'))
+
+    response = confd.endpoints.custom(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.custom()
 def test_delete(custom):
     response = confd.endpoints.custom(custom['id']).delete()
