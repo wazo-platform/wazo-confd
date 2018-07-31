@@ -353,3 +353,13 @@ def test_edit_multi_tenant(main, sub):
 def test_delete(sip):
     response = confd.endpoints.sip(sip['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.endpoints.sip(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+
+    response = confd.endpoints.sip(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
