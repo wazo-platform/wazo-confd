@@ -32,6 +32,7 @@ class SipList(ListResource):
 class SipItem(ItemResource):
 
     schema = SipSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.endpoints.sip.{id}.read')
     def get(self, id):

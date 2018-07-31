@@ -215,6 +215,16 @@ def test_list(sip1, sip2):
     assert_that(response.items, contains(has_entry('id', sip1['id'])))
 
 
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.endpoints.sip(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+
+    response = confd.endpoints.sip(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.endpoints.sip.post()
 
