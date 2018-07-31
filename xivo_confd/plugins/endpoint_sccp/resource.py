@@ -41,6 +41,7 @@ class SccpList(ListResource):
 class SccpItem(ItemResource):
 
     schema = SccpSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.endpoints.sccp.{id}.read')
     def get(self, id):

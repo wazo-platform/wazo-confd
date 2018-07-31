@@ -15,6 +15,7 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import (
+    errors as e,
     fixtures,
     scenarios as s,
 )
@@ -109,6 +110,16 @@ def test_list_multi_tenant(main, sub):
         response.items,
         has_items(main, sub),
     )
+
+
+@fixtures.sccp(wazo_tenant=MAIN_TENANT)
+@fixtures.sccp(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.endpoints.sccp(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
+
+    response = confd.endpoints.sccp(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_parameters():
