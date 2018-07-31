@@ -4,11 +4,11 @@
 
 from hamcrest import (
     assert_that,
-    contains,
+    empty,
     has_entries,
     has_entry,
     has_items,
-    instance_of,
+    none,
 )
 
 from . import confd
@@ -28,6 +28,11 @@ ALL_OPTIONS = [
 def test_get_errors():
     fake_sccp_get = confd.endpoints.sccp(999999).get
     yield s.check_resource_not_found, fake_sccp_get, 'SCCPEndpoint'
+
+
+def test_delete_errors():
+    fake_sccp = confd.endpoints.sccp(999999).delete
+    yield s.check_resource_not_found, fake_sccp, 'SCCPEndpoint'
 
 
 def test_post_errors():
@@ -61,49 +66,38 @@ def error_checks(url):
 
 
 @fixtures.sccp()
-def test_delete_errors(sccp):
-    url = confd.endpoints.sccp(sccp['id'])
-    url.delete()
-    yield s.check_resource_not_found, url.get, 'SCCPEndpoint'
-
-
-@fixtures.sccp()
 def test_get(sccp):
-    expected = has_entries({'id': instance_of(int),
-                            'options': contains(),
-                            'line': None})
-
     response = confd.endpoints.sccp(sccp['id']).get()
-    assert_that(response.item, expected)
+    assert_that(response.item, has_entries(
+        line=none(),
+    ))
 
 
 @fixtures.sccp()
 @fixtures.sccp()
 def test_list(sccp1, sccp2):
-    expected = has_items(has_entry('id', sccp1['id']),
-                         has_entry('id', sccp2['id']))
-
     response = confd.endpoints.sccp.get()
-    assert_that(response.items, expected)
+    assert_that(response.items, has_items(
+        has_entry('id', sccp1['id']),
+        has_entry('id', sccp2['id']),
+    ))
 
 
-def test_create_sccp_with_minimal_parameters():
-    expected = has_entries({'id': instance_of(int),
-                            'options': contains()})
-
+def test_create_minimal_parameters():
     response = confd.endpoints.sccp.post()
 
     response.assert_created('endpoint_sccp', location='endpoints/sccp')
-    assert_that(response.item, expected)
+    assert_that(response.item, has_entries(
+         options=empty(),
+    ))
 
 
-def test_create_sccp_with_all_parameters():
-    expected = has_entries({'options': has_items(*ALL_OPTIONS)
-                            })
-
+def test_create_all_parameters():
     response = confd.endpoints.sccp.post(options=ALL_OPTIONS)
 
-    assert_that(response.item, expected)
+    assert_that(response.item, has_entries(
+        options=has_items(*ALL_OPTIONS),
+    ))
 
 
 @fixtures.sccp(options=[["allow", "alaw"], ["disallow", "all"]])
@@ -113,11 +107,10 @@ def test_update_options(sccp):
         ["disallow", "opus"]
     ]
 
-    url = confd.endpoints.sccp(sccp['id'])
-    response = url.put(options=options)
+    response = confd.endpoints.sccp(sccp['id']).put(options=options)
     response.assert_updated()
 
-    response = url.get()
+    response = confd.endpoints.sccp(sccp['id']).get()
     assert_that(response.item['options'], has_items(*options))
 
 
