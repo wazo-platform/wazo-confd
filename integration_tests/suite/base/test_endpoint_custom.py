@@ -126,18 +126,19 @@ def test_create_minimal_parameters():
     response.assert_created('endpoint_custom', location='endpoints/custom')
     assert_that(response.item, has_entries({
         'id': instance_of(int),
+        'tenant_uuid': MAIN_TENANT,
         'interface': 'custom/createmin',
         'enabled': True,
     }))
 
 
 def test_create_all_parameters():
-    response = confd.endpoints.custom.post(interface='custom/createall',
-                                           enabled=False)
+    response = confd.endpoints.custom.post(interface='custom/createall', enabled=False)
 
     response.assert_created('endpoint_custom', location='endpoints/custom')
     assert_that(response.item, has_entries({
         'id': instance_of(int),
+        'tenant_uuid': MAIN_TENANT,
         'interface': 'custom/createall',
         'enabled': False
     }))

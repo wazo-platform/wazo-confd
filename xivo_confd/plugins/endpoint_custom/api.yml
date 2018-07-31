@@ -107,6 +107,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/EndpointCustomRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         enabled:
           type: boolean
           description: Endpoint can be used when it is enabled

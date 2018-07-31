@@ -12,6 +12,7 @@ INTERFACE_REGEX = r"^[a-zA-Z0-9#*./_@:-]{1,128}$"
 
 class CustomSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     interface = fields.String(validate=Regexp(INTERFACE_REGEX), required=True)
     interface_suffix = fields.String(validate=Length(max=32), allow_none=True)
     enabled = StrictBoolean()
