@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
 
 
-def add_sip(**params):
-    response = confd.endpoints.sip.post(params)
+def add_sip(wazo_tenant=None, **params):
+    response = confd.endpoints.sip.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 

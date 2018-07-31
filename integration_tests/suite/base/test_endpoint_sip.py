@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     has_entries,
@@ -10,6 +11,7 @@ from hamcrest import (
     has_items,
     has_length,
     instance_of,
+    not_,
 )
 
 from . import confd
@@ -17,6 +19,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 ALL_OPTIONS = [
@@ -158,6 +164,28 @@ def test_delete_errors(sip):
     url = confd.endpoints.sip(sip['id'])
     url.delete()
     yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+
+
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(main)), not_(has_items(sub)),
+    )
+
+    response = confd.endpoints.sip.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(sub), not_(has_items(main))),
+    )
+
+    response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.sip()
