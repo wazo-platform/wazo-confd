@@ -155,7 +155,17 @@ def test_update_options(sccp):
     assert_that(response.item['options'], has_items(*options))
 
 
+@fixtures.sccp(wazo_tenant=MAIN_TENANT)
+@fixtures.sccp(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.endpoints.sccp(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
+
+    response = confd.endpoints.sccp(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.sccp()
-def test_delete_sccp(sccp):
+def test_delete(sccp):
     response = confd.endpoints.sccp(sccp['id']).delete()
     response.assert_deleted()
