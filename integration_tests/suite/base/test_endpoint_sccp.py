@@ -127,7 +127,8 @@ def test_create_minimal_parameters():
 
     response.assert_created('endpoint_sccp', location='endpoints/sccp')
     assert_that(response.item, has_entries(
-         options=empty(),
+        tenant_uuid=MAIN_TENANT,
+        options=empty(),
     ))
 
 
@@ -135,6 +136,7 @@ def test_create_all_parameters():
     response = confd.endpoints.sccp.post(options=ALL_OPTIONS)
 
     assert_that(response.item, has_entries(
+        tenant_uuid=MAIN_TENANT,
         options=has_items(*ALL_OPTIONS),
     ))
 

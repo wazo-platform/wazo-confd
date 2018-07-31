@@ -107,6 +107,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/EndpointSccpRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         options:
           description: "Advanced configuration options. Options are appended at the\
             \ end of a \nSCCP account in the file 'sccp.conf' used by asterisk.\n\
