@@ -29,8 +29,9 @@ Changelog
   `tenant_uuid`.
 
   * `/endpoints/sip`
-  * `/trunks`
+  * `/endpoints/custom`
   * `/endpoints/sccp`
+  * `/trunks`
 
 
 18.08
