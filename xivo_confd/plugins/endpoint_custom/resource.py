@@ -32,6 +32,7 @@ class CustomList(ListResource):
 class CustomItem(ItemResource):
 
     schema = CustomSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.endpoints.custom.{id}.read')
     def get(self, id):

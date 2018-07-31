@@ -110,6 +110,16 @@ def test_list_multi_tenant(main, sub):
     )
 
 
+@fixtures.custom(wazo_tenant=MAIN_TENANT)
+@fixtures.custom(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.endpoints.custom(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CustomEndpoint'))
+
+    response = confd.endpoints.custom(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.endpoints.custom.post(interface='custom/createmin')
 
