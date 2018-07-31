@@ -162,63 +162,58 @@ def test_delete_errors(sip):
 
 @fixtures.sip()
 def test_get(sip):
-    expected = has_entries({'username': has_length(8),
-                            'secret': has_length(8),
-                            'type': 'friend',
-                            'host': 'dynamic',
-                            'options': instance_of(list),
-                            'trunk': None,
-                            'line': None,
-                            })
-
     response = confd.endpoints.sip(sip['id']).get()
-    assert_that(response.item, expected)
+    assert_that(response.item, has_entries({
+        'username': has_length(8),
+        'secret': has_length(8),
+        'type': 'friend',
+        'host': 'dynamic',
+        'options': instance_of(list),
+        'trunk': None,
+        'line': None,
+    }))
 
 
 @fixtures.sip()
 @fixtures.sip()
 def test_list(sip1, sip2):
-    expected = has_items(has_entry('id', sip1['id']),
-                         has_entry('id', sip2['id']))
-
     response = confd.endpoints.sip.get()
-    assert_that(response.items, expected)
-
-    expected = contains(has_entry('id', sip1['id']))
+    assert_that(response.items, has_items(
+        has_entry('id', sip1['id']),
+        has_entry('id', sip2['id']),
+    ))
 
     response = confd.endpoints.sip.get(search=sip1['username'])
-    assert_that(response.items, expected)
+    assert_that(response.items, contains(has_entry('id', sip1['id'])))
 
 
 def test_create_sip_with_minimal_parameters():
-    expected = has_entries({'username': has_length(8),
-                            'secret': has_length(8),
-                            'type': 'friend',
-                            'host': 'dynamic',
-                            'options': instance_of(list),
-                            })
-
     response = confd.endpoints.sip.post()
 
     response.assert_created('endpoint_sip', location='endpoints/sip')
-    assert_that(response.item, expected)
+    assert_that(response.item,  has_entries({
+        'username': has_length(8),
+        'secret': has_length(8),
+        'type': 'friend',
+        'host': 'dynamic',
+        'options': instance_of(list),
+    }))
 
 
 def test_create_sip_with_all_parameters():
-    expected = has_entries({'username': 'myusername',
-                            'secret': 'mysecret',
-                            'type': 'peer',
-                            'host': '127.0.0.1',
-                            'options': has_items(*ALL_OPTIONS)
-                            })
-
     response = confd.endpoints.sip.post(username="myusername",
                                         secret="mysecret",
                                         type="peer",
                                         host="127.0.0.1",
                                         options=ALL_OPTIONS)
 
-    assert_that(response.item, expected)
+    assert_that(response.item, has_entries({
+        'username': 'myusername',
+        'secret': 'mysecret',
+        'type': 'peer',
+        'host': '127.0.0.1',
+        'options': has_items(*ALL_OPTIONS)
+    }))
 
 
 def test_create_sip_with_additional_options():
@@ -248,11 +243,12 @@ def test_update_required_parameters(sip):
     response.assert_updated()
 
     response = url.get()
-    assert_that(response.item, has_entries({'username': 'updatedusername',
-                                            'secret': 'updatedsecret',
-                                            'type': 'peer',
-                                            'host': '127.0.0.1',
-                                            }))
+    assert_that(response.item, has_entries({
+        'username': 'updatedusername',
+        'secret': 'updatedsecret',
+        'type': 'peer',
+        'host': '127.0.0.1',
+    }))
 
 
 @fixtures.sip(options=[["allow", "gsm"], ["nat", "force_rport,comedia"]])
