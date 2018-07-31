@@ -3,18 +3,24 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_items,
     none,
+    not_,
 )
 
 from . import confd
 from ..helpers import (
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 ALL_OPTIONS = [
@@ -81,6 +87,28 @@ def test_list(sccp1, sccp2):
         has_entry('id', sccp1['id']),
         has_entry('id', sccp2['id']),
     ))
+
+
+@fixtures.sccp(wazo_tenant=MAIN_TENANT)
+@fixtures.sccp(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.endpoints.sccp.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(main)), not_(has_items(sub)),
+    )
+
+    response = confd.endpoints.sccp.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(sub), not_(has_items(main))),
+    )
+
+    response = confd.endpoints.sccp.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 def test_create_minimal_parameters():
