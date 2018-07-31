@@ -30,6 +30,7 @@ Changelog
 
   * `/endpoints/sip`
   * `/trunks`
+  * `/endpoints/sccp`
 
 
 18.08
