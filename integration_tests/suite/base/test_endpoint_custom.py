@@ -23,6 +23,11 @@ def test_get_errors():
     yield s.check_resource_not_found, fake_custom_get, 'CustomEndpoint'
 
 
+def test_delete_errors():
+    fake_custom = confd.endpoints.custom(999999).delete
+    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+
+
 def test_post_errors():
     url = confd.endpoints.custom.post
     for check in error_checks(url):
@@ -32,8 +37,6 @@ def test_post_errors():
 @fixtures.custom()
 def test_put_errors(custom):
     url = confd.endpoints.custom(custom['id']).put
-
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
 
     for check in error_checks(url):
         yield check
@@ -50,13 +53,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'interface_suffix', s.random_string(33)
     yield s.check_bogus_field_returns_error, url, 'interface_suffix', []
     yield s.check_bogus_field_returns_error, url, 'interface_suffix', {}
-
-
-@fixtures.custom()
-def test_delete_errors(custom):
-    url = confd.endpoints.custom(custom['id'])
-    url.delete()
-    yield s.check_resource_not_found, url.get, 'CustomEndpoint'
+    yield s.check_bogus_field_returns_error, url, 'enabled', None
+    yield s.check_bogus_field_returns_error, url, 'enabled', 'string'
+    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    yield s.check_bogus_field_returns_error, url, 'enabled', {}
 
 
 @fixtures.custom()
@@ -82,7 +82,7 @@ def test_list(custom1, custom2):
     ))
 
 
-def test_create_custom_minimal_parameters():
+def test_create_minimal_parameters():
     response = confd.endpoints.custom.post(interface='custom/createmin')
 
     response.assert_created('endpoint_custom', location='endpoints/custom')
@@ -93,7 +93,7 @@ def test_create_custom_minimal_parameters():
     }))
 
 
-def test_create_custom_all_parameters():
+def test_create_all_parameters():
     response = confd.endpoints.custom.post(interface='custom/createall',
                                            enabled=False)
 
@@ -105,9 +105,8 @@ def test_create_custom_all_parameters():
     }))
 
 
-def test_create_custom_accept_uppercase_interface():
+def test_create_interface_accept_uppercase_interface():
     response = confd.endpoints.custom.post(interface='Local/123@foobar')
-
     response.assert_ok()
 
 
@@ -120,7 +119,7 @@ def test_given_interface_already_exists_then_error_raised():
 
 
 @fixtures.custom(interface='custom/beforeupdate')
-def test_update_custom(custom):
+def test_update(custom):
     parameters = {
         'interface': 'custom/afterupdate',
         'interface_suffix': 'other',
@@ -142,16 +141,14 @@ def test_when_updating_custom_with_interface_that_already_exists_then_error_rais
 
 @fixtures.custom(enabled=False)
 def test_when_updating_endpoint_then_values_are_not_overwriten_with_defaults(custom):
-    url = confd.endpoints.custom(custom['id'])
-
-    response = url.put(interface="noupdateoverwrite")
+    response = confd.endpoints.custom(custom['id']).put(interface="noupdateoverwrite")
     response.assert_ok()
 
-    custom = url.get().item
+    custom = confd.endpoints.custom(custom['id']).get().item
     assert_that(custom, has_entries(enabled=False))
 
 
 @fixtures.custom()
-def test_delete_custom(custom):
+def test_delete(custom):
     response = confd.endpoints.custom(custom['id']).delete()
     response.assert_deleted()
