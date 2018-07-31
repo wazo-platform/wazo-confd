@@ -339,6 +339,16 @@ def test_update_values_other_than_host_does_not_touch_it(sip):
     assert_that(response.item, has_entries(host="static"))
 
 
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.endpoints.sip(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+
+    response = confd.endpoints.sip(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.sip()
 def test_delete(sip):
     response = confd.endpoints.sip(sip['id']).delete()
