@@ -107,6 +107,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/EndpointSipRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         secret:
           type: string
           description: SIP secret/password

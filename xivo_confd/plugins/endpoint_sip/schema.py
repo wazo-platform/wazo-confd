@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
@@ -17,6 +16,7 @@ SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 
 class SipSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     username = fields.String(validate=Regexp(USERNAME_REGEX), attribute='name')
     secret = fields.String(validate=Regexp(SECRET_REGEX))
     type = fields.String(validate=OneOf(['friend', 'peer', 'user']))

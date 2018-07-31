@@ -230,6 +230,7 @@ def test_create_minimal_parameters():
 
     response.assert_created('endpoint_sip', location='endpoints/sip')
     assert_that(response.item,  has_entries({
+        'tenant_uuid': MAIN_TENANT,
         'username': has_length(8),
         'secret': has_length(8),
         'type': 'friend',
@@ -239,13 +240,16 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    response = confd.endpoints.sip.post(username="myusername",
-                                        secret="mysecret",
-                                        type="peer",
-                                        host="127.0.0.1",
-                                        options=ALL_OPTIONS)
+    response = confd.endpoints.sip.post(
+        username="myusername",
+        secret="mysecret",
+        type="peer",
+        host="127.0.0.1",
+        options=ALL_OPTIONS,
+    )
 
     assert_that(response.item, has_entries({
+        'tenant_uuid': MAIN_TENANT,
         'username': 'myusername',
         'secret': 'mysecret',
         'type': 'peer',
