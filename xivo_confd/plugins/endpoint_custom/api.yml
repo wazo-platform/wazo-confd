@@ -8,6 +8,8 @@ paths:
       - endpoints
       - custom
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -26,6 +28,7 @@ paths:
       - endpoints
       - custom
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Custom Endpoint to create
@@ -48,6 +51,7 @@ paths:
       - endpoints
       - custom
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/customid'
       responses:
         '200':
@@ -64,6 +68,7 @@ paths:
       - endpoints
       - custom
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/customid'
       - name: body
         in: body
@@ -85,6 +90,7 @@ paths:
       - endpoints
       - custom
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/customid'
       responses:
         '204':
