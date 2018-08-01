@@ -19,6 +19,7 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import (
+    errors as e,
     fixtures,
     scenarios as s,
 )
@@ -152,6 +153,16 @@ def test_get(iax):
         'options': instance_of(list),
         'trunk': None,
     }))
+
+
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.endpoints.iax(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IAXEndpoint'))
+
+    response = confd.endpoints.iax(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 @fixtures.iax(name='search', type='friend', host='search')
