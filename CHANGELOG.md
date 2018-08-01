@@ -28,9 +28,10 @@ Changelog
   not tenant accessible will result in a 404. New readonly parameter has also been added:
   `tenant_uuid`.
 
-  * `/endpoints/sip`
   * `/endpoints/custom`
+  * `/endpoints/iax`
   * `/endpoints/sccp`
+  * `/endpoints/sip`
   * `/trunks`
 
 
