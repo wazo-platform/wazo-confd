@@ -75,6 +75,12 @@ def test_get_errors():
     yield s.check_resource_not_found, fake_iax_get, 'IAXEndpoint'
 
 
+@fixtures.iax()
+def test_delete_errors(iax):
+    fake_iax_delete = confd.endpoints.iax(999999).delete
+    yield s.check_resource_not_found, fake_iax_delete, 'IAXEndpoint'
+
+
 def test_post_errors():
     url = confd.endpoints.iax.post
     for check in error_checks(url):
@@ -131,12 +137,6 @@ def unique_error_checks(url, iax):
 
 
 @fixtures.iax()
-def test_delete_errors(iax):
-    fake_iax_delete = confd.endpoints.iax(999999).delete
-    yield s.check_resource_not_found, fake_iax_delete, 'IAXEndpoint'
-
-
-@fixtures.iax()
 def test_get(iax):
     response = confd.endpoints.iax(iax['id']).get()
     assert_that(response.item, has_entries({
@@ -152,9 +152,11 @@ def test_get(iax):
 @fixtures.iax(name='hidden', type='peer', host='hidden')
 def test_search(iax, hidden):
     url = confd.endpoints.iax
-    searches = {'name': 'search',
-                'type': 'friend',
-                'host': 'search'}
+    searches = {
+        'name': 'search',
+        'type': 'friend',
+        'host': 'search'
+    }
 
     for field, term in searches.items():
         yield check_search, url, iax, hidden, field, term
@@ -196,15 +198,17 @@ def test_create_minimal_parameters():
         'name': has_length(8),
         'type': 'friend',
         'host': 'dynamic',
-        'options': instance_of(list)}
+        'options': instance_of(list)},
     ))
 
 
 def test_create_all_parameters():
-    response = confd.endpoints.iax.post(name="myname",
-                                        type="peer",
-                                        host="127.0.0.1",
-                                        options=ALL_OPTIONS)
+    response = confd.endpoints.iax.post(
+        name="myname",
+        type="peer",
+        host="127.0.0.1",
+        options=ALL_OPTIONS,
+    )
 
     assert_that(response.item, has_entries({
         'name': 'myname',
