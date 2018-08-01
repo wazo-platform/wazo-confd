@@ -116,6 +116,18 @@ def test_dissociate_not_associated(trunk, iax):
     response.assert_deleted()
 
 
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_iax, sub_iax):
+    response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.iax(main_iax['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('IAXEndpoint'))
+
+
 @fixtures.trunk()
 @fixtures.iax()
 def test_get_endpoint_iax_relation(trunk, iax):

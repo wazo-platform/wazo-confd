@@ -170,6 +170,18 @@ def test_dissociate_not_associated(trunk, custom):
     response.assert_deleted()
 
 
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.custom(wazo_tenant=MAIN_TENANT)
+@fixtures.custom(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
+    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.custom(main_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CustomEndpoint'))
+
+
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_endpoint_custom_relation(trunk, custom):

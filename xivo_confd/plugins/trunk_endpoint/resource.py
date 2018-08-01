@@ -58,8 +58,9 @@ class TrunkEndpointAssociation(TrunkEndpoint):
         return '', 204
 
     def delete(self, trunk_id, endpoint_id):
-        trunk = self.trunk_dao.get(trunk_id)
-        endpoint = self.endpoint_dao.get(endpoint_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
+        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(trunk, endpoint)
         return '', 204
 

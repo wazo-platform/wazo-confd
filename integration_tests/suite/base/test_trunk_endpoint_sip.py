@@ -161,6 +161,18 @@ def test_dissociate_not_associated(trunk, sip):
     response.assert_deleted()
 
 
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
+    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.sip(main_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SIPEndpoint'))
+
+
 @fixtures.trunk()
 @fixtures.sip()
 def test_get_endpoint_sip_relation(trunk, sip):
