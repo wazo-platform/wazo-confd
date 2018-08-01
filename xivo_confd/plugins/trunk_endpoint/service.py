@@ -18,12 +18,6 @@ class TrunkEndpointService(object):
         self.validator = validator
         self.notifier = notifier
 
-    def get_trunk(self, trunk_id):
-        return self.trunk_dao.get(trunk_id)
-
-    def get_endpoint(self, endpoint_id):
-        return self.endpoint_dao.get(endpoint_id)
-
     def get_association_from_trunk(self, trunk_id):
         trunk = self.trunk_dao.get(trunk_id)
         if not trunk.is_associated(self.endpoint):
