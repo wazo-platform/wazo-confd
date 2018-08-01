@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 from hamcrest import (
+    all_of,
     assert_that,
     has_entries,
     has_entry,
@@ -13,12 +14,17 @@ from hamcrest import (
     has_length,
     instance_of,
     is_not,
+    not_,
 )
 
 from . import confd
 from ..helpers import (
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 ALL_OPTIONS = [
@@ -188,6 +194,28 @@ def test_sorting_offset_limit(iax1, iax2):
     yield s.check_offset_legacy, url, iax1, iax2, 'name', 'sort'
 
     yield s.check_limit, url, iax1, iax2, 'name', 'sort'
+
+
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(main)), not_(has_items(sub)),
+    )
+
+    response = confd.endpoints.iax.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(sub), not_(has_items(main))),
+    )
+
+    response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 def test_create_minimal_parameters():

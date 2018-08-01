@@ -5,8 +5,8 @@
 from . import confd
 
 
-def add_iax(**params):
-    response = confd.endpoints.iax.post(params)
+def add_iax(wazo_tenant=None, **params):
+    response = confd.endpoints.iax.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 
