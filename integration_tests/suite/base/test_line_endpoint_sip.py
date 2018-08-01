@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import assert_that, has_entries
+from hamcrest import (
+    assert_that,
+    has_entries,
+)
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
-from ..helpers import helpers as h
 from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    helpers as h,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 @fixtures.line()
