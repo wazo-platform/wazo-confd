@@ -8,13 +8,18 @@ from hamcrest import (
     none,
 )
 
+from . import confd
 from ..helpers import (
-    scenarios as s,
+    associations as a,
     errors as e,
     fixtures,
-    associations as a,
+    scenarios as s,
 )
-from . import confd
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
+
 
 FAKE_ID = 999999999
 
@@ -79,6 +84,21 @@ def test_associate_when_register_sip(trunk, iax, register):
     with a.trunk_register_sip(trunk, register):
         response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_trunk, sub_trunk, main_iax, sub_iax):
+    response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.iax(main_iax['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('IAXEndpoint'))
+
+    response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.trunk()
