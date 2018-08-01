@@ -341,6 +341,16 @@ def test_edit_multi_tenant(main, sub):
 
 
 @fixtures.iax()
-def test_delete_iax(iax):
+def test_delete(iax):
     response = confd.endpoints.iax(iax['id']).delete()
+    response.assert_deleted()
+
+
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.endpoints.iax(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IAXEndpoint'))
+
+    response = confd.endpoints.iax(sub['id']).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
