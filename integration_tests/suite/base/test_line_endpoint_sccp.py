@@ -168,6 +168,20 @@ def test_dissociate_when_associated_to_extension(line, sccp, extension):
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line(context='main-internal')
+@fixtures.line(context='sub-internal')
+@fixtures.sccp(wazo_tenant=MAIN_TENANT)
+@fixtures.sccp(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp):
+    response = confd.lines(main_line['id']).endpoints.sccp(sub_sccp['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+    response = confd.lines(sub_line['id']).endpoints.sccp(main_sccp['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SCCPEndpoint'))
+
+
 @fixtures.line()
 @fixtures.sccp()
 def test_get_endpoint_sccp_relation(line, sccp):

@@ -66,8 +66,9 @@ class LineEndpointAssociation(LineEndpoint):
         return '', 204
 
     def delete(self, line_id, endpoint_id):
-        line = self.line_dao.get(line_id)
-        endpoint = self.endpoint_dao.get(endpoint_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(line, endpoint)
         return '', 204
 

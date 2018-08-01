@@ -177,6 +177,20 @@ def test_dissociate_when_associated_to_extension(line, sip, extension):
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line(context='main-internal')
+@fixtures.line(context='sub-internal')
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sip, sub_sip):
+    response = confd.lines(main_line['id']).endpoints.sip(sub_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+    response = confd.lines(sub_line['id']).endpoints.sip(main_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SIPEndpoint'))
+
+
 @fixtures.line()
 @fixtures.sip()
 def test_get_endpoint_sip_relation(line, sip):
