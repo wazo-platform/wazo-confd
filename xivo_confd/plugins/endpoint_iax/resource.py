@@ -32,6 +32,7 @@ class IAXList(ListResource):
 class IAXItem(ItemResource):
 
     schema = IAXSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.endpoints.iax.{id}.read')
     def get(self, id):

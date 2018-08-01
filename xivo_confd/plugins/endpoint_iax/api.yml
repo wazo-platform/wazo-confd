@@ -107,6 +107,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/EndpointIAXRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         type:
           type: string
           enum:

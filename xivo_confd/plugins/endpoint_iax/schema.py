@@ -12,6 +12,7 @@ NAME_REGEX = r"^[a-zA-Z0-9_-]{1,40}$"
 
 class IAXSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Regexp(NAME_REGEX))
     type = fields.String(validate=OneOf(['friend', 'peer', 'user']))
     host = fields.String(validate=Length(max=255))
