@@ -17,12 +17,6 @@ class LineEndpointService(object):
         self.endpoint_service = endpoint_service
         self.validator = validator
 
-    def get_line(self, line_id):
-        return self.line_service.get(line_id)
-
-    def get_endpoint(self, endpoint_id):
-        return self.endpoint_service.get(endpoint_id)
-
     def get_association_from_line(self, line_id):
         line = self.line_service.get(line_id)
         if not line.is_associated(self.endpoint):

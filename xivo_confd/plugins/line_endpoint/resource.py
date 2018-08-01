@@ -51,15 +51,20 @@ class LineEndpoint(ConfdResource):
 
 class LineEndpointAssociation(LineEndpoint):
 
+    def __init__(self, service, line_dao, endpoint_dao):
+        super(LineEndpointAssociation, self).__init__(service)
+        self.line_dao = line_dao
+        self.endpoint_dao = endpoint_dao
+
     def put(self, line_id, endpoint_id):
-        line = self.service.get_line(line_id)
-        endpoint = self.service.get_endpoint(endpoint_id)
+        line = self.line_dao.get(line_id)
+        endpoint = self.endpoint_dao.get(endpoint_id)
         self.service.associate(line, endpoint)
         return '', 204
 
     def delete(self, line_id, endpoint_id):
-        line = self.service.get_line(line_id)
-        endpoint = self.service.get_endpoint(endpoint_id)
+        line = self.line_dao.get(line_id)
+        endpoint = self.endpoint_dao.get(endpoint_id)
         self.service.dissociate(line, endpoint)
         return '', 204
 
