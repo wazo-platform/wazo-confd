@@ -127,6 +127,23 @@ def test_associate_when_trunk_already_associated(line, trunk, sip):
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line(context='main-internal')
+@fixtures.line(context='sub-internal')
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(_, __, main_line, sub_line, main_sip, sub_sip):
+    response = confd.lines(main_line['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+    response = confd.lines(sub_line['id']).endpoints.sip(main_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SIPEndpoint'))
+
+    response = confd.lines(main_line['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.line()
 @fixtures.sip()
 def test_dissociate(line, sip):

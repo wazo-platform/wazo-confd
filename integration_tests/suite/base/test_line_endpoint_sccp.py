@@ -118,6 +118,23 @@ def test_associate_multiple_lines_to_sccp(line1, line2, sccp):
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.line(context='main-internal')
+@fixtures.line(context='sub-internal')
+@fixtures.sccp(wazo_tenant=MAIN_TENANT)
+@fixtures.sccp(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp):
+    response = confd.lines(main_line['id']).endpoints.sccp(sub_sccp['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Line'))
+
+    response = confd.lines(sub_line['id']).endpoints.sccp(main_sccp['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SCCPEndpoint'))
+
+    response = confd.lines(main_line['id']).endpoints.sccp(sub_sccp['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.line()
 @fixtures.sccp()
 def test_dissociate(line, sccp):
