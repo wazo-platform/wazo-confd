@@ -294,6 +294,16 @@ def test_delete(moh):
     response.assert_match(404, e.not_found(resource='MOH'))
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.moh(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = confd.moh(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.moh()
 def test_add_update_delete_filename(moh):
     client = _new_moh_file_client()
