@@ -184,7 +184,10 @@ def test_create_minimal_parameters():
     response = confd.moh.post(name='moh1', mode='files')
     response.assert_created('moh')
 
-    assert_that(response.item, has_entries(uuid=is_not(empty())))
+    assert_that(response.item, has_entries(
+        uuid=is_not(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
@@ -200,6 +203,7 @@ def test_create_all_parameters():
     response.assert_created('moh')
 
     assert_that(response.item, has_entries(
+        tenant_uuid=MAIN_TENANT,
         name='moh1',
         label='MOH 1',
         mode='custom',
