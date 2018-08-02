@@ -64,9 +64,11 @@ def test_associate_multiple(outcall, trunk1, trunk2, trunk3):
 
     response = confd.outcalls(outcall['id']).get()
     assert_that(response.item, has_entries(
-        trunks=contains(has_entries(id=trunk2['id']),
-                        has_entries(id=trunk3['id']),
-                        has_entries(id=trunk1['id']))
+        trunks=contains(
+            has_entries(id=trunk2['id']),
+            has_entries(id=trunk3['id']),
+            has_entries(id=trunk1['id']),
+        )
     ))
 
 
@@ -82,30 +84,28 @@ def test_associate_same_trunk(outcall, trunk):
 @fixtures.trunk()
 @fixtures.trunk()
 def test_get_trunks_associated_to_outcall(outcall, trunk1, trunk2):
-    expected = has_entries(trunks=contains(has_entries(id=trunk2['id'],
-                                                       endpoint_sip=none(),
-                                                       endpoint_custom=none()),
-                                           has_entries(id=trunk1['id'],
-                                                       endpoint_sip=none(),
-                                                       endpoint_custom=none())))
-
     with a.outcall_trunk(outcall, trunk2, trunk1):
         response = confd.outcalls(outcall['id']).get()
-        assert_that(response.item, expected)
+        assert_that(response.item, has_entries(
+            trunks=contains(
+                has_entries(id=trunk2['id'], endpoint_sip=none(), endpoint_custom=none()),
+                has_entries(id=trunk1['id'], endpoint_sip=none(), endpoint_custom=none()),
+            )
+        ))
 
 
 @fixtures.outcall()
 @fixtures.outcall()
 @fixtures.trunk()
 def test_get_outcalls_associated_to_trunk(outcall1, outcall2, trunk):
-    expected = has_entries(outcalls=contains(has_entries(id=outcall2['id'],
-                                                         name=outcall2['name']),
-                                             has_entries(id=outcall1['id'],
-                                                         name=outcall1['name'])))
-
     with a.outcall_trunk(outcall2, trunk), a.outcall_trunk(outcall1, trunk):
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, expected)
+        assert_that(response.item, has_entries(
+            outcalls=contains(
+                has_entries(id=outcall2['id'], name=outcall2['name']),
+                has_entries(id=outcall1['id'], name=outcall1['name']),
+            )
+        ))
 
 
 @fixtures.outcall()
