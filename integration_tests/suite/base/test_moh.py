@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     empty,
@@ -10,7 +11,9 @@ from hamcrest import (
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
+    not_,
 )
 
 from . import BaseIntegrationTest, confd
@@ -18,6 +21,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 NOT_FOUND_UUID = 'uuid-not-found'
@@ -125,6 +132,28 @@ def test_sorting_offset_limit(moh1, moh2):
     yield s.check_offset_legacy, url, moh1, moh2, 'name', 'sort', 'uuid'
 
     yield s.check_limit, url, moh1, moh2, 'name', 'sort', 'uuid'
+
+
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.moh.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.moh.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.moh.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.moh()

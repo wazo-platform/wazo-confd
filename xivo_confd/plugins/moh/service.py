@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.resources.moh import dao as moh_dao
@@ -16,8 +16,8 @@ class MohService(CRUDService):
         super(MohService, self).__init__(dao, validator, notifier)
         self._storage = storage
 
-    def search(self, parameters):
-        total, resources = self.dao.search(**parameters)
+    def search(self, parameters, tenant_uuids=None):
+        total, resources = self.dao.search(tenant_uuids=tenant_uuids, **parameters)
         for resource in resources:
             self._update_resource(resource)
         return total, resources
