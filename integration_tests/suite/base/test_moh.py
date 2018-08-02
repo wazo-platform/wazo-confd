@@ -334,6 +334,30 @@ def test_add_update_delete_filename(moh):
     assert_that(response.item, has_entries(files=empty()))
 
 
+@fixtures.moh(tenant_uuid=MAIN_TENANT)
+def test_add_update_delete_filename_multi_tenant(moh):
+    client = _new_moh_file_client()
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content', wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    # valid tenant
+    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content', wazo_tenant=MAIN_TENANT)
+    response.assert_status(204)
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.raw, equal_to('content'))
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.moh()
 def test_add_filename_errors(moh):
     client = _new_moh_file_client()
@@ -354,7 +378,7 @@ def _new_moh_file_client():
         return data['content']
 
     return BaseIntegrationTest.new_client(
-        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": "valid-token"},
+        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": "valid-token-multitenant"},
         encoder=encoder,
     )
 

@@ -49,23 +49,28 @@ class MohItem(ItemResource):
 
 class MohFileItem(ConfdResource):
 
+    has_tenant_uuid = True
+
     def __init__(self, service):
         self.service = service
 
     @required_acl('confd.moh.{uuid}.files.{filename}.read')
     def get(self, uuid, filename):
-        moh = self.service.get(uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        moh = self.service.get(uuid, tenant_uuids=tenant_uuids)
         response = self.service.load_file(moh, filename)
         return response
 
     @required_acl('confd.moh.{uuid}.files.{filename}.update')
     def put(self, uuid, filename):
-        moh = self.service.get(uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        moh = self.service.get(uuid, tenant_uuids=tenant_uuids)
         self.service.save_file(moh, filename, request.data)
         return '', 204
 
     @required_acl('confd.moh.{uuid}.files.{filename}.delete')
     def delete(self, uuid, filename):
-        moh = self.service.get(uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        moh = self.service.get(uuid, tenant_uuids=tenant_uuids)
         self.service.delete_file(moh, filename)
         return '', 204
