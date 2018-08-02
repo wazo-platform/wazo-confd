@@ -276,6 +276,16 @@ def test_edit_custom_mode_without_application(moh):
     response.assert_status(400)
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.moh(main['uuid']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = confd.moh(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.moh()
 def test_delete(moh):
     response = confd.moh(moh['uuid']).delete()
