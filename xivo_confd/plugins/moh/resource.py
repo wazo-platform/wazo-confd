@@ -32,6 +32,7 @@ class MohList(ListResource):
 class MohItem(ItemResource):
 
     schema = MohSchemaPUT
+    has_tenant_uuid = True
 
     @required_acl('confd.moh.{uuid}.read')
     def get(self, uuid):

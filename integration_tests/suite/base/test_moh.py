@@ -170,6 +170,16 @@ def test_get(moh):
     ))
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.moh(main['uuid']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = confd.moh(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.moh.post(name='moh1', mode='files')
     response.assert_created('moh')

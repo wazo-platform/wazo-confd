@@ -22,8 +22,8 @@ class MohService(CRUDService):
             self._update_resource(resource)
         return total, resources
 
-    def get(self, resource_id):
-        resource = self.dao.get(resource_id)
+    def get(self, resource_id, tenant_uuids=None):
+        resource = self.dao.get(resource_id, tenant_uuids=tenant_uuids)
         self._update_resource(resource)
         return resource
 
