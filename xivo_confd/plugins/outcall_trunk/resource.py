@@ -24,6 +24,7 @@ class TrunksSchema(BaseSchema):
 class OutcallTrunkList(ConfdResource):
 
     schema = TrunksSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, outcall_dao, trunk_dao):
         super(OutcallTrunkList, self).__init__()
@@ -33,10 +34,11 @@ class OutcallTrunkList(ConfdResource):
 
     @required_acl('confd.outcalls.{outcall_id}.trunks.update')
     def put(self, outcall_id):
-        outcall = self.outcall_dao.get(outcall_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
         try:
-            trunks = [self.trunk_dao.get(ot['id']) for ot in form['trunks']]
+            trunks = [self.trunk_dao.get(trunk['id'], tenant_uuids=tenant_uuids) for trunk in form['trunks']]
         except NotFoundError as e:
             raise errors.param_not_found('trunks', 'Trunk', **e.metadata)
 
