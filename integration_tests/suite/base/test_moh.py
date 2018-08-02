@@ -2,21 +2,23 @@
 # Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from . import BaseIntegrationTest
-from . import confd
+from hamcrest import (
+    assert_that,
+    contains,
+    empty,
+    equal_to,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+)
 
-
-from hamcrest import (assert_that,
-                      contains,
-                      empty,
-                      equal_to,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not)
+from . import BaseIntegrationTest, confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 NOT_FOUND_UUID = 'uuid-not-found'
 
@@ -88,8 +90,10 @@ def unique_error_checks(url, moh):
 @fixtures.moh(name='hidden', label='hidden')
 def test_search(visible, hidden):
     url = confd.moh
-    searches = {'name': 'visible',
-                'label': 'hello'}
+    searches = {
+        'name': 'visible',
+        'label': 'hello',
+    }
 
     for field, term in searches.items():
         yield check_search, url, visible, hidden, field, term
@@ -126,13 +130,15 @@ def test_sorting_offset_limit(moh1, moh2):
 @fixtures.moh()
 def test_get(moh):
     response = confd.moh(moh['uuid']).get()
-    assert_that(response.item, has_entries(uuid=moh['uuid'],
-                                           name=moh['name'],
-                                           label=moh['label'],
-                                           mode=moh['mode'],
-                                           application=moh['application'],
-                                           sort=moh['sort'],
-                                           files=empty()))
+    assert_that(response.item, has_entries(
+        uuid=moh['uuid'],
+        name=moh['name'],
+        label=moh['label'],
+        mode=moh['mode'],
+        application=moh['application'],
+        sort=moh['sort'],
+        files=empty(),
+    ))
 
 
 def test_create_minimal_parameters():
@@ -145,19 +151,23 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    response = confd.moh.post(name='moh1',
-                              label='MOH 1',
-                              mode='custom',
-                              application='/usr/bin/mpg123 xxx',
-                              sort='alphabetical')
+    response = confd.moh.post(
+        name='moh1',
+        label='MOH 1',
+        mode='custom',
+        application='/usr/bin/mpg123 xxx',
+        sort='alphabetical',
+    )
     response.assert_created('moh')
 
-    assert_that(response.item, has_entries(name='moh1',
-                                           label='MOH 1',
-                                           mode='custom',
-                                           application='/usr/bin/mpg123 xxx',
-                                           sort='alphabetical',
-                                           files=empty()))
+    assert_that(response.item, has_entries(
+        name='moh1',
+        label='MOH 1',
+        mode='custom',
+        application='/usr/bin/mpg123 xxx',
+        sort='alphabetical',
+        files=empty(),
+    ))
 
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
@@ -271,8 +281,7 @@ def test_add_filename_errors(moh):
     ]
     for filename in filenames:
         response = client.url.moh(moh['uuid']).files(filename).put(content='content is not checked')
-        assert_that(response.status, equal_to(404),
-                    'unexpected status for MOH filename {}'.format(filename))
+        assert_that(response.status, equal_to(404), 'unexpected status for MOH filename {}'.format(filename))
 
 
 def _new_moh_file_client():
@@ -281,8 +290,10 @@ def _new_moh_file_client():
             return None
         return data['content']
 
-    return BaseIntegrationTest.new_client(headers={"Content-Type": "application/octet-stream",
-                                                   "X-Auth-Token": "valid-token"}, encoder=encoder)
+    return BaseIntegrationTest.new_client(
+        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": "valid-token"},
+        encoder=encoder,
+    )
 
 
 @fixtures.moh()
