@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
-from ..helpers.config import INCALL_CONTEXT, CONTEXT
-from . import confd
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
 
+from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    INCALL_CONTEXT,
+    CONTEXT,
+)
 
 FAKE_ID = 999999999
 
@@ -129,9 +136,11 @@ def test_get_parking_lot_relation(parking_lot, extension):
     with a.parking_lot_extension(parking_lot, extension):
         response = confd.parkinglots(parking_lot['id']).get()
         assert_that(response.item, has_entries(
-            extensions=contains(has_entries(id=extension['id'],
-                                            exten=extension['exten'],
-                                            context=extension['context']))
+            extensions=contains(has_entries(
+                id=extension['id'],
+                exten=extension['exten'],
+                context=extension['context'],
+            ))
         ))
 
 
@@ -141,8 +150,10 @@ def test_get_extension_relation(extension, parking_lot):
     with a.parking_lot_extension(parking_lot, extension):
         response = confd.extensions(extension['id']).get()
         assert_that(response.item, has_entries(
-            parking_lot=has_entries(id=parking_lot['id'],
-                                    name=parking_lot['name'])
+            parking_lot=has_entries(
+                id=parking_lot['id'],
+                name=parking_lot['name'],
+            )
         ))
 
 
