@@ -172,7 +172,10 @@ def test_create_minimal_parameters():
     response = confd.parkinglots.post(slots_start='701', slots_end='750')
     response.assert_created('parkinglots')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(
+        id=not_(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.parkinglots(response.item['id']).delete().assert_deleted()
 
@@ -188,9 +191,8 @@ def test_create_all_parameters():
 
     response = confd.parkinglots.post(**parameters)
     response.assert_created('parkinglots')
-    response = confd.parkinglots(response.item['id']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.parkinglots(response.item['id']).delete().assert_deleted()
 

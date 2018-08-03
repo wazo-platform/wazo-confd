@@ -11,6 +11,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class ParkingLotSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(allow_none=True, validate=Length(max=128))
     slots_start = fields.String(validate=(Length(max=40), Predicate('isdigit')), required=True)
     slots_end = fields.String(validate=(Length(max=40), Predicate('isdigit')), required=True)

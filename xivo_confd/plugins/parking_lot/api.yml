@@ -100,6 +100,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/ParkingLotRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         slots_start:
           type: string
           description: Starting extension to park calls
