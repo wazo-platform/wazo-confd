@@ -16,8 +16,10 @@ from ..helpers import (
     scenarios as s,
 )
 from ..helpers.config import (
-    INCALL_CONTEXT,
     CONTEXT,
+    INCALL_CONTEXT,
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -113,6 +115,23 @@ def test_associate_when_other_extension_exists(parking_lot, extension1, extensio
 def test_associate_when_exten_is_pattern(parking_lot, extension):
     response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
     response.assert_status(400)
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
+@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
+@fixtures.extension(context='main-internal')
+@fixtures.extension(context='sub-internal')
+def test_associate_multi_tenant(_, __, main_pl, sub_pl, main_extension, sub_extension):
+    response = confd.parkinglots(sub_pl['id']).extensions(main_extension['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.parkinglots(main_pl['id']).extensions(sub_extension['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('ParkingLot'))
+
+    response = confd.parkinglots(main_pl['id']).extensions(sub_extension['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.parking_lot()

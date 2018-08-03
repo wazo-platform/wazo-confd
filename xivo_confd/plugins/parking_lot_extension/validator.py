@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -12,12 +12,20 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
 
     def validate(self, parking_lot, extension):
+        self.validate_same_tenant(parking_lot, extension)
         self.validate_parking_lot_not_already_associated(parking_lot)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
         self.validate_extension_is_not_pattern(extension)
         self.validate_slots_do_not_conflict_with_extension_context(parking_lot, extension)
+
+    def validate_same_tenant(self, parking_lot, extension):
+        if extension.tenant_uuid != parking_lot.tenant_uuid:
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                parking_lot_tenant_uuid=parking_lot.tenant_uuid,
+            )
 
     def validate_parking_lot_not_already_associated(self, parking_lot):
         if parking_lot.extensions:
