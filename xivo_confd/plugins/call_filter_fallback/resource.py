@@ -28,7 +28,8 @@ class CallFilterFallbackList(ConfdResource):
 
     @required_acl('confd.callfilters.{call_filter_id}.fallbacks.update')
     def put(self, call_filter_id):
-        call_filter = self.call_filter_dao.get(call_filter_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
         fallbacks = self.schema().load(request.get_json()).data
         self.service.edit(call_filter, fallbacks)
         return '', 204

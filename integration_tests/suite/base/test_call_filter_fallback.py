@@ -92,6 +92,16 @@ def test_edit_to_none(call_filter):
     assert_that(response.item, has_entries(noanswer_destination=None))
 
 
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).fallbacks.put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).fallbacks.put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.call_filter()
 @fixtures.meetme()
 @fixtures.ivr()
