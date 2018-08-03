@@ -12,8 +12,13 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -90,6 +95,30 @@ def test_get_users_associated_to_paging(paging, user1, user2):
                 has_entries(uuid=user1['uuid'], firstname=user1['firstname'], lastname=user1['lastname']))
             )
         ))
+
+
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_paging, sub_paging, main_user, sub_user):
+    response = confd.pagings(main_paging['id']).callers.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('Paging'))
+
+    response = confd.pagings(sub_paging['id']).callers.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('User'))
+
+    response = confd.pagings(main_paging['id']).callers.users.put(
+        users=[{'uuid': sub_user['uuid']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.paging()
