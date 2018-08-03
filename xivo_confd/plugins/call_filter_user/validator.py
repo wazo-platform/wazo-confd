@@ -39,8 +39,17 @@ class CallFilterRecipientUserAssociationValidator(ValidatorAssociation):
 class CallFilterSurrogateUserAssociationValidator(ValidatorAssociation):
 
     def validate(self, call_filter, users):
+        for user in users:
+            self.validate_same_tenant(call_filter, user)
         self.validate_no_duplicate_user(users)
         self.validate_no_recipient_user(call_filter, users)
+
+    def validate_same_tenant(self, call_filter, user):
+        if call_filter.tenant_uuid != user.tenant_uuid:
+            raise errors.different_tenants(
+                call_filter_tenant_uuid=call_filter.tenant_uuid,
+                user_tenant_uuid=user.tenant_uuid
+            )
 
     def validate_no_duplicate_user(self, users):
         if len(users) != len(set(users)):
