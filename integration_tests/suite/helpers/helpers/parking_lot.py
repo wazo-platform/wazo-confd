@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from . import confd
@@ -11,8 +11,8 @@ def generate_parking_lot(**parameters):
     return add_parking_lot(**parameters)
 
 
-def add_parking_lot(**parameters):
-    response = confd.parkinglots.post(parameters)
+def add_parking_lot(wazo_tenant=None, **parameters):
+    response = confd.parkinglots.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 
