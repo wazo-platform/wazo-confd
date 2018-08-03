@@ -45,10 +45,11 @@ class PagingMemberUserItem(PagingUserItem):
 
     @required_acl('confd.pagings.{paging_id}.members.users.update')
     def put(self, paging_id):
-        paging = self.paging_dao.get(paging_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        paging = self.paging_dao.get(paging_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
         try:
-            users = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+            users = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids) for user in form['users']]
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 
