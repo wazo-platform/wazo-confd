@@ -7,6 +7,8 @@ paths:
       tags:
       - callfilters
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - callfilters
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Call Filter to create
@@ -45,6 +48,7 @@ paths:
       tags:
       - callfilters
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callfilterid'
       responses:
         '200':
@@ -60,6 +64,7 @@ paths:
       tags:
       - callfilters
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callfilterid'
       - name: body
         in: body
@@ -84,6 +89,7 @@ paths:
       tags:
       - callfilters
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callfilterid'
       responses:
         '204':
