@@ -17,6 +17,7 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import (
+    errors as e,
     fixtures,
     scenarios as s,
 )
@@ -178,6 +179,16 @@ def test_get(call_filter):
             noanswer_destination=none()
         ),
     ))
+
+
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_parameters():

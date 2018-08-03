@@ -32,6 +32,7 @@ class CallFilterList(ListResource):
 class CallFilterItem(ItemResource):
 
     schema = CallFilterSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.callfilters.{id}.read')
     def get(self, id):
