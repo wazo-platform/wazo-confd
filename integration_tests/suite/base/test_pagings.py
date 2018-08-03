@@ -264,6 +264,16 @@ def test_delete(paging):
     response.assert_match(404, e.not_found(resource='Paging'))
 
 
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.pagings(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Paging'))
+
+    response = confd.pagings(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.paging()
 def test_bus_events(paging):
     yield s.check_bus_event, 'config.pagings.created', confd.pagings.post, {'number': '666'}
