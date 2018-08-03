@@ -149,6 +149,20 @@ def test_dissociate_not_associated(parking_lot, extension):
     response.assert_deleted()
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
+@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
+@fixtures.extension(context='main-internal')
+@fixtures.extension(context='sub-internal')
+def test_dissociate_multi_tenant(_, __, main_pl, sub_pl, main_extension, sub_extension):
+    response = confd.parkinglots(sub_pl['id']).extensions(main_extension['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.parkinglots(main_pl['id']).extensions(sub_extension['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('ParkingLot'))
+
+
 @fixtures.parking_lot()
 @fixtures.extension()
 def test_get_parking_lot_relation(parking_lot, extension):
