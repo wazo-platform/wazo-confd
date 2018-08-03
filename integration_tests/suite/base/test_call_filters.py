@@ -271,6 +271,16 @@ def test_edit_all_parameters(call_filter):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.call_filter()
 def test_delete(call_filter):
     response = confd.callfilters(call_filter['id']).delete()
