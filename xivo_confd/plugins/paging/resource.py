@@ -32,6 +32,7 @@ class PagingList(ListResource):
 class PagingItem(ItemResource):
 
     schema = PagingSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.pagings.{id}.read')
     def get(self, id):

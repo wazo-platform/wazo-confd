@@ -175,6 +175,16 @@ def test_get(paging):
     ))
 
 
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.pagings(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Paging'))
+
+    response = confd.pagings(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.pagings.post(number='123')
     response.assert_created('pagings')
