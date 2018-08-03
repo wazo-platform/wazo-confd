@@ -244,6 +244,16 @@ def test_delete(parking_lot):
     response.assert_match(404, e.not_found(resource='ParkingLot'))
 
 
+@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
+@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.parkinglots(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='ParkingLot'))
+
+    response = confd.parkinglots(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.parking_lot()
 def test_bus_events(parking_lot):
     yield s.check_bus_event, 'config.parkinglots.created', confd.parkinglots.post, {'slots_start': '999',
