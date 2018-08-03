@@ -286,3 +286,13 @@ def test_delete(call_filter):
     response = confd.callfilters(call_filter['id']).delete()
     response.assert_deleted()
     confd.callfilters(call_filter['id']).get().assert_status(404)
+
+
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
