@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -17,6 +19,10 @@ from . import confd
 from ..helpers import (
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -126,6 +132,28 @@ def test_sorting_offset_limit(call_filter1, call_filter2):
     yield s.check_offset_legacy, url, call_filter1, call_filter2, 'name', 'sort'
 
     yield s.check_limit, url, call_filter1, call_filter2, 'name', 'sort'
+
+
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.callfilters.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.callfilters.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.callfilters.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.call_filter()
