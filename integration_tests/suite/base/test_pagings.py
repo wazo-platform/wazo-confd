@@ -189,7 +189,10 @@ def test_create_minimal_parameters():
     response = confd.pagings.post(number='123')
     response.assert_created('pagings')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(
+        id=not_(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.pagings(response.item['id']).delete().assert_deleted()
 
@@ -211,7 +214,7 @@ def test_create_all_parameters():
     response.assert_created('pagings')
     response = confd.pagings(response.item['id']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.pagings(response.item['id']).delete().assert_deleted()
 
