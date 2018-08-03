@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    not_,
+)
 
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      not_)
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 def test_get_errors():
@@ -88,9 +92,11 @@ def unique_error_checks(url, paging):
 @fixtures.paging(name='hidden', number='456', announce_sound='hidden')
 def test_search(paging, hidden):
     url = confd.pagings
-    searches = {'name': 'search',
-                'number': '123',
-                'announce_sound': 'search'}
+    searches = {
+        'name': 'search',
+        'number': '123',
+        'announce_sound': 'search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, paging, hidden, field, term
@@ -127,16 +133,18 @@ def test_sort_offset_limit(paging1, paging2):
 @fixtures.paging()
 def test_get(paging):
     response = confd.pagings(paging['id']).get()
-    assert_that(response.item, has_entries(id=paging['id'],
-                                           name=paging['name'],
-                                           number=paging['number'],
-                                           announce_caller=paging['announce_caller'],
-                                           announce_sound=paging['announce_sound'],
-                                           caller_notification=paging['caller_notification'],
-                                           duplex=paging['duplex'],
-                                           ignore_forward=paging['ignore_forward'],
-                                           record=paging['record'],
-                                           enabled=paging['enabled']))
+    assert_that(response.item, has_entries(
+        id=paging['id'],
+        name=paging['name'],
+        number=paging['number'],
+        announce_caller=paging['announce_caller'],
+        announce_sound=paging['announce_sound'],
+        caller_notification=paging['caller_notification'],
+        duplex=paging['duplex'],
+        ignore_forward=paging['ignore_forward'],
+        record=paging['record'],
+        enabled=paging['enabled'],
+    ))
 
 
 def test_create_minimal_parameters():
@@ -149,15 +157,17 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyPaging',
-                  'number': '123',
-                  'announce_caller': False,
-                  'announce_sound': 'sound',
-                  'caller_notification': True,
-                  'duplex': True,
-                  'ignore_forward': True,
-                  'record': True,
-                  'enabled': False}
+    parameters = {
+        'name': 'MyPaging',
+        'number': '123',
+        'announce_caller': False,
+        'announce_sound': 'sound',
+        'caller_notification': True,
+        'duplex': True,
+        'ignore_forward': True,
+        'record': True,
+        'enabled': False,
+    }
 
     response = confd.pagings.post(**parameters)
     response.assert_created('pagings')
@@ -176,15 +186,17 @@ def test_edit_minimal_parameters(paging):
 
 @fixtures.paging()
 def test_edit_all_parameters(paging):
-    parameters = {'name': 'MyPaging',
-                  'number': '123',
-                  'announce_caller': False,
-                  'announce_sound': 'sound',
-                  'caller_notification': True,
-                  'duplex': True,
-                  'ignore_forward': True,
-                  'record': True,
-                  'enabled': False}
+    parameters = {
+        'name': 'MyPaging',
+        'number': '123',
+        'announce_caller': False,
+        'announce_sound': 'sound',
+        'caller_notification': True,
+        'duplex': True,
+        'ignore_forward': True,
+        'record': True,
+        'enabled': False,
+    }
 
     response = confd.pagings(paging['id']).put(**parameters)
     response.assert_updated()
