@@ -158,6 +158,16 @@ def test_get(parking_lot):
     ))
 
 
+@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
+@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.parkinglots(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='ParkingLot'))
+
+    response = confd.parkinglots(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.parkinglots.post(slots_start='701', slots_end='750')
     response.assert_created('parkinglots')

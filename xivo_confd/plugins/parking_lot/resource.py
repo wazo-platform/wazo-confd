@@ -32,6 +32,7 @@ class ParkingLotList(ListResource):
 class ParkingLotItem(ItemResource):
 
     schema = ParkingLotSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.parkinglots.{id}.read')
     def get(self, id):
