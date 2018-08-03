@@ -246,6 +246,16 @@ def test_edit_all_parameters(paging):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.pagings(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Paging'))
+
+    response = confd.pagings(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.paging()
 def test_delete(paging):
     response = confd.pagings(paging['id']).delete()
