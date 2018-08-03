@@ -9,8 +9,13 @@ from hamcrest import (
 )
 from . import confd
 from ..helpers import (
+    errors as e,
     scenarios as s,
     fixtures,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
@@ -50,6 +55,16 @@ def test_get_all_parameters(call_filter):
     confd.callfilters(call_filter['id']).fallbacks.put(parameters).assert_updated()
     response = confd.callfilters(call_filter['id']).fallbacks.get()
     assert_that(response.item, equal_to(parameters))
+
+
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).fallbacks.get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).fallbacks.get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
 
 
 @fixtures.call_filter()
