@@ -199,7 +199,10 @@ def test_create_minimal_parameters():
     )
     response.assert_created('callfilters')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(
+        id=not_(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.callfilters(response.item['id']).delete().assert_deleted()
 
@@ -218,7 +221,7 @@ def test_create_all_parameters():
 
     response = confd.callfilters.post(**parameters)
     response.assert_created('callfilters')
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
     confd.callfilters(response.item['id']).delete().assert_deleted()
 
 

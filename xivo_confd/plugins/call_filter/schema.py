@@ -34,6 +34,7 @@ class CallFilterSurrogatesSchema(BaseSchema):
 
 class CallFilterSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     strategy = fields.String(validate=OneOf([
         'all-recipients-then-linear-surrogates',
