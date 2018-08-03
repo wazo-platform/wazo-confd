@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields, validates_schema
@@ -18,10 +18,12 @@ class ParkingLotSchema(BaseSchema):
     music_on_hold = fields.String(validate=Length(max=128), allow_none=True, missing='default')
     links = ListLink(Link('parkinglots'))
 
-    extensions = fields.Nested('ExtensionSchema',
-                               only=['id', 'exten', 'context', 'links'],
-                               many=True,
-                               dump_only=True)
+    extensions = fields.Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
+        dump_only=True,
+    )
 
     @validates_schema
     def validate_slots_range(self, data):

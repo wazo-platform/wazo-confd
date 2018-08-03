@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
+from hamcrest import (
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    is_not,
+    not_,
+)
 
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      not_)
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 def test_get_errors():
@@ -72,11 +76,13 @@ def error_checks(url):
 @fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850',  music_on_hold='hidden', timeout=None)
 def test_search(parking_lot, hidden):
     url = confd.parkinglots
-    searches = {'name': 'search',
-                'slots_start': '701',
-                'slots_end': '750',
-                'music_on_hold': 'search',
-                'timeout': 100}
+    searches = {
+        'name': 'search',
+        'slots_start': '701',
+        'slots_end': '750',
+        'music_on_hold': 'search',
+        'timeout': 100,
+    }
 
     for field, term in searches.items():
         yield check_search, url, parking_lot, hidden, field, term
@@ -113,13 +119,15 @@ def test_sorting_offset_limit(parking_lot1, parking_lot2):
 @fixtures.parking_lot()
 def test_get(parking_lot):
     response = confd.parkinglots(parking_lot['id']).get()
-    assert_that(response.item, has_entries(id=parking_lot['id'],
-                                           name=parking_lot['name'],
-                                           slots_start=parking_lot['slots_start'],
-                                           slots_end=parking_lot['slots_end'],
-                                           timeout=parking_lot['timeout'],
-                                           music_on_hold=parking_lot['music_on_hold'],
-                                           extensions=empty()))
+    assert_that(response.item, has_entries(
+        id=parking_lot['id'],
+        name=parking_lot['name'],
+        slots_start=parking_lot['slots_start'],
+        slots_end=parking_lot['slots_end'],
+        timeout=parking_lot['timeout'],
+        music_on_hold=parking_lot['music_on_hold'],
+        extensions=empty(),
+    ))
 
 
 def test_create_minimal_parameters():
@@ -132,11 +140,13 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyParkingLot',
-                  'slots_start': '701',
-                  'slots_end': '750',
-                  'timeout': None,
-                  'music_on_hold': 'music'}
+    parameters = {
+        'name': 'MyParkingLot',
+        'slots_start': '701',
+        'slots_end': '750',
+        'timeout': None,
+        'music_on_hold': 'music',
+    }
 
     response = confd.parkinglots.post(**parameters)
     response.assert_created('parkinglots')
@@ -155,11 +165,13 @@ def test_edit_minimal_parameters(parking_lot):
 
 @fixtures.parking_lot()
 def test_edit_all_parameters(parking_lot):
-    parameters = {'name': 'MyParkingLot',
-                  'slots_start': '801',
-                  'slots_end': '850',
-                  'timeout': None,
-                  'music_on_hold': 'music'}
+    parameters = {
+        'name': 'MyParkingLot',
+        'slots_start': '801',
+        'slots_end': '850',
+        'timeout': None,
+        'music_on_hold': 'music',
+    }
 
     response = confd.parkinglots(parking_lot['id']).put(**parameters)
     response.assert_updated()
