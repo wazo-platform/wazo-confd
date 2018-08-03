@@ -32,6 +32,7 @@ Changelog
   * `/endpoints/iax`
   * `/endpoints/sccp`
   * `/endpoints/sip`
+  * `/pagings`
   * `/parkinglots`
   * `/trunks`
 
