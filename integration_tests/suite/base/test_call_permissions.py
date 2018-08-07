@@ -271,3 +271,13 @@ def test_edit_multi_tenant(main, sub):
 def test_delete(call_permission):
     response = confd.callpermissions(call_permission['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.callpermissions(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPermission'))
+
+    response = confd.callpermissions(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
