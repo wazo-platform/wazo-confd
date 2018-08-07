@@ -45,7 +45,9 @@ def test_put_errors(skill):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', True
+    yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', 1234
+    yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(65)
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
@@ -61,6 +63,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': 1234}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': []}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': {}}], regex
+
+    for check in unique_error_checks(url):
+        yield check
+
+
+@fixtures.skill_rule(name='unique')
+def unique_error_checks(url, skill_rule):
+    yield s.check_bogus_field_returns_error, url, 'name', skill_rule['name']
 
 
 @fixtures.skill_rule(name='search')
@@ -106,13 +116,13 @@ def test_get(skill_rule):
     response = confd.queues.skillrules(skill_rule['id']).get()
     assert_that(response.item, has_entries(
         id=skill_rule['id'],
-        name=None,
+        name=skill_rule['name'],
         rules=empty(),
     ))
 
 
 def test_create_minimal_parameters():
-    response = confd.queues.skillrules.post()
+    response = confd.queues.skillrules.post(name='MySkillRule')
     response.assert_created('skillrules')
 
     assert_that(response.item, has_entries(id=not_none()))
@@ -165,6 +175,7 @@ def test_delete(skill_rule):
 
 @fixtures.skill_rule()
 def test_bus_events(skill_rule):
-    yield s.check_bus_event, 'config.queues.skillrules.created', confd.queues.skillrules.post
+    required_body = {'name': 'SkillRule'}
+    yield s.check_bus_event, 'config.queues.skillrules.created', confd.queues.skillrules.post, required_body
     yield s.check_bus_event, 'config.queues.skillrules.edited', confd.queues.skillrules(skill_rule['id']).put
     yield s.check_bus_event, 'config.queues.skillrules.deleted', confd.queues.skillrules(skill_rule['id']).delete

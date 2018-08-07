@@ -2,8 +2,6 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import re
-
 from flask import url_for
 from marshmallow import Schema, fields, validates, post_dump
 from marshmallow.validate import OneOf, Regexp, Range, Length
@@ -11,7 +9,7 @@ from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
-EXTEN_REGEX = re.compile(r'[A-Z0-9+*]+')
+EXTEN_REGEX = r'[A-Z0-9+*]+'
 
 
 class BaseDestinationSchema(Schema):

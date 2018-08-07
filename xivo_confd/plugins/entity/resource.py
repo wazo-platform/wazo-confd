@@ -2,8 +2,6 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import re
-
 from flask import url_for
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp
@@ -14,7 +12,7 @@ from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
-NAME_REGEX = re.compile(r'^[a-z0-9_\.-]{1,64}$')
+NAME_REGEX = r'^[a-z0-9_\.-]{1,64}$'
 
 
 class EntitySchema(BaseSchema):

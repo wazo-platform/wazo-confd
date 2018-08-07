@@ -19,7 +19,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
-NAMESERVER_REGEX = '^nameserver (.*)'
+NAMESERVER_REGEX = r'^nameserver (.*)'
 PHONEBOOK_BODY = {'name': 'wazo'}
 
 

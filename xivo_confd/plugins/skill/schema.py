@@ -9,7 +9,7 @@ from marshmallow.validate import Length, Regexp
 
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
-NAME_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
+NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
 
 class SkillSchema(BaseSchema):
