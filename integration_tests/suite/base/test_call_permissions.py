@@ -257,6 +257,16 @@ def test_edit_with_same_name(first_call_permission, second_call_permission):
     response.assert_match(400, e.resource_exists('CallPermission'))
 
 
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.callpermissions(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPermission'))
+
+    response = confd.callpermissions(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.call_permission()
 def test_delete(call_permission):
     response = confd.callpermissions(call_permission['id']).delete()
