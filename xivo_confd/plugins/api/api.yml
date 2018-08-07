@@ -181,6 +181,8 @@ definitions:
         $ref: '#/definitions/DestinationNone'
       outcall:
         $ref: '#/definitions/DestinationOutcall'
+      queue:
+        $ref: '#/definitions/DestinationQueue'
       sound:
         $ref: '#/definitions/DestinationSound'
       switchboard:
@@ -440,6 +442,27 @@ definitions:
     - type
     - exten
     - outcall_id
+  DestinationQueue:
+    title: DestinationQueue
+    properties:
+      type:
+        type: string
+        description: MUST be 'queue'
+      queue_id:
+        type: integer
+        description: The id of the queue
+      ring_time:
+        type: number
+        format: float
+      skill_rule_id:
+        type: integer
+        description: The id of the skill rule
+      skill_rule_variables:
+        type: object
+        description: key-value where key represents the variable of the skill rule and value represents a value
+    required:
+    - type
+    - queue_id
   DestinationSound:
     title: DestinationSound
     properties:
