@@ -203,6 +203,18 @@ def test_dissociate_not_associated(user, call_permission):
     response.assert_deleted()
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_user, sub_user, main_perm, sub_perm):
+    response = confd.users(main_user['uuid']).callpermissions(sub_perm['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).callpermissions(main_perm['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CallPermission'))
+
+
 @fixtures.user()
 @fixtures.call_permission()
 def test_delete_user_when_user_and_call_permission_associated(user, call_permission):

@@ -58,6 +58,7 @@ paths:
       - users
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/callpermissionid'
       responses:
