@@ -26,7 +26,8 @@ class OutcallCallPermissionAssociation(ConfdResource):
 
     @required_acl('confd.outcalls.{outcall_id}.callpermissions.{call_permission_id}.delete')
     def delete(self, outcall_id, call_permission_id):
-        outcall = self.outcall_dao.get(outcall_id)
-        call_permission = self.call_permission_dao.get(call_permission_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
+        call_permission = self.call_permission_dao.get(call_permission_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(outcall, call_permission)
         return '', 204
