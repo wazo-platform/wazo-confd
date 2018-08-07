@@ -9,7 +9,7 @@ from ..helpers import scenarios as s
 
 
 def test_put_errors():
-    url = confd.asterisk.queue.general.put
+    url = confd.asterisk.queues.general.put
     for check in error_checks(url):
         yield check
 
@@ -24,7 +24,7 @@ def error_checks(url):
 
 
 def test_get():
-    response = confd.asterisk.queue.general.get()
+    response = confd.asterisk.queues.general.get()
     response.assert_ok()
 
 
@@ -32,32 +32,32 @@ def test_edit_queue_general():
     parameters = {'options': {'nat': 'toto',
                               'username': 'Bob'}}
 
-    response = confd.asterisk.queue.general.put(**parameters)
+    response = confd.asterisk.queues.general.put(**parameters)
     response.assert_updated()
 
-    response = confd.asterisk.queue.general.get()
+    response = confd.asterisk.queues.general.get()
     assert_that(response.item, has_entries(parameters))
 
 
 def test_edit_queue_general_with_no_option():
     parameters = {'options': {}}
-    response = confd.asterisk.queue.general.put(**parameters)
+    response = confd.asterisk.queues.general.put(**parameters)
     response.assert_updated()
 
-    response = confd.asterisk.queue.general.get()
+    response = confd.asterisk.queues.general.get()
     assert_that(response.item, has_entries(parameters))
 
 
 def test_edit_queue_general_with_none_value():
     parameters = {'options': {'nat': 'value'}}
 
-    response = confd.asterisk.queue.general.put(**parameters)
+    response = confd.asterisk.queues.general.put(**parameters)
     response.assert_updated()
 
-    response = confd.asterisk.queue.general.get()
+    response = confd.asterisk.queues.general.get()
     assert_that(response.item, has_entries(parameters))
 
 
 def test_bus_event_when_edited():
-    url = confd.asterisk.queue.general
+    url = confd.asterisk.queues.general
     yield s.check_bus_event, 'config.queue_general.edited', url.put, {'options': {}}
