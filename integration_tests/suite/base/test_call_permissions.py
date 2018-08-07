@@ -3,12 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
+    not_,
 )
 
 
@@ -17,6 +20,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -112,6 +119,28 @@ def check_search(url, call_permission, hidden, field, term):
     hidden_call_permission = is_not(has_item(has_entry('id', hidden['id'])))
     assert_that(response.items, expected_call_permission)
     assert_that(response.items, hidden_call_permission)
+
+
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.callpermissions.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.callpermissions.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.callpermissions.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.call_permission(
