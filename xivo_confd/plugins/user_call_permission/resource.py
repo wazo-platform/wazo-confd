@@ -28,22 +28,22 @@ class UserCallPermission(ConfdResource):
         self.user_dao = user_dao
         self.call_permission_dao = call_permission_dao
 
-    def get_user(self, user_id):
-        return self.user_dao.get_by_id_uuid(user_id)
-
 
 class UserCallPermissionAssociation(UserCallPermission):
 
+    has_tenant_uuid = True
+
     @required_acl('confd.users.{user_id}.callpermissions.{call_permission_id}.update')
     def put(self, user_id, call_permission_id):
-        user = self.get_user(user_id)
-        call_permission = self.call_permission_dao.get(call_permission_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        call_permission = self.call_permission_dao.get(call_permission_id, tenant_uuids=tenant_uuids)
         self.service.associate(user, call_permission)
         return '', 204
 
     @required_acl('confd.users.{user_id}.callpermissions.{call_permission_id}.delete')
     def delete(self, user_id, call_permission_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         call_permission = self.call_permission_dao.get(call_permission_id)
         self.service.dissociate(user, call_permission)
         return '', 204
@@ -55,7 +55,7 @@ class UserCallPermissionGet(UserCallPermission):
 
     @required_acl('confd.users.{user_id}.callpermissions.read')
     def get(self, user_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         user_call_permissions = self.service.find_all_by(user_id=user.id)
         return {'total': len(user_call_permissions),
                 'items': self.schema().dump(user_call_permissions, many=True).data}
