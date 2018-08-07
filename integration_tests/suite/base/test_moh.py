@@ -2,21 +2,30 @@
 # Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from . import BaseIntegrationTest
-from . import confd
+from hamcrest import (
+    all_of,
+    assert_that,
+    contains,
+    empty,
+    equal_to,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    is_not,
+    not_,
+)
 
-
-from hamcrest import (assert_that,
-                      contains,
-                      empty,
-                      equal_to,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not)
+from . import BaseIntegrationTest, confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 NOT_FOUND_UUID = 'uuid-not-found'
 
@@ -88,8 +97,10 @@ def unique_error_checks(url, moh):
 @fixtures.moh(name='hidden', label='hidden')
 def test_search(visible, hidden):
     url = confd.moh
-    searches = {'name': 'visible',
-                'label': 'hello'}
+    searches = {
+        'name': 'visible',
+        'label': 'hello',
+    }
 
     for field, term in searches.items():
         yield check_search, url, visible, hidden, field, term
@@ -123,41 +134,83 @@ def test_sorting_offset_limit(moh1, moh2):
     yield s.check_limit, url, moh1, moh2, 'name', 'sort', 'uuid'
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.moh.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.moh.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.moh.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.moh()
 def test_get(moh):
     response = confd.moh(moh['uuid']).get()
-    assert_that(response.item, has_entries(uuid=moh['uuid'],
-                                           name=moh['name'],
-                                           label=moh['label'],
-                                           mode=moh['mode'],
-                                           application=moh['application'],
-                                           sort=moh['sort'],
-                                           files=empty()))
+    assert_that(response.item, has_entries(
+        uuid=moh['uuid'],
+        name=moh['name'],
+        label=moh['label'],
+        mode=moh['mode'],
+        application=moh['application'],
+        sort=moh['sort'],
+        files=empty(),
+    ))
+
+
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.moh(main['uuid']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = confd.moh(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_parameters():
     response = confd.moh.post(name='moh1', mode='files')
     response.assert_created('moh')
 
-    assert_that(response.item, has_entries(uuid=is_not(empty())))
+    assert_that(response.item, has_entries(
+        uuid=is_not(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
 
 def test_create_all_parameters():
-    response = confd.moh.post(name='moh1',
-                              label='MOH 1',
-                              mode='custom',
-                              application='/usr/bin/mpg123 xxx',
-                              sort='alphabetical')
+    response = confd.moh.post(
+        name='moh1',
+        label='MOH 1',
+        mode='custom',
+        application='/usr/bin/mpg123 xxx',
+        sort='alphabetical',
+    )
     response.assert_created('moh')
 
-    assert_that(response.item, has_entries(name='moh1',
-                                           label='MOH 1',
-                                           mode='custom',
-                                           application='/usr/bin/mpg123 xxx',
-                                           sort='alphabetical',
-                                           files=empty()))
+    assert_that(response.item, has_entries(
+        tenant_uuid=MAIN_TENANT,
+        name='moh1',
+        label='MOH 1',
+        mode='custom',
+        application='/usr/bin/mpg123 xxx',
+        sort='alphabetical',
+        files=empty(),
+    ))
 
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
@@ -223,12 +276,32 @@ def test_edit_custom_mode_without_application(moh):
     response.assert_status(400)
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.moh(main['uuid']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = confd.moh(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.moh()
 def test_delete(moh):
     response = confd.moh(moh['uuid']).delete()
     response.assert_deleted()
     response = confd.moh(moh['uuid']).get()
     response.assert_match(404, e.not_found(resource='MOH'))
+
+
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.moh(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = confd.moh(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.moh()
@@ -261,6 +334,30 @@ def test_add_update_delete_filename(moh):
     assert_that(response.item, has_entries(files=empty()))
 
 
+@fixtures.moh(tenant_uuid=MAIN_TENANT)
+def test_add_update_delete_filename_multi_tenant(moh):
+    client = _new_moh_file_client()
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content', wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='MOH'))
+
+    # valid tenant
+    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content', wazo_tenant=MAIN_TENANT)
+    response.assert_status(204)
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.raw, equal_to('content'))
+
+    response = client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.moh()
 def test_add_filename_errors(moh):
     client = _new_moh_file_client()
@@ -271,8 +368,7 @@ def test_add_filename_errors(moh):
     ]
     for filename in filenames:
         response = client.url.moh(moh['uuid']).files(filename).put(content='content is not checked')
-        assert_that(response.status, equal_to(404),
-                    'unexpected status for MOH filename {}'.format(filename))
+        assert_that(response.status, equal_to(404), 'unexpected status for MOH filename {}'.format(filename))
 
 
 def _new_moh_file_client():
@@ -281,8 +377,10 @@ def _new_moh_file_client():
             return None
         return data['content']
 
-    return BaseIntegrationTest.new_client(headers={"Content-Type": "application/octet-stream",
-                                                   "X-Auth-Token": "valid-token"}, encoder=encoder)
+    return BaseIntegrationTest.new_client(
+        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": "valid-token-multitenant"},
+        encoder=encoder,
+    )
 
 
 @fixtures.moh()

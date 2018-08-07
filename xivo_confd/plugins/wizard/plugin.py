@@ -9,6 +9,7 @@ from xivo_dird_client import Client as DirdClient
 from xivo_provd_client import new_provisioning_client_from_config
 
 from xivo_dao.resources.infos import dao as infos_dao
+from xivo_dao import tenant_dao
 
 from .resource import WizardResource, WizardDiscoverResource
 from .service import build_service
@@ -36,7 +37,7 @@ class Plugin(object):
         dird_client = DirdClient(**config['dird'])
         provd_client = new_provisioning_client_from_config(config['provd'])
 
-        service = build_service(provd_client, auth_client, dird_client, infos_dao)
+        service = build_service(provd_client, auth_client, dird_client, tenant_dao, infos_dao)
 
         api.add_resource(
             WizardResource,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import random
@@ -14,8 +14,8 @@ def generate_moh(**parameters):
     return add_moh(**parameters)
 
 
-def add_moh(**parameters):
-    response = confd.moh.post(parameters)
+def add_moh(wazo_tenant=None, **parameters):
+    response = confd.moh.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

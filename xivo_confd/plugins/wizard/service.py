@@ -8,7 +8,6 @@ import re
 import socket
 import string
 
-from uuid import uuid4
 from os import urandom
 from xivo_dao.helpers.db_utils import session_scope
 
@@ -25,9 +24,10 @@ PHONEBOOK_BODY = {'name': 'wazo'}
 
 class WizardService(object):
 
-    def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, dird_client, sysconfd):
+    def __init__(self, validator, notifier, tenant_dao, infos_dao, provd_client, auth_client, dird_client, sysconfd):
         self.validator = validator
         self.notifier = notifier
+        self.tenant_dao = tenant_dao
         self.infos_dao = infos_dao
         self.provd_client = provd_client
         self.sysconfd = sysconfd
@@ -40,7 +40,7 @@ class WizardService(object):
     def create(self, wizard):
         self.validator.validate_create(wizard)
         autoprov_username = self._generate_autoprov_username()
-        tenant_uuid = uuid4()
+        tenant_uuid = self.tenant_dao.find().uuid
 
         with session_scope():
             wizard_db.create(wizard, autoprov_username, tenant_uuid)
@@ -194,11 +194,14 @@ class WizardService(object):
         return None
 
 
-def build_service(provd_client, auth_client, dird_client, infos_dao):
-    return WizardService(build_validator(),
-                         build_notifier(),
-                         infos_dao,
-                         provd_client,
-                         auth_client,
-                         dird_client,
-                         sysconfd)
+def build_service(provd_client, auth_client, dird_client, tenant_dao, infos_dao):
+    return WizardService(
+        build_validator(),
+        build_notifier(),
+        tenant_dao,
+        infos_dao,
+        provd_client,
+        auth_client,
+        dird_client,
+        sysconfd,
+    )

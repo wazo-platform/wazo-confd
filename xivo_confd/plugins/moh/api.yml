@@ -162,6 +162,10 @@ definitions:
           type: string
           readOnly: true
           description: The UUID of the MOH class
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         name:
           type: string
           description: The name used by Asterisk (can only by set on create and must be unique)
