@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
@@ -9,13 +9,17 @@ from hamcrest import (
     has_entries,
 )
 
+from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     scenarios as s,
 )
-from . import confd
-
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -75,6 +79,21 @@ def test_associate_when_group_already_associated_to_same_call_permission(group, 
         response.assert_updated()
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_group, sub_group, main_perm, sub_perm):
+    response = confd.groups(main_group['id']).callpermissions(sub_perm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Group'))
+
+    response = confd.groups(sub_group['id']).callpermissions(main_perm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CallPermission'))
+
+    response = confd.groups(main_group['id']).callpermissions(sub_perm['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.group()
 @fixtures.call_permission()
 def test_dissociate(group, call_permission):
@@ -89,8 +108,7 @@ def test_get_call_permissions_relation(group, call_permission):
     with a.group_call_permission(group, call_permission):
         response = confd.groups(group['id']).get()
         assert_that(response.item['call_permissions'], contains(
-            has_entries(id=call_permission['id'],
-                        name=call_permission['name'])
+            has_entries(id=call_permission['id'], name=call_permission['name'])
         ))
 
 
@@ -100,8 +118,7 @@ def test_get_groups_relation(group, call_permission):
     with a.group_call_permission(group, call_permission):
         response = confd.callpermissions(call_permission['id']).get()
         assert_that(response.item['groups'], contains(
-            has_entries(id=group['id'],
-                        name=group['name'])
+            has_entries(id=group['id'], name=group['name'])
         ))
 
 
