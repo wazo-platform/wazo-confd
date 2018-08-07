@@ -32,6 +32,7 @@ class CallPermissionList(ListResource):
 class CallPermissionItem(ItemResource):
 
     schema = CallPermissionSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.callpermissions.{id}.read')
     def get(self, id):

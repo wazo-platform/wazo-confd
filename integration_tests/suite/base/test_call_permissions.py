@@ -166,6 +166,16 @@ def test_get(call_permission):
     ))
 
 
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.callpermissions(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPermission'))
+
+    response = confd.callpermissions(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.callpermissions.post(name='minimal')
     response.assert_created('callpermissions')
