@@ -82,6 +82,7 @@ setup(
             'queue = xivo_confd.plugins.queue.plugin:Plugin',
             'queue_extension = xivo_confd.plugins.queue_extension.plugin:Plugin',
             'queue_fallback = xivo_confd.plugins.queue_fallback.plugin:Plugin',
+            'queue_general = xivo_confd.plugins.queue_general.plugin:Plugin',
             'queue_member = xivo_confd.plugins.queue_member.plugin:Plugin',
             'queue_schedule = xivo_confd.plugins.queue_schedule.plugin:Plugin',
             'rtp = xivo_confd.plugins.rtp.plugin:Plugin',
