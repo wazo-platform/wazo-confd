@@ -26,6 +26,7 @@ paths:
       tags:
       - incalls
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Incoming call to create
