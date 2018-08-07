@@ -102,6 +102,18 @@ def test_dissociate(group, call_permission):
         response.assert_deleted()
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_group, sub_group, main_perm, sub_perm):
+    response = confd.groups(main_group['id']).callpermissions(sub_perm['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Group'))
+
+    response = confd.groups(sub_group['id']).callpermissions(main_perm['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CallPermission'))
+
+
 @fixtures.group()
 @fixtures.call_permission()
 def test_get_call_permissions_relation(group, call_permission):
