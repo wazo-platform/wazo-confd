@@ -29,6 +29,7 @@ Changelog
   `tenant_uuid`.
 
   * `/callfilters`
+  * `/callpermissions`
   * `/endpoints/custom`
   * `/endpoints/iax`
   * `/endpoints/sccp`
