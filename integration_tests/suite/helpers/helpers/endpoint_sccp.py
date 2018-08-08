@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
-
 
 from . import confd
 
 
-def add_sccp(**params):
-    response = confd.endpoints.sccp.post(params)
+def add_sccp(wazo_tenant=None, **params):
+    response = confd.endpoints.sccp.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 
