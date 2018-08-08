@@ -13,8 +13,13 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -64,9 +69,11 @@ def test_associate_multiple(outcall, trunk1, trunk2, trunk3):
 
     response = confd.outcalls(outcall['id']).get()
     assert_that(response.item, has_entries(
-        trunks=contains(has_entries(id=trunk2['id']),
-                        has_entries(id=trunk3['id']),
-                        has_entries(id=trunk1['id']))
+        trunks=contains(
+            has_entries(id=trunk2['id']),
+            has_entries(id=trunk3['id']),
+            has_entries(id=trunk1['id']),
+        )
     ))
 
 
@@ -82,30 +89,52 @@ def test_associate_same_trunk(outcall, trunk):
 @fixtures.trunk()
 @fixtures.trunk()
 def test_get_trunks_associated_to_outcall(outcall, trunk1, trunk2):
-    expected = has_entries(trunks=contains(has_entries(id=trunk2['id'],
-                                                       endpoint_sip=none(),
-                                                       endpoint_custom=none()),
-                                           has_entries(id=trunk1['id'],
-                                                       endpoint_sip=none(),
-                                                       endpoint_custom=none())))
-
     with a.outcall_trunk(outcall, trunk2, trunk1):
         response = confd.outcalls(outcall['id']).get()
-        assert_that(response.item, expected)
+        assert_that(response.item, has_entries(
+            trunks=contains(
+                has_entries(id=trunk2['id'], endpoint_sip=none(), endpoint_custom=none()),
+                has_entries(id=trunk1['id'], endpoint_sip=none(), endpoint_custom=none()),
+            )
+        ))
 
 
 @fixtures.outcall()
 @fixtures.outcall()
 @fixtures.trunk()
 def test_get_outcalls_associated_to_trunk(outcall1, outcall2, trunk):
-    expected = has_entries(outcalls=contains(has_entries(id=outcall2['id'],
-                                                         name=outcall2['name']),
-                                             has_entries(id=outcall1['id'],
-                                                         name=outcall1['name'])))
-
     with a.outcall_trunk(outcall2, trunk), a.outcall_trunk(outcall1, trunk):
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, expected)
+        assert_that(response.item, has_entries(
+            outcalls=contains(
+                has_entries(id=outcall2['id'], name=outcall2['name']),
+                has_entries(id=outcall1['id'], name=outcall1['name']),
+            )
+        ))
+
+
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_outcall, sub_outcall, main_trunk, sub_trunk):
+    response = confd.outcalls(main_outcall['id']).trunks.put(
+        trunks=[{'id': main_trunk['id']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('Outcall'))
+
+    response = confd.outcalls(sub_outcall['id']).trunks.put(
+        trunks=[{'id': main_trunk['id']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('Trunk'))
+
+    response = confd.outcalls(main_outcall['id']).trunks.put(
+        trunks=[{'id': sub_trunk['id']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.outcall()
