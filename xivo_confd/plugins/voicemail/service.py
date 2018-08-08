@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers.db_manager import Session
@@ -7,8 +7,9 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from xivo_confd import sysconfd
 from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.voicemail.notifier import build_notifier
-from xivo_confd.plugins.voicemail.validator import build_validator
+
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class VoicemailService(CRUDService):
@@ -32,17 +33,17 @@ class VoicemailService(CRUDService):
         self.notifier.deleted(voicemail)
 
     def delete_voicemail(self, voicemail):
-        self.sysconf.delete_voicemail(voicemail.number,
-                                      voicemail.context)
+        self.sysconf.delete_voicemail(voicemail.number, voicemail.context)
 
     def move_voicemail(self, voicemail, old_number, old_context):
         if (old_number != voicemail.number) or (old_context != voicemail.context):
-            self.sysconf.move_voicemail(old_number, old_context,
-                                        voicemail.number, voicemail.context)
+            self.sysconf.move_voicemail(old_number, old_context, voicemail.number, voicemail.context)
 
 
 def build_service():
-    return VoicemailService(voicemail_dao,
-                            build_validator(),
-                            build_notifier(),
-                            sysconfd)
+    return VoicemailService(
+        voicemail_dao,
+        build_validator(),
+        build_notifier(),
+        sysconfd
+    )
