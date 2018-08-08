@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
+from hamcrest import (
+    all_of,
+    assert_that,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    is_not,
+    not_,
+)
 
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      has_entry,
-                      has_item,
-                      is_not,
-                      not_)
 from . import confd
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 def test_get_errors():
@@ -88,9 +98,11 @@ def unique_error_checks(url, paging):
 @fixtures.paging(name='hidden', number='456', announce_sound='hidden')
 def test_search(paging, hidden):
     url = confd.pagings
-    searches = {'name': 'search',
-                'number': '123',
-                'announce_sound': 'search'}
+    searches = {
+        'name': 'search',
+        'number': '123',
+        'announce_sound': 'search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, paging, hidden, field, term
@@ -124,46 +136,85 @@ def test_sort_offset_limit(paging1, paging2):
     yield s.check_limit, url, paging1, paging2, 'name', 'sort'
 
 
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.pagings.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.pagings.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.pagings.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.paging()
 def test_get(paging):
     response = confd.pagings(paging['id']).get()
-    assert_that(response.item, has_entries(id=paging['id'],
-                                           name=paging['name'],
-                                           number=paging['number'],
-                                           announce_caller=paging['announce_caller'],
-                                           announce_sound=paging['announce_sound'],
-                                           caller_notification=paging['caller_notification'],
-                                           duplex=paging['duplex'],
-                                           ignore_forward=paging['ignore_forward'],
-                                           record=paging['record'],
-                                           enabled=paging['enabled']))
+    assert_that(response.item, has_entries(
+        id=paging['id'],
+        name=paging['name'],
+        number=paging['number'],
+        announce_caller=paging['announce_caller'],
+        announce_sound=paging['announce_sound'],
+        caller_notification=paging['caller_notification'],
+        duplex=paging['duplex'],
+        ignore_forward=paging['ignore_forward'],
+        record=paging['record'],
+        enabled=paging['enabled'],
+    ))
+
+
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.pagings(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Paging'))
+
+    response = confd.pagings(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_parameters():
     response = confd.pagings.post(number='123')
     response.assert_created('pagings')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(
+        id=not_(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.pagings(response.item['id']).delete().assert_deleted()
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyPaging',
-                  'number': '123',
-                  'announce_caller': False,
-                  'announce_sound': 'sound',
-                  'caller_notification': True,
-                  'duplex': True,
-                  'ignore_forward': True,
-                  'record': True,
-                  'enabled': False}
+    parameters = {
+        'name': 'MyPaging',
+        'number': '123',
+        'announce_caller': False,
+        'announce_sound': 'sound',
+        'caller_notification': True,
+        'duplex': True,
+        'ignore_forward': True,
+        'record': True,
+        'enabled': False,
+    }
 
     response = confd.pagings.post(**parameters)
     response.assert_created('pagings')
     response = confd.pagings(response.item['id']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.pagings(response.item['id']).delete().assert_deleted()
 
@@ -176,15 +227,17 @@ def test_edit_minimal_parameters(paging):
 
 @fixtures.paging()
 def test_edit_all_parameters(paging):
-    parameters = {'name': 'MyPaging',
-                  'number': '123',
-                  'announce_caller': False,
-                  'announce_sound': 'sound',
-                  'caller_notification': True,
-                  'duplex': True,
-                  'ignore_forward': True,
-                  'record': True,
-                  'enabled': False}
+    parameters = {
+        'name': 'MyPaging',
+        'number': '123',
+        'announce_caller': False,
+        'announce_sound': 'sound',
+        'caller_notification': True,
+        'duplex': True,
+        'ignore_forward': True,
+        'record': True,
+        'enabled': False,
+    }
 
     response = confd.pagings(paging['id']).put(**parameters)
     response.assert_updated()
@@ -193,12 +246,32 @@ def test_edit_all_parameters(paging):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.pagings(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Paging'))
+
+    response = confd.pagings(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.paging()
 def test_delete(paging):
     response = confd.pagings(paging['id']).delete()
     response.assert_deleted()
     response = confd.pagings(paging['id']).get()
     response.assert_match(404, e.not_found(resource='Paging'))
+
+
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.pagings(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Paging'))
+
+    response = confd.pagings(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.paging()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import random
@@ -26,8 +26,8 @@ def _random_number(numbers):
     return number
 
 
-def add_paging(**parameters):
-    response = confd.pagings.post(parameters)
+def add_paging(wazo_tenant=None, **parameters):
+    response = confd.pagings.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

@@ -1,17 +1,25 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      contains_inanyorder,
-                      empty,
-                      has_entries)
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    empty,
+    has_entries,
+)
 
-from ..helpers import scenarios as s
 from . import confd
-from ..helpers import fixtures
-from ..helpers import associations as a
-
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -60,9 +68,11 @@ def test_associate_multiple(paging, user1, user2, user3):
 
     response = confd.pagings(paging['id']).get()
     assert_that(response.item, has_entries(
-        members=has_entries(users=contains_inanyorder(has_entries(uuid=user1['uuid']),
-                                                      has_entries(uuid=user2['uuid']),
-                                                      has_entries(uuid=user3['uuid'])))
+        members=has_entries(users=contains_inanyorder(
+            has_entries(uuid=user1['uuid']),
+            has_entries(uuid=user2['uuid']),
+            has_entries(uuid=user3['uuid']),
+        ))
     ))
 
 
@@ -81,14 +91,34 @@ def test_get_users_associated_to_paging(paging, user1, user2):
         response = confd.pagings(paging['id']).get()
         assert_that(response.item, has_entries(
             members=has_entries(users=contains_inanyorder(
-                has_entries(uuid=user2['uuid'],
-                            firstname=user2['firstname'],
-                            lastname=user2['lastname']),
-                has_entries(uuid=user1['uuid'],
-                            firstname=user1['firstname'],
-                            lastname=user1['lastname']))
+                has_entries(uuid=user2['uuid'], firstname=user2['firstname'], lastname=user2['lastname']),
+                has_entries(uuid=user1['uuid'], firstname=user1['firstname'], lastname=user1['lastname']))
             )
         ))
+
+
+@fixtures.paging(wazo_tenant=MAIN_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_paging, sub_paging, main_user, sub_user):
+    response = confd.pagings(main_paging['id']).members.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('Paging'))
+
+    response = confd.pagings(sub_paging['id']).members.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('User'))
+
+    response = confd.pagings(main_paging['id']).members.users.put(
+        users=[{'uuid': sub_user['uuid']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.paging()

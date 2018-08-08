@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from marshmallow import fields, post_dump
@@ -10,6 +10,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class PagingSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     number = fields.String(validate=(Length(max=32), Predicate('isdigit')), required=True)
     name = fields.String(validate=Length(max=128), allow_none=True)
     announce_caller = fields.Boolean()

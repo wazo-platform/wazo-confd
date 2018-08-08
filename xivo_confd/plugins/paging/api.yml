@@ -7,6 +7,8 @@ paths:
       tags:
       - pagings
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - pagings
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Paging to create
@@ -45,6 +48,7 @@ paths:
       tags:
       - pagings
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/pagingid'
       responses:
         '200':
@@ -60,6 +64,7 @@ paths:
       tags:
       - pagings
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/pagingid'
       - name: body
         in: body
@@ -80,6 +85,7 @@ paths:
       tags:
       - pagings
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/pagingid'
       responses:
         '204':
@@ -102,6 +108,10 @@ definitions:
     - properties:
         id:
           type: integer
+          readOnly: true
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
           readOnly: true
         name:
           type: string
