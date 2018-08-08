@@ -12,8 +12,13 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -84,6 +89,30 @@ def test_associate_recipient_to_surrogate(call_filter, user):
     with a.call_filter_recipient_user(call_filter, user):
         response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user])
         response.assert_status(400)
+
+
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_call_filter, sub_call_filter, main_user, sub_user):
+    response = confd.callfilters(main_call_filter['id']).surrogates.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('CallFilter'))
+
+    response = confd.callfilters(sub_call_filter['id']).surrogates.users.put(
+        users=[{'uuid': main_user['uuid']}],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found('User'))
+
+    response = confd.callfilters(main_call_filter['id']).surrogates.users.put(
+        users=[{'uuid': sub_user['uuid']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.call_filter()

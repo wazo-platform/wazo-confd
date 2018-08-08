@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -15,8 +17,13 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import (
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -128,6 +135,28 @@ def test_sorting_offset_limit(call_filter1, call_filter2):
     yield s.check_limit, url, call_filter1, call_filter2, 'name', 'sort'
 
 
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.callfilters.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.callfilters.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.callfilters.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.call_filter()
 def test_get(call_filter):
     response = confd.callfilters(call_filter['id']).get()
@@ -152,6 +181,16 @@ def test_get(call_filter):
     ))
 
 
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.callfilters.post(
         name='minimal',
@@ -160,7 +199,10 @@ def test_create_minimal_parameters():
     )
     response.assert_created('callfilters')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(
+        id=not_(empty()),
+        tenant_uuid=MAIN_TENANT,
+    ))
 
     confd.callfilters(response.item['id']).delete().assert_deleted()
 
@@ -179,7 +221,7 @@ def test_create_all_parameters():
 
     response = confd.callfilters.post(**parameters)
     response.assert_created('callfilters')
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
     confd.callfilters(response.item['id']).delete().assert_deleted()
 
 
@@ -229,8 +271,28 @@ def test_edit_all_parameters(call_filter):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.call_filter()
 def test_delete(call_filter):
     response = confd.callfilters(call_filter['id']).delete()
     response.assert_deleted()
     confd.callfilters(call_filter['id']).get().assert_status(404)
+
+
+@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.callfilters(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallFilter'))
+
+    response = confd.callfilters(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()

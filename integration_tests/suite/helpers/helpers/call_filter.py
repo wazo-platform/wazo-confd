@@ -16,8 +16,8 @@ def generate_call_filter(**params):
     return add_call_filter(**params)
 
 
-def add_call_filter(**params):
-    response = confd.callfilters.post(params)
+def add_call_filter(wazo_tenant=None, **params):
+    response = confd.callfilters.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 

@@ -20,6 +20,7 @@ from .schema import (
 class CallFilterRecipientUserList(ConfdResource):
 
     schema = CallFilterRecipientUsersSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, call_filter_dao, user_dao):
         self.service = service
@@ -28,12 +29,13 @@ class CallFilterRecipientUserList(ConfdResource):
 
     @required_acl('confd.callfilters.{call_filter_id}.recipients.users.update')
     def put(self, call_filter_id):
-        call_filter = self.call_filter_dao.get(call_filter_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
         try:
             recipients = []
             for user_form in form['users']:
-                user = self.user_dao.get_by(uuid=user_form['user']['uuid'])
+                user = self.user_dao.get_by(uuid=user_form['user']['uuid'], tenant_uuids=tenant_uuids)
                 recipient = self.service.find_recipient_by_user(call_filter, user)
                 if not recipient:
                     recipient = CallFilterMember()
@@ -51,6 +53,7 @@ class CallFilterRecipientUserList(ConfdResource):
 class CallFilterSurrogateUserList(ConfdResource):
 
     schema = CallFilterSurrogateUsersSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, call_filter_dao, user_dao):
         self.service = service
@@ -59,12 +62,13 @@ class CallFilterSurrogateUserList(ConfdResource):
 
     @required_acl('confd.callfilters.{call_filter_id}.surrogates.users.update')
     def put(self, call_filter_id):
-        call_filter = self.call_filter_dao.get(call_filter_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
         try:
             surrogates = []
             for user_form in form['users']:
-                user = self.user_dao.get_by(uuid=user_form['user']['uuid'])
+                user = self.user_dao.get_by(uuid=user_form['user']['uuid'], tenant_uuids=tenant_uuids)
                 surrogate = self.service.find_surrogate_by_user(call_filter, user)
                 if not surrogate:
                     surrogate = CallFilterMember()
