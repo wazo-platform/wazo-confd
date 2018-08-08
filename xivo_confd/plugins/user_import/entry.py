@@ -42,24 +42,24 @@ class Entry(object):
         permissions = self.call_permissions or []
         return [permission.id for permission in permissions]
 
-    def find(self, resource, creator):
+    def find(self, resource, creator, tenant_uuid):
         model = self.get_resource(resource)
         if model:
             return True
 
         fields = self.entry_dict[resource]
-        model = creator.find(fields)
+        model = creator.find(fields, tenant_uuid)
         if model:
             setattr(self, resource, model)
             return True
         return False
 
-    def create(self, resource, creator, tenant_uuid=None):
+    def create(self, resource, creator, tenant_uuid):
         fields = self.entry_dict[resource]
         setattr(self, resource, creator.create(fields, tenant_uuid))
 
-    def find_or_create(self, resource, creator, tenant_uuid=None):
-        if not self.find(resource, creator):
+    def find_or_create(self, resource, creator, tenant_uuid):
+        if not self.find(resource, creator, tenant_uuid):
             self.create(resource, creator, tenant_uuid)
 
     def update(self, resource, creator):
@@ -80,28 +80,28 @@ class EntryCreator(object):
     def __init__(self, creators):
         self.creators = creators
 
-    def create(self, row, tenant_uuid=None):
+    def create(self, row, tenant_uuid):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
-        entry.create('user', self.creators['user'], tenant_uuid=tenant_uuid)
-        entry.create('wazo_user', self.creators['wazo_user'])
-        entry.find('entity', self.creators['entity'])
-        entry.find_or_create('voicemail', self.creators['voicemail'])
-        entry.find_or_create('call_permissions', self.creators['call_permissions'])
-        entry.find_or_create('line', self.creators['line'])
-        entry.find_or_create('extension', self.creators['extension'])
-        entry.find_or_create('extension_incall', self.creators['extension_incall'])
-        entry.find_or_create('incall', self.creators['incall'], tenant_uuid=tenant_uuid)
-        entry.find_or_create('cti_profile', self.creators['cti_profile'])
-        self.create_endpoint(entry)
+        entry.create('user', self.creators['user'], tenant_uuid)
+        entry.create('wazo_user', self.creators['wazo_user'], tenant_uuid)
+        entry.find('entity', self.creators['entity'], tenant_uuid)
+        entry.find_or_create('voicemail', self.creators['voicemail'], tenant_uuid)
+        entry.find_or_create('call_permissions', self.creators['call_permissions'], tenant_uuid)
+        entry.find_or_create('line', self.creators['line'], tenant_uuid)
+        entry.find_or_create('extension', self.creators['extension'], tenant_uuid)
+        entry.find_or_create('extension_incall', self.creators['extension_incall'], tenant_uuid)
+        entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
+        entry.find_or_create('cti_profile', self.creators['cti_profile'], tenant_uuid)
+        self.create_endpoint(entry, tenant_uuid)
         return entry
 
-    def create_endpoint(self, entry):
+    def create_endpoint(self, entry, tenant_uuid):
         endpoint = entry.extract_field('line', 'endpoint')
         if endpoint == 'sip':
-            entry.find_or_create('sip', self.creators['sip'])
+            entry.find_or_create('sip', self.creators['sip'], tenant_uuid)
         elif endpoint == 'sccp':
-            entry.find_or_create('sccp', self.creators['sccp'])
+            entry.find_or_create('sccp', self.creators['sccp'], tenant_uuid)
 
 
 class EntryAssociator(object):
@@ -206,21 +206,21 @@ class EntryUpdater(object):
         return entry
 
     def create_missing_resources(self, entry, tenant_uuid):
-        entry.find_or_create('voicemail', self.creators['voicemail'])
-        entry.find_or_create('call_permissions', self.creators['call_permissions'])
-        entry.find_or_create('extension', self.creators['extension'])
-        entry.find_or_create('extension_incall', self.creators['extension_incall'])
+        entry.find_or_create('voicemail', self.creators['voicemail'], tenant_uuid)
+        entry.find_or_create('call_permissions', self.creators['call_permissions'], tenant_uuid)
+        entry.find_or_create('extension', self.creators['extension'], tenant_uuid)
+        entry.find_or_create('extension_incall', self.creators['extension_incall'], tenant_uuid)
         entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
-        entry.find_or_create('cti_profile', self.creators['cti_profile'])
-        entry.find_or_create('line', self.creators['line'])
-        self.find_or_create_endpoint(entry)
+        entry.find_or_create('cti_profile', self.creators['cti_profile'], tenant_uuid)
+        entry.find_or_create('line', self.creators['line'], tenant_uuid)
+        self.find_or_create_endpoint(entry, tenant_uuid)
 
-    def find_or_create_endpoint(self, entry):
+    def find_or_create_endpoint(self, entry, tenant_uuid):
         endpoint = entry.extract_field('line', 'endpoint')
         if endpoint == 'sip':
-            entry.find_or_create('sip', self.creators['sip'])
+            entry.find_or_create('sip', self.creators['sip'], tenant_uuid)
         elif endpoint == 'sccp':
-            entry.find_or_create('sccp', self.creators['sccp'])
+            entry.find_or_create('sccp', self.creators['sccp'], tenant_uuid)
 
     def associate_resources(self, entry):
         for associator in self.associators.values():

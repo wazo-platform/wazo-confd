@@ -32,11 +32,11 @@ class Creator(object):
         self.service = service
 
     @abc.abstractmethod
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         pass
 
     @abc.abstractmethod
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         pass
 
     def update(self, fields, model):
@@ -56,7 +56,7 @@ class UserCreator(Creator):
     schema = UserSchema
     schema_nullable = UserSchemaNullable
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         if 'uuid' in fields:
             return self.service.get_by(uuid=fields['uuid'])
 
@@ -71,10 +71,10 @@ class WazoUserCreator(Creator):
 
     schema = WazoUserSchema
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         pass
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         fields = self.schema(handle_error=False, strict=True).load(fields).data
         # We need to have user_uuid on create, so the real create is on associate
         return fields
@@ -93,12 +93,12 @@ class WazoUserCreator(Creator):
 
 class EntityCreator(Creator):
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         entity_id = fields.get('id')
         if entity_id:
             return self.service.get_by(id=entity_id)
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         return None
 
     def update(self, fields, model):
@@ -109,13 +109,13 @@ class VoicemailCreator(Creator):
 
     schema = VoicemailSchema
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
             return self.service.dao.find_by(number=number, context=context)
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
@@ -125,7 +125,7 @@ class VoicemailCreator(Creator):
 
 class LineCreator(Creator):
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         return None
 
     def update(self, fields, line):
@@ -135,7 +135,7 @@ class LineCreator(Creator):
             self.update_model(fields, line)
             self.service.edit(line)
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         fields = dict(fields)
         context = fields.get('context')
         endpoint = fields.pop('endpoint', None)
@@ -148,22 +148,22 @@ class SipCreator(Creator):
     schema = SipSchema
     schema_nullable = SipSchemaNullable
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         name = fields.get('username')
         if name:
             return self.service.find_by(name=name)
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
         return self.service.create(SIP(**form))
 
 
 class SccpCreator(Creator):
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         return None
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         return self.service.create(SCCP(**fields))
 
 
@@ -171,7 +171,7 @@ class ExtensionCreator(Creator):
 
     schema = ExtensionSchema
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
@@ -180,7 +180,7 @@ class ExtensionCreator(Creator):
             except NotFoundError:
                 return None
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
@@ -194,7 +194,7 @@ class CtiProfileCreator(Creator):
     def __init__(self, dao):
         self.dao = dao
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         name = fields.get('name')
         if name:
             try:
@@ -206,7 +206,7 @@ class CtiProfileCreator(Creator):
     def update(self, fields, resource):
         pass
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         name = fields.get('name')
         if name:
             cti_profile_id = self.dao.get_id_by_name(name)
@@ -215,7 +215,7 @@ class CtiProfileCreator(Creator):
 
 class ExtensionIncallCreator(Creator):
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
@@ -224,7 +224,7 @@ class ExtensionIncallCreator(Creator):
             except NotFoundError:
                 return None
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         fields = self.extract_extension_fields(fields)
         if fields:
             extension = Extension(**fields)
@@ -243,7 +243,7 @@ class ExtensionIncallCreator(Creator):
 
 class IncallCreator(Creator):
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
@@ -253,7 +253,7 @@ class IncallCreator(Creator):
             except NotFoundError:
                 return None
 
-    def create(self, fields, tenant_uuid=None):
+    def create(self, fields, tenant_uuid):
         fields = self.extract_extension_fields(fields)
         if fields:
             incall = Incall(destination=Dialaction(action='none'), tenant_uuid=tenant_uuid)
@@ -270,13 +270,13 @@ class IncallCreator(Creator):
 
 class CallPermissionCreator(Creator):
 
-    def find(self, fields):
+    def find(self, fields, tenant_uuid):
         names = fields.get('names')
         if names is not None:
             return [self.service.get_by(name=name) for name in names]
 
-    def create(self, fields, tenant_uuid=None):
-        return self.find(fields)
+    def create(self, fields, tenant_uuid):
+        return self.find(fields, tenant_uuid)
 
     def update(self, fields, resource):
         pass
