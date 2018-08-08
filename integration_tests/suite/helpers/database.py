@@ -328,17 +328,18 @@ class DatabaseQueries(object):
         query = text("DELETE FROM agent_login_status WHERE agent_id = :agent_id")
         self.connection.execute(query, agent_id=agent_id)
 
-    def insert_paging(self, number='1234'):
+    def insert_paging(self, number='1234', tenant_uuid=None):
         query = text("""
-        INSERT INTO paging (number, timeout)
-        VALUES (:number, :timeout)
+        INSERT INTO paging (number, timeout, tenant_uuid)
+        VALUES (:number, :timeout, :tenant_uuid)
         RETURNING id
         """)
 
         paging_id = (self.connection
                      .execute(query,
                               number=number,
-                              timeout=30)
+                              timeout=30,
+                              tenant_uuid=tenant_uuid)
                      .scalar())
 
         func_key_id = self.insert_func_key('speeddial', 'paging')
@@ -346,15 +347,17 @@ class DatabaseQueries(object):
 
         return paging_id
 
-    def insert_callfilter(self, name='bsfilter', type_='bosssecretary', bosssecretary='secretary-simult'):
+    def insert_callfilter(self, name='bsfilter', type_='bosssecretary', bosssecretary='secretary-simult',
+                          tenant_uuid=None):
         query = text("""
-        INSERT INTO callfilter (entity_id, name, type, bosssecretary, description)
+        INSERT INTO callfilter (entity_id, name, type, bosssecretary, tenant_uuid)
         VALUES (
         (SELECT id FROM entity LIMIT 1),
         :name,
         :type,
         :bosssecretary,
-        '')
+        :tenant_uuid
+        )
         RETURNING id
         """)
 
@@ -362,7 +365,8 @@ class DatabaseQueries(object):
                 .execute(query,
                          name=name,
                          type=type_,
-                         bosssecretary=bosssecretary)
+                         bosssecretary=bosssecretary,
+                         tenant_uuid=tenant_uuid)
                 .scalar())
 
     def insert_filter_member(self, callfilter_id, member_id, bstype='secretary'):

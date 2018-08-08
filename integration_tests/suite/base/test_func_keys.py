@@ -196,10 +196,9 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
             queue_id = queries.insert_queue(number=queue_exten)
             conference_id = queries.insert_conference(number=conf_exten)
             agent_id = queries.insert_agent(self.user['id'])
-            paging_id = queries.insert_paging(number=paging_number)
-            callfilter_id = queries.insert_callfilter()
-            filter_member_id = queries.insert_filter_member(callfilter_id,
-                                                            self.user['id'])
+            paging_id = queries.insert_paging(number=paging_number, tenant_uuid=MAIN_TENANT)
+            callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
+            filter_member_id = queries.insert_filter_member(callfilter_id, self.user['id'])
 
         self.provd_funckeys = {
             '1': {'label': '', 'type': 'speeddial', 'line': 1, 'value': user_exten},
@@ -583,10 +582,9 @@ class TestBlfFuncKeys(BaseTestFuncKey):
 
         with self.db.queries() as queries:
             conference_id = queries.insert_conference(number=conf_exten)
-            callfilter_id = queries.insert_callfilter()
+            callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             agent_id = queries.insert_agent(self.user['id'])
-            filter_member_id = queries.insert_filter_member(callfilter_id,
-                                                            self.user['id'])
+            filter_member_id = queries.insert_filter_member(callfilter_id, self.user['id'])
 
         self.confd_funckeys = {
             '1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
