@@ -155,7 +155,7 @@ class SipCreator(Creator):
 
     def create(self, fields, tenant_uuid):
         form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
-        return self.service.create(SIP(**form))
+        return self.service.create(SIP(tenant_uuid=tenant_uuid, **form))
 
 
 class SccpCreator(Creator):
@@ -164,7 +164,7 @@ class SccpCreator(Creator):
         return None
 
     def create(self, fields, tenant_uuid):
-        return self.service.create(SCCP(**fields))
+        return self.service.create(SCCP(tenant_uuid=tenant_uuid, **fields))
 
 
 class ExtensionCreator(Creator):
