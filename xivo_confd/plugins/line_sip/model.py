@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.alchemy.usersip import UserSIP as SIP
@@ -10,6 +10,7 @@ class LineSip(object):
 
     def __init__(self,
                  context,
+                 tenant_uuid,
                  id=None,
                  username=None,
                  secret=None,
@@ -23,11 +24,13 @@ class LineSip(object):
         self.provisioning_extension = provisioning_extension
         self.device_slot = device_slot
         self.context = context
+        self.tenant_uuid = tenant_uuid
 
     @classmethod
     def from_line_and_sip(cls, line, sip):
         return cls(id=line.id,
                    context=line.context,
+                   tenant_uuid=sip.tenant_uuid,
                    username=sip.name,
                    secret=sip.secret,
                    callerid=sip.callerid,
@@ -38,7 +41,8 @@ class LineSip(object):
         return SIP(name=self.username,
                    secret=self.secret,
                    callerid=self.callerid,
-                   context=self.context)
+                   context=self.context,
+                   tenant_uuid=self.tenant_uuid)
 
     def build_line(self, sip):
         return Line(position=self.device_slot,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from flask import url_for
@@ -33,8 +33,17 @@ class LineSipList(ListResource):
     model = LineSip
     schema = LineSipSchema
 
+    def get(self):
+        params = self.search_params()
+        total, items = self.service.search(params)
+        return {'total': total,
+                'items': self.schema().dump(items, many=True).data}
+
     def build_headers(self, line):
         return {'Location': url_for('lines_sip', id=line.id, _external=True)}
+
+    def _has_write_tenant_uuid(self):
+        return True
 
 
 class LineSipItem(ItemResource):
