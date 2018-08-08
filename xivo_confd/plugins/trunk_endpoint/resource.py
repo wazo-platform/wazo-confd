@@ -42,15 +42,25 @@ class TrunkEndpoint(ConfdResource):
 
 class TrunkEndpointAssociation(TrunkEndpoint):
 
+    has_tenant_uuid = True
+
+    def __init__(self, service, trunk_dao, endpoint_dao):
+        super(TrunkEndpointAssociation, self).__init__(service)
+        self.service = service
+        self.trunk_dao = trunk_dao
+        self.endpoint_dao = endpoint_dao
+
     def put(self, trunk_id, endpoint_id):
-        trunk = self.service.get_trunk(trunk_id)
-        endpoint = self.service.get_endpoint(endpoint_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
+        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
         self.service.associate(trunk, endpoint)
         return '', 204
 
     def delete(self, trunk_id, endpoint_id):
-        trunk = self.service.get_trunk(trunk_id)
-        endpoint = self.service.get_endpoint(endpoint_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
+        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(trunk, endpoint)
         return '', 204
 

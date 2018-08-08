@@ -7,13 +7,17 @@ from hamcrest import (
     has_entries,
 )
 
+from . import confd
 from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
     scenarios as s,
 )
-from . import confd
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -106,6 +110,21 @@ def test_associate_when_register_sip(trunk, custom, register):
         response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
 
 
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.custom(wazo_tenant=MAIN_TENANT)
+@fixtures.custom(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
+    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.custom(main_custom['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CustomEndpoint'))
+
+    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_endpoint_associated_to_trunk(trunk, custom):
@@ -149,6 +168,18 @@ def test_dissociate(trunk, custom):
 def test_dissociate_not_associated(trunk, custom):
     response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.custom(wazo_tenant=MAIN_TENANT)
+@fixtures.custom(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
+    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.custom(main_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CustomEndpoint'))
 
 
 @fixtures.trunk()

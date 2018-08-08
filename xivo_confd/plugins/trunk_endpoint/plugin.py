@@ -5,6 +5,7 @@
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
 from xivo_dao.resources.endpoint_iax import dao as endpoint_iax_dao
 from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
+from xivo_dao.resources.trunk import dao as trunk_dao
 
 from .resource import (
     EndpointTrunkGetCustom,
@@ -33,7 +34,7 @@ class Plugin(object):
             TrunkEndpointAssociationSip,
             '/trunks/<int:trunk_id>/endpoints/sip/<int:endpoint_id>',
             endpoint='trunk_endpoint_sip',
-            resource_class_args=(service,)
+            resource_class_args=(service, trunk_dao, endpoint_sip_dao)
         )
 
         api.add_resource(
@@ -55,7 +56,7 @@ class Plugin(object):
             TrunkEndpointAssociationCustom,
             '/trunks/<int:trunk_id>/endpoints/custom/<int:endpoint_id>',
             endpoint='trunk_endpoint_custom',
-            resource_class_args=(service,)
+            resource_class_args=(service, trunk_dao, endpoint_custom_dao)
         )
 
         api.add_resource(
@@ -77,7 +78,7 @@ class Plugin(object):
             TrunkEndpointAssociationIAX,
             '/trunks/<int:trunk_id>/endpoints/iax/<int:endpoint_id>',
             endpoint='trunk_endpoint_iax',
-            resource_class_args=(service,)
+            resource_class_args=(service, trunk_dao, endpoint_iax_dao)
         )
 
     def build_sip_service(self):

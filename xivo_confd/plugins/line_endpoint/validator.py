@@ -22,9 +22,17 @@ class ValidateLineAssociation(ValidatorAssociation):
         self.trunk_dao = trunk_dao
 
     def validate(self, line, endpoint):
+        self.validate_same_tenant(line, endpoint)
         self.validate_not_already_associated(line, endpoint)
         self.validate_not_associated_to_line(line, endpoint)
         self.validate_not_associated_to_trunk(line, endpoint)
+
+    def validate_same_tenant(self, line, endpoint):
+        if line.tenant_uuid != endpoint.tenant_uuid:
+            raise errors.different_tenants(
+                line_tenant_uuid=line.tenant_uuid,
+                endpoint_tenant_uuid=endpoint.tenant_uuid,
+            )
 
     def validate_not_already_associated(self, line, endpoint):
         if line.is_associated():

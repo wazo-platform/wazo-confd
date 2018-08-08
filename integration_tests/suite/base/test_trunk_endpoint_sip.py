@@ -2,15 +2,22 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      has_entries)
+from hamcrest import (
+    assert_that,
+    has_entries,
+)
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
 from . import confd
-
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -94,6 +101,21 @@ def test_associate_when_register_iax(trunk, sip, register):
         response.assert_match(400, e.resource_associated('Trunk', 'IAXRegister'))
 
 
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
+    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.sip(main_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SIPEndpoint'))
+
+    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.trunk()
 @fixtures.sip()
 def test_get_endpoint_associated_to_trunk(trunk, sip):
@@ -137,6 +159,18 @@ def test_dissociate(trunk, sip):
 def test_dissociate_not_associated(trunk, sip):
     response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.sip(wazo_tenant=MAIN_TENANT)
+@fixtures.sip(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
+    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Trunk'))
+
+    response = confd.trunks(sub_trunk['id']).endpoints.sip(main_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('SIPEndpoint'))
 
 
 @fixtures.trunk()
