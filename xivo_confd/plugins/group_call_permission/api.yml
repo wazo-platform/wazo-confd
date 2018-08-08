@@ -8,6 +8,7 @@ paths:
       - groups
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/groupid'
       - $ref: '#/parameters/callpermissionid'
       responses:
@@ -23,6 +24,7 @@ paths:
       - groups
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/groupid'
       - $ref: '#/parameters/callpermissionid'
       responses:

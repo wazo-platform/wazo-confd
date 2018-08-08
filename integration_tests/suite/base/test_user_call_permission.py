@@ -13,11 +13,15 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     helpers as h,
     scenarios as s,
 )
-
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -82,6 +86,21 @@ def test_associate_multiple_users_to_call_permission(user1, user2, user3, call_p
     confd.users(user1['id']).callpermissions(call_permission['id']).put().assert_updated()
     confd.users(user2['id']).callpermissions(call_permission['id']).put().assert_updated()
     confd.users(user3['id']).callpermissions(call_permission['id']).put().assert_updated()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_user, sub_user, main_perm, sub_perm):
+    response = confd.users(main_user['uuid']).callpermissions(sub_perm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).callpermissions(main_perm['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CallPermission'))
+
+    response = confd.users(main_user['uuid']).callpermissions(sub_perm['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.user()
@@ -182,6 +201,18 @@ def test_dissociate_using_uuid(user, call_permission):
 def test_dissociate_not_associated(user, call_permission):
     response = confd.users(user['uuid']).callpermissions(call_permission['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.call_permission(wazo_tenant=MAIN_TENANT)
+@fixtures.call_permission(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_user, sub_user, main_perm, sub_perm):
+    response = confd.users(main_user['uuid']).callpermissions(sub_perm['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).callpermissions(main_perm['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('CallPermission'))
 
 
 @fixtures.user()

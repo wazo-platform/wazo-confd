@@ -7,6 +7,8 @@ paths:
       tags:
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Call Permission to create
@@ -45,6 +48,7 @@ paths:
       tags:
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpermissionid'
       responses:
         '200':
@@ -60,6 +64,7 @@ paths:
       tags:
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpermissionid'
       - name: body
         in: body
@@ -84,6 +89,7 @@ paths:
       tags:
       - callpermissions
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpermissionid'
       responses:
         '204':
@@ -107,6 +113,10 @@ definitions:
         type: integer
         readOnly: true
         description: The id of the call permission
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
       name:
         type: string
         description: The name of the call permission
