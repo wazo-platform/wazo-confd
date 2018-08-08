@@ -7,6 +7,8 @@ paths:
       tags:
       - parking_lots
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - parking_lots
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Parking lot to create
@@ -45,6 +48,7 @@ paths:
       tags:
       - parking_lots
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/parkinglotid'
       responses:
         '200':
@@ -60,6 +64,7 @@ paths:
       tags:
       - parking_lots
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/parkinglotid'
       - name: body
         in: body
@@ -80,6 +85,7 @@ paths:
       tags:
       - parking_lots
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/parkinglotid'
       responses:
         '204':
@@ -100,6 +106,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/ParkingLotRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         slots_start:
           type: string
           description: Starting extension to park calls
