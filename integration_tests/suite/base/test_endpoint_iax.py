@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 from hamcrest import (
+    all_of,
     assert_that,
     has_entries,
     has_entry,
@@ -13,12 +14,18 @@ from hamcrest import (
     has_length,
     instance_of,
     is_not,
+    not_,
 )
 
 from . import confd
 from ..helpers import (
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 ALL_OPTIONS = [
@@ -73,6 +80,12 @@ ALL_OPTIONS = [
 def test_get_errors():
     fake_iax_get = confd.endpoints.iax(999999).get
     yield s.check_resource_not_found, fake_iax_get, 'IAXEndpoint'
+
+
+@fixtures.iax()
+def test_delete_errors(iax):
+    fake_iax_delete = confd.endpoints.iax(999999).delete
+    yield s.check_resource_not_found, fake_iax_delete, 'IAXEndpoint'
 
 
 def test_post_errors():
@@ -131,12 +144,6 @@ def unique_error_checks(url, iax):
 
 
 @fixtures.iax()
-def test_delete_errors(iax):
-    fake_iax_delete = confd.endpoints.iax(999999).delete
-    yield s.check_resource_not_found, fake_iax_delete, 'IAXEndpoint'
-
-
-@fixtures.iax()
 def test_get(iax):
     response = confd.endpoints.iax(iax['id']).get()
     assert_that(response.item, has_entries({
@@ -148,13 +155,25 @@ def test_get(iax):
     }))
 
 
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.endpoints.iax(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IAXEndpoint'))
+
+    response = confd.endpoints.iax(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 @fixtures.iax(name='search', type='friend', host='search')
 @fixtures.iax(name='hidden', type='peer', host='hidden')
 def test_search(iax, hidden):
     url = confd.endpoints.iax
-    searches = {'name': 'search',
-                'type': 'friend',
-                'host': 'search'}
+    searches = {
+        'name': 'search',
+        'type': 'friend',
+        'host': 'search'
+    }
 
     for field, term in searches.items():
         yield check_search, url, iax, hidden, field, term
@@ -188,25 +207,51 @@ def test_sorting_offset_limit(iax1, iax2):
     yield s.check_limit, url, iax1, iax2, 'name', 'sort'
 
 
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(main)), not_(has_items(sub)),
+    )
+
+    response = confd.endpoints.iax.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_items(sub), not_(has_items(main))),
+    )
+
+    response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 def test_create_minimal_parameters():
     response = confd.endpoints.iax.post()
 
     response.assert_created('endpoint_iax', location='endpoints/iax')
     assert_that(response.item, has_entries({
+        'tenant_uuid': MAIN_TENANT,
         'name': has_length(8),
         'type': 'friend',
         'host': 'dynamic',
-        'options': instance_of(list)}
+        'options': instance_of(list)},
     ))
 
 
 def test_create_all_parameters():
-    response = confd.endpoints.iax.post(name="myname",
-                                        type="peer",
-                                        host="127.0.0.1",
-                                        options=ALL_OPTIONS)
+    response = confd.endpoints.iax.post(
+        name="myname",
+        type="peer",
+        host="127.0.0.1",
+        options=ALL_OPTIONS,
+    )
 
     assert_that(response.item, has_entries({
+        'tenant_uuid': MAIN_TENANT,
         'name': 'myname',
         'type': 'peer',
         'host': '127.0.0.1',
@@ -285,7 +330,27 @@ def test_update_values_other_than_host_does_not_touch_it(iax):
     assert_that(response.item, has_entries(host="static"))
 
 
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.endpoints.iax(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IAXEndpoint'))
+
+    response = confd.endpoints.iax(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.iax()
-def test_delete_iax(iax):
+def test_delete(iax):
     response = confd.endpoints.iax(iax['id']).delete()
+    response.assert_deleted()
+
+
+@fixtures.iax(wazo_tenant=MAIN_TENANT)
+@fixtures.iax(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.endpoints.iax(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IAXEndpoint'))
+
+    response = confd.endpoints.iax(sub['id']).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
