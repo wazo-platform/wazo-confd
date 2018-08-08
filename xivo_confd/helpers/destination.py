@@ -242,6 +242,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
         options = data.actionarg2.split(';') if data.actionarg2 else []
         data.ring_time = None
         data.skill_rule_id = None
+        data.skill_rule_variables = None
         _skill_rule_variables = None
         if len(options) == 1:
             data.ring_time = options[0] or None
