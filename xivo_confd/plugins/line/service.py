@@ -7,10 +7,11 @@ from xivo_dao.resources.line import dao as line_dao_module
 
 from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.plugins.device import builder as device_builder
-from xivo_confd.plugins.line.notifier import build_notifier
-from xivo_confd.plugins.line.validator import build_validator
 from xivo_confd.plugins.line_device.service import build_service as line_device_build_service
 from xivo_confd.plugins.user_line.service import build_service as user_line_build_service
+
+from .notifier import build_notifier
+from .validator import build_validator
 
 
 class LineService(CRUDService):
@@ -28,9 +29,15 @@ class LineService(CRUDService):
     def find_all_by(self, **criteria):
         return self.dao.find_all_by(**criteria)
 
-    def edit(self, line, updated_fields=None):
+    def create(self, resource, tenant_uuids):
+        self.validator.validate_create(resource, tenant_uuids=tenant_uuids)
+        created_resource = self.dao.create(resource)
+        self.notifier.created(created_resource)
+        return created_resource
+
+    def edit(self, line, tenant_uuids, updated_fields=None):
         with Session.no_autoflush:
-            self.validator.validate_edit(line)
+            self.validator.validate_edit(line, tenant_uuids=tenant_uuids)
         self.dao.edit(line)
         self.notifier.edited(line, updated_fields)
         self.device_updater.update_for_line(line)

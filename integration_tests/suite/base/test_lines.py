@@ -253,6 +253,12 @@ def test_create_line_with_provisioning_code_already_taken(line):
     response.assert_match(400, re.compile("provisioning_code"))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+def test_create_multi_tenant(in_main):
+    response = confd.lines.post(exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT)
+    response.assert_status(400)
+
+
 @fixtures.line()
 def test_update_line_with_fake_context(line):
     response = confd.lines(line['id']).put(context='fakecontext')
@@ -308,6 +314,21 @@ def test_when_updating_line_then_values_are_not_overwriten_with_defaults(line):
 def test_when_line_has_no_endpoint_then_caller_id_can_be_set_to_null(line):
     response = confd.lines(line['id']).put(caller_id_name=None, caller_id_num=None)
     response.assert_updated()
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.line(context='main_ctx')
+@fixtures.line(context='sub_ctx')
+def test_edit_multi_tenant(main_ctx, _, main, sub):
+    response = confd.lines(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Line'))
+
+    response = confd.lines(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+    response = confd.lines(sub['id']).put(context=main_ctx['name'], wazo_tenant=SUB_TENANT)
+    response.assert_status(400)
 
 
 @fixtures.line()
