@@ -18,10 +18,16 @@ class VoicemailService(CRUDService):
         super(VoicemailService, self).__init__(dao, validator, notifier, extra)
         self.sysconf = sysconf
 
-    def edit(self, voicemail, updated_fields=None):
+    def create(self, resource, tenant_uuids):
+        self.validator.validate_create(resource, tenant_uuids=tenant_uuids)
+        created_resource = self.dao.create(resource)
+        self.notifier.created(created_resource)
+        return created_resource
+
+    def edit(self, voicemail, tenant_uuids, updated_fields=None):
         old_number, old_context = voicemail.get_old_number_context()
         with Session.no_autoflush:
-            self.validator.validate_edit(voicemail)
+            self.validator.validate_edit(voicemail, tenant_uuids=tenant_uuids)
         self.dao.edit(voicemail)
         self.move_voicemail(voicemail, old_number, old_context)
         self.notifier.edited(voicemail)
