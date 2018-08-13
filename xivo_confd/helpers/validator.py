@@ -20,6 +20,9 @@ class Validator(object):
     def validate(self, model):
         return
 
+    def validate_with_tenant_uuids(self, model, tenant_uuids):
+        self.validate(model)
+
 
 class ValidatorAssociation(object):
 
@@ -128,17 +131,23 @@ class ValidationGroup(object):
         self.edit = edit or []
         self.delete = delete or []
 
-    def validate_create(self, model):
+    def validate_create(self, model, tenant_uuids=None):
         for validator in self.common + self.create:
-            validator.validate(model)
+            self._validate(validator, model, tenant_uuids)
 
-    def validate_edit(self, model):
+    def validate_edit(self, model, tenant_uuids=None):
         for validator in self.common + self.edit:
-            validator.validate(model)
+            self._validate(validator, model, tenant_uuids)
 
-    def validate_delete(self, model):
+    def validate_delete(self, model, tenant_uuids=None):
         for validator in self.common + self.delete:
+            self._validate(validator, model, tenant_uuids)
+
+    def _validate(self, validator, model, tenant_uuids):
+        if tenant_uuids is None:
             validator.validate(model)
+        else:
+            validator.validate_with_tenant_uuids(model, tenant_uuids)
 
 
 class ValidationAssociation(object):
