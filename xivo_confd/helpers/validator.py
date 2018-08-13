@@ -41,9 +41,18 @@ class GetResource(Validator):
         self.resource = resource
 
     def validate(self, model):
+        self._validate(model)
+
+    def validate_with_tenant_uuids(self, model, tenant_uuids):
+        self._validate(model, tenant_uuids)
+
+    def _validate(self, model, tenant_uuids=None):
         value = getattr(model, self.field)
         try:
-            self.dao_get(value)
+            if tenant_uuids is None:
+                self.dao_get(value)
+            else:
+                self.dao_get(value, tenant_uuids=tenant_uuids)
         except NotFoundError:
             metadata = {self.field: value}
             raise errors.param_not_found(self.field, self.resource, **metadata)

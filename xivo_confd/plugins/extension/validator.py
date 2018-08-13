@@ -7,7 +7,6 @@ import re
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import (
     InputError,
-    NotFoundError,
 )
 from xivo_dao.resources.context import dao as context_dao_module
 from xivo_dao.resources.extension import dao as extension_dao_module
@@ -122,19 +121,6 @@ class ContextOnUpdateValidator(Validator):
             raise errors.unhandled_context_type(context.type)
 
 
-class ContextExistsValidator(Validator):
-
-    def __init__(self, context_dao):
-        self.context_dao = context_dao
-
-    def validate(self, extension, tenant_uuids):
-        try:
-            self.context_dao.get_by(name=extension.context, tenant_uuids=tenant_uuids)
-        except NotFoundError:
-            metadata = {'context': extension.context}
-            raise errors.param_not_found('context', 'Context', **metadata)
-
-
 class ExtensionRangeValidator(Validator, BaseExtensionRangeMixin):
 
     def __init__(self, dao):
@@ -184,10 +170,6 @@ class ExtensionAssociationValidator(Validator):
                                              'Line',
                                              extension_id=extension.id,
                                              line_id=line_extension.line_id)
-
-
-def build_context_exists_validator():
-    return ContextExistsValidator(context_dao_module)
 
 
 def build_validator():

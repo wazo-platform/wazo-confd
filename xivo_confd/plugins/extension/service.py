@@ -11,22 +11,22 @@ from xivo_confd.helpers.resource import CRUDService
 from xivo_confd.plugins.device import builder as device_builder
 
 from .notifier import build_notifier
-from .validator import build_context_exists_validator, build_validator
+from .validator import build_validator
 
 logger = logging.getLogger(__name__)
 
 
 class ExtensionService(CRUDService):
 
-    def __init__(self, dao, validator, context_exists_validator, notifier, device_updater):
+    def __init__(self, dao, validator, notifier, device_updater):
         super(ExtensionService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
-        self.context_exists_validator = context_exists_validator
 
     def create(self, extension, tenant_uuids):
-        logger.debug('creating %s tenant: %s', extension, tenant_uuids)
-        self.context_exists_validator.validate(extension, tenant_uuids)
-        return super(ExtensionService, self).create(extension)
+        self.validator.validate_create(extension, tenant_uuids)
+        created_extension = self.dao.create(extension)
+        self.notifier.created(created_extension)
+        return created_extension
 
     def search(self, parameters, tenant_uuids=None):
         parameters['is_feature'] = False
@@ -37,8 +37,7 @@ class ExtensionService(CRUDService):
 
     def edit(self, extension, updated_fields=None, tenant_uuids=None):
         with Session.no_autoflush:
-            self.context_exists_validator.validate(extension, tenant_uuids)
-            self.validator.validate_edit(extension)
+            self.validator.validate_edit(extension, tenant_uuids)
         self.dao.edit(extension)
         self.notifier.edited(extension, updated_fields)
 
@@ -50,6 +49,5 @@ def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
     return ExtensionService(extension_dao_module,
                             build_validator(),
-                            build_context_exists_validator(),
                             build_notifier(),
                             device_updater)
