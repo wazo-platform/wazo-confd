@@ -2,7 +2,7 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from flask import url_for
+from flask import url_for, request
 
 from xivo_dao.alchemy.voicemail import Voicemail
 
@@ -23,7 +23,11 @@ class VoicemailList(ListResource):
 
     @required_acl('confd.voicemails.create')
     def post(self):
-        return super(VoicemailList, self).post()
+        form = self.schema().load(request.get_json()).data
+        model = self.model(**form)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        model = self.service.create(model, tenant_uuids)
+        return self.schema().dump(model).data, 201, self.build_headers(model)
 
     @required_acl('confd.voicemails.read')
     def get(self):
@@ -41,7 +45,10 @@ class VoicemailItem(ItemResource):
 
     @required_acl('confd.voicemails.{id}.update')
     def put(self, id):
-        return super(VoicemailItem, self).put(id)
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get(id, **kwargs)
+        self.parse_and_update(model, **kwargs)
+        return '', 204
 
     @required_acl('confd.voicemails.{id}.delete')
     def delete(self, id):

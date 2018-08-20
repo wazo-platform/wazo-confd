@@ -146,7 +146,7 @@ class ItemResource(ConfdResource):
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.iteritems():
             setattr(model, name, value)
-        self.service.edit(model, updated_fields, **kwargs)
+        self.service.edit(model, updated_fields=updated_fields, **kwargs)
 
     def find_updated_fields(self, model, form):
         updated_fields = []

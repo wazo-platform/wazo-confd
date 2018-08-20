@@ -211,7 +211,7 @@ def test_create_2_extensions_same_exten_different_context(context):
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
-def test_post_multi_tenant(in_main):
+def test_create_multi_tenant(in_main):
     response = confd.extensions.post(exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT)
     response.assert_status(400)
 
@@ -266,6 +266,21 @@ def test_edit_pattern(extension):
 def test_edit_outcall_pattern(extension):
     response = confd.extensions(extension['id']).put(exten='_+X21')
     response.assert_updated()
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.extension(context='main_ctx')
+@fixtures.extension(context='sub_ctx')
+def test_edit_multi_tenant(main_ctx, _, main, sub):
+    response = confd.extensions(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Extension'))
+
+    response = confd.extensions(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+    response = confd.extensions(sub['id']).put(context=main_ctx['name'], wazo_tenant=SUB_TENANT)
+    response.assert_status(400)
 
 
 @fixtures.extension()

@@ -2,7 +2,7 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from flask import url_for
+from flask import url_for, request
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
@@ -26,7 +26,11 @@ class LineList(ListResource):
 
     @required_acl('confd.lines.create')
     def post(self):
-        return super(LineList, self).post()
+        form = self.schema().load(request.get_json()).data
+        model = self.model(**form)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        model = self.service.create(model, tenant_uuids)
+        return self.schema().dump(model).data, 201, self.build_headers(model)
 
 
 class LineItem(ItemResource):
@@ -40,7 +44,10 @@ class LineItem(ItemResource):
 
     @required_acl('confd.lines.{id}.update')
     def put(self, id):
-        return super(LineItem, self).put(id)
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get(id, **kwargs)
+        self.parse_and_update(model, **kwargs)
+        return '', 204
 
     @required_acl('confd.lines.{id}.delete')
     def delete(self, id):

@@ -159,6 +159,12 @@ def test_create_voicemail_with_same_number_and_context(voicemail):
     response.assert_match(400, e.resource_exists('Voicemail'))
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+def test_create_multi_tenant(in_main):
+    response = confd.voicemails.post(context=in_main['name'], wazo_tenant=SUB_TENANT)
+    response.assert_status(400)
+
+
 @fixtures.voicemail()
 @fixtures.voicemail()
 def test_edit_voicemail_with_same_number_and_context(first_voicemail, second_voicemail):
@@ -434,12 +440,15 @@ def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
 @fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
 @fixtures.voicemail(context='main_ctx')
 @fixtures.voicemail(context='sub_ctx')
-def test_edit_multi_tenant(_, __, main, sub):
+def test_edit_multi_tenant(main_ctx, _, main, sub):
     response = confd.voicemails(main['id']).put(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='Voicemail'))
 
     response = confd.voicemails(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
+
+    response = confd.voicemails(sub['id']).put(context=main_ctx['name'], wazo_tenant=SUB_TENANT)
+    response.assert_status(400)
 
 
 @fixtures.voicemail()
