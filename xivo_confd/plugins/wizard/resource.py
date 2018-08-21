@@ -70,6 +70,17 @@ class WizardContextIncallSchema(WizardContextInternalSchema):
                 raise ValidationError('Missing data for required field.', 'did_length')
 
 
+class WizardStepsSchema(BaseSchema):
+    database = fields.Boolean(missing=True)
+    manage_services = fields.Boolean(missing=True)
+    manage_hosts_file = fields.Boolean(missing=True)
+    manage_resolv_file = fields.Boolean(missing=True)
+    commonconf = fields.Boolean(missing=True)
+    provisioning = fields.Boolean(missing=True)
+    phonebook = fields.Boolean(missing=True)
+    tenant = fields.Boolean(missing=True)
+
+
 class WizardSchema(BaseSchema):
     xivo_uuid = fields.UUID(dump_only=True)
     admin_username = fields.Constant(constant='root', dump_only=True)
@@ -82,6 +93,7 @@ class WizardSchema(BaseSchema):
     context_internal = fields.Nested(WizardContextInternalSchema, required=True)
     context_outcall = fields.Nested(WizardContextOutcallSchema, missing=WizardContextOutcallSchema().load({}).data)
     context_incall = fields.Nested(WizardContextIncallSchema, missing=WizardContextIncallSchema().load({}).data)
+    steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
 
     @validates('entity_name')
     def validate_entity_name(self, entity_name):

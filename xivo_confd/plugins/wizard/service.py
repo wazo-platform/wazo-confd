@@ -42,34 +42,43 @@ class WizardService(object):
         autoprov_username = self._generate_autoprov_username()
         tenant_uuid = self.tenant_dao.find().uuid
 
-        with session_scope():
-            wizard_db.create(wizard, autoprov_username, tenant_uuid)
+        if wizard['steps']['database']:
+            with session_scope():
+                wizard_db.create(wizard, autoprov_username, tenant_uuid)
 
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],
-                                wizard['network']['nameservers'])
-        self._initialize_provd(wizard['network']['ip_address'], autoprov_username)
+                                wizard['network']['nameservers'],
+                                wizard['steps'])
+        if wizard['steps']['provisioning']:
+            self._initialize_provd(wizard['network']['ip_address'], autoprov_username)
         entity_display_name = wizard['entity_name']
         entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
-        self._initialize_phonebook(entity_unique_name)
-        self._initialize_tenant(tenant_uuid, entity_unique_name)
+        if wizard['steps']['phonebook']:
+            self._initialize_phonebook(entity_unique_name)
+        if wizard['steps']['tenant']:
+            self._initialize_tenant(tenant_uuid, entity_unique_name)
 
         wizard_db.set_xivo_configured()
         self.notifier.created()
         wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
 
-    def _send_sysconfd_cmd(self, hostname, domain, nameserver):
-        self.sysconfd.xivo_service_enable()
-        self.sysconfd.flush()
-        self.sysconfd.xivo_service_start()
-        self.sysconfd.flush()
-        self.sysconfd.set_hosts(hostname, domain)
-        self.sysconfd.set_resolvconf(nameserver, domain)
-        self.sysconfd.commonconf_generate()
-        self.sysconfd.flush()
-        self.sysconfd.commonconf_apply()
-        self.sysconfd.flush()
+    def _send_sysconfd_cmd(self, hostname, domain, nameserver, steps):
+        if steps['manage_services']:
+            self.sysconfd.xivo_service_enable()
+            self.sysconfd.flush()
+            self.sysconfd.xivo_service_start()
+            self.sysconfd.flush()
+        if steps['manage_hosts_file']:
+            self.sysconfd.set_hosts(hostname, domain)
+        if steps['manage_resolv_file']:
+            self.sysconfd.set_resolvconf(nameserver, domain)
+        if steps['commonconf']:
+            self.sysconfd.commonconf_generate()
+            self.sysconfd.flush()
+            self.sysconfd.commonconf_apply()
+            self.sysconfd.flush()
 
     def _initialize_phonebook(self, entity):
         token = self._auth_client.token.new('xivo_service', expiration=60)['token']

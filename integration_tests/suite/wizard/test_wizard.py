@@ -10,6 +10,7 @@ from hamcrest import (
     assert_that,
     contains_inanyorder,
     equal_to,
+    empty,
     has_entry,
     has_entries,
     has_item,
@@ -47,7 +48,17 @@ COMPLETE_POST_BODY = {'admin_password': 'password',
                                          'number_start': '2000',
                                          'number_end': '2999',
                                          'did_length': 4},
-                      'context_outcall': {'display_name': 'Outcalls'}}
+                      'context_outcall': {'display_name': 'Outcalls'},
+                      'steps': {
+                          'database': True,
+                          'manage_services': True,
+                          'manage_hosts_file': True,
+                          'manage_resolv_file': True,
+                          'commonconf': True,
+                          'provisioning': True,
+                          'phonebook': True,
+                          'tenant': True,
+                      }}
 
 MINIMAL_POST_BODY = {'admin_password': 'password',
                      'license': True,
@@ -62,6 +73,30 @@ MINIMAL_POST_BODY = {'admin_password': 'password',
                                  'nameservers': ['8.8.8.8']},
                      'context_internal': {'number_start': '1000',
                                           'number_end': '1999'}}
+
+DISABLED_STEPS_POST_BODY = {'admin_password': 'password',
+                            'license': True,
+                            'timezone': 'America/Montreal',
+                            'entity_name': 'xivo',
+                            'network': {'hostname': 'Tutu',
+                                        'domain': 'domain.example.com',
+                                        'interface': 'eth0',
+                                        'ip_address': '127.0.0.1',
+                                        'netmask': '255.255.0.0',
+                                        'gateway': '127.2.5.1',
+                                        'nameservers': ['8.8.8.8']},
+                            'context_internal': {'number_start': '1000',
+                                                 'number_end': '1999'},
+                            'steps': {
+                                'database': False,
+                                'manage_services': False,
+                                'manage_hosts_file': False,
+                                'manage_resolv_file': False,
+                                'commonconf': False,
+                                'provisioning': False,
+                                'phonebook': False,
+                                'tenant': False,
+                            }}
 
 
 def build_string(length):
@@ -475,3 +510,54 @@ class TestWizard(IntegrationTest):
         ]
 
         assert_that(configs, contains_inanyorder(*expected_config))
+
+
+class TestWizardSteps(IntegrationTest):
+
+    @mocks.sysconfd()
+    def test_post(self, sysconfd):
+        data = copy.deepcopy(DISABLED_STEPS_POST_BODY)
+        bus_events = self.bus.accumulator('config.wizard.created')
+
+        response = self.confd.wizard.get()
+        assert_that(response.item, equal_to({'configured': False}))
+
+        response = self.confd.wizard.post(data)
+        response.assert_ok()
+
+        response = self.confd.wizard.get()
+        assert_that(response.item, equal_to({'configured': True}))
+
+        self.validate_db(data)
+        self.validate_sysconfd(sysconfd, data)
+        self.validate_provd()
+
+        def assert_bus_event_received():
+            assert_that(bus_events.accumulate(), has_length(1))
+
+        until.assert_(assert_bus_event_received, tries=5)
+
+    def validate_db(self, data):
+        with self.db.queries() as queries:
+            assert_that(queries.admin_has_password('proformatique'))
+
+    def validate_sysconfd(self, sysconfd, data):
+        sysconfd.assert_no_request('/xivoctl',
+                                   method='POST',
+                                   body=json.dumps({'wazo-service': 'enable'}))
+        sysconfd.assert_no_request('/hosts',
+                                   method='POST',
+                                   body=json.dumps({'hostname': data['network']['hostname'],
+                                                    'domain': data['network']['domain']}))
+        sysconfd.assert_no_request('/resolv_conf',
+                                   method='POST',
+                                   body=json.dumps({'nameservers': data['network']['nameservers'],
+                                                    'search': [data['network']['domain']]}))
+        sysconfd.assert_no_request('/commonconf_generate',
+                                   method='POST',
+                                   body=json.dumps({}))
+
+    def validate_provd(self):
+        configs = self.provd.configs.find()
+
+        assert_that(configs, empty())

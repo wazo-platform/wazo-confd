@@ -91,6 +91,8 @@ definitions:
         $ref: '#/definitions/WizardContextInternal'
       context_outcall:
         $ref: '#/definitions/WizardContextOutcall'
+      steps:
+        $ref: '#/definitions/WizardSteps'
     required:
     - admin_password
     - license
@@ -226,3 +228,38 @@ definitions:
     - netmask
     - gateway
     - nameservers
+  WizardSteps:
+    title: WizardSteps
+    properties:
+      database:
+        type: boolean
+        default: true
+        description: Initialize Wazo database?
+      manage_services:
+        type: boolean
+        default: true
+        description: Enable/start Wazo services?
+      manage_hosts_file:
+        type: boolean
+        default: true
+        description: Modify /etc/hosts?
+      manage_resolv_file:
+        type: boolean
+        default: true
+        description: Modify /etc/resolv.conf?
+      commonconf:
+        type: boolean
+        default: true
+        description: Generate /etc/xivo/common.conf
+      provisioning:
+        type: boolean
+        default: true
+        description: Initialize xivo-provd database?
+      phonebook:
+        type: boolean
+        default: true
+        description: Create phonebook in xivo-dird?
+      tenant:
+        type: boolean
+        default: true
+        description: Create tenant in wazo-auth?

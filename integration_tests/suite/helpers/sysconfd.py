@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import re
 import requests
 
 from pprint import pformat
-from hamcrest import assert_that, has_entries, equal_to, has_item, has_entry
+from hamcrest import (
+    all_of,
+    anything,
+    assert_that,
+    equal_to,
+    has_entries,
+    has_entry,
+    has_item,
+)
 
 
 class SysconfdMock(object):
@@ -34,6 +42,22 @@ class SysconfdMock(object):
             assert_that(results, has_item(has_entry('query', has_entries(query))), pformat(results))
         if body:
             assert_that(results, has_item(has_entry('body', equal_to(body))), pformat(results))
+
+    def assert_no_request(self, path, method='GET', query=None, body=None):
+        try:
+            results = self.requests_matching(path, method)
+        except AssertionError:
+            return
+        if query:
+            query_matcher = has_entry('query', has_entries(query))
+        else:
+            query_matcher = anything()
+        if body:
+            body_matcher = has_entry('body', equal_to(body))
+        else:
+            body_matcher = anything()
+
+        assert_that(results, not(has_item(all_of(query_matcher, body_matcher), pformat(results))))
 
     def requests_matching(self, path, method='GET'):
         regex = re.compile(path)
