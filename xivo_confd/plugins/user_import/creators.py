@@ -115,12 +115,17 @@ class VoicemailCreator(Creator):
         if number or context:
             return self.service.dao.find_by(number=number, context=context)
 
+    def update(self, fields, model):
+        fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
+        self.update_model(fields, model)
+        self.service.edit(model, None)
+
     def create(self, fields, tenant_uuid):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
             form = self.schema(handle_error=False, strict=True).load(fields).data
-            return self.service.create(Voicemail(**form))
+            return self.service.create(Voicemail(**form), None)
 
 
 class LineCreator(Creator):
@@ -133,14 +138,14 @@ class LineCreator(Creator):
         if 'endpoint' in fields:
             del fields['endpoint']
             self.update_model(fields, line)
-            self.service.edit(line)
+            self.service.edit(line, None)
 
     def create(self, fields, tenant_uuid):
         fields = dict(fields)
         context = fields.get('context')
         endpoint = fields.pop('endpoint', None)
         if context and endpoint in ('sip', 'sccp'):
-            return self.service.create(Line(**fields))
+            return self.service.create(Line(**fields), None)
 
 
 class SipCreator(Creator):

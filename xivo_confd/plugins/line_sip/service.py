@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_dao.helpers import errors
@@ -42,7 +41,7 @@ class LineSipService(object):
 
     def create_line(self, line_sip, sip):
         line = line_sip.build_line(sip)
-        return self.line_service.create(line)
+        return self.line_service.create(line, None)
 
     def edit(self, line_sip, updated_fields=[]):
         line = self.line_service.get(line_sip.id)
@@ -52,7 +51,7 @@ class LineSipService(object):
         self.sip_service.edit(sip)
 
         line_sip.update_line(line)
-        self.line_service.edit(line)
+        self.line_service.edit(line, None)
 
     def delete(self, line_sip):
         line = self.line_service.get(line_sip.id)
