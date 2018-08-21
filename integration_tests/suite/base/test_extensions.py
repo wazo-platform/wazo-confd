@@ -322,6 +322,16 @@ def test_update_and_multi_tenant(_, __, in_main, in_sub):
     response.assert_match(400, e.not_found('Context'))
 
 
+@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
+@fixtures.extension(exten='1001', context='main')
+@fixtures.extension(exten='1001', context='sub')
+def test_that_changing_tenant_is_not_possible(_, __, in_main, in_sub):
+    body = {'exten': '1002', 'context': 'sub'}
+    response = confd.extensions(in_main['id']).put(wazo_tenant=MAIN_TENANT, **body)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.user()
 @fixtures.user()
 @fixtures.user()

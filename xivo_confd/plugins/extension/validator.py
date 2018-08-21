@@ -91,6 +91,21 @@ class ExtenRegexValidator(Validator):
             raise InputError("exten: ['String does not match expected pattern.']")
 
 
+class SameTenantValidator(Validator):
+
+    def __init__(self, context_dao):
+        self._context_dao = context_dao
+
+    def validate(self, extension):
+        context = self._context_dao.get_by_name(extension.context)
+
+        if extension.tenant_uuid != context.tenant_uuid:
+            raise errors.different_tenants(
+                current_tenant_uuid=extension.tenant_uuid,
+                context_tenant_uuid=context.tenant_uuid,
+            )
+
+
 class ContextOnUpdateValidator(Validator):
 
     def __init__(self, dao):
@@ -186,6 +201,7 @@ def build_validator():
             ContextOnUpdateValidator(context_dao_module),
             ExtensionRangeValidator(context_dao_module),
             ExtenRegexValidator(context_dao_module),
+            SameTenantValidator(context_dao_module),
         ],
         delete=[
             ExtensionAssociationValidator(extension_dao_module, line_extension_dao_module)
