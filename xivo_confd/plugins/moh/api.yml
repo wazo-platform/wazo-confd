@@ -7,6 +7,8 @@ paths:
       tags:
       - moh
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -45,6 +47,7 @@ paths:
       tags:
       - moh
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/moh_uuid'
       responses:
         '200':
@@ -60,6 +63,7 @@ paths:
       tags:
       - moh
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/moh_uuid'
       - name: body
         in: body
@@ -83,6 +87,7 @@ paths:
       tags:
       - moh
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/moh_uuid'
       responses:
         '204':
@@ -99,6 +104,7 @@ paths:
       tags:
       - moh
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/moh_uuid'
       - $ref: '#/parameters/moh_filename'
       produces:
@@ -117,6 +123,7 @@ paths:
       consumes:
       - application/octet-stream
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/moh_uuid'
       - $ref: '#/parameters/moh_filename'
       - name: body
@@ -136,6 +143,7 @@ paths:
       tags:
       - moh
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/moh_uuid'
       - $ref: '#/parameters/moh_filename'
       responses:
