@@ -3,11 +3,14 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 from hamcrest import (
+    all_of,
     assert_that,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
+    not_,
     not_none,
 )
 
@@ -16,6 +19,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_UUID = '00000000-0000-0000-0000-000000000000'
@@ -98,6 +105,28 @@ def test_sort_offset_limit(application1, application2):
     yield s.check_limit, url, application1, application2, 'name', 'sort', id_field
 
 
+@fixtures.application(wazo_tenant=MAIN_TENANT)
+@fixtures.application(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.applications.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.applications.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.applications.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.application()
 def test_get(application):
     response = confd.applications(application['uuid']).get()
@@ -109,12 +138,23 @@ def test_get(application):
     ))
 
 
+@fixtures.application(wazo_tenant=MAIN_TENANT)
+@fixtures.application(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.applications(main['uuid']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Application'))
+
+    response = confd.applications(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.applications.post()
     response.assert_created('applications')
 
     assert_that(response.item, has_entries(
         uuid=not_none(),
+        tenant_uuid=MAIN_TENANT,
         destination=None,
         destination_options={},
     ))
@@ -136,7 +176,7 @@ def test_create_all_parameters():
     response.assert_created('applications')
     response = confd.applications(response.item['uuid']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.applications(response.item['uuid']).delete().assert_deleted()
 
@@ -165,12 +205,32 @@ def test_edit_all_parameters(application):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.application(wazo_tenant=MAIN_TENANT)
+@fixtures.application(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.applications(main['uuid']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Application'))
+
+    response = confd.applications(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.application()
 def test_delete(application):
     response = confd.applications(application['uuid']).delete()
     response.assert_deleted()
     response = confd.applications(application['uuid']).get()
     response.assert_match(404, e.not_found(resource='Application'))
+
+
+@fixtures.application(wazo_tenant=MAIN_TENANT)
+@fixtures.application(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.applications(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Application'))
+
+    response = confd.applications(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.application()

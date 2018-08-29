@@ -14,7 +14,6 @@ from .schema import ApplicationSchema
 
 class ApplicationList(ListResource):
 
-    # TODO multi-tenant
     model = Application
     schema = ApplicationSchema
 
@@ -33,6 +32,7 @@ class ApplicationList(ListResource):
 class ApplicationItem(ItemResource):
 
     schema = ApplicationSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.applications.{application_uuid}.read')
     def get(self, application_uuid):

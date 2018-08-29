@@ -44,6 +44,7 @@ class ApplicationDestinationOptionsField(fields.Field):
 
 class ApplicationSchema(BaseSchema):
     uuid = fields.String(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), allow_none=True)
     destination = fields.String(
         validate=OneOf(ApplicationDestinationOptionsField._options.keys()),

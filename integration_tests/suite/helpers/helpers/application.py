@@ -9,8 +9,8 @@ def generate_application(**parameters):
     return add_application(**parameters)
 
 
-def add_application(**parameters):
-    response = confd.applications.post(parameters)
+def add_application(wazo_tenant=None, **parameters):
+    response = confd.applications.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 
