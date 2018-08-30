@@ -1,5 +1,5 @@
 paths:
-  /agents/applications:
+  /applications:
     get:
       operationId: list_applications
       summary: List application
@@ -40,7 +40,7 @@ paths:
             $ref: '#/definitions/Application'
         '400':
           $ref: '#/responses/CreateError'
-  /agents/applications/{application_uuid}:
+  /applications/{application_uuid}:
     get:
       operationId: get_application
       summary: Get application
