@@ -64,5 +64,6 @@ class ApplicationSchema(BaseSchema):
     def create_objects(self, data):
         dest = data.pop('destination', None)
         dest_options = data.pop('destination_options', {})
+        data['dest_node'] = None
         if dest == 'node':
             data['dest_node'] = ApplicationDestNode(**dest_options)

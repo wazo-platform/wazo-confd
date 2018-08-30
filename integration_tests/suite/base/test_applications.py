@@ -205,6 +205,20 @@ def test_edit_all_parameters(application):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.application(destination='node', destination_options={'type': 'mixing'})
+def test_edit_remove_destination(application):
+    parameters = {
+        'destination': None,
+        'destination_options': {},
+    }
+
+    response = confd.applications(application['uuid']).put(**parameters)
+    response.assert_updated()
+
+    response = confd.applications(application['uuid']).get()
+    assert_that(response.item, has_entries(parameters))
+
+
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
 def test_edit_multi_tenant(main, sub):
