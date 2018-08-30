@@ -27,6 +27,7 @@ setup(
             'agent = xivo_confd.plugins.agent.plugin:Plugin',
             'agent_skill = xivo_confd.plugins.agent_skill.plugin:Plugin',
             'api = xivo_confd.plugins.api.plugin:Plugin',
+            'application = xivo_confd.plugins.application.plugin:Plugin',
             'call_log = xivo_confd.plugins.call_log.plugin:Plugin',
             'call_filter = xivo_confd.plugins.call_filter.plugin:Plugin',
             'call_filter_fallback = xivo_confd.plugins.call_filter_fallback.plugin:Plugin',

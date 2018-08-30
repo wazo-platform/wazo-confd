@@ -1,6 +1,18 @@
 Changelog
 =========
 
+18.10
+-----
+
+* Added applicationl endpoints:
+
+  * GET `/1.1/applications`
+  * POST `/1.1/applications`
+  * DELETE `/1.1/applications/<application_uuid>`
+  * GET `/1.1/applications/<application_uuid>`
+  * PUT `/1.1/applications/<application_uuid>`
+
+
 18.09
 -----
 

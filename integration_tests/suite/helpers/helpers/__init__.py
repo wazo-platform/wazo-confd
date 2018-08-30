@@ -90,6 +90,7 @@ from . import destination
 from . import agent
 from . import agent_login_status
 from . import agent_skill
+from . import application
 from . import call_filter
 from . import call_filter_entity
 from . import call_filter_recipient_user
@@ -185,6 +186,7 @@ __all__ = [
     'agent',
     'agent_login_status',
     'agent_skill',
+    'application',
     'call_filter',
     'call_filter_entity',
     'call_filter_recipient_user',

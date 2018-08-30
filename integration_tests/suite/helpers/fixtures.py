@@ -263,3 +263,10 @@ class skill_rule(IsolatedAction):
 
     actions = {'generate': h.skill_rule.generate_skill_rule,
                'delete': h.skill_rule.delete_skill_rule}
+
+
+class application(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {'generate': h.application.generate_application,
+               'delete': h.application.delete_application}

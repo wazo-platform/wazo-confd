@@ -1,0 +1,146 @@
+paths:
+  /agents/applications:
+    get:
+      operationId: list_applications
+      summary: List application
+      description: '**Required ACL:** `confd.applications.read`'
+      tags:
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Applications list
+          schema:
+            $ref: '#/definitions/ApplicationItems'
+    post:
+      operationId: create_application
+      summary: Create application
+      description: '**Required ACL:** `confd.applications.create`'
+      tags:
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - name: body
+        in: body
+        description: Application parameters
+        required: true
+        schema:
+          $ref: '#/definitions/Application'
+      responses:
+        '201':
+          description: The Application has been created
+          schema:
+            $ref: '#/definitions/Application'
+        '400':
+          $ref: '#/responses/CreateError'
+  /agents/applications/{application_uuid}:
+    get:
+      operationId: get_application
+      summary: Get application
+      description: '**Required ACL:** `confd.applications.{application_uuid}.read`'
+      tags:
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/application_uuid'
+      responses:
+        '200':
+          description: Application
+          schema:
+            $ref: '#/definitions/Application'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_application
+      summary: Update application
+      description: '**Required ACL:** `confd.applications.{application_uuid}.update`'
+      tags:
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/application_uuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Application'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_application
+      summary: Delete application
+      description: '**Required ACL:** `confd.applications.{application_uuid}.delete`'
+      tags:
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/application_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  application_uuid:
+    required: true
+    type: integer
+    name: application_uuid
+    in: path
+    description: Application's UUID
+
+definitions:
+  Application:
+    type: object
+    properties:
+      uuid:
+        type: string
+        description: Application UUID
+        readOnly: true
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
+      name:
+        type: string
+        description: Application name
+      destination:
+        type: string
+        description: Destination where the call entering in the application will be sent
+        enum:
+        - node
+      destination_options:
+        $ref: '#/definitions/ApplicationDestination'
+  ApplicationDestination:
+    type: object
+    properties:
+      music_on_hold:
+        type: string
+        description: Name of the MOH category to use for music on hold
+      type:
+        type: string
+        description: type of the default node
+        enum:
+        - mixing
+        - holding
+  ApplicationItems:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Application'
