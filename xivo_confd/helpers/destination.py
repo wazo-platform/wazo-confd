@@ -10,6 +10,7 @@ from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.resources.application import dao as application_dao
 from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
@@ -69,6 +70,7 @@ class ApplicationDestinationSchema(BaseDestinationSchema):
     application = fields.String(
         validate=OneOf([
             'callback_disa',
+            'custom',
             'directory',
             'disa',
             'fax_to_mail',
@@ -111,6 +113,25 @@ class CallBackDISADestinationSchema(ApplicationDestinationSchema):
         attribute='actionarg2',
         required=True,
     )
+
+
+class CustomApplicationDestinationSchema(ApplicationDestinationSchema):
+    application_uuid = fields.UUID(attribute='actionarg1', required=True)
+
+    _application = fields.Nested(
+        'ApplicationSchema',
+        only=['name'],
+        attribute='application',
+        dump_only=True,
+    )
+
+    @post_dump
+    def make_application_fields_flat(self, data):
+        if data.get('_application'):
+            data['application_name'] = data['_application']['name']
+
+        data.pop('_application', None)
+        return data
 
 
 class DISADestinationSchema(ApplicationDestinationSchema):
@@ -434,6 +455,7 @@ class DestinationField(fields.Nested):
     application_schemas = {
         'callback_disa': CallBackDISADestinationSchema,
         'callbackdisa': CallBackDISADestinationSchema,
+        'custom': CustomApplicationDestinationSchema,
         'directory': DirectoryDestinationSchema,
         'disa': DISADestinationSchema,
         'fax_to_mail': FaxToMailDestinationSchema,
@@ -524,6 +546,7 @@ class DestinationValidator(object):
 
     _VALIDATORS = {
         'application:callbackdisa': [],
+        'application:custom': [GetResource('actionarg1', application_dao.get, 'Application')],
         'application:directory': [],
         'application:disa': [],
         'application:faxtomail': [],

@@ -356,10 +356,11 @@ def test_create_all_parameters():
 @fixtures.voicemail()
 @fixtures.conference()
 @fixtures.skill_rule()
-def test_valid_destinations(queue, meetme, ivr, group, outcall, dest_queue,
-                            switchboard, user, voicemail, conference, skill_rule):
-    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue,
-                                          switchboard, user, voicemail, conference, skill_rule):
+@fixtures.application()
+def test_valid_destinations(queue, meetme, ivr, group, outcall, dest_queue, switchboard, user,
+                            voicemail, conference, skill_rule, application):
+    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue, switchboard,
+                                          user, voicemail, conference, skill_rule, application):
         yield create_queue_with_destination, destination
         yield update_queue_with_destination, queue['id'], destination
 

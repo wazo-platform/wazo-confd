@@ -101,10 +101,11 @@ def test_edit_to_none(user):
 @fixtures.voicemail()
 @fixtures.conference()
 @fixtures.skill_rule()
-def test_valid_destinations(user, meetme, ivr, group, outcall, queue, switchboard,
-                            dest_user, voicemail, conference, skill_rule):
+@fixtures.application()
+def test_valid_destinations(user, meetme, ivr, group, outcall, queue, switchboard, dest_user,
+                            voicemail, conference, skill_rule, application):
     for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
-                                          dest_user, voicemail, conference, skill_rule):
+                                          dest_user, voicemail, conference, skill_rule, application):
         yield _update_user_fallbacks_with_destination, user['uuid'], destination
 
 
@@ -124,9 +125,9 @@ def _update_user_fallbacks_with_destination(user_id, destination):
 @fixtures.user()
 def test_nonexistent_destinations(user):
     meetme = ivr = group = outcall = queue = dest_user = voicemail = conference = skill_rule = {'id': 99999999}
-    switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
+    switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
     for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
-                                          dest_user, voicemail, conference, skill_rule):
+                                          dest_user, voicemail, conference, skill_rule, application):
         if destination['type'] in ('meetme',
                                    'ivr',
                                    'group',
@@ -136,6 +137,9 @@ def test_nonexistent_destinations(user):
                                    'user',
                                    'voicemail',
                                    'conference'):
+            yield _update_user_fallbacks_with_nonexistent_destination, user['uuid'], destination
+
+        if destination['type'] == 'application' and destination['application'] == 'custom':
             yield _update_user_fallbacks_with_nonexistent_destination, user['uuid'], destination
 
 
