@@ -12,6 +12,12 @@ Changelog
   * GET `/1.1/applications/<application_uuid>`
   * PUT `/1.1/applications/<application_uuid>`
 
+* New destination application type:
+
+  * For destinations of type `application`:
+
+      * `custom`
+
 
 18.09
 -----
