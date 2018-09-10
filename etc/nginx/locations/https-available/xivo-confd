@@ -1,5 +1,6 @@
 location ^~ /api/confd/ {
     proxy_pass https://127.0.0.1:9486/;
+    # client_max_body_size 16m;
 
     proxy_set_header    Host                $http_host;
     proxy_set_header    X-Script-Name       /api/confd;
