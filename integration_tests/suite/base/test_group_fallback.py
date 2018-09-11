@@ -87,10 +87,9 @@ def test_edit_to_none(group):
 @fixtures.voicemail()
 @fixtures.conference()
 @fixtures.skill_rule()
-def test_valid_destinations(group, meetme, ivr, dest_group, outcall, queue,
-                            switchboard, user, voicemail, conference, skill_rule):
-    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard,
-                                          user, voicemail, conference, skill_rule):
+@fixtures.application()
+def test_valid_destinations(group, *destinations):
+    for destination in valid_destinations(*destinations):
         yield _update_group_fallbacks_with_destination, group['id'], destination
 
 
@@ -104,9 +103,9 @@ def _update_group_fallbacks_with_destination(group_id, destination):
 @fixtures.group()
 def test_nonexistent_destinations(group):
     meetme = ivr = dest_group = outcall = queue = user = voicemail = conference = skill_rule = {'id': 99999999}
-    switchboard = {'uuid': '00000000-0000-0000-0000-000000000000'}
+    switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
     for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard,
-                                          user, voicemail, conference, skill_rule):
+                                          user, voicemail, conference, skill_rule, application):
         if destination['type'] in ('meetme',
                                    'ivr',
                                    'group',
@@ -116,6 +115,9 @@ def test_nonexistent_destinations(group):
                                    'user',
                                    'voicemail',
                                    'conference'):
+            yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
+
+        if destination['type'] == 'application' and destination['application'] == 'custom':
             yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
 
 

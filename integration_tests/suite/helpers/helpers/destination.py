@@ -25,6 +25,11 @@ def invalid_destinations():
         {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': '#123'},
         {'type': 'application', 'application': 'callback_disa', 'context': 'default', 'pin': s.random_string(41)},
 
+        {'type': 'application'},
+        {'type': 'application', 'application': 'custom', 'missing_required_field': 123},
+        {'type': 'application', 'application': 'custom', 'application_uuid': 'string'},
+        {'type': 'application', 'application': 'custom', 'application_uuid': None},
+
         {'type': 'application', 'application': 'directory', 'context': True},
         {'type': 'application', 'application': 'directory', 'context': None},
         {'type': 'application', 'application': 'directory', 'context': 'invalid_char_@'},
@@ -157,7 +162,8 @@ def invalid_destinations():
     ]
 
 
-def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail, conference, skill_rule):
+def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, voicemail,
+                       conference, skill_rule, application):
     return [
         {'type': 'application', 'application': 'callback_disa',
          'context': 'name'},
@@ -165,6 +171,8 @@ def valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user, vo
          'pin': '1234', 'context': 'name'},
         {'type': 'application', 'application': 'callback_disa',
          'pin': None, 'context': 'name'},
+        {'type': 'application', 'application': 'custom',
+         'application_uuid': application['uuid']},
         {'type': 'application', 'application': 'directory',
          'context': 'name'},
         {'type': 'application', 'application': 'disa',

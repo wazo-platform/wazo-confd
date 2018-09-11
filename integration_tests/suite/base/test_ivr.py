@@ -236,10 +236,9 @@ def test_edit_all_parameters(ivr):
 @fixtures.voicemail()
 @fixtures.conference()
 @fixtures.skill_rule()
-def test_valid_destinations(ivr, meetme, dest_ivr, group, outcall, queue,
-                            switchboard, user, voicemail, conference, skill_rule):
-    for destination in valid_destinations(meetme, dest_ivr, group, outcall, queue, switchboard,
-                                          user, voicemail, conference, skill_rule):
+@fixtures.application()
+def test_valid_destinations(ivr, *destinations):
+    for destination in valid_destinations(*destinations):
         yield create_ivr_with_destination, destination
         yield update_ivr_with_destination, ivr['id'], destination
 

@@ -340,10 +340,9 @@ def test_edit_all_parameters(schedule):
 @fixtures.voicemail()
 @fixtures.conference()
 @fixtures.skill_rule()
-def test_valid_destinations(schedule, meetme, ivr, group, outcall, queue, switchboard,
-                            user, voicemail, conference, skill_rule):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
-                                          user, voicemail, conference, skill_rule):
+@fixtures.application()
+def test_valid_destinations(schedule, *destinations):
+    for destination in valid_destinations(*destinations):
         yield create_schedule_with_destination, destination
         yield update_schedule_with_destination, schedule['id'], destination
 

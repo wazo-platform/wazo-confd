@@ -10,6 +10,7 @@ from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.resources.application import dao as application_dao
 from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
@@ -31,22 +32,26 @@ SKILL_RULE_VARIABLE_REGEX = r'^[^[;\|]+$'
 
 
 class BaseDestinationSchema(Schema):
-    type = fields.String(validate=OneOf(['application',
-                                         'conference',
-                                         'custom',
-                                         'extension',
-                                         'group',
-                                         'hangup',
-                                         'ivr',
-                                         'meetme',
-                                         'none',
-                                         'outcall',
-                                         'queue',
-                                         'sound',
-                                         'switchboard',
-                                         'user',
-                                         'voicemail']),
-                         required=True)
+    type = fields.String(
+        validate=OneOf([
+            'application',
+            'conference',
+            'custom',
+            'extension',
+            'group',
+            'hangup',
+            'ivr',
+            'meetme',
+            'none',
+            'outcall',
+            'queue',
+            'sound',
+            'switchboard',
+            'user',
+            'voicemail'
+        ]),
+        required=True,
+    )
 
     @post_dump
     def convert_type_to_user(self, data):
@@ -62,13 +67,18 @@ class BaseDestinationSchema(Schema):
 
 
 class ApplicationDestinationSchema(BaseDestinationSchema):
-    application = fields.String(validate=OneOf(['callback_disa',
-                                                'directory',
-                                                'disa',
-                                                'fax_to_mail',
-                                                'voicemail']),
-                                attribute='subtype',
-                                required=True)
+    application = fields.String(
+        validate=OneOf([
+            'callback_disa',
+            'custom',
+            'directory',
+            'disa',
+            'fax_to_mail',
+            'voicemail',
+        ]),
+        attribute='subtype',
+        required=True,
+    )
 
     @post_dump
     def convert_application_to_user(self, data):
@@ -92,25 +102,57 @@ class ApplicationDestinationSchema(BaseDestinationSchema):
 
 
 class CallBackDISADestinationSchema(ApplicationDestinationSchema):
-    pin = fields.String(validate=(Predicate('isdigit'), Length(max=40)),
-                        allow_none=True,
-                        attribute='actionarg1')
+    pin = fields.String(
+        validate=(Predicate('isdigit'), Length(max=40)),
+        allow_none=True,
+        attribute='actionarg1',
+    )
 
-    context = fields.String(validate=Regexp(CONTEXT_REGEX),
-                            attribute='actionarg2', required=True)
+    context = fields.String(
+        validate=Regexp(CONTEXT_REGEX),
+        attribute='actionarg2',
+        required=True,
+    )
+
+
+class CustomApplicationDestinationSchema(ApplicationDestinationSchema):
+    application_uuid = fields.UUID(attribute='actionarg1', required=True)
+
+    _application = fields.Nested(
+        'ApplicationSchema',
+        only=['name'],
+        attribute='application',
+        dump_only=True,
+    )
+
+    @post_dump
+    def make_application_fields_flat(self, data):
+        if data.get('_application'):
+            data['application_name'] = data['_application']['name']
+
+        data.pop('_application', None)
+        return data
 
 
 class DISADestinationSchema(ApplicationDestinationSchema):
-    pin = fields.String(validate=(Predicate('isdigit'), Length(max=40)),
-                        allow_none=True,
-                        attribute='actionarg1')
-    context = fields.String(validate=Regexp(CONTEXT_REGEX),
-                            attribute='actionarg2', required=True)
+    pin = fields.String(
+        validate=(Predicate('isdigit'), Length(max=40)),
+        allow_none=True,
+        attribute='actionarg1',
+    )
+    context = fields.String(
+        validate=Regexp(CONTEXT_REGEX),
+        attribute='actionarg2',
+        required=True,
+    )
 
 
 class DirectoryDestinationSchema(ApplicationDestinationSchema):
-    context = fields.String(validate=Regexp(CONTEXT_REGEX),
-                            attribute='actionarg1', required=True)
+    context = fields.String(
+        validate=Regexp(CONTEXT_REGEX),
+        attribute='actionarg1',
+        required=True,
+    )
 
 
 class FaxToMailDestinationSchema(ApplicationDestinationSchema):
@@ -118,8 +160,7 @@ class FaxToMailDestinationSchema(ApplicationDestinationSchema):
 
 
 class VoicemailMainDestinationSchema(ApplicationDestinationSchema):
-    context = fields.String(validate=Regexp(CONTEXT_REGEX),
-                            attribute='actionarg1', required=True)
+    context = fields.String(validate=Regexp(CONTEXT_REGEX), attribute='actionarg1', required=True)
 
 
 class MeetmeDestinationSchema(BaseDestinationSchema):
@@ -129,9 +170,11 @@ class MeetmeDestinationSchema(BaseDestinationSchema):
 class ConferenceDestinationSchema(BaseDestinationSchema):
     conference_id = fields.Integer(attribute='actionarg1', required=True)
 
-    conference = fields.Nested('ConferenceSchema',
-                               only=['name'],
-                               dump_only=True)
+    conference = fields.Nested(
+        'ConferenceSchema',
+        only=['name'],
+        dump_only=True,
+    )
 
     @post_dump
     def make_conference_fields_flat(self, data):
@@ -143,24 +186,35 @@ class ConferenceDestinationSchema(BaseDestinationSchema):
 
 
 class CustomDestinationSchema(BaseDestinationSchema):
-    command = fields.String(validate=(Regexp(COMMAND_REGEX), Length(max=255)),
-                            attribute='actionarg1', required=True)
+    command = fields.String(
+        validate=(Regexp(COMMAND_REGEX), Length(max=255)),
+        attribute='actionarg1',
+        required=True,
+    )
 
 
 class ExtensionDestinationSchema(BaseDestinationSchema):
-    exten = fields.String(validate=Regexp(CONTEXT_REGEX),
-                          attribute='actionarg1', required=True)
-    context = fields.String(validate=Regexp(CONTEXT_REGEX),
-                            attribute='actionarg2', required=True)
+    exten = fields.String(
+        validate=Regexp(CONTEXT_REGEX),
+        attribute='actionarg1',
+        required=True,
+    )
+    context = fields.String(
+        validate=Regexp(CONTEXT_REGEX),
+        attribute='actionarg2',
+        required=True,
+    )
 
 
 class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(attribute='actionarg1', required=True)
     ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
-    group = fields.Nested('GroupSchema',
-                          only=['name'],
-                          dump_only=True)
+    group = fields.Nested(
+        'GroupSchema',
+        only=['name'],
+        dump_only=True,
+    )
 
     @post_dump
     def make_group_fields_flat(self, data):
@@ -172,12 +226,12 @@ class GroupDestinationSchema(BaseDestinationSchema):
 
 
 class HangupDestinationSchema(BaseDestinationSchema):
-    cause = fields.String(validate=OneOf(['busy',
-                                          'congestion',
-                                          'normal']),
-                          attribute='subtype',
-                          missing='normal',
-                          required=True)
+    cause = fields.String(
+        validate=OneOf(['busy', 'congestion', 'normal']),
+        attribute='subtype',
+        missing='normal',
+        required=True,
+    )
 
     @post_dump
     def convert_cause_to_user(self, data):
@@ -203,9 +257,11 @@ class CongestionDestinationSchema(HangupDestinationSchema):
 class IVRDestinationSchema(BaseDestinationSchema):
     ivr_id = fields.Integer(attribute='actionarg1', required=True)
 
-    ivr = fields.Nested('IvrSchema',
-                        only=['name'],
-                        dump_only=True)
+    ivr = fields.Nested(
+        'IvrSchema',
+        only=['name'],
+        dump_only=True,
+    )
 
     @post_dump
     def make_ivr_fields_flat(self, data):
@@ -226,9 +282,11 @@ class NoneDestinationSchema(BaseDestinationSchema):
 
 class OutcallDestinationSchema(BaseDestinationSchema):
     outcall_id = fields.Integer(attribute='actionarg1', required=True)
-    exten = fields.String(validate=(Predicate('isdigit'), Length(max=255)),
-                          attribute='actionarg2',
-                          required=True)
+    exten = fields.String(
+        validate=(Predicate('isdigit'), Length(max=255)),
+        attribute='actionarg2',
+        required=True,
+    )
 
 
 class QueueDestinationSchema(BaseDestinationSchema):
@@ -321,9 +379,11 @@ class SwitchboardDestinationSchema(BaseDestinationSchema):
     switchboard_uuid = fields.UUID(attribute='actionarg1', required=True)
     ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
-    switchboard = fields.Nested('SwitchboardSchema',
-                                only=['name'],
-                                dump_only=True)
+    switchboard = fields.Nested(
+        'SwitchboardSchema',
+        only=['name'],
+        dump_only=True,
+    )
 
     @post_dump
     def make_switchboard_fields_flat(self, data):
@@ -338,10 +398,11 @@ class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(attribute='actionarg1', required=True)
     ring_time = fields.Float(validate=Range(min=0), attribute='actionarg2', allow_none=True)
 
-    user = fields.Nested('UserSchema',
-                         only=['firstname',
-                               'lastname'],
-                         dump_only=True)
+    user = fields.Nested(
+        'UserSchema',
+        only=['firstname', 'lastname'],
+        dump_only=True,
+    )
 
     @post_dump
     def make_user_fields_flat(self, data):
@@ -358,9 +419,11 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
     skip_instructions = StrictBoolean()
     greeting = fields.String(validate=OneOf(['busy', 'unavailable']), allow_none=True)
 
-    voicemail = fields.Nested('VoicemailSchema',
-                              only=['name'],
-                              dump_only=True)
+    voicemail = fields.Nested(
+        'VoicemailSchema',
+        only=['name'],
+        dump_only=True,
+    )
 
     @pre_dump
     def separate_action(self, data):
@@ -392,6 +455,7 @@ class DestinationField(fields.Nested):
     application_schemas = {
         'callback_disa': CallBackDISADestinationSchema,
         'callbackdisa': CallBackDISADestinationSchema,
+        'custom': CustomApplicationDestinationSchema,
         'directory': DirectoryDestinationSchema,
         'disa': DISADestinationSchema,
         'fax_to_mail': FaxToMailDestinationSchema,
@@ -482,6 +546,7 @@ class DestinationValidator(object):
 
     _VALIDATORS = {
         'application:callbackdisa': [],
+        'application:custom': [GetResource('actionarg1', application_dao.get, 'Application')],
         'application:directory': [],
         'application:disa': [],
         'application:faxtomail': [],

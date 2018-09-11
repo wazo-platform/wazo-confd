@@ -196,6 +196,8 @@ definitions:
     properties:
       callback_disa:
         $ref: '#/definitions/DestinationApplicationCallbackDISA'
+      custom:
+        $ref: '#/definitions/DestinationApplicationCustom'
       directory:
         $ref: '#/definitions/DestinationApplicationDirectory'
       disa:
@@ -229,6 +231,20 @@ definitions:
     required:
     - application
     - context
+  DestinationApplicationCustom:
+    title: DestinationApplicationCustom
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'custom'
+        application_uuid:
+          type: string
+          description: The UUID of the application.
+    required:
+    - application
+    - application_uuid
   DestinationApplicationDirectory:
     title: DestinationApplicationDirectory
     allOf:
