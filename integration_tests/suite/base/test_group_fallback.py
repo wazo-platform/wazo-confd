@@ -88,10 +88,8 @@ def test_edit_to_none(group):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
-def test_valid_destinations(group, meetme, ivr, dest_group, outcall, queue, switchboard, user,
-                            voicemail, conference, skill_rule, application):
-    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard,
-                                          user, voicemail, conference, skill_rule, application):
+def test_valid_destinations(group, *destinations):
+    for destination in valid_destinations(*destinations):
         yield _update_group_fallbacks_with_destination, group['id'], destination
 
 

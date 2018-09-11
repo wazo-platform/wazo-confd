@@ -114,10 +114,8 @@ def test_edit_to_none(queue):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
-def test_valid_destinations(queue, meetme, ivr, group, outcall, dest_queue, switchboard, user,
-                            voicemail, conference, skill_rule, application):
-    for destination in valid_destinations(meetme, ivr, group, outcall, dest_queue, switchboard,
-                                          user, voicemail, conference, skill_rule, application):
+def test_valid_destinations(queue, *destinations):
+    for destination in valid_destinations(*destinations):
         yield _update_queue_fallbacks_with_destination, queue['id'], destination
 
 

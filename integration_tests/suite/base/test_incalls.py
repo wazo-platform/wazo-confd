@@ -222,10 +222,8 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
-def test_valid_destinations(incall, meetme, ivr, group, outcall, queue, switchboard, user,
-                            voicemail, conference, skill_rule, application):
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard, user,
-                                          voicemail, conference, skill_rule, application):
+def test_valid_destinations(incall, *destinations):
+    for destination in valid_destinations(*destinations):
         yield create_incall_with_destination, destination
         yield update_incall_with_destination, incall['id'], destination
 
