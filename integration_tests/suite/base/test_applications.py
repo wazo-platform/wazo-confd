@@ -193,7 +193,7 @@ def test_edit_all_parameters(application):
         'name': 'UpdatedApplication',
         'destination': 'node',
         'destination_options': {
-            'type': 'mixing',
+            'type': 'holding',
             'music_on_hold': 'updated_moh',
         }
     }
@@ -205,7 +205,7 @@ def test_edit_all_parameters(application):
     assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.application(destination='node', destination_options={'type': 'mixing'})
+@fixtures.application(destination='node', destination_options={'type': 'holding'})
 def test_edit_remove_destination(application):
     parameters = {
         'destination': None,

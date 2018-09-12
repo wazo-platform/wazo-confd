@@ -14,7 +14,7 @@ class NodeApplicationDestinationOptionsSchema(BaseSchema):
 
     type = fields.String(
         attribute='type_',
-        validate=OneOf(['mixing', 'holding']),
+        validate=OneOf(['holding']),
         required=True,
         missing='holding',
     )
