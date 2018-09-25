@@ -34,7 +34,7 @@ class UserList(ListResource):
 
     @required_acl('confd.users.read')
     def get(self):
-        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         if 'q' in request.args:
             return self.legacy_search(tenant_uuids=tenant_uuids)
         else:
