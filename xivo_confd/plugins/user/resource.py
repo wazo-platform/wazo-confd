@@ -4,7 +4,6 @@
 
 from flask import url_for, request
 
-from xivo.tenant_flask_helpers import Tenant
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from xivo_confd.auth import required_acl
@@ -61,7 +60,7 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.read')
     def head(self, id):
-        tenant_uuids = [t.uuid for t in Tenant.autodetect(many=True)]
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         self.service.get(id, tenant_uuids=tenant_uuids)
         return '', 200
 
