@@ -30,9 +30,15 @@ Changelog
   * GET `/1.1/users/<user_id>/voicemails`
   * GET `/1.1/voicemails/<voicemail_id>/users`
 
-  * GET `/1.1/users/<user_id>/cti`
-
   * GET `/1.1/users/<user_id>/agent`
+  * GET `/1.1/users/<user_id>/cti`
+  * GET `/1.1/users/<user_id>/entities`
+
+  * POST `/1.1/entities`
+  * GET `/1.1/entities`
+  * GET `/1.1/entities/<entity_id>`
+  * PUT `/1.1/entities/<entity_id>`
+  * DELETE `/1.1/entities/<entity_id>`
 
 
 18.10

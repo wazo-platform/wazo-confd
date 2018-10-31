@@ -4,8 +4,9 @@ paths:
       operationId: list_entities
       summary: List entities
       description: '**Required ACL:** `confd.entities.read`'
+      deprecated: true
       tags:
-      - entities
+      - deprecated
       parameters:
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
@@ -21,8 +22,9 @@ paths:
       operationId: create_entity
       summary: Create entity
       description: '**Required ACL:** `confd.entities.create`'
+      deprecated: true
       tags:
-      - entities
+      - deprecated
       parameters:
       - name: body
         in: body
@@ -42,8 +44,9 @@ paths:
       operationId: get_entity
       summary: Get entity
       description: '**Required ACL:** `confd.entities.{entity_id}.read`'
+      deprecated: true
       tags:
-      - entities
+      - deprecated
       parameters:
       - $ref: '#/parameters/entityid'
       responses:
@@ -56,12 +59,13 @@ paths:
     delete:
       operationId: delete_entity
       summary: Delete entity
-      description: '**Required ACL:** `confd.entities.{entity_id}.delete`
+      description: |
+        **Required ACL:** `confd.entities.{entity_id}.delete`
 
-
-        An entity can not be deleted if it is associated to an object.'
+        An entity can not be deleted if it is associated to an object.
+      deprecated: true
       tags:
-      - entities
+      - deprecated
       parameters:
       - $ref: '#/parameters/entityid'
       responses:
