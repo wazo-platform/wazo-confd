@@ -7,13 +7,14 @@ paths:
       tags:
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
       - $ref: '#/parameters/view'
-      - $ref: '#/parameters/tenantuuid'
       responses:
         '200':
           description: User list
@@ -26,13 +27,13 @@ paths:
       tags:
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: User to create
         required: true
         schema:
           $ref: '#/definitions/User'
-      - $ref: '#/parameters/tenantuuid'
       responses:
         '201':
           description: User created

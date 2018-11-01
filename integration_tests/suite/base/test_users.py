@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     empty,
@@ -12,8 +13,10 @@ from hamcrest import (
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
+    not_,
 )
 
 from . import confd
@@ -22,6 +25,10 @@ from ..helpers import (
     config,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -467,6 +474,28 @@ def check_search(url, field, term, value):
     expected = has_item(has_entry(field, value))
     response = url.get(search=term)
     assert_that(response.items, expected)
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.users.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.users.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.users.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.user(firstname="firstname1",
