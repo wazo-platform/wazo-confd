@@ -49,6 +49,7 @@ paths:
       tags:
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       responses:
         '200':
@@ -62,6 +63,7 @@ paths:
       tags:
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       responses:
         '200':
@@ -81,6 +83,7 @@ paths:
       tags:
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - name: body
         in: body
@@ -107,6 +110,7 @@ paths:
       tags:
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       responses:
         '204':
