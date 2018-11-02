@@ -1,6 +1,46 @@
 Changelog
 =========
 
+18.13
+-----
+
+* The following URLs have been deprecated:
+
+  * GET `/1.1/endpoints/custom/<custom_id>/lines`
+  * GET `/1.1/endpoints/sccp/<custom_id>/lines`
+  * GET `/1.1/endpoints/sip/<custom_id>/lines`
+  * GET `/1.1/lines/<line_id>/endpoints/custom`
+  * GET `/1.1/lines/<line_id>/endpoints/sccp`
+  * GET `/1.1/lines/<line_id>/endpoints/sip`
+
+  * GET `/1.1/endpoints/custom/<custom_id>/trunks`
+  * GET `/1.1/endpoints/sip/<custom_id>/trunks`
+  * GET `/1.1/trunks/<trunk_id>/endpoints/custom`
+  * GET `/1.1/trunks/<trunk_id>/endpoints/sip`
+
+  * GET `/1.1/lines/<line_id>/extensions`
+  * GET `/1.1/extensions/<extension_id>/lines`
+
+  * GET `/1.1/callpermissions/<call_permission_id>/users`
+  * GET `/1.1/users/<user_id>/callpermissions`
+
+  * GET `/1.1/lines/<line_id>/users`
+  * GET `/1.1/users/<user_id>/lines`
+
+  * GET `/1.1/users/<user_id>/voicemails`
+  * GET `/1.1/voicemails/<voicemail_id>/users`
+
+  * GET `/1.1/users/<user_id>/agent`
+  * GET `/1.1/users/<user_id>/cti`
+  * GET `/1.1/users/<user_id>/entities`
+
+  * POST `/1.1/entities`
+  * GET `/1.1/entities`
+  * GET `/1.1/entities/<entity_id>`
+  * PUT `/1.1/entities/<entity_id>`
+  * DELETE `/1.1/entities/<entity_id>`
+
+
 18.10
 -----
 

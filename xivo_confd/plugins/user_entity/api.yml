@@ -4,9 +4,9 @@ paths:
       operationId: get_user_entity_association
       summary: Get entity of a user
       description: '**Required ACL:** `confd.users.{user_id}.entities.read`'
+      deprecated: true
       tags:
-      - users
-      - entities
+      - deprecated
       parameters:
       - $ref: '#/parameters/useriduuid'
       responses:

@@ -21,9 +21,9 @@ paths:
       operationId: list_extension_line_association
       summary: List lines association to extension
       description: '**Required ACL:** `confd.extensions.{extension_id}.lines.read`'
+      deprecated: true
       tags:
-      - extensions
-      - lines
+      - deprecated
       parameters:
       - $ref: '#/parameters/extensionid'
       responses:
@@ -82,9 +82,9 @@ paths:
       operationId: get_line_extension_association
       summary: List extensions associated to line
       description: '**Required ACL:** `confd.lines.{line_id}.extensions.read`'
+      deprecated: true
       tags:
-      - lines
-      - extensions
+      - deprecated
       parameters:
       - $ref: '#/parameters/lineid'
       responses:

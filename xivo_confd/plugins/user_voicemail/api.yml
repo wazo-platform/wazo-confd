@@ -4,9 +4,9 @@ paths:
       operationId: get_user_voicemail_association
       summary: Get voicemail associated to user
       description: '**Required ACL:** `confd.users.{user_id}.voicemails.read`'
+      deprecated: true
       tags:
-      - users
-      - voicemails
+      - deprecated
       parameters:
       - $ref: '#/parameters/useriduuid'
       responses:
@@ -55,9 +55,9 @@ paths:
       operationId: get_voicemail_user_association
       summary: Get users associated to voicemail
       description: '**Required ACL:** `confd.voicemails.{voicemail_id}.users.read`'
+      deprecated: true
       tags:
-      - users
-      - voicemails
+      - deprecated
       parameters:
       - $ref: '#/parameters/voicemailid'
       responses:

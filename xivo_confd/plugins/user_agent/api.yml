@@ -4,9 +4,9 @@ paths:
       operationId: get_user_agent_association
       summary: Get agent of a user
       description: '**Required ACL:** `confd.users.{user_id}.agents.read`'
+      deprecated: true
       tags:
-      - users
-      - agents
+      - deprecated
       parameters:
       - $ref: '#/parameters/useriduuid'
       responses:

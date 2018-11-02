@@ -4,10 +4,9 @@ paths:
       operationId: get_endpoint_custom_trunk
       summary: Get Trunk associated to Custom endpoint
       description: '**Required ACL:** `confd.endpoints.custom.{custom_id}.trunks.read`'
+      deprecated: true
       tags:
-      - trunks
-      - endpoints
-      - custom
+      - deprecated
       parameters:
       - $ref: '#/parameters/customid'
       responses:
@@ -26,10 +25,9 @@ paths:
       operationId: get_endpoint_sip_trunk
       summary: Get Trunk associated to SIP endpoint
       description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.trunks.read`'
+      deprecated: true
       tags:
-      - trunks
-      - endpoints
-      - sip
+      - deprecated
       parameters:
       - $ref: '#/parameters/sipid'
       responses:
@@ -48,10 +46,9 @@ paths:
       operationId: get_trunk_endpoint_custom
       summary: Get Custom endpoint associated to Trunk
       description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.custom.read`'
+      deprecated: true
       tags:
-      - trunks
-      - endpoints
-      - custom
+      - deprecated
       parameters:
       - $ref: '#/parameters/trunkid'
       responses:
@@ -144,10 +141,9 @@ paths:
       operationId: get_trunk_endpoint_sip
       summary: Get SIP endpoint associated to Trunk
       description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.read`'
+      deprecated: true
       tags:
-      - trunks
-      - endpoints
-      - sip
+      - deprecated
       parameters:
       - $ref: '#/parameters/trunkid'
       responses:

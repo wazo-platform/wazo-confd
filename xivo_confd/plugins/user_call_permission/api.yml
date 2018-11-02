@@ -4,9 +4,9 @@ paths:
       operationId: get_callpermission_user_association
       summary: Get users associated to call permission
       description: '**Required ACL:** `confd.callpermissions.{callpermission_id}.users.read`'
+      deprecated: true
       tags:
-      - users
-      - callpermissions
+      - deprecated
       parameters:
       - $ref: '#/parameters/callpermissionid'
       responses:
@@ -21,9 +21,9 @@ paths:
       operationId: get_user_callpermission_association
       summary: Get call permissions associated to user
       description: '**Required ACL:** `confd.users.{user_id}.callpermissions.read`'
+      deprecated: true
       tags:
-      - users
-      - callpermissions
+      - deprecated
       parameters:
       - $ref: '#/parameters/useriduuid'
       responses:
