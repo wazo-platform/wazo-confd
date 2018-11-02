@@ -33,21 +33,21 @@ class UserList(ListResource):
 
     @required_acl('confd.users.read')
     def get(self):
-        tenant_uuids = self._build_tenant_list({'recurse': True})
-        if 'q' in request.args:
-            return self.legacy_search(tenant_uuids=tenant_uuids)
+        params = self.search_params()
+        tenant_uuids = self._build_tenant_list(params)
+        if 'q' in params:
+            return self.legacy_search(params, tenant_uuids=tenant_uuids)
         else:
-            return self.user_search(tenant_uuids=tenant_uuids)
+            return self.user_search(params, tenant_uuids=tenant_uuids)
 
-    def legacy_search(self, tenant_uuids=None):
-        result = self.service.legacy_search(request.args['q'], tenant_uuids=tenant_uuids)
+    def legacy_search(self, params, tenant_uuids=None):
+        result = self.service.legacy_search(params['q'], tenant_uuids=tenant_uuids)
         return {'total': result.total,
                 'items': self.schema().dump(result.items, many=True).data}
 
-    def user_search(self, tenant_uuids=None):
+    def user_search(self, params, tenant_uuids=None):
         view = request.args.get('view')
         schema = self.view_schemas.get(view, self.schema)
-        params = self.search_params()
         result = self.service.search(params, tenant_uuids)
         return {'total': result.total,
                 'items': schema().dump(result.items, many=True).data}
