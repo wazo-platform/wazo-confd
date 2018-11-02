@@ -107,6 +107,8 @@ definitions:
         category:
           type: string
           description: The category of the skill
+        description:
+          type: string
     required:
     - name
   SkillRelationBase:
