@@ -6,7 +6,7 @@ POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/postgres-test/Dockerfile
 
 
 test-setup: egg-info build-confd
-	docker pull waisbrot/wait
+	docker pull wazopbx/wait
 	docker pull rabbitmq
 	docker pull wazopbx/postgres
 	docker pull wazopbx/postgres-test
