@@ -329,6 +329,19 @@ def test_get_voicemail_destination_relation(voicemail):
     ))
 
 
+@fixtures.queue()
+def test_get_queue_destination_relation(queue):
+    incall = confd.incalls.post(destination={'type': 'queue', 'queue_id': queue['id']}).item
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(response.item, has_entries(
+        destination=has_entries(
+            queue_id=queue['id'],
+            queue_label=queue['label'],
+        )
+    ))
+
+
 @fixtures.group()
 def test_get_incalls_relation_when_group_destination(group):
     incall1 = confd.incalls.post(destination={'type': 'group', 'group_id': group['id']}).item

@@ -295,6 +295,12 @@ class QueueDestinationSchema(BaseDestinationSchema):
     skill_rule_id = fields.Integer(allow_none=True)
     skill_rule_variables = fields.Dict(allow_none=True)
 
+    queue = fields.Nested(
+        'QueueSchema',
+        only=['label'],
+        dump_only=True,
+    )
+
     @pre_dump
     def separate_action(self, data):
         options = data.actionarg2.split(';') if data.actionarg2 else []
@@ -330,6 +336,14 @@ class QueueDestinationSchema(BaseDestinationSchema):
             sep2=';' if skill_rule_id else '',
             skill_rule_variables=skill_rule_variables_str,
         )
+        return data
+
+    @post_dump
+    def make_queue_fields_flat(self, data):
+        if data.get('queue'):
+            data['queue_label'] = data['queue']['label']
+
+        data.pop('queue', None)
         return data
 
     @validates_schema
