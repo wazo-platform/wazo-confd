@@ -14,7 +14,7 @@ from xivo_confd import bus, sysconfd
 class TrunkNotifier(object):
 
     _IPBX_COMMANDS = {
-        'sip': ['sip reload'],
+        'sip': ['module reload res_pjsip.so'],
         'iax': ['iax2 reload'],
     }
 

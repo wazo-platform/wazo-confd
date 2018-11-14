@@ -15,7 +15,7 @@ from ..notifier import RegisterSIPNotifier
 
 EXPECTED_SYSCONFD_HANDLERS = {
     'ctibus': [],
-    'ipbx': ['sip reload'],
+    'ipbx': ['module reload res_pjsip.so'],
     'agentbus': []
 }
 

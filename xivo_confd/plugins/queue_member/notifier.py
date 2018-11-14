@@ -55,7 +55,7 @@ class QueueMemberNotifier(object):
         self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(
             cti_command=['xivo[queuemember,update]'],
-            ipbx_command=['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            ipbx_command=['module reload res_pjsip.so', 'module reload app_queue.so', 'module reload chan_sccp.so'],
         )
 
     def user_dissociated(self, queue, member):
@@ -63,7 +63,7 @@ class QueueMemberNotifier(object):
         self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(
             cti_command=['xivo[queuemember,update]'],
-            ipbx_command=['sip reload', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            ipbx_command=['module reload res_pjsip.so', 'module reload app_queue.so', 'module reload chan_sccp.so'],
         )
 
 

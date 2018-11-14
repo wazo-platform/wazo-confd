@@ -56,7 +56,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_associate_sip_then_sysconfd_event(self):
         self.notifier_sip.associated(self.trunk, self.sip)
         expected = {'ctibus': [],
-                    'ipbx': ['sip reload'],
+                    'ipbx': ['module reload res_pjsip.so'],
                     'agentbus': []}
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected)

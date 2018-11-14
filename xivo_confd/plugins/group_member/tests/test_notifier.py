@@ -14,7 +14,7 @@ from xivo_bus.resources.group_member.event import (
 from ..notifier import GroupMemberNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['sip reload',
+                     'ipbx': ['module reload res_pjsip.so',
                               'module reload app_queue.so',
                               'module reload chan_sccp.so'],
                      'agentbus': []}

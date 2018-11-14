@@ -25,7 +25,7 @@ class TrunkEndpointNotifier(object):
 
     def associated(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            self.send_sysconfd_handlers(['sip reload'])
+            self.send_sysconfd_handlers(['module reload res_pjsip.so'])
         elif self.endpoint == 'iax':
             self.send_sysconfd_handlers(['iax2 reload'])
         event = TrunkEndpointAssociatedEvent(trunk.id, endpoint.id)
@@ -33,7 +33,7 @@ class TrunkEndpointNotifier(object):
 
     def dissociated(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            self.send_sysconfd_handlers(['sip reload'])
+            self.send_sysconfd_handlers(['module reload res_pjsip.so'])
         elif self.endpoint == 'iax':
             self.send_sysconfd_handlers(['iax2 reload'])
         event = TrunkEndpointDissociatedEvent(trunk.id, endpoint.id)

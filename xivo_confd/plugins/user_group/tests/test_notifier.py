@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -13,7 +13,7 @@ from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 from ..notifier import UserGroupNotifier
 
 SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['sip reload',
+                     'ipbx': ['module reload res_pjsip.so',
                               'module reload app_queue.so',
                               'module reload chan_sccp.so'],
                      'agentbus': []}
