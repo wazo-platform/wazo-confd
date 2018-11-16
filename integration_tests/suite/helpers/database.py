@@ -471,20 +471,6 @@ class DatabaseQueries(object):
 
         return count > 0
 
-    def autoprov_is_configured(self):
-        query = text("""SELECT COUNT(*)
-                     FROM staticsip
-                     WHERE
-                        category = 'general'
-                        AND filename = 'sip.conf'
-                        AND var_name = 'autocreate_prefix'
-                     """)
-        count = (self.connection
-                 .execute(query)
-                 .scalar())
-
-        return count > 0
-
     def entity_has_name_displayname(self, name, displayname):
         query = text("""SELECT COUNT(*)
                      FROM entity
