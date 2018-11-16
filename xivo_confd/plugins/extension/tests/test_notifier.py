@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -44,7 +44,7 @@ class TestExtensionNotifier(unittest.TestCase):
     def test_when_extension_edited_then_handlers_sent(self):
         expected_handlers = {'ctibus': [],
                              'ipbx': ['dialplan reload',
-                                      'sip reload',
+                                      'module reload res_pjsip.so',
                                       'module reload chan_sccp.so',
                                       'module reload app_queue.so'],
                              'agentbus': []}
@@ -56,7 +56,7 @@ class TestExtensionNotifier(unittest.TestCase):
     def test_when_extension_edited_and_undefined_change_then_handlers_sent(self):
         expected_handlers = {'ctibus': [],
                              'ipbx': ['dialplan reload',
-                                      'sip reload',
+                                      'module reload res_pjsip.so',
                                       'module reload chan_sccp.so',
                                       'module reload app_queue.so'],
                              'agentbus': []}

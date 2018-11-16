@@ -19,7 +19,7 @@ class RegisterSIPNotifier(object):
 
     def send_sysconfd_handlers(self):
         handlers = {'ctibus': [],
-                    'ipbx': ['sip reload'],
+                    'ipbx': ['module reload res_pjsip.so'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 

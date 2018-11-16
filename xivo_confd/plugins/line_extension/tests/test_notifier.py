@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -15,10 +15,18 @@ from ..notifier import LineExtensionNotifier
 
 USER_ID = 1
 LINE_ID = 2
-SYSCONFD_HANDLERS = {'ctibus': ['xivo[phone,edit,{}]'.format(LINE_ID),
-                                'xivo[user,edit,{}]'.format(USER_ID)],
-                     'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ctibus': [
+        'xivo[phone,edit,{}]'.format(LINE_ID),
+        'xivo[user,edit,{}]'.format(USER_ID),
+    ],
+    'ipbx': [
+        'dialplan reload',
+        'module reload res_pjsip.so',
+        'module reload app_queue.so',
+    ],
+    'agentbus': [],
+}
 
 
 @patch('xivo_dao.resources.user_line.dao.find_all_by_line_id', Mock(return_value=[Mock(user_id=USER_ID)]))

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_bus.resources.user_line.event import UserLineAssociatedEvent, UserLineDissociatedEvent
@@ -15,7 +15,7 @@ class UserLineNotifier(object):
     def _send_sysconfd_handlers(self):
         handlers = {
             'ctibus': [],
-            'ipbx': ['dialplan reload', 'sip reload'],
+            'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
             'agentbus': [],
         }
         self._sysconfd.exec_request_handlers(handlers)

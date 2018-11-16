@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_bus.resources.user_voicemail.event import (
@@ -18,7 +18,7 @@ class UserVoicemailNotifier(object):
     def _send_sysconfd_handlers(self, cti_commands):
         handlers = {
             'ctibus': cti_commands,
-            'ipbx': ['sip reload', 'module reload chan_sccp.so'],
+            'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
             'agentbus': [],
         }
         self._sysconfd.exec_request_handlers(handlers)

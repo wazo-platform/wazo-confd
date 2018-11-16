@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -14,9 +14,15 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from ..notifier import LineNotifier
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['sip reload', 'dialplan reload', 'module reload chan_sccp.so'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ctibus': [],
+    'ipbx': [
+        'module reload res_pjsip.so',
+        'dialplan reload',
+        'module reload chan_sccp.so',
+    ],
+    'agentbus': [],
+}
 
 
 class TestLineNotifier(unittest.TestCase):

@@ -19,7 +19,7 @@ class SipEndpointNotifier(object):
 
     def send_sysconfd_handlers(self):
         handlers = {'ctibus': [],
-                    'ipbx': ['sip reload', 'dialplan reload'],
+                    'ipbx': ['module reload res_pjsip.so', 'dialplan reload'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 

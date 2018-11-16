@@ -19,7 +19,7 @@ class LineExtensionNotifier(object):
 
     def send_sysconfd_handlers(self, line, extension):
         handlers = {'ctibus': self._generate_ctibus_commands(line, extension),
-                    'ipbx': ['dialplan reload', 'sip reload', 'module reload app_queue.so'],
+                    'ipbx': ['dialplan reload', 'module reload res_pjsip.so', 'module reload app_queue.so'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 

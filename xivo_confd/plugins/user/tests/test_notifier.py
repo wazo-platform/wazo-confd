@@ -33,7 +33,7 @@ def sysconfd_handler(action, user_id):
             'ipbx': ['dialplan reload',
                      'module reload chan_sccp.so',
                      'module reload app_queue.so',
-                     'sip reload'],
+                     'module reload res_pjsip.so'],
             'agentbus': []}
 
 

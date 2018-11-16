@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import unittest
@@ -55,7 +55,7 @@ class TestVoicemailNotifier(unittest.TestCase):
                              call(expected_event2)))
 
     def test_when_voicemail_edited_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': ['voicemail reload', 'sip reload', 'module reload chan_sccp.so'],
+        expected_handlers = {'ipbx': ['voicemail reload', 'module reload res_pjsip.so', 'module reload chan_sccp.so'],
                              'agentbus': [],
                              'ctibus': ['xivo[voicemail,edit,{}]'.format(self.voicemail.id)]}
         self.notifier.edited(self.voicemail)

@@ -25,7 +25,7 @@ class UserNotifier(object):
                     'ipbx': ['dialplan reload',
                              'module reload chan_sccp.so',
                              'module reload app_queue.so',
-                             'sip reload'],
+                             'module reload res_pjsip.so'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 

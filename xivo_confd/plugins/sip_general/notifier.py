@@ -22,7 +22,7 @@ class SIPGeneralNotifier(object):
     def edited(self, sip_general):
         event = EditSIPGeneralEvent()
         self.bus.send_bus_event(event)
-        self.send_sysconfd_handlers(['sip reload'])
+        self.send_sysconfd_handlers(['module reload res_pjsip.so'])
 
 
 def build_notifier():

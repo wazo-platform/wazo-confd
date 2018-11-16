@@ -35,7 +35,7 @@ class VoicemailNotifier(object):
     def edited(self, voicemail):
         self._send_sysconfd_handlers('xivo[voicemail,edit,%s]' % voicemail.id,
                                      ['voicemail reload',
-                                      'sip reload',
+                                      'module reload res_pjsip.so',
                                       'module reload chan_sccp.so'])
         event = EditVoicemailEvent(voicemail.id)
         self.bus.send_bus_event(event)

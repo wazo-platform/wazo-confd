@@ -19,7 +19,7 @@ class LineNotifier(object):
 
     def send_sysconfd_handlers(self):
         handlers = {'ctibus': [],
-                    'ipbx': ['sip reload', 'dialplan reload', 'module reload chan_sccp.so'],
+                    'ipbx': ['module reload res_pjsip.so', 'dialplan reload', 'module reload chan_sccp.so'],
                     'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
