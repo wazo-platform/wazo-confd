@@ -16,7 +16,6 @@ from hamcrest import (
     has_item,
     has_length,
     is_not,
-    starts_with
 )
 
 from xivo_test_helpers import until
@@ -413,7 +412,6 @@ class TestWizard(IntegrationTest):
     def validate_db(self, data):
         with self.db.queries() as queries:
             assert_that(queries.admin_has_password(data['admin_password']))
-            assert_that(queries.autoprov_is_configured())
             assert_that(queries.entity_has_name_displayname('testentity', data['entity_name']))
             assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))

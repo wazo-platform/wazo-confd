@@ -43,7 +43,7 @@ class WizardService(object):
 
         if wizard['steps']['database']:
             with session_scope():
-                wizard_db.create(wizard, autoprov_username, tenant_uuid)
+                wizard_db.create(wizard, tenant_uuid)
 
         self._send_sysconfd_cmd(wizard['network']['hostname'],
                                 wizard['network']['domain'],

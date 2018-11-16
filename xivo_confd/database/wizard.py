@@ -27,13 +27,6 @@ def set_admin_password(password):
     Session.add(row)
 
 
-def set_autoprov_name(autoprov_username):
-    Session.add(StaticSIP(category='general',
-                          filename='sip.conf',
-                          var_name='autocreate_prefix',
-                          var_val=autoprov_username))
-
-
 def set_default_entity(display_name, name, tenant_uuid):
     row = Entity(displayname=display_name, name=name, description='Wizard Entity', tenant_uuid=tenant_uuid)
     Session.add(row)
@@ -205,12 +198,11 @@ def get_xivo_configured():
     return Session.query(General).first()
 
 
-def create(wizard, autoprov_username, tenant_uuid):
+def create(wizard, tenant_uuid):
     network = wizard['network']
     entity = entity_unique_name(wizard['entity_name'])
 
     set_admin_password(wizard['admin_password'])
-    set_autoprov_name(autoprov_username)
     set_default_entity(wizard['entity_name'], entity, tenant_uuid)
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
