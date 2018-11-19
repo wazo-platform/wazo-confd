@@ -4,8 +4,8 @@
 
 import logging
 
+from wazo_dird_client import Client as DirdClient
 from xivo_auth_client import Client as AuthClient
-from xivo_dird_client import Client as DirdClient
 from xivo_provd_client import new_provisioning_client_from_config
 
 from xivo_dao.resources.infos import dao as infos_dao
