@@ -258,7 +258,7 @@ definitions:
       phonebook:
         type: boolean
         default: true
-        description: Create phonebook in xivo-dird?
+        description: Create phonebook in wazo-dird?
       tenant:
         type: boolean
         default: true
