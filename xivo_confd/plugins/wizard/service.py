@@ -80,12 +80,12 @@ class WizardService(object):
             self.sysconfd.flush()
 
     def _initialize_phonebook(self, entity):
-        token = self._auth_client.token.new('xivo_service', expiration=60)['token']
+        token = self._auth_client.token.new(expiration=60)['token']
         phonebook = self._dird_client.phonebook.create(tenant=entity, phonebook_body=PHONEBOOK_BODY, token=token)
         wizard_db.set_phonebook(entity, phonebook)
 
     def _initialize_tenant(self, tenant_uuid, tenant_name):
-        token = self._auth_client.token.new('xivo_service', expiration=60)['token']
+        token = self._auth_client.token.new(expiration=60)['token']
         self._auth_client.set_token(token)
         self._auth_client.tenants.new(uuid=str(tenant_uuid), name=tenant_name)
 

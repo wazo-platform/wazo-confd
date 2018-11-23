@@ -17,7 +17,7 @@ class AuthClientProxy(AuthClient):
         super(AuthClientProxy, self).__init__(*args, **kwargs)
         self.users_created = []
         # 30 minutes should be enought to import all users
-        token = self.token.new('xivo_service', expiration=30 * 60)['token']
+        token = self.token.new(expiration=30 * 60)['token']
         self.set_token(token)
 
     def new_user(self, *args, **kwargs):
