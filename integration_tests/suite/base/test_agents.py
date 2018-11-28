@@ -148,6 +148,7 @@ def test_get(agent):
 
         queues=empty(),
         skills=empty(),
+        users=empty(),
     ))
 
 

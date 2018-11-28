@@ -116,6 +116,7 @@ definitions:
           type: string
           description: Additional information about the agent
     - $ref: '#/definitions/AgentRelationQueues'
+    - $ref: '#/definitions/AgentRelationUsers'
     required:
     - number
   AgentRelationBase:
@@ -145,6 +146,16 @@ definitions:
         penalty:
           type: integer
           description: Agent's penalty. A priority used for distributing calls.
+  AgentRelationUsers:
+    properties:
+      users:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/AgentRelationUser'
+  AgentRelationUser:
+    allOf:
+    - $ref: '#/definitions/UserRelationBase'
   AgentItems:
     title: AgentItems
     properties:

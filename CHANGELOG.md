@@ -1,6 +1,13 @@
 Changelog
 =========
 
+18.14
+-----
+* New readonly parameters have been added to the agent resource:
+
+  * `users`
+
+
 18.13
 -----
 
