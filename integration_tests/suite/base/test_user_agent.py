@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from hamcrest import (assert_that,
-                      empty,
-                      has_entries,
-                      not_)
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    empty,
+    has_entries,
+    not_,
+)
 
-from ..helpers import associations as a
 from . import confd
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 
@@ -110,6 +115,28 @@ def test_get_agent_relation(agent, user):
         assert_that(response.item, has_entries(
             agent=has_entries(id=agent['id'],
                               number=agent['number'])
+        ))
+
+
+@fixtures.agent()
+@fixtures.user()
+@fixtures.user()
+def test_get_users_relation(agent, user1, user2):
+    with a.user_agent(user1, agent), a.user_agent(user2, agent):
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(
+            users=contains_inanyorder(
+                has_entries(
+                    uuid=user1['uuid'],
+                    firstname=user1['firstname'],
+                    lastname=user1['lastname'],
+                ),
+                has_entries(
+                    uuid=user2['uuid'],
+                    firstname=user2['firstname'],
+                    lastname=user2['lastname'],
+                ),
+            )
         ))
 
 

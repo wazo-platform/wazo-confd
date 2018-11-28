@@ -33,6 +33,12 @@ class AgentSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    users = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )
 
 
 class AgentQueuesMemberSchema(BaseSchema):
