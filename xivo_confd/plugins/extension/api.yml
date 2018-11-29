@@ -158,9 +158,10 @@ definitions:
     - $ref: '#/definitions/ExtensionRelationConference'
     - $ref: '#/definitions/ExtensionRelationGroup'
     - $ref: '#/definitions/ExtensionRelationIncall'
+    - $ref: '#/definitions/ExtensionRelationLines'
     - $ref: '#/definitions/ExtensionRelationOutcall'
     - $ref: '#/definitions/ExtensionRelationParkingLot'
-    - $ref: '#/definitions/ExtensionRelationLines'
+    - $ref: '#/definitions/ExtensionRelationQueue'
     required:
     - context
     - exten
@@ -206,3 +207,8 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/LineRelationBase'
+  ExtensionRelationQueue:
+    properties:
+      queue:
+        readOnly: true
+        $ref: '#/definitions/QueueRelationBase'
