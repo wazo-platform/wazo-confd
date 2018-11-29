@@ -36,39 +36,35 @@ class TestAuthenticationBase(unittest.TestCase):
         self.client = self.app.test_client()
 
 
-@patch('xivo_dao.accesswebservice_dao.get_allowed_hosts')
 class TestAuthenticationAllowedHosts(TestAuthenticationBase):
 
-    def test_when_request_from_local_host_and_local_port_then_calls_action(self, get_allowed_hosts):
-        get_allowed_hosts.return_value = []
-
-        response = self.client.get('/', environ_overrides={'REMOTE_ADDR': '127.0.0.1', 'SERVER_PORT': '9487'})
-
-        assert_that(response.status_code, equal_to(200))
-        assert_that(response.data, equal_to('called'))
-
-    def test_when_request_from_allowed_host_then_calls_action(self, get_allowed_hosts):
-        get_allowed_hosts.return_value = ['192.168.0.1']
-
-        response = self.client.get('/', environ_overrides={'REMOTE_ADDR': '192.168.0.1', 'SERVER_PORT': '9486'})
+    def test_when_request_from_local_host_and_local_port_then_calls_action(self):
+        response = self.client.get(
+            '/',
+            environ_overrides={'REMOTE_ADDR': '127.0.0.1', 'SERVER_PORT': '9487'}
+        )
 
         assert_that(response.status_code, equal_to(200))
         assert_that(response.data, equal_to('called'))
 
-    def test_when_request_from_local_host_and_remote_port_then_request_refused(self, get_allowed_hosts):
-        get_allowed_hosts.return_value = []
+    def test_when_request_from_remote_host_and_local_port_then_request_refused(self):
+        response = self.client.get(
+            '/',
+            environ_overrides={'REMOTE_ADDR': '192.168.0.1', 'SERVER_PORT': '9487'}
+        )
 
-        response = self.client.get('/', environ_overrides={'REMOTE_ADDR': '127.0.0.1', 'SERVER_PORT': '9486'})
+        assert_that(response.status_code, equal_to(401))
+
+    def test_when_request_from_local_host_and_remote_port_then_request_refused(self):
+        response = self.client.get(
+            '/',
+            environ_overrides={'REMOTE_ADDR': '127.0.0.1', 'SERVER_PORT': '9486'}
+        )
 
         assert_that(response.status_code, equal_to(401))
 
 
 class TestAuthenticationCredentials(TestAuthenticationBase):
-
-    def setUp(self):
-        patch('xivo_dao.accesswebservice_dao.get_allowed_hosts', return_value=[]).start()
-        patch('xivo_dao.accesswebservice_dao.get_password').start()
-        super(TestAuthenticationCredentials, self).setUp()
 
     def tearDown(self):
         patch.stopall()
@@ -85,9 +81,11 @@ class TestAuthenticationCredentials(TestAuthenticationBase):
 
         with patch.object(self.auth, 'authenticate') as mock_auth:
             mock_auth.return_value = True
-            response = self.client.get('/',
-                                       environ_base={'REMOTE_ADDR': '192.168.0.1'},
-                                       headers={'Authorization': auth})
+            response = self.client.get(
+                '/',
+                environ_base={'REMOTE_ADDR': '192.168.0.1'},
+                headers={'Authorization': auth}
+            )
 
             assert_that(mock_auth.call_count, equal_to(1))
             assert_that(response.status_code, equal_to(200))
@@ -97,8 +95,6 @@ class TestAuthenticationCredentials(TestAuthenticationBase):
 class TestAuthenticationToken(TestAuthenticationBase):
 
     def setUp(self):
-        patch('xivo_dao.accesswebservice_dao.get_allowed_hosts', return_value=[]).start()
-        patch('xivo_dao.accesswebservice_dao.get_password').start()
         super(TestAuthenticationToken, self).setUp()
         self.auth_verifier = Mock(AuthVerifier)
         self.auth.auth_verifier = self.auth_verifier
