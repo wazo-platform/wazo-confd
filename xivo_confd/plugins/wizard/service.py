@@ -2,6 +2,7 @@
 # Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import logging
 import netifaces
 import random
 import re
@@ -20,6 +21,24 @@ from .validator import build_validator
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = r'^nameserver (.*)'
 PHONEBOOK_BODY = {'name': 'wazo'}
+ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
+ASTERISK_AUTOPROV_CONFIG_TPL = '''\
+[global](+)
+default_outbound_endpoint = {username}
+
+[{username}](autoprov-endpoint)
+aors = {username}
+auth = {username}-auth
+
+[{username}](autoprov-aor)
+
+[{username}-auth]
+type = auth
+username = {username}
+password = {password}
+'''
+
+logger = logging.getLogger(__name__)
 
 
 class WizardService(object):
@@ -39,7 +58,6 @@ class WizardService(object):
 
     def create(self, wizard):
         self.validator.validate_create(wizard)
-        autoprov_username = self._generate_autoprov_username()
         tenant_uuid = self.tenant_dao.find().uuid
 
         if wizard['steps']['database']:
@@ -51,7 +69,17 @@ class WizardService(object):
                                 wizard['network']['nameservers'],
                                 wizard['steps'])
         if wizard['steps']['provisioning']:
-            self._initialize_provd(wizard['network']['ip_address'], autoprov_username)
+            autoprov_username = self._generate_autoprov_username()
+            autoprov_password = self._generate_phone_password(length=8)
+
+            self._initialize_provd(
+                wizard['network']['ip_address'],
+                autoprov_username,
+                autoprov_password,
+            )
+
+            self._add_asterisk_autoprov_config(autoprov_username, autoprov_password)
+
         entity_display_name = wizard['entity_name']
         entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
         if wizard['steps']['phonebook']:
@@ -63,6 +91,19 @@ class WizardService(object):
         self.notifier.created()
         wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
+
+    def _add_asterisk_autoprov_config(self, autoprov_username, autoprov_password):
+        content = ASTERISK_AUTOPROV_CONFIG_TPL.format(
+            username=autoprov_username,
+            password=autoprov_password,
+        )
+
+        try:
+            with open(ASTERISK_AUTOPROV_CONFIG_FILENAME, 'w') as fobj:
+                fobj.write(content)
+        except IOError as e:
+            logger.info('%s', e)
+            logger.warning('failed to create the Asterisk autoprov configuration file')
 
     def _send_sysconfd_cmd(self, hostname, domain, nameserver, steps):
         if steps['manage_services']:
@@ -90,7 +131,7 @@ class WizardService(object):
         self._auth_client.set_token(token)
         self._auth_client.tenants.new(uuid=str(tenant_uuid), name=tenant_name)
 
-    def _initialize_provd(self, address, autoprov_username):
+    def _initialize_provd(self, address, autoprov_username, autoprov_password):
         default_config = {'X_type': 'registrar',
                           'id': 'default',
                           'deletable': False,
@@ -125,7 +166,7 @@ class WizardService(object):
                            u'raw_config': {u'sccp_call_managers': {u'1': {u'ip': address}},
                                            u'sip_lines': {u'1': {u'display_name': u'Autoprov',
                                                                  u'number': u'autoprov',
-                                                                 u'password': u'autoprov',
+                                                                 u'password': autoprov_password,
                                                                  u'proxy_ip': address,
                                                                  u'registrar_ip': address,
                                                                  u'username': autoprov_username}}},
