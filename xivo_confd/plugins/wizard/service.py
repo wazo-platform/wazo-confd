@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import netifaces
+import random
 import re
 import socket
 import string
@@ -38,7 +39,7 @@ class WizardService(object):
 
     def create(self, wizard):
         self.validator.validate_create(wizard)
-        autoprov_username = 'anonymous'
+        autoprov_username = self._generate_autoprov_username()
         tenant_uuid = self.tenant_dao.find().uuid
 
         if wizard['steps']['database']:
@@ -134,6 +135,10 @@ class WizardService(object):
         self.provd_client.config_manager().add(default_config)
         self.provd_client.config_manager().add(device_config)
         self.provd_client.config_manager().add(autoprov_config)
+
+    def _generate_autoprov_username(self):
+        suffix = ''.join(random.choice(USERNAME_VALUES) for _ in range(8))
+        return 'ap{}'.format(suffix)
 
     def _generate_phone_password(self, length):
         chars = string.ascii_letters + string.digits

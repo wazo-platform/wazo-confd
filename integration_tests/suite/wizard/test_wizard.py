@@ -460,6 +460,9 @@ class TestWizard(IntegrationTest):
     def validate_provd(self, ip_address):
         configs = self.provd.configs.find()
 
+        autoprov_username = configs[1]['raw_config']['sip_lines']['1']['username']
+        assert_that(autoprov_username, starts_with('ap'))
+
         expected_config = [
             {u'X_type': u'registrar',
              u'deletable': False,
@@ -479,7 +482,7 @@ class TestWizard(IntegrationTest):
                                                    u'password': u'autoprov',
                                                    u'proxy_ip': ip_address,
                                                    u'registrar_ip': ip_address,
-                                                   u'username': 'anonymous'}}},
+                                                   u'username': autoprov_username}}},
              u'role': u'autocreate'},
             {u'X_type': u'internal',
              u'deletable': False,
