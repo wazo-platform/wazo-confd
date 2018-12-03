@@ -665,3 +665,11 @@ def test_that_users_can_be_deleted_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.user()
+def test_bus_events(user):
+    required_body = {'firstname': 'test-event-user'}
+    yield s.check_bus_event, 'config.user.created', confd.users.post, required_body
+    yield s.check_bus_event, 'config.user.edited', confd.users(user['id']).put
+    yield s.check_bus_event, 'config.user.deleted', confd.users(user['id']).delete
