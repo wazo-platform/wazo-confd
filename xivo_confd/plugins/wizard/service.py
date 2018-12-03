@@ -64,10 +64,6 @@ class WizardService(object):
             with session_scope():
                 wizard_db.create(wizard, tenant_uuid)
 
-        self._send_sysconfd_cmd(wizard['network']['hostname'],
-                                wizard['network']['domain'],
-                                wizard['network']['nameservers'],
-                                wizard['steps'])
         if wizard['steps']['provisioning']:
             autoprov_username = self._generate_autoprov_username()
             autoprov_password = self._generate_phone_password(length=8)
@@ -79,6 +75,11 @@ class WizardService(object):
             )
 
             self._add_asterisk_autoprov_config(autoprov_username, autoprov_password)
+
+        self._send_sysconfd_cmd(wizard['network']['hostname'],
+                                wizard['network']['domain'],
+                                wizard['network']['nameservers'],
+                                wizard['steps'])
 
         entity_display_name = wizard['entity_name']
         entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
@@ -106,6 +107,8 @@ class WizardService(object):
             logger.warning('failed to create the Asterisk autoprov configuration file')
 
     def _send_sysconfd_cmd(self, hostname, domain, nameserver, steps):
+        if steps['provisioning']:
+            self.sysconfd.exec_request_handlers({'chown_autoprov_config': []})
         if steps['manage_services']:
             self.sysconfd.xivo_service_enable()
             self.sysconfd.flush()
