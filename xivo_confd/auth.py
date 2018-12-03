@@ -12,7 +12,6 @@ from flask import request
 from flask_httpauth import HTTPDigestAuth
 
 from xivo.auth_verifier import AuthVerifier, required_acl
-from xivo_dao import accesswebservice_dao
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +24,6 @@ class Authentication(HTTPDigestAuth):
 
     def __init__(self):
         super(Authentication, self).__init__()
-        self.get_password(accesswebservice_dao.get_password)
         self.auth_verifier = AuthVerifier()
         self._auth_host = None
         self._auth_port = None
@@ -54,12 +52,11 @@ class Authentication(HTTPDigestAuth):
         return decorated
 
     def _remote_address_allowed(self):
-        # check localhost first to avoid accessing the database for nothing
         remote_addr = request.environ.get('werkzeug.proxy_fix.orig_remote_addr', request.remote_addr)
         remote_port = request.environ['SERVER_PORT']
         if remote_addr == self.ALLOWED_HOST and remote_port == self._allowed_port:
             return True
-        return remote_addr in accesswebservice_dao.get_allowed_hosts()
+        return False
 
     def _verify_token(self, func, *args, **kwargs):
         try:
