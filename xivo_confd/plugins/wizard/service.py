@@ -8,9 +8,7 @@ import random
 import re
 import socket
 import string
-import os
 
-from pwd import getpwnam
 from os import urandom
 from xivo_dao.helpers.db_utils import session_scope
 
@@ -95,13 +93,6 @@ class WizardService(object):
         return wizard
 
     def _add_asterisk_autoprov_config(self, autoprov_username, autoprov_password):
-        try:
-            user = getpwnam('asterisk')
-        except KeyError:
-            logger.warning('failed to find user asterisk')
-            logger.warning('failed to create the Asterisk autoprov configuration file')
-            return
-
         content = ASTERISK_AUTOPROV_CONFIG_TPL.format(
             username=autoprov_username,
             password=autoprov_password,
@@ -110,7 +101,6 @@ class WizardService(object):
         try:
             with open(ASTERISK_AUTOPROV_CONFIG_FILENAME, 'w') as fobj:
                 fobj.write(content)
-            os.chown(ASTERISK_AUTOPROV_CONFIG_FILENAME, user.pw_uid, user.pw_gid)
         except IOError as e:
             logger.info('%s', e)
             logger.warning('failed to create the Asterisk autoprov configuration file')
