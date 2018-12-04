@@ -16,6 +16,7 @@ from hamcrest import (
     has_item,
     has_length,
     is_not,
+    starts_with,
 )
 
 from xivo_test_helpers import until
@@ -460,51 +461,68 @@ class TestWizard(IntegrationTest):
     def validate_provd(self, ip_address):
         configs = self.provd.configs.find()
 
-        expected_config = [
-            {u'X_type': u'registrar',
-             u'deletable': False,
-             u'displayname': u'local',
-             u'id': u'default',
-             u'parent_ids': [],
-             u'proxy_main': ip_address,
-             u'raw_config': {u'X_key': u'xivo'},
-             u'registrar_main': ip_address},
-            {u'X_type': u'internal',
-             u'deletable': False,
-             u'id': u'autoprov',
-             u'parent_ids': [u'base', u'defaultconfigdevice'],
-             u'raw_config': {u'sccp_call_managers': {u'1': {u'ip': ip_address}},
-                             u'sip_lines': {u'1': {u'display_name': u'Autoprov',
-                                                   u'number': u'autoprov',
-                                                   u'password': u'autoprov',
-                                                   u'proxy_ip': ip_address,
-                                                   u'registrar_ip': ip_address,
-                                                   u'username': 'anonymous'}}},
-             u'role': u'autocreate'},
-            {u'X_type': u'internal',
-             u'deletable': False,
-             u'id': u'base',
-             u'parent_ids': [],
-             u'raw_config': {u'X_xivo_phonebook_ip': ip_address,
-                             u'ntp_enabled': True,
-                             u'ntp_ip': ip_address}},
-            has_entries({u'X_type': u'device',
-                         u'deletable': False,
-                         u'id': u'defaultconfigdevice',
-                         u'label': u'Default config device',
-                         u'parent_ids': [],
-                         u'raw_config': has_entries({
-                             u'ntp_enabled': True,
-                             u'ntp_ip': ip_address,
-                             u'sip_dtmf_mode': u'RTP-out-of-band',
-                             u'admin_username': 'admin',
-                             u'admin_password': has_length(16),
-                             u'user_username': 'user',
-                             u'user_password': has_length(16)
-                         })})
-        ]
-
-        assert_that(configs, contains_inanyorder(*expected_config))
+        assert_that(
+            configs,
+            contains_inanyorder(
+                has_entries(
+                    X_type=u'registrar',
+                    deletable=False,
+                    displayname=u'local',
+                    id=u'default',
+                    parent_ids=[],
+                    proxy_main=ip_address,
+                    raw_config={u'X_key': u'xivo'},
+                    registrar_main=ip_address,
+                ),
+                has_entries(
+                    X_type=u'internal',
+                    deletable=False,
+                    id=u'autoprov',
+                    parent_ids=[u'base', u'defaultconfigdevice'],
+                    raw_config=has_entries(
+                        sccp_call_managers={u'1': {u'ip': ip_address}},
+                        sip_lines=has_entries(
+                            '1', has_entries(
+                                display_name=u'Autoprov',
+                                number=u'autoprov',
+                                password=has_length(8),
+                                proxy_ip=ip_address,
+                                registrar_ip=ip_address,
+                                username=starts_with('ap')
+                            )
+                        )
+                    ),
+                    role=u'autocreate',
+                ),
+                has_entries(
+                    X_type=u'internal',
+                    deletable=False,
+                    id=u'base',
+                    parent_ids=[],
+                    raw_config={
+                        u'X_xivo_phonebook_ip': ip_address,
+                        u'ntp_enabled': True,
+                        u'ntp_ip': ip_address,
+                    },
+                ),
+                has_entries(
+                    X_type=u'device',
+                    deletable=False,
+                    id=u'defaultconfigdevice',
+                    label=u'Default config device',
+                    parent_ids=[],
+                    raw_config=has_entries(
+                        ntp_enabled=True,
+                        ntp_ip=ip_address,
+                        sip_dtmf_mode=u'RTP-out-of-band',
+                        admin_username='admin',
+                        admin_password=has_length(16),
+                        user_username='user',
+                        user_password=has_length(16)
+                    )
+                )
+            )
+        )
 
 
 class TestWizardSteps(IntegrationTest):
