@@ -29,74 +29,93 @@ RESOLVCONF_NAMESERVERS = ['127.0.0.11']
 TIMEZONE = 'America/Montreal'
 DOMAIN = 'example.com'
 
-COMPLETE_POST_BODY = {'admin_password': 'password',
-                      'license': True,
-                      'language': 'en_US',
-                      'entity_name': 'Test_Entity',
-                      'timezone': 'America/Montreal',
-                      'network': {'hostname': 'Tutu',
-                                  'domain': 'domain.example.com',
-                                  'interface': 'eth0',
-                                  'ip_address': '127.0.0.1',
-                                  'netmask': '255.255.0.0',
-                                  'gateway': '127.2.5.1',
-                                  'nameservers': ['8.8.8.8', '1.2.3.4']},
-                      'context_internal': {'display_name': 'Default',
-                                           'number_start': '1000',
-                                           'number_end': '1999'},
-                      'context_incall': {'display_name': 'Incalls',
-                                         'number_start': '2000',
-                                         'number_end': '2999',
-                                         'did_length': 4},
-                      'context_outcall': {'display_name': 'Outcalls'},
-                      'steps': {
-                          'database': True,
-                          'manage_services': True,
-                          'manage_hosts_file': True,
-                          'manage_resolv_file': True,
-                          'commonconf': True,
-                          'provisioning': True,
-                          'phonebook': True,
-                          'tenant': True,
-                      }}
+COMPLETE_POST_BODY = {
+    'admin_password': 'password',
+    'license': True,
+    'language': 'en_US',
+    'entity_name': 'Test_Entity',
+    'timezone': 'America/Montreal',
+    'network': {
+        'hostname': 'Tutu',
+        'domain': 'domain.example.com',
+        'interface': 'eth0',
+        'ip_address': '127.0.0.1',
+        'netmask': '255.255.0.0',
+        'gateway': '127.2.5.1',
+        'nameservers': ['8.8.8.8', '1.2.3.4']
+    },
+    'context_internal': {
+        'display_name': 'Default',
+        'number_start': '1000',
+        'number_end': '1999'
+    },
+    'context_incall': {
+        'display_name': 'Incalls',
+        'number_start': '2000',
+        'number_end': '2999',
+        'did_length': 4
+    },
+    'context_outcall': {'display_name': 'Outcalls'},
+    'steps': {
+        'database': True,
+        'manage_services': True,
+        'manage_hosts_file': True,
+        'manage_resolv_file': True,
+        'commonconf': True,
+        'provisioning': True,
+        'phonebook': True,
+        'tenant': True,
+    }
+}
 
-MINIMAL_POST_BODY = {'admin_password': 'password',
-                     'license': True,
-                     'timezone': 'America/Montreal',
-                     'entity_name': 'xivo',
-                     'network': {'hostname': 'Tutu',
-                                 'domain': 'domain.example.com',
-                                 'interface': 'eth0',
-                                 'ip_address': '127.0.0.1',
-                                 'netmask': '255.255.0.0',
-                                 'gateway': '127.2.5.1',
-                                 'nameservers': ['8.8.8.8']},
-                     'context_internal': {'number_start': '1000',
-                                          'number_end': '1999'}}
+MINIMAL_POST_BODY = {
+    'admin_password': 'password',
+    'license': True,
+    'timezone': 'America/Montreal',
+    'entity_name': 'xivo',
+    'network': {
+        'hostname': 'Tutu',
+        'domain': 'domain.example.com',
+        'interface': 'eth0',
+        'ip_address': '127.0.0.1',
+        'netmask': '255.255.0.0',
+        'gateway': '127.2.5.1',
+        'nameservers': ['8.8.8.8']
+    },
+    'context_internal': {
+        'number_start': '1000',
+        'number_end': '1999'
+    }
+}
 
-DISABLED_STEPS_POST_BODY = {'admin_password': 'password',
-                            'license': True,
-                            'timezone': 'America/Montreal',
-                            'entity_name': 'xivo',
-                            'network': {'hostname': 'Tutu',
-                                        'domain': 'domain.example.com',
-                                        'interface': 'eth0',
-                                        'ip_address': '127.0.0.1',
-                                        'netmask': '255.255.0.0',
-                                        'gateway': '127.2.5.1',
-                                        'nameservers': ['8.8.8.8']},
-                            'context_internal': {'number_start': '1000',
-                                                 'number_end': '1999'},
-                            'steps': {
-                                'database': False,
-                                'manage_services': False,
-                                'manage_hosts_file': False,
-                                'manage_resolv_file': False,
-                                'commonconf': False,
-                                'provisioning': False,
-                                'phonebook': False,
-                                'tenant': False,
-                            }}
+DISABLED_STEPS_POST_BODY = {
+    'admin_password': 'password',
+    'license': True,
+    'timezone': 'America/Montreal',
+    'entity_name': 'xivo',
+    'network': {
+        'hostname': 'Tutu',
+        'domain': 'domain.example.com',
+        'interface': 'eth0',
+        'ip_address': '127.0.0.1',
+        'netmask': '255.255.0.0',
+        'gateway': '127.2.5.1',
+        'nameservers': ['8.8.8.8']},
+    'context_internal': {
+        'number_start': '1000',
+        'number_end': '1999'
+    },
+    'steps': {
+        'database': False,
+        'manage_services': False,
+        'manage_hosts_file': False,
+        'manage_resolv_file': False,
+        'commonconf': False,
+        'provisioning': False,
+        'phonebook': False,
+        'tenant': False,
+    }
+}
 
 
 def build_string(length):
@@ -197,10 +216,9 @@ class TestWizardErrors(IntegrationTest):
         self.check_network_bogus_field_returns_error('nameservers', True)
         self.check_network_bogus_field_returns_error('nameservers', 'string')
         self.check_network_bogus_field_returns_error('nameservers', ['1234.168.0.1'])
-        self.check_network_bogus_field_returns_error('nameservers', ['192.168.0.1',
-                                                                     '192.168.0.2',
-                                                                     '192.168.0.3',
-                                                                     '192.168.0.4'])
+        self.check_network_bogus_field_returns_error(
+            'nameservers', ['192.168.0.1', '192.168.0.2', '192.168.0.3', '192.168.0.4']
+        )
 
     def test_error_gateway(self):
         self.check_network_bogus_field_returns_error('gateway', 1234)
@@ -378,9 +396,11 @@ class TestWizardDefaultValue(IntegrationTest):
             assert_that(queries.sip_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))
-            assert_that(queries.context_has_internal('Default',
-                                                     body['context_internal']['number_start'],
-                                                     body['context_internal']['number_end']))
+            assert_that(queries.context_has_internal(
+                'Default',
+                body['context_internal']['number_start'],
+                body['context_internal']['number_end']
+            ))
             assert_that(queries.context_has_incall('Incalls'))
             assert_that(queries.context_has_outcall('Outcalls'))
 
@@ -418,18 +438,26 @@ class TestWizard(IntegrationTest):
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
             assert_that(queries.general_has_timezone(data['timezone']))
-            assert_that(queries.resolvconf_is_configured(data['network']['hostname'],
-                                                         data['network']['domain'],
-                                                         data['network']['nameservers']))
-            assert_that(queries.netiface_is_configured(data['network']['ip_address'],
-                                                       data['network']['gateway']))
-            assert_that(queries.context_has_internal(data['context_internal']['display_name'],
-                                                     data['context_internal']['number_start'],
-                                                     data['context_internal']['number_end']))
-            assert_that(queries.context_has_incall(data['context_incall']['display_name'],
-                                                   data['context_incall']['number_start'],
-                                                   data['context_incall']['number_end'],
-                                                   data['context_incall']['did_length']))
+            assert_that(queries.resolvconf_is_configured(
+                data['network']['hostname'],
+                data['network']['domain'],
+                data['network']['nameservers']
+            ))
+            assert_that(queries.netiface_is_configured(
+                data['network']['ip_address'],
+                data['network']['gateway']
+            ))
+            assert_that(queries.context_has_internal(
+                data['context_internal']['display_name'],
+                data['context_internal']['number_start'],
+                data['context_internal']['number_end']
+            ))
+            assert_that(queries.context_has_incall(
+                data['context_incall']['display_name'],
+                data['context_incall']['number_start'],
+                data['context_incall']['number_end'],
+                data['context_incall']['did_length']
+            ))
             assert_that(queries.context_has_outcall(data['context_outcall']['display_name']))
             assert_that(queries.context_has_switchboard())
             assert_that(queries.internal_context_include_outcall_context())
@@ -438,31 +466,51 @@ class TestWizard(IntegrationTest):
             assert_that(queries.phonebook_source_is_configured())
 
     def validate_sysconfd(self, sysconfd, data):
-        sysconfd.assert_request('/xivoctl',
-                                method='POST',
-                                body=json.dumps({'wazo-service': 'enable'}))
-        sysconfd.assert_request('/xivoctl',
-                                method='POST',
-                                body=json.dumps({'wazo-service': 'start'}))
-        sysconfd.assert_request('/hosts',
-                                method='POST',
-                                body=json.dumps({'hostname': data['network']['hostname'],
-                                                 'domain': data['network']['domain']}))
-        sysconfd.assert_request('/resolv_conf',
-                                method='POST',
-                                body=json.dumps({'nameservers': data['network']['nameservers'],
-                                                 'search': [data['network']['domain']]}))
-        sysconfd.assert_request('/commonconf_generate',
-                                method='POST',
-                                body=json.dumps({}))
-        sysconfd.assert_request('/commonconf_apply',
-                                method='GET')
-        sysconfd.assert_request('/exec_request_handlers',
-                                method='POST',
-                                body=json.dumps({'chown_autoprov_config': []}))
-        sysconfd.assert_request('/exec_request_handlers',
-                                method='POST',
-                                body=json.dumps({'ipbx': ['module reload res_pjsip.so']}))
+        sysconfd.assert_request(
+            '/xivoctl',
+            method='POST',
+            body=json.dumps({'wazo-service': 'enable'})
+        )
+        sysconfd.assert_request(
+            '/xivoctl',
+            method='POST',
+            body=json.dumps({'wazo-service': 'start'})
+        )
+        sysconfd.assert_request(
+            '/hosts',
+            method='POST',
+            body=json.dumps({
+                'hostname': data['network']['hostname'],
+                'domain': data['network']['domain']
+            })
+        )
+        sysconfd.assert_request(
+            '/resolv_conf',
+            method='POST',
+            body=json.dumps({
+                'nameservers': data['network']['nameservers'],
+                'search': [data['network']['domain']]
+            })
+        )
+        sysconfd.assert_request(
+            '/commonconf_generate',
+            method='POST',
+            body=json.dumps({})
+        )
+        sysconfd.assert_request(
+            '/commonconf_apply',
+            method='GET'
+        )
+        sysconfd.assert_request(
+            '/exec_request_handlers',
+            method='POST',
+            body=json.dumps({'chown_autoprov_config': []})
+        )
+        sysconfd.assert_request(
+            '/exec_request_handlers',
+            method='POST',
+            body=json.dumps({'ipbx': ['module reload res_pjsip.so']})
+        )
 
     def validate_provd(self, ip_address):
         configs = self.provd.configs.find()
@@ -561,20 +609,32 @@ class TestWizardSteps(IntegrationTest):
             assert_that(queries.admin_has_password('proformatique'))
 
     def validate_sysconfd(self, sysconfd, data):
-        sysconfd.assert_no_request('/xivoctl',
-                                   method='POST',
-                                   body=json.dumps({'wazo-service': 'enable'}))
-        sysconfd.assert_no_request('/hosts',
-                                   method='POST',
-                                   body=json.dumps({'hostname': data['network']['hostname'],
-                                                    'domain': data['network']['domain']}))
-        sysconfd.assert_no_request('/resolv_conf',
-                                   method='POST',
-                                   body=json.dumps({'nameservers': data['network']['nameservers'],
-                                                    'search': [data['network']['domain']]}))
-        sysconfd.assert_no_request('/commonconf_generate',
-                                   method='POST',
-                                   body=json.dumps({}))
+        sysconfd.assert_no_request(
+            '/xivoctl',
+            method='POST',
+            body=json.dumps({'wazo-service': 'enable'})
+        )
+        sysconfd.assert_no_request(
+            '/hosts',
+            method='POST',
+            body=json.dumps({
+                'hostname': data['network']['hostname'],
+                'domain': data['network']['domain']
+            })
+        )
+        sysconfd.assert_no_request(
+            '/resolv_conf',
+            method='POST',
+            body=json.dumps({
+                'nameservers': data['network']['nameservers'],
+                'search': [data['network']['domain']]
+            })
+        )
+        sysconfd.assert_no_request(
+            '/commonconf_generate',
+            method='POST',
+            body=json.dumps({})
+        )
 
     def validate_provd(self):
         configs = self.provd.configs.find()
