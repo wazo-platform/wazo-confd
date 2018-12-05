@@ -457,6 +457,12 @@ class TestWizard(IntegrationTest):
                                 body=json.dumps({}))
         sysconfd.assert_request('/commonconf_apply',
                                 method='GET')
+        sysconfd.assert_request('/exec_request_handlers',
+                                method='POST',
+                                body=json.dumps({'chown_autoprov_config': []}))
+        sysconfd.assert_request('/exec_request_handlers',
+                                method='POST',
+                                body=json.dumps({'ipbx': ['module reload res_pjsip.so']}))
 
     def validate_provd(self, ip_address):
         configs = self.provd.configs.find()
