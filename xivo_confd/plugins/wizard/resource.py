@@ -79,6 +79,7 @@ class WizardStepsSchema(BaseSchema):
     provisioning = fields.Boolean(missing=True)
     phonebook = fields.Boolean(missing=True)
     tenant = fields.Boolean(missing=True)
+    admin = fields.Boolean(missing=True)
 
 
 class WizardSchema(BaseSchema):
