@@ -17,14 +17,7 @@ from xivo_dao.alchemy.resolvconf import Resolvconf
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 from xivo_dao.alchemy.staticiax import StaticIAX
 from xivo_dao.alchemy.staticsip import StaticSIP
-from xivo_dao.alchemy.user import User
 from xivo_dao.helpers.db_manager import Session
-
-
-def set_admin_password(password):
-    row = Session.query(User).filter(User.login == 'root').first()
-    row.passwd = password
-    Session.add(row)
 
 
 def set_default_entity(display_name, name, tenant_uuid):
@@ -202,7 +195,6 @@ def create(wizard, tenant_uuid):
     network = wizard['network']
     entity = entity_unique_name(wizard['entity_name'])
 
-    set_admin_password(wizard['admin_password'])
     set_default_entity(wizard['entity_name'], entity, tenant_uuid)
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
