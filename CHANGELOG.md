@@ -65,6 +65,11 @@ Changelog
 
       * `custom`
 
+* New parameter have been added to the wizard resource:
+
+  * `steps`
+
+
 
 18.09
 -----
