@@ -42,8 +42,8 @@ class SearchEngine(object):
         'description',
     ]
 
-    DIRECTION = {'asc': 1,
-                 'desc': -1}
+    DIRECTION = ['asc',
+                 'desc']
 
     DEFAULT_ORDER = 'ip'
     DEFAULT_DIRECTION = 'asc'
@@ -56,7 +56,6 @@ class SearchEngine(object):
         provd_devices = self.find_all_devices(parameters)
         provd_devices = self.filter_devices(provd_devices,
                                             parameters.get('search'))
-
         total = len(provd_devices)
 
         provd_devices = self.paginate_devices(provd_devices,
@@ -82,8 +81,7 @@ class SearchEngine(object):
                  if key in self.PROVD_DEVICE_KEYS}
         order = parameters.get('order', self.DEFAULT_ORDER)
         direction = parameters.get('direction', self.DEFAULT_DIRECTION)
-        sort_direction = self.DIRECTION[direction]
-        return self.dao.devices.find(query, sort=(order, sort_direction))
+        return self.dao.devices.list(search=query, order=order, direction=direction)['devices']
 
     def filter_devices(self, devices, search=None):
         if search is None:
