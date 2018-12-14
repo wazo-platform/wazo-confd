@@ -2,7 +2,7 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_provd_client import new_provisioning_client_from_config
+from wazo_provd_client import Client as ProvdClient
 
 from .resource import UserItem, UserList
 from .resource_sub import (
@@ -26,7 +26,7 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        provd_client = new_provisioning_client_from_config(config['provd'])
+        provd_client = ProvdClient(**config['provd'])
 
         service = build_service(provd_client)
         service_callservice = build_service_callservice()
