@@ -1,6 +1,6 @@
+git+https://github.com/wazo-pbx/wazo-provd-client.git
 git+https://github.com/wazo-pbx/xivo-auth-client.git
 git+https://github.com/wazo-pbx/xivo-lib-rest-client.git
-git+https://github.com/wazo-pbx/xivo-provd-client.git
 git+https://github.com/wazo-pbx/xivo-test-helpers.git
 docker-compose
 docker
