@@ -73,6 +73,10 @@ DEFAULT_CONFIG = {
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
     },
     'provd': {
+        'host': 'localhost',
+        'port': 8666,
+        'verify_certificate': False,
+        'prefix': '/provd'
     },
     'sysconfd': {
         'host': 'localhost',
