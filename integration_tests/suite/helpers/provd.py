@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -9,7 +9,8 @@ import docker
 from datetime import datetime
 
 from hamcrest import assert_that, equal_to, has_item, starts_with
-from xivo_provd_client import new_provisioning_client, NotFoundError
+from wazo_provd_client import Client
+from wazo_provd_client.exceptions import ProvdError
 
 
 class ProvdHelper(object):
@@ -62,11 +63,11 @@ class ProvdHelper(object):
 
     @property
     def configs(self):
-        return self.client.config_manager()
+        return self.client.configs
 
     @property
     def devices(self):
-        return self.client.device_manager()
+        return self.client.devices
 
     def reset(self):
         self.clean_devices()
@@ -74,16 +75,16 @@ class ProvdHelper(object):
         self.add_default_configs()
 
     def clean_devices(self):
-        for device in self.devices.find():
-            self.devices.remove(device['id'])
+        for device in self.devices.list()['devices']:
+            self.devices.delete(device['id'])
 
     def clean_configs(self):
-        for config in self.configs.find():
-            self.configs.remove(config['id'])
+        for config in self.configs.list()['configs']:
+            self.configs.delete(config['id'])
 
     def add_default_configs(self):
         for config in self.DEFAULT_CONFIGS:
-            self.configs.add(config)
+            self.configs.create(config)
 
     def add_device_template(self):
         config = {
@@ -106,14 +107,14 @@ class ProvdHelper(object):
         }
         self.configs.add(config)
 
-        device = self.devices.get(device_id)
+        device = self.devices.get(device_id)['device']
         device['config'] = device_id
         self.devices.update(device)
 
     def assert_config_does_not_exist(self, config_id):
         try:
             self.configs.get(config_id)
-        except NotFoundError:
+        except ProvdError:
             return
         else:
             raise AssertionError('config "{}" exists in xivo-provd'.format(config_id))
@@ -150,6 +151,5 @@ class ProvdHelper(object):
 
 
 def create_helper(host='localhost', port='8666'):
-    url = "http://{host}:{port}/provd".format(host=host, port=port)
-    client = new_provisioning_client(url)
+    client = Client(host=host, port=port, prefix='/provd')
     return ProvdHelper(client)
