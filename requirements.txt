@@ -1,12 +1,12 @@
-git+https://github.com/wazo-pbx/xivo-auth-client.git
-git+https://github.com/wazo-pbx/wazo-provd-client.git
 git+https://github.com/wazo-pbx/wazo-dird-client.git
+git+https://github.com/wazo-pbx/wazo-provd-client.git
+git+https://github.com/wazo-pbx/xivo-auth-client.git
 git+https://github.com/wazo-pbx/xivo-bus.git
 git+https://github.com/wazo-pbx/xivo-dao.git
 git+https://github.com/wazo-pbx/xivo-lib-python.git
 git+https://github.com/wazo-pbx/xivo-lib-rest-client.git  # from xivo-auth-client
-cherrypy==17.4.0
 cheroot==6.5.2
+cherrypy==17.4.0
 flask-cors==3.0.2
 flask-httpauth==3.2.1
 flask-restful==0.3.5
@@ -16,8 +16,8 @@ marshmallow==2.16.3
 netifaces==0.10.4
 psycopg2==2.6.2  # from xivo-dao
 python-consul==0.7.0
+pytz==2016.7
 pyyaml==3.12
 requests==2.20.0
 sqlalchemy==1.0.15  # from xivo-dao
 stevedore==1.17.1
-pytz==2016.7
