@@ -9,7 +9,7 @@ import docker
 from datetime import datetime
 
 from hamcrest import assert_that, equal_to, has_item, starts_with
-from wazo_provd_client import Client
+from wazo_provd_client import Client as ProvdClient
 from wazo_provd_client.exceptions import ProvdError
 
 
@@ -95,7 +95,7 @@ class ProvdHelper(object):
             'raw_config': {},
         }
 
-        return self.configs.add(config)
+        return self.configs.create(config)['id']
 
     def associate_line_device(self, device_id):
         # line <-> device association is an operation that is currently performed
@@ -105,9 +105,9 @@ class ProvdHelper(object):
             'parent_ids': [],
             'raw_config': {},
         }
-        self.configs.add(config)
+        self.configs.create(config)
 
-        device = self.devices.get(device_id)['device']
+        device = self.devices.get(device_id)
         device['config'] = device_id
         self.devices.update(device)
 
@@ -151,5 +151,5 @@ class ProvdHelper(object):
 
 
 def create_helper(host='localhost', port='8666'):
-    client = Client(host=host, port=port, prefix='/provd')
+    client = ProvdClient(host=host, port=port, verify_certificate=False, prefix='/provd', token='valid-token')
     return ProvdHelper(client)
