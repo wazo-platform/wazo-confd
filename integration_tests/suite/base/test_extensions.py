@@ -216,6 +216,13 @@ def test_create_multi_tenant(in_main):
     response.assert_status(400)
 
 
+@fixtures.extension(context=CONTEXT)
+@fixtures.extension(context=CONTEXT)
+def test_edit_extension_with_same_exten(extension1, extension2):
+    response = confd.extensions(extension1['id']).put(exten=extension2['exten'])
+    response.assert_status(400)
+
+
 @fixtures.extension(exten=gen_conference_exten(), context=CONTEXT)
 @fixtures.conference()
 def test_edit_extension_conference_with_exten_outside_range(extension, conference):
