@@ -3,7 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
+import signal
 import sys
+
+from functools import partial
 
 from xivo import xivo_logging
 from xivo.config_helper import set_xivo_uuid, UUIDNotFound
@@ -35,6 +38,11 @@ def main(argv=None):
             raise
 
     controller = Controller(config)
+    signal.signal(signal.SIGTERM, partial(sigterm, controller))
 
     with pidfile_context(config['pid_filename'], FOREGROUND):
         controller.run()
+
+
+def sigterm(controller, signum, frame):
+    controller.stop(reason='SIGTERM')

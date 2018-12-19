@@ -6,6 +6,7 @@ import os
 import logging
 import cherrypy
 
+from cherrypy.process.wspbus import states
 from cherrypy.process.servers import ServerAdapter
 from cheroot import wsgi
 from flask import Flask, g
@@ -29,7 +30,6 @@ logger = logging.getLogger(__name__)
 app = Flask('xivo_confd')
 api = Api(app, prefix="/1.1")
 _do_not_log_data_endpoints = []
-cherrypy.engine.signal_handler.set_handler('SIGTERM', cherrypy.engine.exit)
 
 
 def get_bus_publisher():
@@ -112,7 +112,6 @@ class HTTPServer(object):
         http_config = self.config['http']
         https_config = self.config['https']
 
-        cherrypy.engine.signal_handler.set_handler('SIGTERM', cherrypy.engine.exit)
         if self.config['profile']:
             app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
                                               profile_dir=self.config['profile'])
@@ -152,5 +151,16 @@ class HTTPServer(object):
         else:
             logger.debug('HTTP server is disabled')
 
-        cherrypy.engine.start()
-        cherrypy.engine.block()
+        try:
+            cherrypy.engine.start()
+            cherrypy.engine.wait(states.EXITING)
+        except KeyboardInterrupt:
+            logger.warning('Stopping xivo-confd: KeyboardInterrupt')
+            cherrypy.engine.exit()
+
+    def stop(self):
+        cherrypy.engine.exit()
+
+    def join(self):
+        if cherrypy.engine.state == states.EXITING:
+            cherrypy.engine.block()
