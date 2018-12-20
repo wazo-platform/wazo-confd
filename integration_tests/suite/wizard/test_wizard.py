@@ -143,6 +143,11 @@ class mocks(object):
 
         actions = {'generate': IntegrationTest.setup_sysconfd}
 
+    @classmethod
+    class auth(IsolatedAction):
+
+        actions = {'generate': IntegrationTest.setup_auth}
+
 
 class TestWizardErrors(IntegrationTest):
 
@@ -410,7 +415,8 @@ class TestWizardDefaultValue(IntegrationTest):
 class TestWizard(IntegrationTest):
 
     @mocks.sysconfd()
-    def test_post(self, sysconfd):
+    @mocks.auth()
+    def test_post(self, sysconfd, auth):
         data = copy.deepcopy(COMPLETE_POST_BODY)
         bus_events = self.bus.accumulator('config.wizard.created')
 
@@ -424,6 +430,7 @@ class TestWizard(IntegrationTest):
         assert_that(response.item, equal_to({'configured': True}))
 
         self.validate_db(data)
+        self.validate_auth(auth, data)
         self.validate_sysconfd(sysconfd, data)
         self.validate_provd(data['network']['ip_address'])
 
@@ -465,6 +472,19 @@ class TestWizard(IntegrationTest):
             assert_that(queries.profile_as_phonebook_for_lookup())
             assert_that(queries.profile_as_phonebook_for_reverse_lookup())
             assert_that(queries.phonebook_source_is_configured())
+
+    def validate_auth(self, auth, data):
+        auth.assert_request(
+            '/0.1/tenants',
+            method='POST',
+        )
+        auth.assert_request(
+            '/0.1/users',
+            method='POST',
+            body=json.dumps(
+                {'username': 'root', 'password': data['admin_password'], 'firstname': 'root'}
+            )
+        )
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_request(
@@ -583,7 +603,8 @@ class TestWizard(IntegrationTest):
 class TestWizardSteps(IntegrationTest):
 
     @mocks.sysconfd()
-    def test_post(self, sysconfd):
+    @mocks.auth()
+    def test_post(self, sysconfd, auth):
         data = copy.deepcopy(DISABLED_STEPS_POST_BODY)
         bus_events = self.bus.accumulator('config.wizard.created')
 
@@ -596,6 +617,7 @@ class TestWizardSteps(IntegrationTest):
         response = self.confd.wizard.get()
         assert_that(response.item, equal_to({'configured': True}))
 
+        self.validate_auth(auth, data)
         self.validate_sysconfd(sysconfd, data)
         self.validate_provd()
 
@@ -603,6 +625,16 @@ class TestWizardSteps(IntegrationTest):
             assert_that(bus_events.accumulate(), has_length(1))
 
         until.assert_(assert_bus_event_received, tries=5)
+
+    def validate_auth(self, sysconfd, data):
+        sysconfd.assert_no_request(
+            '/0.1/tenants',
+            method='POST',
+        )
+        sysconfd.assert_no_request(
+            '/0.1/users',
+            method='POST',
+        )
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_no_request(
