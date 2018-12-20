@@ -434,7 +434,6 @@ class TestWizard(IntegrationTest):
 
     def validate_db(self, data):
         with self.db.queries() as queries:
-            assert_that(queries.admin_has_password(data['admin_password']))
             assert_that(queries.entity_has_name_displayname('testentity', data['entity_name']))
             assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
@@ -597,7 +596,6 @@ class TestWizardSteps(IntegrationTest):
         response = self.confd.wizard.get()
         assert_that(response.item, equal_to({'configured': True}))
 
-        self.validate_db(data)
         self.validate_sysconfd(sysconfd, data)
         self.validate_provd()
 
@@ -605,10 +603,6 @@ class TestWizardSteps(IntegrationTest):
             assert_that(bus_events.accumulate(), has_length(1))
 
         until.assert_(assert_bus_event_received, tries=5)
-
-    def validate_db(self, data):
-        with self.db.queries() as queries:
-            assert_that(queries.admin_has_password('proformatique'))
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_no_request(

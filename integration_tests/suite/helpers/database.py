@@ -457,20 +457,6 @@ class DatabaseQueries(object):
 
         return count > 0
 
-    def admin_has_password(self, password):
-        query = text("""SELECT COUNT(*)
-                     FROM "user"
-                     WHERE
-                        login = 'root'
-                        AND passwd = :password
-                     """)
-        count = (self.connection
-                 .execute(query,
-                          password=password)
-                 .scalar())
-
-        return count > 0
-
     def entity_has_name_displayname(self, name, displayname):
         query = text("""SELECT COUNT(*)
                      FROM entity
